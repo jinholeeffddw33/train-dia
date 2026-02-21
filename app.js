@@ -112,10 +112,45 @@ function expandRoute(m) {
   return html;
 }
 
+// 교대 방향 판별 — 상선/하선/기지 출발
+function getRouteDirection(m) {
+  if (!m || m.includes('충당여부') || m.includes('대휴')) return null;
+  const UP = new Set(['방','왕','영','여','애','화','다']);
+  const DOWN = new Set(['군','마','상','기','둔','강']);
+  const parts = m.split(',');
+  for (const p of parts) {
+    const t = p.trim();
+    if (/^\d{4}$/.test(t)) continue;
+    if (t.includes('편승')) continue;
+    // 기지 출발 (첫 구간이 기로 시작하고 답 없음)
+    if (t[0] === '기' && !t.includes('답')) {
+      return { dir: 'depot', label: '고덕기지 출발', sub: '고덕기지에서 직접 출발' };
+    }
+    const dIdx = t.indexOf('답');
+    if (dIdx >= 0 && dIdx < t.length - 1) {
+      const next = t[dIdx + 1];
+      if (next === '(') continue;
+      if (UP.has(next)) {
+        return { dir: 'up', label: '▲ 상선 교대', sub: '방화 방면 승강장' };
+      }
+      if (DOWN.has(next)) {
+        return { dir: 'down', label: '▼ 하선 교대', sub: '마천·하남 방면 승강장' };
+      }
+    }
+  }
+  return null;
+}
+
 function renderRouteVisual(m) {
   if (!m) return '';
+  // 비운행 텍스트 (충당여부, 대휴 등)
+  if (m.includes('충당여부') || m.includes('대휴')) {
+    return `<div class="rv-text-only">${m}</div>`;
+  }
+
+  const dir = getRouteDirection(m);
   const parts = m.split(',');
-  const legs = []; // each leg = array of station names
+  const legs = [];
   let timeCode = '';
   parts.forEach(p => {
     const trimmed = p.trim();
@@ -124,24 +159,44 @@ function renderRouteVisual(m) {
       timeCode = `${hh}:${mm}`;
     } else {
       const stations = [];
+      const raw = [];
       for (const ch of trimmed) {
+        if (ch === '(' || ch === ')') break; // 괄호 이후 텍스트 제외
         stations.push(STATION_ABBR[ch] || ch);
+        raw.push(ch);
       }
-      if (stations.length) legs.push(stations);
+      // 괄호 텍스트 보존
+      const parenMatch = trimmed.match(/\((.+)\)/);
+      const note = parenMatch ? parenMatch[1] : '';
+      if (stations.length) legs.push({ stations, note });
     }
   });
 
-  let html = '<div class="rv-wrap">';
+  const dirCls = dir ? dir.dir : '';
+  let html = '';
+
+  // 교대 방향 배지
+  if (dir) {
+    html += `<div class="rv-dir-badge ${dirCls}">
+      <div class="rv-dir-label">${dir.label}</div>
+      <div class="rv-dir-sub">${dir.sub}</div>
+    </div>`;
+  }
+
+  html += `<div class="rv-wrap ${dirCls}">`;
   legs.forEach((leg, li) => {
-    // Leg separator (교대 시간 표시)
     if (li > 0) {
-      html += `<div class="rv-swap">${timeCode && li === 1 ? `교대 ${timeCode}` : '교대'}</div>`;
+      const swapText = timeCode && li === legs.length - 1 ? `교대 ${timeCode}` :
+                        timeCode && li === 1 ? `교대 ${timeCode}` : '';
+      if (swapText) {
+        html += `<div class="rv-swap">${swapText}</div>`;
+      }
     }
     html += '<div class="rv-leg">';
-    html += '<div class="rv-line"></div>';
-    leg.forEach((st, si) => {
+    html += `<div class="rv-line"></div>`;
+    leg.stations.forEach((st, si) => {
       const isFirst = si === 0;
-      const isLast = si === leg.length - 1;
+      const isLast = si === leg.stations.length - 1;
       const isDap = st === '답십리';
       let cls = 'rv-stop';
       if (isFirst || isLast) cls += ' rv-terminal';
@@ -152,6 +207,9 @@ function renderRouteVisual(m) {
       </div>`;
     });
     html += '</div>';
+    if (leg.note) {
+      html += `<div class="rv-note">${leg.note}</div>`;
+    }
   });
   html += '</div>';
   return html;
@@ -309,10 +367,12 @@ function rHome() {
   } else {
     const tmTime = tmSc ? tmSc.s : '-';
     const tmTypeName = gTypeName(tmTp);
+    const tmDir = tmSc ? getRouteDirection(tmSc.m) : null;
+    const tmDirH = tmDir ? `<span class="sc-dir ${tmDir.dir}">${tmDir.dir === 'up' ? '▲상선' : tmDir.dir === 'down' ? '▼하선' : '🚇기지'}</span>` : '';
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow})${tmHl ? ' · 휴일' : ''}</div>
       <div class="sc-val sc-val-start">${tmTime}</div>
-      <div class="sc-sub">${tmDia} · ${tmTypeName}</div>
+      <div class="sc-sub">${tmDia} · ${tmTypeName} ${tmDirH}</div>
     </div>`;
   }
 

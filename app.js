@@ -50,8 +50,8 @@ function gType(d) {
   if (d === '~' || d.startsWith('휴')) return 'rest';
   if (d.startsWith('대')) return 'standby';
   const n = parseInt(d);
-  if (n >= 61 && n <= 91) return 'night';
-  if (n >= 1 && n <= 43) return 'day';
+  if (n >= 62 && n <= 91) return 'night';
+  if (n >= 1 && n <= 44) return 'day';
   return 'rest';
 }
 
@@ -61,16 +61,18 @@ function gSched(dia, date) {
   const tm = new Date(date);
   tm.setDate(tm.getDate() + 1);
   const th = isH(tm);
-  const tp = gType(dia);
+  // 야간 대기(대61~대66)는 야간 테이블 사용
+  const isNight = gType(dia) === 'night' ||
+    (dia.startsWith('대') && parseInt(dia.replace('대','')) >= 61);
   let t;
-  if (tp === 'day' || tp === 'standby') {
+  if (!isNight) {
     t = h ? S.p_hol : S.p_ord;
-  } else if (tp === 'night') {
+  } else {
     if (h && th) t = S.p_holhol;
     else if (h && !th) t = S.p_holord;
     else if (!h && th) t = S.p_ordhol;
     else t = S.p_ordord;
-  } else return null;
+  }
   return t[dia] || null;
 }
 
@@ -79,7 +81,7 @@ function gLabel(d) {
   if (d.startsWith('휴')) return '휴무';
   if (d.startsWith('대')) return '대기';
   const n = parseInt(d);
-  return n >= 61 ? '야간' : '주간';
+  return n >= 62 ? '야간' : '주간';
 }
 
 function gTypeName(tp) {
@@ -88,6 +90,23 @@ function gTypeName(tp) {
 
 function gColor(t) {
   return { day: 'var(--blue)', night: 'var(--purple)', rest: 'var(--gray)', standby: 'var(--orange)' }[t] || 'var(--gray)';
+}
+
+// 출퇴근 시간에서 근무시간 계산 (tTime이 PNG일 때)
+function calcWorkTime(s, e) {
+  if (!s || !e || !/^\d{1,2}:\d{2}$/.test(s) || !/^\d{1,2}:\d{2}$/.test(e)) return '-';
+  const sp = s.split(':'), ep = e.split(':');
+  let sm = parseInt(sp[0]) * 60 + parseInt(sp[1]);
+  let em = parseInt(ep[0]) * 60 + parseInt(ep[1]);
+  if (em <= sm) em += 1440; // 야간 (자정 넘김)
+  const diff = em - sm;
+  return Math.floor(diff / 60) + ':' + String(diff % 60).padStart(2, '0');
+}
+
+function getWorkTime(sc) {
+  if (!sc) return '-';
+  if (sc.t && !/\.png$/i.test(sc.t)) return sc.t;
+  return calcWorkTime(sc.s, sc.e);
 }
 
 function expandRoute(m) {
@@ -388,7 +407,7 @@ function rHome() {
       </div>
       <div class="tc-time-block small">
         <div class="tc-time-label">근무시간</div>
-        <div class="tc-time-val sm">${sc.t || '-'}</div>
+        <div class="tc-time-val sm">${getWorkTime(sc)}</div>
       </div>
     </div>`;
     if (sc.m) {
@@ -1186,7 +1205,7 @@ function rSchedDetail() {
       <div class="sd-dia" style="color:${gColor(tp)}">${dia}</div>
       <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
-      <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${sc.t || '-'}</span></div>
+      <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
       ${sc.m ? `<div class="sd-route">${sc.m}</div>` : ''}
     </div>`;
   } else {

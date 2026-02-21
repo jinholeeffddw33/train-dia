@@ -1240,15 +1240,26 @@ function startUpdateCounter() {
   }, 1000);
 }
 
+const TRAIN_API_BASE = '/api/subway/' + API_KEY + '/json/realtimePosition/0/100/5호선';
+const TRAIN_API_URLS = [
+  'https://swopenAPI.seoul.go.kr' + TRAIN_API_BASE,
+  'http://swopenAPI.seoul.go.kr' + TRAIN_API_BASE
+];
+
+function fetchTrainAPI() {
+  // HTTPS 먼저, 실패 시 HTTP 폴백
+  return fetch(TRAIN_API_URLS[0], { signal: AbortSignal.timeout(6000) })
+    .then(r => r.json())
+    .catch(() => fetch(TRAIN_API_URLS[1], { signal: AbortSignal.timeout(8000) }).then(r => r.json()));
+}
+
 function fetchTrains() {
   const btn = document.getElementById('lineRefreshBtn');
   const statusEl = document.getElementById('lineUpdateTime');
   btn.classList.add('spinning');
   statusEl.textContent = '불러오는 중...';
 
-  const url = `https://swopenAPI.seoul.go.kr/api/subway/${API_KEY}/json/realtimePosition/0/100/5호선`;
-  fetch(url, { signal: AbortSignal.timeout(10000) })
-    .then(r => r.json())
+  fetchTrainAPI()
     .then(data => {
       btn.classList.remove('spinning');
       if (data.realtimePositionList) {
@@ -1259,39 +1270,27 @@ function fetchTrains() {
       } else if (data.errorMessage) {
         trainData = [];
         renderLine5();
-        const now = new Date();
-        const h = now.getHours();
-        if (h >= 1 && h < 5) {
-          statusEl.textContent = '심야 운행 종료 (05시 재개)';
-        } else {
-          statusEl.textContent = '열차 데이터 없음';
-        }
+        const h = new Date().getHours();
+        statusEl.textContent = (h >= 1 && h < 5) ? '심야 운행 종료 (05시 재개)' : '열차 데이터 없음';
       } else {
         statusEl.textContent = '데이터 오류 — 다시 시도해주세요';
       }
     })
-    .catch(e => {
+    .catch(() => {
       btn.classList.remove('spinning');
-      if (e.name === 'TimeoutError') {
-        statusEl.textContent = '서버 응답 없음 — 다시 시도해주세요';
-      } else {
-        statusEl.textContent = '네트워크 연결 실패';
-      }
+      statusEl.textContent = '서버 연결 실패 — 다시 시도해주세요';
     });
 }
 
-// 앱 시작 시 열차 데이터 미리 가져오기 (UI 업데이트 없이 조용히)
 function prefetchTrains() {
-  const url = `https://swopenAPI.seoul.go.kr/api/subway/${API_KEY}/json/realtimePosition/0/100/5호선`;
-  fetch(url, { signal: AbortSignal.timeout(8000) })
-    .then(r => r.json())
+  fetchTrainAPI()
     .then(data => {
       if (data.realtimePositionList) {
         trainData = data.realtimePositionList;
         lastTrainFetch = Date.now();
       }
     })
-    .catch(() => {}); // 실패해도 무시 — 노선 탭에서 재시도
+    .catch(() => {});
 }
 
 // ===== MORE =====

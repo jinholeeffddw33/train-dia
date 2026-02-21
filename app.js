@@ -1074,7 +1074,8 @@ function renderLine5() {
     if (hasRealTransfer) {
       transferH = '<div class="tk-transfers">';
       transfers.forEach(t => {
-        transferH += `<span class="tk-transfer-tag">${t}</span>`;
+        const c = LINE_COLORS[t] || '#888';
+        transferH += `<span class="tk-transfer-tag" style="background:${c};color:#fff">${t}</span>`;
       });
       transferH += '</div>';
     }
@@ -1173,7 +1174,13 @@ function renderLine5Map() {
     svg += `<text x="${x}" y="${y + 16}" text-anchor="middle" class="${labelCls}">${displayName}</text>`;
 
     if (isTransfer) {
-      svg += `<text x="${x}" y="${y + 25}" text-anchor="middle" class="map-transfer-text">${transfers.join('·')}</text>`;
+      let tx = x - ((transfers.length - 1) * 22);
+      transfers.forEach((t, i) => {
+        const c = LINE_COLORS[t] || '#888';
+        const cx = tx + i * 44;
+        svg += `<rect x="${cx - 18}" y="${y + 17}" width="36" height="12" rx="3" fill="${c}" opacity="0.85"/>`;
+        svg += `<text x="${cx}" y="${y + 26}" text-anchor="middle" fill="#fff" font-size="7" font-weight="600" font-family="system-ui,sans-serif">${t}</text>`;
+      });
     }
 
     if (isDapsimni) {

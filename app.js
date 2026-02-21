@@ -2320,57 +2320,64 @@ function resetQuiz() {
 (function () {
   document.body.classList.add('splash-active');
 
-  // Restore state
-  const sv = localStorage.getItem('dp');
-  if (sv) {
-    const p = P.find(x => x.I === sv);
-    if (p) {
-      cur = p;
-      document.getElementById('calPersonName').textContent = p.n;
-      document.getElementById('setName').textContent = p.n;
+  try {
+    // Restore state
+    const sv = localStorage.getItem('dp');
+    if (sv) {
+      const p = P.find(x => x.I === sv);
+      if (p) {
+        cur = p;
+        document.getElementById('calPersonName').textContent = p.n;
+        document.getElementById('setName').textContent = p.n;
+      }
     }
+
+    // Supabase 초기화
+    initSupabase();
+
+    // 즉시 localStorage 캐시로 UI 표시
+    try {
+      const saved = localStorage.getItem('diaAlerts');
+      alerts = saved ? JSON.parse(saved) : [];
+    } catch (e) { alerts = []; }
+
+    initDark();
+    tick();
+    setInterval(tick, 1000);
+    rHome();
+    initCal();
+    initCmp();
+    rMore();
+    renderHomeExtras();
+    initPWA();
+
+    // Supabase에서 최신 알림 비동기 로드
+    loadAlerts().then(() => {
+      renderAlertList();
+      renderAlertBanner();
+      renderAlertBadge();
+      updateAlertIndicators();
+    });
+
+    // 열차 데이터 프리페치 — 노선 탭 들어가기 전에 미리 로드
+    prefetchTrains();
+  } catch (e) {
+    // 초기화 실패 시에도 앱을 표시 (디버그용 콘솔 출력)
+    console.error('[DIA init error]', e);
   }
 
-  // Supabase 초기화
-  initSupabase();
-
-  // 즉시 localStorage 캐시로 UI 표시
-  try {
-    const saved = localStorage.getItem('diaAlerts');
-    alerts = saved ? JSON.parse(saved) : [];
-  } catch (e) { alerts = []; }
-
-  initDark();
-  tick();
-  setInterval(tick, 1000);
-  rHome();
-  initCal();
-  initCmp();
-  rMore();
-  renderHomeExtras();
-  initPWA();
-
-  // Supabase에서 최신 알림 비동기 로드
-  loadAlerts().then(() => {
-    renderAlertList();
-    renderAlertBanner();
-    renderAlertBadge();
-    updateAlertIndicators();
-  });
-
-  // 열차 데이터 프리페치 — 노선 탭 들어가기 전에 미리 로드
-  prefetchTrains();
-
-  // Dismiss splash after load
+  // Dismiss splash — 에러 발생해도 항상 실행
   setTimeout(dismissSplash, 1200);
 
   // 스플래시 후: PWA 미설치면 설치 유도 → 알림 허용
   // 3초 대기 — beforeinstallprompt 이벤트가 도착할 시간 확보
   setTimeout(() => {
-    if (!isPWAInstalled()) {
-      showPWAPrompt();
-    } else {
-      requestNotificationPermission();
-    }
+    try {
+      if (!isPWAInstalled()) {
+        showPWAPrompt();
+      } else {
+        requestNotificationPermission();
+      }
+    } catch (e) { /* ignore */ }
   }, 3000);
 })();

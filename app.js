@@ -313,7 +313,7 @@ function subscribeAlerts() {
       const mapped = {
         id: a.id, station: a.station, message: a.message,
         severity: a.severity, ts: new Date(a.created_at).getTime(),
-        createdBy: a.created_by, active: a.is_active, photo: a.photo || null
+        createdBy: a.created_by, active: a.is_active, photo: a.photo || null, photos: a.photos || null
       };
       // 중복 방지 (내가 방금 등록한 것)
       if (!alerts.find(x => x.id === a.id)) {
@@ -368,7 +368,7 @@ async function loadAlerts() {
     alerts = (data || []).map(a => ({
       id: a.id, station: a.station, message: a.message,
       severity: a.severity, ts: new Date(a.created_at).getTime(),
-      createdBy: a.created_by, active: a.is_active, photo: a.photo || null
+      createdBy: a.created_by, active: a.is_active, photo: a.photo || null, photos: a.photos || null
     }));
     // 오프라인용 캐시
     localStorage.setItem('diaAlerts', JSON.stringify(alerts));
@@ -433,7 +433,15 @@ function renderAlertList() {
 
   let h = '';
   active.forEach(a => {
-    const photoHtml = a.photo ? `<div class="alert-item-photo" onclick="viewAlertPhoto('${a.id}')"><img src="${a.photo}" alt="장애 사진"></div>` : '';
+    const allPhotos = a.photos || (a.photo ? [a.photo] : []);
+    let photoHtml = '';
+    if (allPhotos.length > 0) {
+      photoHtml = '<div class="alert-item-photos">';
+      allPhotos.forEach((src, i) => {
+        photoHtml += `<div class="alert-item-photo" onclick="viewAlertPhoto('${a.id}',${i})"><img src="${src}" alt="사진 ${i+1}"></div>`;
+      });
+      photoHtml += '</div>';
+    }
     h += `<div class="alert-item">
       <div class="alert-item-header">
         <div class="alert-item-sev ${a.severity}"></div>
@@ -451,7 +459,8 @@ function renderAlertList() {
   el.innerHTML = h;
 }
 
-let alertPhotoData = null;
+let alertPhotos = []; // Base64 배열 (최대 3장)
+const MAX_PHOTOS = 3;
 const ALL_STATIONS = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
 
 function openAlertForm() {
@@ -459,14 +468,13 @@ function openAlertForm() {
   document.getElementById('alertStation').value = '';
   document.getElementById('alertSuggest').innerHTML = '';
   document.getElementById('alertMessage').value = '';
-  document.getElementById('alertPhotoPreview').innerHTML = '';
-  alertPhotoData = null;
+  alertPhotos = [];
+  renderPhotoGrid();
   alertSeverity = 'high';
   document.querySelectorAll('.af-sev-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('.af-sev-btn.high').classList.add('active');
   document.getElementById('alertModalBg').classList.add('open');
 
-  // 역 검색 이벤트
   const input = document.getElementById('alertStationInput');
   input.oninput = () => {
     const q = input.value.trim();
@@ -481,7 +489,6 @@ function openAlertForm() {
       ).join('');
     }
   };
-  // 포커스 시 전체 목록 (빈 입력일 때)
   input.onfocus = () => {
     if (!input.value.trim()) {
       const suggest = document.getElementById('alertSuggest');
@@ -498,56 +505,117 @@ function pickStation(name) {
   document.getElementById('alertSuggest').innerHTML = '';
 }
 
-// 사진 처리 — 리사이즈 + Base64
-function handleAlertPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
+function triggerPhotoInput() {
+  if (alertPhotos.length >= MAX_PHOTOS) {
+    showToast('사진은 최대 3장까지 가능합니다');
+    return;
+  }
+  document.getElementById('alertPhotoInput').click();
+}
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      // 리사이즈: 최대 800px, 품질 0.7 (데이터 절약)
-      const MAX = 800;
-      let w = img.width, h = img.height;
-      if (w > MAX || h > MAX) {
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      alertPhotoData = canvas.toDataURL('image/jpeg', 0.7);
+function handleAlertPhotos(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
 
-      // 미리보기 표시
-      const preview = document.getElementById('alertPhotoPreview');
-      preview.innerHTML = `<div class="af-photo-thumb">
-        <img src="${alertPhotoData}" alt="첨부 사진">
-        <button class="af-photo-remove" type="button" onclick="removeAlertPhoto()">✕</button>
-      </div>`;
+  const remaining = MAX_PHOTOS - alertPhotos.length;
+  const toProcess = files.slice(0, remaining);
+
+  if (files.length > remaining) {
+    showToast(`최대 3장 — ${files.length - remaining}장은 제외됨`);
+  }
+
+  let processed = 0;
+  toProcess.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        alertPhotos.push(canvas.toDataURL('image/jpeg', 0.7));
+        processed++;
+        if (processed === toProcess.length) renderPhotoGrid();
+      };
+      img.src = e.target.result;
     };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-  // 같은 파일 다시 선택 가능하도록 초기화
+    reader.readAsDataURL(file);
+  });
   input.value = '';
 }
 
-function removeAlertPhoto() {
-  alertPhotoData = null;
-  document.getElementById('alertPhotoPreview').innerHTML = '';
+function removeAlertPhoto(idx) {
+  alertPhotos.splice(idx, 1);
+  renderPhotoGrid();
 }
 
-function viewAlertPhoto(id) {
+function renderPhotoGrid() {
+  const grid = document.getElementById('alertPhotoGrid');
+  const placeholder = document.getElementById('alertPhotoPlaceholder');
+  const area = document.getElementById('alertPhotoArea');
+
+  if (alertPhotos.length === 0) {
+    placeholder.style.display = '';
+    grid.innerHTML = '';
+    area.classList.remove('has-photos');
+    return;
+  }
+
+  placeholder.style.display = 'none';
+  area.classList.add('has-photos');
+
+  let h = '';
+  alertPhotos.forEach((src, i) => {
+    h += `<div class="af-grid-item">
+      <img src="${src}" alt="사진 ${i + 1}">
+      <button class="af-grid-remove" type="button" onclick="event.stopPropagation();removeAlertPhoto(${i})">✕</button>
+      <span class="af-grid-num">${i + 1}</span>
+    </div>`;
+  });
+
+  if (alertPhotos.length < MAX_PHOTOS) {
+    h += `<div class="af-grid-add" onclick="event.stopPropagation();triggerPhotoInput()">
+      <span>+</span>
+      <span class="af-grid-add-text">추가</span>
+    </div>`;
+  }
+
+  grid.innerHTML = h;
+}
+
+function viewAlertPhoto(id, idx) {
   const a = alerts.find(x => x.id === id);
-  if (!a || !a.photo) return;
+  if (!a) return;
+  const photos = a.photos || (a.photo ? [a.photo] : []);
+  if (!photos[idx]) return;
+  let currentIdx = idx;
+
   const overlay = document.createElement('div');
   overlay.className = 'photo-overlay';
+
+  function render() {
+    const hasMulti = photos.length > 1;
+    overlay.innerHTML = `
+      <img src="${photos[currentIdx]}" alt="장애 사진">
+      ${hasMulti ? `<div class="photo-overlay-counter">${currentIdx + 1} / ${photos.length}</div>` : ''}
+      ${hasMulti && currentIdx > 0 ? '<div class="photo-overlay-nav left" onclick="event.stopPropagation()">‹</div>' : ''}
+      ${hasMulti && currentIdx < photos.length - 1 ? '<div class="photo-overlay-nav right" onclick="event.stopPropagation()">›</div>' : ''}
+    `;
+    const navLeft = overlay.querySelector('.photo-overlay-nav.left');
+    const navRight = overlay.querySelector('.photo-overlay-nav.right');
+    if (navLeft) navLeft.onclick = e => { e.stopPropagation(); currentIdx--; render(); };
+    if (navRight) navRight.onclick = e => { e.stopPropagation(); currentIdx++; render(); };
+  }
+
   overlay.onclick = () => overlay.remove();
-  overlay.innerHTML = `<img src="${a.photo}" alt="장애 사진">`;
   document.body.appendChild(overlay);
+  render();
 }
 
 function closeAlertModal(e) {
@@ -568,12 +636,15 @@ async function postAlert() {
   if (!message) { showToast('내용을 입력해 주세요'); return; }
 
   const creator = cur ? cur.n : '관리자';
-  const photo = alertPhotoData || null;
+  const photos = alertPhotos.length > 0 ? [...alertPhotos] : null;
+  // 하위 호환: photo = 첫 번째 사진
+  const photo = photos ? photos[0] : null;
 
   if (sb) {
     try {
       const insertData = { station, message, severity: alertSeverity, created_by: creator };
       if (photo) insertData.photo = photo;
+      if (photos) insertData.photos = photos;
       const { data, error } = await sb.from('alerts').insert(insertData).select().single();
 
       if (error) throw error;
@@ -581,7 +652,7 @@ async function postAlert() {
       alerts.unshift({
         id: data.id, station, message, severity: alertSeverity,
         ts: new Date(data.created_at).getTime(), createdBy: creator, active: true,
-        photo: photo
+        photo, photos
       });
       localStorage.setItem('diaAlerts', JSON.stringify(alerts));
     } catch (e) {
@@ -591,12 +662,12 @@ async function postAlert() {
   } else {
     alerts.unshift({
       id: 'local-' + Date.now(), station, message, severity: alertSeverity,
-      ts: Date.now(), createdBy: creator, active: true, photo: photo
+      ts: Date.now(), createdBy: creator, active: true, photo, photos
     });
     localStorage.setItem('diaAlerts', JSON.stringify(alerts));
   }
 
-  alertPhotoData = null;
+  alertPhotos = [];
   document.getElementById('alertModalBg').classList.remove('open');
   renderAlertList();
   renderAlertBanner();

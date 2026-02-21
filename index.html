@@ -317,11 +317,15 @@
       <label class="af-label">내용</label>
       <textarea class="af-textarea" id="alertMessage" rows="3" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
 
-      <label class="af-label">사진 (선택)</label>
-      <div class="af-photo-row">
-        <button class="af-photo-btn" type="button" onclick="document.getElementById('alertPhotoInput').click()">📷 사진 추가</button>
-        <input type="file" id="alertPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleAlertPhoto(this)">
-        <div class="af-photo-preview" id="alertPhotoPreview"></div>
+      <label class="af-label">사진 (선택 · 최대 3장)</label>
+      <div class="af-photo-area" id="alertPhotoArea" onclick="triggerPhotoInput()">
+        <div class="af-photo-placeholder" id="alertPhotoPlaceholder">
+          <div class="af-photo-icon">📷</div>
+          <div class="af-photo-text">탭하여 사진 추가</div>
+          <div class="af-photo-hint">갤러리 또는 카메라 · 최대 3장</div>
+        </div>
+        <div class="af-photo-grid" id="alertPhotoGrid"></div>
+        <input type="file" id="alertPhotoInput" accept="image/*" multiple style="display:none" onchange="handleAlertPhotos(this)">
       </div>
 
       <button class="af-submit" type="button" onclick="postAlert()">알림 등록</button>

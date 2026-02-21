@@ -505,7 +505,7 @@ function rHome() {
 
   el.innerHTML = `<div class="today-card">
     <div class="tc-header">
-      <div class="tc-label">오늘의 교번 · ${hl}</div>
+      <div class="tc-label">오늘의 교번 · DIA</div>
       <span class="tc-badge ${tp}">${gLabel(dia)}</span>
     </div>
     <div class="tc-body">
@@ -515,7 +515,7 @@ function rHome() {
 
   // Week preview
   const we = document.getElementById('homeWeek');
-  let wh = '<div class="section-label">이번 주 일정</div><div class="week-strip">';
+  let wh = '<div class="section-label">이번주 근무</div><div class="week-strip">';
   const todayD = today.getDay();
   const weekStart = new Date(today);
   weekStart.setDate(weekStart.getDate() - todayD);
@@ -552,7 +552,7 @@ function rHome() {
   let tmCard = '';
   if (tmTp === 'rest') {
     tmCard = `<div class="status-card">
-      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow})</div>
+      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
       <div class="sc-val" style="color:var(--green)">휴무 😊</div>
       <div class="sc-sub">${tmDia}</div>
     </div>`;
@@ -562,18 +562,42 @@ function rHome() {
     const tmDir = tmSc ? getRouteDirection(tmSc.m) : null;
     const tmDirH = tmDir ? `<span class="sc-dir ${tmDir.dir}">${tmDir.dir === 'up' ? '▲상선' : tmDir.dir === 'down' ? '▼하선' : '🚇기지'}</span>` : '';
     tmCard = `<div class="status-card">
-      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow})${tmHl ? ' · 휴일' : ''}</div>
+      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
       <div class="sc-val sc-val-start">${tmTime}</div>
       <div class="sc-sub">${tmDia} · ${tmTypeName} ${tmDirH}</div>
     </div>`;
   }
 
+  // 모레 (day after tomorrow)
+  const aftrw = new Date(today);
+  aftrw.setDate(aftrw.getDate() + 2);
+  const afDia = gDia(cur, aftrw);
+  const afTp = gType(afDia);
+  const afSc = gSched(afDia, aftrw);
+  const afDow = DOW[aftrw.getDay()];
+
+  let afCard = '';
+  if (afTp === 'rest') {
+    afCard = `<div class="status-card">
+      <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
+      <div class="sc-val" style="color:var(--green)">휴무 😊</div>
+      <div class="sc-sub">${afDia}</div>
+    </div>`;
+  } else {
+    const afTime = afSc ? afSc.s : '-';
+    const afTypeName = gTypeName(afTp);
+    const afDir = afSc ? getRouteDirection(afSc.m) : null;
+    const afDirH = afDir ? `<span class="sc-dir ${afDir.dir}">${afDir.dir === 'up' ? '▲상선' : afDir.dir === 'down' ? '▼하선' : '🚇기지'}</span>` : '';
+    afCard = `<div class="status-card">
+      <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
+      <div class="sc-val sc-val-start">${afTime}</div>
+      <div class="sc-sub">${afDia} · ${afTypeName} ${afDirH}</div>
+    </div>`;
+  }
+
   stEl.innerHTML = `<div class="status-bar">
     ${tmCard}
-    <div class="status-card">
-      <div class="sc-label">교번 구성</div>
-      <div class="sc-val" style="font-size:14px;line-height:1.8">주간 43 · 야간 31<br>대기 13 · 휴무 41</div>
-    </div>
+    ${afCard}
   </div>`;
 }
 
@@ -1189,12 +1213,13 @@ function goTab(id, el) {
   if (el) el.classList.add('active');
   else {
     const tabs = document.querySelectorAll('.tab');
-    const m = ['pageHome', 'pageCal', 'pageLine', 'pageCmp', 'pageMore'];
+    const m = ['pageHome', 'pageCal', 'pageLine', 'pageCmp', 'pageContacts', 'pageMore'];
     const i = m.indexOf(id);
     if (i >= 0 && tabs[i]) tabs[i].classList.add('active');
   }
   if (id === 'pageHome') rHome();
   if (id === 'pageLine') initLine5();
+  if (id === 'pageContacts') rContacts();
   if (id === 'pageMore') rMore();
 }
 
@@ -1814,28 +1839,42 @@ function prefetchTrains() {
     .catch(() => {});
 }
 
-// ===== MORE =====
-function rMore() {
-  const ce = document.getElementById('contactCards');
-  let cards = '';
-  CPH.forEach(c => {
-    cards += `<div class="cp-card">
-      <div class="cp-name">${c.n}</div>
-      <div class="cp-nums">
-        <a class="cp-num" href="tel:${c.a}">📞 ${c.a}</a>
-        <a class="cp-num" href="tel:${c.b}">📞 ${c.b}</a>
+// ===== CONTACTS TAB =====
+function rContacts() {
+  const el = document.getElementById('contactsContent');
+  let h = '';
+
+  // 관제 (별도 섹션)
+  h += '<div class="ct-section"><div class="ct-section-title">🚨 관제</div>';
+  CPH_CTRL.forEach(c => {
+    h += `<div class="ct-card ct-ctrl">
+      <div class="ct-name">${c.n}</div>
+      <div class="ct-nums">
+        <a class="ct-num" href="tel:${c.a.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.a}</a>
+        <a class="ct-num" href="tel:${c.b.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.b}</a>
       </div>
     </div>`;
   });
-  ce.innerHTML = `<div class="contacts-accordion">
-    <button class="contacts-toggle" type="button" onclick="toggleContacts()">
-      <span class="contacts-toggle-icon">📞</span>
-      연락처 보기
-      <span class="contacts-count">${CPH.length}개</span>
-      <span class="contacts-arrow" id="contactsArrow">›</span>
-    </button>
-    <div class="contacts-body" id="contactsBody">${cards}</div>
-  </div>`;
+  h += '</div>';
+
+  // 승무운용 · 신호취급실
+  h += '<div class="ct-section"><div class="ct-section-title">🏢 승무운용 · 신호취급실</div>';
+  CPH.forEach(c => {
+    h += `<div class="ct-card">
+      <div class="ct-name">${c.n}</div>
+      <div class="ct-nums">
+        <a class="ct-num" href="tel:${c.a.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.a}</a>
+        <a class="ct-num" href="tel:${c.b.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.b}</a>
+      </div>
+    </div>`;
+  });
+  h += '</div>';
+
+  el.innerHTML = h;
+}
+
+// ===== MORE =====
+function rMore() {
 
   if (cur) {
     document.getElementById('setName').textContent = cur.n;
@@ -1845,13 +1884,6 @@ function rMore() {
   renderAlertBadge();
   updateAlertIndicators();
   updateNotiSetting();
-}
-
-function toggleContacts() {
-  const body = document.getElementById('contactsBody');
-  const arrow = document.getElementById('contactsArrow');
-  body.classList.toggle('open');
-  arrow.classList.toggle('open');
 }
 
 function showSub(id) {
@@ -1940,6 +1972,7 @@ function rList(q) {
   const el = document.getElementById('mList');
   const qq = q.trim().toLowerCase();
   const f = qq ? P.filter(p => p.n.toLowerCase().includes(qq)) : P.filter(p => p.d !== '~');
+  f.sort((a, b) => a.n.localeCompare(b.n, 'ko'));
   let h = '';
   f.forEach(p => {
     const tdia = gDia(p, td());

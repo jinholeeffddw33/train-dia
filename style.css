@@ -37,6 +37,7 @@
   --tab-cal: #0D9452;
   --tab-line: #996CAC;
   --tab-cmp: #D97706;
+  --tab-contacts: #1e88e5;
   --tab-more: #7E849A;
 }
 
@@ -90,6 +91,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .tab.active[data-tab="cal"] { color: var(--tab-cal); }
 .tab.active[data-tab="line"] { color: var(--tab-line); }
 .tab.active[data-tab="cmp"] { color: var(--tab-cmp); }
+.tab.active[data-tab="contacts"] { color: var(--tab-contacts); }
 .tab.active[data-tab="more"] { color: var(--tab-more); }
 .tab.active::after {
   content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
@@ -99,6 +101,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .tab.active[data-tab="cal"]::after { background: var(--tab-cal); }
 .tab.active[data-tab="line"]::after { background: var(--tab-line); }
 .tab.active[data-tab="cmp"]::after { background: var(--tab-cmp); }
+.tab.active[data-tab="contacts"]::after { background: var(--tab-contacts); }
 .tab.active[data-tab="more"]::after { background: var(--tab-more); }
 .tab .t-icon { width: 28px; height: 28px; margin-bottom: 4px; }
 .tab.active .t-icon {
@@ -1610,35 +1613,41 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 
 /* ===== P1-2: CONTACTS ACCORDION ===== */
-.contacts-accordion {
+/* ===== 연락처 탭 ===== */
+.ct-header {
+  background: var(--blue); color: #fff;
+  text-align: center; font-size: 18px; font-weight: 800;
+  padding: 20px 16px 16px;
+  letter-spacing: .5px;
+}
+.ct-section { padding: 0 16px; margin-top: 16px; }
+.ct-section-title {
+  font-size: 14px; font-weight: 700; color: var(--text2);
+  margin-bottom: 10px; padding-left: 2px;
+}
+.ct-card {
   background: var(--white); border-radius: var(--radius-sm);
-  overflow: hidden; box-shadow: var(--shadow3);
+  padding: 14px 16px; margin-bottom: 10px;
+  border: 1px solid var(--border); box-shadow: var(--shadow3);
 }
-.contacts-toggle {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; padding: 18px 20px;
-  font-size: 16px; font-weight: 600; text-align: left;
+.ct-ctrl { border-left: 3px solid var(--red); }
+.ct-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 8px;
 }
-.contacts-toggle-icon { font-size: 20px; }
-.contacts-count {
-  margin-left: auto; font-size: 13px; color: var(--text3);
-  background: var(--gray-light); padding: 4px 10px; border-radius: 12px;
-  font-weight: 600;
+.ct-nums { display: flex; flex-direction: column; gap: 6px; }
+.ct-num {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 600; color: var(--blue);
+  text-decoration: none; padding: 8px 12px;
+  background: var(--blue-light); border-radius: 8px;
+  transition: .1s;
 }
-.contacts-arrow {
-  font-size: 18px; color: var(--text3);
-  transition: transform 0.25s ease; display: inline-block;
-}
-.contacts-arrow.open { transform: rotate(90deg); }
-.contacts-body {
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.35s ease;
-}
-.contacts-body.open {
-  max-height: 600px;
-}
-.contacts-body .cp-card { margin: 0 12px 10px; }
-.contacts-body .cp-card:last-child { margin-bottom: 12px; }
+.ct-num:active { transform: scale(.97); }
+.ct-num-icon { font-size: 16px; }
+.dark .ct-card { background: var(--white); }
+.dark .ct-num { background: rgba(26,86,219,.2); }
+.dark .ct-header { background: #1a3a7a; }
 
 /* ===== ALERT FORM CHAR COUNT ===== */
 .af-char-count {
@@ -1755,7 +1764,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .weather-link-arrow { font-size: 16px; color: var(--text3); }
 
 /* 출근 시간 빨간색 강조 */
-.tc-time-start { color: var(--red) !important; font-weight: 900 !important; font-size: 31px !important; }
+.tc-time-start { color: var(--red) !important; font-weight: 900 !important; }
 .sc-val-start { color: var(--red) !important; font-weight: 800 !important; font-size: 22px !important; }
 
 /* ===== 역 컬럼 차트 (운전행로) ===== */
@@ -1867,7 +1876,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .dark .quiz-card { border-color: var(--border); }
 .dark .cmp-vs { background: var(--border); }
-.dark .contacts-count { background: var(--border); }
 .dark .rv-ed { border-color: var(--bg); }
 .dark .rv-gl { background: var(--text3); opacity: .15; }
 .dark .rv-chg::before { opacity: .2; }

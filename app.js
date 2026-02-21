@@ -151,7 +151,9 @@ function tick() {
   if (de) de.textContent = `${n.getFullYear()}년 ${n.getMonth() + 1}월 ${n.getDate()}일 ${DOW[n.getDay()]}요일`;
   if (te) {
     const h = n.getHours(), ap = h < 12 ? '오전' : '오후', h12 = h % 12 || 12;
-    te.textContent = `${ap} ${String(h12).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
+    const ape = document.getElementById('homeAmpm');
+    if (ape) ape.textContent = ap;
+    te.textContent = `${String(h12).padStart(2, '0')}:${String(n.getMinutes()).padStart(2, '0')}`;
   }
   if (se) se.textContent = `:${String(n.getSeconds()).padStart(2, '0')}`;
 }
@@ -980,9 +982,19 @@ function initLine5() {
   if (!line5Initialized) {
     renderLine5();
     line5Initialized = true;
-    fetchTrains();
+    // 이미 프리페치로 데이터가 있으면 즉시 렌더링
+    if (trainData.length > 0) {
+      renderLine5();
+      if (lineViewMode === 'map') renderLine5Map();
+    } else {
+      fetchTrains();
+    }
     startTrainPolling();
     startUpdateCounter();
+  } else if (trainData.length > 0) {
+    // 탭 재진입 시 기존 데이터로 즉시 렌더
+    renderLine5();
+    if (lineViewMode === 'map') renderLine5Map();
   }
 }
 
@@ -1268,6 +1280,20 @@ function fetchTrains() {
     });
 }
 
+// 앱 시작 시 열차 데이터 미리 가져오기 (UI 업데이트 없이 조용히)
+function prefetchTrains() {
+  const url = `https://swopenAPI.seoul.go.kr/api/subway/${API_KEY}/json/realtimePosition/0/100/5호선`;
+  fetch(url, { signal: AbortSignal.timeout(8000) })
+    .then(r => r.json())
+    .then(data => {
+      if (data.realtimePositionList) {
+        trainData = data.realtimePositionList;
+        lastTrainFetch = Date.now();
+      }
+    })
+    .catch(() => {}); // 실패해도 무시 — 노선 탭에서 재시도
+}
+
 // ===== MORE =====
 function rMore() {
   const ce = document.getElementById('contactCards');
@@ -1519,8 +1545,11 @@ document.addEventListener('keydown', e => {
     renderAlertList();
     renderAlertBanner();
     renderAlertBadge();
-  updateAlertIndicators();
+    updateAlertIndicators();
   });
+
+  // 열차 데이터 프리페치 — 노선 탭 들어가기 전에 미리 로드
+  prefetchTrains();
 
   // Dismiss splash after load
   setTimeout(dismissSplash, 1200);

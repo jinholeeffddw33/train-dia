@@ -991,6 +991,7 @@ function initLine5() {
     }
     startTrainPolling();
     startUpdateCounter();
+    initMapPinchZoom();
   } else if (trainData.length > 0) {
     // 탭 재진입 시 기존 데이터로 즉시 렌더
     renderLine5();
@@ -1124,6 +1125,12 @@ function toggleLineView() {
   if (isMap) renderLine5Map();
 }
 
+// 열차 상태 코드 → 한글
+const TRAIN_STATUS = { '0': '도착', '1': '출발', '2': '진입', '3': '전역출발' };
+
+let mapZoomLevel = 1;
+let mapIsFullscreen = false;
+
 function renderLine5Map() {
   const coords = LINE5_MAP;
   const routes = LINE5_ROUTES;
@@ -1131,25 +1138,35 @@ function renderLine5Map() {
 
   let svg = '<defs>';
   svg += '<filter id="mapGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
-  svg += '<filter id="trainGl"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg += '<filter id="trainGl"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg += '<filter id="trainBoxShadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/></filter>';
   svg += '</defs>';
 
-  // Route lines (glow + main)
+  // Background grid (subtle)
+  for (let gx = 0; gx < 960; gx += 40) {
+    svg += `<line x1="${gx}" y1="0" x2="${gx}" y2="580" stroke="rgba(255,255,255,0.015)" stroke-width="0.5"/>`;
+  }
+  for (let gy = 0; gy < 580; gy += 40) {
+    svg += `<line x1="0" y1="${gy}" x2="960" y2="${gy}" stroke="rgba(255,255,255,0.015)" stroke-width="0.5"/>`;
+  }
+
+  // Route lines — 두꺼운 글로우 + 메인 라인 + 점선 테두리
   ['main', 'macheon', 'hanam'].forEach(branch => {
     const stns = routes[branch];
     let d = stns.map((name, i) => {
       const [x, y] = coords[name];
       return (i === 0 ? 'M' : 'L') + x + ',' + y;
     }).join(' ');
-    svg += `<path d="${d}" fill="none" stroke="rgba(139,92,246,0.2)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" class="map-route-glow"/>`;
-    svg += `<path d="${d}" fill="none" stroke="#8B5CF6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    svg += `<path d="${d}" fill="none" stroke="rgba(139,92,246,0.12)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" class="map-route-glow"/>`;
+    svg += `<path d="${d}" fill="none" stroke="#8B5CF6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+    svg += `<path d="${d}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
   });
 
   // Direction labels
-  svg += '<text x="50" y="28" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" font-family="system-ui,sans-serif">← 방화</text>';
-  svg += '<text x="890" y="350" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">강동 →</text>';
-  svg += '<text x="400" y="460" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">← 마천</text>';
-  svg += '<text x="260" y="530" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">← 하남검단산</text>';
+  svg += '<text x="50" y="22" fill="rgba(255,255,255,0.25)" font-size="11" font-weight="700" font-family="system-ui,sans-serif">← 방화</text>';
+  svg += '<text x="910" y="350" fill="rgba(255,255,255,0.25)" font-size="11" font-weight="700" text-anchor="end" font-family="system-ui,sans-serif">강동 →</text>';
+  svg += '<text x="400" y="465" fill="rgba(255,255,255,0.25)" font-size="11" font-weight="700" text-anchor="middle" font-family="system-ui,sans-serif">← 마천</text>';
+  svg += '<text x="260" y="540" fill="rgba(255,255,255,0.25)" font-size="11" font-weight="700" text-anchor="middle" font-family="system-ui,sans-serif">← 하남검단산</text>';
 
   // Station dots and labels
   Object.entries(coords).forEach(([name, [x, y]]) => {
@@ -1157,41 +1174,42 @@ function renderLine5Map() {
     const transfers = LINE5_TRANSFERS[name];
     const isTransfer = transfers && !transfers.some(t => t.includes('지선'));
 
+    // Transfer outer ring
     if (isTransfer) {
-      svg += `<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>`;
     }
 
+    // Station dot
     if (isDapsimni) {
-      svg += `<circle cx="${x}" cy="${y}" r="8" fill="rgba(251,191,36,0.15)" class="map-pulse"/>`;
-      svg += `<circle cx="${x}" cy="${y}" r="6" fill="#FBBF24" filter="url(#mapGlow)"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="9" fill="rgba(251,191,36,0.15)" class="map-pulse"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="7" fill="#FBBF24" filter="url(#mapGlow)"/>`;
+      svg += `<text x="${x}" y="${y + 4}" text-anchor="middle" fill="#000" font-size="8" font-weight="900" font-family="system-ui">★</text>`;
     } else {
-      const r = isTransfer ? 4.5 : 3;
-      svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${isTransfer ? '#fff' : 'rgba(255,255,255,0.65)'}"/>`;
+      const r = isTransfer ? 5 : 3.5;
+      svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${isTransfer ? '#fff' : 'rgba(255,255,255,0.7)'}"/>`;
     }
 
+    // Station name
     const displayName = nameMap[name] || name;
     const labelCls = isDapsimni ? 'map-label-dap' : 'map-label';
-    svg += `<text x="${x}" y="${y + 16}" text-anchor="middle" class="${labelCls}">${displayName}</text>`;
+    svg += `<text x="${x}" y="${y + 18}" text-anchor="middle" class="${labelCls}">${displayName}</text>`;
 
+    // Transfer line color chips
     if (isTransfer) {
       let tx = x - ((transfers.length - 1) * 22);
       transfers.forEach((t, i) => {
         const c = LINE_COLORS[t] || '#888';
         const cx = tx + i * 44;
-        svg += `<rect x="${cx - 18}" y="${y + 17}" width="36" height="12" rx="3" fill="${c}" opacity="0.85"/>`;
-        svg += `<text x="${cx}" y="${y + 26}" text-anchor="middle" fill="#fff" font-size="7" font-weight="600" font-family="system-ui,sans-serif">${t}</text>`;
+        svg += `<rect x="${cx - 18}" y="${y + 20}" width="36" height="12" rx="3" fill="${c}" opacity="0.85"/>`;
+        svg += `<text x="${cx}" y="${y + 29}" text-anchor="middle" fill="#fff" font-size="7" font-weight="600" font-family="system-ui,sans-serif">${t}</text>`;
       });
-    }
-
-    if (isDapsimni) {
-      svg += `<text x="${x + 24}" y="${y + 5}" fill="#FBBF24" font-size="12" font-family="system-ui">★</text>`;
     }
   });
 
-  // Train markers
+  // Train markers — 박스형 (원본 참고)
   const trainsByStation = {};
   trainData.forEach(t => {
-    const stn = t.statnNm.replace('역', '');
+    const stn = t.statnNm.replace(/역$/, '').replace(/\(.*\)/, '');
     if (!trainsByStation[stn]) trainsByStation[stn] = [];
     trainsByStation[stn].push(t);
   });
@@ -1205,18 +1223,28 @@ function renderLine5Map() {
     trains.forEach(t => {
       const isUp = t.updnLine === '0' || t.updnLine === '상행';
       const idx = isUp ? upIdx++ : downIdx++;
-      const offsetY = isUp ? -(24 + idx * 20) : (28 + idx * 20);
-      const dest = (t.statnTnm || '').replace('역', '');
+      const offsetY = isUp ? -(32 + idx * 48) : (30 + idx * 48);
+      const dest = (t.statnTnm || '').replace(/역$/, '');
       const no = t.trainNo || '';
-      const label = `${dest} ${no}`;
-      const arriving = t.trainSttus === '0';
-      const fillColor = isUp ? '#22C55E' : '#F97316';
-      const capsuleW = Math.max(label.length * 8 + 14, 56);
-      const capsuleX = -capsuleW / 2;
+      const status = TRAIN_STATUS[t.trainSttus] || '';
+      const arriving = t.trainSttus === '0' || t.trainSttus === '2';
+      const dirColor = isUp ? '#22C55E' : '#F97316';
+      const boxW = 72, boxH = 40;
+      const bx = -boxW / 2;
 
-      svg += `<g transform="translate(${sx},${sy + offsetY})" filter="url(#trainGl)" class="${arriving ? 'map-train-arrive' : ''}">`;
-      svg += `<rect x="${capsuleX}" y="-9" width="${capsuleW}" height="18" rx="4" fill="${fillColor}" opacity="${arriving ? 1 : 0.85}"/>`;
-      svg += `<text x="0" y="4" text-anchor="middle" fill="white" font-size="9" font-weight="700" font-family="system-ui,sans-serif">${label}</text>`;
+      svg += `<g transform="translate(${sx},${sy + offsetY})" filter="url(#trainBoxShadow)" class="${arriving ? 'map-train-arrive' : ''}">`;
+      // Box background
+      svg += `<rect x="${bx}" y="${-boxH/2}" width="${boxW}" height="${boxH}" rx="5" fill="rgba(30,30,40,0.92)" stroke="${dirColor}" stroke-width="1.5"/>`;
+      // Direction indicator dot
+      svg += `<circle cx="${bx + 8}" cy="${-boxH/2 + 8}" r="3.5" fill="${dirColor}"/>`;
+      // Direction name (행선지)
+      svg += `<text x="${bx + 15}" y="${-boxH/2 + 11}" fill="${dirColor}" font-size="8" font-weight="700" font-family="system-ui,sans-serif">${dest}</text>`;
+      // Train number
+      svg += `<text x="0" y="3" text-anchor="middle" fill="#fff" font-size="12" font-weight="800" font-family="system-ui,sans-serif">${no}</text>`;
+      // Status text
+      svg += `<text x="0" y="${boxH/2 - 5}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="7.5" font-weight="500" font-family="system-ui,sans-serif">${stn} ${status}</text>`;
+      // Train icon (small)
+      svg += `<text x="${bx + boxW - 10}" y="${-boxH/2 + 12}" fill="rgba(255,255,255,0.3)" font-size="8">🚇</text>`;
       svg += '</g>';
     });
   });
@@ -1224,15 +1252,102 @@ function renderLine5Map() {
   document.getElementById('lineMapContent').innerHTML =
     `<svg viewBox="-30 -10 1020 620" class="line-map-svg" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
 
+  applyMapZoom();
+
   // Auto-scroll to 답십리
   setTimeout(() => {
     const scroll = document.getElementById('lineMapScroll');
     if (!scroll) return;
-    const scaleX = 1100 / 1020, scaleY = 669 / 620;
-    const dapX = (470 + 30) * scaleX, dapY = (360 + 10) * scaleY;
-    scroll.scrollLeft = Math.max(0, dapX - scroll.clientWidth / 2);
-    scroll.scrollTop = Math.max(0, dapY - scroll.clientHeight / 2);
-  }, 80);
+    const svgEl = scroll.querySelector('.line-map-svg');
+    if (!svgEl) return;
+    const svgW = svgEl.getBoundingClientRect().width;
+    const svgH = svgEl.getBoundingClientRect().height;
+    const ratioX = (470 + 30) / 1020;
+    const ratioY = (360 + 10) / 620;
+    scroll.scrollLeft = Math.max(0, svgW * ratioX - scroll.clientWidth / 2);
+    scroll.scrollTop = Math.max(0, svgH * ratioY - scroll.clientHeight / 2);
+  }, 100);
+}
+
+// ===== MAP ZOOM =====
+function applyMapZoom() {
+  const svgEl = document.querySelector('.line-map-svg');
+  if (!svgEl) return;
+  const w = Math.round(1100 * mapZoomLevel);
+  const h = Math.round(669 * mapZoomLevel);
+  svgEl.style.width = w + 'px';
+  svgEl.style.height = h + 'px';
+  const label = document.getElementById('mapZoomLevel');
+  if (label) label.textContent = Math.round(mapZoomLevel * 100) + '%';
+}
+
+function mapZoom(dir) {
+  const steps = [0.6, 0.8, 1, 1.3, 1.6, 2, 2.5];
+  const cur = steps.findIndex(s => Math.abs(s - mapZoomLevel) < 0.05);
+  const next = Math.max(0, Math.min(steps.length - 1, (cur >= 0 ? cur : 2) + dir));
+  mapZoomLevel = steps[next];
+  applyMapZoom();
+}
+
+// ===== MAP FULLSCREEN =====
+function toggleMapFullscreen() {
+  const wrap = document.getElementById('lineMapWrap');
+  const btn = document.getElementById('mapFullscreenBtn');
+  mapIsFullscreen = !mapIsFullscreen;
+
+  if (mapIsFullscreen) {
+    wrap.classList.add('map-fullscreen');
+    btn.textContent = '✕';
+    btn.title = '전체화면 닫기';
+    document.body.style.overflow = 'hidden';
+  } else {
+    wrap.classList.remove('map-fullscreen');
+    btn.textContent = '⛶';
+    btn.title = '전체화면';
+    document.body.style.overflow = '';
+  }
+}
+
+// 핀치 줌 (터치)
+function initMapPinchZoom() {
+  const scroll = document.getElementById('lineMapScroll');
+  if (!scroll) return;
+  let startDist = 0, startZoom = 1;
+
+  scroll.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      startDist = Math.hypot(dx, dy);
+      startZoom = mapZoomLevel;
+    }
+  }, { passive: false });
+
+  scroll.addEventListener('touchmove', e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      const scale = dist / startDist;
+      mapZoomLevel = Math.max(0.5, Math.min(3, startZoom * scale));
+      applyMapZoom();
+    }
+  }, { passive: false });
+
+  // 더블탭 줌
+  let lastTap = 0;
+  scroll.addEventListener('touchend', e => {
+    if (e.touches.length > 0) return;
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      e.preventDefault();
+      mapZoomLevel = mapZoomLevel > 1.2 ? 1 : 1.6;
+      applyMapZoom();
+    }
+    lastTap = now;
+  });
 }
 
 function startUpdateCounter() {
@@ -1503,6 +1618,7 @@ function initPWA() {
 // ===== KEYBOARD =====
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (mapIsFullscreen) { toggleMapFullscreen(); return; }
     const modal = document.getElementById('modalBg');
     const alertModal = document.getElementById('alertModalBg');
     if (alertModal.classList.contains('open')) {

@@ -118,10 +118,18 @@
     <div id="lineTrackList"></div>
   </div>
   <div class="line-map-wrap" id="lineMapWrap">
-    <div class="line-map-legend">
-      <span class="map-legend-item up">● 상행(방화)</span>
-      <span class="map-legend-item down">● 하행</span>
-      <span class="map-legend-item dapsimni">★ 답십리</span>
+    <div class="line-map-toolbar">
+      <div class="line-map-legend">
+        <span class="map-legend-item up">▲ 상행</span>
+        <span class="map-legend-item down">▼ 하행</span>
+        <span class="map-legend-item dapsimni">★ 답십리</span>
+      </div>
+      <div class="line-map-tools">
+        <button class="map-tool-btn" type="button" onclick="mapZoom(-1)" title="축소">−</button>
+        <span class="map-zoom-level" id="mapZoomLevel">100%</span>
+        <button class="map-tool-btn" type="button" onclick="mapZoom(1)" title="확대">+</button>
+        <button class="map-tool-btn fullscreen" type="button" onclick="toggleMapFullscreen()" id="mapFullscreenBtn" title="전체화면">⛶</button>
+      </div>
     </div>
     <div class="line-map-scroll" id="lineMapScroll">
       <div id="lineMapContent"></div>

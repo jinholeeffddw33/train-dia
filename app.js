@@ -29,7 +29,8 @@ function td() {
 }
 
 function isH(d) {
-  if (d.getDay() === 0) return true;
+  const day = d.getDay();
+  if (day === 0 || day === 6) return true; // 일요일 + 토요일 = 휴일
   const y = d.getFullYear(), ds = HOL[String(y)];
   if (!ds) return false;
   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -147,7 +148,6 @@ function getRouteDirection(m) {
 
 function renderRouteVisual(m) {
   if (!m) return '';
-  // 비운행 텍스트 (충당여부, 대휴 등)
   if (m.includes('충당여부') || m.includes('대휴')) {
     return `<div class="rv-text-only">${m}</div>`;
   }
@@ -159,22 +159,20 @@ function renderRouteVisual(m) {
   parts.forEach(p => {
     const trimmed = p.trim();
     if (/^\d{4}$/.test(trimmed)) {
-      const hh = trimmed.slice(0, 2), mm = trimmed.slice(2);
-      timeCode = `${hh}:${mm}`;
+      timeCode = trimmed.slice(0, 2) + ':' + trimmed.slice(2);
     } else {
       const stations = [];
-      const raw = [];
       for (const ch of trimmed) {
-        if (ch === '(' || ch === ')') break; // 괄호 이후 텍스트 제외
+        if (ch === '(' || ch === ')') break;
         stations.push(STATION_ABBR[ch] || ch);
-        raw.push(ch);
       }
-      // 괄호 텍스트 보존
       const parenMatch = trimmed.match(/\((.+)\)/);
       const note = parenMatch ? parenMatch[1] : '';
       if (stations.length) legs.push({ stations, note });
     }
   });
+
+  if (!legs.length) return '';
 
   const dirCls = dir ? dir.dir : '';
   let html = '';
@@ -187,34 +185,46 @@ function renderRouteVisual(m) {
     </div>`;
   }
 
-  html += `<div class="rv-wrap ${dirCls}">`;
-  legs.forEach((leg, li) => {
-    if (li > 0) {
-      const swapText = timeCode && li === legs.length - 1 ? `교대 ${timeCode}` :
-                        timeCode && li === 1 ? `교대 ${timeCode}` : '';
-      if (swapText) {
-        html += `<div class="rv-swap">${swapText}</div>`;
-      }
+  // ㄹ자 지그재그 레이아웃
+  html += `<div class="rv-zigzag ${dirCls}">`;
+  legs.forEach((leg, i) => {
+    const isRtl = i % 2 === 1;
+
+    // 행 사이 꺾임 연결선
+    if (i > 0) {
+      const side = isRtl ? 'right' : 'left';
+      html += `<div class="rv-turn rv-turn-${side}"><div class="rv-turn-pipe"></div></div>`;
     }
-    html += '<div class="rv-leg">';
-    html += `<div class="rv-line"></div>`;
+
+    html += `<div class="rv-row ${isRtl ? 'rv-rtl' : 'rv-ltr'}">`;
+
     leg.stations.forEach((st, si) => {
       const isFirst = si === 0;
       const isLast = si === leg.stations.length - 1;
       const isDap = st === '답십리';
-      let cls = 'rv-stop';
-      if (isFirst || isLast) cls += ' rv-terminal';
+      let cls = 'rv-stn';
+      if (isFirst || isLast) cls += ' rv-end';
       if (isDap) cls += ' rv-home';
+
+      // 역 사이 연결 트랙 (첫 역 이후부터)
+      if (si > 0) html += '<div class="rv-seg"></div>';
+
       html += `<div class="${cls}">
         <div class="rv-dot"></div>
-        <div class="rv-name">${st}</div>
+        <div class="rv-nm">${st}</div>
       </div>`;
     });
+
     html += '</div>';
     if (leg.note) {
       html += `<div class="rv-note">${leg.note}</div>`;
     }
   });
+
+  if (timeCode) {
+    html += `<div class="rv-time">교대 ${timeCode}</div>`;
+  }
+
   html += '</div>';
   return html;
 }

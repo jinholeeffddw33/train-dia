@@ -605,10 +605,13 @@ function showPWAPrompt() {
     installBtn.textContent = '확인했어요';
     installBtn.onclick = dismissPWA;
   } else if (deferredInstallPrompt) {
+    // 안드로이드 — 자동 설치 가능
     descEl.textContent = '홈 화면에 추가하면 앱처럼 사용할 수 있습니다';
     stepsEl.innerHTML = '';
     installBtn.textContent = '설치하기';
+    installBtn.onclick = installPWA;
   } else {
+    // beforeinstallprompt 미도착 — 수동 안내
     descEl.textContent = '홈 화면에 추가하면 앱처럼 사용할 수 있습니다';
     stepsEl.innerHTML = '<div class="pwa-steps">① 브라우저 <strong>메뉴(⋮)</strong> 탭<br>② <strong>"홈 화면에 추가"</strong> 선택</div>';
     installBtn.textContent = '확인했어요';
@@ -1144,6 +1147,21 @@ function dismissSplash() {
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
+  // 이미 프롬프트가 열려 있으면 → 자동 설치 버튼으로 교체
+  const prompt = document.getElementById('pwaPrompt');
+  if (prompt && prompt.classList.contains('show')) {
+    const stepsEl = document.getElementById('pwaSteps');
+    const installBtn = document.getElementById('pwaInstallBtn');
+    stepsEl.innerHTML = '';
+    installBtn.textContent = '설치하기';
+    installBtn.onclick = installPWA;
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  dismissPWA();
+  showToast('앱이 설치되었습니다!');
 });
 
 function initPWA() {
@@ -1219,11 +1237,12 @@ document.addEventListener('keydown', e => {
   setTimeout(dismissSplash, 1200);
 
   // 스플래시 후: PWA 미설치면 설치 유도 → 알림 허용
+  // 3초 대기 — beforeinstallprompt 이벤트가 도착할 시간 확보
   setTimeout(() => {
     if (!isPWAInstalled()) {
       showPWAPrompt();
     } else {
       requestNotificationPermission();
     }
-  }, 2000);
+  }, 3000);
 })();

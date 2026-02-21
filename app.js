@@ -6,6 +6,11 @@
 const API_KEY = '5a724369526a696e34366552514247';
 const TRAIN_POLL_MS = 120000; // 2분 간격 폴링
 
+// ===== SUPABASE =====
+const SB_URL = 'https://uhlxokrskgloupjelqlf.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVobHhva3Jza2dsb3VwamVscWxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjAzNTksImV4cCI6MjA4NzIzNjM1OX0.nNrV8FMVVz35uzcKMOesiziUBJ5YPq19U1_LgHtlr5g';
+let sb = null;
+
 // ===== STATE =====
 let cur = null, calY, calM, selDate, c1 = null, c2 = null, cmpY, cmpM;
 let mTarget = 'home', sopIdx = -1;
@@ -288,22 +293,86 @@ function rHome() {
   </div>`;
 }
 
-// ===== ALERT SYSTEM =====
-function loadAlerts() {
-  try {
-    const saved = localStorage.getItem('diaAlerts');
-    alerts = saved ? JSON.parse(saved) : [];
-    // Remove alerts older than 48 hours
-    const cutoff = Date.now() - 48 * 60 * 60 * 1000;
-    alerts = alerts.filter(a => a.ts > cutoff);
-    saveAlerts();
-  } catch (e) {
-    alerts = [];
+// ===== SUPABASE INIT =====
+function initSupabase() {
+  if (typeof supabase !== 'undefined') {
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    subscribeAlerts();
   }
 }
 
-function saveAlerts() {
-  localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+function subscribeAlerts() {
+  if (!sb) return;
+  sb.channel('alerts-realtime')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'alerts' }, payload => {
+      const a = payload.new;
+      const mapped = {
+        id: a.id, station: a.station, message: a.message,
+        severity: a.severity, ts: new Date(a.created_at).getTime(),
+        createdBy: a.created_by, active: a.is_active
+      };
+      // 중복 방지 (내가 방금 등록한 것)
+      if (!alerts.find(x => x.id === a.id)) {
+        alerts.unshift(mapped);
+        localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+        renderAlertList();
+        renderAlertBanner();
+        renderAlertBadge();
+        // 다른 사람이 등록한 알림이면 브라우저 알림
+        if (a.created_by !== (cur ? cur.n : '')) {
+          sendNotification(`${a.station}역 장애 발생`, a.message);
+        }
+      }
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'alerts' }, payload => {
+      const a = payload.new;
+      const idx = alerts.findIndex(x => x.id === a.id);
+      if (idx >= 0) {
+        alerts[idx].active = a.is_active;
+        localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+        renderAlertList();
+        renderAlertBanner();
+        renderAlertBadge();
+      }
+    })
+    .subscribe();
+}
+
+// ===== ALERT SYSTEM =====
+async function loadAlerts() {
+  if (!sb) {
+    // 오프라인 폴백: localStorage
+    try {
+      const saved = localStorage.getItem('diaAlerts');
+      alerts = saved ? JSON.parse(saved) : [];
+    } catch (e) { alerts = []; }
+    return;
+  }
+
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await sb
+      .from('alerts')
+      .select('*')
+      .gte('created_at', cutoff)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    alerts = (data || []).map(a => ({
+      id: a.id, station: a.station, message: a.message,
+      severity: a.severity, ts: new Date(a.created_at).getTime(),
+      createdBy: a.created_by, active: a.is_active
+    }));
+    // 오프라인용 캐시
+    localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+  } catch (e) {
+    // Supabase 실패 시 localStorage 폴백
+    try {
+      const saved = localStorage.getItem('diaAlerts');
+      alerts = saved ? JSON.parse(saved) : [];
+    } catch (e2) { alerts = []; }
+  }
 }
 
 function getActiveAlerts() {
@@ -366,8 +435,8 @@ function renderAlertList() {
       </div>
       <div class="alert-item-msg">${a.message}</div>
       <div class="alert-item-actions">
-        <div class="alert-act-btn share" onclick="shareAlert(${a.id})">📋 공유</div>
-        <div class="alert-act-btn dismiss" onclick="dismissAlert(${a.id})">해제</div>
+        <div class="alert-act-btn share" onclick="shareAlert('${a.id}')">📋 공유</div>
+        <div class="alert-act-btn dismiss" onclick="dismissAlert('${a.id}')">해제</div>
       </div>
     </div>`;
   });
@@ -402,45 +471,69 @@ function pickSeverity(sev, el) {
   el.classList.add('active');
 }
 
-function postAlert() {
+async function postAlert() {
   const station = document.getElementById('alertStation').value;
   const message = document.getElementById('alertMessage').value.trim();
   if (!station) { showToast('역을 선택해 주세요'); return; }
   if (!message) { showToast('내용을 입력해 주세요'); return; }
 
-  const newAlert = {
-    id: Date.now(),
-    station: station,
-    message: message,
-    severity: alertSeverity,
-    ts: Date.now(),
-    createdBy: cur ? cur.n : '관리자',
-    active: true
-  };
+  const creator = cur ? cur.n : '관리자';
 
-  alerts.unshift(newAlert);
-  saveAlerts();
+  if (sb) {
+    try {
+      const { data, error } = await sb.from('alerts').insert({
+        station, message, severity: alertSeverity, created_by: creator
+      }).select().single();
+
+      if (error) throw error;
+
+      // 로컬 리스트에 즉시 추가 (실시간 구독 중복 방지용)
+      alerts.unshift({
+        id: data.id, station, message, severity: alertSeverity,
+        ts: new Date(data.created_at).getTime(), createdBy: creator, active: true
+      });
+      localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+    } catch (e) {
+      showToast('알림 등록 실패 — 네트워크를 확인해 주세요');
+      return;
+    }
+  } else {
+    // 오프라인 폴백
+    alerts.unshift({
+      id: 'local-' + Date.now(), station, message, severity: alertSeverity,
+      ts: Date.now(), createdBy: creator, active: true
+    });
+    localStorage.setItem('diaAlerts', JSON.stringify(alerts));
+  }
 
   document.getElementById('alertModalBg').classList.remove('open');
   renderAlertList();
   renderAlertBanner();
   renderAlertBadge();
   showToast(`${station}역 장애 알림이 등록되었습니다`);
-
-  // Browser notification
   sendNotification(`${station}역 장애 발생`, message);
 }
 
-function dismissAlert(id) {
+async function dismissAlert(id) {
+  if (sb && typeof id === 'string' && !id.startsWith('local-')) {
+    try {
+      const { error } = await sb.from('alerts').update({ is_active: false }).eq('id', id);
+      if (error) throw error;
+    } catch (e) {
+      showToast('해제에 실패했습니다');
+      return;
+    }
+  }
+
   const idx = alerts.findIndex(a => a.id === id);
   if (idx >= 0) {
     alerts[idx].active = false;
-    saveAlerts();
-    renderAlertList();
-    renderAlertBanner();
-    renderAlertBadge();
-    showToast('알림이 해제되었습니다');
+    localStorage.setItem('diaAlerts', JSON.stringify(alerts));
   }
+  renderAlertList();
+  renderAlertBanner();
+  renderAlertBadge();
+  showToast('알림이 해제되었습니다');
 }
 
 function shareAlert(id) {
@@ -1016,8 +1109,14 @@ document.addEventListener('keydown', e => {
     }
   }
 
-  // Load alerts
-  loadAlerts();
+  // Supabase 초기화
+  initSupabase();
+
+  // 즉시 localStorage 캐시로 UI 표시
+  try {
+    const saved = localStorage.getItem('diaAlerts');
+    alerts = saved ? JSON.parse(saved) : [];
+  } catch (e) { alerts = []; }
 
   initDark();
   tick();
@@ -1027,6 +1126,13 @@ document.addEventListener('keydown', e => {
   initCmp();
   rMore();
   initPWA();
+
+  // Supabase에서 최신 알림 비동기 로드
+  loadAlerts().then(() => {
+    renderAlertList();
+    renderAlertBanner();
+    renderAlertBadge();
+  });
 
   // Dismiss splash after load
   setTimeout(dismissSplash, 1200);

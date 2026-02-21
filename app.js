@@ -87,24 +87,21 @@ function gColor(t) {
 
 function expandRoute(m) {
   if (!m) return '';
-  // Split by comma, expand each segment
   const parts = m.split(',');
   const segments = [];
   let timeCode = '';
   parts.forEach(p => {
     const trimmed = p.trim();
-    // Check if it's a 4-digit time code (e.g., "1648")
     if (/^\d{4}$/.test(trimmed)) {
       const hh = trimmed.slice(0, 2), mm = trimmed.slice(2);
       timeCode = `${hh}:${mm}`;
     } else {
-      // Expand station abbreviations
       let expanded = '';
       for (const ch of trimmed) {
         expanded += STATION_ABBR[ch] || ch;
         expanded += '→';
       }
-      expanded = expanded.replace(/→$/, ''); // remove trailing arrow
+      expanded = expanded.replace(/→$/, '');
       segments.push(expanded);
     }
   });
@@ -112,6 +109,51 @@ function expandRoute(m) {
   if (timeCode) {
     html += `<span class="tc-route-time">교대 ${timeCode}</span>`;
   }
+  return html;
+}
+
+function renderRouteVisual(m) {
+  if (!m) return '';
+  const parts = m.split(',');
+  const legs = []; // each leg = array of station names
+  let timeCode = '';
+  parts.forEach(p => {
+    const trimmed = p.trim();
+    if (/^\d{4}$/.test(trimmed)) {
+      const hh = trimmed.slice(0, 2), mm = trimmed.slice(2);
+      timeCode = `${hh}:${mm}`;
+    } else {
+      const stations = [];
+      for (const ch of trimmed) {
+        stations.push(STATION_ABBR[ch] || ch);
+      }
+      if (stations.length) legs.push(stations);
+    }
+  });
+
+  let html = '<div class="rv-wrap">';
+  legs.forEach((leg, li) => {
+    // Leg separator (교대 시간 표시)
+    if (li > 0) {
+      html += `<div class="rv-swap">${timeCode && li === 1 ? `교대 ${timeCode}` : '교대'}</div>`;
+    }
+    html += '<div class="rv-leg">';
+    html += '<div class="rv-line"></div>';
+    leg.forEach((st, si) => {
+      const isFirst = si === 0;
+      const isLast = si === leg.length - 1;
+      const isDap = st === '답십리';
+      let cls = 'rv-stop';
+      if (isFirst || isLast) cls += ' rv-terminal';
+      if (isDap) cls += ' rv-home';
+      html += `<div class="${cls}">
+        <div class="rv-dot"></div>
+        <div class="rv-name">${st}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
   return html;
 }
 
@@ -189,7 +231,7 @@ function rHome() {
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
         <div class="tc-time-label">출근</div>
-        <div class="tc-time-val">${sc.s || '-'}</div>
+        <div class="tc-time-val tc-time-start">${sc.s || '-'}</div>
       </div>
       <div class="tc-time-arrow">→</div>
       <div class="tc-time-block">
@@ -204,7 +246,7 @@ function rHome() {
     if (sc.m) {
       infoH += `<div class="tc-route">
         <div class="tc-route-label">🚇 운전행로</div>
-        <div class="tc-route-text">${expandRoute(sc.m)}</div>
+        ${renderRouteVisual(sc.m)}
       </div>`;
     }
   } else {
@@ -247,53 +289,39 @@ function rHome() {
   wh += '</div>';
   we.innerHTML = wh;
 
-  // Status cards
+  // Status cards — 내일 근무 + 교번 구성
   const stEl = document.getElementById('homeStatus');
-  let restIn = 0;
-  for (let i = 1; i <= 128; i++) {
-    const fd = new Date(today);
-    fd.setDate(fd.getDate() + i);
-    const fdia = gDia(cur, fd);
-    if (gType(fdia) === 'rest') { restIn = i; break; }
-  }
+  const tmrw = new Date(today);
+  tmrw.setDate(tmrw.getDate() + 1);
+  const tmDia = gDia(cur, tmrw);
+  const tmTp = gType(tmDia);
+  const tmSc = gSched(tmDia, tmrw);
+  const tmDow = DOW[tmrw.getDay()];
+  const tmHl = isH(tmrw);
 
-  let nextWork = '';
-  if (tp === 'rest' || tp === 'standby') {
-    for (let i = 1; i <= 128; i++) {
-      const fd = new Date(today);
-      fd.setDate(fd.getDate() + i);
-      const fdia = gDia(cur, fd);
-      const ftp = gType(fdia);
-      if (ftp === 'day' || ftp === 'night') {
-        const fsc = gSched(fdia, fd);
-        nextWork = `<div class="status-card">
-          <div class="sc-label">다음 근무</div>
-          <div class="sc-val" style="font-size:16px;line-height:1.6">
-            ${i}일 후 · ${gTypeName(ftp)}<br>
-            ${fsc ? fsc.s + ' 출근' : ''}
-          </div>
-        </div>`;
-        break;
-      }
-    }
+  let tmCard = '';
+  if (tmTp === 'rest') {
+    tmCard = `<div class="status-card">
+      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow})</div>
+      <div class="sc-val" style="color:var(--green)">휴무 😊</div>
+      <div class="sc-sub">${tmDia}</div>
+    </div>`;
+  } else {
+    const tmTime = tmSc ? tmSc.s : '-';
+    const tmTypeName = gTypeName(tmTp);
+    tmCard = `<div class="status-card">
+      <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow})${tmHl ? ' · 휴일' : ''}</div>
+      <div class="sc-val sc-val-start">${tmTime}</div>
+      <div class="sc-sub">${tmDia} · ${tmTypeName}</div>
+    </div>`;
   }
-
-  const restDate = new Date(today);
-  restDate.setDate(restDate.getDate() + restIn);
-  const restDateStr = `${restDate.getMonth() + 1}/${restDate.getDate()} (${DOW[restDate.getDay()]})`;
-  const restColor = restIn <= 1 ? 'var(--green)' : 'var(--blue)';
-  const restText = restIn === 0 ? '오늘 휴무!' : `${restIn}일 뒤`;
 
   stEl.innerHTML = `<div class="status-bar">
+    ${tmCard}
     <div class="status-card">
-      <div class="sc-label">다음 쉬는 날</div>
-      <div class="sc-val" style="color:${restColor}">${restText}</div>
-      <div class="sc-sub">${restDateStr}</div>
-    </div>
-    ${nextWork || `<div class="status-card">
       <div class="sc-label">교번 구성</div>
       <div class="sc-val" style="font-size:14px;line-height:1.8">주간 43 · 야간 31<br>대기 13 · 휴무 41</div>
-    </div>`}
+    </div>
   </div>`;
 }
 
@@ -1209,6 +1237,13 @@ function renderLine5() {
 
   el.innerHTML = h;
 
+  // Auto-scroll to 답십리
+  requestAnimationFrame(() => {
+    const dapRow = el.querySelector('.tk-row.highlight');
+    if (dapRow) {
+      dapRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
 }
 
 // ===== MAP VIEW =====

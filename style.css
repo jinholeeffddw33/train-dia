@@ -1753,6 +1753,56 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .weather-link-text { font-size: 15px; font-weight: 600; flex: 1; }
 .weather-link-arrow { font-size: 16px; color: var(--text3); }
 
+/* 출근 시간 주황색 강조 */
+.tc-time-start { color: var(--orange) !important; font-weight: 800 !important; }
+.sc-val-start { color: var(--orange) !important; font-weight: 800 !important; font-size: 22px !important; }
+
+/* ===== 운전행로 비주얼 (역 연결 플로우) ===== */
+.rv-wrap {
+  display: flex; flex-direction: column; gap: 0;
+  margin-top: 8px;
+}
+.rv-leg {
+  position: relative; display: flex; align-items: center;
+  padding: 10px 0; gap: 0; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.rv-line {
+  position: absolute; top: 50%; left: 16px; right: 16px;
+  height: 3px; background: var(--purple); border-radius: 2px;
+  transform: translateY(-50%); z-index: 0;
+}
+.rv-stop {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 48px; flex-shrink: 0;
+}
+.rv-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--white); border: 2.5px solid var(--purple);
+  box-shadow: 0 0 0 2px var(--white);
+}
+.rv-terminal .rv-dot {
+  width: 14px; height: 14px; background: var(--purple);
+  border-color: var(--purple); box-shadow: 0 0 6px rgba(153,108,172,.4);
+}
+.rv-home .rv-dot {
+  width: 14px; height: 14px; background: var(--blue);
+  border-color: var(--blue); box-shadow: 0 0 8px rgba(26,86,219,.5);
+}
+.rv-name {
+  font-size: 11px; font-weight: 600; color: var(--text2);
+  margin-top: 6px; white-space: nowrap; text-align: center;
+}
+.rv-terminal .rv-name { font-weight: 700; color: var(--text); font-size: 12px; }
+.rv-home .rv-name { font-weight: 800; color: var(--blue); font-size: 12px; }
+.rv-swap {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--orange); background: var(--orange-light);
+  padding: 4px 12px; border-radius: 10px;
+  margin: 2px auto; width: fit-content;
+}
+
 /* Dark mode additions */
 .dark .daily-tip-card {
   background: linear-gradient(135deg, rgba(26,86,219,.15) 0%, var(--white) 100%);
@@ -1761,3 +1811,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .quiz-card { border-color: var(--border); }
 .dark .cmp-vs { background: var(--border); }
 .dark .contacts-count { background: var(--border); }
+.dark .rv-dot { background: var(--bg); box-shadow: 0 0 0 2px var(--bg); }
+.dark .rv-terminal .rv-dot { background: var(--purple); box-shadow: 0 0 6px rgba(153,108,172,.4); }
+.dark .rv-home .rv-dot { background: var(--blue); box-shadow: 0 0 8px rgba(26,86,219,.5); }
+.dark .rv-swap { background: rgba(217,119,6,.15); }

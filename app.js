@@ -16,6 +16,7 @@ let cur = null, calY, calM, selDate, c1 = null, c2 = null, cmpY, cmpM;
 let mTarget = 'home', sopIdx = -1;
 let alerts = [], alertSeverity = 'high', lineBranch = 'main';
 let trainData = [], trainTimer = null;
+let lineViewMode = 'list', lastTrainFetch = 0, updateCounterTimer = null;
 
 // ===== UTILITY =====
 function td() {
@@ -839,6 +840,7 @@ function initLine5() {
     line5Initialized = true;
     fetchTrains();
     startTrainPolling();
+    startUpdateCounter();
   }
 }
 
@@ -950,6 +952,140 @@ function renderLine5() {
 
 }
 
+// ===== MAP VIEW =====
+function toggleLineView() {
+  lineViewMode = lineViewMode === 'list' ? 'map' : 'list';
+  const isMap = lineViewMode === 'map';
+  document.getElementById('lineTrackWrap').style.display = isMap ? 'none' : '';
+  document.getElementById('lineMapWrap').style.display = isMap ? '' : 'none';
+  document.getElementById('lineBranchBar').style.display = isMap ? 'none' : '';
+
+  const btn = document.getElementById('lineViewToggle');
+  btn.innerHTML = isMap
+    ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>';
+  btn.title = isMap ? '목록 보기' : '노선도 보기';
+
+  if (isMap) renderLine5Map();
+}
+
+function renderLine5Map() {
+  const coords = LINE5_MAP;
+  const routes = LINE5_ROUTES;
+  const nameMap = { '동대문역사문화공원': '동대문역사' };
+
+  let svg = '<defs>';
+  svg += '<filter id="mapGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg += '<filter id="trainGl"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+  svg += '</defs>';
+
+  // Route lines (glow + main)
+  ['main', 'macheon', 'hanam'].forEach(branch => {
+    const stns = routes[branch];
+    let d = stns.map((name, i) => {
+      const [x, y] = coords[name];
+      return (i === 0 ? 'M' : 'L') + x + ',' + y;
+    }).join(' ');
+    svg += `<path d="${d}" fill="none" stroke="rgba(139,92,246,0.2)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" class="map-route-glow"/>`;
+    svg += `<path d="${d}" fill="none" stroke="#8B5CF6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+
+  // Direction labels
+  svg += '<text x="50" y="28" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" font-family="system-ui,sans-serif">← 방화</text>';
+  svg += '<text x="890" y="350" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">강동 →</text>';
+  svg += '<text x="400" y="460" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">← 마천</text>';
+  svg += '<text x="260" y="530" fill="rgba(255,255,255,0.3)" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui,sans-serif">← 하남검단산</text>';
+
+  // Station dots and labels
+  Object.entries(coords).forEach(([name, [x, y]]) => {
+    const isDapsimni = name === '답십리';
+    const transfers = LINE5_TRANSFERS[name];
+    const isTransfer = transfers && !transfers.some(t => t.includes('지선'));
+
+    if (isTransfer) {
+      svg += `<circle cx="${x}" cy="${y}" r="7" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>`;
+    }
+
+    if (isDapsimni) {
+      svg += `<circle cx="${x}" cy="${y}" r="8" fill="rgba(251,191,36,0.15)" class="map-pulse"/>`;
+      svg += `<circle cx="${x}" cy="${y}" r="6" fill="#FBBF24" filter="url(#mapGlow)"/>`;
+    } else {
+      const r = isTransfer ? 4.5 : 3;
+      svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${isTransfer ? '#fff' : 'rgba(255,255,255,0.65)'}"/>`;
+    }
+
+    const displayName = nameMap[name] || name;
+    const labelCls = isDapsimni ? 'map-label-dap' : 'map-label';
+    svg += `<text x="${x}" y="${y + 16}" text-anchor="middle" class="${labelCls}">${displayName}</text>`;
+
+    if (isTransfer) {
+      svg += `<text x="${x}" y="${y + 25}" text-anchor="middle" class="map-transfer-text">${transfers.join('·')}</text>`;
+    }
+
+    if (isDapsimni) {
+      svg += `<text x="${x + 24}" y="${y + 5}" fill="#FBBF24" font-size="12" font-family="system-ui">★</text>`;
+    }
+  });
+
+  // Train markers
+  const trainsByStation = {};
+  trainData.forEach(t => {
+    const stn = t.statnNm.replace('역', '');
+    if (!trainsByStation[stn]) trainsByStation[stn] = [];
+    trainsByStation[stn].push(t);
+  });
+
+  Object.entries(trainsByStation).forEach(([stn, trains]) => {
+    const pos = coords[stn];
+    if (!pos) return;
+    const [sx, sy] = pos;
+    let upIdx = 0, downIdx = 0;
+
+    trains.forEach(t => {
+      const isUp = t.updnLine === '0' || t.updnLine === '상행';
+      const idx = isUp ? upIdx++ : downIdx++;
+      const offsetY = isUp ? -(24 + idx * 20) : (28 + idx * 20);
+      const dest = (t.statnTnm || '').replace('역', '');
+      const no = t.trainNo || '';
+      const label = `${dest} ${no}`;
+      const arriving = t.trainSttus === '0';
+      const fillColor = isUp ? '#22C55E' : '#F97316';
+      const capsuleW = Math.max(label.length * 8 + 14, 56);
+      const capsuleX = -capsuleW / 2;
+
+      svg += `<g transform="translate(${sx},${sy + offsetY})" filter="url(#trainGl)" class="${arriving ? 'map-train-arrive' : ''}">`;
+      svg += `<rect x="${capsuleX}" y="-9" width="${capsuleW}" height="18" rx="4" fill="${fillColor}" opacity="${arriving ? 1 : 0.85}"/>`;
+      svg += `<text x="0" y="4" text-anchor="middle" fill="white" font-size="9" font-weight="700" font-family="system-ui,sans-serif">${label}</text>`;
+      svg += '</g>';
+    });
+  });
+
+  document.getElementById('lineMapContent').innerHTML =
+    `<svg viewBox="-30 -10 1020 620" class="line-map-svg" xmlns="http://www.w3.org/2000/svg">${svg}</svg>`;
+
+  // Auto-scroll to 답십리
+  setTimeout(() => {
+    const scroll = document.getElementById('lineMapScroll');
+    if (!scroll) return;
+    const scaleX = 1100 / 1020, scaleY = 669 / 620;
+    const dapX = (470 + 30) * scaleX, dapY = (360 + 10) * scaleY;
+    scroll.scrollLeft = Math.max(0, dapX - scroll.clientWidth / 2);
+    scroll.scrollTop = Math.max(0, dapY - scroll.clientHeight / 2);
+  }, 80);
+}
+
+function startUpdateCounter() {
+  clearInterval(updateCounterTimer);
+  updateCounterTimer = setInterval(() => {
+    if (!lastTrainFetch) return;
+    const el = document.getElementById('lineUpdateTime');
+    const diff = Math.floor((Date.now() - lastTrainFetch) / 1000);
+    if (diff < 5) el.textContent = '실시간 · 방금 갱신';
+    else if (diff < 60) el.textContent = `실시간 · ${diff}초 전 갱신`;
+    else el.textContent = `실시간 · ${Math.floor(diff / 60)}분 전 갱신`;
+  }, 1000);
+}
+
 function fetchTrains() {
   const btn = document.getElementById('lineRefreshBtn');
   btn.classList.add('spinning');
@@ -961,9 +1097,9 @@ function fetchTrains() {
     .then(data => {
       if (data.realtimePositionList) {
         trainData = data.realtimePositionList;
+        lastTrainFetch = Date.now();
         renderLine5();
-        document.getElementById('lineUpdateTime').textContent =
-          '실시간 · ' + new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        if (lineViewMode === 'map') renderLine5Map();
       } else if (data.errorMessage) {
         // API 에러 (운행 종료 시간 등)
         trainData = [];

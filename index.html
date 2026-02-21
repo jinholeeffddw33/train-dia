@@ -99,17 +99,32 @@
       <div class="line-header-title">5호선 실시간</div>
       <div class="line-header-status" id="lineUpdateTime">업데이트 대기중</div>
     </div>
-    <button class="line-refresh-btn" type="button" id="lineRefreshBtn" onclick="fetchTrains()">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-    </button>
+    <div class="line-header-btns">
+      <button class="line-view-btn" id="lineViewToggle" type="button" onclick="toggleLineView()" title="노선도 보기">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      </button>
+      <button class="line-refresh-btn" type="button" id="lineRefreshBtn" onclick="fetchTrains()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </button>
+    </div>
   </div>
-  <div class="line-branch-bar">
+  <div class="line-branch-bar" id="lineBranchBar">
     <button class="line-branch-tab active" type="button" onclick="switchBranch('main',this)">본선</button>
     <button class="line-branch-tab" type="button" onclick="switchBranch('macheon',this)">마천</button>
     <button class="line-branch-tab" type="button" onclick="switchBranch('hanam',this)">하남</button>
   </div>
   <div class="line-track-wrap" id="lineTrackWrap">
     <div id="lineTrackList"></div>
+  </div>
+  <div class="line-map-wrap" id="lineMapWrap">
+    <div class="line-map-legend">
+      <span class="map-legend-item up">● 상행(방화)</span>
+      <span class="map-legend-item down">● 하행</span>
+      <span class="map-legend-item dapsimni">★ 답십리</span>
+    </div>
+    <div class="line-map-scroll" id="lineMapScroll">
+      <div id="lineMapContent"></div>
+    </div>
   </div>
 </div>
 

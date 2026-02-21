@@ -1197,3 +1197,94 @@ body.dark .tk-transfer-tag { background: rgba(255,255,255,.1); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 body.dark .toast { background: #374151; }
+
+/* ===== LINE 5 MAP VIEW ===== */
+.line-header-btns {
+  display: flex; gap: 8px; align-items: center;
+}
+.line-view-btn {
+  width: 42px; height: 42px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--white);
+  border: 1px solid var(--border); color: var(--text2);
+  transition: .2s; flex-shrink: 0;
+  box-shadow: var(--shadow3);
+}
+.line-view-btn:active { transform: scale(.92); }
+body.dark .line-view-btn { background: #1F2937; border-color: #374151; }
+
+.line-map-wrap {
+  display: none;
+  background: #0a0e1a;
+  border-radius: 12px;
+  margin: 0 8px;
+  overflow: hidden;
+}
+.line-map-legend {
+  display: flex; gap: 16px; padding: 10px 16px;
+  font-size: 12px; font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+.map-legend-item { color: rgba(255,255,255,0.5); }
+.map-legend-item.up { color: #22C55E; }
+.map-legend-item.down { color: #F97316; }
+.map-legend-item.dapsimni { color: #FBBF24; }
+
+.line-map-scroll {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  height: calc(100dvh - var(--tab-h) - 170px);
+  position: relative;
+}
+.line-map-svg {
+  width: 1100px;
+  height: 669px;
+  display: block;
+}
+
+/* SVG Map station labels */
+.map-label {
+  fill: rgba(255,255,255,0.6);
+  font-size: 9px;
+  font-weight: 400;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.map-label-dap {
+  fill: #FBBF24;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.map-transfer-text {
+  fill: rgba(255,255,255,0.28);
+  font-size: 7px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* SVG Map animations */
+.map-pulse {
+  animation: mapPulse 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes mapPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(1.8); }
+}
+.map-train-arrive rect {
+  animation: mapTrainBlink 1s ease-in-out infinite;
+}
+@keyframes mapTrainBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+/* Route line glow animation */
+.map-route-glow {
+  animation: routeGlow 3s ease-in-out infinite;
+}
+@keyframes routeGlow {
+  0%, 100% { stroke-opacity: .2; }
+  50% { stroke-opacity: .35; }
+}

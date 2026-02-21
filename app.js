@@ -1810,9 +1810,33 @@ function getDailyTip() {
   return DAILY_TIPS[getDayOfYear() % DAILY_TIPS.length];
 }
 
-function getDailyQuiz() {
-  if (typeof QUIZ === 'undefined' || !QUIZ.length) return null;
-  return QUIZ[getDayOfYear() % QUIZ.length];
+// 퀴즈 상태 (연속 풀기)
+let quizState = null;
+
+function initQuizState() {
+  if (typeof QUIZ === 'undefined' || !QUIZ.length) return;
+  const day = getDayOfYear();
+  try {
+    const saved = localStorage.getItem('quizState');
+    if (saved) {
+      const s = JSON.parse(saved);
+      if (s.day === day) { quizState = s; return; }
+    }
+  } catch(e) {}
+  // 새 날 — 셔플 순서 생성 (시드 기반)
+  const indices = Array.from({length: QUIZ.length}, (_, i) => i);
+  let seed = day * 2654435761;
+  for (let i = indices.length - 1; i > 0; i--) {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    const j = seed % (i + 1);
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  quizState = { day, order: indices, idx: 0, correct: 0, total: 0, answered: false };
+  saveQuizState();
+}
+
+function saveQuizState() {
+  if (quizState) localStorage.setItem('quizState', JSON.stringify(quizState));
 }
 
 function renderHomeExtras() {
@@ -1832,40 +1856,8 @@ function renderHomeExtras() {
     </div>`;
   }
 
-  // 퀴즈
-  const quiz = getDailyQuiz();
-  if (quiz) {
-    const todayKey = 'quizDone_' + getDayOfYear();
-    const done = localStorage.getItem(todayKey);
-    const streak = parseInt(localStorage.getItem('quizStreak') || '0');
-
-    if (done) {
-      const wasCorrect = done === '1';
-      h += `<div class="quiz-card">
-        <div class="quiz-header">
-          <div class="quiz-title">🧠 오늘의 퀴즈</div>
-          ${streak > 0 ? `<div class="quiz-streak">🔥 ${streak}일 연속!</div>` : ''}
-        </div>
-        <div class="quiz-done">
-          <div class="quiz-done-icon">${wasCorrect ? '🎉' : '📖'}</div>
-          ${wasCorrect ? '오늘 퀴즈를 맞혔습니다!' : '내일 다시 도전해 보세요!'}
-        </div>
-        <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">이 퀴즈는 참고용입니다</div>
-      </div>`;
-    } else {
-      h += `<div class="quiz-card" id="quizCardLive">
-        <div class="quiz-header">
-          <div class="quiz-title">🧠 오늘의 퀴즈</div>
-          ${streak > 0 ? `<div class="quiz-streak">🔥 ${streak}일 연속!</div>` : ''}
-        </div>
-        <div class="quiz-question">${quiz.q}</div>
-        <div class="quiz-options" id="quizOptions">
-          ${quiz.a.map((opt, i) => `<button class="quiz-opt" type="button" onclick="answerQuiz(${i})">${opt}</button>`).join('')}
-        </div>
-        <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">이 퀴즈는 참고용입니다</div>
-      </div>`;
-    }
-  }
+  // 퀴즈 컨테이너
+  h += '<div id="quizContainer"></div>';
 
   // 날씨 링크
   h += `<a class="weather-link-card" href="https://weather.naver.com/" target="_blank" rel="noopener">
@@ -1875,31 +1867,65 @@ function renderHomeExtras() {
   </a>`;
 
   el.innerHTML = h;
+  initQuizState();
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  if (!container || !quizState) return;
+
+  const total = QUIZ.length;
+  const { order, idx, correct, total: answered } = quizState;
+
+  // 모든 문제 완료
+  if (idx >= total) {
+    const pct = Math.round((correct / answered) * 100);
+    container.innerHTML = `<div class="quiz-card">
+      <div class="quiz-header">
+        <div class="quiz-title">🧠 기관사 퀴즈</div>
+        <div class="quiz-streak">${correct}/${answered} (${pct}%)</div>
+      </div>
+      <div class="quiz-done">
+        <div class="quiz-done-icon">🏆</div>
+        모든 문제를 풀었습니다!<br>
+        <span style="font-size:14px;color:var(--text3)">내일 다시 셔플됩니다</span>
+      </div>
+      <button class="quiz-opt" type="button" onclick="resetQuiz()" style="margin-top:12px;text-align:center;border-color:var(--blue);color:var(--blue)">🔄 처음부터 다시 풀기</button>
+      <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">이 퀴즈는 참고용입니다</div>
+    </div>`;
+    return;
+  }
+
+  const quiz = QUIZ[order[idx]];
+  const num = idx + 1;
+
+  container.innerHTML = `<div class="quiz-card" id="quizCardLive">
+    <div class="quiz-header">
+      <div class="quiz-title">🧠 기관사 퀴즈</div>
+      <div class="quiz-streak">${num}/${total}</div>
+    </div>
+    ${answered > 0 ? `<div class="quiz-score">✅ ${correct}개 정답 / ${answered}문제</div>` : ''}
+    <div class="quiz-question">${quiz.q}</div>
+    <div class="quiz-options" id="quizOptions">
+      ${quiz.a.map((opt, i) => `<button class="quiz-opt" type="button" onclick="answerQuiz(${i})">${opt}</button>`).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">이 퀴즈는 참고용입니다</div>
+  </div>`;
 }
 
 function answerQuiz(idx) {
-  const quiz = getDailyQuiz();
-  if (!quiz) return;
+  if (!quizState || quizState.answered) return;
+  const quiz = QUIZ[quizState.order[quizState.idx]];
   const correct = quiz.correct;
   const isCorrect = idx === correct;
-  const todayKey = 'quizDone_' + getDayOfYear();
 
-  // 이미 완료 방지
-  if (localStorage.getItem(todayKey)) return;
+  quizState.answered = true;
+  quizState.total++;
+  if (isCorrect) quizState.correct++;
+  saveQuizState();
 
-  // 결과 저장
-  localStorage.setItem(todayKey, isCorrect ? '1' : '0');
-
-  // 스트릭 업데이트
-  let streak = parseInt(localStorage.getItem('quizStreak') || '0');
-  if (isCorrect) {
-    streak++;
-  } else {
-    streak = 0;
-  }
-  localStorage.setItem('quizStreak', String(streak));
-
-  // UI 업데이트
+  // 버튼 상태
   const buttons = document.querySelectorAll('#quizOptions .quiz-opt');
   buttons.forEach((btn, i) => {
     btn.disabled = true;
@@ -1907,18 +1933,36 @@ function answerQuiz(idx) {
     if (i === idx && !isCorrect) btn.classList.add('wrong');
   });
 
-  // 결과 메시지
+  // 결과 + 다음 문제 버튼
   const card = document.getElementById('quizCardLive');
   if (card) {
-    const resultDiv = document.createElement('div');
-    resultDiv.className = 'quiz-result ' + (isCorrect ? 'pass' : 'fail');
-    if (isCorrect) {
-      resultDiv.textContent = `🎉 정답! ${streak > 1 ? `(${streak}일 연속 정답!)` : ''}`;
-    } else {
-      resultDiv.textContent = `정답은 "${quiz.a[correct]}"입니다`;
-    }
-    card.querySelector('.quiz-options').after(resultDiv);
+    let resultH = `<div class="quiz-result ${isCorrect ? 'pass' : 'fail'}">`;
+    resultH += isCorrect ? '🎉 정답!' : `정답: "${quiz.a[correct]}"`;
+    resultH += '</div>';
+    resultH += `<button class="quiz-next-btn" type="button" onclick="nextQuiz()">다음 문제 →</button>`;
+    card.querySelector('.quiz-options').insertAdjacentHTML('afterend', resultH);
   }
+}
+
+function nextQuiz() {
+  if (!quizState) return;
+  quizState.idx++;
+  quizState.answered = false;
+  saveQuizState();
+  renderQuiz();
+  // 스크롤을 퀴즈 카드로
+  const c = document.getElementById('quizContainer');
+  if (c) c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetQuiz() {
+  if (!quizState) return;
+  quizState.idx = 0;
+  quizState.correct = 0;
+  quizState.total = 0;
+  quizState.answered = false;
+  saveQuizState();
+  renderQuiz();
 }
 
 // ===== INIT =====

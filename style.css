@@ -1724,6 +1724,20 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   font-size: 15px; color: var(--text2); font-weight: 600;
 }
 .quiz-done-icon { font-size: 32px; margin-bottom: 8px; }
+.quiz-score {
+  font-size: 13px; font-weight: 700; color: var(--green);
+  background: var(--green-light); padding: 6px 14px; border-radius: 8px;
+  margin-bottom: 12px; text-align: center;
+}
+.quiz-next-btn {
+  display: block; width: 100%; margin-top: 10px;
+  padding: 14px; text-align: center;
+  background: linear-gradient(135deg, #1A56DB 0%, #2B6EE8 100%);
+  color: #fff; border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(26,86,219,.25);
+}
+.quiz-next-btn:active { transform: scale(0.96); }
 
 /* Weather link */
 .weather-link-card {

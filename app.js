@@ -1230,31 +1230,41 @@ function startUpdateCounter() {
 
 function fetchTrains() {
   const btn = document.getElementById('lineRefreshBtn');
+  const statusEl = document.getElementById('lineUpdateTime');
   btn.classList.add('spinning');
-  setTimeout(() => btn.classList.remove('spinning'), 800);
+  statusEl.textContent = '불러오는 중...';
 
   const url = `https://swopenAPI.seoul.go.kr/api/subway/${API_KEY}/json/realtimePosition/0/100/5호선`;
-  fetch(url)
+  fetch(url, { signal: AbortSignal.timeout(10000) })
     .then(r => r.json())
     .then(data => {
+      btn.classList.remove('spinning');
       if (data.realtimePositionList) {
         trainData = data.realtimePositionList;
         lastTrainFetch = Date.now();
         renderLine5();
         if (lineViewMode === 'map') renderLine5Map();
       } else if (data.errorMessage) {
-        // API 에러 (운행 종료 시간 등)
         trainData = [];
         renderLine5();
-        document.getElementById('lineUpdateTime').textContent = '열차 운행 종료';
+        const now = new Date();
+        const h = now.getHours();
+        if (h >= 1 && h < 5) {
+          statusEl.textContent = '심야 운행 종료 (05시 재개)';
+        } else {
+          statusEl.textContent = '열차 데이터 없음';
+        }
       } else {
-        showToast('열차 데이터를 불러올 수 없습니다');
-        document.getElementById('lineUpdateTime').textContent = '데이터 오류';
+        statusEl.textContent = '데이터 오류 — 다시 시도해주세요';
       }
     })
-    .catch(() => {
-      showToast('네트워크 연결을 확인해 주세요');
-      document.getElementById('lineUpdateTime').textContent = '연결 실패';
+    .catch(e => {
+      btn.classList.remove('spinning');
+      if (e.name === 'TimeoutError') {
+        statusEl.textContent = '서버 응답 없음 — 다시 시도해주세요';
+      } else {
+        statusEl.textContent = '네트워크 연결 실패';
+      }
     });
 }
 

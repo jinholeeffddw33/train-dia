@@ -1110,9 +1110,9 @@ function renderLine5() {
 function toggleLineView() {
   lineViewMode = lineViewMode === 'list' ? 'map' : 'list';
   const isMap = lineViewMode === 'map';
-  document.getElementById('lineTrackWrap').style.display = isMap ? 'none' : '';
-  document.getElementById('lineMapWrap').style.display = isMap ? '' : 'none';
-  document.getElementById('lineBranchBar').style.display = isMap ? 'none' : '';
+  document.getElementById('lineTrackWrap').style.display = isMap ? 'none' : 'block';
+  document.getElementById('lineMapWrap').style.display = isMap ? 'block' : 'none';
+  document.getElementById('lineBranchBar').style.display = isMap ? 'none' : 'flex';
 
   const btn = document.getElementById('lineViewToggle');
   btn.innerHTML = isMap

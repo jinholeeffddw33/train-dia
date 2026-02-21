@@ -27,15 +27,26 @@
   <div class="splash-footer">서울교통공사</div>
 </div>
 
+<!-- ===== PWA INSTALL PROMPT ===== -->
+<div class="pwa-prompt" id="pwaPrompt">
+  <div class="pwa-prompt-card">
+    <div class="pwa-prompt-icon">📲</div>
+    <div class="pwa-prompt-title">앱 설치하기</div>
+    <div class="pwa-prompt-desc" id="pwaDesc">홈 화면에 추가하면 더 빠르게 사용할 수 있습니다</div>
+    <div id="pwaSteps"></div>
+    <button class="pwa-btn-install" id="pwaInstallBtn" type="button" onclick="installPWA()">홈 화면에 추가</button>
+    <button class="pwa-btn-done" type="button" onclick="dismissPWA()">이미 설치했어요</button>
+  </div>
+</div>
+
 <!-- ===== NOTIFICATION PROMPT ===== -->
 <div class="noti-prompt" id="notiPrompt">
   <div class="noti-prompt-card">
-    <div class="noti-prompt-icon">🔔</div>
-    <div class="noti-prompt-title">장애 알림 받기</div>
-    <div class="noti-prompt-desc">역 장애 발생 시 실시간 알림을 받으려면<br>알림을 허용해 주세요</div>
+    <div class="noti-prompt-icon">🚨</div>
+    <div class="noti-prompt-title">알림 허용 필수</div>
+    <div class="noti-prompt-desc">다른 기관사가 등록한 <strong>역 장애 알림</strong>을<br>실시간으로 받을 수 있습니다.<br><br>이 앱의 <strong>핵심 기능</strong>입니다.</div>
     <div class="noti-prompt-btns">
-      <button class="noti-btn-allow" type="button" onclick="allowNotifications()">허용</button>
-      <button class="noti-btn-later" type="button" onclick="dismissNotiPrompt()">나중에</button>
+      <button class="noti-btn-allow" type="button" onclick="allowNotifications()">알림 허용하기</button>
     </div>
   </div>
 </div>
@@ -214,9 +225,16 @@
   </div>
 </div>
 
+<!-- FAB (장애 알림 등록) -->
+<button class="fab-alert" id="fabAlert" type="button" onclick="openAlertForm()">
+  <span class="fab-icon">🚨</span>
+  <span class="fab-count" id="fabCount"></span>
+</button>
+
 <!-- Tab Bar -->
 <div class="tabs" id="tabBar">
   <button class="tab active" type="button" onclick="goTab('pageHome',this)">
+    <span class="tab-dot" id="tabHomeDot"></span>
     <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     홈
   </button>

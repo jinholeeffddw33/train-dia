@@ -318,6 +318,7 @@ function subscribeAlerts() {
         renderAlertList();
         renderAlertBanner();
         renderAlertBadge();
+  updateAlertIndicators();
         // 다른 사람이 등록한 알림이면 브라우저 알림
         if (a.created_by !== (cur ? cur.n : '')) {
           sendNotification(`${a.station}역 장애 발생`, a.message);
@@ -333,6 +334,7 @@ function subscribeAlerts() {
         renderAlertList();
         renderAlertBanner();
         renderAlertBadge();
+  updateAlertIndicators();
       }
     })
     .subscribe();
@@ -510,6 +512,7 @@ async function postAlert() {
   renderAlertList();
   renderAlertBanner();
   renderAlertBadge();
+  updateAlertIndicators();
   showToast(`${station}역 장애 알림이 등록되었습니다`);
   sendNotification(`${station}역 장애 발생`, message);
 }
@@ -533,6 +536,7 @@ async function dismissAlert(id) {
   renderAlertList();
   renderAlertBanner();
   renderAlertBadge();
+  updateAlertIndicators();
   showToast('알림이 해제되었습니다');
 }
 
@@ -551,16 +555,12 @@ function shareAlert(id) {
   }
 }
 
-// ===== NOTIFICATIONS =====
+// ===== NOTIFICATIONS (필수) =====
 function requestNotificationPermission() {
   if (!('Notification' in window)) return;
+  // 허용될 때까지 매번 표시
   if (Notification.permission === 'default') {
-    const dismissed = localStorage.getItem('notiPromptDismissed');
-    if (!dismissed) {
-      setTimeout(() => {
-        document.getElementById('notiPrompt').classList.add('show');
-      }, 2000);
-    }
+    document.getElementById('notiPrompt').classList.add('show');
   }
 }
 
@@ -568,20 +568,94 @@ function allowNotifications() {
   document.getElementById('notiPrompt').classList.remove('show');
   if ('Notification' in window) {
     Notification.requestPermission().then(p => {
-      if (p === 'granted') showToast('알림이 활성화되었습니다');
+      if (p === 'granted') {
+        showToast('알림이 활성화되었습니다');
+      } else if (p === 'denied') {
+        showToast('브라우저 설정에서 알림을 허용해 주세요');
+      }
     });
   }
-}
-
-function dismissNotiPrompt() {
-  document.getElementById('notiPrompt').classList.remove('show');
-  localStorage.setItem('notiPromptDismissed', '1');
 }
 
 function sendNotification(title, body) {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     new Notification(title, { body: body, icon: 'logo.png', badge: 'logo.png' });
+  }
+}
+
+// ===== PWA INSTALL =====
+let deferredInstallPrompt = null;
+
+function isPWAInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function showPWAPrompt() {
+  if (isPWAInstalled()) return; // 이미 설치됨
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const stepsEl = document.getElementById('pwaSteps');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const descEl = document.getElementById('pwaDesc');
+
+  if (isIOS) {
+    descEl.textContent = '홈 화면에 추가하면 앱처럼 사용할 수 있습니다';
+    stepsEl.innerHTML = '<div class="pwa-steps">① 하단 <strong>공유 버튼</strong> (□↑) 탭<br>② <strong>"홈 화면에 추가"</strong> 선택<br>③ <strong>"추가"</strong> 탭</div>';
+    installBtn.textContent = '확인했어요';
+    installBtn.onclick = dismissPWA;
+  } else if (deferredInstallPrompt) {
+    descEl.textContent = '홈 화면에 추가하면 앱처럼 사용할 수 있습니다';
+    stepsEl.innerHTML = '';
+    installBtn.textContent = '설치하기';
+  } else {
+    descEl.textContent = '홈 화면에 추가하면 앱처럼 사용할 수 있습니다';
+    stepsEl.innerHTML = '<div class="pwa-steps">① 브라우저 <strong>메뉴(⋮)</strong> 탭<br>② <strong>"홈 화면에 추가"</strong> 선택</div>';
+    installBtn.textContent = '확인했어요';
+    installBtn.onclick = dismissPWA;
+  }
+
+  document.getElementById('pwaPrompt').classList.add('show');
+}
+
+function installPWA() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        showToast('앱이 설치되었습니다!');
+      }
+      deferredInstallPrompt = null;
+    });
+  }
+  dismissPWA();
+}
+
+function dismissPWA() {
+  document.getElementById('pwaPrompt').classList.remove('show');
+  localStorage.setItem('pwaPromptShown', '1');
+  // PWA 닫힌 후 알림 프롬프트 표시
+  setTimeout(requestNotificationPermission, 500);
+}
+
+// ===== FAB & TAB BADGE =====
+function updateAlertIndicators() {
+  const count = getActiveAlerts().length;
+
+  // FAB 카운트
+  const fabCount = document.getElementById('fabCount');
+  if (count > 0) {
+    fabCount.textContent = count;
+    fabCount.classList.add('show');
+  } else {
+    fabCount.classList.remove('show');
+  }
+
+  // 홈 탭 빨간 점
+  const tabDot = document.getElementById('tabHomeDot');
+  if (tabDot) {
+    if (count > 0) tabDot.classList.add('show');
+    else tabDot.classList.remove('show');
   }
 }
 
@@ -924,6 +998,7 @@ function rMore() {
   }
 
   renderAlertBadge();
+  updateAlertIndicators();
 }
 
 function showSub(id) {
@@ -1066,6 +1141,11 @@ function dismissSplash() {
 }
 
 // ===== PWA =====
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
 function initPWA() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').then(reg => {
@@ -1132,11 +1212,18 @@ document.addEventListener('keydown', e => {
     renderAlertList();
     renderAlertBanner();
     renderAlertBadge();
+  updateAlertIndicators();
   });
 
   // Dismiss splash after load
   setTimeout(dismissSplash, 1200);
 
-  // Request notification permission after splash
-  setTimeout(requestNotificationPermission, 2500);
+  // 스플래시 후: PWA 미설치면 설치 유도 → 알림 허용
+  setTimeout(() => {
+    if (!isPWAInstalled()) {
+      showPWAPrompt();
+    } else {
+      requestNotificationPermission();
+    }
+  }, 2000);
 })();

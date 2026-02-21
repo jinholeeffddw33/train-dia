@@ -520,6 +520,9 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .set-item:last-child { border-bottom: none; }
 .set-l { font-size: 15px; color: var(--text2); font-weight: 500; }
 .set-v { font-size: 15px; font-weight: 700; color: var(--text); }
+.noti-on { color: #34D399; }
+.noti-off { color: #FB7185; font-size: 13px; }
+.noti-ask { color: #38BDF8; }
 
 /* ===== MODAL ===== */
 .modal-bg {

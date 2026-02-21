@@ -127,7 +127,7 @@ function timeAgo(ts) {
 
 // ===== TOAST =====
 let toastTimer = null;
-function showToast(msg) {
+function showToast(msg, duration) {
   let el = document.getElementById('toast');
   if (!el) {
     el = document.createElement('div');
@@ -136,9 +136,10 @@ function showToast(msg) {
     document.body.appendChild(el);
   }
   el.textContent = msg;
+  el.style.whiteSpace = msg.includes('\n') ? 'pre-line' : '';
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  toastTimer = setTimeout(() => el.classList.remove('show'), duration || 2500);
 }
 
 // ===== CLOCK =====
@@ -574,8 +575,64 @@ function allowNotifications() {
       } else if (p === 'denied') {
         showToast('브라우저 설정에서 알림을 허용해 주세요');
       }
+      updateNotiSetting();
     });
   }
+}
+
+function updateNotiSetting() {
+  const statusEl = document.getElementById('notiStatus');
+  const itemEl = document.getElementById('notiSettingItem');
+  if (!statusEl || !itemEl) return;
+
+  if (!('Notification' in window)) {
+    statusEl.textContent = '미지원';
+    statusEl.className = 'set-v';
+    itemEl.onclick = null;
+    return;
+  }
+
+  const perm = Notification.permission;
+  if (perm === 'granted') {
+    statusEl.textContent = 'ON';
+    statusEl.className = 'set-v noti-on';
+    itemEl.onclick = null;
+    itemEl.style.cursor = 'default';
+  } else if (perm === 'denied') {
+    statusEl.textContent = 'OFF · 설정에서 허용 ›';
+    statusEl.className = 'set-v noti-off';
+    itemEl.onclick = showNotiHelp;
+    itemEl.style.cursor = 'pointer';
+  } else {
+    statusEl.textContent = '허용하기 ›';
+    statusEl.className = 'set-v noti-ask';
+    itemEl.onclick = requestNotiFromSetting;
+    itemEl.style.cursor = 'pointer';
+  }
+}
+
+function requestNotiFromSetting() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') showToast('알림이 활성화되었습니다');
+      else if (p === 'denied') showToast('알림이 차단되었습니다');
+      updateNotiSetting();
+    });
+  }
+}
+
+function showNotiHelp() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
+  let msg = '';
+  if (isIOS) {
+    msg = '① Safari 설정 → 이 웹사이트 → 알림 허용\n② 또는: iPhone 설정 → Safari → 알림';
+  } else if (isAndroid) {
+    msg = '① 주소창 왼쪽 🔒 아이콘 탭\n② "알림" → 허용으로 변경';
+  } else {
+    msg = '① 주소창 왼쪽 🔒 아이콘 클릭\n② "알림" → 허용으로 변경';
+  }
+  showToast(msg, 5000);
 }
 
 function sendNotification(title, body) {
@@ -1138,6 +1195,7 @@ function rMore() {
 
   renderAlertBadge();
   updateAlertIndicators();
+  updateNotiSetting();
 }
 
 function showSub(id) {

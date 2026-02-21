@@ -10,6 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="stylesheet" href="style.css">
+<script>if(localStorage.getItem('darkMode')==='1')document.documentElement.classList.add('dark');</script>
 </head>
 <body>
 
@@ -75,6 +76,7 @@
   <div id="homeTodayCard"></div>
   <div id="homeWeek"></div>
   <div id="homeStatus"></div>
+  <div id="homeExtras"></div>
 </div>
 
 <!-- ===== CALENDAR ===== -->
@@ -143,13 +145,14 @@
     <div class="cal-title">교번 비교</div>
   </div>
   <div class="cmp-selectors">
-    <button class="cmp-sel-card" id="cmpSel1" type="button" onclick="openModal('c1')">
-      <div class="cmp-sel-icon">👤</div>
+    <button class="cmp-sel-card" data-slot="1" id="cmpSel1" type="button" onclick="openModal('c1')">
+      <div class="cmp-sel-avatar cmp-avatar-1" id="c1Icon">A</div>
       <div class="cmp-sel-name" id="c1Name">기관사 1</div>
       <div class="cmp-sel-sub" id="c1Sub">탭하여 선택</div>
     </button>
-    <button class="cmp-sel-card" id="cmpSel2" type="button" onclick="openModal('c2')">
-      <div class="cmp-sel-icon">👤</div>
+    <div class="cmp-vs">VS</div>
+    <button class="cmp-sel-card" data-slot="2" id="cmpSel2" type="button" onclick="openModal('c2')">
+      <div class="cmp-sel-avatar cmp-avatar-2" id="c2Icon">B</div>
       <div class="cmp-sel-name" id="c2Name">기관사 2</div>
       <div class="cmp-sel-sub" id="c2Sub">탭하여 선택</div>
     </button>
@@ -221,7 +224,7 @@
         <div class="set-item"><div class="set-l">노선</div><div class="set-v">5호선</div></div>
         <div class="set-item"><div class="set-l">사업소</div><div class="set-v">답십리</div></div>
         <div class="set-item"><div class="set-l">DB 기준일</div><div class="set-v">2014.01.29</div></div>
-        <div class="set-item"><div class="set-l">DIA 주기</div><div class="set-v">128일</div></div>
+        <div class="set-item"><div class="set-l">DIA 주기</div><div class="set-v">128일 순환</div></div>
         <div class="set-item"><div class="set-l">버전</div><div class="set-v">Web 3.0 PWA</div></div>
       </div>
     </div>
@@ -261,24 +264,24 @@
 
 <!-- Tab Bar -->
 <div class="tabs" id="tabBar">
-  <button class="tab active" type="button" onclick="goTab('pageHome',this)">
+  <button class="tab active" data-tab="home" type="button" onclick="goTab('pageHome',this)">
     <span class="tab-dot" id="tabHomeDot"></span>
     <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     홈
   </button>
-  <button class="tab" type="button" onclick="goTab('pageCal',this)">
+  <button class="tab" data-tab="cal" type="button" onclick="goTab('pageCal',this)">
     <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     교번
   </button>
-  <button class="tab" type="button" onclick="goTab('pageLine',this)">
-    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+  <button class="tab" data-tab="line" type="button" onclick="goTab('pageLine',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="16" rx="3"/><rect x="7.5" y="4.5" width="9" height="5" rx="1.5"/><circle cx="8.5" cy="13" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><line x1="4" y1="20" x2="20" y2="20" stroke-width="2.5"/><line x1="8" y1="18" x2="8" y2="20"/><line x1="16" y1="18" x2="16" y2="20"/></svg>
     노선
   </button>
-  <button class="tab" type="button" onclick="goTab('pageCmp',this)">
+  <button class="tab" data-tab="cmp" type="button" onclick="goTab('pageCmp',this)">
     <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     비교
   </button>
-  <button class="tab" type="button" onclick="goTab('pageMore',this)">
+  <button class="tab" data-tab="more" type="button" onclick="goTab('pageMore',this)">
     <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
     더보기
   </button>
@@ -315,7 +318,8 @@
       </div>
 
       <label class="af-label">내용</label>
-      <textarea class="af-textarea" id="alertMessage" rows="3" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
+      <textarea class="af-textarea" id="alertMessage" rows="3" maxlength="200" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
+      <div class="af-char-count" id="alertMsgCount">0/200</div>
 
       <label class="af-label">사진 (선택 · 최대 3장)</label>
       <div class="af-photo-area" id="alertPhotoArea" onclick="triggerPhotoInput()">

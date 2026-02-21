@@ -291,8 +291,8 @@ function rHome() {
       <div class="sc-sub">${restDateStr}</div>
     </div>
     ${nextWork || `<div class="status-card">
-      <div class="sc-label">128일 주기</div>
-      <div class="sc-val" style="font-size:14px;line-height:1.8">주간 43일 · 야간 31일<br>대기 13일 · 휴무 41일</div>
+      <div class="sc-label">교번 구성</div>
+      <div class="sc-val" style="font-size:14px;line-height:1.8">주간 43 · 야간 31<br>대기 13 · 휴무 41</div>
     </div>`}
   </div>`;
 }
@@ -425,8 +425,9 @@ function renderAlertList() {
   const active = getActiveAlerts();
   if (active.length === 0) {
     el.innerHTML = `<div class="alert-empty">
-      <div class="alert-empty-icon">✅</div>
+      <div class="alert-empty-icon">🛡️</div>
       <div class="alert-empty-msg">현재 장애 알림이 없습니다</div>
+      <div class="alert-empty-sub">안전한 하루입니다!</div>
     </div>`;
     return;
   }
@@ -473,21 +474,33 @@ function openAlertForm() {
   alertSeverity = 'high';
   document.querySelectorAll('.af-sev-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('.af-sev-btn.high').classList.add('active');
+  // 글자 수 카운터
+  const msgEl = document.getElementById('alertMessage');
+  const countEl = document.getElementById('alertMsgCount');
+  msgEl.oninput = () => {
+    countEl.textContent = `${msgEl.value.length}/200`;
+  };
+  countEl.textContent = '0/200';
+
   document.getElementById('alertModalBg').classList.add('open');
 
   const input = document.getElementById('alertStationInput');
+  let stationSearchTimer = null;
   input.oninput = () => {
-    const q = input.value.trim();
-    const suggest = document.getElementById('alertSuggest');
-    if (!q) { suggest.innerHTML = ''; return; }
-    const matches = ALL_STATIONS.filter(s => s.includes(q));
-    if (matches.length === 0) {
-      suggest.innerHTML = '<div class="af-suggest-empty">검색 결과 없음</div>';
-    } else {
-      suggest.innerHTML = matches.map(s =>
-        `<div class="af-suggest-item" onclick="pickStation('${s}')">${s.replace(q, '<strong>' + q + '</strong>')}역</div>`
-      ).join('');
-    }
+    clearTimeout(stationSearchTimer);
+    stationSearchTimer = setTimeout(() => {
+      const q = input.value.trim();
+      const suggest = document.getElementById('alertSuggest');
+      if (!q) { suggest.innerHTML = ''; return; }
+      const matches = ALL_STATIONS.filter(s => s.includes(q));
+      if (matches.length === 0) {
+        suggest.innerHTML = '<div class="af-suggest-empty">검색 결과 없음</div>';
+      } else {
+        suggest.innerHTML = matches.map(s =>
+          `<div class="af-suggest-item" onclick="pickStation('${s}')">${s.replace(q, '<strong>' + q + '</strong>')}역</div>`
+        ).join('');
+      }
+    }, 200);
   };
   input.onfocus = () => {
     if (!input.value.trim()) {
@@ -503,6 +516,7 @@ function pickStation(name) {
   document.getElementById('alertStationInput').value = name + '역';
   document.getElementById('alertStation').value = name;
   document.getElementById('alertSuggest').innerHTML = '';
+  setTimeout(() => document.getElementById('alertMessage').focus(), 100);
 }
 
 function triggerPhotoInput() {
@@ -683,7 +697,7 @@ async function dismissAlert(id) {
       const { error } = await sb.from('alerts').update({ is_active: false }).eq('id', id);
       if (error) throw error;
     } catch (e) {
-      showToast('해제에 실패했습니다');
+      showToast('알림 해제 실패 — 다시 시도해 주세요');
       return;
     }
   }
@@ -752,7 +766,7 @@ function updateNotiSetting() {
 
   const perm = Notification.permission;
   if (perm === 'granted') {
-    statusEl.textContent = 'ON';
+    statusEl.textContent = '사용 중';
     statusEl.className = 'set-v noti-on';
     itemEl.onclick = null;
     itemEl.style.cursor = 'default';
@@ -914,6 +928,17 @@ function chgMonth(d) {
 function rCal() {
   document.getElementById('calMonth').textContent = `${calY}년 ${calM + 1}월`;
   if (cur) document.getElementById('calPersonName').textContent = cur.n;
+
+  // 기관사 미선택 시 빈 상태 가이드
+  const detailEl = document.getElementById('schedDetail');
+  if (!cur) {
+    detailEl.innerHTML = `<div class="cal-empty-guide">
+      <div class="cal-empty-icon">📅</div>
+      <div class="cal-empty-text">기관사를 선택하면<br>교번이 달력에 표시됩니다</div>
+      <button class="he-btn" type="button" onclick="openModal('home')">기관사 선택</button>
+    </div>`;
+  }
+
   const g = document.getElementById('calGrid');
   const fd = new Date(calY, calM, 1).getDay();
   const ld = new Date(calY, calM + 1, 0).getDate();
@@ -1012,7 +1037,11 @@ function rCmp() {
   document.getElementById('cmpMonth').textContent = `${cmpY}년 ${cmpM + 1}월`;
   const el = document.getElementById('cmpResult');
   if (!c1 || !c2) {
-    el.innerHTML = '<div class="empty-msg">비교할 기관사 2명을 선택하세요</div>';
+    el.innerHTML = `<div class="cmp-onboard">
+      <div class="cmp-onboard-icon">👥</div>
+      <div class="cmp-onboard-text">위에서 기관사 2명을 선택하면<br>교번을 나란히 비교할 수 있습니다</div>
+      <div class="cmp-onboard-hint">같은 날 일정이 같으면 초록 표시</div>
+    </div>`;
     return;
   }
   const ld = new Date(cmpY, cmpM + 1, 0).getDate();
@@ -1023,11 +1052,14 @@ function rCmp() {
     const s1 = gSched(d1, dt), s2 = gSched(d2, dt);
     const t1 = gType(d1), t2 = gType(d2);
     const hlIcon = hl ? '🔴' : '';
+    const sameType = t1 === t2;
+    const bothRest = t1 === 'rest' && t2 === 'rest';
+    const syncCls = sameType ? (bothRest ? 'cmp-sync cmp-sync-rest' : 'cmp-sync') : '';
 
-    h += `<div class="cmp-row-card"><div class="cmp-pair">
+    h += `<div class="cmp-row-card ${syncCls}"><div class="cmp-pair">
       <div class="cmp-card" style="border-top-color:${gColor(t1)}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
-        <div class="cmp-cd-name">${c1.n}</div>
+        <div class="cmp-cd-name" style="color:var(--blue)">${c1.n}</div>
         <div class="cmp-cd-dia" style="color:${gColor(t1)}">${d1}</div>
         ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
@@ -1035,7 +1067,7 @@ function rCmp() {
       </div>
       <div class="cmp-card" style="border-top-color:${gColor(t2)}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
-        <div class="cmp-cd-name">${c2.n}</div>
+        <div class="cmp-cd-name" style="color:var(--purple)">${c2.n}</div>
         <div class="cmp-cd-dia" style="color:${gColor(t2)}">${d2}</div>
         ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
@@ -1489,9 +1521,9 @@ function prefetchTrains() {
 // ===== MORE =====
 function rMore() {
   const ce = document.getElementById('contactCards');
-  let ch = '';
+  let cards = '';
   CPH.forEach(c => {
-    ch += `<div class="cp-card">
+    cards += `<div class="cp-card">
       <div class="cp-name">${c.n}</div>
       <div class="cp-nums">
         <a class="cp-num" href="tel:${c.a}">📞 ${c.a}</a>
@@ -1499,7 +1531,15 @@ function rMore() {
       </div>
     </div>`;
   });
-  ce.innerHTML = ch;
+  ce.innerHTML = `<div class="contacts-accordion">
+    <button class="contacts-toggle" type="button" onclick="toggleContacts()">
+      <span class="contacts-toggle-icon">📞</span>
+      연락처 보기
+      <span class="contacts-count">${CPH.length}개</span>
+      <span class="contacts-arrow" id="contactsArrow">›</span>
+    </button>
+    <div class="contacts-body" id="contactsBody">${cards}</div>
+  </div>`;
 
   if (cur) {
     document.getElementById('setName').textContent = cur.n;
@@ -1509,6 +1549,13 @@ function rMore() {
   renderAlertBadge();
   updateAlertIndicators();
   updateNotiSetting();
+}
+
+function toggleContacts() {
+  const body = document.getElementById('contactsBody');
+  const arrow = document.getElementById('contactsArrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
 }
 
 function showSub(id) {
@@ -1524,6 +1571,15 @@ function hideSub(id) {
 }
 
 // ===== SOP =====
+function getSopIcon(title) {
+  if (/화재/.test(title)) return '🔴';
+  if (/탈선/.test(title)) return '🔴';
+  if (/충돌|추돌/.test(title)) return '🔴';
+  if (/침수|매몰/.test(title)) return '🟡';
+  if (/독가스|화생방/.test(title)) return '🟡';
+  return '🟠';
+}
+
 function rSopList() {
   const el = document.getElementById('sopList');
   const em = SOP.filter(s => s.sub === '1');
@@ -1531,8 +1587,9 @@ function rSopList() {
   let h = '<div class="section-label" style="padding:14px 20px 8px">이례상황 조치</div>';
   em.forEach(s => {
     const i = SOP.indexOf(s);
+    const icon = getSopIcon(s.t);
     h += `<div class="sop-card" onclick="showSopD(${i})">
-      <div class="sop-t">⚠️ ${s.t}</div>
+      <div class="sop-t">${icon} ${s.t}</div>
       ${s.c ? `<div class="sop-c">${s.c}</div>` : ''}
     </div>`;
   });
@@ -1611,12 +1668,14 @@ function pick(id) {
     rCal();
   } else if (mTarget === 'c1') {
     c1 = p;
+    document.getElementById('c1Icon').textContent = p.n.charAt(0);
     document.getElementById('c1Name').textContent = p.n;
     document.getElementById('c1Sub').textContent = '오늘: ' + gDia(p, td());
     document.getElementById('cmpSel1').classList.add('filled');
     rCmp();
   } else if (mTarget === 'c2') {
     c2 = p;
+    document.getElementById('c2Icon').textContent = p.n.charAt(0);
     document.getElementById('c2Name').textContent = p.n;
     document.getElementById('c2Sub').textContent = '오늘: ' + gDia(p, td());
     document.getElementById('cmpSel2').classList.add('filled');
@@ -1627,16 +1686,16 @@ function pick(id) {
 
 // ===== DARK MODE =====
 function toggleDark() {
-  const isDark = document.body.classList.toggle('dark');
+  const isDark = document.documentElement.classList.toggle('dark');
   localStorage.setItem('darkMode', isDark ? '1' : '0');
   document.getElementById('darkToggle').classList.toggle('on', isDark);
   document.querySelector('meta[name="theme-color"]').content = isDark ? '#1F2937' : '#1A56DB';
 }
 
 function initDark() {
-  const saved = localStorage.getItem('darkMode');
-  if (saved === '1') {
-    document.body.classList.add('dark');
+  // <head>에서 이미 html.dark 클래스 적용됨 — 토글 UI만 동기화
+  const isDark = document.documentElement.classList.contains('dark');
+  if (isDark) {
     document.getElementById('darkToggle').classList.add('on');
     document.querySelector('meta[name="theme-color"]').content = '#1F2937';
   }
@@ -1739,6 +1798,129 @@ if (window.visualViewport) {
   document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
 }
 
+// ===== DAILY TIP + QUIZ + WEATHER =====
+function getDayOfYear() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  return Math.floor((now - start) / 864e5);
+}
+
+function getDailyTip() {
+  if (typeof DAILY_TIPS === 'undefined' || !DAILY_TIPS.length) return null;
+  return DAILY_TIPS[getDayOfYear() % DAILY_TIPS.length];
+}
+
+function getDailyQuiz() {
+  if (typeof QUIZ === 'undefined' || !QUIZ.length) return null;
+  return QUIZ[getDayOfYear() % QUIZ.length];
+}
+
+function renderHomeExtras() {
+  const el = document.getElementById('homeExtras');
+  if (!el) return;
+  let h = '';
+
+  // 오늘의 한마디
+  const tip = getDailyTip();
+  if (tip) {
+    h += `<div class="daily-tip-card">
+      <div class="dt-icon">${tip.icon}</div>
+      <div class="dt-content">
+        <div class="dt-label">오늘의 한마디</div>
+        <div class="dt-msg">${tip.text}</div>
+      </div>
+    </div>`;
+  }
+
+  // 퀴즈
+  const quiz = getDailyQuiz();
+  if (quiz) {
+    const todayKey = 'quizDone_' + getDayOfYear();
+    const done = localStorage.getItem(todayKey);
+    const streak = parseInt(localStorage.getItem('quizStreak') || '0');
+
+    if (done) {
+      const wasCorrect = done === '1';
+      h += `<div class="quiz-card">
+        <div class="quiz-header">
+          <div class="quiz-title">🧠 오늘의 퀴즈</div>
+          ${streak > 0 ? `<div class="quiz-streak">🔥 ${streak}일 연속!</div>` : ''}
+        </div>
+        <div class="quiz-done">
+          <div class="quiz-done-icon">${wasCorrect ? '🎉' : '📖'}</div>
+          ${wasCorrect ? '오늘 퀴즈를 맞혔습니다!' : '내일 다시 도전해 보세요!'}
+        </div>
+        <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">이 퀴즈는 참고용입니다</div>
+      </div>`;
+    } else {
+      h += `<div class="quiz-card" id="quizCardLive">
+        <div class="quiz-header">
+          <div class="quiz-title">🧠 오늘의 퀴즈</div>
+          ${streak > 0 ? `<div class="quiz-streak">🔥 ${streak}일 연속!</div>` : ''}
+        </div>
+        <div class="quiz-question">${quiz.q}</div>
+        <div class="quiz-options" id="quizOptions">
+          ${quiz.a.map((opt, i) => `<button class="quiz-opt" type="button" onclick="answerQuiz(${i})">${opt}</button>`).join('')}
+        </div>
+        <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">이 퀴즈는 참고용입니다</div>
+      </div>`;
+    }
+  }
+
+  // 날씨 링크
+  h += `<a class="weather-link-card" href="https://weather.naver.com/" target="_blank" rel="noopener">
+    <span class="weather-link-icon">🌤</span>
+    <span class="weather-link-text">오늘의 날씨 확인</span>
+    <span class="weather-link-arrow">›</span>
+  </a>`;
+
+  el.innerHTML = h;
+}
+
+function answerQuiz(idx) {
+  const quiz = getDailyQuiz();
+  if (!quiz) return;
+  const correct = quiz.correct;
+  const isCorrect = idx === correct;
+  const todayKey = 'quizDone_' + getDayOfYear();
+
+  // 이미 완료 방지
+  if (localStorage.getItem(todayKey)) return;
+
+  // 결과 저장
+  localStorage.setItem(todayKey, isCorrect ? '1' : '0');
+
+  // 스트릭 업데이트
+  let streak = parseInt(localStorage.getItem('quizStreak') || '0');
+  if (isCorrect) {
+    streak++;
+  } else {
+    streak = 0;
+  }
+  localStorage.setItem('quizStreak', String(streak));
+
+  // UI 업데이트
+  const buttons = document.querySelectorAll('#quizOptions .quiz-opt');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correct) btn.classList.add(i === idx ? 'correct' : 'reveal-correct');
+    if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // 결과 메시지
+  const card = document.getElementById('quizCardLive');
+  if (card) {
+    const resultDiv = document.createElement('div');
+    resultDiv.className = 'quiz-result ' + (isCorrect ? 'pass' : 'fail');
+    if (isCorrect) {
+      resultDiv.textContent = `🎉 정답! ${streak > 1 ? `(${streak}일 연속 정답!)` : ''}`;
+    } else {
+      resultDiv.textContent = `정답은 "${quiz.a[correct]}"입니다`;
+    }
+    card.querySelector('.quiz-options').after(resultDiv);
+  }
+}
+
 // ===== INIT =====
 (function () {
   document.body.classList.add('splash-active');
@@ -1770,6 +1952,7 @@ if (window.visualViewport) {
   initCal();
   initCmp();
   rMore();
+  renderHomeExtras();
   initPWA();
 
   // Supabase에서 최신 알림 비동기 로드

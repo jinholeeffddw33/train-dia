@@ -311,7 +311,7 @@ function subscribeAlerts() {
       const mapped = {
         id: a.id, station: a.station, message: a.message,
         severity: a.severity, ts: new Date(a.created_at).getTime(),
-        createdBy: a.created_by, active: a.is_active
+        createdBy: a.created_by, active: a.is_active, photo: a.photo || null
       };
       // 중복 방지 (내가 방금 등록한 것)
       if (!alerts.find(x => x.id === a.id)) {
@@ -366,7 +366,7 @@ async function loadAlerts() {
     alerts = (data || []).map(a => ({
       id: a.id, station: a.station, message: a.message,
       severity: a.severity, ts: new Date(a.created_at).getTime(),
-      createdBy: a.created_by, active: a.is_active
+      createdBy: a.created_by, active: a.is_active, photo: a.photo || null
     }));
     // 오프라인용 캐시
     localStorage.setItem('diaAlerts', JSON.stringify(alerts));
@@ -431,6 +431,7 @@ function renderAlertList() {
 
   let h = '';
   active.forEach(a => {
+    const photoHtml = a.photo ? `<div class="alert-item-photo" onclick="viewAlertPhoto('${a.id}')"><img src="${a.photo}" alt="장애 사진"></div>` : '';
     h += `<div class="alert-item">
       <div class="alert-item-header">
         <div class="alert-item-sev ${a.severity}"></div>
@@ -438,6 +439,7 @@ function renderAlertList() {
         <div class="alert-item-time">${timeAgo(a.ts)}</div>
       </div>
       <div class="alert-item-msg">${a.message}</div>
+      ${photoHtml}
       <div class="alert-item-actions">
         <div class="alert-act-btn share" onclick="shareAlert('${a.id}')">📋 공유</div>
         <div class="alert-act-btn dismiss" onclick="dismissAlert('${a.id}')">해제</div>
@@ -447,21 +449,103 @@ function renderAlertList() {
   el.innerHTML = h;
 }
 
+let alertPhotoData = null;
+const ALL_STATIONS = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
+
 function openAlertForm() {
-  const sel = document.getElementById('alertStation');
-  if (sel.children.length <= 1) {
-    let opts = '<option value="">역을 선택하세요</option>';
-    const allStations = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
-    allStations.forEach(s => {
-      opts += `<option value="${s}">${s}</option>`;
-    });
-    sel.innerHTML = opts;
-  }
+  document.getElementById('alertStationInput').value = '';
+  document.getElementById('alertStation').value = '';
+  document.getElementById('alertSuggest').innerHTML = '';
   document.getElementById('alertMessage').value = '';
+  document.getElementById('alertPhotoPreview').innerHTML = '';
+  alertPhotoData = null;
   alertSeverity = 'high';
   document.querySelectorAll('.af-sev-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('.af-sev-btn.high').classList.add('active');
   document.getElementById('alertModalBg').classList.add('open');
+
+  // 역 검색 이벤트
+  const input = document.getElementById('alertStationInput');
+  input.oninput = () => {
+    const q = input.value.trim();
+    const suggest = document.getElementById('alertSuggest');
+    if (!q) { suggest.innerHTML = ''; return; }
+    const matches = ALL_STATIONS.filter(s => s.includes(q));
+    if (matches.length === 0) {
+      suggest.innerHTML = '<div class="af-suggest-empty">검색 결과 없음</div>';
+    } else {
+      suggest.innerHTML = matches.map(s =>
+        `<div class="af-suggest-item" onclick="pickStation('${s}')">${s.replace(q, '<strong>' + q + '</strong>')}역</div>`
+      ).join('');
+    }
+  };
+  // 포커스 시 전체 목록 (빈 입력일 때)
+  input.onfocus = () => {
+    if (!input.value.trim()) {
+      const suggest = document.getElementById('alertSuggest');
+      suggest.innerHTML = ALL_STATIONS.map(s =>
+        `<div class="af-suggest-item" onclick="pickStation('${s}')">${s}역</div>`
+      ).join('');
+    }
+  };
+}
+
+function pickStation(name) {
+  document.getElementById('alertStationInput').value = name + '역';
+  document.getElementById('alertStation').value = name;
+  document.getElementById('alertSuggest').innerHTML = '';
+}
+
+// 사진 처리 — 리사이즈 + Base64
+function handleAlertPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // 리사이즈: 최대 800px, 품질 0.7 (데이터 절약)
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      alertPhotoData = canvas.toDataURL('image/jpeg', 0.7);
+
+      // 미리보기 표시
+      const preview = document.getElementById('alertPhotoPreview');
+      preview.innerHTML = `<div class="af-photo-thumb">
+        <img src="${alertPhotoData}" alt="첨부 사진">
+        <button class="af-photo-remove" type="button" onclick="removeAlertPhoto()">✕</button>
+      </div>`;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // 같은 파일 다시 선택 가능하도록 초기화
+  input.value = '';
+}
+
+function removeAlertPhoto() {
+  alertPhotoData = null;
+  document.getElementById('alertPhotoPreview').innerHTML = '';
+}
+
+function viewAlertPhoto(id) {
+  const a = alerts.find(x => x.id === id);
+  if (!a || !a.photo) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'photo-overlay';
+  overlay.onclick = () => overlay.remove();
+  overlay.innerHTML = `<img src="${a.photo}" alt="장애 사진">`;
+  document.body.appendChild(overlay);
 }
 
 function closeAlertModal(e) {
@@ -482,19 +566,20 @@ async function postAlert() {
   if (!message) { showToast('내용을 입력해 주세요'); return; }
 
   const creator = cur ? cur.n : '관리자';
+  const photo = alertPhotoData || null;
 
   if (sb) {
     try {
-      const { data, error } = await sb.from('alerts').insert({
-        station, message, severity: alertSeverity, created_by: creator
-      }).select().single();
+      const insertData = { station, message, severity: alertSeverity, created_by: creator };
+      if (photo) insertData.photo = photo;
+      const { data, error } = await sb.from('alerts').insert(insertData).select().single();
 
       if (error) throw error;
 
-      // 로컬 리스트에 즉시 추가 (실시간 구독 중복 방지용)
       alerts.unshift({
         id: data.id, station, message, severity: alertSeverity,
-        ts: new Date(data.created_at).getTime(), createdBy: creator, active: true
+        ts: new Date(data.created_at).getTime(), createdBy: creator, active: true,
+        photo: photo
       });
       localStorage.setItem('diaAlerts', JSON.stringify(alerts));
     } catch (e) {
@@ -502,14 +587,14 @@ async function postAlert() {
       return;
     }
   } else {
-    // 오프라인 폴백
     alerts.unshift({
       id: 'local-' + Date.now(), station, message, severity: alertSeverity,
-      ts: Date.now(), createdBy: creator, active: true
+      ts: Date.now(), createdBy: creator, active: true, photo: photo
     });
     localStorage.setItem('diaAlerts', JSON.stringify(alerts));
   }
 
+  alertPhotoData = null;
   document.getElementById('alertModalBg').classList.remove('open');
   renderAlertList();
   renderAlertBanner();

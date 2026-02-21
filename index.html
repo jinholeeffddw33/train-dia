@@ -292,9 +292,11 @@
     <h3>장애 알림 등록</h3>
     <div class="alert-form">
       <label class="af-label">역명</label>
-      <select class="af-select" id="alertStation">
-        <option value="">역을 선택하세요</option>
-      </select>
+      <div class="af-search-wrap">
+        <input class="af-search" id="alertStationInput" type="text" placeholder="역 이름 검색 (예: 답십리)" autocomplete="off">
+        <input type="hidden" id="alertStation" value="">
+        <div class="af-suggest" id="alertSuggest"></div>
+      </div>
 
       <label class="af-label">심각도</label>
       <div class="af-severity-row">
@@ -305,6 +307,13 @@
 
       <label class="af-label">내용</label>
       <textarea class="af-textarea" id="alertMessage" rows="3" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
+
+      <label class="af-label">사진 (선택)</label>
+      <div class="af-photo-row">
+        <button class="af-photo-btn" type="button" onclick="document.getElementById('alertPhotoInput').click()">📷 사진 추가</button>
+        <input type="file" id="alertPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleAlertPhoto(this)">
+        <div class="af-photo-preview" id="alertPhotoPreview"></div>
+      </div>
 
       <button class="af-submit" type="button" onclick="postAlert()">알림 등록</button>
     </div>

@@ -78,14 +78,14 @@ function gSched(dia, date) {
 
 function gLabel(d) {
   if (d === '~') return '비순환';
-  if (d.startsWith('휴')) return '휴무';
+  if (d.startsWith('휴')) return '비번';
   if (d.startsWith('대')) return '대기';
   const n = parseInt(d);
   return n >= 62 ? '야간' : '주간';
 }
 
 function gTypeName(tp) {
-  return { day: '주간 근무', night: '야간 근무', standby: '대기 근무', rest: '휴무' }[tp] || '휴무';
+  return { day: '주간 근무', night: '야간 근무', standby: '대기 근무', rest: '비번' }[tp] || '비번';
 }
 
 function gColor(t) {
@@ -223,7 +223,7 @@ function shortStn(name) {
 function renderRouteVisual(m) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
-    return `<div class="rv-text-only">${m}</div>`;
+    return `<div class="rv-text">${m}</div>`;
 
   const dir = getRouteDirection(m);
   const parts = m.split(',');
@@ -245,85 +245,71 @@ function renderRouteVisual(m) {
   });
   if (!segs.length) return '';
 
-  // 방향별 레그 분리
-  const legs = [];
-  segs.forEach((seg, si) => {
-    splitByDirection(seg.stations).forEach((sl, li) => {
-      legs.push({
-        stations: sl.stations,
-        direction: sl.direction,
-        segBreak: li === 0 && si > 0,
-        changeTime: li === 0 && si > 0 ? seg.note : ''
-      });
-    });
-  });
-
-  // 유니크 역 → 차트 컬럼 매핑
+  // 유니크 역 수집 → 차트 컬럼
   const stSet = new Set();
-  legs.forEach(l => l.stations.forEach(s => stSet.add(s)));
+  segs.forEach(seg => seg.stations.forEach(s => stSet.add(s)));
   const sorted = [...stSet].sort((a, b) => getChartIdx(a) - getChartIdx(b));
   const ci = {};
   sorted.forEach((s, i) => { ci[s] = i; });
   const n = sorted.length;
 
-  // HTML 빌드
+  // === HTML 빌드 (APK 스타일) ===
   let html = '';
+
+  // 방향 칩 (간소화)
   if (dir) {
-    html += `<div class="rv-dir-badge ${dir.dir}">
-      <div class="rv-dir-label">${dir.label}</div>
-      <div class="rv-dir-sub">${dir.sub}</div>
-    </div>`;
+    const ic = dir.dir === 'up' ? '▲' : dir.dir === 'down' ? '▼' : '🚇';
+    html += `<div class="rv-dir ${dir.dir}"><span>${ic} ${dir.label}</span></div>`;
   }
 
-  html += `<div class="rv-chart" style="--n:${n}">`;
+  html += `<div class="rv-apk" style="--n:${n}">`;
 
-  // 헤더 행
-  html += '<div class="rv-hdrs">';
+  // 역 헤더 (세로 텍스트)
+  html += '<div class="rv-hdr">';
   sorted.forEach(s => {
-    const cls = s === '답십리' ? ' rv-hh' : '';
-    html += `<div class="rv-h${cls}">${shortStn(s)}</div>`;
+    const home = s === '답십리' ? ' rv-home' : '';
+    html += `<div class="rv-col${home}">${shortStn(s)}</div>`;
   });
   html += '</div>';
 
   // 차트 바디
-  html += '<div class="rv-bd">';
+  html += '<div class="rv-body">';
+
+  // 그리드 라인
   for (let i = 0; i < n; i++) {
-    html += `<div class="rv-gl" style="left:calc((${i} + .5) / var(--n) * 100%)"></div>`;
+    html += `<div class="rv-vl" style="--i:${i}"></div>`;
   }
 
-  legs.forEach((leg, idx) => {
-    // 교대 구분
-    if (leg.segBreak) {
-      html += `<div class="rv-chg"><span class="rv-ct">${leg.changeTime ? '교대 ' + leg.changeTime : '교대'}</span></div>`;
-    }
-    // 꺾임 커넥터
-    else if (idx > 0) {
-      const prev = legs[idx - 1];
-      const shared = prev.stations[prev.stations.length - 1];
-      const col = ci[shared];
-      const cc = prev.direction === 'west' ? 'rv-cw' : 'rv-ce';
-      html += `<div class="rv-cn"><div class="rv-cv ${cc}" style="left:calc((${col} + .5) / var(--n) * 100%)"></div></div>`;
+  // 세그먼트 렌더링
+  segs.forEach((seg, si) => {
+    // 교대 구분선
+    if (si > 0) {
+      html += `<div class="rv-sep"><span>${seg.note ? '교대 ' + seg.note : '교대'}</span></div>`;
     }
 
-    // 바 위치
-    const cols = leg.stations.map(s => ci[s]);
-    const minC = Math.min(...cols);
-    const maxC = Math.max(...cols);
-    const isW = leg.direction === 'west';
-    const bc = isW ? 'rv-bw' : 'rv-be';
+    // 방향별 레그 분리
+    const legs = splitByDirection(seg.stations);
 
-    html += '<div class="rv-lg">';
-    html += `<div class="rv-br ${bc}" style="left:calc((${minC} + .5) / var(--n) * 100%);width:calc(${maxC - minC} / var(--n) * 100%)">`;
-    html += `<span class="rv-ba">${isW ? '◀' : '▶'}</span>`;
-    html += '</div>';
+    html += '<div class="rv-pair">';
+    legs.forEach((leg, li) => {
+      const cols = leg.stations.map(s => ci[s]);
+      const minC = Math.min(...cols);
+      const maxC = Math.max(...cols);
+      const isW = leg.direction === 'west';
 
-    // 끝점 도트
-    const fc = ci[leg.stations[0]];
-    const lc = ci[leg.stations[leg.stations.length - 1]];
-    html += `<div class="rv-ed ${bc}" style="left:calc((${fc} + .5) / var(--n) * 100%)"></div>`;
-    if (fc !== lc) {
-      html += `<div class="rv-ed ${bc}" style="left:calc((${lc} + .5) / var(--n) * 100%)"></div>`;
-    }
+      // 바
+      html += '<div class="rv-row">';
+      html += `<div class="rv-bar" style="left:calc((${minC} + .25) / var(--n) * 100%);width:calc((${maxC - minC} + .5) / var(--n) * 100%)">`;
+      html += `<span class="rv-arr">${isW ? '◀' : '▶'}</span>`;
+      html += '</div></div>';
+
+      // 꺾임 커넥터 (같은 세그먼트 내 레그 간)
+      if (li < legs.length - 1) {
+        const shared = leg.stations[leg.stations.length - 1];
+        const cCol = ci[shared];
+        html += `<div class="rv-turn" style="--at:${cCol}"></div>`;
+      }
+    });
     html += '</div>';
   });
 
@@ -500,7 +486,7 @@ function rHome() {
       </div>`;
     }
   } else {
-    infoH = `<div class="tc-rest-msg">오늘은 휴무입니다 😊</div>`;
+    infoH = `<div class="tc-rest-msg">오늘은 비번입니다 😊</div>`;
   }
 
   el.innerHTML = `<div class="today-card">
@@ -553,7 +539,7 @@ function rHome() {
   if (tmTp === 'rest') {
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
-      <div class="sc-val" style="color:var(--green)">휴무 😊</div>
+      <div class="sc-val" style="color:var(--green)">비번 😊</div>
       <div class="sc-sub">${tmDia}</div>
     </div>`;
   } else {
@@ -580,7 +566,7 @@ function rHome() {
   if (afTp === 'rest') {
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
-      <div class="sc-val" style="color:var(--green)">휴무 😊</div>
+      <div class="sc-val" style="color:var(--green)">비번 😊</div>
       <div class="sc-sub">${afDia}</div>
     </div>`;
   } else {
@@ -1320,7 +1306,7 @@ function rSchedDetail() {
     sh = `<div class="sd-body">
       <div class="sd-dia" style="color:${gColor(tp)}">${dia}</div>
       <div style="text-align:center;padding:16px;color:var(--text2);font-size:18px;font-weight:600">
-        ${dia === '~' ? '비순환 (근무 없음)' : '휴무'}
+        ${dia === '~' ? '비순환 (근무 없음)' : '비번'}
       </div>
     </div>`;
   }
@@ -1377,7 +1363,7 @@ function rCmp() {
         <div class="cmp-cd-dia" style="color:${gColor(t1)}">${d1}</div>
         ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">휴무</div>`}
+        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">비번</div>`}
       </div>
       <div class="cmp-card" style="border-top-color:${gColor(t2)}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
@@ -1385,7 +1371,7 @@ function rCmp() {
         <div class="cmp-cd-dia" style="color:${gColor(t2)}">${d2}</div>
         ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">휴무</div>`}
+        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">비번</div>`}
       </div>
     </div></div>`;
   }

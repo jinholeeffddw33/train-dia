@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1A56DB">
+<title>답십리 기관사 DIA</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div class="splash" id="splash">
+  <div class="splash-inner">
+    <img src="logo.png" alt="서울교통공사" class="splash-logo">
+    <div class="splash-divider"></div>
+    <div class="splash-title">기관사 DIA</div>
+    <div class="splash-sub">답십리 승무사업소 · 5호선</div>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+  </div>
+  <div class="splash-footer">서울교통공사</div>
+</div>
+
+<!-- ===== NOTIFICATION PROMPT ===== -->
+<div class="noti-prompt" id="notiPrompt">
+  <div class="noti-prompt-card">
+    <div class="noti-prompt-icon">🔔</div>
+    <div class="noti-prompt-title">장애 알림 받기</div>
+    <div class="noti-prompt-desc">역 장애 발생 시 실시간 알림을 받으려면<br>알림을 허용해 주세요</div>
+    <div class="noti-prompt-btns">
+      <button class="noti-btn-allow" type="button" onclick="allowNotifications()">허용</button>
+      <button class="noti-btn-later" type="button" onclick="dismissNotiPrompt()">나중에</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== UPDATE BANNER ===== -->
+<div class="update-banner" id="updateBanner" onclick="location.reload()">
+  새 버전이 있습니다. 탭하여 업데이트
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="pageHome">
+  <div class="home-top">
+    <div class="home-greeting">안녕하세요</div>
+    <div class="home-name" id="homeName">
+      <button class="home-select-btn" type="button" onclick="openModal('home')">기관사를 선택하세요 ▾</button>
+    </div>
+    <div class="home-date-row" id="homeDate"></div>
+    <div class="home-clock-row">
+      <div class="home-time-big" id="homeTime">--:--</div>
+      <div class="home-time-sec" id="homeSec">:--</div>
+    </div>
+  </div>
+  <!-- Alert Banner -->
+  <div id="homeAlertBanner"></div>
+  <div id="homeTodayCard"></div>
+  <div id="homeWeek"></div>
+  <div id="homeStatus"></div>
+</div>
+
+<!-- ===== CALENDAR ===== -->
+<div class="page" id="pageCal">
+  <div class="cal-nav">
+    <div>
+      <div class="cal-title" id="calMonth"></div>
+      <div class="cal-person-tag" id="calPersonName">선택 안됨</div>
+    </div>
+    <div class="cal-nav-btns">
+      <button class="cal-btn" type="button" onclick="chgMonth(-1)">‹</button>
+      <button class="cal-btn" type="button" onclick="chgMonth(1)">›</button>
+    </div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div id="schedDetail"></div>
+</div>
+
+<!-- ===== LINE 5 REAL-TIME ===== -->
+<div class="page" id="pageLine">
+  <div class="line-header">
+    <div>
+      <div class="line-header-title">5호선 실시간</div>
+      <div class="line-header-status" id="lineUpdateTime">업데이트 대기중</div>
+    </div>
+    <button class="line-refresh-btn" type="button" id="lineRefreshBtn" onclick="fetchTrains()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+    </button>
+  </div>
+  <div class="line-branch-bar">
+    <button class="line-branch-tab active" type="button" onclick="switchBranch('main',this)">본선</button>
+    <button class="line-branch-tab" type="button" onclick="switchBranch('macheon',this)">마천</button>
+    <button class="line-branch-tab" type="button" onclick="switchBranch('hanam',this)">하남</button>
+  </div>
+  <div class="line-track-wrap" id="lineTrackWrap">
+    <div id="lineTrackList"></div>
+  </div>
+</div>
+
+<!-- ===== COMPARE ===== -->
+<div class="page" id="pageCmp">
+  <div class="cmp-header">
+    <div class="cal-title">교번 비교</div>
+  </div>
+  <div class="cmp-selectors">
+    <button class="cmp-sel-card" id="cmpSel1" type="button" onclick="openModal('c1')">
+      <div class="cmp-sel-icon">👤</div>
+      <div class="cmp-sel-name" id="c1Name">기관사 1</div>
+      <div class="cmp-sel-sub" id="c1Sub">탭하여 선택</div>
+    </button>
+    <button class="cmp-sel-card" id="cmpSel2" type="button" onclick="openModal('c2')">
+      <div class="cmp-sel-icon">👤</div>
+      <div class="cmp-sel-name" id="c2Name">기관사 2</div>
+      <div class="cmp-sel-sub" id="c2Sub">탭하여 선택</div>
+    </button>
+  </div>
+  <div class="cmp-nav">
+    <button class="cal-btn" type="button" onclick="chgCmpMonth(-1)">‹</button>
+    <div class="cmp-month" id="cmpMonth"></div>
+    <button class="cal-btn" type="button" onclick="chgCmpMonth(1)">›</button>
+  </div>
+  <div id="cmpResult"></div>
+</div>
+
+<!-- ===== MORE ===== -->
+<div class="page" id="pageMore">
+  <div id="moreMain">
+    <div class="more-top-header">
+      <div class="more-top-title">더보기</div>
+      <div class="more-top-sub" id="morePersonInfo">기관사를 선택해주세요</div>
+    </div>
+
+    <!-- Alert Section -->
+    <div class="more-section">
+      <div class="more-section-title">장애 알림</div>
+      <div class="more-menu-card">
+        <div class="more-menu-item" onclick="showSub('alertPanel')">
+          <span class="more-menu-icon">🚨</span>장애 알림 관리
+          <span class="alert-badge" id="alertBadge"></span>
+          <span class="more-menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="more-section">
+      <div class="more-section-title">비상 매뉴얼</div>
+      <div class="more-menu-card">
+        <div class="more-menu-item" onclick="showSub('sopPanel')">
+          <span class="more-menu-icon">⚠️</span>이례상황 · SOP
+          <span class="more-menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="more-section">
+      <div class="more-section-title">연락처</div>
+      <div id="contactCards"></div>
+    </div>
+    <div class="more-section">
+      <div class="more-section-title">설정</div>
+      <div class="set-section">
+        <div class="set-item">
+          <div class="set-l">선택된 기관사</div>
+          <div class="set-v" id="setName">없음</div>
+        </div>
+        <div class="set-item" onclick="openModal('setting')">
+          <div class="set-l">기관사 변경</div>
+          <div class="set-link">변경 ›</div>
+        </div>
+        <div class="set-item">
+          <div class="set-l">다크 모드</div>
+          <div class="toggle-wrap">
+            <div class="toggle" id="darkToggle" onclick="toggleDark()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="set-section">
+        <div class="set-item"><div class="set-l">노선</div><div class="set-v">5호선</div></div>
+        <div class="set-item"><div class="set-l">사업소</div><div class="set-v">답십리</div></div>
+        <div class="set-item"><div class="set-l">DB 기준일</div><div class="set-v">2014.01.29</div></div>
+        <div class="set-item"><div class="set-l">DIA 주기</div><div class="set-v">128일</div></div>
+        <div class="set-item"><div class="set-l">버전</div><div class="set-v">Web 3.0 PWA</div></div>
+      </div>
+    </div>
+
+    <div class="more-footer">
+      <img src="logo.png" alt="" class="more-footer-logo">
+      서울교통공사 · 답십리 승무사업소
+    </div>
+  </div>
+
+  <!-- Alert Management Sub -->
+  <div class="sub-view" id="alertPanel">
+    <button class="back-btn" type="button" onclick="hideSub('alertPanel')">← 목록으로</button>
+    <div class="alert-panel-header">
+      <div class="section-label" style="padding-top:0">현재 장애 알림</div>
+      <button class="alert-post-btn" type="button" onclick="openAlertForm()">+ 알림 등록</button>
+    </div>
+    <div id="alertList"></div>
+  </div>
+
+  <!-- SOP Sub -->
+  <div class="sub-view" id="sopPanel">
+    <button class="back-btn" type="button" onclick="hideSub('sopPanel')">← 목록으로</button>
+    <div id="sopList"></div>
+  </div>
+  <div class="sub-view" id="sopDetailPanel">
+    <button class="back-btn" type="button" onclick="backToSopList()">← SOP 목록</button>
+    <div id="sopDetailContent"></div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tabs" id="tabBar">
+  <button class="tab active" type="button" onclick="goTab('pageHome',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    홈
+  </button>
+  <button class="tab" type="button" onclick="goTab('pageCal',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    교번
+  </button>
+  <button class="tab" type="button" onclick="goTab('pageLine',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    노선
+  </button>
+  <button class="tab" type="button" onclick="goTab('pageCmp',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    비교
+  </button>
+  <button class="tab" type="button" onclick="goTab('pageMore',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    더보기
+  </button>
+</div>
+
+<!-- Person Modal -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-bar"></div>
+    <h3>기관사 선택</h3>
+    <input class="modal-search" id="mSearch" placeholder="이름으로 검색" oninput="filterList()" type="text">
+    <div class="modal-list" id="mList"></div>
+  </div>
+</div>
+
+<!-- Alert Form Modal -->
+<div class="modal-bg" id="alertModalBg" onclick="closeAlertModal(event)">
+  <div class="modal-sheet alert-form-sheet">
+    <div class="modal-bar"></div>
+    <h3>장애 알림 등록</h3>
+    <div class="alert-form">
+      <label class="af-label">역명</label>
+      <select class="af-select" id="alertStation">
+        <option value="">역을 선택하세요</option>
+      </select>
+
+      <label class="af-label">심각도</label>
+      <div class="af-severity-row">
+        <button class="af-sev-btn high active" type="button" onclick="pickSeverity('high',this)">긴급</button>
+        <button class="af-sev-btn medium" type="button" onclick="pickSeverity('medium',this)">주의</button>
+        <button class="af-sev-btn low" type="button" onclick="pickSeverity('low',this)">참고</button>
+      </div>
+
+      <label class="af-label">내용</label>
+      <textarea class="af-textarea" id="alertMessage" rows="3" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
+
+      <button class="af-submit" type="button" onclick="postAlert()">알림 등록</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

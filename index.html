@@ -256,8 +256,8 @@
   </div>
 </div>
 
-<!-- FAB (장애 알림 등록) -->
-<button class="fab-alert" id="fabAlert" type="button" onclick="openAlertForm()">
+<!-- FAB (장애 알림 — 활성 알림 있을 때만 표시, 탭하면 목록) -->
+<button class="fab-alert" id="fabAlert" type="button" style="display:none" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
   <span class="fab-icon">🚨</span>
   <span class="fab-count" id="fabCount"></span>
 </button>

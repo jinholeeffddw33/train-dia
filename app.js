@@ -18,6 +18,10 @@ let alerts = [], alertSeverity = 'high', lineBranch = 'main';
 let trainData = [], trainTimer = null;
 let lineViewMode = 'list', lastTrainFetch = 0, updateCounterTimer = null;
 
+// ===== 장애알림 권한 =====
+const ALERT_PIN = '5959'; // 승인된 사용자용 PIN
+let alertAuthorized = false; // 세션 내 인증 상태
+
 // ===== UTILITY =====
 function td() {
   const n = new Date();
@@ -242,6 +246,82 @@ function showToast(msg, duration) {
   toastTimer = setTimeout(() => el.classList.remove('show'), duration || 2500);
 }
 
+// ===== PIN MODAL =====
+function showPinModal() {
+  let bg = document.getElementById('pinModalBg');
+  if (!bg) {
+    bg = document.createElement('div');
+    bg.id = 'pinModalBg';
+    bg.className = 'pin-modal-bg';
+    bg.innerHTML = `<div class="pin-modal">
+      <div class="pin-title">🔒 승인 필요</div>
+      <div class="pin-desc">장애 알림 등록은 승인된 사용자만 가능합니다</div>
+      <input type="password" id="pinInput" class="pin-input" placeholder="PIN 입력" maxlength="8" inputmode="numeric">
+      <div class="pin-error" id="pinError"></div>
+      <div class="pin-actions">
+        <button type="button" class="pin-btn cancel" onclick="closePinModal()">취소</button>
+        <button type="button" class="pin-btn confirm" onclick="verifyPin()">확인</button>
+      </div>
+    </div>`;
+    document.body.appendChild(bg);
+  }
+  bg.classList.add('open');
+  document.getElementById('pinError').textContent = '';
+  const input = document.getElementById('pinInput');
+  input.value = '';
+  setTimeout(() => input.focus(), 200);
+  input.onkeydown = (e) => { if (e.key === 'Enter') verifyPin(); };
+}
+
+function closePinModal() {
+  const bg = document.getElementById('pinModalBg');
+  if (bg) bg.classList.remove('open');
+}
+
+function verifyPin() {
+  const pin = document.getElementById('pinInput').value;
+  if (pin === ALERT_PIN) {
+    alertAuthorized = true;
+    closePinModal();
+    showToast('인증 완료 — 장애 알림 등록이 가능합니다');
+    openAlertForm();
+  } else {
+    document.getElementById('pinError').textContent = 'PIN이 일치하지 않습니다';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
+
+// ===== ALERT POPUP (실시간 알림 수신 시) =====
+let alertPopupTimer = null;
+function showAlertPopup(a) {
+  let el = document.getElementById('alertPopup');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'alertPopup';
+    el.className = 'alert-popup';
+    document.body.appendChild(el);
+  }
+  const sevIcon = a.severity === 'high' ? '🚨' : a.severity === 'medium' ? '⚠️' : 'ℹ️';
+  el.innerHTML = `<div class="ap-inner" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100);closeAlertPopup();">
+    <div class="ap-icon">${sevIcon}</div>
+    <div class="ap-body">
+      <div class="ap-title">${a.station}역 장애 발생</div>
+      <div class="ap-msg">${a.message}</div>
+    </div>
+    <button type="button" class="ap-close" onclick="event.stopPropagation();closeAlertPopup();">✕</button>
+  </div>`;
+  el.classList.add('show');
+  clearTimeout(alertPopupTimer);
+  alertPopupTimer = setTimeout(() => el.classList.remove('show'), 8000);
+}
+
+function closeAlertPopup() {
+  const el = document.getElementById('alertPopup');
+  if (el) el.classList.remove('show');
+  clearTimeout(alertPopupTimer);
+}
+
 // ===== CLOCK =====
 function tick() {
   const n = new Date();
@@ -297,7 +377,7 @@ function rHome() {
         <div class="tc-time-val">${sc.e || '-'}</div>
       </div>
       <div class="tc-time-block small">
-        <div class="tc-time-label">근무</div>
+        <div class="tc-time-label">근무시간</div>
         <div class="tc-time-val sm">${sc.t || '-'}</div>
       </div>
     </div>`;
@@ -318,7 +398,7 @@ function rHome() {
     </div>
     <div class="tc-body">
       <div class="tc-dia ${tp}">${dia}</div>
-      <div class="tc-type-name">${gTypeName(tp)}</div>
+      <div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>
     </div>${infoH}</div>`;
 
   // Week preview
@@ -411,10 +491,12 @@ function subscribeAlerts() {
         renderAlertBanner();
         renderAlertBadge();
   updateAlertIndicators();
-        // 다른 사람이 등록한 알림이면 브라우저 알림
+        // 다른 사람이 등록한 알림이면 브라우저 알림 + 인앱 팝업
         if (a.created_by !== (cur ? cur.n : '')) {
           sendNotification(`${a.station}역 장애 발생`, a.message);
+          showAlertPopup(mapped);
         }
+        renderHomeExtras();
       }
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'alerts' }, payload => {
@@ -553,6 +635,11 @@ const MAX_PHOTOS = 3;
 const ALL_STATIONS = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
 
 function openAlertForm() {
+  // PIN 인증 확인
+  if (!alertAuthorized) {
+    showPinModal();
+    return;
+  }
   document.getElementById('alertStationInput').value = '';
   document.getElementById('alertStation').value = '';
   document.getElementById('alertSuggest').innerHTML = '';
@@ -562,7 +649,6 @@ function openAlertForm() {
   alertSeverity = 'high';
   document.querySelectorAll('.af-sev-btn').forEach(b => b.classList.remove('active'));
   document.querySelector('.af-sev-btn.high').classList.add('active');
-  // 글자 수 카운터
   const msgEl = document.getElementById('alertMessage');
   const countEl = document.getElementById('alertMsgCount');
   msgEl.oninput = () => {
@@ -963,12 +1049,15 @@ function dismissPWA() {
 function updateAlertIndicators() {
   const count = getActiveAlerts().length;
 
-  // FAB 카운트
+  // FAB: 알림 있을 때만 표시 + 탭하면 알림 목록으로
+  const fab = document.getElementById('fabAlert');
   const fabCount = document.getElementById('fabCount');
   if (count > 0) {
+    fab.style.display = 'flex';
     fabCount.textContent = count;
     fabCount.classList.add('show');
   } else {
+    fab.style.display = 'none';
     fabCount.classList.remove('show');
   }
 
@@ -1938,6 +2027,28 @@ function renderHomeExtras() {
   const el = document.getElementById('homeExtras');
   if (!el) return;
   let h = '';
+
+  // 중요 알림 카드 (장애 알림 목록 — 오늘의 한마디 위)
+  const active = getActiveAlerts();
+  if (active.length > 0) {
+    h += '<div class="home-alert-section">';
+    h += '<div class="section-label">🚨 장애 알림</div>';
+    active.slice(0, 3).forEach(a => {
+      const sevIcon = a.severity === 'high' ? '🔴' : a.severity === 'medium' ? '🟠' : '🟡';
+      h += `<div class="home-alert-card ${a.severity}" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
+        <div class="ha-icon">${sevIcon}</div>
+        <div class="ha-body">
+          <div class="ha-station">${a.station}역</div>
+          <div class="ha-msg">${a.message}</div>
+        </div>
+        <div class="ha-time">${timeAgo(a.ts)}</div>
+      </div>`;
+    });
+    if (active.length > 3) {
+      h += `<div class="ha-more" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">+${active.length - 3}건 더보기 ›</div>`;
+    }
+    h += '</div>';
+  }
 
   // 오늘의 한마디
   const tip = getDailyTip();

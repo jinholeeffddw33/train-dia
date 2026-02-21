@@ -1769,6 +1769,20 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .rv-row.rv-rtl { flex-direction: row-reverse; }
 
+/* 방향 화살표 */
+.rv-arrow {
+  font-size: 10px; color: var(--text3); opacity: .6;
+  flex: 0 0 auto; padding: 0 2px; align-self: center;
+  margin-bottom: 16px;
+}
+.rv-row.rv-ltr .rv-arrow { order: 999; } /* LTR: 화살표 오른쪽 끝 */
+.rv-row.rv-rtl .rv-arrow { order: 999; } /* RTL(reversed): 화살표 왼쪽 끝 */
+
+/* 방향별 화살표 색상 */
+.rv-zigzag.up .rv-arrow { color: var(--blue); opacity: .8; }
+.rv-zigzag.down .rv-arrow { color: #996CAC; opacity: .8; }
+.rv-zigzag.depot .rv-arrow { color: var(--green); opacity: .8; }
+
 /* 역 사이 트랙 선 */
 .rv-seg {
   flex: 1; height: 3px; min-width: 8px;

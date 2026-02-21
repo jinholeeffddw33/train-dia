@@ -165,6 +165,41 @@ function getRouteDirection(m) {
   return null;
 }
 
+// 역의 동서(east-west) 위치 인덱스 (방화=0 ~ 하남검단산=48)
+function getStationPos(name) {
+  let idx = LINE5_MAIN.indexOf(name);
+  if (idx >= 0) return idx;
+  idx = LINE5_MACHEON.indexOf(name);
+  if (idx >= 0) return LINE5_MAIN.length + idx;
+  idx = LINE5_HANAM.indexOf(name);
+  if (idx >= 0) return LINE5_MAIN.length + idx;
+  // 특수 위치
+  if (name === '고덕기지') return LINE5_MAIN.length + 4.5; // 고덕~상일동 사이
+  if (name === '둔촌오륜') return LINE5_MAIN.length;
+  if (name === '다산') return LINE5_MAIN.indexOf('왕십리');
+  return LINE5_MAIN.indexOf('답십리'); // fallback
+}
+
+// 방향 전환점 기준 구간 분리 (동행/서행)
+function splitByDirection(stations) {
+  if (stations.length < 2) return [{ stations, direction: 'east' }];
+  const legs = [];
+  let cur = [stations[0]], curDir = null;
+  for (let i = 1; i < stations.length; i++) {
+    const pp = getStationPos(stations[i - 1]);
+    const cp = getStationPos(stations[i]);
+    const d = cp >= pp ? 'east' : 'west';
+    if (curDir && d !== curDir) {
+      legs.push({ stations: [...cur], direction: curDir });
+      cur = [stations[i - 1]]; // 전환점에서 새 구간 시작
+    }
+    curDir = d;
+    cur.push(stations[i]);
+  }
+  if (cur.length >= 2) legs.push({ stations: cur, direction: curDir });
+  return legs;
+}
+
 function renderRouteVisual(m) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴')) {
@@ -173,7 +208,7 @@ function renderRouteVisual(m) {
 
   const dir = getRouteDirection(m);
   const parts = m.split(',');
-  const legs = [];
+  const allLegs = []; // 방향별 구간들
   let timeCode = '';
   parts.forEach(p => {
     const trimmed = p.trim();
@@ -187,11 +222,20 @@ function renderRouteVisual(m) {
       }
       const parenMatch = trimmed.match(/\((.+)\)/);
       const note = parenMatch ? parenMatch[1] : '';
-      if (stations.length) legs.push({ stations, note });
+      if (stations.length >= 2) {
+        const subLegs = splitByDirection(stations);
+        subLegs.forEach((sl, si) => {
+          allLegs.push({
+            stations: sl.stations,
+            direction: sl.direction,
+            note: si === subLegs.length - 1 ? note : ''
+          });
+        });
+      }
     }
   });
 
-  if (!legs.length) return '';
+  if (!allLegs.length) return '';
 
   const dirCls = dir ? dir.dir : '';
   let html = '';
@@ -204,18 +248,24 @@ function renderRouteVisual(m) {
     </div>`;
   }
 
-  // ㄹ자 지그재그 레이아웃
+  // 지그재그 레이아웃 — 실제 방향 기반
   html += `<div class="rv-zigzag ${dirCls}">`;
-  legs.forEach((leg, i) => {
-    const isRtl = i % 2 === 1;
+  allLegs.forEach((leg, i) => {
+    const isWest = leg.direction === 'west';
 
-    // 행 사이 꺾임 연결선
+    // 행 사이 꺾임 연결선 — 이전 행 끝 방향에 따라 좌/우
     if (i > 0) {
-      const side = isRtl ? 'right' : 'left';
+      const prevWest = allLegs[i - 1].direction === 'west';
+      const side = prevWest ? 'left' : 'right';
       html += `<div class="rv-turn rv-turn-${side}"><div class="rv-turn-pipe"></div></div>`;
     }
 
-    html += `<div class="rv-row ${isRtl ? 'rv-rtl' : 'rv-ltr'}">`;
+    // west(서행) = RTL, east(동행) = LTR
+    html += `<div class="rv-row ${isWest ? 'rv-rtl' : 'rv-ltr'}">`;
+
+    // 방향 화살표 (행 시작)
+    const arrow = isWest ? '◀' : '▶';
+    html += `<div class="rv-arrow">${arrow}</div>`;
 
     leg.stations.forEach((st, si) => {
       const isFirst = si === 0;
@@ -225,7 +275,6 @@ function renderRouteVisual(m) {
       if (isFirst || isLast) cls += ' rv-end';
       if (isDap) cls += ' rv-home';
 
-      // 역 사이 연결 트랙 (첫 역 이후부터)
       if (si > 0) html += '<div class="rv-seg"></div>';
 
       html += `<div class="${cls}">
@@ -236,7 +285,7 @@ function renderRouteVisual(m) {
 
     html += '</div>';
     if (leg.note) {
-      html += `<div class="rv-note">${leg.note}</div>`;
+      html += `<div class="rv-note">교대 ${leg.note}</div>`;
     }
   });
 

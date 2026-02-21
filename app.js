@@ -1698,7 +1698,46 @@ document.addEventListener('keydown', e => {
       modal.classList.remove('open');
     }
   }
+  // Enter/Done → 키보드 내리기 (textarea 제외)
+  if (e.key === 'Enter' && document.activeElement) {
+    const tag = document.activeElement.tagName;
+    if (tag === 'INPUT') {
+      e.preventDefault();
+      document.activeElement.blur();
+    }
+  }
 });
+
+// 인풋 바깥 탭 → 키보드 내리기
+document.addEventListener('touchstart', e => {
+  const ae = document.activeElement;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) {
+    if (!ae.contains(e.target) && e.target !== ae) {
+      // 자동완성 목록 클릭은 무시 (af-suggest)
+      if (e.target.closest && e.target.closest('.af-suggest')) return;
+      ae.blur();
+    }
+  }
+});
+
+// 인풋 포커스 시 화면 스크롤 보정 (모바일 키보드 대응)
+document.addEventListener('focusin', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }
+});
+
+// VisualViewport 리사이즈 대응 (모바일 키보드 열릴 때 모달 높이 조정)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const vvh = window.visualViewport.height;
+    document.documentElement.style.setProperty('--vvh', vvh + 'px');
+  });
+  // 초기값
+  document.documentElement.style.setProperty('--vvh', window.visualViewport.height + 'px');
+}
 
 // ===== INIT =====
 (function () {

@@ -538,11 +538,14 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
   display: flex; align-items: flex-end; justify-content: center;
   opacity: 0; pointer-events: none; transition: .25s;
+  height: var(--vvh, 100vh); height: var(--vvh, 100dvh);
+  top: auto; bottom: 0;
 }
 .modal-bg.open { opacity: 1; pointer-events: auto; }
 .modal-sheet {
   background: var(--white); border-radius: 20px 20px 0 0;
-  width: 100%; max-width: 500px; max-height: 80vh;
+  width: 100%; max-width: 500px;
+  max-height: 80vh; max-height: 80dvh;
   padding: 12px 0 0; display: flex; flex-direction: column;
   transform: translateY(100%); transition: transform .3s cubic-bezier(.32,1,.6,1);
 }
@@ -560,7 +563,8 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .modal-search:focus { border-color: var(--blue); background: var(--white); }
 .modal-list {
-  flex: 1; overflow-y: auto; padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 0 16px calc(16px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling: touch;
 }
 .modal-person {
@@ -907,8 +911,13 @@ body.dark .fab-count { border-color: #111827; }
 .alert-empty-msg { font-size: 16px; font-weight: 500; }
 
 /* ===== ALERT FORM MODAL ===== */
-.alert-form-sheet { max-height: 85vh; }
-.alert-form { padding: 0 20px 20px; }
+.alert-form-sheet { max-height: 90vh; max-height: 90dvh; }
+.alert-form {
+  padding: 0 20px 20px;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  flex: 1; min-height: 0;
+}
 .af-label {
   display: block; font-size: 14px; font-weight: 700;
   color: var(--text2); margin: 16px 0 8px;
@@ -961,11 +970,12 @@ body.dark .fab-count { border-color: #111827; }
 }
 .af-search:focus { border-color: var(--blue); outline: none; }
 .af-suggest {
-  position: absolute; left: 0; right: 0; top: 100%;
+  position: relative; left: 0; right: 0;
   max-height: 200px; overflow-y: auto;
   background: var(--white); border: 2px solid var(--border);
   border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   z-index: 10; display: none;
+  margin-top: -2px;
 }
 .af-suggest:not(:empty) { display: block; }
 .af-suggest-item {

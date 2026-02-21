@@ -1758,89 +1758,69 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .tc-time-start { color: var(--red) !important; font-weight: 900 !important; font-size: 31px !important; }
 .sc-val-start { color: var(--red) !important; font-weight: 800 !important; font-size: 22px !important; }
 
-/* ===== ㄹ자 운전행로 지그재그 ===== */
-.rv-zigzag {
-  display: flex; flex-direction: column;
-  margin-top: 8px; padding: 4px 0;
+/* ===== 역 컬럼 차트 (운전행로) ===== */
+.rv-chart { margin-top: 8px; overflow-x: auto; }
+.rv-hdrs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px; margin-bottom: 2px;
 }
-.rv-row {
-  display: flex; align-items: center;
-  padding: 8px 12px;
+.rv-h {
+  flex: 1; text-align: center;
+  font-size: 11px; font-weight: 700; color: var(--text2);
+  white-space: nowrap; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis;
 }
-.rv-row.rv-rtl { flex-direction: row-reverse; }
-
-/* 방향 화살표 */
-.rv-arrow {
-  font-size: 10px; color: var(--text3); opacity: .6;
-  flex: 0 0 auto; padding: 0 2px; align-self: center;
-  margin-bottom: 16px;
+.rv-hh { color: var(--blue); font-weight: 800; }
+.rv-bd { position: relative; padding: 6px 0 2px; }
+.rv-gl {
+  position: absolute; top: 0; bottom: 0; width: 1px;
+  background: var(--border); opacity: .3;
+  transform: translateX(-.5px); pointer-events: none;
 }
-.rv-row.rv-ltr .rv-arrow { order: 999; } /* LTR: 화살표 오른쪽 끝 */
-.rv-row.rv-rtl .rv-arrow { order: 999; } /* RTL(reversed): 화살표 왼쪽 끝 */
-
-/* 방향별 화살표 색상 */
-.rv-zigzag.up .rv-arrow { color: var(--blue); opacity: .8; }
-.rv-zigzag.down .rv-arrow { color: #996CAC; opacity: .8; }
-.rv-zigzag.depot .rv-arrow { color: var(--green); opacity: .8; }
-
-/* 역 사이 트랙 선 */
-.rv-seg {
-  flex: 1; height: 3px; min-width: 8px;
-  background: var(--purple); border-radius: 2px;
+.rv-lg { position: relative; height: 26px; }
+.rv-br {
+  position: absolute; top: 9px; height: 8px;
+  border-radius: 4px; min-width: 4px;
 }
-
-/* 역 정류장 */
-.rv-stn {
-  display: flex; flex-direction: column; align-items: center;
-  flex: 0 0 auto; padding: 0 2px;
+.rv-bw { background: var(--blue); }
+.rv-be { background: #996CAC; }
+.rv-ba {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 8px; color: #fff; opacity: .8; line-height: 1;
 }
-.rv-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--white); border: 2.5px solid var(--purple);
-  box-shadow: 0 0 0 2px var(--white);
+.rv-ed {
+  position: absolute; top: 8px; width: 10px; height: 10px;
+  border-radius: 50%; transform: translateX(-5px);
+  border: 2px solid var(--white); box-sizing: border-box;
 }
-.rv-end .rv-dot {
-  width: 14px; height: 14px; background: var(--purple);
-  border-color: var(--purple); box-shadow: 0 0 6px rgba(153,108,172,.4);
+.rv-ed.rv-bw { background: var(--blue); }
+.rv-ed.rv-be { background: #996CAC; }
+/* 꺾임 커넥터 */
+.rv-cn { position: relative; height: 10px; }
+.rv-cv {
+  position: absolute; top: 0; width: 3px; height: 100%;
+  border-radius: 2px; transform: translateX(-1.5px);
 }
-.rv-home .rv-dot {
-  width: 14px; height: 14px; background: var(--blue);
-  border-color: var(--blue); box-shadow: 0 0 8px rgba(26,86,219,.5);
+.rv-cw { background: var(--blue); }
+.rv-ce { background: #996CAC; }
+/* 교대 구분 */
+.rv-chg { text-align: center; padding: 6px 0; position: relative; }
+.rv-chg::before {
+  content: ''; position: absolute;
+  left: 10%; right: 10%; top: 50%; height: 1px;
+  background: var(--orange); opacity: .3;
 }
-.rv-nm {
-  font-size: 11px; font-weight: 600; color: var(--text2);
-  margin-top: 5px; white-space: nowrap; text-align: center;
+.rv-ct {
+  position: relative; display: inline-block;
+  font-size: 12px; font-weight: 700; color: var(--orange);
+  background: var(--orange-light);
+  padding: 3px 12px; border-radius: 10px;
 }
-.rv-end .rv-nm { font-weight: 700; color: var(--text); font-size: 12px; }
-.rv-home .rv-nm { font-weight: 800; color: var(--blue); font-size: 12px; }
-
-/* ㄹ자 꺾임 연결선 */
-.rv-turn {
-  display: flex; height: 18px; padding: 0 12px;
-}
-.rv-turn-right { justify-content: flex-end; }
-.rv-turn-left { justify-content: flex-start; }
-.rv-turn-pipe {
-  width: 3px; height: 100%; border-radius: 2px;
-  background: var(--purple); margin: 0 22px;
-}
-
-/* 교대 시간 배지 */
-.rv-time {
-  text-align: center; font-size: 13px; font-weight: 700;
-  color: var(--orange); background: var(--orange-light);
-  padding: 6px 14px; border-radius: 12px;
-  margin: 8px auto 0; width: fit-content;
-}
-
 /* 비운행 텍스트 */
 .rv-text-only {
   font-size: 14px; color: var(--text2); padding: 8px 0; font-weight: 500;
-}
-/* 편승/교대 주석 */
-.rv-note {
-  font-size: 11px; color: var(--text3); text-align: center;
-  margin-top: -2px; margin-bottom: 4px; font-weight: 500;
 }
 
 /* ===== 교대 방향 배지 ===== */
@@ -1870,19 +1850,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .rv-dir-badge.down .rv-dir-sub { color: #996CAC; opacity: .7; }
 .rv-dir-badge.depot .rv-dir-sub { color: var(--green); opacity: .7; }
 
-/* 방향별 트랙/도트 색상 */
-.rv-zigzag.up .rv-seg { background: var(--blue); }
-.rv-zigzag.up .rv-dot { border-color: var(--blue); }
-.rv-zigzag.up .rv-end .rv-dot { background: var(--blue); border-color: var(--blue); box-shadow: 0 0 6px rgba(26,86,219,.4); }
-.rv-zigzag.up .rv-turn-pipe { background: var(--blue); }
-.rv-zigzag.down .rv-seg { background: #996CAC; }
-.rv-zigzag.down .rv-dot { border-color: #996CAC; }
-.rv-zigzag.down .rv-end .rv-dot { background: #996CAC; border-color: #996CAC; box-shadow: 0 0 6px rgba(153,108,172,.4); }
-.rv-zigzag.down .rv-turn-pipe { background: #996CAC; }
-.rv-zigzag.depot .rv-seg { background: var(--green); }
-.rv-zigzag.depot .rv-dot { border-color: var(--green); }
-.rv-zigzag.depot .rv-end .rv-dot { background: var(--green); border-color: var(--green); box-shadow: 0 0 6px rgba(13,148,82,.4); }
-.rv-zigzag.depot .rv-turn-pipe { background: var(--green); }
 
 /* 내일 카드 교대 방향 칩 */
 .sc-dir {
@@ -1901,19 +1868,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .quiz-card { border-color: var(--border); }
 .dark .cmp-vs { background: var(--border); }
 .dark .contacts-count { background: var(--border); }
-.dark .rv-dot { background: var(--bg); box-shadow: 0 0 0 2px var(--bg); }
-.dark .rv-end .rv-dot { background: var(--purple); box-shadow: 0 0 6px rgba(153,108,172,.4); }
-.dark .rv-home .rv-dot { background: var(--blue); box-shadow: 0 0 8px rgba(26,86,219,.5); }
+.dark .rv-ed { border-color: var(--bg); }
+.dark .rv-gl { background: var(--text3); opacity: .15; }
+.dark .rv-chg::before { opacity: .2; }
+.dark .rv-ct { background: rgba(217,119,6,.15); }
 .dark .rv-dir-badge.up { background: linear-gradient(135deg, rgba(26,86,219,.2) 0%, rgba(26,86,219,.06) 100%); }
 .dark .rv-dir-badge.down { background: linear-gradient(135deg, rgba(153,108,172,.2) 0%, rgba(153,108,172,.06) 100%); }
 .dark .rv-dir-badge.depot { background: linear-gradient(135deg, rgba(13,148,82,.2) 0%, rgba(13,148,82,.06) 100%); }
-.dark .rv-zigzag.up .rv-dot { background: var(--bg); }
-.dark .rv-zigzag.up .rv-end .rv-dot { background: var(--blue); }
-.dark .rv-zigzag.down .rv-dot { background: var(--bg); }
-.dark .rv-zigzag.down .rv-end .rv-dot { background: #996CAC; }
-.dark .rv-zigzag.depot .rv-dot { background: var(--bg); }
-.dark .rv-zigzag.depot .rv-end .rv-dot { background: var(--green); }
-.dark .rv-time { background: rgba(217,119,6,.15); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }
 .dark .sc-dir.down { background: rgba(153,108,172,.2); }
 .dark .sc-dir.depot { background: rgba(13,148,82,.2); }

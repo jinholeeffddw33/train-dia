@@ -200,100 +200,134 @@ function splitByDirection(stations) {
   return legs;
 }
 
+// 차트 위치 — 선형화 (본선→마천→하남)
+function getChartIdx(name) {
+  let i = LINE5_MAIN.indexOf(name);
+  if (i >= 0) return i;
+  i = LINE5_MACHEON.indexOf(name);
+  if (i >= 0) return LINE5_MAIN.length + i;
+  i = LINE5_HANAM.indexOf(name);
+  if (i >= 0) return LINE5_MAIN.length + LINE5_MACHEON.length + i;
+  if (name === '고덕기지') return LINE5_MAIN.length + LINE5_MACHEON.length + 3.5;
+  if (name === '다산') return LINE5_MAIN.indexOf('왕십리');
+  return LINE5_MAIN.indexOf('답십리');
+}
+
+function shortStn(name) {
+  var map = {'영등포구청':'영등포','하남검단산':'하남','고덕기지':'기지',
+    '둔촌오륜':'둔촌','올림픽공원':'올공','상일동':'상일',
+    '하남풍산':'풍산','하남시청':'시청'};
+  return map[name] || name;
+}
+
 function renderRouteVisual(m) {
   if (!m) return '';
-  if (m.includes('충당여부') || m.includes('대휴')) {
+  if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text-only">${m}</div>`;
-  }
 
   const dir = getRouteDirection(m);
   const parts = m.split(',');
-  const allLegs = []; // 방향별 구간들
-  let timeCode = '';
+
+  // 세그먼트 파싱
+  const segs = [];
   parts.forEach(p => {
     const trimmed = p.trim();
-    if (/^\d{4}$/.test(trimmed)) {
-      timeCode = trimmed.slice(0, 2) + ':' + trimmed.slice(2);
-    } else {
-      const stations = [];
-      for (const ch of trimmed) {
-        if (ch === '(' || ch === ')') break;
-        stations.push(STATION_ABBR[ch] || ch);
-      }
-      const parenMatch = trimmed.match(/\((.+)\)/);
-      const note = parenMatch ? parenMatch[1] : '';
-      if (stations.length >= 2) {
-        const subLegs = splitByDirection(stations);
-        subLegs.forEach((sl, si) => {
-          allLegs.push({
-            stations: sl.stations,
-            direction: sl.direction,
-            note: si === subLegs.length - 1 ? note : ''
-          });
-        });
-      }
+    const pm = trimmed.match(/\((.+)\)/);
+    const note = pm ? pm[1] : '';
+    const clean = trimmed.replace(/\(.+\)/, '');
+    if (/^\d{4}$/.test(clean)) return;
+    const stations = [];
+    for (const ch of clean) {
+      if (ch === '(' || ch === ')') break;
+      if (STATION_ABBR[ch]) stations.push(STATION_ABBR[ch]);
     }
+    if (stations.length >= 2) segs.push({ stations, note });
+  });
+  if (!segs.length) return '';
+
+  // 방향별 레그 분리
+  const legs = [];
+  segs.forEach((seg, si) => {
+    splitByDirection(seg.stations).forEach((sl, li) => {
+      legs.push({
+        stations: sl.stations,
+        direction: sl.direction,
+        segBreak: li === 0 && si > 0,
+        changeTime: li === 0 && si > 0 ? seg.note : ''
+      });
+    });
   });
 
-  if (!allLegs.length) return '';
+  // 유니크 역 → 차트 컬럼 매핑
+  const stSet = new Set();
+  legs.forEach(l => l.stations.forEach(s => stSet.add(s)));
+  const sorted = [...stSet].sort((a, b) => getChartIdx(a) - getChartIdx(b));
+  const ci = {};
+  sorted.forEach((s, i) => { ci[s] = i; });
+  const n = sorted.length;
 
-  const dirCls = dir ? dir.dir : '';
+  // HTML 빌드
   let html = '';
-
-  // 교대 방향 배지
   if (dir) {
-    html += `<div class="rv-dir-badge ${dirCls}">
+    html += `<div class="rv-dir-badge ${dir.dir}">
       <div class="rv-dir-label">${dir.label}</div>
       <div class="rv-dir-sub">${dir.sub}</div>
     </div>`;
   }
 
-  // 지그재그 레이아웃 — 실제 방향 기반
-  html += `<div class="rv-zigzag ${dirCls}">`;
-  allLegs.forEach((leg, i) => {
-    const isWest = leg.direction === 'west';
+  html += `<div class="rv-chart" style="--n:${n}">`;
 
-    // 행 사이 꺾임 연결선 — 이전 행 끝 방향에 따라 좌/우
-    if (i > 0) {
-      const prevWest = allLegs[i - 1].direction === 'west';
-      const side = prevWest ? 'left' : 'right';
-      html += `<div class="rv-turn rv-turn-${side}"><div class="rv-turn-pipe"></div></div>`;
-    }
-
-    // west(서행) = RTL, east(동행) = LTR
-    html += `<div class="rv-row ${isWest ? 'rv-rtl' : 'rv-ltr'}">`;
-
-    // 방향 화살표 (행 시작)
-    const arrow = isWest ? '◀' : '▶';
-    html += `<div class="rv-arrow">${arrow}</div>`;
-
-    leg.stations.forEach((st, si) => {
-      const isFirst = si === 0;
-      const isLast = si === leg.stations.length - 1;
-      const isDap = st === '답십리';
-      let cls = 'rv-stn';
-      if (isFirst || isLast) cls += ' rv-end';
-      if (isDap) cls += ' rv-home';
-
-      if (si > 0) html += '<div class="rv-seg"></div>';
-
-      html += `<div class="${cls}">
-        <div class="rv-dot"></div>
-        <div class="rv-nm">${st}</div>
-      </div>`;
-    });
-
-    html += '</div>';
-    if (leg.note) {
-      html += `<div class="rv-note">교대 ${leg.note}</div>`;
-    }
+  // 헤더 행
+  html += '<div class="rv-hdrs">';
+  sorted.forEach(s => {
+    const cls = s === '답십리' ? ' rv-hh' : '';
+    html += `<div class="rv-h${cls}">${shortStn(s)}</div>`;
   });
+  html += '</div>';
 
-  if (timeCode) {
-    html += `<div class="rv-time">교대 ${timeCode}</div>`;
+  // 차트 바디
+  html += '<div class="rv-bd">';
+  for (let i = 0; i < n; i++) {
+    html += `<div class="rv-gl" style="left:calc((${i} + .5) / var(--n) * 100%)"></div>`;
   }
 
-  html += '</div>';
+  legs.forEach((leg, idx) => {
+    // 교대 구분
+    if (leg.segBreak) {
+      html += `<div class="rv-chg"><span class="rv-ct">${leg.changeTime ? '교대 ' + leg.changeTime : '교대'}</span></div>`;
+    }
+    // 꺾임 커넥터
+    else if (idx > 0) {
+      const prev = legs[idx - 1];
+      const shared = prev.stations[prev.stations.length - 1];
+      const col = ci[shared];
+      const cc = prev.direction === 'west' ? 'rv-cw' : 'rv-ce';
+      html += `<div class="rv-cn"><div class="rv-cv ${cc}" style="left:calc((${col} + .5) / var(--n) * 100%)"></div></div>`;
+    }
+
+    // 바 위치
+    const cols = leg.stations.map(s => ci[s]);
+    const minC = Math.min(...cols);
+    const maxC = Math.max(...cols);
+    const isW = leg.direction === 'west';
+    const bc = isW ? 'rv-bw' : 'rv-be';
+
+    html += '<div class="rv-lg">';
+    html += `<div class="rv-br ${bc}" style="left:calc((${minC} + .5) / var(--n) * 100%);width:calc(${maxC - minC} / var(--n) * 100%)">`;
+    html += `<span class="rv-ba">${isW ? '◀' : '▶'}</span>`;
+    html += '</div>';
+
+    // 끝점 도트
+    const fc = ci[leg.stations[0]];
+    const lc = ci[leg.stations[leg.stations.length - 1]];
+    html += `<div class="rv-ed ${bc}" style="left:calc((${fc} + .5) / var(--n) * 100%)"></div>`;
+    if (fc !== lc) {
+      html += `<div class="rv-ed ${bc}" style="left:calc((${lc} + .5) / var(--n) * 100%)"></div>`;
+    }
+    html += '</div>';
+  });
+
+  html += '</div></div>';
   return html;
 }
 

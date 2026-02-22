@@ -856,7 +856,7 @@ function tick() {
 function rHome() {
   const ne = document.getElementById('homeName');
   if (cur) {
-    ne.innerHTML = `<span style="cursor:pointer" onclick="openModal('home')">${cur.n} <span style="opacity:.6;font-size:18px;">▾</span></span>`;
+    ne.innerHTML = `<span class="home-name-link" onclick="openModal('home')">${cur.n} <span class="home-name-arrow">▾</span></span>`;
   } else {
     ne.innerHTML = `<button class="home-select-btn" type="button" onclick="openModal('home')">기관사를 선택하세요 ▾</button>`;
   }
@@ -987,7 +987,7 @@ function rHome() {
   if (tmTp === 'rest') {
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
-      <div class="sc-val" style="color:var(--green)">비번 😊</div>
+      <div class="sc-val sc-val-rest">비번 😊</div>
       <div class="sc-sub">${tmDia}</div>
     </div>`;
   } else {
@@ -1014,7 +1014,7 @@ function rHome() {
   if (afTp === 'rest') {
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
-      <div class="sc-val" style="color:var(--green)">비번 😊</div>
+      <div class="sc-val sc-val-rest">비번 😊</div>
       <div class="sc-sub">${afDia}</div>
     </div>`;
   } else {
@@ -1771,7 +1771,7 @@ function rSchedDetail() {
   let sh = '';
   if (sc) {
     sh = `<div class="sd-body">
-      <div class="sd-dia" style="color:${gColor(tp)}">${dia}</div>
+      <div class="sd-dia ${tp}">${dia}</div>
       <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
@@ -1779,8 +1779,8 @@ function rSchedDetail() {
     </div>`;
   } else {
     sh = `<div class="sd-body">
-      <div class="sd-dia" style="color:${gColor(tp)}">${dia}</div>
-      <div style="text-align:center;padding:16px;color:var(--text2);font-size:18px;font-weight:600">
+      <div class="sd-dia ${tp}">${dia}</div>
+      <div class="sd-rest-text">
         ${dia === '~' ? '비순환 (근무 없음)' : '비번'}
       </div>
     </div>`;
@@ -1832,21 +1832,21 @@ function rCmp() {
     const syncCls = sameType ? (bothRest ? 'cmp-sync cmp-sync-rest' : 'cmp-sync') : '';
 
     h += `<div class="cmp-row-card ${syncCls}"><div class="cmp-pair">
-      <div class="cmp-card" style="border-top-color:${gColor(t1)}">
+      <div class="cmp-card cmp-card-${t1}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
-        <div class="cmp-cd-name" style="color:var(--blue)">${c1.n}</div>
-        <div class="cmp-cd-dia" style="color:${gColor(t1)}">${d1}</div>
+        <div class="cmp-cd-name cmp-name-1">${c1.n}</div>
+        <div class="cmp-cd-dia ${t1}">${d1}</div>
         ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">비번</div>`}
+        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
-      <div class="cmp-card" style="border-top-color:${gColor(t2)}">
+      <div class="cmp-card cmp-card-${t2}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
-        <div class="cmp-cd-name" style="color:var(--purple)">${c2.n}</div>
-        <div class="cmp-cd-dia" style="color:${gColor(t2)}">${d2}</div>
+        <div class="cmp-cd-name cmp-name-2">${c2.n}</div>
+        <div class="cmp-cd-dia ${t2}">${d2}</div>
         ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div style="color:var(--gray);font-size:15px;font-weight:500">비번</div>`}
+        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
     </div></div>`;
   }
@@ -2373,7 +2373,7 @@ function rSopList() {
   const el = document.getElementById('sopList');
   const em = SOP.filter(s => s.sub === '1');
   const bc = SOP.filter(s => s.sub === '2');
-  let h = '<div class="section-label" style="padding:14px 20px 8px">이례상황 조치</div>';
+  let h = '<div class="section-label sop-section-label">이례상황 조치</div>';
   em.forEach(s => {
     const i = SOP.indexOf(s);
     const icon = getSopIcon(s.t);
@@ -2382,7 +2382,7 @@ function rSopList() {
       ${s.c ? `<div class="sop-c">${s.c}</div>` : ''}
     </div>`;
   });
-  h += '<div class="section-label" style="padding:14px 20px 8px">방송문안</div>';
+  h += '<div class="section-label sop-section-label">방송문안</div>';
   bc.forEach(s => {
     const i = SOP.indexOf(s);
     h += `<div class="sop-card" onclick="showSopD(${i})">
@@ -2701,10 +2701,10 @@ function renderQuiz() {
       <div class="quiz-done">
         <div class="quiz-done-icon">🏆</div>
         모든 문제를 풀었습니다!<br>
-        <span style="font-size:14px;color:var(--text3)">내일 다시 셔플됩니다</span>
+        <span class="quiz-done-sub">내일 다시 셔플됩니다</span>
       </div>
-      <button class="quiz-opt" type="button" onclick="resetQuiz()" style="margin-top:12px;text-align:center;border-color:var(--blue);color:var(--blue)">🔄 처음부터 다시 풀기</button>
-      <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:8px">이 퀴즈는 참고용입니다</div>
+      <button class="quiz-opt quiz-reset-btn" type="button" onclick="resetQuiz()">🔄 처음부터 다시 풀기</button>
+      <div class="quiz-disclaimer">이 퀴즈는 참고용입니다</div>
     </div>`;
     return;
   }
@@ -2722,7 +2722,7 @@ function renderQuiz() {
     <div class="quiz-options" id="quizOptions">
       ${quiz.a.map((opt, i) => `<button class="quiz-opt" type="button" onclick="answerQuiz(${i})">${opt}</button>`).join('')}
     </div>
-    <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:12px">이 퀴즈는 참고용입니다</div>
+    <div class="quiz-disclaimer">이 퀴즈는 참고용입니다</div>
   </div>`;
 }
 

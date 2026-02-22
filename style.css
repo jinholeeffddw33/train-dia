@@ -1955,6 +1955,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   padding: 8px 12px 4px; background: rgba(26,86,219,.06);
   border-bottom: 1px solid rgba(26,86,219,.1);
 }
+.rv-block-active > .rv-block-label {
+  background: rgba(26,86,219,.12);
+  border-left: 3px solid var(--blue);
+}
 .rv-rest {
   text-align: center; padding: 8px 0;
   font-size: 13px; font-weight: 800; color: var(--orange);
@@ -2044,6 +2048,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-conn-mini .rv-conn-label { color: #5a5e6a; }
 .dark .rv-conn-tick { background: #3a4050; }
 .dark .rv-block-label { background: rgba(26,86,219,.1); color: #5b8eef; }
+.dark .rv-block-active > .rv-block-label { background: rgba(26,86,219,.2); border-left: 3px solid #5b8eef; }
 .dark .rv-rest { background: rgba(217,119,6,.1); border-color: rgba(217,119,6,.4); }
 .dark .preview-banner { background: rgba(217,119,6,.15); border-color: rgba(217,119,6,.5); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }

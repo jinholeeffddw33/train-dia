@@ -214,6 +214,42 @@ function getChartIdx(name) {
   return LINE5_MAIN.indexOf('답십리');
 }
 
+// 블록별 방향 판별 (첫 세그먼트의 역 순서 기반)
+function getBlockDir(blockSegs) {
+  if (!blockSegs || !blockSegs.length) return null;
+  const seg = blockSegs[0];
+  if (!seg.stations || seg.stations.length < 2) return null;
+  if (seg.stations[0] === '고덕기지') {
+    return { dir: 'depot', short: '기지출발', label: '고덕기지 출발', sub: '고덕기지에서 직접 출발' };
+  }
+  const p0 = getStationPos(seg.stations[0]);
+  const p1 = getStationPos(seg.stations[1]);
+  return p1 < p0
+    ? { dir: 'up', short: '▲상선', label: '▲ 상선 교대', sub: '방화 방면 승강장' }
+    : { dir: 'down', short: '▼하선', label: '▼ 하선 교대', sub: '마천·하남 방면 승강장' };
+}
+
+// 현재 시각 기준 활성 블록 결정 (교대 시각에 전환)
+function getActiveBlock(changeTimes, startTime) {
+  if (!changeTimes.length) return 0;
+  var now = new Date();
+  var nowMins = now.getHours() * 60 + now.getMinutes();
+  var sClean = (startTime || '06:00').replace('기', '');
+  var sp = sClean.split(':');
+  var startMins = (parseInt(sp[0]) || 0) * 60 + (parseInt(sp[1]) || 0);
+  for (var i = changeTimes.length - 1; i >= 0; i--) {
+    var cp = changeTimes[i].split(':');
+    var cMins = (parseInt(cp[0]) || 0) * 60 + (parseInt(cp[1]) || 0);
+    // 야간 근무: 출근 > 교대 (자정 넘김)
+    if (startMins > cMins) {
+      if (nowMins >= cMins && nowMins < startMins) return i + 1;
+    } else {
+      if (nowMins >= cMins) return i + 1;
+    }
+  }
+  return 0;
+}
+
 function shortStn(name) {
   var map = {'영등포구청':'영등포','하남검단산':'하남','고덕기지':'기지',
     '둔촌오륜':'둔촌','올림픽공원':'올공','상일동':'상일',
@@ -226,7 +262,6 @@ function renderRouteVisual(m, startTime, endTime) {
   if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text">${m}</div>`;
 
-  const dir = getRouteDirection(m);
   const parts = m.split(',');
 
   // 세그먼트 파싱 + 교대 시간 추출
@@ -307,34 +342,47 @@ function renderRouteVisual(m, startTime, endTime) {
     }
   }
 
+  // === 블록 구성 (배너보다 먼저) ===
+  const hasBlocks = changeTimes.length > 0 && segs.length > 1;
+  let blocks;
+  if (hasBlocks) {
+    blocks = [];
+    const numBlocks = Math.min(changeTimes.length + 1, segs.length);
+    for (let i = 0; i < numBlocks; i++) {
+      const tStart = i === 0 ? startTime : changeTimes[i - 1];
+      const tEnd = i < changeTimes.length ? changeTimes[i] : endTime;
+      const bSegs = i < numBlocks - 1 ? [segs[i]] : segs.slice(i);
+      blocks.push({
+        label: `${i + 1}근무`,
+        time: tStart && tEnd ? `${tStart} → ${tEnd}` : (tStart ? `${tStart}~` : ''),
+        segs: bSegs
+      });
+    }
+  } else {
+    blocks = [{ label: null, time: null, segs: segs }];
+  }
+
+  // 블록별 방향 + 활성 블록 (시간 기반 자동 전환)
+  const blockDirs = blocks.map(b => getBlockDir(b.segs));
+  const isPreview = typeof weekPreviewDate !== 'undefined' && !!weekPreviewDate;
+  const activeIdx = hasBlocks && !isPreview
+    ? Math.min(getActiveBlock(changeTimes, startTime), blocks.length - 1)
+    : 0;
+
   // === HTML 빌드 ===
   let html = '';
 
-  // 출발 방향 배너 (3중 강조)
-  if (dir) {
-    const dirCls = dir.dir;
-    const timeStr = startTime || '';
+  // 출발 방향 배너 (활성 블록 기준)
+  const bannerDir = blockDirs[activeIdx] || blockDirs[0];
+  if (bannerDir) {
+    const dirCls = bannerDir.dir;
+    const blockPrefix = hasBlocks ? `${blocks[activeIdx].label} · ` : '';
+    const departTime = activeIdx === 0 ? startTime : changeTimes[activeIdx - 1];
     html += `<div class="rv-depart ${dirCls}">`;
-    html += `<div class="rv-depart-dir">${dir.label}</div>`;
-    html += `<div class="rv-depart-sub">${dir.sub}</div>`;
-    if (timeStr) html += `<div class="rv-depart-time">출발 ${timeStr}</div>`;
+    html += `<div class="rv-depart-dir">${blockPrefix}${bannerDir.label}</div>`;
+    html += `<div class="rv-depart-sub">${bannerDir.sub}</div>`;
+    if (departTime) html += `<div class="rv-depart-time">출발 ${departTime}</div>`;
     html += `</div>`;
-  }
-
-  // 블록 분리 (교대 시간이 있으면 2근무 분리)
-  const hasBlocks = changeTimes.length > 0 && segs.length > 1;
-
-  // 블록별 세그먼트 그룹화
-  let blocks;
-  if (hasBlocks) {
-    const splitIdx = Math.min(changeTimes.length, segs.length - 1);
-    const ct = changeTimes[0];
-    blocks = [
-      { label: '1근무', time: startTime ? `${startTime} → ${ct}` : '', segs: segs.slice(0, splitIdx) },
-      { label: '2근무', time: endTime ? `${ct} → ${endTime}` : `${ct}~`, segs: segs.slice(splitIdx) }
-    ];
-  } else {
-    blocks = [{ label: null, time: null, segs: segs }];
   }
 
   // 공통: 차트 컨테이너
@@ -367,8 +415,11 @@ function renderRouteVisual(m, startTime, endTime) {
   // 블록별 렌더링
   blocks.forEach((block, bi) => {
     if (block.label) {
-      if (bi > 0) html += `<div class="rv-rest">교대 ${changeTimes[0]}</div>`;
-      html += `<div class="rv-block"><div class="rv-block-label">${block.label} · ${block.time}</div>`;
+      if (bi > 0) html += `<div class="rv-rest">교대 ${changeTimes[bi - 1] || ''}</div>`;
+      const bDir = blockDirs[bi];
+      const dirTag = bDir ? ` · ${bDir.short}` : '';
+      const activeCls = bi === activeIdx ? ' rv-block-active' : '';
+      html += `<div class="rv-block${activeCls}"><div class="rv-block-label">${block.label}${dirTag} · ${block.time}</div>`;
     }
 
     // 차트 바디

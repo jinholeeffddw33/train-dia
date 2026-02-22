@@ -280,8 +280,9 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   padding: 10px 2px 8px; border-radius: var(--radius-sm);
   background: var(--white); border: 2px solid transparent;
   box-shadow: var(--shadow3);
-  transition: .2s;
+  transition: .2s; cursor: pointer;
 }
+.week-day:active { transform: scale(.95); }
 .week-day.is-today {
   border-color: var(--blue);
   background: linear-gradient(160deg, #1A56DB 0%, #2B6EE8 100%);
@@ -1767,39 +1768,65 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .tc-time-start { color: var(--red) !important; font-weight: 900 !important; }
 .sc-val-start { color: var(--red) !important; font-weight: 800 !important; font-size: 22px !important; }
 
-/* ===== 역 컬럼 차트 (운전행로) ===== */
-/* ===== 운전행로 차트 (APK 스타일) ===== */
+/* ===== 운전행로 차트 (비율 기반) ===== */
 .rv-text {
   font-size: 14px; color: var(--text2); padding: 8px 0; font-weight: 500;
 }
-.rv-dir {
-  display: inline-block; font-size: 13px; font-weight: 700;
-  padding: 4px 10px; border-radius: 6px; margin-bottom: 6px;
+
+/* 출발 방향 배너 (3중 강조) */
+.rv-depart {
+  width: 100%; padding: 10px 14px; border-radius: 8px;
+  margin-bottom: 8px; text-align: center;
 }
-.rv-dir.up { color: var(--blue); background: var(--blue-light); }
-.rv-dir.down { color: #996CAC; background: rgba(153,108,172,.12); }
-.rv-dir.depot { color: var(--green); background: var(--green-light); }
+.rv-depart.up {
+  background: var(--blue); color: #fff;
+}
+.rv-depart.down {
+  background: #996CAC; color: #fff;
+}
+.rv-depart.depot {
+  background: var(--green); color: #fff;
+}
+.rv-depart-dir {
+  font-size: 15px; font-weight: 800; letter-spacing: .5px;
+}
+.rv-depart-sub {
+  font-size: 12px; opacity: .8; margin-top: 2px; font-weight: 500;
+}
+.rv-depart-time {
+  font-size: 22px; font-weight: 900; margin-top: 4px;
+  letter-spacing: -0.5px;
+}
 
 .rv-apk {
   background: #f8f9fa; border: 1px solid #d0d4dc;
-  border-radius: 8px; margin-top: 6px; overflow-x: auto;
+  border-radius: 8px; margin-top: 6px; overflow: hidden;
 }
 .rv-hdr {
-  display: flex; border-bottom: 1px solid #c0c4cc;
+  position: relative; border-bottom: 1px solid #c0c4cc;
   background: #eef0f4; border-radius: 8px 8px 0 0;
+  height: 34px;
 }
 .rv-col {
-  flex: 1; text-align: center; font-size: 11px; font-weight: 700;
-  color: #555; padding: 6px 1px; min-width: 0;
-  word-break: break-all; line-height: 1.15;
+  position: absolute; text-align: center; font-size: 11px; font-weight: 700;
+  color: #555; padding: 6px 0; top: 0;
+  transform: translateX(-50%); white-space: nowrap;
+  line-height: 1.15;
 }
 .rv-col.rv-home { color: #1A56DB; font-weight: 800; }
+
+/* N역 칩 (역 사이 거리 표시) */
+.rv-gap {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  font-size: 9px; font-weight: 700; color: var(--text3);
+  background: rgba(0,0,0,.06); padding: 1px 5px;
+  border-radius: 6px; white-space: nowrap; pointer-events: none;
+}
 
 .rv-body { position: relative; padding: 8px 0 6px; min-height: 40px; }
 .rv-vl {
   position: absolute; top: 0; bottom: 0; width: 1px;
   background: #d4d8e0; pointer-events: none;
-  left: calc((var(--i) + .5) / var(--n) * 100%);
 }
 .rv-pair { padding: 2px 0; }
 .rv-row { position: relative; height: 22px; }
@@ -1820,7 +1847,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   content: ''; position: absolute;
   width: 2px; top: -7px; bottom: -7px;
   background: #333; border-radius: 1px;
-  left: calc((var(--at) + .5) / var(--n) * 100%);
+  left: var(--turn-pos, 50%);
   transform: translateX(-1px);
 }
 /* 교대 구분선 */
@@ -1838,6 +1865,22 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   background: #f8f9fa; padding: 1px 10px; border-radius: 8px;
 }
 
+/* 근무 블록 분리 */
+.rv-block {
+  border-top: 1px solid #d0d4dc; padding: 0;
+}
+.rv-block:first-child { border-top: none; }
+.rv-block-label {
+  font-size: 12px; font-weight: 800; color: var(--blue);
+  padding: 6px 10px 2px; background: rgba(26,86,219,.04);
+}
+.rv-rest {
+  text-align: center; padding: 6px 0;
+  font-size: 12px; font-weight: 700; color: var(--orange);
+  background: var(--orange-light); border-top: 1px dashed var(--orange);
+  border-bottom: 1px dashed var(--orange);
+  letter-spacing: 2px;
+}
 
 /* 내일 카드 교대 방향 칩 */
 .sc-dir {
@@ -1847,6 +1890,36 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .sc-dir.up { color: var(--blue); background: var(--blue-light); }
 .sc-dir.down { color: #996CAC; background: rgba(153,108,172,.12); }
 .sc-dir.depot { color: var(--green); background: var(--green-light); }
+
+/* ===== 미리보기 배너 ===== */
+.preview-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 16px; margin: 0 16px 8px;
+  background: var(--orange-light); border: 2px solid var(--orange);
+  border-radius: var(--radius-sm);
+}
+.preview-banner-text {
+  font-size: 14px; font-weight: 700; color: var(--orange);
+}
+.preview-banner-btn {
+  font-size: 13px; font-weight: 700; color: #fff;
+  background: var(--orange); padding: 6px 14px;
+  border-radius: 8px; border: none; white-space: nowrap;
+  cursor: pointer; transition: .15s;
+}
+.preview-banner-btn:active { transform: scale(.96); opacity: .9; }
+
+/* 주간 탭 미리보기 상태 */
+.week-day.is-preview {
+  border-color: var(--orange);
+  background: linear-gradient(160deg, #D97706 0%, #F59E0B 100%);
+  box-shadow: 0 2px 12px rgba(217,119,6,.3);
+  transform: translateY(-2px);
+}
+.is-preview .wd-dow,
+.is-preview .wd-date,
+.is-preview .wd-dia,
+.is-preview .wd-time { color: #fff !important; }
 
 /* Dark mode additions */
 .dark .daily-tip-card {
@@ -1864,9 +1937,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-arr { color: #1c2030; }
 .dark .rv-turn::before { background: #b8bcc8; }
 .dark .rv-sep span { background: #1c2030; }
-.dark .rv-dir.up { background: rgba(26,86,219,.2); }
-.dark .rv-dir.down { background: rgba(153,108,172,.2); }
-.dark .rv-dir.depot { background: rgba(13,148,82,.2); }
+.dark .rv-depart.up { background: #0F3490; }
+.dark .rv-depart.down { background: #6D28D9; }
+.dark .rv-depart.depot { background: #065F46; }
+.dark .rv-gap { background: rgba(255,255,255,.08); color: #8a8e9a; }
+.dark .rv-block-label { background: rgba(26,86,219,.1); color: #5b8eef; }
+.dark .rv-rest { background: rgba(217,119,6,.1); border-color: rgba(217,119,6,.4); }
+.dark .preview-banner { background: rgba(217,119,6,.15); border-color: rgba(217,119,6,.5); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }
 .dark .sc-dir.down { background: rgba(153,108,172,.2); }
 .dark .sc-dir.depot { background: rgba(13,148,82,.2); }

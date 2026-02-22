@@ -15,6 +15,7 @@ let sb = null;
 let cur = null, calY, calM, selDate, c1 = null, c2 = null, cmpY, cmpM;
 let mTarget = 'home', sopIdx = -1;
 let alerts = [], alertSeverity = 'high', lineBranch = 'main';
+let weekPreviewDate = null; // null = showing today
 let trainData = [], trainTimer = null;
 let lineViewMode = 'list', lastTrainFetch = 0, updateCounterTimer = null;
 
@@ -220,7 +221,7 @@ function shortStn(name) {
   return map[name] || name;
 }
 
-function renderRouteVisual(m) {
+function renderRouteVisual(m, startTime) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text">${m}</div>`;
@@ -228,10 +229,16 @@ function renderRouteVisual(m) {
   const dir = getRouteDirection(m);
   const parts = m.split(',');
 
-  // 세그먼트 파싱
+  // 세그먼트 파싱 + 교대 시간 추출
   const segs = [];
+  let changeTimes = [];
   parts.forEach(p => {
     const trimmed = p.trim();
+    if (/^\d{4}$/.test(trimmed)) {
+      const hh = trimmed.slice(0, 2), mm = trimmed.slice(2);
+      changeTimes.push(`${hh}:${mm}`);
+      return;
+    }
     const pm = trimmed.match(/\((.+)\)/);
     const note = pm ? pm[1] : '';
     const clean = trimmed.replace(/\(.+\)/, '');
@@ -245,75 +252,151 @@ function renderRouteVisual(m) {
   });
   if (!segs.length) return '';
 
-  // 유니크 역 수집 → 차트 컬럼
+  // 유니크 역 수집 → 비율 기반 위치 계산
   const stSet = new Set();
   segs.forEach(seg => seg.stations.forEach(s => stSet.add(s)));
   const sorted = [...stSet].sort((a, b) => getChartIdx(a) - getChartIdx(b));
-  const ci = {};
-  sorted.forEach((s, i) => { ci[s] = i; });
   const n = sorted.length;
 
-  // === HTML 빌드 (APK 스타일) ===
-  let html = '';
+  // 비율 기반 위치 계산
+  const indices = sorted.map(s => getChartIdx(s));
+  const minIdx = Math.min(...indices);
+  const maxIdx = Math.max(...indices);
+  const range = maxIdx - minIdx || 1;
 
-  // 방향 칩 (간소화)
-  if (dir) {
-    const ic = dir.dir === 'up' ? '▲' : dir.dir === 'down' ? '▼' : '🚇';
-    html += `<div class="rv-dir ${dir.dir}"><span>${ic} ${dir.label}</span></div>`;
+  // 원시 비율(0~100) 계산
+  const rawPos = {};
+  sorted.forEach(s => {
+    rawPos[s] = ((getChartIdx(s) - minIdx) / range) * 100;
+  });
+
+  // 인접 역 간 최소 12% 간격 보장
+  const MIN_GAP = 12;
+  const positions = {};
+  positions[sorted[0]] = rawPos[sorted[0]];
+  for (let i = 1; i < sorted.length; i++) {
+    const prevPos = positions[sorted[i - 1]];
+    const rawGap = rawPos[sorted[i]] - rawPos[sorted[i - 1]];
+    positions[sorted[i]] = rawGap < MIN_GAP ? prevPos + MIN_GAP : rawPos[sorted[i]];
+  }
+  // 정규화 (5~95% 범위로 — 양쪽 여백 확보)
+  const posMax = positions[sorted[sorted.length - 1]];
+  const posMin = positions[sorted[0]];
+  const posRange = posMax - posMin || 1;
+  sorted.forEach(s => {
+    positions[s] = 5 + ((positions[s] - posMin) / posRange) * 90;
+  });
+
+  // 역간 구간 정보 (N역 칩용)
+  const gapChips = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i], b = sorted[i + 1];
+    const idxA = getChartIdx(a), idxB = getChartIdx(b);
+    const stationCount = Math.abs(idxB - idxA);
+    if (stationCount > 1) {
+      const midPct = (positions[a] + positions[b]) / 2;
+      gapChips.push({ pct: midPct, count: stationCount });
+    }
   }
 
-  html += `<div class="rv-apk" style="--n:${n}">`;
+  // === HTML 빌드 ===
+  let html = '';
 
-  // 역 헤더 (세로 텍스트)
+  // 출발 방향 배너 (3중 강조)
+  if (dir) {
+    const dirCls = dir.dir;
+    const ic = dir.dir === 'up' ? '▲' : dir.dir === 'down' ? '▼' : '🚇';
+    const timeStr = startTime || '';
+    html += `<div class="rv-depart ${dirCls}">`;
+    html += `<div class="rv-depart-dir">${ic} ${dir.label}</div>`;
+    html += `<div class="rv-depart-sub">${dir.sub}</div>`;
+    if (timeStr) html += `<div class="rv-depart-time">출발 ${timeStr}</div>`;
+    html += `</div>`;
+  }
+
+  // 블록 분리 (교대 시간이 있으면 2근무 분리)
+  const hasBlocks = changeTimes.length > 0 && segs.length > 1;
+
+  // 블록별 세그먼트 그룹화
+  let blocks;
+  if (hasBlocks) {
+    // 첫 교대 시간 기준으로 2블록
+    const splitIdx = Math.min(changeTimes.length, segs.length - 1);
+    blocks = [
+      { label: '1근무', time: startTime ? startTime + '~' : '', segs: segs.slice(0, splitIdx) },
+      { label: '2근무', time: changeTimes[0] + '~', segs: segs.slice(splitIdx) }
+    ];
+  } else {
+    blocks = [{ label: null, time: null, segs: segs }];
+  }
+
+  // 공통: 차트 컨테이너
+  html += `<div class="rv-apk">`;
+
+  // 역 헤더 (비율 기반 위치)
   html += '<div class="rv-hdr">';
   sorted.forEach(s => {
     const home = s === '답십리' ? ' rv-home' : '';
-    html += `<div class="rv-col${home}">${shortStn(s)}</div>`;
+    const pct = positions[s];
+    html += `<div class="rv-col${home}" style="left:${pct.toFixed(1)}%">${shortStn(s)}</div>`;
+  });
+  // N역 칩
+  gapChips.forEach(chip => {
+    html += `<span class="rv-gap" style="left:${chip.pct.toFixed(1)}%">${chip.count}역</span>`;
   });
   html += '</div>';
 
-  // 차트 바디
-  html += '<div class="rv-body">';
-
-  // 그리드 라인
-  for (let i = 0; i < n; i++) {
-    html += `<div class="rv-vl" style="--i:${i}"></div>`;
-  }
-
-  // 세그먼트 렌더링
-  segs.forEach((seg, si) => {
-    // 교대 구분선
-    if (si > 0) {
-      html += `<div class="rv-sep"><span>${seg.note ? '교대 ' + seg.note : '교대'}</span></div>`;
+  // 블록별 렌더링
+  blocks.forEach((block, bi) => {
+    if (block.label) {
+      if (bi > 0) html += `<div class="rv-rest">대기</div>`;
+      html += `<div class="rv-block"><div class="rv-block-label">${block.label} · ${block.time}</div>`;
     }
 
-    // 방향별 레그 분리
-    const legs = splitByDirection(seg.stations);
+    // 차트 바디
+    html += '<div class="rv-body">';
 
-    html += '<div class="rv-pair">';
-    legs.forEach((leg, li) => {
-      const cols = leg.stations.map(s => ci[s]);
-      const minC = Math.min(...cols);
-      const maxC = Math.max(...cols);
-      const isW = leg.direction === 'west';
-
-      // 바
-      html += '<div class="rv-row">';
-      html += `<div class="rv-bar" style="left:calc((${minC} + .25) / var(--n) * 100%);width:calc((${maxC - minC} + .5) / var(--n) * 100%)">`;
-      html += `<span class="rv-arr">${isW ? '◀' : '▶'}</span>`;
-      html += '</div></div>';
-
-      // 꺾임 커넥터 (같은 세그먼트 내 레그 간)
-      if (li < legs.length - 1) {
-        const shared = leg.stations[leg.stations.length - 1];
-        const cCol = ci[shared];
-        html += `<div class="rv-turn" style="--at:${cCol}"></div>`;
-      }
+    // 그리드 라인
+    sorted.forEach(s => {
+      const pct = positions[s];
+      html += `<div class="rv-vl" style="left:${pct.toFixed(1)}%"></div>`;
     });
-    html += '</div>';
+
+    // 세그먼트 렌더링
+    block.segs.forEach((seg, si) => {
+      if (si > 0) {
+        html += `<div class="rv-sep"><span>${seg.note ? '교대 ' + seg.note : '교대'}</span></div>`;
+      }
+
+      const legs = splitByDirection(seg.stations);
+
+      html += '<div class="rv-pair">';
+      legs.forEach((leg, li) => {
+        const stnPositions = leg.stations.map(s => positions[s]);
+        const minP = Math.min(...stnPositions);
+        const maxP = Math.max(...stnPositions);
+        const isW = leg.direction === 'west';
+
+        html += '<div class="rv-row">';
+        html += `<div class="rv-bar" style="left:${(minP).toFixed(1)}%;width:${(maxP - minP).toFixed(1)}%">`;
+        html += `<span class="rv-arr">${isW ? '◀' : '▶'}</span>`;
+        html += '</div></div>';
+
+        if (li < legs.length - 1) {
+          const shared = leg.stations[leg.stations.length - 1];
+          const turnPct = positions[shared];
+          html += `<div class="rv-turn" style="--turn-pos:${turnPct.toFixed(1)}%"></div>`;
+        }
+      });
+      html += '</div>';
+    });
+
+    html += '</div>'; // rv-body
+
+    if (block.label) html += '</div>'; // rv-block
   });
 
-  html += '</div></div>';
+  html += '</div>'; // rv-apk
   return html;
 }
 
@@ -460,8 +543,23 @@ function rHome() {
     return;
   }
 
-  const today = td(), dia = gDia(cur, today), tp = gType(dia);
-  const sc = gSched(dia, today), hl = isH(today) ? '휴일' : '평일';
+  // 미리보기 모드 or 오늘
+  const today = td();
+  const targetDate = weekPreviewDate ? new Date(weekPreviewDate + 'T00:00:00') : today;
+  const dia = gDia(cur, targetDate), tp = gType(dia);
+  const sc = gSched(dia, targetDate), hl = isH(targetDate) ? '휴일' : '평일';
+
+  // 미리보기 배너
+  let previewBannerH = '';
+  if (weekPreviewDate) {
+    const pd = new Date(weekPreviewDate + 'T00:00:00');
+    const pdDow = DOW[pd.getDay()];
+    previewBannerH = `<div class="preview-banner">
+      <span class="preview-banner-text">👁 미리보기: ${pdDow}요일 (${pd.getDate()}일)</span>
+      <button class="preview-banner-btn" type="button" onclick="resetToToday()">오늘로 돌아가기</button>
+    </div>`;
+  }
+
   let infoH = '';
   if (sc) {
     infoH = `<div class="tc-time-hero">
@@ -482,16 +580,21 @@ function rHome() {
     if (sc.m) {
       infoH += `<div class="tc-route">
         <div class="tc-route-label">🚇 운전행로</div>
-        ${renderRouteVisual(sc.m)}
+        ${renderRouteVisual(sc.m, sc.s)}
       </div>`;
     }
   } else {
-    infoH = `<div class="tc-rest-msg">오늘은 비번입니다 😊</div>`;
+    const restMsg = weekPreviewDate ? '이 날은 비번입니다 😊' : '오늘은 비번입니다 😊';
+    infoH = `<div class="tc-rest-msg">${restMsg}</div>`;
   }
 
-  el.innerHTML = `<div class="today-card">
+  const cardLabel = weekPreviewDate
+    ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
+    : '오늘의 교번 · DIA';
+
+  el.innerHTML = `${previewBannerH}<div class="today-card">
     <div class="tc-header">
-      <div class="tc-label">오늘의 교번 · DIA</div>
+      <div class="tc-label">${cardLabel}</div>
       <span class="tc-badge ${tp}">${gLabel(dia)}</span>
     </div>
     <div class="tc-body">
@@ -499,7 +602,7 @@ function rHome() {
       <div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>
     </div>${infoH}</div>`;
 
-  // Week preview
+  // Week strip
   const we = document.getElementById('homeWeek');
   let wh = '<div class="section-label">이번주 근무</div><div class="week-strip">';
   const todayD = today.getDay();
@@ -510,12 +613,17 @@ function rHome() {
     const d = new Date(weekStart);
     d.setDate(d.getDate() + i);
     const di = gDia(cur, d), tt = gType(di), isT = d.getTime() === today.getTime();
+    const dateStr = d.toISOString().split('T')[0];
+    const isPreview = weekPreviewDate === dateStr;
     const ss = gSched(di, d);
     let timeStr = '';
     if (ss && ss.s && !ss.s.startsWith('대') && ss.s !== '대휴') {
       timeStr = ss.s.replace('기', '');
     }
-    wh += `<div class="week-day ${isT ? 'is-today' : ''}">
+    let cls = 'week-day';
+    if (isPreview) cls += ' is-preview';
+    else if (isT && !weekPreviewDate) cls += ' is-today';
+    wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
       <div class="wd-dia ${tt}">${di === '~' ? '-' : di}</div>
@@ -586,6 +694,32 @@ function rHome() {
     ${afCard}
   </div>`;
 }
+
+// ===== WEEK PREVIEW =====
+function showWeekPreview(dateStr) {
+  const today = td();
+  const todayStr = today.toISOString().split('T')[0];
+  if (dateStr === todayStr) {
+    // 오늘을 클릭하면 미리보기 해제
+    resetToToday();
+    return;
+  }
+  weekPreviewDate = dateStr;
+  rHome();
+  renderHomeExtras();
+}
+
+function resetToToday() {
+  if (!weekPreviewDate) return;
+  weekPreviewDate = null;
+  rHome();
+  renderHomeExtras();
+}
+
+// 페이지 복귀 시 미리보기 자동 해제
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && weekPreviewDate) resetToToday();
+});
 
 // ===== SUPABASE INIT =====
 function initSupabase() {
@@ -1193,6 +1327,7 @@ function updateAlertIndicators() {
 
 // ===== TABS =====
 function goTab(id, el) {
+  if (id === 'pageHome' && weekPreviewDate) resetToToday();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById(id).classList.add('active');

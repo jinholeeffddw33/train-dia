@@ -1947,6 +1947,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .rv-depart-until {
   font-size: 12px; font-weight: 500; opacity: .8;
 }
+/* 오늘 근무 완료 배너 (퇴근 2시간 이후 — 차분한 톤) */
+.rv-depart.rv-idle {
+  background: linear-gradient(135deg, #374151 0%, #4B5563 50%, #6B7280 100%);
+  color: #fff; box-shadow: 0 2px 8px rgba(107,114,128,.25);
+}
+.rv-depart.rv-idle .rv-depart-dir { font-size: 14px; font-weight: 700; opacity: .9; }
+.rv-depart.rv-idle .rv-depart-next { border-top-color: rgba(255,255,255,.15); }
 /* 다음 근무 준비 배너 */
 .rv-depart.rv-prep {
   position: relative; overflow: hidden;
@@ -2194,6 +2201,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-depart.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
 .dark .rv-depart.rv-done { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.25); }
+.dark .rv-depart.rv-idle { background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #4B5563 100%); box-shadow: 0 2px 8px rgba(75,85,99,.2); }
 .dark .rv-depart.rv-prep.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
 .dark .rv-depart.rv-prep.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.rv-prep.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }

@@ -133,9 +133,10 @@ function getNextShift(person, fromDate) {
   return null;
 }
 
-// 배너 상태 판별: 'working' | 'done' | 'preparing'
+// 배너 상태 판별: 'working' | 'done' | 'idle' | 'preparing'
 // - working: 출근 시간 ~ 퇴근 시간 사이 (또는 출근 2시간 이상 전)
-// - done: 퇴근 후 ~ 다음 출근 2시간 전
+// - done: 퇴근 후 2시간 이내 (격려 + 다음 출발)
+// - idle: 퇴근 후 2시간 이후 (차분하게 다음 출발만)
 // - preparing: 다음 출근 2시간 전 ~
 function getBannerState(sc, nextShift, now) {
   if (!sc || !sc.s || !sc.e) return { state: 'working', next: nextShift };
@@ -174,23 +175,29 @@ function getBannerState(sc, nextShift, now) {
     }
     // 2시간 이상 전 — 야간이면 '종료' (어젯밤 근무 끝남), 주간이면 그냥 정상 배너
     if (isNight) {
-      return calcDoneState(nextShift, nowMins, startMins);
+      // 야간 퇴근 후 경과: nowMins - endMins
+      var minsAfterNight = nowMins - endMins;
+      return calcDoneState(nextShift, nowMins, startMins, minsAfterNight);
     }
     return { state: 'working', next: nextShift };
   }
 
-  // 오늘 퇴근 후
-  return calcDoneState(nextShift, nowMins, -1);
+  // 오늘 퇴근 후 — 경과 시간 계산
+  var minsAfterEnd = nowMins - endMins;
+  return calcDoneState(nextShift, nowMins, -1, minsAfterEnd);
 }
 
 // 근무 종료 상태에서 다음 근무까지 시간 계산
-function calcDoneState(nextShift, nowMins, todayStartMins) {
+// minsAfterEnd: 퇴근 후 경과 시간(분) — 2시간 넘으면 idle
+function calcDoneState(nextShift, nowMins, todayStartMins, minsAfterEnd) {
+  var isDone = minsAfterEnd <= 120; // 퇴근 후 2시간 이내 = done, 이후 = idle
+
   if (!nextShift || !nextShift.schedule || !nextShift.schedule.s) {
-    return { state: 'done', next: nextShift, minsUntil: null };
+    return { state: isDone ? 'done' : 'idle', next: nextShift, minsUntil: null };
   }
   var nextStartMins = timeToMins(nextShift.schedule.s);
   if (nextStartMins < 0) {
-    return { state: 'done', next: nextShift, minsUntil: null };
+    return { state: isDone ? 'done' : 'idle', next: nextShift, minsUntil: null };
   }
   // 다음 출근까지 남은 시간(분)
   var minsUntilNext;
@@ -205,7 +212,7 @@ function calcDoneState(nextShift, nowMins, todayStartMins) {
   if (minsUntilNext <= 120) {
     return { state: 'preparing', next: nextShift, minsUntil: minsUntilNext };
   }
-  return { state: 'done', next: nextShift, minsUntil: minsUntilNext };
+  return { state: isDone ? 'done' : 'idle', next: nextShift, minsUntil: minsUntilNext };
 }
 
 // 남은 시간 포맷 ("약 N시간 후" / "약 N시간 N분 후")
@@ -562,12 +569,12 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
   // Y자 미니맵 (답십리 중앙 + 브랜치 시각화)
   html += renderYMap(segs);
 
-  // 출발 방향 배너 — 3-state (근무중 / 종료 / 준비)
+  // 출발 방향 배너 — 4-state (근무중 / 종료 / 대기 / 준비)
   const bannerDir = blockDirs[activeIdx] || blockDirs[0];
   const bState = bannerState || { state: 'working' };
 
   if (bState.state === 'done' && bState.next) {
-    // === STATE 2: 근무 종료 ===
+    // === STATE 2: 근무 종료 (퇴근 후 2시간 이내) ===
     const ns = bState.next;
     const nextTime = ns.schedule ? ns.schedule.s : '';
     const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;
@@ -588,8 +595,29 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     }
     html += `</div>`;
 
+  } else if (bState.state === 'idle') {
+    // === STATE 3: 오늘 근무 완료 (퇴근 후 2시간 이후, 차분) ===
+    const ns = bState.next;
+    const nextTime = ns && ns.schedule ? ns.schedule.s : '';
+    const nextDir = ns && ns.schedule ? getRouteDirection(ns.schedule.m) : null;
+    const nextDirText = nextDir
+      ? (nextDir.dir === 'up' ? '▲상선' : nextDir.dir === 'down' ? '▼하선' : '🚇기지')
+      : '';
+    const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
+    const daysText = ns && ns.daysAhead === 1 ? '내일' : (ns && ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
+
+    html += `<div class="rv-depart rv-idle">`;
+    html += `<div class="rv-depart-dir">오늘 근무 완료</div>`;
+    if (nextTime) {
+      html += `<div class="rv-depart-next">`;
+      html += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+
   } else if (bState.state === 'preparing' && bState.next) {
-    // === STATE 3: 다음 근무 준비 ===
+    // === STATE 4: 다음 근무 준비 (2시간 이내) ===
     const ns = bState.next;
     const nextTime = ns.schedule ? ns.schedule.s : '';
     const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;

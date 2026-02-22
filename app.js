@@ -110,6 +110,114 @@ function getWorkTime(sc) {
   return calcWorkTime(sc.s, sc.e);
 }
 
+// 시간 문자열("HH:MM") → 분으로 변환
+function timeToMins(t) {
+  if (!t || !/^\d{1,2}:\d{2}$/.test(t.replace('기', ''))) return -1;
+  var clean = t.replace('기', '');
+  var p = clean.split(':');
+  return (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0);
+}
+
+// 다음 근무일 탐색 (최대 7일 앞)
+function getNextShift(person, fromDate) {
+  for (var i = 1; i <= 7; i++) {
+    var d = new Date(fromDate);
+    d.setDate(d.getDate() + i);
+    var dia = gDia(person, d);
+    var tp = gType(dia);
+    if (tp !== 'rest') {
+      var sc = gSched(dia, d);
+      return { date: d, dia: dia, type: tp, schedule: sc, daysAhead: i };
+    }
+  }
+  return null;
+}
+
+// 배너 상태 판별: 'working' | 'done' | 'preparing'
+// - working: 출근 시간 ~ 퇴근 시간 사이 (또는 출근 2시간 이상 전)
+// - done: 퇴근 후 ~ 다음 출근 2시간 전
+// - preparing: 다음 출근 2시간 전 ~
+function getBannerState(sc, nextShift, now) {
+  if (!sc || !sc.s || !sc.e) return { state: 'working', next: nextShift };
+  var nowMins = now.getHours() * 60 + now.getMinutes();
+  var startMins = timeToMins(sc.s);
+  var endMins = timeToMins(sc.e);
+  if (startMins < 0 || endMins < 0) return { state: 'working', next: nextShift };
+
+  var isNight = endMins <= startMins; // 야간 (자정 넘김)
+
+  // 현재 근무 중인지 판별
+  var isWorking;
+  if (isNight) {
+    isWorking = nowMins >= startMins || nowMins < endMins;
+  } else {
+    isWorking = nowMins >= startMins && nowMins < endMins;
+  }
+  if (isWorking) return { state: 'working', next: nextShift };
+
+  // 근무 중이 아닌 경우 — 출근 전인지 퇴근 후인지 판별
+  var isBeforeShift;
+  if (isNight) {
+    // 야간: endMins(새벽) ~ startMins(밤) 사이 = 출근 전 대기
+    isBeforeShift = nowMins >= endMins && nowMins < startMins;
+  } else {
+    isBeforeShift = nowMins < startMins;
+  }
+
+  if (isBeforeShift) {
+    // 오늘 출근 전 — 2시간 이내면 '준비' 상태
+    var minsUntilToday = startMins - nowMins;
+    if (minsUntilToday <= 120) {
+      // 오늘 근무를 "다음 근무"로 구성
+      var todayAsNext = { schedule: sc, daysAhead: 0 };
+      return { state: 'preparing', next: todayAsNext, minsUntil: minsUntilToday };
+    }
+    // 2시간 이상 전 — 야간이면 '종료' (어젯밤 근무 끝남), 주간이면 그냥 정상 배너
+    if (isNight) {
+      return calcDoneState(nextShift, nowMins, startMins);
+    }
+    return { state: 'working', next: nextShift };
+  }
+
+  // 오늘 퇴근 후
+  return calcDoneState(nextShift, nowMins, -1);
+}
+
+// 근무 종료 상태에서 다음 근무까지 시간 계산
+function calcDoneState(nextShift, nowMins, todayStartMins) {
+  if (!nextShift || !nextShift.schedule || !nextShift.schedule.s) {
+    return { state: 'done', next: nextShift, minsUntil: null };
+  }
+  var nextStartMins = timeToMins(nextShift.schedule.s);
+  if (nextStartMins < 0) {
+    return { state: 'done', next: nextShift, minsUntil: null };
+  }
+  // 다음 출근까지 남은 시간(분)
+  var minsUntilNext;
+  if (nextShift.daysAhead === 0) {
+    // 오늘 근무 (야간 대기 시간 중)
+    minsUntilNext = todayStartMins - nowMins;
+  } else if (nextShift.daysAhead === 1) {
+    minsUntilNext = (1440 - nowMins) + nextStartMins;
+  } else {
+    minsUntilNext = ((nextShift.daysAhead - 1) * 1440) + (1440 - nowMins) + nextStartMins;
+  }
+  if (minsUntilNext <= 120) {
+    return { state: 'preparing', next: nextShift, minsUntil: minsUntilNext };
+  }
+  return { state: 'done', next: nextShift, minsUntil: minsUntilNext };
+}
+
+// 남은 시간 포맷 ("약 N시간 후" / "약 N시간 N분 후")
+function formatTimeUntil(mins) {
+  if (!mins || mins <= 0) return '';
+  var h = Math.floor(mins / 60);
+  var m = mins % 60;
+  if (h === 0) return '약 ' + m + '분 후';
+  if (m === 0) return '약 ' + h + '시간 후';
+  return '약 ' + h + '시간 ' + m + '분 후';
+}
+
 function expandRoute(m) {
   if (!m) return '';
   const parts = m.split(',');
@@ -336,7 +444,7 @@ function renderYMap(segs) {
   return html;
 }
 
-function renderRouteVisual(m, startTime, endTime) {
+function renderRouteVisual(m, startTime, endTime, bannerState) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text">${m}</div>`;
@@ -454,9 +562,54 @@ function renderRouteVisual(m, startTime, endTime) {
   // Y자 미니맵 (답십리 중앙 + 브랜치 시각화)
   html += renderYMap(segs);
 
-  // 출발 방향 배너 (활성 블록 기준)
+  // 출발 방향 배너 — 3-state (근무중 / 종료 / 준비)
   const bannerDir = blockDirs[activeIdx] || blockDirs[0];
-  if (bannerDir) {
+  const bState = bannerState || { state: 'working' };
+
+  if (bState.state === 'done' && bState.next) {
+    // === STATE 2: 근무 종료 ===
+    const ns = bState.next;
+    const nextTime = ns.schedule ? ns.schedule.s : '';
+    const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;
+    const nextDirText = nextDir
+      ? (nextDir.dir === 'up' ? '▲상선' : nextDir.dir === 'down' ? '▼하선' : '🚇기지')
+      : '';
+    const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
+    const daysText = ns.daysAhead === 1 ? '내일' : (ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
+
+    html += `<div class="rv-depart rv-done">`;
+    html += `<div class="rv-depart-dir">근무 종료</div>`;
+    html += `<div class="rv-depart-sub">수고하셨습니다</div>`;
+    if (nextTime) {
+      html += `<div class="rv-depart-next">`;
+      html += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+
+  } else if (bState.state === 'preparing' && bState.next) {
+    // === STATE 3: 다음 근무 준비 ===
+    const ns = bState.next;
+    const nextTime = ns.schedule ? ns.schedule.s : '';
+    const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;
+    const nextDirCls = nextDir ? nextDir.dir : 'up';
+    const nextDirLabel = nextDir ? nextDir.label : '';
+    const nextDirSub = nextDir ? nextDir.sub : '';
+    const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
+
+    html += `<div class="rv-depart rv-prep ${nextDirCls}">`;
+    html += `<div class="rv-depart-dir">다음 근무 · ${nextDirLabel}</div>`;
+    html += `<div class="rv-depart-sub">${nextDirSub}</div>`;
+    if (nextTime) {
+      html += `<div class="rv-depart-time">출발 ${nextTime}`;
+      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      html += `</div>`;
+    }
+    html += `</div>`;
+
+  } else if (bannerDir) {
+    // === STATE 1: 근무 중 (기존 동작) ===
     const dirCls = bannerDir.dir;
     const blockPrefix = hasBlocks ? `${blocks[activeIdx].label} · ` : '';
     const departTime = activeIdx === 0 ? startTime : changeTimes[activeIdx - 1];
@@ -712,6 +865,13 @@ function rHome() {
     </div>`;
   }
 
+  // 배너 상태 계산 (오늘 + 실시간만, 미리보기는 항상 working)
+  let bannerState = null;
+  if (sc && !weekPreviewDate) {
+    const nextShift = getNextShift(cur, today);
+    bannerState = getBannerState(sc, nextShift, new Date());
+  }
+
   let infoH = '';
   if (sc) {
     infoH = `<div class="tc-time-hero">
@@ -732,7 +892,7 @@ function rHome() {
     if (sc.m) {
       infoH += `<div class="tc-route">
         <div class="tc-route-label">🚇 운전행로</div>
-        ${renderRouteVisual(sc.m, sc.s, sc.e)}
+        ${renderRouteVisual(sc.m, sc.s, sc.e, bannerState)}
       </div>`;
     }
   } else {
@@ -2618,6 +2778,10 @@ function resetQuiz() {
     tick();
     setInterval(tick, 1000);
     rHome();
+    // 배너 상태 자동 전환 — 1분마다 홈 갱신
+    setInterval(function() {
+      if (!weekPreviewDate && cur) rHome();
+    }, 60000);
     initCal();
     initCmp();
     rMore();

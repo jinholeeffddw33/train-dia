@@ -1933,6 +1933,39 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   0%, 100% { text-shadow: 0 0 4px rgba(255,255,255,.3); transform: scale(1); }
   50% { text-shadow: 0 0 24px rgba(255,255,255,.8), 0 0 48px rgba(255,255,255,.3); transform: scale(1.04); }
 }
+/* 근무 종료 배너 */
+.rv-depart.rv-done {
+  background: linear-gradient(135deg, #065F46 0%, #0D9452 50%, #34D399 100%);
+  color: #fff; box-shadow: 0 4px 16px rgba(52,211,153,.3);
+}
+.rv-depart.rv-done .rv-depart-dir { font-size: 16px; }
+.rv-depart.rv-done .rv-depart-sub { font-size: 13px; opacity: .9; }
+.rv-depart-next {
+  font-size: 14px; font-weight: 700; margin-top: 6px;
+  padding-top: 6px; border-top: 1px solid rgba(255,255,255,.2);
+}
+.rv-depart-until {
+  font-size: 12px; font-weight: 500; opacity: .8;
+}
+/* 다음 근무 준비 배너 */
+.rv-depart.rv-prep {
+  position: relative; overflow: hidden;
+}
+.rv-depart.rv-prep::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    -45deg, transparent, transparent 8px,
+    rgba(255,255,255,.06) 8px, rgba(255,255,255,.06) 12px
+  );
+  pointer-events: none;
+}
+.rv-depart.rv-prep .rv-depart-time {
+  animation: rvPrepPulse 1.5s ease-in-out infinite;
+}
+@keyframes rvPrepPulse {
+  0%, 100% { text-shadow: 0 0 8px rgba(255,255,255,.4); }
+  50% { text-shadow: 0 0 20px rgba(255,255,255,.9), 0 0 40px rgba(255,255,255,.4); }
+}
 
 .rv-apk {
   background: #f8f9fa; border: 1px solid #d0d4dc;
@@ -2160,6 +2193,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-depart.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
 .dark .rv-depart.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
+.dark .rv-depart.rv-done { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.25); }
+.dark .rv-depart.rv-prep.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
+.dark .rv-depart.rv-prep.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
+.dark .rv-depart.rv-prep.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
 .dark .rv-conn::before { background: #3a4050; }
 .dark .rv-conn-label { background: #161a28; color: #8a8e9a; }
 .dark .rv-conn-mini::before { background: #2a3040; }

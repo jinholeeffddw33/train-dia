@@ -221,7 +221,7 @@ function shortStn(name) {
   return map[name] || name;
 }
 
-function renderRouteVisual(m, startTime) {
+function renderRouteVisual(m, startTime, endTime) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text">${m}</div>`;
@@ -252,11 +252,17 @@ function renderRouteVisual(m, startTime) {
   });
   if (!segs.length) return '';
 
+  // 세그먼트 note에서 교대시간 추출 (괄호 안 HH:MM)
+  segs.forEach((seg, i) => {
+    if (i > 0 && seg.note && /^\d{2}:\d{2}$/.test(seg.note)) {
+      changeTimes.push(seg.note);
+    }
+  });
+
   // 유니크 역 수집 → 비율 기반 위치 계산
   const stSet = new Set();
   segs.forEach(seg => seg.stations.forEach(s => stSet.add(s)));
   const sorted = [...stSet].sort((a, b) => getChartIdx(a) - getChartIdx(b));
-  const n = sorted.length;
 
   // 비율 기반 위치 계산
   const indices = sorted.map(s => getChartIdx(s));
@@ -287,18 +293,6 @@ function renderRouteVisual(m, startTime) {
     positions[s] = 5 + ((positions[s] - posMin) / posRange) * 90;
   });
 
-  // 역간 구간 정보 (N역 칩용)
-  const gapChips = [];
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const a = sorted[i], b = sorted[i + 1];
-    const idxA = getChartIdx(a), idxB = getChartIdx(b);
-    const stationCount = Math.abs(idxB - idxA);
-    if (stationCount > 1) {
-      const midPct = (positions[a] + positions[b]) / 2;
-      gapChips.push({ pct: midPct, count: stationCount });
-    }
-  }
-
   // === HTML 빌드 ===
   let html = '';
 
@@ -320,11 +314,11 @@ function renderRouteVisual(m, startTime) {
   // 블록별 세그먼트 그룹화
   let blocks;
   if (hasBlocks) {
-    // 첫 교대 시간 기준으로 2블록
     const splitIdx = Math.min(changeTimes.length, segs.length - 1);
+    const ct = changeTimes[0];
     blocks = [
-      { label: '1근무', time: startTime ? startTime + '~' : '', segs: segs.slice(0, splitIdx) },
-      { label: '2근무', time: changeTimes[0] + '~', segs: segs.slice(splitIdx) }
+      { label: '1근무', time: startTime ? `${startTime} → ${ct}` : '', segs: segs.slice(0, splitIdx) },
+      { label: '2근무', time: endTime ? `${ct} → ${endTime}` : `${ct}~`, segs: segs.slice(splitIdx) }
     ];
   } else {
     blocks = [{ label: null, time: null, segs: segs }];
@@ -340,16 +334,12 @@ function renderRouteVisual(m, startTime) {
     const pct = positions[s];
     html += `<div class="rv-col${home}" style="left:${pct.toFixed(1)}%">${shortStn(s)}</div>`;
   });
-  // N역 칩
-  gapChips.forEach(chip => {
-    html += `<span class="rv-gap" style="left:${chip.pct.toFixed(1)}%">${chip.count}역</span>`;
-  });
   html += '</div>';
 
   // 블록별 렌더링
   blocks.forEach((block, bi) => {
     if (block.label) {
-      if (bi > 0) html += `<div class="rv-rest">대기</div>`;
+      if (bi > 0) html += `<div class="rv-rest">⏸ 대기</div>`;
       html += `<div class="rv-block"><div class="rv-block-label">${block.label} · ${block.time}</div>`;
     }
 
@@ -580,7 +570,7 @@ function rHome() {
     if (sc.m) {
       infoH += `<div class="tc-route">
         <div class="tc-route-label">🚇 운전행로</div>
-        ${renderRouteVisual(sc.m, sc.s)}
+        ${renderRouteVisual(sc.m, sc.s, sc.e)}
       </div>`;
     }
   } else {

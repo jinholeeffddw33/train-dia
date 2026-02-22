@@ -1925,12 +1925,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   to { opacity: 1; transform: translateY(0); }
 }
 .rv-block-label {
-  font-size: 12px; font-weight: 800; color: var(--blue);
-  padding: 6px 10px 2px; background: rgba(26,86,219,.04);
+  font-size: 13px; font-weight: 800; color: var(--blue);
+  padding: 8px 12px 4px; background: rgba(26,86,219,.06);
+  border-bottom: 1px solid rgba(26,86,219,.1);
 }
 .rv-rest {
-  text-align: center; padding: 6px 0;
-  font-size: 12px; font-weight: 700; color: var(--orange);
+  text-align: center; padding: 8px 0;
+  font-size: 13px; font-weight: 800; color: var(--orange);
   background: var(--orange-light); border-top: 1px dashed var(--orange);
   border-bottom: 1px dashed var(--orange);
   letter-spacing: 2px;

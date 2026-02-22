@@ -683,7 +683,7 @@ function rHome() {
     const d = new Date(weekStart);
     d.setDate(d.getDate() + i);
     const di = gDia(cur, d), tt = gType(di), isT = d.getTime() === today.getTime();
-    const dateStr = d.toISOString().split('T')[0];
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isPreview = weekPreviewDate === dateStr;
     const ss = gSched(di, d);
     let timeStr = '';
@@ -697,7 +697,7 @@ function rHome() {
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
       <div class="wd-dia ${tt}">${di === '~' ? '-' : di}</div>
-      ${timeStr ? `<div class="wd-time">${timeStr}</div>` : ''}
+      ${tt === 'rest' ? '<div class="wd-time rest-label">비번</div>' : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
     </div>`;
   }
   wh += '</div>';
@@ -768,7 +768,7 @@ function rHome() {
 // ===== WEEK PREVIEW =====
 function showWeekPreview(dateStr) {
   const today = td();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   if (dateStr === todayStr) {
     // 오늘을 클릭하면 미리보기 해제
     resetToToday();

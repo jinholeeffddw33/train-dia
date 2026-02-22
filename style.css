@@ -1823,11 +1823,12 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .rv-hdr {
   position: relative; border-bottom: 1px solid #c0c4cc;
   background: #eef0f4; border-radius: 8px 8px 0 0;
-  height: 34px;
+  height: 50px;
 }
+/* 역 이름: 위쪽 줄 */
 .rv-col {
   position: absolute; text-align: center; font-size: 11px; font-weight: 700;
-  color: #555; padding: 6px 0; top: 0;
+  color: #555; padding: 4px 0; top: 0;
   transform: translateX(-50%); white-space: nowrap;
   line-height: 1.15;
   animation: rvColDrop .3s ease .1s both;
@@ -1838,17 +1839,17 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .rv-col.rv-home { color: #1A56DB; font-weight: 800; }
 
-/* N역 칩 (역 사이 거리 표시) */
+/* N역 칩: 아래쪽 줄 (역 이름과 분리) */
 .rv-gap {
-  position: absolute; top: 50%; transform: translate(-50%, -50%);
-  font-size: 9px; font-weight: 700; color: var(--text3);
-  background: rgba(0,0,0,.06); padding: 1px 5px;
+  position: absolute; bottom: 4px; transform: translateX(-50%);
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  background: rgba(0,0,0,.06); padding: 2px 6px;
   border-radius: 6px; white-space: nowrap; pointer-events: none;
   animation: rvGapPop .3s cubic-bezier(.34,1.56,.64,1) .4s both;
 }
 @keyframes rvGapPop {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  from { opacity: 0; transform: translateX(-50%) scale(0); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 
 .rv-body { position: relative; padding: 8px 0 6px; min-height: 40px; animation: rvBodyFade .5s ease .15s both; }

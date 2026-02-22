@@ -293,6 +293,16 @@ function renderRouteVisual(m, startTime, endTime) {
     positions[s] = 5 + ((positions[s] - posMin) / posRange) * 90;
   });
 
+  // 역간 구간 정보 (N역 칩)
+  const gapChips = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const a = sorted[i], b = sorted[i + 1];
+    const stationCount = Math.abs(getChartIdx(b) - getChartIdx(a));
+    if (stationCount > 1) {
+      gapChips.push({ pct: (positions[a] + positions[b]) / 2, count: stationCount });
+    }
+  }
+
   // === HTML 빌드 ===
   let html = '';
 
@@ -333,6 +343,9 @@ function renderRouteVisual(m, startTime, endTime) {
     const home = s === '답십리' ? ' rv-home' : '';
     const pct = positions[s];
     html += `<div class="rv-col${home}" style="left:${pct.toFixed(1)}%">${shortStn(s)}</div>`;
+  });
+  gapChips.forEach(chip => {
+    html += `<span class="rv-gap" style="left:${chip.pct.toFixed(1)}%">${chip.count}역</span>`;
   });
   html += '</div>';
 

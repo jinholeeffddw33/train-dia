@@ -293,13 +293,17 @@ function renderRouteVisual(m, startTime, endTime) {
     positions[s] = 5 + ((positions[s] - posMin) / posRange) * 90;
   });
 
-  // 역간 구간 정보 (N역 칩)
-  const gapChips = [];
+  // 구간 커넥터 정보 (인접 역 간 연결선 + n역 라벨)
+  const connectors = [];
   for (let i = 0; i < sorted.length - 1; i++) {
     const a = sorted[i], b = sorted[i + 1];
-    const stationCount = Math.abs(getChartIdx(b) - getChartIdx(a));
-    if (stationCount >= 3) {
-      gapChips.push({ pct: (positions[a] + positions[b]) / 2, count: stationCount });
+    const raw = Math.abs(getChartIdx(b) - getChartIdx(a));
+    const count = Math.round(raw); // 소수점 제거 (고덕기지 0.5 오프셋 등)
+    if (count >= 1) {
+      connectors.push({
+        leftPct: positions[a], rightPct: positions[b],
+        count, isMini: count <= 2, isLong: count >= 15
+      });
     }
   }
 
@@ -336,22 +340,34 @@ function renderRouteVisual(m, startTime, endTime) {
   // 공통: 차트 컨테이너
   html += `<div class="rv-apk">`;
 
-  // 역 헤더 (비율 기반 위치)
+  // 역 헤더 — 위: 역 이름, 아래: 구간 커넥터 라인
   html += '<div class="rv-hdr">';
   sorted.forEach(s => {
     const home = s === '답십리' ? ' rv-home' : '';
     const pct = positions[s];
     html += `<div class="rv-col${home}" style="left:${pct.toFixed(1)}%">${shortStn(s)}</div>`;
   });
-  gapChips.forEach(chip => {
-    html += `<span class="rv-gap" style="left:${chip.pct.toFixed(1)}%">${chip.count}역</span>`;
+  // 구간 커넥터 (얇은 라인 + n역 라벨)
+  connectors.forEach(c => {
+    const w = c.rightPct - c.leftPct;
+    const cls = c.isMini ? 'rv-conn rv-conn-mini' : 'rv-conn';
+    let inner = '';
+    // 긴 구간 눈금 (15역 이상)
+    if (c.isLong) {
+      const ticks = Math.min(5, Math.floor(c.count / 7));
+      for (let t = 1; t <= ticks; t++) {
+        inner += `<span class="rv-conn-tick" style="left:${(t / (ticks + 1) * 100).toFixed(0)}%"></span>`;
+      }
+    }
+    inner += `<span class="rv-conn-label">${c.count}역</span>`;
+    html += `<div class="${cls}" style="left:${c.leftPct.toFixed(1)}%;width:${w.toFixed(1)}%">${inner}</div>`;
   });
   html += '</div>';
 
   // 블록별 렌더링
   blocks.forEach((block, bi) => {
     if (block.label) {
-      if (bi > 0) html += `<div class="rv-rest">⏸ 대기</div>`;
+      if (bi > 0) html += `<div class="rv-rest">교대 ${changeTimes[0]}</div>`;
       html += `<div class="rv-block"><div class="rv-block-label">${block.label} · ${block.time}</div>`;
     }
 

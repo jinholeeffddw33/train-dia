@@ -298,7 +298,7 @@ function renderRouteVisual(m, startTime, endTime) {
   for (let i = 0; i < sorted.length - 1; i++) {
     const a = sorted[i], b = sorted[i + 1];
     const stationCount = Math.abs(getChartIdx(b) - getChartIdx(a));
-    if (stationCount > 1) {
+    if (stationCount >= 3) {
       gapChips.push({ pct: (positions[a] + positions[b]) / 2, count: stationCount });
     }
   }
@@ -309,10 +309,9 @@ function renderRouteVisual(m, startTime, endTime) {
   // 출발 방향 배너 (3중 강조)
   if (dir) {
     const dirCls = dir.dir;
-    const ic = dir.dir === 'up' ? '▲' : dir.dir === 'down' ? '▼' : '🚇';
     const timeStr = startTime || '';
     html += `<div class="rv-depart ${dirCls}">`;
-    html += `<div class="rv-depart-dir">${ic} ${dir.label}</div>`;
+    html += `<div class="rv-depart-dir">${dir.label}</div>`;
     html += `<div class="rv-depart-sub">${dir.sub}</div>`;
     if (timeStr) html += `<div class="rv-depart-time">출발 ${timeStr}</div>`;
     html += `</div>`;
@@ -380,8 +379,9 @@ function renderRouteVisual(m, startTime, endTime) {
         const maxP = Math.max(...stnPositions);
         const isW = leg.direction === 'west';
 
+        const barCls = isW ? 'rv-bar rv-bar-up' : 'rv-bar rv-bar-down';
         html += '<div class="rv-row">';
-        html += `<div class="rv-bar" style="left:${(minP).toFixed(1)}%;width:${(maxP - minP).toFixed(1)}%">`;
+        html += `<div class="${barCls}" style="left:${(minP).toFixed(1)}%;width:${(maxP - minP).toFixed(1)}%">`;
         html += `<span class="rv-arr">${isW ? '◀' : '▶'}</span>`;
         html += '</div></div>';
 

@@ -826,7 +826,7 @@ function rHome() {
     ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
     : '오늘의 교번 · DIA';
 
-  const shareBtn = weekPreviewDate ? '' : '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="오늘 교번 공유"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';
+  const shareBtn = '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="교번 공유"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';
   el.innerHTML = `${previewBannerH}<div class="today-card">
     <div class="tc-header">
       <div class="tc-label">${cardLabel}</div>
@@ -2788,10 +2788,12 @@ function initShake() {
 
 function shareSchedule() {
   if (!cur) { showToast('기관사를 먼저 선택하세요'); return; }
-  const today = td();
-  const dia = gDia(cur, today), tp = gType(dia), sc = gSched(dia, today);
-  const dow = DOW[today.getDay()];
-  let text = `[기관사 DIA] ${cur.n}\n${today.getMonth()+1}/${today.getDate()} (${dow})\n교번: ${dia} (${gLabel(dia)})`;
+  const targetDate = weekPreviewDate ? new Date(weekPreviewDate + 'T00:00:00') : td();
+  const dia = gDia(cur, targetDate), tp = gType(dia), sc = gSched(dia, targetDate);
+  const dow = DOW[targetDate.getDay()];
+  const isToday = !weekPreviewDate;
+  const dateLabel = `${targetDate.getMonth()+1}/${targetDate.getDate()} (${dow})`;
+  let text = `[기관사 DIA] ${cur.n}\n${dateLabel}\n교번: ${dia} (${gLabel(dia)})`;
   if (sc) text += `\n출근: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
   if (sc && sc.g && sc.g.length > 0) {
     sc.g.forEach((seg, i) => {
@@ -2800,10 +2802,11 @@ function shareSchedule() {
     });
   }
   if (sc && sc.m) text += `\n행로: ${sc.m}`;
+  const title = isToday ? '오늘의 교번' : `${dateLabel} 교번`;
   if (navigator.share) {
-    navigator.share({ title: '오늘의 교번', text }).catch(() => {});
+    navigator.share({ title, text }).catch(() => {});
   } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됨 📋'));
+    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됨'));
   } else {
     showToast('공유 기능을 지원하지 않는 브라우저입니다');
   }

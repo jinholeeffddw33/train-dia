@@ -144,6 +144,7 @@
   <div class="sw-header">
     <button class="sw-back" type="button" onclick="closeSubway()">←</button>
     <div class="sw-title">지하철</div>
+    <button class="sw-map-btn" type="button" onclick="swOpenMap()">노선도</button>
   </div>
   <div class="sw-search-area">
     <div class="sw-input-row">
@@ -153,11 +154,36 @@
       </div>
       <button class="sw-swap-btn" type="button" onclick="swSwap()">⇅</button>
     </div>
+    <div class="sw-time-row">
+      <button class="sw-time-btn active" id="swTimeNow" type="button" onclick="swSetTime('now')">지금</button>
+      <button class="sw-time-btn" id="swTimeFirst" type="button" onclick="swSetTime('first')">첫차</button>
+      <button class="sw-time-btn" id="swTimeLast" type="button" onclick="swSetTime('last')">막차</button>
+      <button class="sw-time-btn" id="swTimePick" type="button" onclick="swSetTime('pick')">시간선택</button>
+    </div>
+    <input type="datetime-local" id="swTimePicker" class="sw-time-picker-input hidden">
     <button class="sw-search-btn" type="button" onclick="swSearch()">검색</button>
     <div class="sw-ac" id="swAC"></div>
   </div>
   <div class="sw-favs" id="swFavs"></div>
   <div class="sw-results" id="swResults"></div>
+  <!-- 실시간 도착정보 패널 -->
+  <div class="sw-realtime hidden" id="swRealtime">
+    <div class="sw-rt-header">
+      <span id="swRTStation">역 이름</span> 실시간 도착
+      <button class="sw-rt-close" type="button" onclick="swCloseRT()">✕</button>
+    </div>
+    <div id="swRTList"></div>
+  </div>
+</div>
+
+<!-- 노선도 오버레이 -->
+<div class="sw-map-overlay hidden" id="swMapOverlay">
+  <div class="sw-mo-header">
+    <button class="sw-mo-back" type="button" onclick="swCloseMap()">←</button>
+    <span class="sw-mo-title">노선도</span>
+  </div>
+  <div class="sw-map-lines" id="swMapLines"></div>
+  <div class="sw-map-stations hidden" id="swMapStations"></div>
 </div>
 
 <!-- ===== CALENDAR ===== -->
@@ -427,7 +453,7 @@
 <script>
 // 1회성 SW 핵 리셋 — 모든 캐시+SW 삭제 후 새로고침
 (function(){
-  if(localStorage.getItem('sw-reset-v53'))return;
+  if(localStorage.getItem('sw-reset-v56'))return;
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(function(regs){
       var p=regs.map(function(r){return r.unregister()});
@@ -437,7 +463,7 @@
     }).then(function(keys){
       return Promise.all(keys.map(function(k){return caches.delete(k)}));
     }).then(function(){
-      localStorage.setItem('sw-reset-v53','1');
+      localStorage.setItem('sw-reset-v56','1');
       location.reload();
     });
   }

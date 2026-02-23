@@ -2877,3 +2877,212 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   cursor: pointer; text-align: center;
 }
 .sw-alarm-btn:active { background: var(--border); }
+.sw-rt-btn {
+  flex: 1; padding: 12px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: center;
+}
+.sw-rt-btn:active { background: var(--border); }
+
+/* 노선도 버튼 (헤더) */
+.sw-map-btn {
+  margin-left: auto; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 13px; font-weight: 600;
+  padding: 6px 12px; cursor: pointer;
+}
+.sw-map-btn:active { background: var(--border); }
+
+/* 시간 선택 행 */
+.sw-time-row {
+  display: flex; gap: 4px; margin-top: 8px;
+}
+.sw-time-btn {
+  flex: 1; padding: 7px 4px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-dim); font-size: 13px; font-weight: 600;
+  cursor: pointer; text-align: center;
+}
+.sw-time-btn.active {
+  background: #0052A4; color: #fff; border-color: #0052A4;
+}
+.sw-time-btn:active { opacity: .8; }
+.sw-time-picker-input {
+  width: 100%; margin-top: 6px; padding: 9px 12px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 14px;
+  box-sizing: border-box;
+}
+.sw-time-picker-input.hidden { display: none; }
+
+/* 시간 라벨 (첫차/막차) */
+.sw-time-label {
+  display: inline-block; background: #0052A4; color: #fff;
+  padding: 2px 8px; border-radius: 4px; font-size: 12px;
+  font-weight: 700; margin-right: 8px; vertical-align: middle;
+}
+
+/* 요약 개선 */
+.sw-summary-top {
+  display: flex; align-items: center; margin-bottom: 4px;
+}
+.sw-summary-time { font-size: 32px; font-weight: 800; color: var(--text); }
+
+/* 실시간 도착 힌트 */
+.sw-tl-rt-hint {
+  color: #0052A4; font-size: 11px; font-weight: 400; opacity: .7;
+}
+.sw-tl-station { cursor: pointer; }
+.sw-tl-station:active { background: var(--bg); border-radius: 4px; }
+.sw-tl-mid-row { cursor: pointer; }
+.sw-tl-mid-row:active { background: var(--bg); border-radius: 4px; }
+
+/* ===== 실시간 도착정보 패널 ===== */
+.sw-realtime {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  max-height: 60vh; background: var(--card);
+  border-top-left-radius: 16px; border-top-right-radius: 16px;
+  box-shadow: 0 -4px 24px rgba(0,0,0,.3);
+  z-index: 210; overflow-y: auto;
+  animation: swSlideUp .25s ease;
+}
+.sw-realtime.hidden { display: none; }
+@keyframes swSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sw-rt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  font-size: 16px; font-weight: 700; color: var(--text);
+  position: sticky; top: 0; background: var(--card);
+}
+.sw-rt-close {
+  background: none; border: none; color: var(--text-dim);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+}
+.sw-rt-group {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.sw-rt-group:last-child { border-bottom: none; }
+.sw-rt-group-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.sw-rt-line-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 10px;
+  color: #fff; font-size: 12px; font-weight: 700;
+}
+.sw-rt-dir { font-size: 13px; color: var(--text-dim); font-weight: 600; }
+.sw-rt-train {
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.sw-rt-train:last-child { border-bottom: none; }
+.sw-rt-dest { font-size: 14px; color: var(--text); font-weight: 500; }
+.sw-rt-express {
+  display: inline-block; background: #D4003B; color: #fff;
+  padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;
+}
+.sw-rt-msg { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+.sw-rt-sec { color: #0052A4; font-weight: 600; }
+.sw-rt-empty {
+  text-align: center; padding: 32px; color: var(--text-dim); font-size: 14px;
+}
+
+/* ===== 노선도 오버레이 ===== */
+.sw-map-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg); z-index: 250;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.sw-map-overlay.hidden { display: none; }
+.sw-map-overlay.open { animation: swFadeIn .2s ease; }
+@keyframes swFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.sw-mo-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 10px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 5;
+}
+.sw-mo-back {
+  background: none; border: none; color: var(--text);
+  font-size: 22px; padding: 4px 8px; cursor: pointer;
+}
+.sw-mo-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+/* 노선 목록 */
+.sw-map-lines { padding: 8px 16px; }
+.sw-map-lines.hidden { display: none; }
+.sw-ml-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px; background: var(--card);
+  border-radius: 10px; margin-bottom: 6px; cursor: pointer;
+}
+.sw-ml-item:active { background: var(--border); }
+.sw-ml-color {
+  width: 8px; height: 36px; border-radius: 4px; flex-shrink: 0;
+}
+.sw-ml-info { flex: 1; }
+.sw-ml-name { font-size: 16px; font-weight: 700; color: var(--text); }
+.sw-ml-count { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.sw-ml-arrow { color: var(--text-dim); font-size: 20px; }
+
+/* 역 목록 */
+.sw-map-stations {
+  padding: 0; overflow-y: auto;
+}
+.sw-map-stations.hidden { display: none; }
+.sw-ms-header {
+  padding: 14px 16px 10px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 3;
+}
+.sw-ms-back {
+  background: none; border: none; color: var(--text);
+  font-size: 14px; cursor: pointer; padding: 4px 0;
+}
+.sw-ms-title {
+  font-size: 17px; font-weight: 700; margin-top: 4px;
+}
+.sw-ms-list { padding: 0 16px 24px; }
+.sw-ms-branch-label {
+  padding: 16px 0 6px; font-size: 13px; font-weight: 700;
+  color: var(--text-dim); border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.sw-ms-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 0; cursor: pointer; min-height: 40px;
+}
+.sw-ms-row:active { background: rgba(255,255,255,.05); border-radius: 6px; }
+.sw-ms-dot-col {
+  width: 20px; display: flex; flex-direction: column;
+  align-items: center; flex-shrink: 0; position: relative;
+  min-height: 40px;
+}
+.sw-ms-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 3px solid; background: var(--bg);
+  z-index: 2; position: relative;
+}
+.sw-ms-bar-top, .sw-ms-bar-btm {
+  width: 3px; position: absolute; left: 50%;
+  transform: translateX(-50%);
+}
+.sw-ms-bar-top { top: 0; height: 50%; }
+.sw-ms-bar-btm { bottom: 0; height: 50%; }
+.sw-ms-name {
+  flex: 1; font-size: 15px; color: var(--text);
+}
+.sw-ms-btns {
+  display: flex; gap: 4px; flex-shrink: 0;
+}
+.sw-ms-btn {
+  padding: 4px 8px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text-dim);
+  font-size: 11px; cursor: pointer;
+}
+.sw-ms-btn.rt { color: #0052A4; border-color: #0052A4; }
+.sw-ms-btn:active { background: var(--border); }

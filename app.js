@@ -498,6 +498,55 @@ function renderSegments(segs) {
   return html;
 }
 
+// 구간 타임라인 v2 — 이번주 근무 상단 배치
+function renderRoute(sc) {
+  if (!sc) return '';
+  const segs = sc.g;
+  if (!segs || segs.length === 0) return '';
+  const multi = segs.length > 1;
+
+  let html = '<div class="rt"><div class="rt-label">🚇 구간 운행</div>';
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    const trains = seg.n ? seg.n.join(' / ') : '';
+
+    // 소요시간
+    let durStr = '';
+    if (seg.d && seg.a) {
+      const dur = calcWaitMin(seg.d, seg.a);
+      if (dur > 0) {
+        const dH = Math.floor(dur / 60);
+        const dM = dur % 60;
+        durStr = dH > 0 ? `${dH}시간${dM > 0 ? ' ' + dM + '분' : ''}` : `${dM}분`;
+      }
+    }
+
+    html += '<div class="rt-block">';
+    if (multi) html += `<div class="rt-head"><span class="rt-num">${i + 1}근무</span>${durStr ? `<span class="rt-dur">${durStr}</span>` : ''}</div>`;
+    html += `<div class="rt-run">
+      <span class="rt-dep">${seg.d}</span>
+      <div class="rt-mid">${trains ? `<span class="rt-tn">${trains}</span>` : ''}</div>
+      <span class="rt-arr">${seg.a || '-'}</span>
+    </div></div>`;
+
+    if (multi && i < segs.length - 1 && seg.a && segs[i + 1].d) {
+      const wait = calcWaitMin(seg.a, segs[i + 1].d);
+      if (wait > 0) {
+        const wH = Math.floor(wait / 60);
+        const wM = wait % 60;
+        const wStr = wH > 0 ? `${wH}시간${wM > 0 ? ' ' + wM + '분' : ''}` : `${wM}분`;
+        html += `<div class="rt-gap"><span>${wStr} 대기</span></div>`;
+      }
+    }
+  }
+
+  if (sc.m && !sc.m.includes('충당여부') && !sc.m.includes('대휴')) {
+    html += `<div class="rt-raw">${sc.m}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
 function calcWaitMin(arrTime, depTime) {
   const [ah, am] = arrTime.split(':').map(Number);
   const [dh, dm] = depTime.split(':').map(Number);
@@ -1002,6 +1051,14 @@ function rHome() {
       <div class="tc-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
       ${tp !== 'rest' ? `<div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>` : ''}
     </div>${infoH}</div>`;
+
+  // 구간 타임라인 (이번주 근무 상단)
+  const rtEl = document.getElementById('homeRoute');
+  if (sc && sc.g && sc.g.length > 0) {
+    rtEl.innerHTML = renderRoute(sc);
+  } else {
+    rtEl.innerHTML = '';
+  }
 
   // Week strip
   const we = document.getElementById('homeWeek');

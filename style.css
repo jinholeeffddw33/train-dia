@@ -276,6 +276,57 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   font-size: 11px; color: var(--text3); padding: 0 0 0 30px;
 }
 
+/* 구간 타임라인 v2 — 이번주 근무 상단 */
+.rt {
+  background: var(--card); border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 16px; margin: 12px 16px 0;
+  animation: cardFadeIn .3s ease .1s both;
+}
+.rt-label {
+  font-size: 12px; font-weight: 700; color: var(--blue);
+  margin-bottom: 10px; letter-spacing: .3px;
+}
+.rt-block { margin-bottom: 4px; }
+.rt-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 5px; padding: 0 2px;
+}
+.rt-num { font-size: 12px; font-weight: 700; color: var(--blue); }
+.rt-dur { font-size: 11px; color: var(--text3); font-weight: 600; }
+.rt-run {
+  display: flex; align-items: center;
+  background: linear-gradient(90deg, rgba(56,189,248,.04), rgba(56,189,248,.10), rgba(56,189,248,.04));
+  border: 1.5px solid rgba(56,189,248,.18);
+  border-radius: 10px; padding: 10px 14px;
+}
+.rt-dep, .rt-arr {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; flex-shrink: 0;
+}
+.rt-mid { flex: 1; text-align: center; min-width: 0; }
+.rt-tn {
+  font-size: 15px; font-weight: 800; color: var(--blue);
+  letter-spacing: .5px;
+}
+.rt-gap {
+  display: flex; align-items: center;
+  padding: 6px 0; font-size: 11px; color: var(--text3);
+}
+.rt-gap::before, .rt-gap::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.rt-gap span { padding: 0 10px; white-space: nowrap; }
+.rt-raw {
+  margin-top: 10px; padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: 13px; color: var(--text3); line-height: 1.6;
+}
+.dark .rt-run {
+  background: linear-gradient(90deg, rgba(56,189,248,.02), rgba(56,189,248,.06), rgba(56,189,248,.02));
+  border-color: rgba(56,189,248,.12);
+}
+
 /* Route info (운전행로) */
 .tc-route {
   padding: 14px 20px; border-top: 1px solid var(--border);

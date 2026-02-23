@@ -245,6 +245,37 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   padding-top: 14px;
 }
 
+/* Segment timeline (구간 타임라인) */
+.tc-segments {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+  animation: cardFadeIn .3s ease .15s both;
+}
+.tc-seg {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px;
+  background: var(--bg); font-size: 14px;
+}
+.tc-seg-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.tc-seg-time {
+  font-weight: 600; color: var(--text); white-space: nowrap;
+}
+.tc-seg-arrow { color: var(--text3); font-size: 12px; }
+.tc-seg-train {
+  margin-left: auto; font-size: 12px; font-weight: 700;
+  color: var(--blue); background: var(--blue-light);
+  padding: 2px 8px; border-radius: 4px; white-space: nowrap;
+}
+.tc-seg-wait {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text3); padding: 0 0 0 30px;
+}
+
 /* Route info (운전행로) */
 .tc-route {
   padding: 14px 20px; border-top: 1px solid var(--border);

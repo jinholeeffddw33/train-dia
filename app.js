@@ -463,6 +463,47 @@ function renderYMap(segs) {
   return html;
 }
 
+function renderSegments(segs) {
+  if (!segs || segs.length === 0) return '';
+  let html = '<div class="tc-segments">';
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    const trains = seg.n ? seg.n.join('/') : '';
+    html += `<div class="tc-seg">
+      <span class="tc-seg-num">${i + 1}</span>
+      <span class="tc-seg-time">${seg.d}</span>
+      <span class="tc-seg-arrow">→</span>
+      <span class="tc-seg-time">${seg.a || '-'}</span>
+      ${trains ? `<span class="tc-seg-train">${trains}</span>` : ''}
+    </div>`;
+    // 구간 사이 대기시간 표시
+    if (i < segs.length - 1) {
+      const nextDep = segs[i + 1].d;
+      const curArr = seg.a;
+      if (curArr && nextDep) {
+        const wait = calcWaitMin(curArr, nextDep);
+        if (wait > 0) {
+          const wH = Math.floor(wait / 60);
+          const wM = wait % 60;
+          const wStr = wH > 0 ? `${wH}시간 ${wM}분` : `${wM}분`;
+          html += `<div class="tc-seg-wait">대기 ${wStr}</div>`;
+        }
+      }
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+function calcWaitMin(arrTime, depTime) {
+  const [ah, am] = arrTime.split(':').map(Number);
+  const [dh, dm] = depTime.split(':').map(Number);
+  let aMin = ah * 60 + am;
+  let dMin = dh * 60 + dm;
+  if (dMin < aMin) dMin += 24 * 60; // 자정 넘김
+  return dMin - aMin;
+}
+
 function renderRouteVisual(m, startTime, endTime, bannerState) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
@@ -929,6 +970,9 @@ function rHome() {
         <div class="tc-time-val sm">${getWorkTime(sc)}</div>
       </div>
     </div>`;
+    if (sc.g && sc.g.length > 0) {
+      infoH += renderSegments(sc.g);
+    }
     if (sc.m) {
       infoH += `<div class="tc-route">
         <div class="tc-route-label">🚇 운전행로</div>
@@ -1848,6 +1892,7 @@ function rSchedDetail() {
       <div class="sd-row"><span class="sd-rl">출발</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
+      ${sc.g && sc.g.length > 0 ? renderSegments(sc.g) : ''}
       ${sc.m ? `<div class="sd-route">${sc.m}</div>` : ''}
     </div>`;
   } else {
@@ -2905,6 +2950,12 @@ function shareSchedule() {
   const dow = DOW[today.getDay()];
   let text = `[기관사 DIA] ${cur.n}\n${today.getMonth()+1}/${today.getDate()} (${dow})\n교번: ${dia} (${gLabel(dia)})`;
   if (sc) text += `\n출발: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
+  if (sc && sc.g && sc.g.length > 0) {
+    sc.g.forEach((seg, i) => {
+      const trains = seg.n ? seg.n.join('/') : '';
+      text += `\n${i+1}구간: ${seg.d}→${seg.a || '-'}${trains ? ' [' + trains + ']' : ''}`;
+    });
+  }
   if (sc && sc.m) text += `\n행로: ${sc.m}`;
   if (navigator.share) {
     navigator.share({ title: '오늘의 교번', text }).catch(() => {});

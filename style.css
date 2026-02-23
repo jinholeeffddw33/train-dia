@@ -1251,7 +1251,25 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   padding: 16px 16px 8px;
 }
 .line-header-title { font-size: 20px; font-weight: 800; }
-.line-header-status { font-size: 12px; color: var(--text3); font-weight: 500; margin-top: 2px; }
+.line-header-status { font-size: 12px; color: var(--text3); font-weight: 500; margin-top: 2px; display: flex; align-items: center; gap: 6px; }
+.line-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+  background: var(--gray);
+}
+.line-dot.loading {
+  background: var(--blue);
+  animation: dotPulse 1s ease-in-out infinite;
+}
+.line-dot.success {
+  background: var(--green);
+  animation: dotFlash .5s ease;
+}
+.line-dot.error { background: var(--red); }
+.line-dot.stale { background: var(--orange); }
+.line-dot.idle { background: var(--gray); }
+@keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes dotFlash { 0% { transform: scale(1.5); } 100% { transform: scale(1); } }
 .line-refresh-btn {
   width: 42px; height: 42px; display: flex;
   align-items: center; justify-content: center;

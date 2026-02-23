@@ -2307,9 +2307,11 @@ function startUpdateCounter() {
     if (!lastTrainFetch) return;
     const el = document.getElementById('lineUpdateTime');
     const diff = Math.floor((Date.now() - lastTrainFetch) / 1000);
-    if (diff < 5) el.textContent = '실시간 · 방금 갱신';
-    else if (diff < 60) el.textContent = `실시간 · ${diff}초 전 갱신`;
-    else el.textContent = `실시간 · ${Math.floor(diff / 60)}분 전 갱신`;
+    const dotClass = diff < 120 ? 'success' : 'stale';
+    const dot = `<span class="line-dot ${dotClass}" id="lineDot"></span>`;
+    if (diff < 5) el.innerHTML = dot + '실시간 · 방금 갱신';
+    else if (diff < 60) el.innerHTML = dot + `실시간 · ${diff}초 전 갱신`;
+    else el.innerHTML = dot + `실시간 · ${Math.floor(diff / 60)}분 전 갱신`;
   }, 1000);
 }
 
@@ -2326,11 +2328,18 @@ function fetchTrainAPI() {
     .catch(() => fetch(TRAIN_API_URLS[1], { signal: AbortSignal.timeout(8000) }).then(r => r.json()));
 }
 
+function setLineDot(state) {
+  const dot = document.getElementById('lineDot');
+  if (!dot) return;
+  dot.className = 'line-dot ' + state; // loading, success, error, idle
+}
+
 function fetchTrains() {
   const btn = document.getElementById('lineRefreshBtn');
   const statusEl = document.getElementById('lineUpdateTime');
   btn.classList.add('spinning');
-  statusEl.textContent = '불러오는 중...';
+  setLineDot('loading');
+  statusEl.innerHTML = '<span class="line-dot loading" id="lineDot"></span>불러오는 중...';
 
   fetchTrainAPI()
     .then(data => {
@@ -2338,20 +2347,25 @@ function fetchTrains() {
       if (data.realtimePositionList) {
         trainData = data.realtimePositionList;
         lastTrainFetch = Date.now();
+        setLineDot('success');
         renderLine5();
         if (lineViewMode === 'map') renderLine5Map();
       } else if (data.errorMessage) {
         trainData = [];
         renderLine5();
         const h = new Date().getHours();
-        statusEl.textContent = (h >= 1 && h < 5) ? '심야 운행 종료 (05시 재개)' : '열차 데이터 없음';
+        setLineDot('idle');
+        statusEl.innerHTML = '<span class="line-dot idle" id="lineDot"></span>' +
+          ((h >= 1 && h < 5) ? '심야 운행 종료 (05시 재개)' : '열차 데이터 없음');
       } else {
-        statusEl.textContent = '데이터 오류 — 다시 시도해주세요';
+        setLineDot('error');
+        statusEl.innerHTML = '<span class="line-dot error" id="lineDot"></span>데이터 오류 — 다시 시도해주세요';
       }
     })
     .catch(() => {
       btn.classList.remove('spinning');
-      statusEl.textContent = '서버 연결 실패 — 다시 시도해주세요';
+      setLineDot('error');
+      statusEl.innerHTML = '<span class="line-dot error" id="lineDot"></span>서버 연결 실패 — 다시 시도해주세요';
     });
 }
 

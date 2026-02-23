@@ -49,6 +49,7 @@ function gDia(p, d) {
 
 function gType(d) {
   if (d.startsWith('휴')) return 'rest';
+  if (d.endsWith('~')) return 'rest';  // ~ 교번 = 비번
   if (d.startsWith('대')) return 'standby';
   const n = parseInt(d);  // parseInt("86~") = 86, ~ 무시됨
   if (n >= 62 && n <= 91) return 'night';
@@ -58,6 +59,7 @@ function gType(d) {
 
 function gSched(dia, date) {
   if (dia.startsWith('휴')) return null;
+  if (dia.endsWith('~')) return null;  // ~ 교번 = 비번 (스케줄 없음)
   const is2nd = dia.endsWith('~');
   // ~ 접미사 제거 ("86~" → "86", "대63~" → "대63") — 스케줄 테이블 키에 ~ 없음
   const key = is2nd ? dia.slice(0, -1) : dia;
@@ -78,7 +80,7 @@ function gSched(dia, date) {
     else t = S.p_ordord;
   }
   const sched = t[key] || null;
-  // 2근무(~)는 출발시간이 1근무보다 30분 늦음 (행로표 기준)
+  // 2근무(~)는 출근시각이 1근무보다 30분 늦음 (행로표 기준)
   if (sched && is2nd && isNight && sched.s && sched.s.includes(':')) {
     const [hh, mm] = sched.s.split(':').map(Number);
     const total = hh * 60 + mm + 30;
@@ -91,10 +93,11 @@ function gSched(dia, date) {
 
 function gLabel(d) {
   if (d.startsWith('휴')) return '비번';
-  if (d.startsWith('대')) return d.endsWith('~') ? '대기(잔여)' : '대기';
+  if (d.endsWith('~')) return '비번';  // ~ 교번 = 비번
+  if (d.startsWith('대')) return '대기';
   const n = parseInt(d);
-  if (n >= 62) return d.endsWith('~') ? '야간(잔여)' : '야간';
-  return d.endsWith('~') ? '주간(잔여)' : '주간';
+  if (n >= 62) return '야간';
+  return '주간';
 }
 
 function gTypeName(tp) {
@@ -957,7 +960,7 @@ function rHome() {
   if (sc) {
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
-        <div class="tc-time-label">출발</div>
+        <div class="tc-time-label">출근</div>
         <div class="tc-time-val tc-time-start">${sc.s || '-'}</div>
       </div>
       <div class="tc-time-arrow">→</div>
@@ -995,7 +998,7 @@ function rHome() {
       <div class="tc-header-right">${shareBtn}<span class="tc-badge ${tp}">${gLabel(dia)}</span></div>
     </div>
     <div class="tc-body">
-      <div class="tc-dia ${tp}">${dia}</div>
+      <div class="tc-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
       <div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>
     </div>${infoH}</div>`;
 
@@ -1023,7 +1026,7 @@ function rHome() {
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
-      <div class="wd-dia ${tt}">${di}</div>
+      <div class="wd-dia ${tt}">${di.endsWith('~') ? '비번' : di}</div>
       ${tt === 'rest' ? '<div class="wd-time rest-label">비번</div>' : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
     </div>`;
   }
@@ -1860,7 +1863,7 @@ function rCal() {
     const hasMemo = getMemo(memoKey);
     h += `<div class="${cls}" onclick="pickDate(${d})">
       <div class="cd">${d}</div>
-      ${di ? `<div class="cdia ${dc}">${di}</div>` : ''}
+      ${di ? `<div class="cdia ${dc}">${di.endsWith('~') ? '비번' : di}</div>` : ''}
       ${hl && dw !== 0 ? '<div class="cal-hol-dot"></div>' : ''}
       ${hasMemo ? '<div class="cal-memo-dot"></div>' : ''}
     </div>`;
@@ -1889,7 +1892,7 @@ function rSchedDetail() {
   if (sc) {
     sh = `<div class="sd-body">
       <div class="sd-dia ${tp}">${dia}</div>
-      <div class="sd-row"><span class="sd-rl">출발</span><span class="sd-rv">${sc.s || '-'}</span></div>
+      <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
       ${sc.g && sc.g.length > 0 ? renderSegments(sc.g) : ''}
@@ -1897,7 +1900,7 @@ function rSchedDetail() {
     </div>`;
   } else {
     sh = `<div class="sd-body">
-      <div class="sd-dia ${tp}">${dia}</div>
+      <div class="sd-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
       <div class="sd-rest-text">
         비번
       </div>
@@ -1958,16 +1961,16 @@ function rCmp() {
       <div class="cmp-card cmp-card-${t1}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-1">${c1.n}</div>
-        <div class="cmp-cd-dia ${t1}">${d1}</div>
-        ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출발</span><span class="cir-v">${s1.s || '-'}</span></div>
+        <div class="cmp-cd-dia ${t1}">${d1.endsWith('~') ? '비번' : d1}</div>
+        ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
         <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
       <div class="cmp-card cmp-card-${t2}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-2">${c2.n}</div>
-        <div class="cmp-cd-dia ${t2}">${d2}</div>
-        ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출발</span><span class="cir-v">${s2.s || '-'}</span></div>
+        <div class="cmp-cd-dia ${t2}">${d2.endsWith('~') ? '비번' : d2}</div>
+        ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
         <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
@@ -2949,7 +2952,7 @@ function shareSchedule() {
   const dia = gDia(cur, today), tp = gType(dia), sc = gSched(dia, today);
   const dow = DOW[today.getDay()];
   let text = `[기관사 DIA] ${cur.n}\n${today.getMonth()+1}/${today.getDate()} (${dow})\n교번: ${dia} (${gLabel(dia)})`;
-  if (sc) text += `\n출발: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
+  if (sc) text += `\n출근: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
   if (sc && sc.g && sc.g.length > 0) {
     sc.g.forEach((seg, i) => {
       const trains = seg.n ? seg.n.join('/') : '';

@@ -2315,15 +2315,15 @@ function startUpdateCounter() {
   }, 1000);
 }
 
-const TRAIN_API_BASE = '/api/subway/' + API_KEY + '/json/realtimePosition/0/100/5호선';
+const TRAIN_API_PATH = '/api/subway/' + API_KEY + '/json/realtimePosition/0/100/5호선';
 const TRAIN_API_URLS = [
-  'https://swopenAPI.seoul.go.kr' + TRAIN_API_BASE,
-  'http://swopenAPI.seoul.go.kr' + TRAIN_API_BASE
+  'https://dia-proxy.jinho2209.workers.dev' + TRAIN_API_PATH,
+  'http://swopenAPI.seoul.go.kr' + TRAIN_API_PATH
 ];
 
 function fetchTrainAPI() {
-  // HTTPS 먼저, 실패 시 HTTP 폴백
-  return fetch(TRAIN_API_URLS[0], { signal: AbortSignal.timeout(6000) })
+  // Cloudflare Worker 프록시 우선, 실패 시 직접 호출 폴백
+  return fetch(TRAIN_API_URLS[0], { signal: AbortSignal.timeout(8000) })
     .then(r => r.json())
     .catch(() => fetch(TRAIN_API_URLS[1], { signal: AbortSignal.timeout(8000) }).then(r => r.json()));
 }

@@ -888,9 +888,11 @@ function rHome() {
 
   let tmCard = '';
   if (tmTp === 'rest') {
+    const tmRestWord = tmDia.startsWith('휴') ? '휴무' : '비번';
+    const tmRestCls = tmDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest';
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
-      <div class="sc-val sc-val-rest">비번 😊</div>
+      <div class="sc-val ${tmRestCls}">${tmRestWord} 😊</div>
       <div class="sc-sub">${tmDia}</div>
     </div>`;
   } else {
@@ -915,9 +917,11 @@ function rHome() {
 
   let afCard = '';
   if (afTp === 'rest') {
+    const afRestWord = afDia.startsWith('휴') ? '휴무' : '비번';
+    const afRestCls = afDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest';
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
-      <div class="sc-val sc-val-rest">비번 😊</div>
+      <div class="sc-val ${afRestCls}">${afRestWord} 😊</div>
       <div class="sc-sub">${afDia}</div>
     </div>`;
   } else {

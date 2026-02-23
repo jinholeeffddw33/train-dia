@@ -410,6 +410,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .sc-label { font-size: 13px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
 .sc-val { font-size: 22px; font-weight: 900; color: var(--blue); }
 .sc-val-rest { color: var(--green); }
+.sc-val-off { color: var(--blue); }
 .sc-sub { font-size: 13px; color: var(--text3); font-weight: 500; margin-top: 4px; }
 
 /* D-Day pill */

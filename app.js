@@ -2930,7 +2930,7 @@ function cleanOldMemos() {
 }
 
 // ===== COMMUTE (출퇴근) =====
-const LINE_COLORS = {
+const LINE_COLORS_ID = {
   '1001':'#0052A4','1002':'#00A84D','1003':'#EF7C1C','1004':'#00A5DE',
   '1005':'#996CAC','1006':'#CD7C2F','1007':'#747F00','1008':'#E6186C',
   '1009':'#BDB092','1063':'#77C4A3','1065':'#0090D2','1067':'#178C72',
@@ -3056,7 +3056,7 @@ function renderArrivals(list, stationName) {
   </div>`;
 
   for (const lineId of Object.keys(groups).sort()) {
-    const color = LINE_COLORS[lineId] || '#888';
+    const color = LINE_COLORS_ID[lineId] || '#888';
     const lineName = LINE_NAMES[lineId] || lineId;
     const trains = groups[lineId];
 

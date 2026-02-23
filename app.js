@@ -943,9 +943,34 @@ function rHome() {
     }
   }
 
-  const ms = getMonthSummary(cur, today.getFullYear(), today.getMonth());
-  const monthH = `<div class="month-summary">
-    <div class="ms-title">${today.getMonth()+1}월 근무 요약</div>
+  stEl.innerHTML = `<div class="status-bar">
+    ${tmCard}
+    ${afCard}
+  </div>${ddayH}<div id="monthSummaryWrap"></div>`;
+  renderMonthSummary();
+}
+
+let msMonthOffset = 0;
+function changeMonthSummary(delta) {
+  msMonthOffset += delta;
+  renderMonthSummary();
+}
+function renderMonthSummary() {
+  if (!cur) return;
+  const wrap = document.getElementById('monthSummaryWrap');
+  if (!wrap) return;
+  const base = td();
+  const target = new Date(base.getFullYear(), base.getMonth() + msMonthOffset, 1);
+  const y = target.getFullYear(), m = target.getMonth();
+  const ms = getMonthSummary(cur, y, m);
+  const total = ms.dayWork + ms.nightWork + ms.dayStandby + ms.nightStandby;
+  const isThisMonth = msMonthOffset === 0;
+  wrap.innerHTML = `<div class="month-summary">
+    <div class="ms-header">
+      <button class="ms-arrow" type="button" onclick="changeMonthSummary(-1)">‹</button>
+      <div class="ms-title">${m+1}월 근무 요약${isThisMonth ? '' : ' (' + y + ')'}</div>
+      <button class="ms-arrow" type="button" onclick="changeMonthSummary(1)">›</button>
+    </div>
     <div class="ms-row">
       <div class="ms-group">
         <div class="ms-group-label">근무</div>
@@ -963,12 +988,8 @@ function rHome() {
         </div>
       </div>
     </div>
+    <div class="ms-total">총 근무일 <strong>${total}</strong>일</div>
   </div>`;
-
-  stEl.innerHTML = `<div class="status-bar">
-    ${tmCard}
-    ${afCard}
-  </div>${ddayH}${monthH}`;
 }
 
 // D-Day: 다음 비번까지 남은 일수

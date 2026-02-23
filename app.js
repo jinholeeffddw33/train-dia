@@ -6,6 +6,45 @@
 const API_KEY = '5a724369526a696e34366552514247';
 const TRAIN_POLL_MS = 120000; // 2분 간격 폴링
 
+// ===== DISPLAY CONSTANTS (SSOT — 하드코딩 방지) =====
+const LABELS = {
+  START: '출근', END: '퇴근', WORK_TIME: '근무시간',
+  DEPART: '출발', NEXT_DEPART: '다음 출발',
+  WORK_DONE: '근무 종료', GOOD_JOB: '수고하셨습니다',
+  TODAY_DONE: '오늘 근무 완료', NEXT_WORK: '다음 근무',
+  DAY_WORK: '주간 근무', NIGHT_WORK: '야간 근무', STANDBY_WORK: '대기 근무',
+  WORK: '근무', STANDBY: '대기', DAY: '주간', NIGHT: '야간',
+  MONTH_SUMMARY: '근무 요약', TOTAL_WORK: '총 근무일',
+  TODAY_DIA: '오늘의 교번 · DIA', TODAY_DIA_SHORT: '오늘의 교번',
+  WEEK_WORK: '이번주 근무', SEGMENT_RUN: '구간 운행',
+  SELECT_DRIVER: '기관사 선택',
+  EMPTY_HOME: '기관사를 선택하면<br>오늘의 교번을 확인합니다',
+  EMPTY_CAL: '기관사를 선택하면<br>교번이 달력에 표시됩니다',
+  AUTH_REQUIRED: '승인 필요',
+};
+const EMOJI = {
+  SMILE: '😊', PARTY: '🎉', TRAIN: '🚇', CLOSE: '✕',
+  CALENDAR: '📅', LOCK: '🔒', EYE: '👁',
+  ALERT: { high: '🚨', medium: '⚠️', low: 'ℹ️' },
+};
+const DIR = {
+  UP: '▲상선', DOWN: '▼하선', DEPOT: '🚇기지',
+  UP_FULL: '▲ 상선 교대', DOWN_FULL: '▼ 하선 교대', DEPOT_FULL: '고덕기지 출발',
+  UP_SUB: '방화 방면 승강장', DOWN_SUB: '마천·하남 방면 승강장', DEPOT_SUB: '고덕기지에서 직접 출발',
+};
+function dirShort(dir) {
+  return { up: DIR.UP, down: DIR.DOWN, depot: DIR.DEPOT }[dir] || '';
+}
+function dirFull(dir) {
+  return { up: DIR.UP_FULL, down: DIR.DOWN_FULL, depot: DIR.DEPOT_FULL }[dir] || '';
+}
+function dirSub(dir) {
+  return { up: DIR.UP_SUB, down: DIR.DOWN_SUB, depot: DIR.DEPOT_SUB }[dir] || '';
+}
+function alertIcon(severity) {
+  return EMOJI.ALERT[severity] || EMOJI.ALERT.low;
+}
+
 // ===== SUPABASE =====
 const SB_URL = 'https://uhlxokrskgloupjelqlf.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVobHhva3Jza2dsb3VwamVscWxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjAzNTksImV4cCI6MjA4NzIzNjM1OX0.nNrV8FMVVz35uzcKMOesiziUBJ5YPq19U1_LgHtlr5g';
@@ -101,7 +140,7 @@ function gLabel(d) {
 }
 
 function gTypeName(tp) {
-  return { day: '주간 근무', night: '야간 근무', standby: '대기 근무' }[tp] || '';
+  return { day: LABELS.DAY_WORK, night: LABELS.NIGHT_WORK, standby: LABELS.STANDBY_WORK }[tp] || '';
 }
 // 휴무/비번 구분 — rest 타입의 교번 표시명 (SSOT)
 function gRestLabel(dia) {
@@ -288,17 +327,17 @@ function getRouteDirection(m) {
     if (t.includes('편승')) continue;
     // 기지 출발 (첫 구간이 기로 시작하고 답 없음)
     if (t[0] === '기' && !t.includes('답')) {
-      return { dir: 'depot', label: '고덕기지 출발', sub: '고덕기지에서 직접 출발' };
+      return { dir: 'depot', label: dirFull('depot'), sub: dirSub('depot') };
     }
     const dIdx = t.indexOf('답');
     if (dIdx >= 0 && dIdx < t.length - 1) {
       const next = t[dIdx + 1];
       if (next === '(') continue;
       if (UP.has(next)) {
-        return { dir: 'up', label: '▲ 상선 교대', sub: '방화 방면 승강장' };
+        return { dir: 'up', label: dirFull('up'), sub: dirSub('up') };
       }
       if (DOWN.has(next)) {
-        return { dir: 'down', label: '▼ 하선 교대', sub: '마천·하남 방면 승강장' };
+        return { dir: 'down', label: dirFull('down'), sub: dirSub('down') };
       }
     }
   }
@@ -359,13 +398,13 @@ function getBlockDir(blockSegs) {
   const seg = blockSegs[0];
   if (!seg.stations || seg.stations.length < 2) return null;
   if (seg.stations[0] === '고덕기지') {
-    return { dir: 'depot', short: '기지출발', label: '고덕기지 출발', sub: '고덕기지에서 직접 출발' };
+    return { dir: 'depot', short: DIR.DEPOT, label: dirFull('depot'), sub: dirSub('depot') };
   }
   const p0 = getStationPos(seg.stations[0]);
   const p1 = getStationPos(seg.stations[1]);
   return p1 < p0
-    ? { dir: 'up', short: '▲상선', label: '▲ 상선 교대', sub: '방화 방면 승강장' }
-    : { dir: 'down', short: '▼하선', label: '▼ 하선 교대', sub: '마천·하남 방면 승강장' };
+    ? { dir: 'up', short: DIR.UP, label: dirFull('up'), sub: dirSub('up') }
+    : { dir: 'down', short: DIR.DOWN, label: dirFull('down'), sub: dirSub('down') };
 }
 
 // 현재 시각 기준 활성 블록 결정 (교대 시각에 전환)
@@ -436,7 +475,7 @@ function renderRoute(sc) {
   if (!segs || segs.length === 0) return '';
   const multi = segs.length > 1;
 
-  let html = '<div class="rt"><div class="rt-label">🚇 구간 운행</div>';
+  let html = `<div class="rt"><div class="rt-label">${EMOJI.TRAIN} ${LABELS.SEGMENT_RUN}</div>`;
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];
     const trains = seg.n ? seg.n.join(' / ') : '';
@@ -564,17 +603,17 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
     const nextTime = ns.schedule ? ns.schedule.s : '';
     const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;
     const nextDirText = nextDir
-      ? (nextDir.dir === 'up' ? '▲상선' : nextDir.dir === 'down' ? '▼하선' : '🚇기지')
+      ? dirShort(nextDir.dir)
       : '';
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
     const daysText = ns.daysAhead === 1 ? '내일' : (ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
 
     bannerHtml += `<div class="rv-depart rv-done">`;
-    bannerHtml += `<div class="rv-depart-dir">근무 종료</div>`;
-    bannerHtml += `<div class="rv-depart-sub">수고하셨습니다</div>`;
+    bannerHtml += `<div class="rv-depart-dir">${LABELS.WORK_DONE}</div>`;
+    bannerHtml += `<div class="rv-depart-sub">${LABELS.GOOD_JOB}</div>`;
     if (nextTime) {
       bannerHtml += `<div class="rv-depart-next">`;
-      bannerHtml += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      bannerHtml += `${LABELS.NEXT_DEPART} ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }
@@ -586,16 +625,16 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
     const nextTime = ns && ns.schedule ? ns.schedule.s : '';
     const nextDir = ns && ns.schedule ? getRouteDirection(ns.schedule.m) : null;
     const nextDirText = nextDir
-      ? (nextDir.dir === 'up' ? '▲상선' : nextDir.dir === 'down' ? '▼하선' : '🚇기지')
+      ? dirShort(nextDir.dir)
       : '';
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
     const daysText = ns && ns.daysAhead === 1 ? '내일' : (ns && ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
 
     bannerHtml += `<div class="rv-depart rv-idle">`;
-    bannerHtml += `<div class="rv-depart-dir">오늘 근무 완료</div>`;
+    bannerHtml += `<div class="rv-depart-dir">${LABELS.TODAY_DONE}</div>`;
     if (nextTime) {
       bannerHtml += `<div class="rv-depart-next">`;
-      bannerHtml += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      bannerHtml += `${LABELS.NEXT_DEPART} ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }
@@ -612,10 +651,10 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
 
     bannerHtml += `<div class="rv-depart rv-prep ${nextDirCls}">`;
-    bannerHtml += `<div class="rv-depart-dir">다음 근무 · ${nextDirLabel}</div>`;
+    bannerHtml += `<div class="rv-depart-dir">${LABELS.NEXT_WORK} · ${nextDirLabel}</div>`;
     bannerHtml += `<div class="rv-depart-sub">${nextDirSub}</div>`;
     if (nextTime) {
-      bannerHtml += `<div class="rv-depart-time">출발 ${nextTime}`;
+      bannerHtml += `<div class="rv-depart-time">${LABELS.DEPART} ${nextTime}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }
@@ -635,7 +674,7 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
     bannerHtml += `<div class="rv-depart ${dirCls}">`;
     bannerHtml += `<div class="rv-depart-dir">${blockPrefix}${bannerDir.label}</div>`;
     bannerHtml += `<div class="rv-depart-sub">${bannerDir.sub}</div>`;
-    if (departTime) bannerHtml += `<div class="rv-depart-time">출발 ${departTime}</div>`;
+    if (departTime) bannerHtml += `<div class="rv-depart-time">${LABELS.DEPART} ${departTime}</div>`;
     bannerHtml += `</div>`;
   }
 
@@ -677,7 +716,7 @@ function showPinModal() {
     bg.id = 'pinModalBg';
     bg.className = 'pin-modal-bg';
     bg.innerHTML = `<div class="pin-modal">
-      <div class="pin-title">🔒 승인 필요</div>
+      <div class="pin-title">${EMOJI.LOCK} ${LABELS.AUTH_REQUIRED}</div>
       <div class="pin-desc">장애 알림 등록은 승인된 사용자만 가능합니다</div>
       <input type="password" id="pinInput" class="pin-input" placeholder="PIN 입력" maxlength="8" inputmode="numeric">
       <div class="pin-error" id="pinError"></div>
@@ -725,14 +764,14 @@ function showAlertPopup(a) {
     el.className = 'alert-popup';
     document.body.appendChild(el);
   }
-  const sevIcon = a.severity === 'high' ? '🚨' : a.severity === 'medium' ? '⚠️' : 'ℹ️';
+  const sevIcon = alertIcon(a.severity);
   el.innerHTML = `<div class="ap-inner" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100);closeAlertPopup();">
     <div class="ap-icon">${sevIcon}</div>
     <div class="ap-body">
       <div class="ap-title">${a.station}역 장애 발생</div>
       <div class="ap-msg">${a.message}</div>
     </div>
-    <button type="button" class="ap-close" onclick="event.stopPropagation();closeAlertPopup();">✕</button>
+    <button type="button" class="ap-close" onclick="event.stopPropagation();closeAlertPopup();">${EMOJI.CLOSE}</button>
   </div>`;
   el.classList.add('show');
   clearTimeout(alertPopupTimer);
@@ -776,9 +815,9 @@ function rHome() {
   const el = document.getElementById('homeTodayCard');
   if (!cur) {
     el.innerHTML = `<div class="today-card"><div class="home-empty">
-      <div class="he-icon">🚇</div>
-      <div class="he-msg">기관사를 선택하면<br>오늘의 교번을 확인합니다</div>
-      <button class="he-btn" type="button" onclick="openModal('home')">기관사 선택</button>
+      <div class="he-icon">${EMOJI.TRAIN}</div>
+      <div class="he-msg">${LABELS.EMPTY_HOME}</div>
+      <button class="he-btn" type="button" onclick="openModal('home')">${LABELS.SELECT_DRIVER}</button>
     </div></div>`;
     document.getElementById('homeWeek').innerHTML = '';
     document.getElementById('homeStatus').innerHTML = '';
@@ -797,7 +836,7 @@ function rHome() {
     const pd = new Date(weekPreviewDate + 'T00:00:00');
     const pdDow = DOW[pd.getDay()];
     previewBannerH = `<div class="preview-banner">
-      <span class="preview-banner-text">👁 미리보기: ${pdDow}요일 (${pd.getDate()}일)</span>
+      <span class="preview-banner-text">${EMOJI.EYE} 미리보기: ${pdDow}요일 (${pd.getDate()}일)</span>
       <button class="preview-banner-btn" type="button" onclick="resetToToday()">오늘로 돌아가기</button>
     </div>`;
   }
@@ -814,16 +853,16 @@ function rHome() {
     const bannerH = sc.m ? renderRouteVisual(sc.m, sc.s, sc.e, bannerState, sc.g) : '';
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
-        <div class="tc-time-label">출근</div>
+        <div class="tc-time-label">${LABELS.START}</div>
         <div class="tc-time-val tc-time-start">${sc.s || '-'}</div>
       </div>
       <div class="tc-time-arrow">→</div>
       <div class="tc-time-block">
-        <div class="tc-time-label">퇴근</div>
+        <div class="tc-time-label">${LABELS.END}</div>
         <div class="tc-time-val">${sc.e || '-'}</div>
       </div>
       <div class="tc-time-block small">
-        <div class="tc-time-label">근무시간</div>
+        <div class="tc-time-label">${LABELS.WORK_TIME}</div>
         <div class="tc-time-val sm">${getWorkTime(sc)}</div>
       </div>
     </div>`;
@@ -834,12 +873,12 @@ function rHome() {
   } else {
     const restWord = gRestLabel(dia);
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
-    infoH = `<div class="tc-rest-msg">${dayWord} ${restWord}입니다 😊</div>`;
+    infoH = `<div class="tc-rest-msg">${dayWord} ${restWord}입니다 ${EMOJI.SMILE}</div>`;
   }
 
   const cardLabel = weekPreviewDate
     ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
-    : '오늘의 교번 · DIA';
+    : LABELS.TODAY_DIA;
 
   const shareBtn = '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="교번 공유"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';
   el.innerHTML = `${previewBannerH}<div class="today-card">
@@ -862,7 +901,7 @@ function rHome() {
 
   // Week strip
   const we = document.getElementById('homeWeek');
-  let wh = '<div class="section-label">이번주 근무</div><div class="week-strip">';
+  let wh = `<div class="section-label">${LABELS.WEEK_WORK}</div><div class="week-strip">`;
   const todayD = today.getDay();
   const weekStart = new Date(today);
   weekStart.setDate(weekStart.getDate() - todayD);
@@ -907,14 +946,14 @@ function rHome() {
     const tmRestCls = tmDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest'; // gRestLabel 기반
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
-      <div class="sc-val ${tmRestCls}">${tmRestWord} 😊</div>
+      <div class="sc-val ${tmRestCls}">${tmRestWord} ${EMOJI.SMILE}</div>
       <div class="sc-sub">${tmDia}</div>
     </div>`;
   } else {
     const tmTime = tmSc ? tmSc.s : '-';
     const tmTypeName = gTypeName(tmTp);
     const tmDir = tmSc ? getRouteDirection(tmSc.m) : null;
-    const tmDirH = tmDir ? `<span class="sc-dir ${tmDir.dir}">${tmDir.dir === 'up' ? '▲상선' : tmDir.dir === 'down' ? '▼하선' : '🚇기지'}</span>` : '';
+    const tmDirH = tmDir ? `<span class="sc-dir ${tmDir.dir}">${dirShort(tmDir.dir)}</span>` : '';
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
       <div class="sc-val sc-val-start">${tmTime}</div>
@@ -936,14 +975,14 @@ function rHome() {
     const afRestCls = afDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest';
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
-      <div class="sc-val ${afRestCls}">${afRestWord} 😊</div>
+      <div class="sc-val ${afRestCls}">${afRestWord} ${EMOJI.SMILE}</div>
       <div class="sc-sub">${afDia}</div>
     </div>`;
   } else {
     const afTime = afSc ? afSc.s : '-';
     const afTypeName = gTypeName(afTp);
     const afDir = afSc ? getRouteDirection(afSc.m) : null;
-    const afDirH = afDir ? `<span class="sc-dir ${afDir.dir}">${afDir.dir === 'up' ? '▲상선' : afDir.dir === 'down' ? '▼하선' : '🚇기지'}</span>` : '';
+    const afDirH = afDir ? `<span class="sc-dir ${afDir.dir}">${dirShort(afDir.dir)}</span>` : '';
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
       <div class="sc-val sc-val-start">${afTime}</div>
@@ -960,7 +999,7 @@ function rHome() {
       ddayH = `<div class="dday-pill">${ddayWord}까지 <strong>${ddayResult.days}일</strong></div>`;
     } else if (ddayResult !== null && ddayResult.days === 0) {
       const ddayWord = gRestLabel(ddayResult.dia);
-      ddayH = `<div class="dday-pill dday-today">오늘 ${ddayWord} 🎉</div>`;
+      ddayH = `<div class="dday-pill dday-today">${LABELS.TODAY} ${ddayWord} ${EMOJI.PARTY}</div>`;
     }
   }
 
@@ -989,27 +1028,27 @@ function renderMonthSummary() {
   wrap.innerHTML = `<div class="month-summary">
     <div class="ms-header">
       <button class="ms-arrow" type="button" onclick="changeMonthSummary(-1)">‹</button>
-      <div class="ms-title">${m+1}월 근무 요약${isThisMonth ? '' : ' (' + y + ')'}</div>
+      <div class="ms-title">${m+1}월 ${LABELS.MONTH_SUMMARY}${isThisMonth ? '' : ' (' + y + ')'}</div>
       <button class="ms-arrow" type="button" onclick="changeMonthSummary(1)">›</button>
     </div>
     <div class="ms-row">
       <div class="ms-group">
-        <div class="ms-group-label">근무</div>
+        <div class="ms-group-label">${LABELS.WORK}</div>
         <div class="ms-pair">
-          <div class="ms-cell"><div class="ms-num day">${ms.dayWork}</div><div class="ms-label">주간</div></div>
-          <div class="ms-cell"><div class="ms-num night">${ms.nightWork}</div><div class="ms-label">야간</div></div>
+          <div class="ms-cell"><div class="ms-num day">${ms.dayWork}</div><div class="ms-label">${LABELS.DAY}</div></div>
+          <div class="ms-cell"><div class="ms-num night">${ms.nightWork}</div><div class="ms-label">${LABELS.NIGHT}</div></div>
         </div>
       </div>
       <div class="ms-divider"></div>
       <div class="ms-group">
-        <div class="ms-group-label">대기</div>
+        <div class="ms-group-label">${LABELS.STANDBY}</div>
         <div class="ms-pair">
-          <div class="ms-cell"><div class="ms-num day-standby">${ms.dayStandby}</div><div class="ms-label">주간</div></div>
-          <div class="ms-cell"><div class="ms-num night-standby">${ms.nightStandby}</div><div class="ms-label">야간</div></div>
+          <div class="ms-cell"><div class="ms-num day-standby">${ms.dayStandby}</div><div class="ms-label">${LABELS.DAY}</div></div>
+          <div class="ms-cell"><div class="ms-num night-standby">${ms.nightStandby}</div><div class="ms-label">${LABELS.NIGHT}</div></div>
         </div>
       </div>
     </div>
-    <div class="ms-total">총 근무일 <strong>${total}</strong>일</div>
+    <div class="ms-total">${LABELS.TOTAL_WORK} <strong>${total}</strong>일</div>
   </div>`;
 }
 
@@ -1170,7 +1209,7 @@ function renderAlertBanner() {
   }
   const latest = active[0]; // Most recent
   const sevClass = `alert-banner-${latest.severity}`;
-  const sevIcon = latest.severity === 'high' ? '🚨' : latest.severity === 'medium' ? '⚠️' : 'ℹ️';
+  const sevIcon = alertIcon(latest.severity);
   const countText = active.length > 1 ? `+${active.length - 1}건` : '';
 
   el.innerHTML = `<div class="alert-home-banner ${sevClass}" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
@@ -1368,7 +1407,7 @@ function renderPhotoGrid() {
   alertPhotos.forEach((src, i) => {
     h += `<div class="af-grid-item">
       <img src="${src}" alt="사진 ${i + 1}">
-      <button class="af-grid-remove" type="button" onclick="event.stopPropagation();removeAlertPhoto(${i})">✕</button>
+      <button class="af-grid-remove" type="button" onclick="event.stopPropagation();removeAlertPhoto(${i})">${EMOJI.CLOSE}</button>
       <span class="af-grid-num">${i + 1}</span>
     </div>`;
   });
@@ -1772,9 +1811,9 @@ function rCal() {
   const detailEl = document.getElementById('schedDetail');
   if (!cur) {
     detailEl.innerHTML = `<div class="cal-empty-guide">
-      <div class="cal-empty-icon">📅</div>
-      <div class="cal-empty-text">기관사를 선택하면<br>교번이 달력에 표시됩니다</div>
-      <button class="he-btn" type="button" onclick="openModal('home')">기관사 선택</button>
+      <div class="cal-empty-icon">${EMOJI.CALENDAR}</div>
+      <div class="cal-empty-text">${LABELS.EMPTY_CAL}</div>
+      <button class="he-btn" type="button" onclick="openModal('home')">${LABELS.SELECT_DRIVER}</button>
     </div>`;
   }
 
@@ -1839,9 +1878,9 @@ function rSchedDetail() {
   if (sc) {
     sh = `<div class="sd-body">
       <div class="sd-dia ${tp}">${dia}</div>
-      <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
-      <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
-      <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
+      <div class="sd-row"><span class="sd-rl">${LABELS.START}</span><span class="sd-rv">${sc.s || '-'}</span></div>
+      <div class="sd-row"><span class="sd-rl">${LABELS.END}</span><span class="sd-rv">${sc.e || '-'}</span></div>
+      <div class="sd-row"><span class="sd-rl">${LABELS.WORK_TIME}</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
       ${sc.g && sc.g.length > 0 ? renderSegments(sc.g) : ''}
       ${sc.m ? `<div class="sd-route">${sc.m}</div>` : ''}
     </div>`;
@@ -2199,7 +2238,7 @@ function renderLine5Map() {
       // Status text
       svg += `<text x="0" y="${boxH/2 - 5}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="7.5" font-weight="500" font-family="system-ui,sans-serif">${stn} ${status}</text>`;
       // Train icon (small)
-      svg += `<text x="${bx + boxW - 10}" y="${-boxH/2 + 12}" fill="rgba(255,255,255,0.3)" font-size="8">🚇</text>`;
+      svg += `<text x="${bx + boxW - 10}" y="${-boxH/2 + 12}" fill="rgba(255,255,255,0.3)" font-size="8">${EMOJI.TRAIN}</text>`;
       svg += '</g>';
     });
   });
@@ -2252,7 +2291,7 @@ function toggleMapFullscreen() {
 
   if (mapIsFullscreen) {
     wrap.classList.add('map-fullscreen');
-    btn.textContent = '✕';
+    btn.textContent = EMOJI.CLOSE;
     btn.title = '전체화면 닫기';
     document.body.style.overflow = 'hidden';
   } else {
@@ -2832,7 +2871,7 @@ function answerQuiz(idx) {
   const card = document.getElementById('quizCardLive');
   if (card) {
     let resultH = `<div class="quiz-result ${isCorrect ? 'pass' : 'fail'}">`;
-    resultH += isCorrect ? '🎉 정답!' : `정답: "${quiz.a[correct]}"`;
+    resultH += isCorrect ? `${EMOJI.PARTY} 정답!` : `정답: "${quiz.a[correct]}"`;
     resultH += '</div>';
     resultH += `<button class="quiz-next-btn" type="button" onclick="nextQuiz()">다음 문제 →</button>`;
     card.querySelector('.quiz-options').insertAdjacentHTML('afterend', resultH);
@@ -2898,7 +2937,7 @@ function shareSchedule() {
   const isToday = !weekPreviewDate;
   const dateLabel = `${targetDate.getMonth()+1}/${targetDate.getDate()} (${dow})`;
   let text = `[기관사 DIA] ${cur.n}\n${dateLabel}\n교번: ${dia} (${gLabel(dia)})`;
-  if (sc) text += `\n출근: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
+  if (sc) text += `\n${LABELS.START}: ${sc.s || '-'} / ${LABELS.END}: ${sc.e || '-'}`;
   if (sc && sc.g && sc.g.length > 0) {
     sc.g.forEach((seg, i) => {
       const trains = seg.n ? seg.n.join('/') : '';
@@ -2906,7 +2945,7 @@ function shareSchedule() {
     });
   }
   if (sc && sc.m) text += `\n행로: ${sc.m}`;
-  const title = isToday ? '오늘의 교번' : `${dateLabel} 교번`;
+  const title = isToday ? LABELS.TODAY_DIA_SHORT : `${dateLabel} 교번`;
   if (navigator.share) {
     navigator.share({ title, text }).catch(() => {});
   } else if (navigator.clipboard) {

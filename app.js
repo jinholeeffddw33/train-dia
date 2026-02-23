@@ -1901,9 +1901,6 @@ function rSchedDetail() {
   } else {
     sh = `<div class="sd-body">
       <div class="sd-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
-      <div class="sd-rest-text">
-        비번
-      </div>
     </div>`;
   }
   const dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,'0')}-${String(selDate.getDate()).padStart(2,'0')}`;

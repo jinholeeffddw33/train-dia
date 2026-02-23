@@ -1,12 +1,13 @@
 // Service Worker — 오프라인 지원 + 자동 업데이트
-const CACHE_NAME = 'dia-v49';
+const CACHE_NAME = 'dia-v50';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './data.js',
-  './manifest.json'
+  './manifest.json',
+  './logo.png'
 ];
 
 // 설치 — 핵심 파일 캐시
@@ -27,15 +28,18 @@ self.addEventListener('activate', e => {
   );
 });
 
-// 요청 — 네트워크 우선, 실패시 캐시 (항상 최신 버전 시도)
+// 요청 — 네트워크 우선 (3초 타임아웃), 실패/지연 시 캐시 폴백
 self.addEventListener('fetch', e => {
+  // 외부 CDN 요청은 SW가 관여하지 않음 (Supabase 등)
+  if (!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    fetch(e.request)
-      .then(res => {
+    Promise.race([
+      fetch(e.request).then(res => {
         const clone = res.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         return res;
-      })
-      .catch(() => caches.match(e.request))
+      }),
+      new Promise((_, reject) => setTimeout(reject, 3000))
+    ]).catch(() => caches.match(e.request))
   );
 });

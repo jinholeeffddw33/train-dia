@@ -2636,3 +2636,244 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   font-weight: 600; cursor: pointer;
 }
 .cm-alarm-cancel:active { background: rgba(255,255,255,.3); }
+
+/* ================================================================
+   SUBWAY PAGE — 지하철 경로 검색 (카카오지하철 스타일)
+   ================================================================ */
+.sw-page {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg); z-index: 200;
+  transform: translateX(100%); transition: transform .25s ease;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column;
+}
+.sw-page.open { transform: translateX(0); }
+
+/* 알람 바 */
+.sw-alarm-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; background: #0052A4; color: #fff;
+  font-size: 13px; font-weight: 600;
+  position: sticky; top: 0; z-index: 10;
+}
+.sw-alarm-bar.hidden { display: none; }
+.sw-alarm-info { display: flex; align-items: center; gap: 8px; }
+.sw-alarm-icon { font-size: 16px; }
+.sw-alarm-cancel {
+  background: rgba(255,255,255,.2); border: none; color: #fff;
+  padding: 5px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;
+}
+
+/* 헤더 */
+.sw-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 10px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.sw-back {
+  background: none; border: none; color: var(--text);
+  font-size: 22px; padding: 4px 8px; cursor: pointer;
+}
+.sw-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+/* 검색 영역 */
+.sw-search-area {
+  padding: 12px 16px; background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.sw-input-row {
+  display: flex; gap: 8px; align-items: stretch;
+}
+.sw-inputs {
+  flex: 1; display: flex; flex-direction: column; gap: 6px;
+}
+.sw-input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg); color: var(--text);
+  font-size: 15px; outline: none; box-sizing: border-box;
+}
+.sw-input:focus { border-color: #0052A4; }
+.sw-input::placeholder { color: var(--text-dim); }
+.sw-swap-btn {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 18px;
+  width: 44px; cursor: pointer; display: flex; align-items: center;
+  justify-content: center;
+}
+.sw-swap-btn:active { background: var(--border); }
+.sw-search-btn {
+  width: 100%; margin-top: 8px; padding: 11px;
+  background: #0052A4; color: #fff; border: none;
+  border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.sw-search-btn:active { background: #003d7a; }
+
+/* 자동완성 */
+.sw-ac {
+  display: none; position: absolute; left: 16px; right: 16px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  max-height: 260px; overflow-y: auto; z-index: 50;
+}
+.sw-ac.show { display: block; }
+.sw-ac-item {
+  padding: 12px 14px; font-size: 15px; color: var(--text);
+  border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.sw-ac-item:last-child { border-bottom: none; }
+.sw-ac-item:active { background: var(--bg); }
+
+/* 즐겨찾기 */
+.sw-favs { padding: 12px 16px; }
+.sw-fav-title {
+  font-size: 13px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600;
+}
+.sw-fav-empty {
+  text-align: center; padding: 24px; color: var(--text-dim); font-size: 14px;
+}
+.sw-fav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; background: var(--card);
+  border-radius: 8px; margin-bottom: 6px; cursor: pointer;
+}
+.sw-fav-item:active { background: var(--border); }
+.sw-fav-icon { color: #0052A4; font-size: 16px; }
+.sw-fav-route { flex: 1; font-size: 15px; color: var(--text); }
+.sw-fav-del {
+  color: var(--text-dim); font-size: 18px; padding: 4px 8px;
+  border: none; background: none; cursor: pointer;
+}
+
+/* 결과 영역 */
+.sw-results { padding: 0 16px 24px; flex: 1; }
+.sw-loading {
+  text-align: center; padding: 40px; color: var(--text-dim); font-size: 15px;
+}
+.sw-spinner {
+  width: 28px; height: 28px; border: 3px solid var(--border);
+  border-top-color: #0052A4; border-radius: 50%;
+  animation: swSpin .8s linear infinite;
+  margin: 0 auto 12px;
+}
+@keyframes swSpin { to { transform: rotate(360deg); } }
+.sw-empty {
+  text-align: center; padding: 40px; color: var(--text-dim); font-size: 15px;
+}
+.sw-empty small { color: var(--text-dim); opacity: .7; }
+
+/* 탭 (최단시간/최소환승) */
+.sw-tabs {
+  display: flex; gap: 0; margin: 16px 0 0;
+  border-bottom: 2px solid var(--border);
+}
+.sw-tab {
+  flex: 1; padding: 10px; text-align: center;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--text-dim); font-size: 14px; font-weight: 600;
+  cursor: pointer; margin-bottom: -2px;
+}
+.sw-tab.active { color: var(--text); border-bottom-color: #0052A4; }
+
+/* 요약 */
+.sw-summary { padding: 16px 0 8px; }
+.sw-summary-label { font-size: 13px; color: var(--text-dim); }
+.sw-summary-time { font-size: 32px; font-weight: 800; color: var(--text); margin: 2px 0; }
+.sw-summary-info { font-size: 13px; color: var(--text-dim); }
+
+/* 출발/도착 시간 */
+.sw-time-bar {
+  display: flex; gap: 8px; margin: 8px 0 16px;
+}
+.sw-time-pill {
+  flex: 1; padding: 8px 12px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; color: var(--text); text-align: center;
+}
+
+/* ===== 타임라인 (카카오 스타일) ===== */
+.sw-timeline { padding: 8px 0; }
+
+.sw-tl-segment {
+  display: flex; gap: 0; position: relative;
+}
+.sw-tl-line-col {
+  width: 28px; display: flex; flex-direction: column;
+  align-items: center; flex-shrink: 0;
+}
+.sw-tl-dot-big {
+  width: 14px; height: 14px; border-radius: 50%;
+  flex-shrink: 0; z-index: 2;
+}
+.sw-tl-bar {
+  width: 4px; flex: 1; min-height: 20px;
+}
+.sw-tl-content {
+  flex: 1; padding-bottom: 4px;
+}
+
+/* 역 정보 */
+.sw-tl-station {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 28px;
+}
+.sw-tl-station.first { font-weight: 700; }
+.sw-tl-time {
+  width: 42px; font-size: 12px; color: var(--text-dim);
+  text-align: right; flex-shrink: 0;
+}
+.sw-tl-name { font-size: 15px; color: var(--text); }
+.sw-tl-badge {
+  padding: 2px 8px; border-radius: 10px; color: #fff;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.sw-tl-detail {
+  padding: 4px 0 4px 50px; font-size: 12px; color: var(--text-dim);
+}
+
+/* 중간역 (접기/펼치기) */
+.sw-tl-middle {
+  padding: 6px 0 6px 50px; cursor: pointer;
+}
+.sw-tl-middle-summary {
+  font-size: 13px; color: #0052A4; font-weight: 600;
+}
+.sw-tl-middle-list {
+  display: none; padding-top: 4px;
+}
+.sw-tl-middle.expanded .sw-tl-middle-list { display: block; }
+.sw-tl-middle.expanded .sw-tl-middle-summary { color: var(--text-dim); }
+.sw-tl-mid-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 0; font-size: 13px; color: var(--text-dim);
+}
+.sw-tl-mid-time { width: 42px; text-align: right; font-size: 11px; flex-shrink: 0; }
+.sw-tl-mid-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* 환승 표시 */
+.sw-tl-transfer {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0 10px 5px; margin: 4px 0;
+}
+.sw-tl-transfer-dot {
+  width: 18px; height: 18px; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; color: var(--text-dim);
+  border: 2px dashed var(--border); border-radius: 50%;
+}
+.sw-tl-transfer-text {
+  font-size: 13px; color: var(--text-dim); font-weight: 600;
+}
+
+/* 하단 액션 */
+.sw-actions {
+  display: flex; gap: 8px; padding: 16px 0;
+}
+.sw-alarm-btn {
+  flex: 1; padding: 12px; background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); font-size: 14px; font-weight: 600;
+  cursor: pointer; text-align: center;
+}
+.sw-alarm-btn:active { background: var(--border); }

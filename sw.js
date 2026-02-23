@@ -1,11 +1,12 @@
 // Service Worker — 오프라인 지원 + 자동 업데이트
-const CACHE_NAME = 'dia-v54';
+const CACHE_NAME = 'dia-v55';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './data.js',
+  './subway.js',
   './manifest.json',
   './logo.png'
 ];

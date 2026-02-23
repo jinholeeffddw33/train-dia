@@ -85,6 +85,15 @@
     </div>
     <div class="hc-arrow">›</div>
   </div>
+  <!-- 지하철 경로 검색 카드 -->
+  <div class="hc-card" id="homeSubwayCard" onclick="openSubway()">
+    <div class="hc-icon">🗺️</div>
+    <div class="hc-body">
+      <div class="hc-title">지하철 경로</div>
+      <div class="hc-sub">출발역→도착역 경로 검색 · 환승 · 소요시간</div>
+    </div>
+    <div class="hc-arrow">›</div>
+  </div>
   <div id="homeExtras"></div>
 </div>
 
@@ -121,6 +130,34 @@
 
   <!-- Results -->
   <div class="cm-results" id="cmResults"></div>
+</div>
+
+<!-- ===== SUBWAY PAGE (카카오지하철 스타일 경로 검색) ===== -->
+<div class="sw-page" id="subwayPage">
+  <div class="sw-alarm-bar hidden" id="swAlarmBar">
+    <div class="sw-alarm-info">
+      <span class="sw-alarm-icon">🔔</span>
+      <span id="swAlarmText">알람 설정됨</span>
+    </div>
+    <button class="sw-alarm-cancel" type="button" onclick="swClearAlarm()">취소</button>
+  </div>
+  <div class="sw-header">
+    <button class="sw-back" type="button" onclick="closeSubway()">←</button>
+    <div class="sw-title">지하철</div>
+  </div>
+  <div class="sw-search-area">
+    <div class="sw-input-row">
+      <div class="sw-inputs">
+        <input class="sw-input" id="swFrom" type="text" placeholder="출발역" autocomplete="off">
+        <input class="sw-input" id="swTo" type="text" placeholder="도착역" autocomplete="off">
+      </div>
+      <button class="sw-swap-btn" type="button" onclick="swSwap()">⇅</button>
+    </div>
+    <button class="sw-search-btn" type="button" onclick="swSearch()">검색</button>
+    <div class="sw-ac" id="swAC"></div>
+  </div>
+  <div class="sw-favs" id="swFavs"></div>
+  <div class="sw-results" id="swResults"></div>
 </div>
 
 <!-- ===== CALENDAR ===== -->
@@ -411,5 +448,6 @@ setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="subway.js"></script>
 </body>
 </html>

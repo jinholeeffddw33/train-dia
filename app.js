@@ -466,49 +466,34 @@ function renderYMap(segs) {
   return html;
 }
 
-function renderRoute(sc) {
-  if (!sc) return '';
-  const segs = sc.g;
-  const hasSegs = segs && segs.length > 0;
-  if (!hasSegs && !sc.m) return '';
-
-  let html = '<div class="rt-timeline">';
-  html += '<div class="rt-header">🚇 운전행로</div>';
-
-  if (hasSegs) {
-    const multi = segs.length > 1;
-    for (let i = 0; i < segs.length; i++) {
-      const seg = segs[i];
-      const trains = seg.n ? seg.n.join(' / ') : '';
-
-      html += '<div class="rt-seg">';
-      if (multi) html += `<div class="rt-seg-badge">${i + 1}근무</div>`;
-      html += `<div class="rt-track">
-        <span class="rt-time">${seg.d}</span>
-        <div class="rt-bar">
-          <div class="rt-bar-line"></div>
-          ${trains ? `<span class="rt-train">${trains}</span>` : ''}
-        </div>
-        <span class="rt-time">${seg.a || '-'}</span>
-      </div></div>`;
-
-      // 대기시간
-      if (multi && i < segs.length - 1 && seg.a && segs[i + 1].d) {
-        const wait = calcWaitMin(seg.a, segs[i + 1].d);
+function renderSegments(segs) {
+  if (!segs || segs.length === 0) return '';
+  let html = '<div class="tc-segments">';
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    const trains = seg.n ? seg.n.join('/') : '';
+    html += `<div class="tc-seg">
+      <span class="tc-seg-num">${i + 1}</span>
+      <span class="tc-seg-time">${seg.d}</span>
+      <span class="tc-seg-arrow">→</span>
+      <span class="tc-seg-time">${seg.a || '-'}</span>
+      ${trains ? `<span class="tc-seg-train">${trains}</span>` : ''}
+    </div>`;
+    // 구간 사이 대기시간 표시
+    if (i < segs.length - 1) {
+      const nextDep = segs[i + 1].d;
+      const curArr = seg.a;
+      if (curArr && nextDep) {
+        const wait = calcWaitMin(curArr, nextDep);
         if (wait > 0) {
           const wH = Math.floor(wait / 60);
           const wM = wait % 60;
-          const wStr = wH > 0 ? `${wH}시간${wM > 0 ? ' ' + wM + '분' : ''}` : `${wM}분`;
-          html += `<div class="rt-wait"><span class="rt-wait-dot"></span> ${wStr} 대기</div>`;
+          const wStr = wH > 0 ? `${wH}시간 ${wM}분` : `${wM}분`;
+          html += `<div class="tc-seg-wait">대기 ${wStr}</div>`;
         }
       }
     }
   }
-
-  if (sc.m && !sc.m.includes('충당여부') && !sc.m.includes('대휴')) {
-    html += `<div class="rt-route-raw">${sc.m}</div>`;
-  }
-
   html += '</div>';
   return html;
 }
@@ -988,7 +973,15 @@ function rHome() {
         <div class="tc-time-val sm">${getWorkTime(sc)}</div>
       </div>
     </div>`;
-    infoH += renderRoute(sc);
+    if (sc.g && sc.g.length > 0) {
+      infoH += renderSegments(sc.g);
+    }
+    if (sc.m) {
+      infoH += `<div class="tc-route">
+        <div class="tc-route-label">🚇 운전행로</div>
+        ${renderRouteVisual(sc.m, sc.s, sc.e, bannerState)}
+      </div>`;
+    }
   } else {
     const restWord = dia.startsWith('휴') ? '휴무' : '비번';
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
@@ -1903,7 +1896,8 @@ function rSchedDetail() {
       <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
-      ${renderRoute(sc)}
+      ${sc.g && sc.g.length > 0 ? renderSegments(sc.g) : ''}
+      ${sc.m ? `<div class="sd-route">${sc.m}</div>` : ''}
     </div>`;
   } else {
     sh = `<div class="sd-body">

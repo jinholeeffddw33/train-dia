@@ -246,60 +246,58 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 
 /* Segment timeline (구간 타임라인) */
-/* Route Timeline — 구간별 운전행로 */
-.rt-timeline {
-  padding: 14px 20px; border-top: 1px solid var(--border);
+.tc-segments {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
   animation: cardFadeIn .3s ease .15s both;
 }
-.rt-header {
-  font-size: 12px; font-weight: 700; color: var(--blue);
-  margin-bottom: 10px; letter-spacing: .3px;
-}
-.rt-seg { margin-bottom: 6px; }
-.rt-seg-badge {
-  font-size: 11px; font-weight: 700; color: var(--blue);
-  margin-bottom: 4px; padding-left: 2px;
-}
-.rt-track {
+.tc-seg {
   display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px;
+  background: var(--bg); font-size: 14px;
 }
-.rt-time {
-  font-size: 14px; font-weight: 700; color: var(--text);
-  white-space: nowrap; min-width: 38px;
-}
-.rt-bar {
-  flex: 1; position: relative;
+.tc-seg-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--blue); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  height: 30px;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
 }
-.rt-bar-line {
-  position: absolute; top: 50%; left: 0; right: 0;
-  height: 2px; background: var(--blue); opacity: .4;
-  transform: translateY(-50%);
+.tc-seg-time {
+  font-weight: 600; color: var(--text); white-space: nowrap;
 }
-.rt-train {
-  position: relative; z-index: 1;
-  font-size: 12px; font-weight: 700; color: var(--blue);
-  background: var(--card); padding: 2px 10px;
-  border-radius: 10px; border: 1.5px solid var(--blue);
-  white-space: nowrap;
+.tc-seg-arrow { color: var(--text3); font-size: 12px; }
+.tc-seg-train {
+  margin-left: auto; font-size: 12px; font-weight: 700;
+  color: var(--blue); background: var(--blue-light);
+  padding: 2px 8px; border-radius: 4px; white-space: nowrap;
 }
-.rt-wait {
+.tc-seg-wait {
   display: flex; align-items: center; justify-content: center;
-  gap: 6px; font-size: 11px; color: var(--text3);
-  padding: 6px 0; opacity: .8;
-}
-.rt-wait-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--text3); opacity: .5;
-}
-.rt-route-raw {
-  margin-top: 10px; padding-top: 8px;
-  border-top: 1px dashed var(--border);
-  font-size: 13px; color: var(--text3); line-height: 1.6;
+  font-size: 11px; color: var(--text3); padding: 0 0 0 30px;
 }
 
-/* (구 tc-route 제거됨 → rt-timeline으로 대체) */
+/* Route info (운전행로) */
+.tc-route {
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  background: var(--bg);
+  animation: cardFadeIn .4s ease .2s both;
+}
+.tc-route-label {
+  font-size: 12px; font-weight: 700; color: var(--blue);
+  margin-bottom: 6px; letter-spacing: .3px;
+}
+.tc-route-text {
+  font-size: 15px; color: var(--text); font-weight: 600;
+  line-height: 1.8; word-break: keep-all;
+}
+.tc-route-seg {
+  display: inline-block; padding: 2px 0;
+}
+.tc-route-time {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  color: var(--blue); background: var(--blue-light);
+  padding: 2px 8px; border-radius: 4px; margin-left: 4px;
+}
 
 .tc-rest-msg {
   padding: 24px; text-align: center;

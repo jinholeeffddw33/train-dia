@@ -2927,6 +2927,267 @@ function cleanOldMemos() {
   } catch(e) {}
 }
 
+// ===== COMMUTE (출퇴근) =====
+const LINE_COLORS = {
+  '1001':'#0052A4','1002':'#00A84D','1003':'#EF7C1C','1004':'#00A5DE',
+  '1005':'#996CAC','1006':'#CD7C2F','1007':'#747F00','1008':'#E6186C',
+  '1009':'#BDB092','1063':'#77C4A3','1065':'#0090D2','1067':'#178C72',
+  '1075':'#F5A200','1077':'#D4003B','1092':'#B7C452'
+};
+const LINE_NAMES = {
+  '1001':'1호선','1002':'2호선','1003':'3호선','1004':'4호선',
+  '1005':'5호선','1006':'6호선','1007':'7호선','1008':'8호선',
+  '1009':'9호선','1063':'경의중앙','1065':'공항철도','1067':'경춘선',
+  '1075':'수인분당','1077':'신분당선','1092':'우이신설'
+};
+const COMMUTE_PROXY = 'https://dia-proxy.jinho2209.workers.dev';
+let commuteAlarmTimer = null;
+let commuteAlarmInfo = null;
+
+function openCommute() {
+  document.getElementById('commutePage').classList.add('open');
+  document.getElementById('tabBar').classList.add('hidden');
+  loadFavStations();
+  // 즐겨찾기 첫 번째 역 자동 조회
+  const favs = getFavStations();
+  if (favs.length > 0) searchStation(favs[0]);
+}
+
+function closeCommute() {
+  document.getElementById('commutePage').classList.remove('open');
+  document.getElementById('tabBar').classList.remove('hidden');
+}
+
+function refreshCommute() {
+  const input = document.getElementById('cmSearchInput');
+  if (input.value.trim()) searchStation(input.value.trim());
+  else {
+    const favs = getFavStations();
+    if (favs.length > 0) searchStation(favs[0]);
+  }
+}
+
+function getFavStations() {
+  try { return JSON.parse(localStorage.getItem('cmFavStations') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveFavStations(list) {
+  localStorage.setItem('cmFavStations', JSON.stringify(list));
+}
+
+function addFavStation(name) {
+  const favs = getFavStations();
+  if (!favs.includes(name)) {
+    favs.unshift(name);
+    if (favs.length > 10) favs.pop();
+    saveFavStations(favs);
+  }
+  loadFavStations();
+}
+
+function removeFavStation(name) {
+  const favs = getFavStations().filter(f => f !== name);
+  saveFavStations(favs);
+  loadFavStations();
+}
+
+function loadFavStations() {
+  const wrap = document.getElementById('cmFavList');
+  const favs = getFavStations();
+  if (favs.length === 0) {
+    wrap.innerHTML = '<div class="cm-fav-empty">★ 검색 후 역을 즐겨찾기에 추가하세요</div>';
+    return;
+  }
+  wrap.innerHTML = favs.map(name =>
+    `<div class="cm-fav-chip" onclick="searchStation('${name}')">
+      <span class="cm-fav-star">★</span> ${name}
+      <button class="cm-fav-del" type="button" onclick="event.stopPropagation();removeFavStation('${name}')">×</button>
+    </div>`
+  ).join('');
+}
+
+function searchStation(name) {
+  if (!name) {
+    name = document.getElementById('cmSearchInput').value.trim();
+  }
+  if (!name) { showToast('역 이름을 입력하세요'); return; }
+  document.getElementById('cmSearchInput').value = name;
+
+  const results = document.getElementById('cmResults');
+  results.innerHTML = '<div class="cm-loading">불러오는 중...</div>';
+
+  const url = COMMUTE_PROXY + '/api/subway/' + API_KEY + '/json/realtimeStationArrival/0/30/' + encodeURIComponent(name);
+  fetch(url, { signal: AbortSignal.timeout(10000) })
+    .then(r => r.json())
+    .then(data => {
+      if (data.realtimeArrivalList) {
+        renderArrivals(data.realtimeArrivalList, name);
+      } else {
+        results.innerHTML = '<div class="cm-empty">도착 정보가 없습니다<br><small>역 이름을 확인해주세요 (예: 강남, 신도림)</small></div>';
+      }
+    })
+    .catch(() => {
+      results.innerHTML = '<div class="cm-empty">서버 연결 실패 — 다시 시도해주세요</div>';
+    });
+}
+
+function renderArrivals(list, stationName) {
+  const results = document.getElementById('cmResults');
+  const favs = getFavStations();
+  const isFav = favs.includes(stationName);
+
+  // 노선별 그룹핑
+  const groups = {};
+  list.forEach(item => {
+    const lineId = item.subwayId;
+    if (!groups[lineId]) groups[lineId] = [];
+    groups[lineId].push(item);
+  });
+
+  let html = `<div class="cm-station-header">
+    <div class="cm-station-name">${stationName}</div>
+    <button class="cm-fav-btn ${isFav ? 'active' : ''}" type="button"
+      onclick="${isFav ? `removeFavStation('${stationName}')` : `addFavStation('${stationName}')`};searchStation('${stationName}')">
+      ${isFav ? '★' : '☆'}
+    </button>
+  </div>`;
+
+  for (const lineId of Object.keys(groups).sort()) {
+    const color = LINE_COLORS[lineId] || '#888';
+    const lineName = LINE_NAMES[lineId] || lineId;
+    const trains = groups[lineId];
+
+    // 방향별 분리
+    const dirs = {};
+    trains.forEach(t => {
+      const dir = t.updnLine || '기타';
+      if (!dirs[dir]) dirs[dir] = [];
+      dirs[dir].push(t);
+    });
+
+    html += `<div class="cm-line-group">
+      <div class="cm-line-badge" style="background:${color}">${lineName}</div>`;
+
+    for (const dir of Object.keys(dirs)) {
+      html += `<div class="cm-dir-label">${dir}</div>`;
+      dirs[dir].forEach(t => {
+        const arrMsg = t.arvlMsg2 || '';
+        const destParts = (t.trainLineNm || '').split(' - ');
+        const dest = destParts[0] || t.bstatnNm || '';
+        const via = destParts[1] || '';
+        const isExpress = t.btrainSttus === '급행';
+        const isLast = t.lstcarAt === '1';
+        const trainNo = t.btrainNo || '';
+        const sec = parseInt(t.barvlDt) || 0;
+        const minText = sec > 0 ? Math.floor(sec / 60) + '분' + (sec % 60 > 0 ? ' ' + (sec % 60) + '초' : '') : '';
+
+        html += `<div class="cm-train-row">
+          <div class="cm-train-info">
+            <div class="cm-train-dest">
+              ${dest}
+              ${via ? `<span class="cm-train-via">${via}</span>` : ''}
+              ${isExpress ? '<span class="cm-badge express">급행</span>' : ''}
+              ${isLast ? '<span class="cm-badge last">막차</span>' : ''}
+            </div>
+            <div class="cm-train-msg">${arrMsg}${minText && !arrMsg.includes('분') ? ' (' + minText + ')' : ''}</div>
+          </div>
+          <button class="cm-alarm-btn" type="button" onclick="setCommuteAlarm('${stationName}','${dest}','${arrMsg}',${sec},'${trainNo}')" title="하차 알람">
+            🔔
+          </button>
+        </div>`;
+      });
+    }
+    html += '</div>';
+  }
+
+  results.innerHTML = html;
+}
+
+function setCommuteAlarm(station, dest, msg, delaySec, trainNo) {
+  // 기존 알람 취소
+  if (commuteAlarmTimer) clearTimeout(commuteAlarmTimer);
+
+  // 알람 시간: 도착 예상 시간의 80% 지점 (1정거장 전 근사)
+  const alarmSec = Math.max(Math.floor(delaySec * 0.8), delaySec - 120);
+  const alarmMs = Math.max(alarmSec * 1000, 10000); // 최소 10초
+
+  commuteAlarmInfo = { station, dest, trainNo };
+
+  commuteAlarmTimer = setTimeout(function() {
+    // 진동
+    if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 300]);
+    // 알림
+    showToast('🔔 곧 도착! ' + dest + ' 방면 — 하차 준비하세요');
+    // Web Notification
+    if (Notification && Notification.permission === 'granted') {
+      new Notification('하차 알람 🔔', {
+        body: dest + ' 방면 열차가 곧 도착합니다. 하차 준비하세요!',
+        icon: 'logo.png',
+        vibrate: [300, 100, 300]
+      });
+    }
+    // 알람 바 업데이트
+    document.getElementById('cmAlarmBar').classList.add('hidden');
+    commuteAlarmTimer = null;
+    commuteAlarmInfo = null;
+  }, alarmMs);
+
+  // 알람 바 표시
+  const bar = document.getElementById('cmAlarmBar');
+  const alarmMin = Math.ceil(alarmSec / 60);
+  document.getElementById('cmAlarmText').textContent =
+    dest + ' 방면 · 약 ' + alarmMin + '분 후 알림';
+  bar.classList.remove('hidden');
+  showToast('🔔 알람 설정 완료 — 약 ' + alarmMin + '분 후 알려드릴게요');
+}
+
+function cancelCommuteAlarm() {
+  if (commuteAlarmTimer) {
+    clearTimeout(commuteAlarmTimer);
+    commuteAlarmTimer = null;
+    commuteAlarmInfo = null;
+  }
+  document.getElementById('cmAlarmBar').classList.add('hidden');
+  showToast('알람이 취소되었습니다');
+}
+
+function updateHomeCommuteCard() {
+  const sub = document.getElementById('hcNextTrain');
+  if (!sub) return;
+  const favs = getFavStations();
+  if (favs.length === 0) {
+    sub.textContent = '역을 즐겨찾기하면 실시간 도착정보를 볼 수 있어요';
+    return;
+  }
+  // 첫 즐겨찾기 역의 도착정보 미리보기
+  const url = COMMUTE_PROXY + '/api/subway/' + API_KEY + '/json/realtimeStationArrival/0/3/' + encodeURIComponent(favs[0]);
+  fetch(url, { signal: AbortSignal.timeout(5000) })
+    .then(r => r.json())
+    .then(data => {
+      if (data.realtimeArrivalList && data.realtimeArrivalList.length > 0) {
+        const t = data.realtimeArrivalList[0];
+        const lineName = LINE_NAMES[t.subwayId] || '';
+        sub.textContent = favs[0] + ' · ' + lineName + ' ' + (t.arvlMsg2 || '');
+      } else {
+        sub.textContent = favs[0] + ' · 실시간 정보 없음';
+      }
+    })
+    .catch(() => {
+      sub.textContent = favs[0] + ' · 탭하여 확인';
+    });
+}
+
+// cmSearchInput Enter키 지원
+document.addEventListener('DOMContentLoaded', function() {
+  const cmInput = document.getElementById('cmSearchInput');
+  if (cmInput) {
+    cmInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); searchStation(); }
+    });
+  }
+});
+
 // ===== INIT =====
 (function () {
   document.body.classList.add('splash-active');
@@ -2978,6 +3239,7 @@ function cleanOldMemos() {
     prefetchTrains();
     initShake();
     cleanOldMemos();
+    updateHomeCommuteCard();
   } catch (e) {
     // 초기화 실패 시에도 앱을 표시 (디버그용 콘솔 출력)
     try { showToast('초기화 중 오류가 발생했습니다'); } catch(_) {}

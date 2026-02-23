@@ -76,7 +76,51 @@
   <div id="homeTodayCard"></div>
   <div id="homeWeek"></div>
   <div id="homeStatus"></div>
+  <!-- 출퇴근 카드 -->
+  <div class="hc-card" id="homeCommuteCard" onclick="openCommute()">
+    <div class="hc-icon">🚇</div>
+    <div class="hc-body">
+      <div class="hc-title">출퇴근</div>
+      <div class="hc-sub" id="hcNextTrain">역을 즐겨찾기하면 실시간 도착정보를 볼 수 있어요</div>
+    </div>
+    <div class="hc-arrow">›</div>
+  </div>
   <div id="homeExtras"></div>
+</div>
+
+<!-- ===== COMMUTE PAGE (overlay) ===== -->
+<div class="cm-page" id="commutePage">
+  <!-- Alarm bar (sticky top) -->
+  <div class="cm-alarm-bar hidden" id="cmAlarmBar">
+    <div class="cm-alarm-info">
+      <span class="cm-alarm-icon">🔔</span>
+      <span id="cmAlarmText">알람 설정됨</span>
+    </div>
+    <button class="cm-alarm-cancel" type="button" onclick="cancelCommuteAlarm()">취소</button>
+  </div>
+
+  <div class="cm-header">
+    <button class="cm-back" type="button" onclick="closeCommute()">←</button>
+    <div class="cm-title">출퇴근</div>
+    <button class="cm-refresh" type="button" onclick="refreshCommute()">↻</button>
+  </div>
+
+  <!-- Search -->
+  <div class="cm-search-wrap">
+    <input class="cm-search-input" id="cmSearchInput" type="text" placeholder="역 이름 검색 (예: 신도림, 강남)" autocomplete="off">
+    <button class="cm-search-btn" type="button" onclick="searchStation()">검색</button>
+  </div>
+
+  <!-- Favorites -->
+  <div class="cm-fav-wrap" id="cmFavWrap">
+    <div class="cm-section-title">즐겨찾기</div>
+    <div class="cm-fav-list" id="cmFavList">
+      <div class="cm-fav-empty">★ 검색 후 역을 즐겨찾기에 추가하세요</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="cm-results" id="cmResults"></div>
 </div>
 
 <!-- ===== CALENDAR ===== -->

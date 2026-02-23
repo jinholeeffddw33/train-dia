@@ -867,9 +867,6 @@ function rHome() {
       </div>
     </div>`;
     infoH += bannerH;
-    if (sc.g && sc.g.length > 0) {
-      infoH += renderSegments(sc.g);
-    }
   } else {
     const restWord = gRestLabel(dia);
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';

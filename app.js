@@ -388,84 +388,6 @@ function shortStn(name) {
 }
 
 // 세그먼트들에서 마천/하남 브랜치 판별
-function detectBranch(segs) {
-  var hasMacheon = false, hasHanam = false;
-  segs.forEach(function(seg) {
-    seg.stations.forEach(function(s) {
-      if (LINE5_MACHEON.indexOf(s) >= 0) hasMacheon = true;
-      if (LINE5_HANAM.indexOf(s) >= 0 || s === '고덕기지') hasHanam = true;
-    });
-  });
-  return { macheon: hasMacheon, hanam: hasHanam };
-}
-
-// Y자 미니맵 렌더링 (답십리 중앙 고정, 브랜치 시각화)
-function renderYMap(segs) {
-  var branch = detectBranch(segs);
-  // 경로에 포함된 모든 역 수집
-  var routeStns = {};
-  segs.forEach(function(seg) {
-    seg.stations.forEach(function(s) { routeStns[s] = true; });
-  });
-
-  // 활성/비활성 브랜치 클래스
-  var mCls = branch.macheon ? 'ym-active' : 'ym-dim';
-  var hCls = branch.hanam ? 'ym-active' : 'ym-dim';
-  // 둘 다 없으면 양쪽 동일
-  if (!branch.macheon && !branch.hanam) { mCls = ''; hCls = ''; }
-
-  // 본선 내 고정 레퍼런스 역 (% = 본선 영역 내 비율)
-  // 답십리(index 32)는 본선 39역의 중간보다 약간 뒤 → 약 55% 위치
-  // 방화(0) = 2%, 답십리(32) = 55%, 강동(38) = 98%
-  var refStations = [
-    { name: '방화', pct: 2 },
-    { name: '답십리', pct: 55, home: true },
-    { name: '강동', pct: 98 },
-  ];
-
-  var html = '<div class="ym-wrap"><div class="ym-row">';
-
-  // === 본선 (방화 → 강동) ===
-  html += '<div class="ym-main">';
-  // 메인 라인 (방화~강동 전체)
-  html += '<div class="ym-line" style="left:2%;width:96%"></div>';
-  // 역 점 + 라벨
-  refStations.forEach(function(st) {
-    var dot = routeStns[st.name] ? ' ym-dot-on' : '';
-    var label = st.home ? ' ym-home' : '';
-    html += '<div class="ym-station' + label + '" style="left:' + st.pct + '%">';
-    html += '<div class="ym-dot' + dot + '"></div>';
-    html += '<div class="ym-name">' + shortStn(st.name) + '</div>';
-    html += '</div>';
-  });
-  html += '</div>';
-
-  // === 분기 영역 (강동 이후 Y자) ===
-  html += '<div class="ym-fork">';
-
-  // 마천 브랜치 (위쪽, 짧음)
-  html += '<div class="ym-branch ym-macheon ' + mCls + '">';
-  html += '<div class="ym-bline"></div>';
-  var mDot = routeStns['마천'] ? ' ym-dot-on' : '';
-  html += '<div class="ym-station ym-end"><div class="ym-dot' + mDot + '"></div>';
-  html += '<div class="ym-name">마천</div></div>';
-  html += '<div class="ym-blabel">' + (branch.macheon ? '운행' : '7역') + '</div>';
-  html += '</div>';
-
-  // 하남 브랜치 (아래쪽, 김)
-  html += '<div class="ym-branch ym-hanam ' + hCls + '">';
-  html += '<div class="ym-bline"></div>';
-  var hDot = routeStns['하남검단산'] ? ' ym-dot-on' : '';
-  html += '<div class="ym-station ym-end"><div class="ym-dot' + hDot + '"></div>';
-  html += '<div class="ym-name">하남</div></div>';
-  html += '<div class="ym-blabel">' + (branch.hanam ? '운행' : '10역') + '</div>';
-  html += '</div>';
-
-  html += '</div>'; // ym-fork
-  html += '</div></div>'; // ym-row, ym-wrap
-  return html;
-}
-
 function renderSegments(segs) {
   if (!segs || segs.length === 0) return '';
   let html = '<div class="tc-segments">';
@@ -670,9 +592,6 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
 
   // === HTML 빌드 ===
   let html = '';
-
-  // Y자 미니맵 (답십리 중앙 + 브랜치 시각화)
-  html += renderYMap(segs);
 
   // 출발 방향 배너 — 4-state (근무중 / 종료 / 대기 / 준비)
   const bannerDir = blockDirs[activeIdx] || blockDirs[0];

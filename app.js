@@ -3191,76 +3191,85 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ===== INIT =====
+// 개별 보호 실행 — 하나 실패해도 나머지 진행
+function safeRun(name, fn) {
+  try { fn(); } catch (e) {
+    window.__diaErrors = window.__diaErrors || [];
+    window.__diaErrors.push(name + ': ' + e.message);
+  }
+}
+
 (function () {
   document.body.classList.add('splash-active');
 
-  try {
-    // Restore state
-    const sv = localStorage.getItem('dp');
+  // 1) 상태 복원
+  safeRun('restore', function() {
+    var sv = localStorage.getItem('dp');
     if (sv) {
-      const p = P.find(x => x.I === sv);
+      var p = P.find(function(x) { return x.I === sv; });
       if (p) {
         cur = p;
-        document.getElementById('calPersonName').textContent = p.n;
-        document.getElementById('setName').textContent = p.n;
+        var cn = document.getElementById('calPersonName');
+        var sn = document.getElementById('setName');
+        if (cn) cn.textContent = p.n;
+        if (sn) sn.textContent = p.n;
       }
     }
+  });
 
-    // Supabase 초기화 (async 로드이므로 지연 재시도)
+  // 2) Supabase (async 로드 — 없어도 앱 동작)
+  safeRun('supabase', function() {
     initSupabase();
     if (!sb) setTimeout(initSupabase, 2000);
+    if (!sb) setTimeout(initSupabase, 5000);
+  });
 
-    // 즉시 localStorage 캐시로 UI 표시
-    try {
-      const saved = localStorage.getItem('diaAlerts');
-      alerts = saved ? JSON.parse(saved) : [];
-    } catch (e) { alerts = []; }
+  // 3) 알림 캐시 복원
+  safeRun('alerts-cache', function() {
+    var saved = localStorage.getItem('diaAlerts');
+    alerts = saved ? JSON.parse(saved) : [];
+  });
 
-    initDark();
-    tick();
-    setInterval(tick, 1000);
-    rHome();
-    // 배너 상태 자동 전환 — 1분마다 홈 갱신
-    setInterval(function() {
-      if (!weekPreviewDate && cur) rHome();
-    }, 60000);
-    initCal();
-    initCmp();
-    rMore();
-    renderHomeExtras();
-    initPWA();
+  // 4) 핵심 UI
+  safeRun('dark', initDark);
+  safeRun('tick', function() { tick(); setInterval(tick, 1000); });
+  safeRun('home', rHome);
+  safeRun('home-interval', function() {
+    setInterval(function() { if (!weekPreviewDate && cur) try { rHome(); } catch(e){} }, 60000);
+  });
+  safeRun('cal', initCal);
+  safeRun('cmp', initCmp);
+  safeRun('more', rMore);
+  safeRun('extras', renderHomeExtras);
+  safeRun('pwa', initPWA);
 
-    // Supabase에서 최신 알림 비동기 로드
-    loadAlerts().then(() => {
-      renderAlertList();
-      renderAlertBanner();
-      renderAlertBadge();
-      updateAlertIndicators();
+  // 5) 비동기 (실패해도 무관)
+  safeRun('load-alerts', function() {
+    loadAlerts().then(function() {
+      try { renderAlertList(); renderAlertBanner(); renderAlertBadge(); updateAlertIndicators(); } catch(e){}
     });
+  });
+  safeRun('prefetch', prefetchTrains);
+  safeRun('shake', initShake);
+  safeRun('memos', cleanOldMemos);
+  safeRun('commute', updateHomeCommuteCard);
 
-    // 열차 데이터 프리페치 — 노선 탭 들어가기 전에 미리 로드
-    prefetchTrains();
-    initShake();
-    cleanOldMemos();
-    updateHomeCommuteCard();
-  } catch (e) {
-    // 초기화 실패 시에도 앱을 표시 (디버그용 콘솔 출력)
-    try { showToast('초기화 중 오류가 발생했습니다'); } catch(_) {}
-    window.__diaErrors = window.__diaErrors || []; window.__diaErrors.push(e);
-  }
-
-  // Dismiss splash — 에러 발생해도 항상 실행
+  // Dismiss splash — 무조건 실행
   setTimeout(dismissSplash, 1200);
 
-  // 스플래시 후: PWA 미설치면 설치 유도 → 알림 허용
-  // 3초 대기 — beforeinstallprompt 이벤트가 도착할 시간 확보
-  setTimeout(() => {
+  // 에러가 있으면 화면에 표시 (디버그용, 3초 후)
+  setTimeout(function() {
+    if (window.__diaErrors && window.__diaErrors.length > 0) {
+      var msg = '초기화 오류 ' + window.__diaErrors.length + '건:\n' + window.__diaErrors.join('\n');
+      try { showToast(msg); } catch(e) {}
+    }
+  }, 2000);
+
+  // PWA 설치 유도
+  setTimeout(function() {
     try {
-      if (!isPWAInstalled()) {
-        showPWAPrompt();
-      } else {
-        requestNotificationPermission();
-      }
+      if (!isPWAInstalled()) showPWAPrompt();
+      else requestNotificationPermission();
     } catch (e) { /* ignore */ }
   }, 3000);
 })();

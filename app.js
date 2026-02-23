@@ -932,10 +932,11 @@ function rHome() {
     ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
     : '오늘의 교번 · DIA';
 
+  const shareBtn = weekPreviewDate ? '' : '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="오늘 교번 공유">📤</button>';
   el.innerHTML = `${previewBannerH}<div class="today-card">
     <div class="tc-header">
       <div class="tc-label">${cardLabel}</div>
-      <span class="tc-badge ${tp}">${gLabel(dia)}</span>
+      <div class="tc-header-right">${shareBtn}<span class="tc-badge ${tp}">${gLabel(dia)}</span></div>
     </div>
     <div class="tc-body">
       <div class="tc-dia ${tp}">${dia}</div>
@@ -1029,10 +1030,59 @@ function rHome() {
     </div>`;
   }
 
+  // D-Day 카운터 + 월간 요약
+  let ddayH = '';
+  if (!weekPreviewDate) {
+    const daysLeft = getDaysUntilRest(cur, today);
+    if (daysLeft !== null && daysLeft > 0) {
+      ddayH = `<div class="dday-pill">비번까지 <strong>${daysLeft}일</strong></div>`;
+    } else if (daysLeft === 0) {
+      ddayH = `<div class="dday-pill dday-today">오늘 비번 🎉</div>`;
+    }
+  }
+
+  const ms = getMonthSummary(cur, today.getFullYear(), today.getMonth());
+  const monthH = `<div class="month-summary">
+    <div class="ms-title">${today.getMonth()+1}월 근무 요약</div>
+    <div class="ms-grid">
+      <div class="ms-cell"><div class="ms-num day">${ms.day}</div><div class="ms-label">주간</div></div>
+      <div class="ms-cell"><div class="ms-num night">${ms.night}</div><div class="ms-label">야간</div></div>
+      <div class="ms-cell"><div class="ms-num standby">${ms.standby}</div><div class="ms-label">대기</div></div>
+      <div class="ms-cell"><div class="ms-num rest">${ms.rest}</div><div class="ms-label">비번</div></div>
+    </div>
+  </div>`;
+
   stEl.innerHTML = `<div class="status-bar">
     ${tmCard}
     ${afCard}
-  </div>`;
+  </div>${ddayH}${monthH}`;
+}
+
+// D-Day: 다음 비번까지 남은 일수
+function getDaysUntilRest(person, fromDate) {
+  const todayType = gType(gDia(person, fromDate));
+  if (todayType === 'rest') return 0;
+  for (let i = 1; i <= 15; i++) {
+    const d = new Date(fromDate);
+    d.setDate(d.getDate() + i);
+    if (gType(gDia(person, d)) === 'rest') return i;
+  }
+  return null;
+}
+
+// 월간 요약: 해당 월의 근무 유형별 일수
+function getMonthSummary(person, year, month) {
+  const ld = new Date(year, month + 1, 0).getDate();
+  let day = 0, night = 0, rest = 0, standby = 0;
+  for (let d = 1; d <= ld; d++) {
+    const dt = new Date(year, month, d);
+    const tp = gType(gDia(person, dt));
+    if (tp === 'day') day++;
+    else if (tp === 'night') night++;
+    else if (tp === 'standby') standby++;
+    else rest++;
+  }
+  return { day, night, standby, rest };
 }
 
 // ===== WEEK PREVIEW =====
@@ -1649,11 +1699,11 @@ function updateAlertIndicators() {
   const fab = document.getElementById('fabAlert');
   const fabCount = document.getElementById('fabCount');
   if (count > 0) {
-    fab.style.display = 'flex';
+    fab.classList.remove('fab-hidden');
     fabCount.textContent = count;
     fabCount.classList.add('show');
   } else {
-    fab.style.display = 'none';
+    fab.classList.add('fab-hidden');
     fabCount.classList.remove('show');
   }
 
@@ -1666,16 +1716,24 @@ function updateAlertIndicators() {
 }
 
 // ===== TABS =====
+const TAB_ORDER = ['pageHome', 'pageCal', 'pageLine', 'pageCmp', 'pageContacts', 'pageMore'];
+let prevTabIdx = 0;
+
 function goTab(id, el) {
   if (id === 'pageHome' && weekPreviewDate) resetToToday();
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const nextIdx = TAB_ORDER.indexOf(id);
+  const dir = nextIdx >= prevTabIdx ? 'right' : 'left';
+  prevTabIdx = nextIdx >= 0 ? nextIdx : prevTabIdx;
+
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.removeAttribute('data-slide'); });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const page = document.getElementById(id);
+  page.classList.add('active');
+  page.setAttribute('data-slide', dir);
   if (el) el.classList.add('active');
   else {
     const tabs = document.querySelectorAll('.tab');
-    const m = ['pageHome', 'pageCal', 'pageLine', 'pageCmp', 'pageContacts', 'pageMore'];
-    const i = m.indexOf(id);
+    const i = TAB_ORDER.indexOf(id);
     if (i >= 0 && tabs[i]) tabs[i].classList.add('active');
   }
   if (id === 'pageHome') rHome();
@@ -1742,10 +1800,13 @@ function rCal() {
     if (dw === 6) cls += ' sat';
     if (hl && dw !== 0) cls += ' hol';
 
+    const memoKey = `${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasMemo = getMemo(memoKey);
     h += `<div class="${cls}" onclick="pickDate(${d})">
       <div class="cd">${d}</div>
       ${di && di !== '~' ? `<div class="cdia ${dc}">${di}</div>` : ''}
       ${hl && dw !== 0 ? '<div class="cal-hol-dot"></div>' : ''}
+      ${hasMemo ? '<div class="cal-memo-dot"></div>' : ''}
     </div>`;
   }
 
@@ -1785,11 +1846,16 @@ function rSchedDetail() {
       </div>
     </div>`;
   }
+  const dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,'0')}-${String(selDate.getDate()).padStart(2,'0')}`;
+  const memo = getMemo(dateStr);
+  const memoH = `<div class="sd-memo">
+    <textarea class="sd-memo-input" placeholder="메모 (이 날짜에 대한 간단한 기록)" maxlength="200" oninput="setMemo('${dateStr}', this.value)">${memo}</textarea>
+  </div>`;
   el.innerHTML = `<div class="sched-detail">
     <div class="sd-top">
       <div class="sd-date">${selDate.getMonth() + 1}월 ${selDate.getDate()}일 (${dw}) · ${hl}</div>
       <span class="sd-badge tc-badge ${tp}">${gLabel(dia)}</span>
-    </div>${sh}</div>`;
+    </div>${sh}${memoH}</div>`;
 }
 
 // ===== COMPARE =====
@@ -2305,14 +2371,14 @@ function rContacts() {
   const el = document.getElementById('contactsContent');
   let h = '';
 
-  // 관제 (별도 섹션)
+  // 관제 (긴급 스타일)
   h += '<div class="ct-section"><div class="ct-section-title">🚨 관제</div>';
   CPH_CTRL.forEach(c => {
-    h += `<div class="ct-card ct-ctrl">
+    h += `<div class="ct-card ct-ctrl ct-emergency">
       <div class="ct-name">${c.n}</div>
       <div class="ct-nums">
-        <a class="ct-num" href="tel:${c.a.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.a}</a>
-        <a class="ct-num" href="tel:${c.b.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.b}</a>
+        <a class="ct-num ct-num-emergency" href="tel:${c.a.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.a}<span class="ct-call-hint">터치하여 전화</span></a>
+        <a class="ct-num ct-num-emergency" href="tel:${c.b.replace(/-/g, '')}"><span class="ct-num-icon">📞</span>${c.b}<span class="ct-call-hint">터치하여 전화</span></a>
       </div>
     </div>`;
   });
@@ -2348,7 +2414,7 @@ function rMore() {
 }
 
 function showSub(id) {
-  document.getElementById('moreMain').style.display = 'none';
+  document.getElementById('moreMain').classList.add('hidden');
   document.getElementById(id).classList.add('active');
   if (id === 'sopPanel') rSopList();
   if (id === 'alertPanel') renderAlertList();
@@ -2356,7 +2422,7 @@ function showSub(id) {
 
 function hideSub(id) {
   document.getElementById(id).classList.remove('active');
-  document.getElementById('moreMain').style.display = 'block';
+  document.getElementById('moreMain').classList.remove('hidden');
 }
 
 // ===== SOP =====
@@ -2371,15 +2437,16 @@ function getSopIcon(title) {
 
 function rSopList() {
   const el = document.getElementById('sopList');
-  const em = SOP.filter(s => s.sub === '1');
-  const bc = SOP.filter(s => s.sub === '2');
+  // 내용 기반 분류: ◆ 또는 번호(1〕/1)) 포함 → 이례상황, 나머지 → 방송문안
+  const isEmergency = s => /[◆◈]|^\d[〕\)]|\n\d[〕\)]/m.test(s.c || '');
+  const em = SOP.filter(isEmergency);
+  const bc = SOP.filter(s => !isEmergency(s));
   let h = '<div class="section-label sop-section-label">이례상황 조치</div>';
   em.forEach(s => {
     const i = SOP.indexOf(s);
     const icon = getSopIcon(s.t);
     h += `<div class="sop-card" onclick="showSopD(${i})">
       <div class="sop-t">${icon} ${s.t}</div>
-      ${s.c ? `<div class="sop-c">${s.c}</div>` : ''}
     </div>`;
   });
   h += '<div class="section-label sop-section-label">방송문안</div>';
@@ -2398,9 +2465,7 @@ function showSopD(i) {
   document.getElementById('sopDetailPanel').classList.add('active');
   const s = SOP[i], el = document.getElementById('sopDetailContent');
   let h = `<div class="sop-detail-panel"><div class="sop-dp"><h3>${s.t}</h3>`;
-  if (s.o) h += `<div class="sop-sec"><div class="sop-sec-t">${s.sub === '1' ? '발생현상' : '방송문안'}</div><div class="sop-sec-b">${s.o}</div></div>`;
-  if (s.s) h += `<div class="sop-sec"><div class="sop-sec-t">조치절차</div><div class="sop-sec-b">${s.s}</div></div>`;
-  if (s.ca) h += `<div class="sop-sec"><div class="sop-sec-t">주의사항</div><div class="sop-sec-b">${s.ca}</div></div>`;
+  if (s.c) h += `<div class="sop-sec"><div class="sop-sec-b">${s.c.replace(/\n/g, '<br>')}</div></div>`;
   h += '</div></div>';
   el.innerHTML = h;
 }
@@ -2777,6 +2842,77 @@ function resetQuiz() {
   renderQuiz();
 }
 
+// ===== SHAKE TO SHARE =====
+let lastShake = 0;
+function initShake() {
+  if (!('DeviceMotionEvent' in window)) return;
+  let lastX = 0, lastY = 0, lastZ = 0, lastTime = 0;
+  const handler = e => {
+    const a = e.accelerationIncludingGravity;
+    if (!a) return;
+    const now = Date.now();
+    if (now - lastTime < 100) return;
+    const total = Math.abs(a.x - lastX) + Math.abs(a.y - lastY) + Math.abs(a.z - lastZ);
+    if (total > 35 && now - lastShake > 3000) {
+      lastShake = now;
+      shareSchedule();
+    }
+    lastX = a.x; lastY = a.y; lastZ = a.z; lastTime = now;
+  };
+  // iOS 13+ 권한 요청은 사용자 제스처 필요 — 첫 터치 시 등록
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    document.addEventListener('touchstart', function reqPerm() {
+      DeviceMotionEvent.requestPermission().then(r => {
+        if (r === 'granted') window.addEventListener('devicemotion', handler);
+      }).catch(() => {});
+      document.removeEventListener('touchstart', reqPerm);
+    }, { once: true });
+  } else {
+    window.addEventListener('devicemotion', handler);
+  }
+}
+
+function shareSchedule() {
+  if (!cur) { showToast('기관사를 먼저 선택하세요'); return; }
+  const today = td();
+  const dia = gDia(cur, today), tp = gType(dia), sc = gSched(dia, today);
+  const dow = DOW[today.getDay()];
+  let text = `[기관사 DIA] ${cur.n}\n${today.getMonth()+1}/${today.getDate()} (${dow})\n교번: ${dia} (${gLabel(dia)})`;
+  if (sc) text += `\n출근: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
+  if (sc && sc.m) text += `\n행로: ${sc.m}`;
+  if (navigator.share) {
+    navigator.share({ title: '오늘의 교번', text }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됨 📋'));
+  } else {
+    showToast('공유 기능을 지원하지 않는 브라우저입니다');
+  }
+}
+
+// ===== DAY MEMO =====
+function getMemo(dateStr) {
+  try { return JSON.parse(localStorage.getItem('diaMemos') || '{}')[dateStr] || ''; }
+  catch(e) { return ''; }
+}
+function setMemo(dateStr, text) {
+  try {
+    const m = JSON.parse(localStorage.getItem('diaMemos') || '{}');
+    if (text.trim()) m[dateStr] = text.trim(); else delete m[dateStr];
+    localStorage.setItem('diaMemos', JSON.stringify(m));
+  } catch(e) {}
+}
+function cleanOldMemos() {
+  try {
+    const m = JSON.parse(localStorage.getItem('diaMemos') || '{}');
+    const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - 6);
+    let changed = false;
+    for (const k of Object.keys(m)) {
+      if (new Date(k) < cutoff) { delete m[k]; changed = true; }
+    }
+    if (changed) localStorage.setItem('diaMemos', JSON.stringify(m));
+  } catch(e) {}
+}
+
 // ===== INIT =====
 (function () {
   document.body.classList.add('splash-active');
@@ -2826,9 +2962,12 @@ function resetQuiz() {
 
     // 열차 데이터 프리페치 — 노선 탭 들어가기 전에 미리 로드
     prefetchTrains();
+    initShake();
+    cleanOldMemos();
   } catch (e) {
     // 초기화 실패 시에도 앱을 표시 (디버그용 콘솔 출력)
-    console.error('[DIA init error]', e);
+    try { showToast('초기화 중 오류가 발생했습니다'); } catch(_) {}
+    window.__diaErrors = window.__diaErrors || []; window.__diaErrors.push(e);
   }
 
   // Dismiss splash — 에러 발생해도 항상 실행

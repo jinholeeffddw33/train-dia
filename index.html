@@ -17,7 +17,7 @@
 <!-- ===== SPLASH SCREEN ===== -->
 <div class="splash" id="splash">
   <div class="splash-inner">
-    <img src="logo.png" alt="서울교통공사" class="splash-logo">
+    <img src="logo.png" alt="서울교통공사" class="splash-logo" width="192" height="192">
     <div class="splash-divider"></div>
     <div class="splash-title">기관사 DIA</div>
     <div class="splash-sub">답십리 승무사업소 · 5호선</div>
@@ -235,7 +235,7 @@
   <div class="sub-view" id="alertPanel">
     <button class="back-btn" type="button" onclick="hideSub('alertPanel')">← 목록으로</button>
     <div class="alert-panel-header">
-      <div class="section-label" style="padding-top:0">현재 장애 알림</div>
+      <div class="section-label section-label--flush">현재 장애 알림</div>
       <button class="alert-post-btn" type="button" onclick="openAlertForm()">+ 알림 등록</button>
     </div>
     <div id="alertList"></div>
@@ -253,7 +253,7 @@
 </div>
 
 <!-- FAB (장애 알림 — 활성 알림 있을 때만 표시, 탭하면 목록) -->
-<button class="fab-alert" id="fabAlert" type="button" style="display:none" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
+<button class="fab-alert fab-hidden" id="fabAlert" type="button" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
   <span class="fab-icon">🚨</span>
   <span class="fab-count" id="fabCount"></span>
 </button>

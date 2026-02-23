@@ -1000,7 +1000,7 @@ function rHome() {
     </div>
     <div class="tc-body">
       <div class="tc-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
-      <div class="tc-type-name tc-type-bold">${tp === 'rest' ? (dia.startsWith('휴') ? '휴무' : '비번') : gTypeName(tp)}</div>
+      ${tp !== 'rest' ? `<div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>` : ''}
     </div>${infoH}</div>`;
 
   // Week strip

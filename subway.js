@@ -818,14 +818,11 @@ function swShowRT(station) {
           '<span class="sw-rt-dir">' + g.direction + '</span>' +
         '</div>';
       g.trains.slice(0, 3).forEach(function(t) {
-        var secStr = t.arrivalSec > 0 ? Math.ceil(t.arrivalSec / 60) + '분' : '';
         html += '<div class="sw-rt-train">' +
           '<div class="sw-rt-dest">' + t.destination +
             (t.trainType !== '일반' ? ' <span class="sw-rt-express">' + t.trainType + '</span>' : '') +
           '</div>' +
-          '<div class="sw-rt-msg">' + t.arrivalMsg +
-            (secStr ? ' <span class="sw-rt-sec">(' + secStr + ')</span>' : '') +
-          '</div>' +
+          '<div class="sw-rt-msg">' + t.arrivalMsg + '</div>' +
         '</div>';
       });
       html += '</div>';

@@ -934,7 +934,7 @@ function rHome() {
     ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
     : '오늘의 교번 · DIA';
 
-  const shareBtn = weekPreviewDate ? '' : '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="오늘 교번 공유">📤</button>';
+  const shareBtn = weekPreviewDate ? '' : '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="오늘 교번 공유"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';
   el.innerHTML = `${previewBannerH}<div class="today-card">
     <div class="tc-header">
       <div class="tc-label">${cardLabel}</div>

@@ -58,8 +58,9 @@ function gType(d) {
 
 function gSched(dia, date) {
   if (dia.startsWith('휴')) return null;
+  const is2nd = dia.endsWith('~');
   // ~ 접미사 제거 ("86~" → "86", "대63~" → "대63") — 스케줄 테이블 키에 ~ 없음
-  const key = dia.endsWith('~') ? dia.slice(0, -1) : dia;
+  const key = is2nd ? dia.slice(0, -1) : dia;
   const h = isH(date);
   const tm = new Date(date);
   tm.setDate(tm.getDate() + 1);
@@ -76,7 +77,16 @@ function gSched(dia, date) {
     else if (!h && th) t = S.p_ordhol;
     else t = S.p_ordord;
   }
-  return t[key] || null;
+  const sched = t[key] || null;
+  // 2근무(~)는 출근시각이 1근무보다 30분 늦음 (행로표 기준)
+  if (sched && is2nd && isNight && sched.s && sched.s.includes(':')) {
+    const [hh, mm] = sched.s.split(':').map(Number);
+    const total = hh * 60 + mm + 30;
+    const nh = Math.floor(total / 60) % 24;
+    const nm = total % 60;
+    return { ...sched, s: `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}` };
+  }
+  return sched;
 }
 
 function gLabel(d) {

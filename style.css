@@ -327,29 +327,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   border-color: rgba(56,189,248,.12);
 }
 
-/* Route info (운전행로) */
-.tc-route {
-  padding: 14px 20px; border-top: 1px solid var(--border);
-  background: var(--bg);
-  animation: cardFadeIn .4s ease .2s both;
-}
-.tc-route-label {
-  font-size: 12px; font-weight: 700; color: var(--blue);
-  margin-bottom: 6px; letter-spacing: .3px;
-}
-.tc-route-text {
-  font-size: 15px; color: var(--text); font-weight: 600;
-  line-height: 1.8; word-break: keep-all;
-}
-.tc-route-seg {
-  display: inline-block; padding: 2px 0;
-}
-.tc-route-time {
-  display: inline-block; font-size: 12px; font-weight: 700;
-  color: var(--blue); background: var(--blue-light);
-  padding: 2px 8px; border-radius: 4px; margin-left: 4px;
-}
-
 .tc-rest-msg {
   padding: 24px; text-align: center;
   font-size: 20px; font-weight: 600; color: var(--green);
@@ -2072,183 +2049,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   50% { text-shadow: 0 0 20px rgba(255,255,255,.9), 0 0 40px rgba(255,255,255,.4); }
 }
 
-.rv-apk {
-  background: #f8f9fa; border: 1px solid #d0d4dc;
-  border-radius: 8px; margin-top: 6px; overflow: hidden;
-}
-.rv-hdr {
-  position: relative; border-bottom: 1px solid #c0c4cc;
-  background: #eef0f4; border-radius: 8px 8px 0 0;
-  height: 50px;
-}
-/* 역 이름: 위쪽 줄 */
-.rv-col {
-  position: absolute; text-align: center; font-size: 11px; font-weight: 700;
-  color: #555; padding: 4px 0; top: 0;
-  transform: translateX(-50%); white-space: nowrap;
-  line-height: 1.15;
-  animation: rvColDrop .3s ease .1s both;
-}
-@keyframes rvColDrop {
-  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-.rv-col.rv-home { color: #1A56DB; font-weight: 800; }
-
-/* 구간 커넥터 라인 (인접 역 사이 연결) */
-.rv-conn {
-  position: absolute; bottom: 2px; height: 18px;
-  display: flex; align-items: center; justify-content: center;
-  animation: rvConnFade .4s ease .2s both;
-}
-@keyframes rvConnFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-/* 연결 라인 */
-.rv-conn::before {
-  content: ''; position: absolute;
-  left: 12px; right: 12px; top: 50%;
-  height: 1px; background: #c0c4cc;
-}
-/* n역 라벨 (3역 이상) */
-.rv-conn-label {
-  position: relative; z-index: 1;
-  font-size: 11px; font-weight: 700; color: var(--text3);
-  background: #eef0f4; padding: 0 5px;
-  white-space: nowrap;
-}
-/* 미니 라벨 (1~2역 — 약하게) */
-.rv-conn-mini::before { background: #dde0e6; }
-.rv-conn-mini .rv-conn-label {
-  font-weight: 500; color: #b0b4c0; font-size: 11px;
-}
-/* 긴 구간 눈금 (15역 이상) */
-.rv-conn-tick {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 1px; height: 6px; background: #ccd0d8;
-  z-index: 0;
-}
-
-.rv-body { position: relative; padding: 8px 0 6px; min-height: 40px; animation: rvBodyFade .5s ease .15s both; }
-@keyframes rvBodyFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.rv-vl {
-  position: absolute; top: 0; bottom: 0; width: 1px;
-  background: #d4d8e0; pointer-events: none;
-}
-.rv-pair { padding: 2px 0; }
-.rv-row { position: relative; height: 22px; }
-.rv-bar {
-  position: absolute; top: 5px; height: 12px;
-  background: #555; border-radius: 6px; min-width: 6px;
-  animation: rvBarGrow .5s cubic-bezier(.34,1.56,.64,1) .2s both;
-  transform-origin: left center;
-}
-.rv-bar-up { background: var(--blue); }
-.rv-bar-down { background: #996CAC; }
-/* Route bar direction flow animation */
-.rv-bar-up::after,
-.rv-bar-down::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 30%;
-  border-radius: 6px;
-  animation: rvBarFlow 2s ease-in-out infinite;
-  pointer-events: none;
-}
-.rv-bar-up::after {
-  background: linear-gradient(270deg, transparent, rgba(255,255,255,.25), transparent);
-}
-.rv-bar-down::after {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
-}
-@keyframes rvBarFlow {
-  0% { left: -30%; }
-  100% { left: 100%; }
-}
-@keyframes rvBarGrow {
-  from { transform: scaleX(0); opacity: .3; }
-  to { transform: scaleX(1); opacity: 1; }
-}
-.rv-arr {
-  position: absolute; top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  font-size: 9px; color: #fff; opacity: .9; line-height: 1;
-  font-weight: 700;
-}
-/* 꺾임 커넥터 — 세로 브래킷 */
-.rv-turn {
-  position: relative; height: 6px;
-  animation: rvTurnGrow .3s ease .35s both;
-}
-@keyframes rvTurnGrow {
-  from { opacity: 0; transform: scaleY(0); }
-  to { opacity: 1; transform: scaleY(1); }
-}
-.rv-turn::before {
-  content: ''; position: absolute;
-  width: 2px; top: -7px; bottom: -7px;
-  background: #888; border-radius: 1px;
-  left: var(--turn-pos, 50%);
-  transform: translateX(-1px);
-}
-/* 교대 구분선 */
-.rv-sep {
-  text-align: center; padding: 5px 0; position: relative; margin: 2px 0;
-  animation: rvSepFade .4s ease .3s both;
-}
-@keyframes rvSepFade {
-  from { opacity: 0; transform: scaleX(.5); }
-  to { opacity: 1; transform: scaleX(1); }
-}
-.rv-sep::before {
-  content: ''; position: absolute;
-  left: 8%; right: 8%; top: 50%; height: 1px;
-  background: #e53e3e; opacity: .25;
-}
-.rv-sep span {
-  position: relative; display: inline-block;
-  font-size: 11px; font-weight: 700; color: #e53e3e;
-  background: #f8f9fa; padding: 1px 10px; border-radius: 8px;
-}
-
-/* 근무 블록 분리 */
-.rv-block {
-  border-top: 1px solid #d0d4dc; padding: 0;
-  animation: rvBlockSlide .4s ease both;
-}
-.rv-block:first-child { border-top: none; animation-delay: .1s; }
-.rv-block:nth-child(2) { animation-delay: .25s; }
-@keyframes rvBlockSlide {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.rv-block-label {
-  font-size: 13px; font-weight: 800; color: var(--blue);
-  padding: 8px 12px 4px; background: rgba(26,86,219,.06);
-  border-bottom: 1px solid rgba(26,86,219,.1);
-}
-.rv-block-active > .rv-block-label {
-  background: rgba(26,86,219,.12);
-  border-left: 3px solid var(--blue);
-}
-.rv-rest {
-  text-align: center; padding: 8px 0;
-  font-size: 13px; font-weight: 800; color: var(--orange);
-  background: var(--orange-light); border-top: 1px dashed var(--orange);
-  border-bottom: 1px dashed var(--orange);
-  letter-spacing: 2px;
-  animation: rvRestPulse 3s ease-in-out infinite;
-}
-@keyframes rvRestPulse {
-  0%, 100% { background: var(--orange-light); }
-  50% { background: rgba(217,119,6,.15); }
-}
-
 /* 내일 카드 교대 방향 칩 */
 .sc-dir {
   display: inline-block; font-size: 12px; font-weight: 800;
@@ -2305,17 +2105,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .dark .quiz-card { border-color: var(--border); }
 .dark .cmp-vs { background: var(--border); }
-.dark .rv-apk { background: #1c2030; border-color: #2a3040; }
-.dark .rv-hdr { background: #161a28; border-bottom-color: #2a3040; }
-.dark .rv-col { color: #8a8e9a; }
-.dark .rv-col.rv-home { color: #5b8eef; }
-.dark .rv-vl { background: #2a3040; }
-.dark .rv-bar { background: #6b7280; }
-.dark .rv-bar-up { background: #3b82f6; }
-.dark .rv-bar-down { background: #a78bfa; }
-.dark .rv-arr { color: #1c2030; }
-.dark .rv-turn::before { background: #b8bcc8; }
-.dark .rv-sep span { background: #1c2030; }
 .dark .rv-depart.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
 .dark .rv-depart.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
@@ -2324,14 +2113,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-depart.rv-prep.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
 .dark .rv-depart.rv-prep.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.rv-prep.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
-.dark .rv-conn::before { background: #3a4050; }
-.dark .rv-conn-label { background: #161a28; color: #8a8e9a; }
-.dark .rv-conn-mini::before { background: #2a3040; }
-.dark .rv-conn-mini .rv-conn-label { color: #5a5e6a; }
-.dark .rv-conn-tick { background: #3a4050; }
-.dark .rv-block-label { background: rgba(26,86,219,.1); color: #5b8eef; }
-.dark .rv-block-active > .rv-block-label { background: rgba(26,86,219,.2); border-left: 3px solid #5b8eef; }
-.dark .rv-rest { background: rgba(217,119,6,.1); border-color: rgba(217,119,6,.4); }
 .dark .preview-banner { background: rgba(217,119,6,.15); border-color: rgba(217,119,6,.5); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }
 .dark .sc-dir.down { background: rgba(153,108,172,.2); }

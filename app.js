@@ -515,55 +515,7 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     }
   });
 
-  // 유니크 역 수집 → 비율 기반 위치 계산
-  const stSet = new Set();
-  segs.forEach(seg => seg.stations.forEach(s => stSet.add(s)));
-  const sorted = [...stSet].sort((a, b) => getChartIdx(a) - getChartIdx(b));
-
-  // 비율 기반 위치 계산
-  const indices = sorted.map(s => getChartIdx(s));
-  const minIdx = Math.min(...indices);
-  const maxIdx = Math.max(...indices);
-  const range = maxIdx - minIdx || 1;
-
-  // 원시 비율(0~100) 계산
-  const rawPos = {};
-  sorted.forEach(s => {
-    rawPos[s] = ((getChartIdx(s) - minIdx) / range) * 100;
-  });
-
-  // 인접 역 간 최소 12% 간격 보장
-  const MIN_GAP = 12;
-  const positions = {};
-  positions[sorted[0]] = rawPos[sorted[0]];
-  for (let i = 1; i < sorted.length; i++) {
-    const prevPos = positions[sorted[i - 1]];
-    const rawGap = rawPos[sorted[i]] - rawPos[sorted[i - 1]];
-    positions[sorted[i]] = rawGap < MIN_GAP ? prevPos + MIN_GAP : rawPos[sorted[i]];
-  }
-  // 정규화 (5~95% 범위로 — 양쪽 여백 확보)
-  const posMax = positions[sorted[sorted.length - 1]];
-  const posMin = positions[sorted[0]];
-  const posRange = posMax - posMin || 1;
-  sorted.forEach(s => {
-    positions[s] = 5 + ((positions[s] - posMin) / posRange) * 90;
-  });
-
-  // 구간 커넥터 정보 (인접 역 간 연결선 + n역 라벨)
-  const connectors = [];
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const a = sorted[i], b = sorted[i + 1];
-    const raw = Math.abs(getChartIdx(b) - getChartIdx(a));
-    const count = Math.round(raw); // 소수점 제거 (고덕기지 0.5 오프셋 등)
-    if (count >= 1) {
-      connectors.push({
-        leftPct: positions[a], rightPct: positions[b],
-        count, isMini: count <= 2, isLong: count >= 15
-      });
-    }
-  }
-
-  // === 블록 구성 (배너보다 먼저) ===
+  // === 블록 구성 (배너용) ===
   const hasBlocks = changeTimes.length > 0 && segs.length > 1;
   let blocks;
   if (hasBlocks) {
@@ -590,8 +542,8 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     ? Math.min(getActiveBlock(changeTimes, startTime), blocks.length - 1)
     : 0;
 
-  // === HTML 빌드 ===
-  let html = '';
+  // === 배너 HTML 빌드 ===
+  let bannerHtml = '';
 
   // 출발 방향 배너 — 4-state (근무중 / 종료 / 대기 / 준비)
   const bannerDir = blockDirs[activeIdx] || blockDirs[0];
@@ -608,16 +560,16 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
     const daysText = ns.daysAhead === 1 ? '내일' : (ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
 
-    html += `<div class="rv-depart rv-done">`;
-    html += `<div class="rv-depart-dir">근무 종료</div>`;
-    html += `<div class="rv-depart-sub">수고하셨습니다</div>`;
+    bannerHtml += `<div class="rv-depart rv-done">`;
+    bannerHtml += `<div class="rv-depart-dir">근무 종료</div>`;
+    bannerHtml += `<div class="rv-depart-sub">수고하셨습니다</div>`;
     if (nextTime) {
-      html += `<div class="rv-depart-next">`;
-      html += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
-      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
-      html += `</div>`;
+      bannerHtml += `<div class="rv-depart-next">`;
+      bannerHtml += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      bannerHtml += `</div>`;
     }
-    html += `</div>`;
+    bannerHtml += `</div>`;
 
   } else if (bState.state === 'idle') {
     // === STATE 3: 오늘 근무 완료 (퇴근 후 2시간 이후, 차분) ===
@@ -630,15 +582,15 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
     const daysText = ns && ns.daysAhead === 1 ? '내일' : (ns && ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
 
-    html += `<div class="rv-depart rv-idle">`;
-    html += `<div class="rv-depart-dir">오늘 근무 완료</div>`;
+    bannerHtml += `<div class="rv-depart rv-idle">`;
+    bannerHtml += `<div class="rv-depart-dir">오늘 근무 완료</div>`;
     if (nextTime) {
-      html += `<div class="rv-depart-next">`;
-      html += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
-      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
-      html += `</div>`;
+      bannerHtml += `<div class="rv-depart-next">`;
+      bannerHtml += `다음 출발 ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      bannerHtml += `</div>`;
     }
-    html += `</div>`;
+    bannerHtml += `</div>`;
 
   } else if (bState.state === 'preparing' && bState.next) {
     // === STATE 4: 다음 근무 준비 (2시간 이내) ===
@@ -650,111 +602,29 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     const nextDirSub = nextDir ? nextDir.sub : '';
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
 
-    html += `<div class="rv-depart rv-prep ${nextDirCls}">`;
-    html += `<div class="rv-depart-dir">다음 근무 · ${nextDirLabel}</div>`;
-    html += `<div class="rv-depart-sub">${nextDirSub}</div>`;
+    bannerHtml += `<div class="rv-depart rv-prep ${nextDirCls}">`;
+    bannerHtml += `<div class="rv-depart-dir">다음 근무 · ${nextDirLabel}</div>`;
+    bannerHtml += `<div class="rv-depart-sub">${nextDirSub}</div>`;
     if (nextTime) {
-      html += `<div class="rv-depart-time">출발 ${nextTime}`;
-      if (timeUntil) html += ` <span class="rv-depart-until">(${timeUntil})</span>`;
-      html += `</div>`;
+      bannerHtml += `<div class="rv-depart-time">출발 ${nextTime}`;
+      if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
+      bannerHtml += `</div>`;
     }
-    html += `</div>`;
+    bannerHtml += `</div>`;
 
   } else if (bannerDir) {
     // === STATE 1: 근무 중 (기존 동작) ===
     const dirCls = bannerDir.dir;
     const blockPrefix = hasBlocks ? `${blocks[activeIdx].label} · ` : '';
     const departTime = activeIdx === 0 ? startTime : changeTimes[activeIdx - 1];
-    html += `<div class="rv-depart ${dirCls}">`;
-    html += `<div class="rv-depart-dir">${blockPrefix}${bannerDir.label}</div>`;
-    html += `<div class="rv-depart-sub">${bannerDir.sub}</div>`;
-    if (departTime) html += `<div class="rv-depart-time">출발 ${departTime}</div>`;
-    html += `</div>`;
+    bannerHtml += `<div class="rv-depart ${dirCls}">`;
+    bannerHtml += `<div class="rv-depart-dir">${blockPrefix}${bannerDir.label}</div>`;
+    bannerHtml += `<div class="rv-depart-sub">${bannerDir.sub}</div>`;
+    if (departTime) bannerHtml += `<div class="rv-depart-time">출발 ${departTime}</div>`;
+    bannerHtml += `</div>`;
   }
 
-  // 공통: 차트 컨테이너
-  html += `<div class="rv-apk">`;
-
-  // 역 헤더 — 위: 역 이름, 아래: 구간 커넥터 라인
-  html += '<div class="rv-hdr">';
-  sorted.forEach(s => {
-    const home = s === '답십리' ? ' rv-home' : '';
-    const pct = positions[s];
-    html += `<div class="rv-col${home}" style="left:${pct.toFixed(1)}%">${shortStn(s)}</div>`;
-  });
-  // 구간 커넥터 (얇은 라인 + n역 라벨)
-  connectors.forEach(c => {
-    const w = c.rightPct - c.leftPct;
-    const cls = c.isMini ? 'rv-conn rv-conn-mini' : 'rv-conn';
-    let inner = '';
-    // 긴 구간 눈금 (15역 이상)
-    if (c.isLong) {
-      const ticks = Math.min(5, Math.floor(c.count / 7));
-      for (let t = 1; t <= ticks; t++) {
-        inner += `<span class="rv-conn-tick" style="left:${(t / (ticks + 1) * 100).toFixed(0)}%"></span>`;
-      }
-    }
-    inner += `<span class="rv-conn-label">${c.count}역</span>`;
-    html += `<div class="${cls}" style="left:${c.leftPct.toFixed(1)}%;width:${w.toFixed(1)}%">${inner}</div>`;
-  });
-  html += '</div>';
-
-  // 블록별 렌더링
-  blocks.forEach((block, bi) => {
-    if (block.label) {
-      if (bi > 0) html += `<div class="rv-rest">교대 ${changeTimes[bi - 1] || ''}</div>`;
-      const bDir = blockDirs[bi];
-      const dirTag = bDir ? ` · ${bDir.short}` : '';
-      const activeCls = bi === activeIdx ? ' rv-block-active' : '';
-      html += `<div class="rv-block${activeCls}"><div class="rv-block-label">${block.label}${dirTag} · ${block.time}</div>`;
-    }
-
-    // 차트 바디
-    html += '<div class="rv-body">';
-
-    // 그리드 라인
-    sorted.forEach(s => {
-      const pct = positions[s];
-      html += `<div class="rv-vl" style="left:${pct.toFixed(1)}%"></div>`;
-    });
-
-    // 세그먼트 렌더링
-    block.segs.forEach((seg, si) => {
-      if (si > 0) {
-        html += `<div class="rv-sep"><span>${seg.note ? '교대 ' + seg.note : '교대'}</span></div>`;
-      }
-
-      const legs = splitByDirection(seg.stations);
-
-      html += '<div class="rv-pair">';
-      legs.forEach((leg, li) => {
-        const stnPositions = leg.stations.map(s => positions[s]);
-        const minP = Math.min(...stnPositions);
-        const maxP = Math.max(...stnPositions);
-        const isW = leg.direction === 'west';
-
-        const barCls = isW ? 'rv-bar rv-bar-up' : 'rv-bar rv-bar-down';
-        html += '<div class="rv-row">';
-        html += `<div class="${barCls}" style="left:${(minP).toFixed(1)}%;width:${(maxP - minP).toFixed(1)}%">`;
-        html += `<span class="rv-arr">${isW ? '◀' : '▶'}</span>`;
-        html += '</div></div>';
-
-        if (li < legs.length - 1) {
-          const shared = leg.stations[leg.stations.length - 1];
-          const turnPct = positions[shared];
-          html += `<div class="rv-turn" style="--turn-pos:${turnPct.toFixed(1)}%"></div>`;
-        }
-      });
-      html += '</div>';
-    });
-
-    html += '</div>'; // rv-body
-
-    if (block.label) html += '</div>'; // rv-block
-  });
-
-  html += '</div>'; // rv-apk
-  return html;
+  return bannerHtml;
 }
 
 function timeAgo(ts) {
@@ -926,6 +796,7 @@ function rHome() {
 
   let infoH = '';
   if (sc) {
+    const bannerH = sc.m ? renderRouteVisual(sc.m, sc.s, sc.e, bannerState) : '';
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
         <div class="tc-time-label">출근</div>
@@ -941,14 +812,9 @@ function rHome() {
         <div class="tc-time-val sm">${getWorkTime(sc)}</div>
       </div>
     </div>`;
+    infoH += bannerH;
     if (sc.g && sc.g.length > 0) {
       infoH += renderSegments(sc.g);
-    }
-    if (sc.m) {
-      infoH += `<div class="tc-route">
-        <div class="tc-route-label">🚇 운전행로</div>
-        ${renderRouteVisual(sc.m, sc.s, sc.e, bannerState)}
-      </div>`;
     }
   } else {
     const restWord = dia.startsWith('휴') ? '휴무' : '비번';

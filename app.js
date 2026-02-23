@@ -101,7 +101,16 @@ function gLabel(d) {
 }
 
 function gTypeName(tp) {
-  return { day: '주간 근무', night: '야간 근무', standby: '대기 근무', rest: '비번' }[tp] || '비번';
+  return { day: '주간 근무', night: '야간 근무', standby: '대기 근무' }[tp] || '';
+}
+// 휴무/비번 구분 — rest 타입의 교번 표시명 (SSOT)
+function gRestLabel(dia) {
+  return dia.startsWith('휴') ? '휴무' : '비번';
+}
+// 교번 표시명 (캘린더/주간 등에서 사용)
+function gDiaDisplay(dia) {
+  if (dia.startsWith('휴') || dia.endsWith('~')) return gRestLabel(dia);
+  return dia;
 }
 
 function gColor(t) {
@@ -817,7 +826,7 @@ function rHome() {
       infoH += renderSegments(sc.g);
     }
   } else {
-    const restWord = dia.startsWith('휴') ? '휴무' : '비번';
+    const restWord = gRestLabel(dia);
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
     infoH = `<div class="tc-rest-msg">${dayWord} ${restWord}입니다 😊</div>`;
   }
@@ -833,7 +842,7 @@ function rHome() {
       <div class="tc-header-right">${shareBtn}<span class="tc-badge ${tp}">${gLabel(dia)}</span></div>
     </div>
     <div class="tc-body">
-      <div class="tc-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
+      <div class="tc-dia ${tp}">${gDiaDisplay(dia)}</div>
       ${tp !== 'rest' ? `<div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>` : ''}
     </div>${infoH}</div>`;
 
@@ -869,8 +878,8 @@ function rHome() {
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
-      <div class="wd-dia ${tt}">${di.endsWith('~') ? '비번' : di}</div>
-      ${tt === 'rest' ? '<div class="wd-time rest-label">비번</div>' : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
+      <div class="wd-dia ${tt}">${gDiaDisplay(di)}</div>
+      ${tt === 'rest' ? `<div class="wd-time rest-label">${gRestLabel(di)}</div>` : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
     </div>`;
   }
   wh += '</div>';
@@ -888,8 +897,8 @@ function rHome() {
 
   let tmCard = '';
   if (tmTp === 'rest') {
-    const tmRestWord = tmDia.startsWith('휴') ? '휴무' : '비번';
-    const tmRestCls = tmDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest';
+    const tmRestWord = gRestLabel(tmDia);
+    const tmRestCls = tmDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest'; // gRestLabel 기반
     tmCard = `<div class="status-card">
       <div class="sc-label">내일 (${tmrw.getDate()}일 ${tmDow}요일)</div>
       <div class="sc-val ${tmRestCls}">${tmRestWord} 😊</div>
@@ -917,7 +926,7 @@ function rHome() {
 
   let afCard = '';
   if (afTp === 'rest') {
-    const afRestWord = afDia.startsWith('휴') ? '휴무' : '비번';
+    const afRestWord = gRestLabel(afDia);
     const afRestCls = afDia.startsWith('휴') ? 'sc-val-off' : 'sc-val-rest';
     afCard = `<div class="status-card">
       <div class="sc-label">모레 (${aftrw.getDate()}일 ${afDow}요일)</div>
@@ -939,11 +948,13 @@ function rHome() {
   // D-Day 카운터 + 월간 요약
   let ddayH = '';
   if (!weekPreviewDate) {
-    const daysLeft = getDaysUntilRest(cur, today);
-    if (daysLeft !== null && daysLeft > 0) {
-      ddayH = `<div class="dday-pill">비번까지 <strong>${daysLeft}일</strong></div>`;
-    } else if (daysLeft === 0) {
-      ddayH = `<div class="dday-pill dday-today">오늘 비번 🎉</div>`;
+    const ddayResult = getDaysUntilRest(cur, today);
+    if (ddayResult !== null && ddayResult.days > 0) {
+      const ddayWord = gRestLabel(ddayResult.dia);
+      ddayH = `<div class="dday-pill">${ddayWord}까지 <strong>${ddayResult.days}일</strong></div>`;
+    } else if (ddayResult !== null && ddayResult.days === 0) {
+      const ddayWord = gRestLabel(ddayResult.dia);
+      ddayH = `<div class="dday-pill dday-today">오늘 ${ddayWord} 🎉</div>`;
     }
   }
 
@@ -996,14 +1007,15 @@ function renderMonthSummary() {
   </div>`;
 }
 
-// D-Day: 다음 비번까지 남은 일수
+// D-Day: 다음 쉬는 날까지 남은 일수 + 해당 교번
 function getDaysUntilRest(person, fromDate) {
-  const todayType = gType(gDia(person, fromDate));
-  if (todayType === 'rest') return 0;
+  const todayDia = gDia(person, fromDate);
+  if (gType(todayDia) === 'rest') return { days: 0, dia: todayDia };
   for (let i = 1; i <= 15; i++) {
     const d = new Date(fromDate);
     d.setDate(d.getDate() + i);
-    if (gType(gDia(person, d)) === 'rest') return i;
+    const dia = gDia(person, d);
+    if (gType(dia) === 'rest') return { days: i, dia };
   }
   return null;
 }
@@ -1792,7 +1804,7 @@ function rCal() {
     const hasMemo = getMemo(memoKey);
     h += `<div class="${cls}" onclick="pickDate(${d})">
       <div class="cd">${d}</div>
-      ${di ? `<div class="cdia ${dc}">${di.endsWith('~') ? '비번' : di}</div>` : ''}
+      ${di ? `<div class="cdia ${dc}">${gDiaDisplay(di)}</div>` : ''}
       ${hl && dw !== 0 ? '<div class="cal-hol-dot"></div>' : ''}
       ${hasMemo ? '<div class="cal-memo-dot"></div>' : ''}
     </div>`;
@@ -1829,7 +1841,7 @@ function rSchedDetail() {
     </div>`;
   } else {
     sh = `<div class="sd-body">
-      <div class="sd-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
+      <div class="sd-dia ${tp}">${gDiaDisplay(dia)}</div>
     </div>`;
   }
   const dateStr = `${selDate.getFullYear()}-${String(selDate.getMonth()+1).padStart(2,'0')}-${String(selDate.getDate()).padStart(2,'0')}`;
@@ -1887,18 +1899,18 @@ function rCmp() {
       <div class="cmp-card cmp-card-${t1}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-1">${c1.n}</div>
-        <div class="cmp-cd-dia ${t1}">${d1.endsWith('~') ? '비번' : d1}</div>
+        <div class="cmp-cd-dia ${t1}">${gDiaDisplay(d1)}</div>
         ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
+        <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div class="cmp-rest-text">${gRestLabel(d1)}</div>`}
       </div>
       <div class="cmp-card cmp-card-${t2}">
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-2">${c2.n}</div>
-        <div class="cmp-cd-dia ${t2}">${d2.endsWith('~') ? '비번' : d2}</div>
+        <div class="cmp-cd-dia ${t2}">${gDiaDisplay(d2)}</div>
         ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
-        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
+        <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div class="cmp-rest-text">${gRestLabel(d2)}</div>`}
       </div>
     </div></div>`;
   }

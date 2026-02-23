@@ -487,7 +487,7 @@ function calcWaitMin(arrTime, depTime) {
   return dMin - aMin;
 }
 
-function renderRouteVisual(m, startTime, endTime, bannerState) {
+function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
   if (!m) return '';
   if (m.includes('충당여부') || m.includes('대휴'))
     return `<div class="rv-text">${m}</div>`;
@@ -625,7 +625,13 @@ function renderRouteVisual(m, startTime, endTime, bannerState) {
     // === STATE 1: 근무 중 (기존 동작) ===
     const dirCls = bannerDir.dir;
     const blockPrefix = hasBlocks ? `${blocks[activeIdx].label} · ` : '';
-    const departTime = activeIdx === 0 ? startTime : changeTimes[activeIdx - 1];
+    // 실제 열차 출발시각 사용 (segments[i].d), 없으면 교대시간 폴백
+    let departTime;
+    if (segments && segments[activeIdx] && segments[activeIdx].d) {
+      departTime = segments[activeIdx].d;
+    } else {
+      departTime = activeIdx === 0 ? startTime : changeTimes[activeIdx - 1];
+    }
     bannerHtml += `<div class="rv-depart ${dirCls}">`;
     bannerHtml += `<div class="rv-depart-dir">${blockPrefix}${bannerDir.label}</div>`;
     bannerHtml += `<div class="rv-depart-sub">${bannerDir.sub}</div>`;
@@ -805,7 +811,7 @@ function rHome() {
 
   let infoH = '';
   if (sc) {
-    const bannerH = sc.m ? renderRouteVisual(sc.m, sc.s, sc.e, bannerState) : '';
+    const bannerH = sc.m ? renderRouteVisual(sc.m, sc.s, sc.e, bannerState, sc.g) : '';
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
         <div class="tc-time-label">출근</div>

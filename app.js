@@ -946,11 +946,22 @@ function rHome() {
   const ms = getMonthSummary(cur, today.getFullYear(), today.getMonth());
   const monthH = `<div class="month-summary">
     <div class="ms-title">${today.getMonth()+1}월 근무 요약</div>
-    <div class="ms-grid">
-      <div class="ms-cell"><div class="ms-num day">${ms.day}</div><div class="ms-label">주간</div></div>
-      <div class="ms-cell"><div class="ms-num night">${ms.night}</div><div class="ms-label">야간</div></div>
-      <div class="ms-cell"><div class="ms-num standby">${ms.standby}</div><div class="ms-label">대기</div></div>
-      <div class="ms-cell"><div class="ms-num rest">${ms.rest}</div><div class="ms-label">비번</div></div>
+    <div class="ms-row">
+      <div class="ms-group">
+        <div class="ms-group-label">근무</div>
+        <div class="ms-pair">
+          <div class="ms-cell"><div class="ms-num day">${ms.dayWork}</div><div class="ms-label">주간</div></div>
+          <div class="ms-cell"><div class="ms-num night">${ms.nightWork}</div><div class="ms-label">야간</div></div>
+        </div>
+      </div>
+      <div class="ms-divider"></div>
+      <div class="ms-group">
+        <div class="ms-group-label">대기</div>
+        <div class="ms-pair">
+          <div class="ms-cell"><div class="ms-num day-standby">${ms.dayStandby}</div><div class="ms-label">주간</div></div>
+          <div class="ms-cell"><div class="ms-num night-standby">${ms.nightStandby}</div><div class="ms-label">야간</div></div>
+        </div>
+      </div>
     </div>
   </div>`;
 
@@ -975,16 +986,20 @@ function getDaysUntilRest(person, fromDate) {
 // 월간 요약: 해당 월의 근무 유형별 일수
 function getMonthSummary(person, year, month) {
   const ld = new Date(year, month + 1, 0).getDate();
-  let day = 0, night = 0, rest = 0, standby = 0;
+  let dayWork = 0, nightWork = 0, dayStandby = 0, nightStandby = 0;
   for (let d = 1; d <= ld; d++) {
     const dt = new Date(year, month, d);
-    const tp = gType(gDia(person, dt));
-    if (tp === 'day') day++;
-    else if (tp === 'night') night++;
-    else if (tp === 'standby') standby++;
-    else rest++;
+    const dia = gDia(person, dt);
+    const tp = gType(dia);
+    if (tp === 'standby') {
+      const num = parseInt(dia.replace('대', ''));
+      if (num >= 61) nightStandby++;
+      else dayStandby++;
+    } else if (tp === 'day') dayWork++;
+    else if (tp === 'night') nightWork++;
+    // rest는 집계하지 않음
   }
-  return { day, night, standby, rest };
+  return { dayWork, nightWork, dayStandby, nightStandby };
 }
 
 // ===== WEEK PREVIEW =====

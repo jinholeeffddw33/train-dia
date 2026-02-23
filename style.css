@@ -431,14 +431,26 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   border: 1px solid var(--border); box-shadow: var(--shadow3);
 }
 .ms-title { font-size: 13px; font-weight: 600; color: var(--text3); margin-bottom: 10px; }
-.ms-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
-.ms-cell { padding: 6px 4px; }
+.ms-row { display: flex; gap: 0; align-items: stretch; }
+.ms-group { flex: 1; text-align: center; }
+.ms-group-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 6px; opacity: .7;
+}
+.ms-pair { display: flex; justify-content: center; gap: 4px; }
+.ms-cell { flex: 1; padding: 6px 4px; }
 .ms-num { font-size: 22px; font-weight: 900; margin-bottom: 2px; }
 .ms-num.day { color: var(--blue); }
 .ms-num.night { color: var(--purple); }
-.ms-num.standby { color: var(--orange); }
-.ms-num.rest { color: var(--green); }
+.ms-num.day-standby { color: var(--orange); }
+.ms-num.night-standby { color: #D97706; }
 .ms-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+.ms-divider {
+  width: 1px; align-self: stretch;
+  margin: 0 6px;
+  background: linear-gradient(180deg, transparent 10%, var(--border) 30%, var(--border) 70%, transparent 90%);
+}
 .dark .dday-pill { background: var(--white); border-color: var(--border); }
 .dark .month-summary { background: var(--white); border-color: var(--border); }
 

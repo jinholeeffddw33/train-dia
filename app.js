@@ -78,7 +78,7 @@ function gSched(dia, date) {
     else t = S.p_ordord;
   }
   const sched = t[key] || null;
-  // 2근무(~)는 출근시각이 1근무보다 30분 늦음 (행로표 기준)
+  // 2근무(~)는 출발시간이 1근무보다 30분 늦음 (행로표 기준)
   if (sched && is2nd && isNight && sched.s && sched.s.includes(':')) {
     const [hh, mm] = sched.s.split(':').map(Number);
     const total = hh * 60 + mm + 30;
@@ -916,7 +916,7 @@ function rHome() {
   if (sc) {
     infoH = `<div class="tc-time-hero">
       <div class="tc-time-block">
-        <div class="tc-time-label">출근</div>
+        <div class="tc-time-label">출발</div>
         <div class="tc-time-val tc-time-start">${sc.s || '-'}</div>
       </div>
       <div class="tc-time-arrow">→</div>
@@ -1845,7 +1845,7 @@ function rSchedDetail() {
   if (sc) {
     sh = `<div class="sd-body">
       <div class="sd-dia ${tp}">${dia}</div>
-      <div class="sd-row"><span class="sd-rl">출근</span><span class="sd-rv">${sc.s || '-'}</span></div>
+      <div class="sd-row"><span class="sd-rl">출발</span><span class="sd-rv">${sc.s || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">퇴근</span><span class="sd-rv">${sc.e || '-'}</span></div>
       <div class="sd-row"><span class="sd-rl">근무시간</span><span class="sd-rv">${getWorkTime(sc)}</span></div>
       ${sc.m ? `<div class="sd-route">${sc.m}</div>` : ''}
@@ -1914,7 +1914,7 @@ function rCmp() {
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-1">${c1.n}</div>
         <div class="cmp-cd-dia ${t1}">${d1}</div>
-        ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s1.s || '-'}</span></div>
+        ${s1 ? `<div class="cmp-info-row"><span class="cir-l">출발</span><span class="cir-v">${s1.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s1.e || '-'}</span></div>
         <div class="cmp-cd-route">${s1.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
@@ -1922,7 +1922,7 @@ function rCmp() {
         <div class="cmp-cd-date">${d}일 (${dw}) ${hlIcon}</div>
         <div class="cmp-cd-name cmp-name-2">${c2.n}</div>
         <div class="cmp-cd-dia ${t2}">${d2}</div>
-        ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출근</span><span class="cir-v">${s2.s || '-'}</span></div>
+        ${s2 ? `<div class="cmp-info-row"><span class="cir-l">출발</span><span class="cir-v">${s2.s || '-'}</span></div>
         <div class="cmp-info-row"><span class="cir-l">퇴근</span><span class="cir-v">${s2.e || '-'}</span></div>
         <div class="cmp-cd-route">${s2.m || ''}</div>` : `<div class="cmp-rest-text">비번</div>`}
       </div>
@@ -2904,7 +2904,7 @@ function shareSchedule() {
   const dia = gDia(cur, today), tp = gType(dia), sc = gSched(dia, today);
   const dow = DOW[today.getDay()];
   let text = `[기관사 DIA] ${cur.n}\n${today.getMonth()+1}/${today.getDate()} (${dow})\n교번: ${dia} (${gLabel(dia)})`;
-  if (sc) text += `\n출근: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
+  if (sc) text += `\n출발: ${sc.s || '-'} / 퇴근: ${sc.e || '-'}`;
   if (sc && sc.m) text += `\n행로: ${sc.m}`;
   if (navigator.share) {
     navigator.share({ title: '오늘의 교번', text }).catch(() => {});

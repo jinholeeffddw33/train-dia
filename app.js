@@ -1659,6 +1659,52 @@ function goTab(id, el) {
   if (id === 'pageMore') rMore();
 }
 
+// 현재 활성 탭 ID
+function getActiveTab() {
+  const p = document.querySelector('.page.active');
+  return p ? p.id : 'pageHome';
+}
+
+// ===== 안드로이드 뒤로가기 (두 번 눌러 종료) =====
+let backPressedOnce = false;
+(function initBackHandler() {
+  // 초기 히스토리 상태 push (뒤로가기 잡기용)
+  history.pushState({ dia: true }, '');
+
+  window.addEventListener('popstate', function(e) {
+    const active = getActiveTab();
+
+    // 모달/패널이 열려있으면 닫기
+    const pinModal = document.querySelector('.pin-modal-bg.open');
+    if (pinModal) { pinModal.classList.remove('open'); history.pushState({ dia: true }, ''); return; }
+
+    // 홈이 아니면 홈으로 이동
+    if (active !== 'pageHome') {
+      goTab('pageHome');
+      history.pushState({ dia: true }, '');
+      return;
+    }
+
+    // 미리보기 모드면 해제
+    if (weekPreviewDate) {
+      resetToToday();
+      history.pushState({ dia: true }, '');
+      return;
+    }
+
+    // 홈에서 첫 번째 뒤로가기
+    if (!backPressedOnce) {
+      backPressedOnce = true;
+      showToast('한 번 더 누르면 종료됩니다');
+      history.pushState({ dia: true }, '');
+      setTimeout(function() { backPressedOnce = false; }, 2000);
+      return;
+    }
+
+    // 2초 내 두 번째 → 종료 허용 (히스토리 더 안 넣음)
+  });
+})();
+
 // ===== CALENDAR =====
 function initCal() {
   const n = new Date();

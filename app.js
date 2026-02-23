@@ -92,8 +92,8 @@ function gSched(dia, date) {
 }
 
 function gLabel(d) {
-  if (d.startsWith('휴')) return '비번';
-  if (d.endsWith('~')) return '비번';  // ~ 교번 = 비번
+  if (d.startsWith('휴')) return '휴무';
+  if (d.endsWith('~')) return '비번';
   if (d.startsWith('대')) return '대기';
   const n = parseInt(d);
   if (n >= 62) return '야간';
@@ -983,8 +983,9 @@ function rHome() {
       </div>`;
     }
   } else {
-    const restMsg = weekPreviewDate ? '이 날은 비번입니다 😊' : '오늘은 비번입니다 😊';
-    infoH = `<div class="tc-rest-msg">${restMsg}</div>`;
+    const restWord = dia.startsWith('휴') ? '휴무' : '비번';
+    const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
+    infoH = `<div class="tc-rest-msg">${dayWord} ${restWord}입니다 😊</div>`;
   }
 
   const cardLabel = weekPreviewDate
@@ -999,7 +1000,7 @@ function rHome() {
     </div>
     <div class="tc-body">
       <div class="tc-dia ${tp}">${dia.endsWith('~') ? '비번' : dia}</div>
-      <div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>
+      <div class="tc-type-name tc-type-bold">${tp === 'rest' ? (dia.startsWith('휴') ? '휴무' : '비번') : gTypeName(tp)}</div>
     </div>${infoH}</div>`;
 
   // Week strip

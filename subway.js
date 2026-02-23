@@ -1,5 +1,5 @@
-// subway.js — 서울 지하철 경로 검색 (카카오지하철 스타일) v2
-// API: 서울교통공사 최단경로이동정보 (OA-22724) + 실시간 도착정보
+// subway.js — 서울 지하철 경로 검색 (카카오지하철 스타일) v3
+// 빠른환승, 환승도보, 이전·다음 열차, 호선배지, 실시간, 노선도
 (function() {
 'use strict';
 
@@ -19,6 +19,14 @@ var LC = {
   '9호선':'#BDB092','경의중앙선':'#77C4A3','공항철도':'#0090D2',
   '수인분당선':'#FABE00','신분당선':'#D4003B','경춘선':'#0C8E72',
   '우이신설선':'#B7C452','신림선':'#6789CA','GTX-A':'#9A6292'
+};
+
+// ===== 호선 약칭 (배지용) =====
+var LS = {
+  '1호선':'1','2호선':'2','3호선':'3','4호선':'4','5호선':'5',
+  '6호선':'6','7호선':'7','8호선':'8','9호선':'9',
+  '경의중앙선':'경의','공항철도':'공항','수인분당선':'수분',
+  '신분당선':'신분','경춘선':'경춘','우이신설선':'우이','신림선':'신림','GTX-A':'GTX'
 };
 
 // ===== 호선 ID → 이름 매핑 (실시간 API용) =====
@@ -77,12 +85,82 @@ var LINES = [
     stations:'샛강,대방,서울지방병무청,보라매,보라매공원,보라매병원,당곡,신림,서울대벤처타운,관악산'}
 ];
 
+// ===== [v3] 역 → 호선 매핑 (자동완성 배지용) =====
+var STN_LINES = {};
+LINES.forEach(function(line) {
+  function addStn(s) {
+    if (!STN_LINES[s]) STN_LINES[s] = [];
+    if (STN_LINES[s].indexOf(line.name) === -1) STN_LINES[s].push(line.name);
+  }
+  line.stations.split(',').forEach(addStn);
+  if (line.branches) line.branches.forEach(function(b) { b.stations.split(',').forEach(addStn); });
+});
+
+// ===== [v3] 빠른 환승 데이터 (참고용 · 실제와 다를 수 있음) =====
+// [칸번호, 문번호] — 환승역_출발호선_도착호선
+var FT = {};
+[
+  ['신도림','1호선','2호선',4,2], ['신도림','2호선','1호선',5,3],
+  ['사당','2호선','4호선',5,3], ['사당','4호선','2호선',4,1],
+  ['교대','2호선','3호선',8,2], ['교대','3호선','2호선',3,4],
+  ['잠실','2호선','8호선',6,3], ['잠실','8호선','2호선',4,1],
+  ['건대입구','2호선','7호선',3,2], ['건대입구','7호선','2호선',6,3],
+  ['왕십리','2호선','5호선',1,1], ['왕십리','5호선','2호선',7,3],
+  ['왕십리','2호선','경의중앙선',1,1], ['왕십리','2호선','수인분당선',1,1],
+  ['동대문역사문화공원','2호선','4호선',7,3], ['동대문역사문화공원','2호선','5호선',4,2],
+  ['동대문역사문화공원','4호선','2호선',5,1], ['동대문역사문화공원','4호선','5호선',6,4],
+  ['동대문역사문화공원','5호선','2호선',8,2], ['동대문역사문화공원','5호선','4호선',3,1],
+  ['노원','4호선','7호선',8,4], ['노원','7호선','4호선',1,1],
+  ['종로3가','1호선','3호선',7,3], ['종로3가','1호선','5호선',3,2],
+  ['종로3가','3호선','1호선',5,2], ['종로3가','3호선','5호선',6,3],
+  ['종로3가','5호선','1호선',7,1], ['종로3가','5호선','3호선',4,4],
+  ['을지로3가','2호선','3호선',8,2], ['을지로3가','3호선','2호선',4,3],
+  ['충무로','3호선','4호선',6,1], ['충무로','4호선','3호선',3,4],
+  ['고속터미널','3호선','7호선',5,2], ['고속터미널','3호선','9호선',7,4],
+  ['고속터미널','7호선','3호선',6,1], ['고속터미널','7호선','9호선',4,3],
+  ['고속터미널','9호선','3호선',2,2], ['고속터미널','9호선','7호선',5,1],
+  ['서울역','1호선','4호선',6,3], ['서울역','4호선','1호선',4,2],
+  ['서울역','1호선','공항철도',6,3], ['서울역','4호선','공항철도',4,2],
+  ['공덕','5호선','6호선',5,4], ['공덕','6호선','5호선',3,1],
+  ['공덕','5호선','경의중앙선',1,1], ['공덕','6호선','경의중앙선',4,2],
+  ['공덕','5호선','공항철도',1,1], ['공덕','경의중앙선','5호선',4,3],
+  ['강남','2호선','신분당선',7,4], ['강남','신분당선','2호선',3,2],
+  ['이수','4호선','7호선',5,2], ['이수','7호선','4호선',4,3],
+  ['대림','2호선','7호선',4,2], ['대림','7호선','2호선',6,3],
+  ['까치산','2호선','7호선',4,1], ['까치산','7호선','2호선',1,4],
+  ['금정','1호선','4호선',7,2], ['금정','4호선','1호선',3,3],
+  ['석계','1호선','6호선',2,2], ['석계','6호선','1호선',9,1],
+  ['태릉입구','6호선','7호선',3,2], ['태릉입구','7호선','6호선',6,4],
+  ['군자','5호선','7호선',4,3], ['군자','7호선','5호선',5,1],
+  ['창동','1호선','4호선',6,2], ['창동','4호선','1호선',3,4],
+  ['동작','4호선','9호선',7,1], ['동작','9호선','4호선',3,3],
+  ['선릉','2호선','수인분당선',9,2], ['선릉','수인분당선','2호선',3,3],
+  ['김포공항','5호선','9호선',5,3], ['김포공항','9호선','5호선',2,2],
+  ['김포공항','5호선','공항철도',5,3], ['김포공항','9호선','공항철도',2,2],
+  ['복정','8호선','수인분당선',4,2], ['복정','수인분당선','8호선',5,3],
+  ['디지털미디어시티','6호선','경의중앙선',4,2], ['디지털미디어시티','경의중앙선','6호선',3,1],
+  ['디지털미디어시티','6호선','공항철도',4,2], ['디지털미디어시티','공항철도','6호선',3,1],
+  ['신도림','2호선','2호선',5,3], ['성수','2호선','2호선',3,2]
+].forEach(function(e) { FT[e[0]+'_'+e[1]+'_'+e[2]] = [e[3],e[4]]; });
+
+// ===== [v3] 환승 도보 시간 (분) =====
+var TW = {
+  '신도림':2,'사당':3,'교대':2,'동대문역사문화공원':4,'고속터미널':5,
+  '왕십리':4,'서울역':6,'공덕':3,'강남':4,'노원':3,'종로3가':4,
+  '을지로3가':2,'충무로':2,'잠실':3,'건대입구':3,'이수':3,'대림':2,
+  '까치산':2,'금정':3,'석계':3,'태릉입구':3,'군자':3,'창동':4,
+  '동작':3,'선릉':4,'김포공항':5,'복정':3,'디지털미디어시티':4
+};
+
 // ===== 상태 =====
 var swActiveInput = null;
 var swResult = null;
 var swMode = 'duration';
 var swAlarmTimer = null;
 var swTimeMode = 'now';
+var swDayType = 'auto'; // auto, weekday, saturday, holiday
+var swTrainOpts = null; // {prev, current, next} for 이전·다음 열차
+var swTrainIdx = 1; // 0=prev, 1=current, 2=next
 
 // ===== 유틸 =====
 function swToday() {
@@ -95,12 +173,30 @@ function swNow() {
   return swToday() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':00';
 }
 
+function swGetDateForDay(dayType) {
+  if (dayType === 'auto') return swToday();
+  var d = new Date();
+  var dow = d.getDay();
+  if (dayType === 'weekday') {
+    if (dow === 0) d.setDate(d.getDate() + 1);
+    else if (dow === 6) d.setDate(d.getDate() + 2);
+  } else if (dayType === 'saturday') {
+    while (d.getDay() !== 6) d.setDate(d.getDate() + 1);
+  } else {
+    while (d.getDay() !== 0) d.setDate(d.getDate() + 1);
+  }
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 function swGetTime() {
-  if (swTimeMode === 'first') return swToday() + ' 05:30:00';
-  if (swTimeMode === 'last') return swToday() + ' 23:50:00';
+  if (swTimeMode === 'first') return swGetDateForDay(swDayType) + ' 05:30:00';
+  if (swTimeMode === 'last') return swGetDateForDay(swDayType) + ' 23:50:00';
   if (swTimeMode === 'pick') {
-    var el = document.getElementById('swTimePicker');
-    if (el && el.value) return el.value.replace('T', ' ') + ':00';
+    var h = document.getElementById('swHour');
+    var m = document.getElementById('swMin');
+    if (h && m) {
+      return swGetDateForDay(swDayType) + ' ' + h.value + ':' + m.value + ':00';
+    }
   }
   return swNow();
 }
@@ -112,8 +208,26 @@ function swFmtTime(sec) {
 }
 
 function swLineColor(name) { return LC[name] || '#888'; }
+function swLineShort(name) { return LS[name] || name.replace('호선','').replace('선',''); }
 
-// ===== API: 경로검색 (openapi.seoul.go.kr:8088 via /api/opendata/) =====
+function swOffsetTime(datetime, minOffset) {
+  var p = datetime.split(' ');
+  var dp = p[0].split('-');
+  var tp = (p[1] || '00:00:00').split(':');
+  var d = new Date(+dp[0], +dp[1]-1, +dp[2], +tp[0], +tp[1], +tp[2]||0);
+  d.setMinutes(d.getMinutes() + minOffset);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0') + ' ' +
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':00';
+}
+
+function swGetFT(station, fromLine, toLine) {
+  var key = station + '_' + fromLine + '_' + toLine;
+  var d = FT[key];
+  return d ? { car: d[0], door: d[1] } : null;
+}
+
+// ===== API =====
 function swRouteAPI(from, to, type) {
   var dt = swGetTime();
   var url = COMMUTE_PROXY + '/api/opendata/' + API_KEY + '/json/getShtrmPath/1/100/' +
@@ -122,14 +236,20 @@ function swRouteAPI(from, to, type) {
   return fetch(url, { signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); });
 }
 
-// ===== API: 실시간 도착정보 (swopenAPI via /api/subway/) =====
+function swRouteWithTime(from, to, type, datetime) {
+  var url = COMMUTE_PROXY + '/api/opendata/' + API_KEY + '/json/getShtrmPath/1/100/' +
+    encodeURIComponent(from) + '/' + encodeURIComponent(to) + '/' + encodeURIComponent(datetime);
+  if (type) url += '/' + type;
+  return fetch(url, { signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); });
+}
+
 function swRealtimeAPI(station) {
   var url = COMMUTE_PROXY + '/api/subway/' + API_KEY + '/json/realtimeStationArrival/0/30/' +
     encodeURIComponent(station);
   return fetch(url, { signal: AbortSignal.timeout(10000) }).then(function(r) { return r.json(); });
 }
 
-// ===== 응답 파싱: 경로 =====
+// ===== 파싱: 경로 =====
 function swParse(data) {
   if (!data || !data.body) return null;
   var b = data.body;
@@ -160,7 +280,7 @@ function swParse(data) {
   };
 }
 
-// ===== 응답 파싱: 실시간 =====
+// ===== 파싱: 실시간 =====
 function swParseRT(data) {
   if (!data || !data.realtimeArrivalList) return [];
   return data.realtimeArrivalList.map(function(a) {
@@ -178,11 +298,12 @@ function swParseRT(data) {
   }).sort(function(a, b) { return a.arrivalSec - b.arrivalSec; });
 }
 
-// ===== UI: 페이지 열기/닫기 =====
+// ===== UI: 페이지 =====
 function openSubway() {
   document.getElementById('subwayPage').classList.add('open');
   document.getElementById('tabBar').classList.add('hidden');
   swLoadFavs();
+  swInitPicker();
 }
 
 function closeSubway() {
@@ -204,18 +325,44 @@ function swSetTime(mode) {
   var btn = document.getElementById(map[mode]);
   if (btn) btn.classList.add('active');
 
-  var picker = document.getElementById('swTimePicker');
+  var panel = document.getElementById('swPickerPanel');
   if (mode === 'pick') {
-    picker.classList.remove('hidden');
-    if (!picker.value) {
-      var d = new Date();
-      picker.value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' +
-        String(d.getDate()).padStart(2,'0') + 'T' +
-        String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-    }
+    panel.classList.remove('hidden');
   } else {
-    picker.classList.add('hidden');
+    panel.classList.add('hidden');
   }
+}
+
+function swSetDay(type, el) {
+  swDayType = type;
+  var btns = document.querySelectorAll('.sw-day-btn');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  if (el) el.classList.add('active');
+}
+
+function swInitPicker() {
+  var hSel = document.getElementById('swHour');
+  var mSel = document.getElementById('swMin');
+  if (!hSel || hSel.options.length > 0) return;
+
+  for (var h = 5; h <= 23; h++) {
+    var opt = document.createElement('option');
+    opt.value = String(h).padStart(2,'0');
+    opt.textContent = String(h).padStart(2,'0');
+    hSel.appendChild(opt);
+  }
+  for (var m = 0; m < 60; m += 5) {
+    var opt2 = document.createElement('option');
+    opt2.value = String(m).padStart(2,'0');
+    opt2.textContent = String(m).padStart(2,'0');
+    mSel.appendChild(opt2);
+  }
+  // 현재 시간으로 초기화
+  var now = new Date();
+  hSel.value = String(now.getHours()).padStart(2,'0');
+  var roundMin = Math.round(now.getMinutes() / 5) * 5;
+  if (roundMin >= 60) roundMin = 55;
+  mSel.value = String(roundMin).padStart(2,'0');
 }
 
 // ===== UI: 검색 =====
@@ -227,8 +374,9 @@ function swSearch() {
 
   var el = document.getElementById('swResults');
   el.innerHTML = '<div class="sw-loading"><div class="sw-spinner"></div>경로 검색 중...</div>';
+  swTrainOpts = null;
+  swTrainIdx = 1;
 
-  // 3가지 모드 동시 검색
   Promise.all([
     swRouteAPI(f, t, 'duration'),
     swRouteAPI(f, t, 'transfer'),
@@ -242,13 +390,14 @@ function swSearch() {
       return;
     }
     swResult = { duration: dur, transfer: trf, distance: dist, from: f, to: t };
-    // 기본 모드 설정 — 결과 있는 것으로
     swMode = dur ? 'duration' : (trf ? 'transfer' : 'distance');
     swRender();
     swSaveFav(f, t);
-    // 즐겨찾기 숨기기
     document.getElementById('swFavs').classList.add('hidden');
-  }).catch(function(err) {
+
+    // 백그라운드: 이전·다음 열차 조회
+    swFetchTrains(f, t);
+  }).catch(function() {
     el.innerHTML = '<div class="sw-empty">서버 연결 실패<br><small>네트워크를 확인해주세요</small></div>';
   });
 }
@@ -261,12 +410,116 @@ function swSwap() {
   t.value = tmp;
 }
 
-// ===== UI: 결과 렌더링 (3탭) =====
+// ===== [v3] 이전·다음 열차 =====
+function swFetchTrains(from, to) {
+  var r = swResult ? swResult[swMode] : null;
+  if (!r || !r.segments) return;
+
+  // 현재 결과의 출발 시각 추출
+  var deptTime = null;
+  for (var i = 0; i < r.segments.length; i++) {
+    if (!r.segments[i].isTransfer && r.segments[i].departsAt) {
+      deptTime = r.segments[i].departsAt;
+      break;
+    }
+  }
+  if (!deptTime) return;
+
+  var baseDate = swGetTime().split(' ')[0];
+  if (deptTime.length === 5) deptTime += ':00';
+  var baseDT = baseDate + ' ' + deptTime;
+
+  var prevDT = swOffsetTime(baseDT, -15);
+  var nextDT = swOffsetTime(baseDT, 5);
+
+  Promise.all([
+    swRouteWithTime(from, to, swMode, prevDT),
+    swRouteWithTime(from, to, swMode, nextDT)
+  ]).then(function(res) {
+    var prev = swParse(res[0]);
+    var next = swParse(res[1]);
+    if (!prev && !next) return;
+
+    // 현재 열차의 출발 시각
+    var curDept = swGetDeptTime(r);
+
+    // 이전/다음 열차 출발 시각 확인 (중복 제거)
+    var prevDept = prev ? swGetDeptTime(prev) : null;
+    var nextDept = next ? swGetDeptTime(next) : null;
+
+    if (prevDept === curDept) prev = null;
+    if (nextDept === curDept) next = null;
+    if (prevDept && nextDept && prevDept === nextDept) next = null;
+
+    if (!prev && !next) return;
+
+    swTrainOpts = {
+      prev: prev,
+      current: r,
+      next: next,
+      prevDept: prevDept,
+      curDept: curDept,
+      nextDept: nextDept
+    };
+    swTrainIdx = 1;
+    swRenderTrainSel();
+  }).catch(function() { /* 실패해도 기존 결과는 유지 */ });
+}
+
+function swGetDeptTime(result) {
+  if (!result || !result.segments) return '';
+  for (var i = 0; i < result.segments.length; i++) {
+    if (!result.segments[i].isTransfer && result.segments[i].departsAt) {
+      return result.segments[i].departsAt.substring(0, 5);
+    }
+  }
+  return '';
+}
+
+function swSelectTrain(idx) {
+  if (!swTrainOpts) return;
+  swTrainIdx = idx;
+  var trains = [swTrainOpts.prev, swTrainOpts.current, swTrainOpts.next];
+  var selected = trains[idx];
+  if (!selected) return;
+
+  // 현재 모드 결과 교체
+  swResult[swMode] = selected;
+  swRender();
+  swRenderTrainSel();
+}
+
+function swRenderTrainSel() {
+  var container = document.getElementById('swTrainSel');
+  if (!container || !swTrainOpts) { if (container) container.classList.add('hidden'); return; }
+
+  var trains = [
+    { r: swTrainOpts.prev, dept: swTrainOpts.prevDept, label: '이전' },
+    { r: swTrainOpts.current, dept: swTrainOpts.curDept, label: '이 열차' },
+    { r: swTrainOpts.next, dept: swTrainOpts.nextDept, label: '다음' }
+  ];
+
+  var html = '';
+  trains.forEach(function(t, i) {
+    if (!t.r) return;
+    var active = i === swTrainIdx ? ' active' : '';
+    var timeStr = t.r ? swFmtTime(t.r.totalTime) : '';
+    html += '<button class="sw-ts-btn' + active + '" type="button" onclick="swSelectTrain(' + i + ')">' +
+      '<div class="sw-ts-label">' + t.label + '</div>' +
+      '<div class="sw-ts-time">' + (t.dept || '') + '</div>' +
+      '<div class="sw-ts-dur">' + timeStr + '</div>' +
+    '</button>';
+  });
+
+  container.innerHTML = html;
+  container.classList.remove('hidden');
+}
+
+// ===== UI: 결과 렌더링 =====
 function swRender() {
   var el = document.getElementById('swResults');
   var r = swResult ? swResult[swMode] : null;
   if (!r) {
-    // 현재 모드에 결과 없으면 있는 모드로 폴백
     var modes = ['duration','transfer','distance'];
     for (var i = 0; i < modes.length; i++) {
       if (swResult && swResult[modes[i]]) { swMode = modes[i]; r = swResult[swMode]; break; }
@@ -277,29 +530,31 @@ function swRender() {
   var timeStr = swFmtTime(r.totalTime);
   var distKm = (r.totalDist / 1000).toFixed(1);
 
-  // 첫 출발/마지막 도착 시각
   var firstSeg = null, lastSeg = null;
-  for (var i = 0; i < r.segments.length; i++) {
-    if (!r.segments[i].isTransfer && r.segments[i].departsAt && !firstSeg) firstSeg = r.segments[i];
+  for (var j = 0; j < r.segments.length; j++) {
+    if (!r.segments[j].isTransfer && r.segments[j].departsAt && !firstSeg) firstSeg = r.segments[j];
   }
-  for (var j = r.segments.length - 1; j >= 0; j--) {
-    if (!r.segments[j].isTransfer && r.segments[j].arrivesAt) { lastSeg = r.segments[j]; break; }
+  for (var k = r.segments.length - 1; k >= 0; k--) {
+    if (!r.segments[k].isTransfer && r.segments[k].arrivesAt) { lastSeg = r.segments[k]; break; }
   }
   var deptTime = firstSeg ? firstSeg.departsAt.substring(0, 5) : '';
   var arrvTime = lastSeg ? lastSeg.arrivesAt.substring(0, 5) : '';
 
-  // 시간 모드 라벨
   var timeLabel = '';
   if (swTimeMode === 'first') timeLabel = '<span class="sw-time-label">첫차</span>';
   else if (swTimeMode === 'last') timeLabel = '<span class="sw-time-label">막차</span>';
 
-  // 탭 (3개: 최단시간/최소환승/최단거리)
+  // 탭
   var html = '<div class="sw-tabs">';
   if (swResult.duration) html += '<button class="sw-tab' + (swMode === 'duration' ? ' active' : '') + '" type="button" onclick="swSetMode(\'duration\')">최단시간</button>';
   if (swResult.transfer) html += '<button class="sw-tab' + (swMode === 'transfer' ? ' active' : '') + '" type="button" onclick="swSetMode(\'transfer\')">최소환승</button>';
   if (swResult.distance) html += '<button class="sw-tab' + (swMode === 'distance' ? ' active' : '') + '" type="button" onclick="swSetMode(\'distance\')">최단거리</button>';
   html += '</div>';
 
+  // 이전·다음 열차 셀렉터
+  html += '<div class="sw-train-sel hidden" id="swTrainSel"></div>';
+
+  // 요약
   html += '<div class="sw-summary">' +
     '<div class="sw-summary-top">' + timeLabel +
       '<span class="sw-summary-time">' + timeStr + '</span>' +
@@ -317,9 +572,12 @@ function swRender() {
   '</div>';
 
   el.innerHTML = html;
+
+  // 이전·다음 열차 렌더링
+  if (swTrainOpts) swRenderTrainSel();
 }
 
-// ===== 타임라인 렌더링 (카카오 스타일) =====
+// ===== 타임라인 (빠른 환승 + 도보 시간 포함) =====
 function swRenderTimeline(r) {
   var groups = [];
   var cur = null;
@@ -353,14 +611,32 @@ function swRenderTimeline(r) {
   if (cur) groups.push(cur);
 
   var html = '';
-  groups.forEach(function(g) {
+  groups.forEach(function(g, idx) {
     if (g.type === 'transfer') {
+      // 환승: 앞뒤 ride 그룹에서 호선 정보 가져오기
+      var prevRide = null, nextRide = null;
+      for (var pi = idx - 1; pi >= 0; pi--) { if (groups[pi].type === 'ride') { prevRide = groups[pi]; break; } }
+      for (var ni = idx + 1; ni < groups.length; ni++) { if (groups[ni].type === 'ride') { nextRide = groups[ni]; break; } }
+
+      var fromLine = prevRide ? prevRide.line : '';
+      var toLine = nextRide ? nextRide.line : '';
+      var tStation = g.seg.to.name || g.seg.from.name;
+
+      // 빠른 환승 조회
+      var ft = swGetFT(tStation, fromLine, toLine);
+      var walkMin = TW[tStation] || 0;
       var waitMin = Math.ceil(g.seg.wait / 60);
+
       html += '<div class="sw-tl-transfer">' +
         '<div class="sw-tl-transfer-dot">⇄</div>' +
-        '<div class="sw-tl-transfer-text">' + g.seg.to.line + ' 환승' +
-          (waitMin > 0 ? ' · 대기 ' + waitMin + '분' : '') +
-        '</div></div>';
+        '<div class="sw-tl-transfer-info">' +
+          '<div class="sw-tl-transfer-text">' + (toLine || '') + ' 환승' +
+            (walkMin > 0 ? '<span class="sw-tl-walk"> · 도보 ' + walkMin + '분</span>' : '') +
+            (waitMin > 0 ? '<span class="sw-tl-wait"> · 대기 ' + waitMin + '분</span>' : '') +
+          '</div>' +
+          (ft ? '<div class="sw-tl-ft">빠른 환승 <strong>' + ft.car + '-' + ft.door + '</strong> <span class="sw-tl-ft-sub">(참고)</span></div>' : '') +
+        '</div>' +
+      '</div>';
     } else {
       var color = swLineColor(g.line);
       var stCount = g.stations.length;
@@ -371,6 +647,7 @@ function swRenderTimeline(r) {
       var deptStr = g.firstDepart ? g.firstDepart.substring(0, 5) : '';
       var arrvStr = g.lastArrive ? g.lastArrive.substring(0, 5) : '';
       var termDir = g.terminal ? g.terminal + '행' : '';
+      var lineShort = swLineShort(g.line);
 
       html += '<div class="sw-tl-segment">' +
         '<div class="sw-tl-line-col">' +
@@ -383,9 +660,11 @@ function swRenderTimeline(r) {
           '<div class="sw-tl-station first" onclick="swShowRT(\'' + first.replace(/'/g,"\\'") + '\')">' +
             '<div class="sw-tl-time">' + deptStr + '</div>' +
             '<div class="sw-tl-name">' + first + ' <small class="sw-tl-rt-hint">실시간▸</small></div>' +
-            '<div class="sw-tl-badge" style="background:' + color + '">' + g.line.replace('호선', '') + '</div>' +
+            '<div class="sw-tl-badge" style="background:' + color + '">' + lineShort + '</div>' +
           '</div>' +
-          '<div class="sw-tl-detail">' + termDir + (g.trainNo ? ' · ' + g.trainNo : '') + '</div>' +
+          '<div class="sw-tl-detail">' + termDir + (g.trainNo ? ' · ' + g.trainNo : '') +
+            (g.direction ? ' · ' + g.direction : '') +
+          '</div>' +
           (midStations.length > 0 ?
             '<div class="sw-tl-middle" onclick="this.classList.toggle(\'expanded\')">' +
               '<span class="sw-tl-middle-summary">' + midStations.length + '개역 (' + rideMin + '분) ▾</span>' +
@@ -409,7 +688,7 @@ function swRenderTimeline(r) {
   return html;
 }
 
-// ===== 자동완성 =====
+// ===== 자동완성 (호선 배지 포함) =====
 function swInitAC() {
   ['swFrom', 'swTo'].forEach(function(id) {
     var el = document.getElementById(id);
@@ -436,7 +715,16 @@ function swShowAC(list) {
   var el = document.getElementById('swAC');
   if (!el || list.length === 0) { swHideAC(); return; }
   el.innerHTML = list.map(function(s) {
-    return '<div class="sw-ac-item" onmousedown="swPick(\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</div>';
+    var badges = '';
+    var lines = STN_LINES[s];
+    if (lines && lines.length > 0) {
+      badges = '<span class="sw-ac-badges">' + lines.map(function(l) {
+        return '<span class="sw-ac-badge" style="background:' + swLineColor(l) + '">' + swLineShort(l) + '</span>';
+      }).join('') + '</span>';
+    }
+    return '<div class="sw-ac-item" onmousedown="swPick(\'' + s.replace(/'/g, "\\'") + '\')">' +
+      '<span class="sw-ac-name">' + s + '</span>' + badges +
+    '</div>';
   }).join('');
   el.classList.add('show');
 }
@@ -513,7 +801,6 @@ function swShowRT(station) {
       list.innerHTML = '<div class="sw-rt-empty">도착 예정 열차가 없습니다<br><small>운행 시간을 확인해주세요</small></div>';
       return;
     }
-    // 방향별 그룹화
     var byDir = {};
     trains.forEach(function(t) {
       var key = t.line + ' ' + t.direction;
@@ -605,18 +892,16 @@ function swShowLine(lineName) {
   '</div>' +
   '<div class="sw-ms-list">';
 
-  // 메인 라인 역
   stations.forEach(function(s, i) {
-    html += swStationRow(s, line.color, i === 0, i === stations.length - 1 && !line.branches);
+    html += swStationRow(s, line.color, i === 0, i === stations.length - 1 && !line.branches, line.name);
   });
 
-  // 지선
   if (line.branches) {
     line.branches.forEach(function(branch) {
       html += '<div class="sw-ms-branch-label">' + branch.name + ' 방면</div>';
       var bs = branch.stations.split(',');
       bs.forEach(function(s, i) {
-        html += swStationRow(s, line.color, false, i === bs.length - 1);
+        html += swStationRow(s, line.color, false, i === bs.length - 1, line.name);
       });
     });
   }
@@ -626,14 +911,24 @@ function swShowLine(lineName) {
   stns.scrollTop = 0;
 }
 
-function swStationRow(name, color, isFirst, isLast) {
+function swStationRow(name, color, isFirst, isLast, lineName) {
+  // 환승 가능 노선 배지
+  var transferBadges = '';
+  var lines = STN_LINES[name];
+  if (lines && lines.length > 1) {
+    transferBadges = '<div class="sw-ms-transfers">' +
+      lines.filter(function(l) { return l !== lineName; }).map(function(l) {
+        return '<span class="sw-ms-tbadge" style="background:' + swLineColor(l) + '">' + swLineShort(l) + '</span>';
+      }).join('') + '</div>';
+  }
+
   return '<div class="sw-ms-row" onclick="swPickStn(\'' + name.replace(/'/g, "\\'") + '\')">' +
     '<div class="sw-ms-dot-col">' +
       (isFirst ? '' : '<div class="sw-ms-bar-top" style="background:' + color + '"></div>') +
       '<div class="sw-ms-dot" style="border-color:' + color + '"></div>' +
       (isLast ? '' : '<div class="sw-ms-bar-btm" style="background:' + color + '"></div>') +
     '</div>' +
-    '<div class="sw-ms-name">' + name + '</div>' +
+    '<div class="sw-ms-name">' + name + transferBadges + '</div>' +
     '<div class="sw-ms-btns">' +
       '<button class="sw-ms-btn" type="button" onclick="event.stopPropagation();swSetStn(\'swFrom\',\'' + name.replace(/'/g, "\\'") + '\')">출발</button>' +
       '<button class="sw-ms-btn" type="button" onclick="event.stopPropagation();swSetStn(\'swTo\',\'' + name.replace(/'/g, "\\'") + '\')">도착</button>' +
@@ -653,7 +948,6 @@ function swSetStn(inputId, name) {
 }
 
 function swPickStn(name) {
-  // 빈 입력란에 자동 채우기
   var f = document.getElementById('swFrom');
   var t = document.getElementById('swTo');
   if (!f.value) {
@@ -662,7 +956,6 @@ function swPickStn(name) {
   } else if (!t.value) {
     t.value = name;
     showToast('도착: ' + name);
-    // 둘 다 채워지면 노선도 닫기
     swCloseMap();
   } else {
     f.value = name;
@@ -724,8 +1017,9 @@ window.openSubway = openSubway;
 window.closeSubway = closeSubway;
 window.swSearch = swSearch;
 window.swSwap = swSwap;
-window.swSetMode = function(m) { swMode = m; swRender(); };
+window.swSetMode = function(m) { swMode = m; swTrainOpts = null; swTrainIdx = 1; swRender(); if (swResult) swFetchTrains(swResult.from, swResult.to); };
 window.swSetTime = swSetTime;
+window.swSetDay = swSetDay;
 window.swPick = swPick;
 window.swQuick = swQuick;
 window.swSetAlarm = swSetAlarm;
@@ -739,5 +1033,6 @@ window.swShowLine = swShowLine;
 window.swBackToLines = swBackToLines;
 window.swSetStn = swSetStn;
 window.swPickStn = swPickStn;
+window.swSelectTrain = swSelectTrain;
 
 })();

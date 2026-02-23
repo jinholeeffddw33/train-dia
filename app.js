@@ -3206,8 +3206,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    // Supabase 초기화
+    // Supabase 초기화 (async 로드이므로 지연 재시도)
     initSupabase();
+    if (!sb) setTimeout(initSupabase, 2000);
 
     // 즉시 localStorage 캐시로 UI 표시
     try {

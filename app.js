@@ -923,8 +923,8 @@ function rHome() {
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
-      <div class="wd-dia ${tt}">${gDiaDisplay(di)}</div>
-      ${tt === 'rest' ? `<div class="wd-time rest-label">${gRestLabel(di)}</div>` : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
+      <div class="wd-dia ${tt}${di.startsWith('휴') ? ' off' : ''}">${gDiaDisplay(di)}</div>
+      ${tt !== 'rest' && timeStr ? `<div class="wd-time">${timeStr}</div>` : ''}
     </div>`;
   }
   wh += '</div>';

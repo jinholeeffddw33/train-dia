@@ -40,7 +40,7 @@ function isH(d) {
 }
 
 function gDia(p, d) {
-  if (!p || p.d === '~') return '~';
+  if (!p) return '~';
   const r = CYCLE.indexOf(p.d);
   if (r === -1) return p.d;
   const diff = Math.floor((d - DB_STD) / 864e5);
@@ -48,16 +48,18 @@ function gDia(p, d) {
 }
 
 function gType(d) {
-  if (d === '~' || d.startsWith('휴')) return 'rest';
+  if (d.startsWith('휴')) return 'rest';
   if (d.startsWith('대')) return 'standby';
-  const n = parseInt(d);
+  const n = parseInt(d);  // parseInt("86~") = 86, ~ 무시됨
   if (n >= 62 && n <= 91) return 'night';
   if (n >= 1 && n <= 44) return 'day';
   return 'rest';
 }
 
 function gSched(dia, date) {
-  if (dia === '~' || dia.startsWith('휴')) return null;
+  if (dia.startsWith('휴')) return null;
+  // ~ 접미사 제거 ("86~" → "86", "대63~" → "대63") — 스케줄 테이블 키에 ~ 없음
+  const key = dia.endsWith('~') ? dia.slice(0, -1) : dia;
   const h = isH(date);
   const tm = new Date(date);
   tm.setDate(tm.getDate() + 1);
@@ -74,15 +76,15 @@ function gSched(dia, date) {
     else if (!h && th) t = S.p_ordhol;
     else t = S.p_ordord;
   }
-  return t[dia] || null;
+  return t[key] || null;
 }
 
 function gLabel(d) {
-  if (d === '~') return '비순환';
   if (d.startsWith('휴')) return '비번';
-  if (d.startsWith('대')) return '대기';
+  if (d.startsWith('대')) return d.endsWith('~') ? '대기(잔여)' : '대기';
   const n = parseInt(d);
-  return n >= 62 ? '야간' : '주간';
+  if (n >= 62) return d.endsWith('~') ? '야간(잔여)' : '야간';
+  return d.endsWith('~') ? '주간(잔여)' : '주간';
 }
 
 function gTypeName(tp) {
@@ -967,7 +969,7 @@ function rHome() {
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
       <div class="wd-dow">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
-      <div class="wd-dia ${tt}">${di === '~' ? '-' : di}</div>
+      <div class="wd-dia ${tt}">${di}</div>
       ${tt === 'rest' ? '<div class="wd-time rest-label">비번</div>' : (timeStr ? `<div class="wd-time">${timeStr}</div>` : '')}
     </div>`;
   }
@@ -1791,7 +1793,7 @@ function rCal() {
     let di = '', dc = '';
     if (cur) {
       di = gDia(cur, dt);
-      if (di !== '~') dc = gType(di);
+      dc = gType(di);
     }
     let cls = 'cal-c';
     if (isT) cls += ' today';
@@ -1804,7 +1806,7 @@ function rCal() {
     const hasMemo = getMemo(memoKey);
     h += `<div class="${cls}" onclick="pickDate(${d})">
       <div class="cd">${d}</div>
-      ${di && di !== '~' ? `<div class="cdia ${dc}">${di}</div>` : ''}
+      ${di ? `<div class="cdia ${dc}">${di}</div>` : ''}
       ${hl && dw !== 0 ? '<div class="cal-hol-dot"></div>' : ''}
       ${hasMemo ? '<div class="cal-memo-dot"></div>' : ''}
     </div>`;
@@ -1842,7 +1844,7 @@ function rSchedDetail() {
     sh = `<div class="sd-body">
       <div class="sd-dia ${tp}">${dia}</div>
       <div class="sd-rest-text">
-        ${dia === '~' ? '비순환 (근무 없음)' : '비번'}
+        비번
       </div>
     </div>`;
   }
@@ -2511,7 +2513,7 @@ function filterList() {
 function rList(q) {
   const el = document.getElementById('mList');
   const qq = q.trim().toLowerCase();
-  const f = qq ? P.filter(p => p.n.toLowerCase().includes(qq)) : P.filter(p => p.d !== '~');
+  const f = qq ? P.filter(p => p.n.toLowerCase().includes(qq)) : P;
   f.sort((a, b) => a.n.localeCompare(b.n, 'ko'));
   let h = '';
   f.forEach(p => {

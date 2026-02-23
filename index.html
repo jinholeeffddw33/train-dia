@@ -390,9 +390,11 @@
 <script>
 // 스플래시 안전장치 — JS 로딩 실패해도 5초 후 무조건 닫힘
 setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.add('hide');document.body.classList.remove('splash-active');setTimeout(function(){s.remove()},600)}},5000);
+// SW 강제 업데이트
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(reg){reg.update()})});}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async></script>
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=52"></script>
+<script src="app.js?v=52"></script>
 </body>
 </html>

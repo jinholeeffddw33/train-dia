@@ -1,7 +1,10 @@
-// Cloudflare Worker — 서울교통공사 API HTTPS 프록시 (v2)
-// 두 가지 백엔드:
-//   /api/subway/  → swopenAPI.seoul.go.kr (실시간 도착정보 등)
-//   /api/opendata/ → openapi.seoul.go.kr:8088 (경로검색 등)
+// Cloudflare Worker — API HTTPS 프록시 (v3)
+// 세 가지 백엔드:
+//   /api/subway/  → swopenAPI.seoul.go.kr (실시간 도착정보)
+//   /api/opendata/ → openapi.seoul.go.kr:8088 (레거시 경로검색)
+//   /api/odsay/*   → api.odsay.com (ODsay 지하철 경로검색)
+
+const ODSAY_KEY = 'IzzA/5DUELruztg3iXTMeA';
 
 export default {
   async fetch(request) {
@@ -19,13 +22,19 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
     let target;
+    let extraHeaders = { 'Accept': 'application/json' };
 
-    if (path.startsWith('/api/opendata/')) {
-      // 경로검색(getShtrmPath) 등 — openapi.seoul.go.kr:8088
-      // /api/opendata/{KEY}/json/... → http://openapi.seoul.go.kr:8088/{KEY}/json/...
+    if (path.startsWith('/api/odsay/')) {
+      // ODsay 지하철 경로검색 — api.odsay.com
+      // /api/odsay/subwayPathSchedule?SID=230&EID=112&... → https://api.odsay.com/v1/api/subwayPathSchedule?...&apiKey=KEY
+      const apiPath = path.replace('/api/odsay/', '');
+      const params = new URLSearchParams(url.search);
+      params.set('apiKey', ODSAY_KEY);
+      target = 'https://api.odsay.com/v1/api/' + apiPath + '?' + params.toString();
+      extraHeaders['Referer'] = 'https://dia5.kr/';
+    } else if (path.startsWith('/api/opendata/')) {
       target = 'http://openapi.seoul.go.kr:8088' + path.replace('/api/opendata/', '/') + url.search;
     } else if (path.startsWith('/api/subway/')) {
-      // 실시간 도착정보 등 — swopenAPI.seoul.go.kr
       target = 'http://swopenAPI.seoul.go.kr' + path + url.search;
     } else {
       return new Response('Not Found', { status: 404 });
@@ -33,7 +42,7 @@ export default {
 
     try {
       const res = await fetch(target, {
-        headers: { 'Accept': 'application/json' },
+        headers: extraHeaders,
         cf: { cacheTtl: 20 }
       });
 

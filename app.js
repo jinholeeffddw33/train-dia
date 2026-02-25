@@ -1067,23 +1067,10 @@ function rHome() {
     </div>`;
   }
 
-  // D-Day 카운터 + 월간 요약
-  let ddayH = '';
-  if (!weekPreviewDate) {
-    const ddayResult = getDaysUntilRest(cur, today);
-    if (ddayResult !== null && ddayResult.days > 0) {
-      const ddayWord = gRestLabel(ddayResult.dia);
-      ddayH = `<div class="dday-pill">${ddayWord}까지 <strong>${ddayResult.days}일</strong></div>`;
-    } else if (ddayResult !== null && ddayResult.days === 0) {
-      const ddayWord = gRestLabel(ddayResult.dia);
-      ddayH = `<div class="dday-pill dday-today">${LABELS.TODAY} ${ddayWord} ${EMOJI.PARTY}</div>`;
-    }
-  }
-
   stEl.innerHTML = `<div class="status-bar">
     ${tmCard}
     ${afCard}
-  </div>${ddayH}<div id="monthSummaryWrap"></div>`;
+  </div><div id="monthSummaryWrap"></div>`;
   renderMonthSummary();
 }
 

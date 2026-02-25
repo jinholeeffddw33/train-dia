@@ -503,11 +503,9 @@ function renderRoute(sc) {
       <div class="rt-mid">${trains ? `<span class="rt-tn">${trains}</span>` : ''}</div>
       <span class="rt-arr">${seg.a || '-'}</span>
     </div>`;
-    // 교대 상대 표시 (인수/인계 방향 구분)
+    // 교대 상대 표시
     if (partners[i]) {
-      const p = partners[i];
-      const label = p.dir === 'in' ? `${p.name} → 인수` : `인계 → ${p.name}`;
-      html += `<div class="rt-partner">${label}</div>`;
+      html += `<div class="rt-partner">교대 <strong>${partners[i]}</strong></div>`;
     }
     html += '</div>';
 
@@ -529,7 +527,14 @@ function renderRoute(sc) {
   return html;
 }
 
-// 교대 상대 찾기 — 열차번호 우선, 시간 폴백
+// ===== 교대 상대 찾기 =====
+// 규칙 (사용자 확정):
+// - 1000번대(1xxx) 열차로 시작/끝나는 구간 → 교대 없음
+// - 교대는 항상 1:1
+// - 같은 열차번호 + 같은 시간대에서 교대
+// - UI 용어: "교대"로만 표기 (인수/인계 금지)
+function is1xxx(n) { return n >= 1000 && n < 2000; }
+
 function findExchangePartners(sc) {
   const partners = {};
   if (!sc || !sc.g || !cur) return partners;
@@ -537,25 +542,26 @@ function findExchangePartners(sc) {
 
   for (let i = 0; i < sc.g.length; i++) {
     const seg = sc.g[i];
-    // 인수: 2근무 이후 시작 — 누구에게서 받는가 (내 첫 열차 = 상대 마지막 열차)
-    if (i > 0 && seg.d) {
-      const firstTrain = seg.n && seg.n.length > 0 ? seg.n[0] : null;
-      const name = (firstTrain && findPartnerByTrain(firstTrain, date, 'last'))
-                || findPartnerByTime(seg.d, date, 'arrival');
-      if (name) { partners[i] = {name, dir: 'in'}; continue; }
+    if (!seg.n || seg.n.length === 0) continue;
+    const firstTrain = seg.n[0];
+    const lastTrain = seg.n[seg.n.length - 1];
+
+    // 구간 시작이 1xxx → 교대 없음 (특수 운행)
+    // 구간 끝이 1xxx → 교대 없음
+    // 그 외: 끝 열차번호로 다음 사람 찾기
+    if (!is1xxx(lastTrain)) {
+      const name = findPartnerByTrain(lastTrain, date, 'first');
+      if (name) { partners[i] = name; continue; }
     }
-    // 인계: 마지막이 아닌 세그먼트 — 누구에게 넘기는가 (내 마지막 열차 = 상대 첫 열차)
-    if (i < sc.g.length - 1 && seg.a) {
-      const lastTrain = seg.n && seg.n.length > 0 ? seg.n[seg.n.length - 1] : null;
-      const name = (lastTrain && findPartnerByTrain(lastTrain, date, 'first'))
-                || findPartnerByTime(seg.a, date, 'departure');
-      if (name) partners[i] = {name, dir: 'out'};
+    if (!is1xxx(firstTrain)) {
+      const name = findPartnerByTrain(firstTrain, date, 'last');
+      if (name) { partners[i] = name; continue; }
     }
   }
   return partners;
 }
 
-// 열차번호 기반 교대 상대 찾기 (정확도 높음)
+// 열차번호 기반 교대 상대 찾기
 function findPartnerByTrain(trainNum, date, pos) {
   // pos: 'first' = 상대 세그먼트 첫 열차, 'last' = 상대 세그먼트 마지막 열차
   for (let pi = 0; pi < P.length; pi++) {
@@ -571,32 +577,6 @@ function findPartnerByTrain(trainNum, date, pos) {
     }
   }
   return null;
-}
-
-// 시간 기반 교대 상대 찾기 (열차번호 매칭 실패 시 폴백)
-function findPartnerByTime(time, date, matchField) {
-  const mins = timeToMins(time);
-  if (mins < 0) return null;
-  let best = null, bestDiff = 4; // ±3분 이내 (기존 5→3으로 강화)
-
-  for (let pi = 0; pi < P.length; pi++) {
-    if (P[pi] === cur) continue;
-    const dia = gDia(P[pi], date);
-    const otherSc = gSched(dia, date);
-    if (!otherSc || !otherSc.g) continue;
-    for (let si = 0; si < otherSc.g.length; si++) {
-      const t = matchField === 'arrival' ? otherSc.g[si].a : otherSc.g[si].d;
-      if (!t) continue;
-      const tMins = timeToMins(t);
-      if (tMins < 0) continue;
-      const diff = Math.abs(tMins - mins);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        best = P[pi].n;
-      }
-    }
-  }
-  return best;
 }
 
 function calcWaitMin(arrTime, depTime) {

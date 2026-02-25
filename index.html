@@ -78,9 +78,9 @@
   </div>
   <!-- Alert Banner -->
   <div id="homeAlertBanner"></div>
+  <div id="homeWeek"></div>
   <div id="homeTodayCard"></div>
   <div id="homeRoute"></div>
-  <div id="homeWeek"></div>
   <div id="homeStatus"></div>
   <!-- 출퇴근 카드 -->
   <div class="hc-card" id="homeCommuteCard" onclick="openCommute()">
@@ -472,7 +472,7 @@
 <script>
 // 1회성 SW 핵 리셋 — 모든 캐시+SW 삭제 후 새로고침
 (function(){
-  if(localStorage.getItem('sw-reset-v91'))return;
+  if(localStorage.getItem('sw-reset-v92'))return;
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(function(regs){
       var p=regs.map(function(r){return r.unregister()});
@@ -482,7 +482,7 @@
     }).then(function(keys){
       return Promise.all(keys.map(function(k){return caches.delete(k)}));
     }).then(function(){
-      localStorage.setItem('sw-reset-v91','1');
+      localStorage.setItem('sw-reset-v92','1');
       location.reload();
     });
   }

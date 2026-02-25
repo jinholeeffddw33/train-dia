@@ -1249,21 +1249,9 @@ function showWeekPreview(dateStr) {
   } else {
     weekPreviewDate = dateStr;
   }
-
-  // 스크롤 앵커링: 주간탭 뷰포트 위치 고정 (카드 높이 변동 보정)
-  const weekEl = document.getElementById('homeWeek');
-  const topBefore = weekEl.getBoundingClientRect().top;
-
-  // 항상 동일 경로: 카드+라우트 교체 + 하이라이트 토글
+  // 주간탭이 카드 위에 있으므로 스크롤 앵커링 불필요
   updateCardOnly();
   updateWeekHighlight();
-
-  // 카드 높이 변동분만큼 스크롤 보정 → 주간탭 위치 고정
-  const topAfter = weekEl.getBoundingClientRect().top;
-  const drift = topAfter - topBefore;
-  if (Math.abs(drift) > 1) {
-    window.scrollBy(0, drift);
-  }
 }
 
 // 카드+라우트만 업데이트 (전체 리렌더 없이)
@@ -1374,14 +1362,9 @@ function resetToToday() {
   if (needFullRender) {
     rHomeKeepScroll(); // 주간 스트립 리빌드 필요
   } else {
-    // 스크롤 앵커링
-    const weekEl = document.getElementById('homeWeek');
-    const topBefore = weekEl.getBoundingClientRect().top;
+    // 주간탭이 카드 위에 있으므로 스크롤 앵커링 불필요
     updateCardOnly();
     updateWeekHighlight();
-    const topAfter = weekEl.getBoundingClientRect().top;
-    const drift = topAfter - topBefore;
-    if (Math.abs(drift) > 1) window.scrollBy(0, drift);
   }
 }
 

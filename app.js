@@ -503,9 +503,11 @@ function renderRoute(sc) {
       <div class="rt-mid">${trains ? `<span class="rt-tn">${trains}</span>` : ''}</div>
       <span class="rt-arr">${seg.a || '-'}</span>
     </div>`;
-    // 교대 상대 표시
+    // 교대 상대 표시 (인수/인계 방향 구분)
     if (partners[i]) {
-      html += `<div class="rt-partner">교대 · <strong>${partners[i]}</strong></div>`;
+      const p = partners[i];
+      const label = p.dir === 'in' ? `${p.name} → 인수` : `인계 → ${p.name}`;
+      html += `<div class="rt-partner">${label}</div>`;
     }
     html += '</div>';
 
@@ -527,7 +529,7 @@ function renderRoute(sc) {
   return html;
 }
 
-// 교대 상대 찾기 — 각 세그먼트 시작/종료 시간과 다른 사람의 세그먼트를 매칭
+// 교대 상대 찾기 — 열차번호 우선, 시간 폴백
 function findExchangePartners(sc) {
   const partners = {};
   if (!sc || !sc.g || !cur) return partners;
@@ -535,24 +537,47 @@ function findExchangePartners(sc) {
 
   for (let i = 0; i < sc.g.length; i++) {
     const seg = sc.g[i];
-    // 2근무 이후 시작 시 — 누구에게서 인수받는가
+    // 인수: 2근무 이후 시작 — 누구에게서 받는가 (내 첫 열차 = 상대 마지막 열차)
     if (i > 0 && seg.d) {
-      const name = findPartnerByTime(seg.d, date, 'arrival');
-      if (name) { partners[i] = name; continue; }
+      const firstTrain = seg.n && seg.n.length > 0 ? seg.n[0] : null;
+      const name = (firstTrain && findPartnerByTrain(firstTrain, date, 'last'))
+                || findPartnerByTime(seg.d, date, 'arrival');
+      if (name) { partners[i] = {name, dir: 'in'}; continue; }
     }
-    // 마지막 세그먼트가 아닌 경우 — 도착 시 누구에게 인계하는가
+    // 인계: 마지막이 아닌 세그먼트 — 누구에게 넘기는가 (내 마지막 열차 = 상대 첫 열차)
     if (i < sc.g.length - 1 && seg.a) {
-      const name = findPartnerByTime(seg.a, date, 'departure');
-      if (name) partners[i] = name;
+      const lastTrain = seg.n && seg.n.length > 0 ? seg.n[seg.n.length - 1] : null;
+      const name = (lastTrain && findPartnerByTrain(lastTrain, date, 'first'))
+                || findPartnerByTime(seg.a, date, 'departure');
+      if (name) partners[i] = {name, dir: 'out'};
     }
   }
   return partners;
 }
 
+// 열차번호 기반 교대 상대 찾기 (정확도 높음)
+function findPartnerByTrain(trainNum, date, pos) {
+  // pos: 'first' = 상대 세그먼트 첫 열차, 'last' = 상대 세그먼트 마지막 열차
+  for (let pi = 0; pi < P.length; pi++) {
+    if (P[pi] === cur) continue;
+    const dia = gDia(P[pi], date);
+    const otherSc = gSched(dia, date);
+    if (!otherSc || !otherSc.g) continue;
+    for (let si = 0; si < otherSc.g.length; si++) {
+      const ns = otherSc.g[si].n;
+      if (!ns || ns.length === 0) continue;
+      const target = pos === 'first' ? ns[0] : ns[ns.length - 1];
+      if (target === trainNum) return P[pi].n;
+    }
+  }
+  return null;
+}
+
+// 시간 기반 교대 상대 찾기 (열차번호 매칭 실패 시 폴백)
 function findPartnerByTime(time, date, matchField) {
   const mins = timeToMins(time);
   if (mins < 0) return null;
-  let best = null, bestDiff = 6; // ±5분 이내
+  let best = null, bestDiff = 4; // ±3분 이내 (기존 5→3으로 강화)
 
   for (let pi = 0; pi < P.length; pi++) {
     if (P[pi] === cur) continue;

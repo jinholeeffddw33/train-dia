@@ -179,6 +179,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .home-select-btn:active { background: rgba(255,255,255,.3); transform: scale(.97); }
 
 /* ===== TODAY CARD ===== */
+#homeTodayCard {
+  /* 카드 높이 변동에 의한 주간탭 위치 점프 방지 */
+  min-height: 200px;
+}
 .today-card {
   margin: 12px 16px 0; background: var(--white);
   border-radius: var(--radius); box-shadow: var(--shadow2);
@@ -392,10 +396,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .week-day {
   display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start;
   padding: 10px 2px 8px; border-radius: var(--radius-sm);
   background: var(--white); border: 2px solid transparent;
   box-shadow: var(--shadow3);
   transition: transform .15s, box-shadow .15s; cursor: pointer;
+  /* 모든 버튼 동일 높이 (wd-time 유무 관계없이) */
+  min-height: 92px;
 }
 .week-day:active { transform: scale(.95); }
 .week-day.is-today {

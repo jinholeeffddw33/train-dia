@@ -985,7 +985,7 @@ function rHome() {
       <div class="wd-dow${holiday ? ' wd-dow-hol' : ''}">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
       <div class="wd-dia ${tt}${di.startsWith('휴') ? ' off' : ''}">${gDiaDisplay(di)}</div>
-      ${tt !== 'rest' && timeStr ? `<div class="wd-time">${timeStr}</div>` : ''}
+      <div class="wd-time">${tt !== 'rest' && timeStr ? timeStr : '\u00A0'}</div>
     </div>`;
   }
   wh += '</div>';
@@ -1244,9 +1244,21 @@ function showWeekPreview(dateStr) {
   } else {
     weekPreviewDate = dateStr;
   }
+
+  // 스크롤 앵커링: 주간탭 뷰포트 위치 고정 (카드 높이 변동 보정)
+  const weekEl = document.getElementById('homeWeek');
+  const topBefore = weekEl.getBoundingClientRect().top;
+
   // 항상 동일 경로: 카드+라우트 교체 + 하이라이트 토글
   updateCardOnly();
   updateWeekHighlight();
+
+  // 카드 높이 변동분만큼 스크롤 보정 → 주간탭 위치 고정
+  const topAfter = weekEl.getBoundingClientRect().top;
+  const drift = topAfter - topBefore;
+  if (Math.abs(drift) > 1) {
+    window.scrollBy(0, drift);
+  }
 }
 
 // 카드+라우트만 업데이트 (전체 리렌더 없이)
@@ -1357,8 +1369,14 @@ function resetToToday() {
   if (needFullRender) {
     rHomeKeepScroll(); // 주간 스트립 리빌드 필요
   } else {
+    // 스크롤 앵커링
+    const weekEl = document.getElementById('homeWeek');
+    const topBefore = weekEl.getBoundingClientRect().top;
     updateCardOnly();
     updateWeekHighlight();
+    const topAfter = weekEl.getBoundingClientRect().top;
+    const drift = topAfter - topBefore;
+    if (Math.abs(drift) > 1) window.scrollBy(0, drift);
   }
 }
 

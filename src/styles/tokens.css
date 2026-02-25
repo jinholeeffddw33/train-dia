@@ -1,0 +1,140 @@
+/* ==========================================
+   Train DIA Design Tokens v2.0
+   단일 진실 원천 (SSOT) — 모든 색/간격/라운드/그림자
+   ========================================== */
+
+:root {
+  /* ========================================
+     Color Palette
+     ======================================== */
+  --dia-blue: #1A56DB;
+  --dia-blue-light: #3B82F6;
+  --dia-green: #10B981;
+  --dia-green-light: #34D399;
+  --dia-purple: #8B5CF6;
+  --dia-purple-light: #A78BFA;
+  --dia-orange: #F59E0B;
+  --dia-orange-light: #FBBF24;
+  --dia-red: #EF4444;
+  --dia-red-light: #FB7185;
+  --dia-gray: #6B7280;
+  --dia-gray-light: #9CA3AF;
+  --dia-sky: #38BDF8;
+
+  /* ========================================
+     Background & Surface
+     ======================================== */
+  --dia-bg: #F0F2F5;
+  --dia-surface: #FFFFFF;
+  --dia-surface-elevated: #FFFFFF;
+  --dia-surface-hover: #F9FAFB;
+
+  /* ========================================
+     Text
+     ======================================== */
+  --dia-text-primary: #111827;
+  --dia-text-secondary: #4B5563;
+  --dia-text-tertiary: #9CA3AF;
+
+  /* ========================================
+     Border
+     ======================================== */
+  --dia-border: #E5E7EB;
+  --dia-border-light: #F3F4F6;
+
+  /* ========================================
+     Spacing (4px grid)
+     ======================================== */
+  --dia-space-1: 4px;
+  --dia-space-2: 8px;
+  --dia-space-3: 12px;
+  --dia-space-4: 16px;
+  --dia-space-5: 20px;
+  --dia-space-6: 24px;
+  --dia-space-8: 32px;
+  --dia-space-10: 40px;
+  --dia-space-12: 48px;
+
+  /* ========================================
+     Border Radius
+     ======================================== */
+  --dia-radius-sm: 6px;
+  --dia-radius-md: 10px;
+  --dia-radius-lg: 14px;
+  --dia-radius-xl: 18px;
+  --dia-radius-full: 9999px;
+
+  /* ========================================
+     Shadow
+     ======================================== */
+  --dia-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --dia-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+  --dia-shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+
+  /* ========================================
+     Typography
+     ======================================== */
+  --dia-font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --dia-text-xs: 11px;
+  --dia-text-sm: 13px;
+  --dia-text-base: 15px;
+  --dia-text-lg: 17px;
+  --dia-text-xl: 20px;
+  --dia-text-2xl: 24px;
+  --dia-text-3xl: 30px;
+
+  /* ========================================
+     Z-Index Layer System (SSOT)
+     ======================================== */
+  --dia-layer-base: 0;
+  --dia-layer-sticky: 10;
+  --dia-layer-dropdown: 20;
+  --dia-layer-fixed: 30;
+  --dia-layer-overlay: 50;
+  --dia-layer-modal: 100;
+  --dia-layer-toast: 200;
+  --dia-layer-critical: 9999;
+
+  /* ========================================
+     Tab Bar
+     ======================================== */
+  --dia-tab-height: 72px;
+
+  /* ========================================
+     Tab Colors (각 페이지 고유 컬러)
+     ======================================== */
+  --dia-tab-home: var(--dia-blue);
+  --dia-tab-calendar: var(--dia-green);
+  --dia-tab-line: var(--dia-purple);
+  --dia-tab-compare: var(--dia-orange);
+  --dia-tab-contacts: var(--dia-sky);
+  --dia-tab-more: var(--dia-gray);
+
+  /* ========================================
+     Transition
+     ======================================== */
+  --dia-transition-fast: 150ms;
+  --dia-transition-normal: 250ms;
+  --dia-transition-slow: 350ms;
+}
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+:root.dark {
+  --dia-bg: #0F172A;
+  --dia-surface: #1E293B;
+  --dia-surface-elevated: #273549;
+  --dia-surface-hover: #334155;
+
+  --dia-text-primary: #F1F5F9;
+  --dia-text-secondary: #94A3B8;
+  --dia-text-tertiary: #64748B;
+
+  --dia-border: rgba(255,255,255,0.1);
+  --dia-border-light: rgba(255,255,255,0.05);
+
+  --dia-shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --dia-shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+  --dia-shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+}

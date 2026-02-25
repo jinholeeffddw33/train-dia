@@ -1,0 +1,29 @@
+{
+  "name": "train-dia",
+  "version": "2.0.0",
+  "private": true,
+  "description": "답십리 기관사 DIA — 서울교통공사 5호선 교번 관리 시스템",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@supabase/supabase-js": "^2.47.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/node": "^22.0.0",
+    "vitest": "^2.1.0",
+    "@vitejs/plugin-react": "^4.3.0"
+  }
+}

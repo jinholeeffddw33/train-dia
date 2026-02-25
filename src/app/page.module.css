@@ -1,0 +1,194 @@
+/* ===== Home Page ===== */
+
+.main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--dia-space-4);
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--dia-space-6);
+}
+
+.title {
+  font-size: var(--dia-text-2xl);
+  font-weight: 700;
+  color: var(--dia-blue);
+}
+
+.date {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+/* 기관사 선택 */
+.selectorBtn {
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+  text-align: left;
+  margin-bottom: var(--dia-space-4);
+  box-shadow: var(--dia-shadow-sm);
+  min-height: 44px;
+}
+
+.selectorList {
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-4);
+  box-shadow: var(--dia-shadow-md);
+}
+
+.personItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border-light);
+  min-height: 44px;
+  color: var(--dia-text-primary);
+  text-align: left;
+}
+.personItem:last-child {
+  border-bottom: none;
+}
+.personItem:hover {
+  background: var(--dia-surface-hover);
+}
+
+.personNum {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  min-width: 32px;
+}
+
+.personName {
+  font-size: var(--dia-text-base);
+  font-weight: 500;
+}
+
+/* 교번 카드 */
+.card {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-5);
+  box-shadow: var(--dia-shadow-md);
+}
+
+.cardHeader {
+  margin-bottom: var(--dia-space-3);
+}
+
+.cardLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-weight: 600;
+}
+
+.diaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-4);
+}
+
+.diaBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  color: #fff;
+  font-size: var(--dia-text-xl);
+  font-weight: 700;
+}
+
+.diaType {
+  font-size: var(--dia-text-lg);
+  color: var(--dia-text-secondary);
+  font-weight: 500;
+}
+
+/* 스케줄 */
+.scheduleInfo {
+  padding-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.timeRow {
+  display: flex;
+  gap: var(--dia-space-4);
+  flex-wrap: wrap;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.route {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  word-break: keep-all;
+}
+
+/* 배너 */
+.banner {
+  margin-top: var(--dia-space-4);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  text-align: center;
+}
+
+.banner_working {
+  background: rgba(26, 86, 219, 0.1);
+  color: var(--dia-blue);
+}
+
+.banner_done {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--dia-green);
+}
+
+.banner_preparing {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--dia-orange);
+}
+
+.banner_idle {
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+}
+
+/* 빈 상태 */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-6);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-base);
+  white-space: pre-line;
+}

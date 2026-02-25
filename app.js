@@ -847,7 +847,7 @@ function tick() {
   const de = document.getElementById('homeDate');
   const te = document.getElementById('homeTime');
   const se = document.getElementById('homeSec');
-  if (de) de.textContent = `${n.getFullYear()}년 ${n.getMonth() + 1}월 ${n.getDate()}일 ${DOW[n.getDay()]}요일`;
+  if (de) de.textContent = `${n.getMonth() + 1}/${n.getDate()} ${DOW[n.getDay()]}요일`;
   if (te) {
     const h = n.getHours(), ap = h < 12 ? '오전' : '오후', h12 = h % 12 || 12;
     const ape = document.getElementById('homeAmpm');

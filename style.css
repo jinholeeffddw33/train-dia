@@ -129,44 +129,49 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 /* ===== HOME TOP ===== */
 .home-top {
   background: linear-gradient(160deg, #0F3490 0%, #1A56DB 50%, #2B6EE8 100%);
-  color: #fff; padding: 20px 20px 22px; position: relative; overflow: hidden;
+  color: #fff; padding: 16px 20px 14px; position: relative; overflow: hidden;
 }
 .home-top::after {
-  content: ''; position: absolute; right: -50px; top: -50px;
-  width: 200px; height: 200px; border-radius: 50%;
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 150px; height: 150px; border-radius: 50%;
   background: rgba(255,255,255,.05);
 }
 .home-top::before {
-  content: ''; position: absolute; right: 30px; bottom: -70px;
-  width: 160px; height: 160px; border-radius: 50%;
+  content: ''; position: absolute; right: 20px; bottom: -50px;
+  width: 120px; height: 120px; border-radius: 50%;
   background: rgba(255,255,255,.03);
 }
 .home-org {
   font-size: 11px; font-weight: 600; opacity: .55;
   letter-spacing: 1.5px; text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
-.home-greeting { font-size: 14px; opacity: .75; font-weight: 400; margin-bottom: 0; }
-.home-name { font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.3px; }
+.home-top-row {
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.home-top-left { flex: 1; min-width: 0; }
+.home-top-right { text-align: right; flex-shrink: 0; }
+.home-name { font-size: 22px; font-weight: 800; margin-bottom: 2px; letter-spacing: -.3px; }
 .home-name-link { cursor: pointer; }
 .home-name-arrow { opacity: .6; font-size: 18px; }
-.home-date-row { font-size: 14px; font-weight: 500; opacity: .85; margin-bottom: 4px; }
-.home-ampm {
-  font-size: 26px; font-weight: 800; line-height: 1.2;
-  color: #fff;
-}
-.home-clock-row {
-  display: flex; align-items: baseline; gap: 0;
+.home-greeting { font-size: 14px; opacity: .65; font-weight: 400; }
+.home-date-short { font-size: 14px; font-weight: 500; opacity: .8; margin-bottom: 4px; }
+.home-clock-compact {
+  display: flex; align-items: baseline; justify-content: flex-end;
   white-space: nowrap;
 }
+.home-ampm {
+  font-size: 20px; font-weight: 800; line-height: 1;
+  color: #fff; margin-right: 4px;
+}
 .home-time-big {
-  font-size: clamp(42px, 11vw, 56px); font-weight: 900; letter-spacing: -2px;
+  font-size: clamp(36px, 10vw, 48px); font-weight: 900; letter-spacing: -2px;
   line-height: 1; font-variant-numeric: tabular-nums;
 }
 .home-time-sec {
-  font-size: clamp(24px, 6vw, 32px); font-weight: 700; opacity: .65;
+  font-size: clamp(20px, 5vw, 26px); font-weight: 700; opacity: .65;
   font-variant-numeric: tabular-nums;
-  margin-left: 2px;
+  margin-left: 1px;
 }
 .home-select-btn {
   display: inline-flex; align-items: center; gap: 8px;

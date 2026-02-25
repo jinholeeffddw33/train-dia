@@ -410,6 +410,7 @@ function getBlockDir(blockSegs) {
 }
 
 // 현재 시각 기준 활성 블록 결정 (교대 시각에 전환)
+// 출근 시각 기준 선형화: 자정 넘김(야간 2근무→3근무→4근무) 완전 처리
 function getActiveBlock(changeTimes, startTime) {
   if (!changeTimes.length) return 0;
   var now = new Date();
@@ -417,15 +418,13 @@ function getActiveBlock(changeTimes, startTime) {
   var sClean = (startTime || '06:00').replace('기', '');
   var sp = sClean.split(':');
   var startMins = (parseInt(sp[0]) || 0) * 60 + (parseInt(sp[1]) || 0);
+  // 출근 시각 기준으로 선형화 — 자정 넘김 시 +1440
+  var nowLinear = nowMins >= startMins ? nowMins : nowMins + 1440;
   for (var i = changeTimes.length - 1; i >= 0; i--) {
     var cp = changeTimes[i].split(':');
     var cMins = (parseInt(cp[0]) || 0) * 60 + (parseInt(cp[1]) || 0);
-    // 야간 근무: 출근 > 교대 (자정 넘김)
-    if (startMins > cMins) {
-      if (nowMins >= cMins && nowMins < startMins) return i + 1;
-    } else {
-      if (nowMins >= cMins) return i + 1;
-    }
+    var cLinear = cMins >= startMins ? cMins : cMins + 1440;
+    if (nowLinear >= cLinear) return i + 1;
   }
   return 0;
 }

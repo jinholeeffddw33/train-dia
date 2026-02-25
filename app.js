@@ -1174,18 +1174,18 @@ function initWeekSwipe() {
 }
 
 // ===== WEEK PREVIEW =====
+// 모든 요일 탭은 동일 경로로 처리 (렉/불일치 방지)
 function showWeekPreview(dateStr) {
   const today = td();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  if (dateStr === todayStr && !weekPreviewDate) {
-    return;
-  }
+
   if (dateStr === todayStr) {
-    resetToToday();
-    return;
+    if (!weekPreviewDate) return; // 이미 오늘 표시 중
+    weekPreviewDate = null; // 미리보기 해제 → 오늘로
+  } else {
+    weekPreviewDate = dateStr;
   }
-  weekPreviewDate = dateStr;
-  // 카드+라우트만 업데이트 (주간 스트립은 하이라이트만 교체)
+  // 항상 동일 경로: 카드+라우트 교체 + 하이라이트 토글
   updateCardOnly();
   updateWeekHighlight();
 }
@@ -1292,9 +1292,15 @@ function rHomeKeepScroll() {
 
 function resetToToday() {
   if (!weekPreviewDate && weekOffset === 0) return;
+  const needFullRender = weekOffset !== 0; // 주 전환 시에만 풀 렌더
   weekPreviewDate = null;
   weekOffset = 0;
-  rHomeKeepScroll();
+  if (needFullRender) {
+    rHomeKeepScroll(); // 주간 스트립 리빌드 필요
+  } else {
+    updateCardOnly();
+    updateWeekHighlight();
+  }
 }
 
 // 페이지 복귀 시 미리보기 자동 해제

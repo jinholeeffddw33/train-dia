@@ -9,8 +9,8 @@ const TRAIN_POLL_MS = 120000; // 2분 간격 폴링
 // ===== DISPLAY CONSTANTS (SSOT — 하드코딩 방지) =====
 const LABELS = {
   START: '출근', END: '퇴근', WORK_TIME: '근무시간',
-  DEPART: '출발', NEXT_DEPART: '다음 출발',
-  WORK_DONE: '근무 종료', GOOD_JOB: '수고하셨습니다',
+  DEPART: '출발', NEXT_SHIFT: '다음 근무', GO_WORK: '출근',
+  WORK_DONE: '오늘 근무 끝!', GOOD_JOB: '수고 많으셨습니다',
   TODAY_DONE: '오늘 근무 완료', NEXT_WORK: '다음 근무',
   DAY_WORK: '주간 근무', NIGHT_WORK: '야간 근무', STANDBY_WORK: '대기 근무',
   WORK: '근무', STANDBY: '대기', DAY: '주간', NIGHT: '야간',
@@ -673,43 +673,39 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
   const bState = bannerState || { state: 'working' };
 
   if (bState.state === 'done' && bState.next) {
-    // === STATE 2: 근무 종료 (퇴근 후 2시간 이내) ===
+    // === STATE 2: 근무 종료 (퇴근 후 1시간 이내) ===
     const ns = bState.next;
     const nextTime = ns.schedule ? ns.schedule.s : '';
     const nextDir = ns.schedule ? getRouteDirection(ns.schedule.m) : null;
-    const nextDirText = nextDir
-      ? dirShort(nextDir.dir)
-      : '';
+    const nextDirText = nextDir ? dirShort(nextDir.dir) : '';
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
-    const daysText = ns.daysAhead === 1 ? '내일' : (ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
+    const daysText = ns.daysAhead === 1 ? '내일' : (ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '오늘');
 
     bannerHtml += `<div class="rv-depart rv-done">`;
     bannerHtml += `<div class="rv-depart-dir">${LABELS.WORK_DONE}</div>`;
     bannerHtml += `<div class="rv-depart-sub">${LABELS.GOOD_JOB}</div>`;
     if (nextTime) {
       bannerHtml += `<div class="rv-depart-next">`;
-      bannerHtml += `${LABELS.NEXT_DEPART} ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      bannerHtml += `${LABELS.NEXT_SHIFT} ${daysText} ${nextTime} ${nextDirText}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }
     bannerHtml += `</div>`;
 
   } else if (bState.state === 'idle') {
-    // === STATE 3: 오늘 근무 완료 (퇴근 후 2시간 이후, 차분) ===
+    // === STATE 3: 오늘 근무 완료 (퇴근 후 1시간 이후, 차분) ===
     const ns = bState.next;
     const nextTime = ns && ns.schedule ? ns.schedule.s : '';
     const nextDir = ns && ns.schedule ? getRouteDirection(ns.schedule.m) : null;
-    const nextDirText = nextDir
-      ? dirShort(nextDir.dir)
-      : '';
+    const nextDirText = nextDir ? dirShort(nextDir.dir) : '';
     const timeUntil = bState.minsUntil ? formatTimeUntil(bState.minsUntil) : '';
-    const daysText = ns && ns.daysAhead === 1 ? '내일' : (ns && ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '');
+    const daysText = ns && ns.daysAhead === 1 ? '내일' : (ns && ns.daysAhead > 1 ? ns.daysAhead + '일 후' : '오늘');
 
     bannerHtml += `<div class="rv-depart rv-idle">`;
     bannerHtml += `<div class="rv-depart-dir">${LABELS.TODAY_DONE}</div>`;
     if (nextTime) {
       bannerHtml += `<div class="rv-depart-next">`;
-      bannerHtml += `${LABELS.NEXT_DEPART} ${daysText ? daysText + ' ' : ''}${nextTime} ${nextDirText}`;
+      bannerHtml += `${LABELS.NEXT_SHIFT} ${daysText} ${nextTime} ${nextDirText}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }
@@ -729,7 +725,7 @@ function renderRouteVisual(m, startTime, endTime, bannerState, segments) {
     bannerHtml += `<div class="rv-depart-dir">${LABELS.NEXT_WORK} · ${nextDirLabel}</div>`;
     bannerHtml += `<div class="rv-depart-sub">${nextDirSub}</div>`;
     if (nextTime) {
-      bannerHtml += `<div class="rv-depart-time">${LABELS.DEPART} ${nextTime}`;
+      bannerHtml += `<div class="rv-depart-time">${LABELS.GO_WORK} ${nextTime}`;
       if (timeUntil) bannerHtml += ` <span class="rv-depart-until">(${timeUntil})</span>`;
       bannerHtml += `</div>`;
     }

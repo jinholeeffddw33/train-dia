@@ -942,6 +942,7 @@ function rHome() {
       </div>
     </div>`;
     infoH += bannerH;
+    if (!weekPreviewDate) infoH += renderAlarmInfo(sc);
   } else {
     const restWord = gRestLabel(dia);
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
@@ -1312,6 +1313,7 @@ function updateCardOnly() {
       </div>
     </div>`;
     infoH += bannerH;
+    if (!weekPreviewDate) infoH += renderAlarmInfo(sc);
   } else {
     const restWord = gRestLabel(dia);
     const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
@@ -1909,11 +1911,18 @@ function sendNotification(title, body) {
   }
 }
 
-// ===== DEPARTURE ALARM (2근무/3근무 출발 20분 전) =====
+// ===== DEPARTURE ALARM =====
+// 2근무부터 적용: 5xxx 시작 열차 → 20분 전, 1xxx 시작 열차 → 1시간 전
 let departAlarmTimers = [];
 
+function getAlarmMinutes(firstTrain) {
+  // 1xxx(1000번대) 열차로 시작 → 1시간 전 알람
+  if (firstTrain >= 1000 && firstTrain < 2000) return 60;
+  // 그 외(5xxx 등) → 20분 전 알람
+  return 20;
+}
+
 function setupDepartureAlarms() {
-  // 기존 타이머 전부 해제
   departAlarmTimers.forEach(t => clearTimeout(t));
   departAlarmTimers = [];
 
@@ -1926,33 +1935,81 @@ function setupDepartureAlarms() {
   if (!sc || !sc.g || sc.g.length < 2) return;
 
   const now = new Date();
-  const ALARM_BEFORE_MS = 20 * 60 * 1000; // 20분
 
-  // 2근무(g[1]), 3근무(g[2]) 등 — 첫 번째(1근무)는 제외
+  // 2근무(g[1])부터 — 1근무(g[0])는 알람 없음
   for (let i = 1; i < sc.g.length; i++) {
     const seg = sc.g[i];
-    if (!seg.d) continue;
+    if (!seg.d || !seg.n || !seg.n.length) continue;
+
+    const firstTrain = seg.n[0];
+    const alarmMins = getAlarmMinutes(firstTrain);
+    const alarmBeforeMs = alarmMins * 60 * 1000;
+
     const [hh, mm] = seg.d.split(':').map(Number);
     const departDate = new Date(today);
     departDate.setHours(hh, mm, 0, 0);
     // 야간(자정 넘김) 보정
-    if (departDate < today) departDate.setDate(departDate.getDate() + 1);
+    if (departDate < now && hh < 12) departDate.setDate(departDate.getDate() + 1);
 
-    const alarmTime = departDate.getTime() - ALARM_BEFORE_MS;
+    const alarmTime = departDate.getTime() - alarmBeforeMs;
     const delay = alarmTime - now.getTime();
 
     if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
       const segNum = i + 1;
       const timer = setTimeout(() => {
         sendNotification(
-          `${segNum}근무 출발 20분 전`,
+          `${segNum}근무 출발 ${alarmMins}분 전`,
           `${seg.d} 출발 · ${cur.n}님 준비하세요`
         );
-        showToast(`${segNum}근무 출발 20분 전 ⏰`);
+        showToast(`${segNum}근무 출발 ${alarmMins}분 전`);
       }, delay);
       departAlarmTimers.push(timer);
     }
   }
+}
+
+// 알람 정보 HTML 생성 (홈 카드 내 표시)
+function renderAlarmInfo(sc) {
+  if (!sc || !sc.g || sc.g.length < 2) return '';
+  if (!('Notification' in window)) return '';
+  const perm = Notification.permission;
+
+  // 알림 미허용 시 유도 배너
+  if (perm !== 'granted') {
+    return `<div class="alarm-info alarm-info-ask" onclick="requestNotiFromSetting()">
+      <span class="alarm-bell">🔕</span>
+      <span class="alarm-text">알림을 허용하면 근무 출발 전 알려드려요</span>
+      <span class="alarm-action">허용 ›</span>
+    </div>`;
+  }
+
+  // 다음 알람 찾기
+  const now = new Date();
+  const today = td();
+  let nextAlarm = null;
+
+  for (let i = 1; i < sc.g.length; i++) {
+    const seg = sc.g[i];
+    if (!seg.d || !seg.n || !seg.n.length) continue;
+    const alarmMins = getAlarmMinutes(seg.n[0]);
+    const [hh, mm] = seg.d.split(':').map(Number);
+    const departDate = new Date(today);
+    departDate.setHours(hh, mm, 0, 0);
+    if (departDate < now && hh < 12) departDate.setDate(departDate.getDate() + 1);
+    const alarmTime = new Date(departDate.getTime() - alarmMins * 60 * 1000);
+    if (alarmTime > now) {
+      const ah = String(alarmTime.getHours()).padStart(2, '0');
+      const am = String(alarmTime.getMinutes()).padStart(2, '0');
+      nextAlarm = { segNum: i + 1, departTime: seg.d, alarmMins, alarmTimeStr: `${ah}:${am}` };
+      break;
+    }
+  }
+
+  if (!nextAlarm) return '';
+  return `<div class="alarm-info">
+    <span class="alarm-bell">🔔</span>
+    <span class="alarm-text">${nextAlarm.segNum}근무 알람 ${nextAlarm.alarmTimeStr} <span class="alarm-sub">(출발 ${nextAlarm.alarmMins}분 전)</span></span>
+  </div>`;
 }
 
 // ===== PWA INSTALL =====
@@ -2856,17 +2913,32 @@ function backToSopList() {
 }
 
 // ===== MODAL =====
+var modalScrollY = 0;
+function lockBody() {
+  modalScrollY = window.scrollY;
+  document.body.classList.add('modal-open');
+  document.body.style.top = `-${modalScrollY}px`;
+}
+function unlockBody() {
+  document.body.classList.remove('modal-open');
+  document.body.style.top = '';
+  window.scrollTo(0, modalScrollY);
+}
+
 function openModal(t) {
   mTarget = t;
   document.getElementById('mSearch').value = '';
   rList('');
   document.getElementById('modalBg').classList.add('open');
+  lockBody();
   setTimeout(() => document.getElementById('mSearch').focus(), 300);
 }
 
 function closeModal(e) {
-  if (e.target === e.currentTarget)
+  if (e.target === e.currentTarget) {
     document.getElementById('modalBg').classList.remove('open');
+    unlockBody();
+  }
 }
 
 function filterList() {
@@ -2918,6 +2990,7 @@ function pick(id) {
     rCmp();
   }
   document.getElementById('modalBg').classList.remove('open');
+  unlockBody();
 }
 
 // ===== DARK MODE =====

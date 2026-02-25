@@ -56,7 +56,7 @@ let cur = null, calY, calM, selDate, c1 = null, c2 = null, cmpY, cmpM;
 let mTarget = 'home', sopIdx = -1;
 let alerts = [], alertSeverity = 'high', lineBranch = 'main';
 let weekPreviewDate = null; // null = showing today
-let weekOffset = 0; // 0 = 이번주, 1 = 다음주
+// weekOffset 제거됨 — 14일 연속 스크롤로 전환
 let trainData = [], trainTimer = null;
 let lineViewMode = 'list', lastTrainFetch = 0, updateCounterTimer = null;
 
@@ -968,25 +968,22 @@ function rHome() {
     rtEl.innerHTML = '';
   }
 
-  // Week strip with navigation (이번주 + 다음주)
+  // Week strip — 14일 연속 가로 스크롤 (이번주 + 다음주)
   const we = document.getElementById('homeWeek');
-  const weekLabel = weekOffset === 0 ? LABELS.WEEK_WORK : LABELS.NEXT_WEEK_WORK;
   let wh = `<div class="week-nav">
-    <button class="week-nav-btn${weekOffset === 0 ? ' disabled' : ''}" type="button" onclick="changeWeekOffset(-1)" ${weekOffset === 0 ? 'disabled' : ''}>‹</button>
-    <span class="week-nav-label">${weekLabel}</span>
-    <button class="week-nav-btn${weekOffset >= 1 ? ' disabled' : ''}" type="button" onclick="changeWeekOffset(1)" ${weekOffset >= 1 ? 'disabled' : ''}>›</button>
+    <span class="week-nav-label">${LABELS.WEEK_WORK}</span>
   </div><div class="week-strip" id="weekStrip">`;
   const todayD = today.getDay();
   const weekStart = new Date(today);
-  weekStart.setDate(weekStart.getDate() - todayD + (weekOffset * 7));
+  weekStart.setDate(weekStart.getDate() - todayD); // 이번주 일요일
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 14; i++) {
     const d = new Date(weekStart);
     d.setDate(d.getDate() + i);
     const di = gDia(cur, d), tt = gType(di), isT = d.getTime() === today.getTime();
     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isPreview = weekPreviewDate === dateStr;
-    const holiday = isH(d); // 토/일/공휴일
+    const holiday = isH(d);
     const ss = gSched(di, d);
     let timeStr = '';
     if (ss && ss.s && !ss.s.startsWith('대') && ss.s !== '대휴') {
@@ -997,7 +994,7 @@ function rHome() {
     else if (isT && !weekPreviewDate) cls += ' is-today';
     if (holiday && !isT && !isPreview) cls += ' is-holiday';
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
-      <div class="wd-dow${holiday ? ' wd-dow-hol' : ''}">${DOW[i]}</div>
+      <div class="wd-dow${holiday ? ' wd-dow-hol' : ''}">${DOW[d.getDay()]}</div>
       <div class="wd-date">${d.getDate()}</div>
       <div class="wd-dia ${tt}${di.startsWith('휴') ? ' off' : ''}">${gDiaDisplay(di)}</div>
       <div class="wd-time">${tt !== 'rest' && timeStr ? timeStr : '\u00A0'}</div>
@@ -1005,7 +1002,7 @@ function rHome() {
   }
   wh += '</div>';
   we.innerHTML = wh;
-  initWeekSwipe();
+  scrollWeekToToday();
 
   // Status cards — 내일 근무 + 교번 구성
   const stEl = document.getElementById('homeStatus');
@@ -1148,90 +1145,16 @@ function getMonthSummary(person, year, month) {
   return { dayWork, nightWork, dayStandby, nightStandby };
 }
 
-// ===== WEEK NAVIGATION (이번주/다음주) =====
-function changeWeekOffset(delta) {
-  const next = weekOffset + delta;
-  if (next < 0 || next > 1) return;
+// ===== WEEK STRIP — 오늘 위치로 스크롤 =====
+function scrollWeekToToday() {
   const strip = document.getElementById('weekStrip');
-  const dir = delta > 0 ? 'left' : 'right';
-  // 슬라이드 아웃
-  if (strip) {
-    strip.style.transition = 'transform .18s ease, opacity .18s ease';
-    strip.style.transform = dir === 'left' ? 'translateX(-40px)' : 'translateX(40px)';
-    strip.style.opacity = '0';
+  if (!strip) return;
+  const todayEl = strip.querySelector('.is-today') || strip.querySelector('.is-preview');
+  if (todayEl) {
+    // 오늘을 스트립 왼쪽에서 약간 안쪽에 배치
+    const targetScroll = todayEl.offsetLeft - 12;
+    strip.scrollLeft = Math.max(0, targetScroll);
   }
-  setTimeout(function() {
-    weekOffset = next;
-    weekPreviewDate = null;
-    const scrollY = window.scrollY;
-    rHome();
-    renderHomeExtras();
-    window.scrollTo(0, scrollY);
-    // 슬라이드 인
-    const newStrip = document.getElementById('weekStrip');
-    if (newStrip) {
-      newStrip.style.transition = 'none';
-      newStrip.style.transform = dir === 'left' ? 'translateX(40px)' : 'translateX(-40px)';
-      newStrip.style.opacity = '0';
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          newStrip.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1), opacity .22s ease';
-          newStrip.style.transform = 'translateX(0)';
-          newStrip.style.opacity = '1';
-        });
-      });
-    }
-  }, 180);
-}
-
-// 터치 스와이프 — 실시간 드래그 피드백 + 부드러운 전환
-function initWeekSwipe() {
-  const strip = document.getElementById('weekStrip');
-  if (!strip || strip._swipeInit) return;
-  strip._swipeInit = true;
-  let sx = 0, sy = 0, dragging = false, dx = 0;
-
-  strip.addEventListener('touchstart', function(e) {
-    sx = e.touches[0].clientX;
-    sy = e.touches[0].clientY;
-    dragging = false;
-    dx = 0;
-    strip.style.transition = 'none';
-  }, { passive: true });
-
-  strip.addEventListener('touchmove', function(e) {
-    dx = e.touches[0].clientX - sx;
-    const dy = e.touches[0].clientY - sy;
-    // 수평 드래그가 확실할 때만 피드백
-    if (!dragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
-      dragging = true;
-    }
-    if (dragging) {
-      // 끝에 도달하면 저항감 (rubber band)
-      let move = dx * 0.35;
-      if ((dx < 0 && weekOffset >= 1) || (dx > 0 && weekOffset <= 0)) {
-        move = dx * 0.08; // 저항
-      }
-      strip.style.transform = 'translateX(' + move + 'px)';
-      strip.style.opacity = String(1 - Math.abs(move) / 300);
-    }
-  }, { passive: true });
-
-  strip.addEventListener('touchend', function(e) {
-    if (!dragging) return;
-    dragging = false;
-    const threshold = 50;
-    if (dx < -threshold && weekOffset < 1) {
-      changeWeekOffset(1);
-    } else if (dx > threshold && weekOffset > 0) {
-      changeWeekOffset(-1);
-    } else {
-      // 스냅 백
-      strip.style.transition = 'transform .25s cubic-bezier(.22,1,.36,1), opacity .25s ease';
-      strip.style.transform = 'translateX(0)';
-      strip.style.opacity = '1';
-    }
-  }, { passive: true });
 }
 
 // ===== WEEK PREVIEW =====
@@ -1344,26 +1267,13 @@ function updateWeekHighlight() {
   });
 }
 
-// 전체 rHome 호출 (주간 전환, 사람 변경 등)
-function rHomeKeepScroll() {
-  const scrollY = window.scrollY;
-  rHome();
-  renderHomeExtras();
-  window.scrollTo(0, scrollY);
-}
 
 function resetToToday() {
-  if (!weekPreviewDate && weekOffset === 0) return;
-  const needFullRender = weekOffset !== 0; // 주 전환 시에만 풀 렌더
+  if (!weekPreviewDate) return;
   weekPreviewDate = null;
-  weekOffset = 0;
-  if (needFullRender) {
-    rHomeKeepScroll(); // 주간 스트립 리빌드 필요
-  } else {
-    // 주간탭이 카드 위에 있으므로 스크롤 앵커링 불필요
-    updateCardOnly();
-    updateWeekHighlight();
-  }
+  updateCardOnly();
+  updateWeekHighlight();
+  scrollWeekToToday();
 }
 
 // 페이지 복귀 시 미리보기 자동 해제
@@ -2950,7 +2860,6 @@ function pick(id) {
   if (!p) return;
   if (mTarget === 'main' || mTarget === 'setting' || mTarget === 'home') {
     cur = p;
-    weekOffset = 0;
     localStorage.setItem('dp', id);
     document.getElementById('calPersonName').textContent = p.n;
     document.getElementById('setName').textContent = p.n;

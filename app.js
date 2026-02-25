@@ -502,9 +502,17 @@ function renderRoute(sc) {
       <div class="rt-mid">${trains ? `<span class="rt-tn">${trains}</span>` : ''}</div>
       <span class="rt-arr">${seg.a || '-'}</span>
     </div>`;
-    // 교대 상대 표시
+    // 교대 상대 표시 (왼쪽=받을 때, 오른쪽=줄 때)
     if (partners[i]) {
-      html += `<div class="rt-partner">교대 <strong>${partners[i]}</strong></div>`;
+      const p = partners[i];
+      html += `<div class="rt-partner-row">`;
+      html += p.left
+        ? `<span class="rt-partner rt-partner-left">교대 <strong>${p.left}</strong></span>`
+        : `<span class="rt-partner-empty"></span>`;
+      html += p.right
+        ? `<span class="rt-partner rt-partner-right">교대 <strong>${p.right}</strong></span>`
+        : `<span class="rt-partner-empty"></span>`;
+      html += `</div>`;
     }
     html += '</div>';
 
@@ -534,6 +542,10 @@ function renderRoute(sc) {
 // - UI 용어: "교대"로만 표기 (인수/인계 금지)
 function is1xxx(n) { return n >= 1000 && n < 2000; }
 
+// 양방향 교대 상대 찾기
+// partners[i] = { left: '받을 때 상대', right: '줄 때 상대' }
+// left: 내 구간 시작 열차(non-1xxx) = 상대 구간 끝 열차 → 내가 받는 상대
+// right: 내 구간 끝 열차(non-1xxx) = 상대 구간 시작 열차 → 내가 주는 상대
 function findExchangePartners(sc) {
   const partners = {};
   if (!sc || !sc.g || !cur) return partners;
@@ -544,18 +556,20 @@ function findExchangePartners(sc) {
     if (!seg.n || seg.n.length === 0) continue;
     const firstTrain = seg.n[0];
     const lastTrain = seg.n[seg.n.length - 1];
+    const p = {};
 
-    // 구간 시작이 1xxx → 교대 없음 (특수 운행)
-    // 구간 끝이 1xxx → 교대 없음
-    // 그 외: 끝 열차번호로 다음 사람 찾기
-    if (!is1xxx(lastTrain)) {
-      const name = findPartnerByTrain(lastTrain, date, 'first');
-      if (name) { partners[i] = name; continue; }
-    }
+    // 왼쪽: 내가 받을 때 (내 시작 열차 = 상대 끝 열차)
     if (!is1xxx(firstTrain)) {
       const name = findPartnerByTrain(firstTrain, date, 'last');
-      if (name) { partners[i] = name; continue; }
+      if (name) p.left = name;
     }
+    // 오른쪽: 내가 줄 때 (내 끝 열차 = 상대 시작 열차)
+    if (!is1xxx(lastTrain)) {
+      const name = findPartnerByTrain(lastTrain, date, 'first');
+      if (name) p.right = name;
+    }
+
+    if (p.left || p.right) partners[i] = p;
   }
   return partners;
 }

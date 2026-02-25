@@ -314,11 +314,15 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   font-size: 15px; font-weight: 800; color: var(--blue);
   letter-spacing: .5px;
 }
+.rt-partner-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 4px 14px 0;
+}
 .rt-partner {
-  font-size: 12px; font-weight: 600; color: var(--blue);
-  padding: 4px 14px 0; opacity: .85;
+  font-size: 12px; font-weight: 600; color: var(--blue); opacity: .85;
 }
 .rt-partner strong { font-weight: 800; }
+.rt-partner-empty { flex: 1; }
 .rt-gap {
   display: flex; align-items: center;
   padding: 6px 0; font-size: 12px; color: var(--text3);

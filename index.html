@@ -60,7 +60,6 @@
 <!-- ===== HOME ===== -->
 <div class="page active" id="pageHome">
   <div class="home-top">
-    <div class="home-org">답십리승무사업소 · 5호선</div>
     <div class="home-top-row">
       <div class="home-top-left">
         <div class="home-name" id="homeName">
@@ -473,7 +472,7 @@
 <script>
 // 1회성 SW 핵 리셋 — 모든 캐시+SW 삭제 후 새로고침
 (function(){
-  if(localStorage.getItem('sw-reset-v87'))return;
+  if(localStorage.getItem('sw-reset-v88'))return;
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(function(regs){
       var p=regs.map(function(r){return r.unregister()});
@@ -483,7 +482,7 @@
     }).then(function(keys){
       return Promise.all(keys.map(function(k){return caches.delete(k)}));
     }).then(function(){
-      localStorage.setItem('sw-reset-v87','1');
+      localStorage.setItem('sw-reset-v88','1');
       location.reload();
     });
   }

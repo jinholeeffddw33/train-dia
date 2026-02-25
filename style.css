@@ -141,11 +141,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   width: 120px; height: 120px; border-radius: 50%;
   background: rgba(255,255,255,.03);
 }
-.home-org {
-  font-size: 11px; font-weight: 600; opacity: .55;
-  letter-spacing: 1.5px; text-transform: uppercase;
-  margin-bottom: 8px;
-}
 .home-top-row {
   display: flex; justify-content: space-between; align-items: flex-end;
 }
@@ -1288,7 +1283,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .af-grid-num {
   position: absolute; bottom: 4px; left: 4px;
   background: rgba(0,0,0,0.6); color: #fff;
-  font-size: 10px; font-weight: 700;
+  font-size: 11px; font-weight: 700;
   padding: 1px 6px; border-radius: 4px;
 }
 .af-grid-add {
@@ -1413,7 +1408,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .line-refresh-btn.spinning svg { animation: spin .8s linear; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .line-demo-badge {
-  display: inline-block; font-size: 10px; font-weight: 800;
+  display: inline-block; font-size: 11px; font-weight: 800;
   background: var(--orange); color: #fff;
   padding: 2px 8px; border-radius: 4px;
   vertical-align: middle; margin-left: 6px;
@@ -2561,7 +2556,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .sw-ac-badges { display: flex; gap: 3px; flex-shrink: 0; }
 .sw-ac-badge {
   display: inline-block; padding: 2px 6px; border-radius: 8px;
-  color: #fff; font-size: 10px; font-weight: 700; line-height: 1.3;
+  color: #fff; font-size: 11px; font-weight: 700; line-height: 1.3;
 }
 
 /* 즐겨찾기 */
@@ -2722,7 +2717,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   display: flex; align-items: center; gap: 4px;
 }
 .sw-tl-ft strong { font-size: 15px; }
-.sw-tl-ft-sub { font-size: 10px; color: var(--text-dim); font-weight: 400; }
+.sw-tl-ft-sub { font-size: 11px; color: var(--text-dim); font-weight: 400; }
 
 /* 하단 액션 */
 .sw-actions {
@@ -2996,7 +2991,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .sw-ms-tbadge {
   display: inline-block; padding: 1px 5px; border-radius: 6px;
-  color: #fff; font-size: 9px; font-weight: 700; line-height: 1.4;
+  color: #fff; font-size: 11px; font-weight: 700; line-height: 1.4;
 }
 
 /* ===== 이전·다음 열차 셀렉터 ===== */
@@ -3016,6 +3011,6 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   background: var(--card); border-color: #0052A4; color: var(--text);
 }
 .sw-ts-btn:active { transform: scale(.96); }
-.sw-ts-label { font-size: 10px; font-weight: 600; margin-bottom: 1px; white-space: nowrap; }
+.sw-ts-label { font-size: 11px; font-weight: 600; margin-bottom: 1px; white-space: nowrap; }
 .sw-ts-time { font-size: 16px; font-weight: 800; white-space: nowrap; }
-.sw-ts-dur { font-size: 10px; margin-top: 1px; opacity: .7; white-space: nowrap; }
+.sw-ts-dur { font-size: 11px; margin-top: 1px; opacity: .7; white-space: nowrap; }

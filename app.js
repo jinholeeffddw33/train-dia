@@ -477,6 +477,9 @@ function renderRoute(sc) {
   if (!segs || segs.length === 0) return '';
   const multi = segs.length > 1;
 
+  // 교대 상대 찾기
+  const partners = findExchangePartners(sc);
+
   let html = `<div class="rt"><div class="rt-label">${EMOJI.TRAIN} ${LABELS.SEGMENT_RUN}</div>`;
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];
@@ -499,7 +502,12 @@ function renderRoute(sc) {
       <span class="rt-dep">${seg.d}</span>
       <div class="rt-mid">${trains ? `<span class="rt-tn">${trains}</span>` : ''}</div>
       <span class="rt-arr">${seg.a || '-'}</span>
-    </div></div>`;
+    </div>`;
+    // 교대 상대 표시
+    if (partners[i]) {
+      html += `<div class="rt-partner">교대 · <strong>${partners[i]}</strong></div>`;
+    }
+    html += '</div>';
 
     if (multi && i < segs.length - 1 && seg.a && segs[i + 1].d) {
       const wait = calcWaitMin(seg.a, segs[i + 1].d);
@@ -517,6 +525,53 @@ function renderRoute(sc) {
   }
   html += '</div>';
   return html;
+}
+
+// 교대 상대 찾기 — 각 세그먼트 시작/종료 시간과 다른 사람의 세그먼트를 매칭
+function findExchangePartners(sc) {
+  const partners = {};
+  if (!sc || !sc.g || !cur) return partners;
+  const date = weekPreviewDate ? new Date(weekPreviewDate + 'T00:00:00') : td();
+
+  for (let i = 0; i < sc.g.length; i++) {
+    const seg = sc.g[i];
+    // 2근무 이후 시작 시 — 누구에게서 인수받는가
+    if (i > 0 && seg.d) {
+      const name = findPartnerByTime(seg.d, date, 'arrival');
+      if (name) { partners[i] = name; continue; }
+    }
+    // 마지막 세그먼트가 아닌 경우 — 도착 시 누구에게 인계하는가
+    if (i < sc.g.length - 1 && seg.a) {
+      const name = findPartnerByTime(seg.a, date, 'departure');
+      if (name) partners[i] = name;
+    }
+  }
+  return partners;
+}
+
+function findPartnerByTime(time, date, matchField) {
+  const mins = timeToMins(time);
+  if (mins < 0) return null;
+  let best = null, bestDiff = 6; // ±5분 이내
+
+  for (let pi = 0; pi < P.length; pi++) {
+    if (P[pi] === cur) continue;
+    const dia = gDia(P[pi], date);
+    const otherSc = gSched(dia, date);
+    if (!otherSc || !otherSc.g) continue;
+    for (let si = 0; si < otherSc.g.length; si++) {
+      const t = matchField === 'arrival' ? otherSc.g[si].a : otherSc.g[si].d;
+      if (!t) continue;
+      const tMins = timeToMins(t);
+      if (tMins < 0) continue;
+      const diff = Math.abs(tMins - mins);
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        best = P[pi].n;
+      }
+    }
+  }
+  return best;
 }
 
 function calcWaitMin(arrTime, depTime) {
@@ -1123,30 +1178,116 @@ function showWeekPreview(dateStr) {
   const today = td();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   if (dateStr === todayStr && !weekPreviewDate) {
-    return; // 이미 오늘 표시 중이면 아무것도 안 함
+    return;
   }
   if (dateStr === todayStr) {
     resetToToday();
     return;
   }
   weekPreviewDate = dateStr;
-  rHomeKeepScroll();
+  // 카드+라우트만 업데이트 (주간 스트립은 하이라이트만 교체)
+  updateCardOnly();
+  updateWeekHighlight();
 }
 
-// 스크롤 위치 유지하면서 rHome 실행
+// 카드+라우트만 업데이트 (전체 리렌더 없이)
+function updateCardOnly() {
+  if (!cur) return;
+  const today = td();
+  const targetDate = weekPreviewDate ? new Date(weekPreviewDate + 'T00:00:00') : today;
+  const dia = gDia(cur, targetDate), tp = gType(dia);
+  const sc = gSched(dia, targetDate);
+
+  // 미리보기 배너
+  let previewBannerH = '';
+  if (weekPreviewDate) {
+    const pd = new Date(weekPreviewDate + 'T00:00:00');
+    const pdDow = DOW[pd.getDay()];
+    previewBannerH = `<div class="preview-banner">
+      <span class="preview-banner-text">${EMOJI.EYE} 미리보기: ${pdDow}요일 (${pd.getDate()}일)</span>
+      <button class="preview-banner-btn" type="button" onclick="resetToToday()">오늘로 돌아가기</button>
+    </div>`;
+  }
+
+  // 배너 상태 (오늘만)
+  let bannerState = null;
+  if (sc && !weekPreviewDate) {
+    const nextShift = getNextShift(cur, today);
+    bannerState = getBannerState(sc, nextShift, new Date());
+  }
+
+  let infoH = '';
+  if (sc) {
+    const bannerH = sc.m ? renderRouteVisual(sc.m, sc.s, sc.e, bannerState, sc.g) : '';
+    infoH = `<div class="tc-time-hero">
+      <div class="tc-time-block">
+        <div class="tc-time-label">${LABELS.START}</div>
+        <div class="tc-time-val tc-time-start">${sc.s || '-'}</div>
+      </div>
+      <div class="tc-time-arrow">→</div>
+      <div class="tc-time-block">
+        <div class="tc-time-label">${LABELS.END}</div>
+        <div class="tc-time-val">${sc.e || '-'}</div>
+      </div>
+      <div class="tc-time-block small">
+        <div class="tc-time-label">${LABELS.WORK_TIME}</div>
+        <div class="tc-time-val sm">${getWorkTime(sc)}</div>
+      </div>
+    </div>`;
+    infoH += bannerH;
+  } else {
+    const restWord = gRestLabel(dia);
+    const dayWord = weekPreviewDate ? `${DOW[targetDate.getDay()]}요일은` : '오늘은';
+    infoH = `<div class="tc-rest-msg">${dayWord} ${restWord}입니다 ${EMOJI.SMILE}</div>`;
+  }
+
+  const cardLabel = weekPreviewDate
+    ? `${DOW[targetDate.getDay()]}요일 교번 (미리보기)`
+    : LABELS.TODAY_DIA;
+  const shareBtn = '<button class="tc-share-btn" type="button" onclick="shareSchedule()" title="교번 공유"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button>';
+
+  const el = document.getElementById('homeTodayCard');
+  el.innerHTML = `${previewBannerH}<div class="today-card">
+    <div class="tc-header">
+      <div class="tc-label">${cardLabel}</div>
+      <div class="tc-header-right">${shareBtn}<span class="tc-badge ${tp}">${gLabel(dia)}</span></div>
+    </div>
+    <div class="tc-body">
+      <div class="tc-dia ${tp}">${gDiaDisplay(dia)}</div>
+      ${tp !== 'rest' ? `<div class="tc-type-name tc-type-bold">${gTypeName(tp)}</div>` : ''}
+    </div>${infoH}</div>`;
+
+  // 라우트
+  const rtEl = document.getElementById('homeRoute');
+  if (sc && sc.g && sc.g.length > 0) {
+    rtEl.innerHTML = renderRoute(sc);
+  } else {
+    rtEl.innerHTML = '';
+  }
+}
+
+// 주간 스트립 하이라이트만 토글 (DOM 리빌드 없이)
+function updateWeekHighlight() {
+  const today = td();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const days = document.querySelectorAll('.week-day');
+  days.forEach(d => {
+    const date = d.getAttribute('data-date');
+    d.classList.remove('is-today', 'is-preview');
+    if (weekPreviewDate && date === weekPreviewDate) {
+      d.classList.add('is-preview');
+    } else if (date === todayStr && !weekPreviewDate) {
+      d.classList.add('is-today');
+    }
+  });
+}
+
+// 전체 rHome 호출 (주간 전환, 사람 변경 등)
 function rHomeKeepScroll() {
-  const cardEl = document.getElementById('homeTodayCard');
   const scrollY = window.scrollY;
-  const cardTop = cardEl ? cardEl.getBoundingClientRect().top : null;
   rHome();
   renderHomeExtras();
-  // 카드 위치 복원
-  if (cardEl && cardTop !== null) {
-    const newCardTop = cardEl.getBoundingClientRect().top;
-    window.scrollTo(0, scrollY + (newCardTop - cardTop));
-  } else {
-    window.scrollTo(0, scrollY);
-  }
+  window.scrollTo(0, scrollY);
 }
 
 function resetToToday() {

@@ -141,6 +141,11 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   width: 160px; height: 160px; border-radius: 50%;
   background: rgba(255,255,255,.03);
 }
+.home-org {
+  font-size: 11px; font-weight: 600; opacity: .55;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 4px;
+}
 .home-greeting { font-size: 14px; opacity: .75; font-weight: 400; margin-bottom: 0; }
 .home-name { font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.3px; }
 .home-name-link { cursor: pointer; }
@@ -309,6 +314,11 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   font-size: 15px; font-weight: 800; color: var(--blue);
   letter-spacing: .5px;
 }
+.rt-partner {
+  font-size: 12px; font-weight: 600; color: var(--blue);
+  padding: 4px 14px 0; opacity: .85;
+}
+.rt-partner strong { font-weight: 800; }
 .rt-gap {
   display: flex; align-items: center;
   padding: 6px 0; font-size: 12px; color: var(--text3);

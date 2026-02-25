@@ -15,8 +15,9 @@ const LABELS = {
   DAY_WORK: '주간 근무', NIGHT_WORK: '야간 근무', STANDBY_WORK: '대기 근무',
   WORK: '근무', STANDBY: '대기', DAY: '주간', NIGHT: '야간',
   MONTH_SUMMARY: '근무 요약', TOTAL_WORK: '총 근무일',
+  TODAY: '오늘',
   TODAY_DIA: '오늘의 교번 · DIA', TODAY_DIA_SHORT: '오늘의 교번',
-  WEEK_WORK: '이번주 근무', SEGMENT_RUN: '구간 운행',
+  WEEK_WORK: '이번주 근무', NEXT_WEEK_WORK: '다음주 근무', SEGMENT_RUN: '구간 운행',
   SELECT_DRIVER: '기관사 선택',
   EMPTY_HOME: '기관사를 선택하면<br>오늘의 교번을 확인합니다',
   EMPTY_CAL: '기관사를 선택하면<br>교번이 달력에 표시됩니다',
@@ -55,6 +56,7 @@ let cur = null, calY, calM, selDate, c1 = null, c2 = null, cmpY, cmpM;
 let mTarget = 'home', sopIdx = -1;
 let alerts = [], alertSeverity = 'high', lineBranch = 'main';
 let weekPreviewDate = null; // null = showing today
+let weekOffset = 0; // 0 = 이번주, 1 = 다음주
 let trainData = [], trainTimer = null;
 let lineViewMode = 'list', lastTrainFetch = 0, updateCounterTimer = null;
 
@@ -896,12 +898,17 @@ function rHome() {
     rtEl.innerHTML = '';
   }
 
-  // Week strip
+  // Week strip with navigation (이번주 + 다음주)
   const we = document.getElementById('homeWeek');
-  let wh = `<div class="section-label">${LABELS.WEEK_WORK}</div><div class="week-strip">`;
+  const weekLabel = weekOffset === 0 ? LABELS.WEEK_WORK : LABELS.NEXT_WEEK_WORK;
+  let wh = `<div class="week-nav">
+    <button class="week-nav-btn${weekOffset === 0 ? ' disabled' : ''}" type="button" onclick="changeWeekOffset(-1)" ${weekOffset === 0 ? 'disabled' : ''}>‹</button>
+    <span class="week-nav-label">${weekLabel}</span>
+    <button class="week-nav-btn${weekOffset >= 1 ? ' disabled' : ''}" type="button" onclick="changeWeekOffset(1)" ${weekOffset >= 1 ? 'disabled' : ''}>›</button>
+  </div><div class="week-strip" id="weekStrip">`;
   const todayD = today.getDay();
   const weekStart = new Date(today);
-  weekStart.setDate(weekStart.getDate() - todayD);
+  weekStart.setDate(weekStart.getDate() - todayD + (weekOffset * 7));
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart);
@@ -926,6 +933,7 @@ function rHome() {
   }
   wh += '</div>';
   we.innerHTML = wh;
+  initWeekSwipe();
 
   // Status cards — 내일 근무 + 교번 구성
   const stEl = document.getElementById('homeStatus');
@@ -1081,25 +1089,71 @@ function getMonthSummary(person, year, month) {
   return { dayWork, nightWork, dayStandby, nightStandby };
 }
 
+// ===== WEEK NAVIGATION (이번주/다음주) =====
+function changeWeekOffset(delta) {
+  const next = weekOffset + delta;
+  if (next < 0 || next > 1) return;
+  weekOffset = next;
+  weekPreviewDate = null;
+  rHomeKeepScroll();
+}
+
+// 터치 스와이프로 주간 전환
+function initWeekSwipe() {
+  const strip = document.getElementById('weekStrip');
+  if (!strip || strip._swipeInit) return;
+  strip._swipeInit = true;
+  let sx = 0, sy = 0;
+  strip.addEventListener('touchstart', function(e) {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, { passive: true });
+  strip.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0 && weekOffset < 1) changeWeekOffset(1);
+      else if (dx > 0 && weekOffset > 0) changeWeekOffset(-1);
+    }
+  }, { passive: true });
+}
+
 // ===== WEEK PREVIEW =====
 function showWeekPreview(dateStr) {
   const today = td();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  if (dateStr === todayStr && !weekPreviewDate) {
+    return; // 이미 오늘 표시 중이면 아무것도 안 함
+  }
   if (dateStr === todayStr) {
-    // 오늘을 클릭하면 미리보기 해제
     resetToToday();
     return;
   }
   weekPreviewDate = dateStr;
+  rHomeKeepScroll();
+}
+
+// 스크롤 위치 유지하면서 rHome 실행
+function rHomeKeepScroll() {
+  const cardEl = document.getElementById('homeTodayCard');
+  const scrollY = window.scrollY;
+  const cardTop = cardEl ? cardEl.getBoundingClientRect().top : null;
   rHome();
   renderHomeExtras();
+  // 카드 위치 복원
+  if (cardEl && cardTop !== null) {
+    const newCardTop = cardEl.getBoundingClientRect().top;
+    window.scrollTo(0, scrollY + (newCardTop - cardTop));
+  } else {
+    window.scrollTo(0, scrollY);
+  }
 }
 
 function resetToToday() {
-  if (!weekPreviewDate) return;
+  if (!weekPreviewDate && weekOffset === 0) return;
   weekPreviewDate = null;
-  rHome();
-  renderHomeExtras();
+  weekOffset = 0;
+  rHomeKeepScroll();
 }
 
 // 페이지 복귀 시 미리보기 자동 해제
@@ -1627,6 +1681,52 @@ function sendNotification(title, body) {
   if (!('Notification' in window)) return;
   if (Notification.permission === 'granted') {
     new Notification(title, { body: body, icon: 'logo.png', badge: 'logo.png' });
+  }
+}
+
+// ===== DEPARTURE ALARM (2근무/3근무 출발 20분 전) =====
+let departAlarmTimers = [];
+
+function setupDepartureAlarms() {
+  // 기존 타이머 전부 해제
+  departAlarmTimers.forEach(t => clearTimeout(t));
+  departAlarmTimers = [];
+
+  if (!cur) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const today = td();
+  const dia = gDia(cur, today);
+  const sc = gSched(dia, today);
+  if (!sc || !sc.g || sc.g.length < 2) return;
+
+  const now = new Date();
+  const ALARM_BEFORE_MS = 20 * 60 * 1000; // 20분
+
+  // 2근무(g[1]), 3근무(g[2]) 등 — 첫 번째(1근무)는 제외
+  for (let i = 1; i < sc.g.length; i++) {
+    const seg = sc.g[i];
+    if (!seg.d) continue;
+    const [hh, mm] = seg.d.split(':').map(Number);
+    const departDate = new Date(today);
+    departDate.setHours(hh, mm, 0, 0);
+    // 야간(자정 넘김) 보정
+    if (departDate < today) departDate.setDate(departDate.getDate() + 1);
+
+    const alarmTime = departDate.getTime() - ALARM_BEFORE_MS;
+    const delay = alarmTime - now.getTime();
+
+    if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
+      const segNum = i + 1;
+      const timer = setTimeout(() => {
+        sendNotification(
+          `${segNum}근무 출발 20분 전`,
+          `${seg.d} 출발 · ${cur.n}님 준비하세요`
+        );
+        showToast(`${segNum}근무 출발 20분 전 ⏰`);
+      }, delay);
+      departAlarmTimers.push(timer);
+    }
   }
 }
 
@@ -2570,11 +2670,13 @@ function pick(id) {
   if (!p) return;
   if (mTarget === 'main' || mTarget === 'setting' || mTarget === 'home') {
     cur = p;
+    weekOffset = 0;
     localStorage.setItem('dp', id);
     document.getElementById('calPersonName').textContent = p.n;
     document.getElementById('setName').textContent = p.n;
     rHome();
     rCal();
+    setupDepartureAlarms();
   } else if (mTarget === 'c1') {
     c1 = p;
     document.getElementById('c1Icon').textContent = p.n.charAt(0);
@@ -3300,6 +3402,7 @@ function safeRun(name, fn) {
   safeRun('shake', initShake);
   safeRun('memos', cleanOldMemos);
   safeRun('commute', updateHomeCommuteCard);
+  safeRun('depart-alarm', setupDepartureAlarms);
 
   // Dismiss splash — 무조건 실행
   setTimeout(dismissSplash, 1200);

@@ -273,7 +273,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .tc-seg-wait {
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--text3); padding: 0 0 0 30px;
+  font-size: 12px; color: var(--text3); padding: 0 0 0 30px;
 }
 
 /* 구간 타임라인 v2 — 이번주 근무 상단 */
@@ -293,7 +293,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   margin-bottom: 5px; padding: 0 2px;
 }
 .rt-num { font-size: 12px; font-weight: 700; color: var(--blue); }
-.rt-dur { font-size: 11px; color: var(--text3); font-weight: 600; }
+.rt-dur { font-size: 12px; color: var(--text3); font-weight: 600; }
 .rt-run {
   display: flex; align-items: center;
   background: linear-gradient(90deg, rgba(56,189,248,.04), rgba(56,189,248,.10), rgba(56,189,248,.04));
@@ -311,7 +311,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 .rt-gap {
   display: flex; align-items: center;
-  padding: 6px 0; font-size: 11px; color: var(--text3);
+  padding: 6px 0; font-size: 12px; color: var(--text3);
 }
 .rt-gap::before, .rt-gap::after {
   content: ''; flex: 1; height: 1px; background: var(--border);
@@ -354,14 +354,31 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   letter-spacing: -.2px;
 }
 
+/* ===== WEEK NAV ===== */
+.week-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 8px;
+}
+.week-nav-label {
+  font-size: 14px; font-weight: 700; color: var(--text2); letter-spacing: -.2px;
+}
+.week-nav-btn {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; font-size: 18px; font-weight: 700;
+  color: var(--text2); background: var(--white); border: 1px solid var(--border);
+  box-shadow: var(--shadow3); cursor: pointer; transition: .15s;
+}
+.week-nav-btn:active { transform: scale(.92); }
+.week-nav-btn.disabled {
+  opacity: .3; pointer-events: none;
+}
+
 /* ===== WEEK STRIP ===== */
 .week-strip {
   display: grid; grid-template-columns: repeat(7, 1fr);
   gap: 4px; padding: 0 12px 16px;
-  scroll-snap-type: x mandatory;
 }
 .week-day {
-  scroll-snap-align: center;
   display: flex; flex-direction: column; align-items: center;
   padding: 10px 2px 8px; border-radius: var(--radius-sm);
   background: var(--white); border: 2px solid transparent;
@@ -379,10 +396,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .is-today .wd-date,
 .is-today .wd-dia,
 .is-today .wd-time { color: #fff !important; }
-.wd-dow { font-size: 12px; font-weight: 600; color: var(--text3); margin-bottom: 2px; }
-.wd-date { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.wd-dow { font-size: 13px; font-weight: 600; color: var(--text3); margin-bottom: 2px; }
+.wd-date { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
 .wd-dia {
-  font-size: 13px; font-weight: 700; padding: 2px 4px;
+  font-size: 14px; font-weight: 700; padding: 2px 4px;
   border-radius: 4px; white-space: nowrap;
 }
 .wd-dia.day { color: var(--blue); }
@@ -390,7 +407,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .wd-dia.standby { color: var(--orange); }
 .wd-dia.rest { color: var(--green); }
 .wd-dia.rest.off { color: #FB7185; }
-.wd-time { font-size: 11px; color: var(--text3); margin-top: 2px; font-weight: 500; }
+.wd-time { font-size: 12px; color: var(--text3); margin-top: 2px; font-weight: 500; }
 
 /* ===== STATUS BAR ===== */
 .status-bar {
@@ -411,7 +428,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .sc-val { font-size: 22px; font-weight: 900; color: var(--blue); }
 .sc-val-rest { color: var(--green); }
 .sc-val-off { color: var(--blue); }
-.sc-sub { font-size: 13px; color: var(--text3); font-weight: 500; margin-top: 4px; }
+.sc-sub { font-size: 14px; color: var(--text3); font-weight: 500; margin-top: 4px; }
 
 /* D-Day pill */
 .dday-pill {
@@ -435,7 +452,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 10px;
 }
-.ms-title { font-size: 13px; font-weight: 600; color: var(--text3); }
+.ms-title { font-size: 14px; font-weight: 600; color: var(--text3); }
 .ms-arrow {
   width: 32px; height: 32px; border: none; border-radius: 50%;
   background: var(--bg); color: var(--text2); font-size: 18px; font-weight: 700;
@@ -446,13 +463,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .ms-total {
   text-align: center; margin-top: 8px; padding-top: 8px;
   border-top: 1px solid var(--border);
-  font-size: 12px; color: var(--text3); font-weight: 500;
+  font-size: 13px; color: var(--text3); font-weight: 500;
 }
 .ms-total strong { font-weight: 800; color: var(--text); }
 .ms-row { display: flex; gap: 0; align-items: stretch; }
 .ms-group { flex: 1; text-align: center; }
 .ms-group-label {
-  font-size: 11px; font-weight: 700; color: var(--text3);
+  font-size: 12px; font-weight: 700; color: var(--text3);
   text-transform: uppercase; letter-spacing: .5px;
   margin-bottom: 6px; opacity: .7;
 }
@@ -463,7 +480,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .ms-num.night { color: var(--purple); }
 .ms-num.day-standby { color: var(--orange); }
 .ms-num.night-standby { color: #D97706; }
-.ms-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+.ms-label { font-size: 13px; color: var(--text3); font-weight: 500; }
 .ms-divider {
   width: 1px; align-self: stretch;
   margin: 0 6px;
@@ -2143,6 +2160,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-depart.rv-prep.up { background: linear-gradient(135deg, #0a1e4a 0%, #0F3490 50%, #1A56DB 100%); box-shadow: 0 4px 16px rgba(26,86,219,.3); }
 .dark .rv-depart.rv-prep.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.rv-prep.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
+.dark .week-nav-btn { background: var(--white); border-color: var(--border); color: var(--text2); }
 .dark .preview-banner { background: rgba(217,119,6,.15); border-color: rgba(217,119,6,.5); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }
 .dark .sc-dir.down { background: rgba(153,108,172,.2); }

@@ -253,9 +253,9 @@ function getBannerState(sc, nextShift, now) {
 }
 
 // 근무 종료 상태에서 다음 근무까지 시간 계산
-// minsAfterEnd: 퇴근 후 경과 시간(분) — 2시간 넘으면 idle
+// minsAfterEnd: 퇴근 후 경과 시간(분) — 1시간 넘으면 idle
 function calcDoneState(nextShift, nowMins, todayStartMins, minsAfterEnd) {
-  var isDone = minsAfterEnd <= 120; // 퇴근 후 2시간 이내 = done, 이후 = idle
+  var isDone = minsAfterEnd <= 60; // 퇴근 후 1시간 이내 = done, 이후 = idle
 
   if (!nextShift || !nextShift.schedule || !nextShift.schedule.s) {
     return { state: isDone ? 'done' : 'idle', next: nextShift, minsUntil: null };

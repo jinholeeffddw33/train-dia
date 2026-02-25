@@ -971,6 +971,7 @@ function rHome() {
     const di = gDia(cur, d), tt = gType(di), isT = d.getTime() === today.getTime();
     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isPreview = weekPreviewDate === dateStr;
+    const holiday = isH(d); // 토/일/공휴일
     const ss = gSched(di, d);
     let timeStr = '';
     if (ss && ss.s && !ss.s.startsWith('대') && ss.s !== '대휴') {
@@ -979,8 +980,9 @@ function rHome() {
     let cls = 'week-day';
     if (isPreview) cls += ' is-preview';
     else if (isT && !weekPreviewDate) cls += ' is-today';
+    if (holiday && !isT && !isPreview) cls += ' is-holiday';
     wh += `<div class="${cls}" onclick="showWeekPreview('${dateStr}')" data-date="${dateStr}">
-      <div class="wd-dow">${DOW[i]}</div>
+      <div class="wd-dow${holiday ? ' wd-dow-hol' : ''}">${DOW[i]}</div>
       <div class="wd-date">${d.getDate()}</div>
       <div class="wd-dia ${tt}${di.startsWith('휴') ? ' off' : ''}">${gDiaDisplay(di)}</div>
       ${tt !== 'rest' && timeStr ? `<div class="wd-time">${timeStr}</div>` : ''}
@@ -1148,27 +1150,84 @@ function getMonthSummary(person, year, month) {
 function changeWeekOffset(delta) {
   const next = weekOffset + delta;
   if (next < 0 || next > 1) return;
-  weekOffset = next;
-  weekPreviewDate = null;
-  rHomeKeepScroll();
+  const strip = document.getElementById('weekStrip');
+  const dir = delta > 0 ? 'left' : 'right';
+  // 슬라이드 아웃
+  if (strip) {
+    strip.style.transition = 'transform .18s ease, opacity .18s ease';
+    strip.style.transform = dir === 'left' ? 'translateX(-40px)' : 'translateX(40px)';
+    strip.style.opacity = '0';
+  }
+  setTimeout(function() {
+    weekOffset = next;
+    weekPreviewDate = null;
+    const scrollY = window.scrollY;
+    rHome();
+    renderHomeExtras();
+    window.scrollTo(0, scrollY);
+    // 슬라이드 인
+    const newStrip = document.getElementById('weekStrip');
+    if (newStrip) {
+      newStrip.style.transition = 'none';
+      newStrip.style.transform = dir === 'left' ? 'translateX(40px)' : 'translateX(-40px)';
+      newStrip.style.opacity = '0';
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          newStrip.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1), opacity .22s ease';
+          newStrip.style.transform = 'translateX(0)';
+          newStrip.style.opacity = '1';
+        });
+      });
+    }
+  }, 180);
 }
 
-// 터치 스와이프로 주간 전환
+// 터치 스와이프 — 실시간 드래그 피드백 + 부드러운 전환
 function initWeekSwipe() {
   const strip = document.getElementById('weekStrip');
   if (!strip || strip._swipeInit) return;
   strip._swipeInit = true;
-  let sx = 0, sy = 0;
+  let sx = 0, sy = 0, dragging = false, dx = 0;
+
   strip.addEventListener('touchstart', function(e) {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
+    dragging = false;
+    dx = 0;
+    strip.style.transition = 'none';
   }, { passive: true });
+
+  strip.addEventListener('touchmove', function(e) {
+    dx = e.touches[0].clientX - sx;
+    const dy = e.touches[0].clientY - sy;
+    // 수평 드래그가 확실할 때만 피드백
+    if (!dragging && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+      dragging = true;
+    }
+    if (dragging) {
+      // 끝에 도달하면 저항감 (rubber band)
+      let move = dx * 0.35;
+      if ((dx < 0 && weekOffset >= 1) || (dx > 0 && weekOffset <= 0)) {
+        move = dx * 0.08; // 저항
+      }
+      strip.style.transform = 'translateX(' + move + 'px)';
+      strip.style.opacity = String(1 - Math.abs(move) / 300);
+    }
+  }, { passive: true });
+
   strip.addEventListener('touchend', function(e) {
-    const dx = e.changedTouches[0].clientX - sx;
-    const dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      if (dx < 0 && weekOffset < 1) changeWeekOffset(1);
-      else if (dx > 0 && weekOffset > 0) changeWeekOffset(-1);
+    if (!dragging) return;
+    dragging = false;
+    const threshold = 50;
+    if (dx < -threshold && weekOffset < 1) {
+      changeWeekOffset(1);
+    } else if (dx > threshold && weekOffset > 0) {
+      changeWeekOffset(-1);
+    } else {
+      // 스냅 백
+      strip.style.transition = 'transform .25s cubic-bezier(.22,1,.36,1), opacity .25s ease';
+      strip.style.transform = 'translateX(0)';
+      strip.style.opacity = '1';
     }
   }, { passive: true });
 }

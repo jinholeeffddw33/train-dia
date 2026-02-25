@@ -392,13 +392,15 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .week-strip {
   display: grid; grid-template-columns: repeat(7, 1fr);
   gap: 4px; padding: 0 12px 16px;
+  will-change: transform, opacity;
+  transform: translateZ(0); /* GPU 가속 */
 }
 .week-day {
   display: flex; flex-direction: column; align-items: center;
   padding: 10px 2px 8px; border-radius: var(--radius-sm);
   background: var(--white); border: 2px solid transparent;
   box-shadow: var(--shadow3);
-  transition: .2s; cursor: pointer;
+  transition: transform .15s, box-shadow .15s; cursor: pointer;
 }
 .week-day:active { transform: scale(.95); }
 .week-day.is-today {
@@ -411,8 +413,16 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .is-today .wd-date,
 .is-today .wd-dia,
 .is-today .wd-time { color: #fff !important; }
+
+/* 토/일/공휴일 */
+.week-day.is-holiday {
+  background: linear-gradient(180deg, rgba(251,113,133,.06) 0%, var(--white) 100%);
+  border-color: rgba(251,113,133,.25);
+}
 .wd-dow { font-size: 13px; font-weight: 600; color: var(--text3); margin-bottom: 2px; }
+.wd-dow.wd-dow-hol { color: var(--red); font-weight: 700; }
 .wd-date { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.is-holiday .wd-date { color: var(--red); }
 .wd-dia {
   font-size: 14px; font-weight: 700; padding: 2px 4px;
   border-radius: 4px; white-space: nowrap;
@@ -2176,6 +2186,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .dark .rv-depart.rv-prep.down { background: linear-gradient(135deg, #4c1d95 0%, #6D28D9 50%, #7c3aed 100%); box-shadow: 0 4px 16px rgba(109,40,217,.3); }
 .dark .rv-depart.rv-prep.depot { background: linear-gradient(135deg, #064e3b 0%, #065F46 50%, #0D9452 100%); box-shadow: 0 4px 16px rgba(13,148,82,.3); }
 .dark .week-nav-btn { background: var(--white); border-color: var(--border); color: var(--text2); }
+.dark .week-day.is-holiday {
+  background: linear-gradient(180deg, rgba(251,113,133,.08) 0%, var(--white) 100%);
+  border-color: rgba(251,113,133,.2);
+}
 .dark .preview-banner { background: rgba(217,119,6,.15); border-color: rgba(217,119,6,.5); }
 .dark .sc-dir.up { background: rgba(26,86,219,.2); }
 .dark .sc-dir.down { background: rgba(153,108,172,.2); }

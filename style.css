@@ -129,7 +129,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 /* ===== HOME TOP ===== */
 .home-top {
   background: linear-gradient(160deg, #0F3490 0%, #1A56DB 50%, #2B6EE8 100%);
-  color: #fff; padding: 28px 24px 32px; position: relative; overflow: hidden;
+  color: #fff; padding: 20px 20px 22px; position: relative; overflow: hidden;
 }
 .home-top::after {
   content: ''; position: absolute; right: -50px; top: -50px;
@@ -141,13 +141,13 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   width: 160px; height: 160px; border-radius: 50%;
   background: rgba(255,255,255,.03);
 }
-.home-greeting { font-size: 15px; opacity: .75; font-weight: 400; margin-bottom: 2px; }
-.home-name { font-size: 24px; font-weight: 800; margin-bottom: 16px; letter-spacing: -.3px; }
+.home-greeting { font-size: 14px; opacity: .75; font-weight: 400; margin-bottom: 0; }
+.home-name { font-size: 22px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.3px; }
 .home-name-link { cursor: pointer; }
 .home-name-arrow { opacity: .6; font-size: 18px; }
-.home-date-row { font-size: 16px; font-weight: 500; opacity: .85; margin-bottom: 6px; }
+.home-date-row { font-size: 14px; font-weight: 500; opacity: .85; margin-bottom: 4px; }
 .home-ampm {
-  font-size: 32px; font-weight: 800; line-height: 1.2;
+  font-size: 26px; font-weight: 800; line-height: 1.2;
   color: #fff;
 }
 .home-clock-row {
@@ -155,11 +155,11 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   white-space: nowrap;
 }
 .home-time-big {
-  font-size: clamp(48px, 13vw, 64px); font-weight: 900; letter-spacing: -2px;
+  font-size: clamp(42px, 11vw, 56px); font-weight: 900; letter-spacing: -2px;
   line-height: 1; font-variant-numeric: tabular-nums;
 }
 .home-time-sec {
-  font-size: clamp(28px, 7vw, 36px); font-weight: 700; opacity: .65;
+  font-size: clamp(24px, 6vw, 32px); font-weight: 700; opacity: .65;
   font-variant-numeric: tabular-nums;
   margin-left: 2px;
 }
@@ -175,7 +175,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 
 /* ===== TODAY CARD ===== */
 .today-card {
-  margin: 20px 16px 0; background: var(--white);
+  margin: 12px 16px 0; background: var(--white);
   border-radius: var(--radius); box-shadow: var(--shadow2);
   overflow: hidden;
   animation: cardFadeIn .35s ease;
@@ -185,7 +185,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
   to { opacity: 1; transform: translateY(0); }
 }
 .tc-header {
-  padding: 18px 22px 14px; display: flex; align-items: center;
+  padding: 12px 18px 10px; display: flex; align-items: center;
   justify-content: space-between; border-bottom: 1px solid var(--border);
 }
 .tc-header-right { display: flex; align-items: center; gap: 8px; }
@@ -206,10 +206,10 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .tc-badge.standby { background: var(--orange-light); color: var(--orange); }
 .tc-badge.rest { background: var(--gray-light); color: var(--gray); }
 
-.tc-body { padding: 20px 22px; text-align: center; }
+.tc-body { padding: 14px 18px; text-align: center; }
 .tc-dia {
-  font-size: 48px; font-weight: 900; line-height: 1.2;
-  margin-bottom: 4px;
+  font-size: 40px; font-weight: 900; line-height: 1.2;
+  margin-bottom: 2px;
 }
 .tc-dia.day { color: var(--blue); }
 .tc-dia.night { color: var(--purple); }
@@ -222,7 +222,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 /* Time hero (출근/퇴근 강조) */
 .tc-time-hero {
   display: flex; align-items: center; justify-content: center;
-  gap: 12px; padding: 20px 16px;
+  gap: 12px; padding: 14px 16px;
   border-top: 1px solid var(--border);
   animation: cardFadeIn .4s ease .1s both;
 }
@@ -280,7 +280,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 .rt {
   background: var(--card); border-radius: 16px;
   border: 1px solid var(--border);
-  padding: 16px; margin: 12px 16px 0;
+  padding: 12px 14px; margin: 8px 16px 0;
   animation: cardFadeIn .3s ease .1s both;
 }
 .rt-label {
@@ -328,8 +328,8 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 }
 
 .tc-rest-msg {
-  padding: 24px; text-align: center;
-  font-size: 20px; font-weight: 600; color: var(--green);
+  padding: 16px; text-align: center;
+  font-size: 18px; font-weight: 600; color: var(--green);
 }
 
 /* ===== HOME EMPTY ===== */
@@ -349,7 +349,7 @@ button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; bord
 
 /* ===== SECTION LABEL ===== */
 .section-label {
-  padding: 20px 20px 12px; font-size: 15px;
+  padding: 14px 18px 8px; font-size: 14px;
   font-weight: 700; color: var(--text2);
   letter-spacing: -.2px;
 }

@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { X } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import { P } from '@/data/cycle';
 import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
+
+/** 가나다순 정렬된 기관사 목록 */
+const SORTED_P = [...P].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 
 interface DriverSelectorProps {
   open: boolean;
@@ -18,9 +22,9 @@ export default function DriverSelector({ open, onClose }: DriverSelectorProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return P;
+    if (!query.trim()) return SORTED_P;
     const q = query.trim();
-    return P.filter(
+    return SORTED_P.filter(
       (p) => p.n.includes(q) || p.I.includes(q) || p.d.includes(q),
     );
   }, [query]);
@@ -56,7 +60,7 @@ export default function DriverSelector({ open, onClose }: DriverSelectorProps) {
             onClick={() => setQuery('')}
             aria-label="검색어 지우기"
           >
-            ✕
+            <X size={16} strokeWidth={2.5} />
           </button>
         )}
       </div>

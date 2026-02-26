@@ -76,6 +76,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
               placeholder="역 이름 검색..."
               value={stationSearch}
               onChange={(e) => setStationSearch(e.target.value)}
+              aria-label="역 이름 검색"
             />
             <div className={styles.stationGrid}>
               {filteredStations.slice(0, 20).map((s) => (
@@ -106,6 +107,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={200}
+          aria-label="장애 상황 설명"
         />
         <span className={styles.charCount}>{message.length}/200</span>
       </div>

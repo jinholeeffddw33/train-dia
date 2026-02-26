@@ -56,8 +56,8 @@
 }
 
 .closeBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -182,12 +182,12 @@
 }
 
 .resolveBtn {
-  padding: var(--dia-space-1) var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-surface-hover);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
   color: var(--dia-text-secondary);
-  min-height: 32px;
+  min-height: 44px;
 }
 
 .addBtn {
@@ -295,13 +295,13 @@
 }
 
 .stationChip {
-  padding: var(--dia-space-1) var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-xs);
   color: var(--dia-text-primary);
-  min-height: 32px;
+  min-height: 44px;
 }
 
 .stationChip:active { background: var(--dia-surface-hover); }

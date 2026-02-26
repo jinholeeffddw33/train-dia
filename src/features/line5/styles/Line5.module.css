@@ -112,14 +112,14 @@
 }
 
 .errorRetry {
-  padding: var(--dia-space-1) var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-red);
   color: white;
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   white-space: nowrap;
-  min-height: 32px;
+  min-height: 44px;
 }
 
 /* ── Loading ── */
@@ -294,8 +294,8 @@
 }
 
 .mapBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;

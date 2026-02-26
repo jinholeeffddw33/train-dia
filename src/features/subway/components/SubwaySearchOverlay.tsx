@@ -123,6 +123,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
               placeholder="출발역"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
+              aria-label="출발역"
             />
           </div>
           <button
@@ -141,6 +142,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
               placeholder="도착역"
               value={to}
               onChange={(e) => setTo(e.target.value)}
+              aria-label="도착역"
             />
           </div>
         </div>

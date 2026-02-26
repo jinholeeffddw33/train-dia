@@ -93,7 +93,7 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-blue);
   font-weight: var(--dia-weight-medium);
-  min-height: 36px;
+  min-height: 44px;
   text-decoration: none;
   font-variant-numeric: tabular-nums;
 }

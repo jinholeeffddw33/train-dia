@@ -101,7 +101,7 @@ export default function StationArrivals({
       {error && (
         <div className={styles.errorSmall}>
           <span>{error}</span>
-          <button type="button" onClick={fetchArrivals}>다시 시도</button>
+          <button type="button" className={styles.errorRetryBtn} onClick={fetchArrivals} aria-label="다시 시도">다시 시도</button>
         </div>
       )}
 

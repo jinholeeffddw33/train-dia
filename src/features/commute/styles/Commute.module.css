@@ -64,8 +64,8 @@
 }
 
 .backBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,8 +83,8 @@
 }
 
 .favBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,8 +96,8 @@
 .favBtnActive { color: var(--dia-amber); }
 
 .refreshSmall {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -137,6 +137,16 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-red);
   margin-bottom: var(--dia-space-3);
+}
+
+.errorRetryBtn {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  min-height: 44px;
 }
 
 .noArrivals {

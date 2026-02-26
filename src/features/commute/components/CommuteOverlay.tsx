@@ -32,6 +32,7 @@ export default function CommuteOverlay({ open, onClose }: { open: boolean; onClo
           placeholder="역 이름으로 검색..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="역 이름 검색"
         />
 
         {/* 선택된 역 도착 정보 */}

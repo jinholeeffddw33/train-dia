@@ -102,6 +102,7 @@ export default function CompareTab() {
       {/* 비교 테이블 */}
       {hasAnyPerson && (
         <div className={styles.table}>
+          {/* STYLE-EXCEPTION: 비교 인원 수에 따라 동적 grid columns 필요 */}
           <div className={styles.tableHeader} style={{ gridTemplateColumns: gridCols }}>
             <span className={styles.tableHeaderCell}>날짜</span>
             {persons.map((p, idx) => (
@@ -112,6 +113,7 @@ export default function CompareTab() {
             <div
               key={row.d}
               className={`${styles.tableRow} ${row.allRest ? styles.tableRowMatch : ''}`}
+              /* STYLE-EXCEPTION: 비교 인원 수에 따라 동적 grid columns 필요 */
               style={{ gridTemplateColumns: gridCols }}
             >
               <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''}`}>

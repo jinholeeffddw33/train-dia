@@ -53,7 +53,7 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
 
   return (
     <div className={styles.rt}>
-      <div className={styles.rtLabel}><TrainFront size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '4px' }} />{LABELS.SEGMENT_RUN}</div>
+      <div className={styles.rtLabel}><TrainFront size={14} className={styles.rtLabelIcon} />{LABELS.SEGMENT_RUN}</div>
 
       {segs.map((seg, i) => {
         const trains = seg.n ? seg.n.join(' / ') : '';

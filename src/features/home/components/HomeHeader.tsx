@@ -28,7 +28,7 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
         <div className={styles.headerLeft}>
           {driver ? (
             <>
-              <span className={styles.headerName}>{driver.n} 기관사</span>
+              <span className={styles.headerName}>{driver.n} <span className={styles.headerRole}>기관사</span></span>
               <span className={styles.headerGreeting}>
                 {parseInt(clock.hours) < 12 ? '좋은 아침이에요' : parseInt(clock.hours) < 18 ? '좋은 오후예요' : '수고하셨어요'}
               </span>

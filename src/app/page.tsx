@@ -8,7 +8,7 @@ import { CalendarTab } from '@/features/calendar';
 import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import { MoreTab } from '@/features/more';
-import styles from './page.module.css';
+import { Line5Tab } from '@/features/line5';
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -17,7 +17,7 @@ function TabContent({ tab }: { tab: TabId }) {
     case 'calendar':
       return <CalendarTab />;
     case 'line':
-      return <PlaceholderTab name="5호선" emoji="🚇" color="var(--dia-purple)" />;
+      return <Line5Tab />;
     case 'compare':
       return <CompareTab />;
     case 'contacts':
@@ -44,17 +44,6 @@ function HomeTab() {
         onClose={() => setSelectorOpen(false)}
       />
     </>
-  );
-}
-
-function PlaceholderTab({ name, emoji, color }: { name: string; emoji: string; color: string }) {
-  return (
-    <div className={styles.placeholder}>
-      <span className={styles.placeholderIcon}>{emoji}</span>
-      {/* STYLE-EXCEPTION: 탭별 동적 컬러 */}
-      <h2 className={styles.placeholderTitle} style={{ color }}>{name}</h2>
-      <p className={styles.placeholderDesc}>준비 중입니다</p>
-    </div>
   );
 }
 

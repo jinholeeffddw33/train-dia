@@ -49,7 +49,7 @@ function HomeTab() {
         onSelectDate={(date) => setSelectedDate(date || undefined)}
       />
       <TodayCard selectedDate={selectedDate} />
-      <StatusCards />
+      <StatusCards baseDate={selectedDate} />
       <MonthSummary />
       <DriverSelector
         open={selectorOpen}

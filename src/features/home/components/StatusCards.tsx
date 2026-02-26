@@ -6,21 +6,25 @@ import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today } from '@/
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Home.module.css';
 
-/** 내일 + 모레 카드 */
-export default function StatusCards() {
+interface StatusCardsProps {
+  baseDate?: Date;
+}
+
+/** 기준일 +1 / +2 카드 */
+export default function StatusCards({ baseDate }: StatusCardsProps) {
   const driver = useDriverStore((s) => s.current);
-  const td = today();
+  const base = baseDate ?? today();
 
   const cards = useMemo(() => {
     if (!driver) return [];
     return [1, 2].map((offset) => {
-      const d = new Date(td);
+      const d = new Date(base);
       d.setDate(d.getDate() + offset);
       const dia = getDia(driver, d);
       const type = getType(dia);
       const schedule = getSchedule(dia, d);
       return {
-        label: offset === 1 ? '내일' : '모레',
+        label: offset === 1 ? '다음날' : '다다음날',
         date: `${d.getMonth() + 1}/${d.getDate()}(${DOW[d.getDay()]})`,
         dia,
         display: getDiaDisplay(dia),
@@ -29,7 +33,7 @@ export default function StatusCards() {
         time: schedule ? `${schedule.s} ~ ${schedule.e}` : null,
       };
     });
-  }, [driver]);
+  }, [driver, base]);
 
   if (!driver || cards.length === 0) return null;
 

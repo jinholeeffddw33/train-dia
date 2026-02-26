@@ -1,0 +1,71 @@
+/* ===== Modal — Bottom Sheet 스타일 ===== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-modal);
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 200ms var(--dia-ease);
+}
+
+.content {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-2xl) var(--dia-radius-2xl) 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 300ms var(--dia-ease);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.headerArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-5) var(--dia-space-5) var(--dia-space-3);
+  border-bottom: 1px solid var(--dia-border);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.closeBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-tertiary);
+  transition: background var(--dia-transition-fast);
+}
+
+.closeBtn:hover {
+  background: var(--dia-surface-hover);
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

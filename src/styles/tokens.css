@@ -1,50 +1,56 @@
 /* ==========================================
-   Train DIA Design Tokens v2.0
-   단일 진실 원천 (SSOT) — 모든 색/간격/라운드/그림자
+   Train DIA v2 — "Night Shift" Design Tokens
+   SSOT: 모든 색/간격/라운드/그림자는 여기서만 정의
+   기본 = 다크 모드 (야간 근무 최적화)
    ========================================== */
 
 :root {
   /* ========================================
-     Color Palette
+     Color Palette — Night Shift
      ======================================== */
-  --dia-blue: #1A56DB;
-  --dia-blue-light: #3B82F6;
-  --dia-green: #10B981;
-  --dia-green-light: #34D399;
+  --dia-blue: #3B82F6;
+  --dia-blue-dim: rgba(59, 130, 246, 0.15);
+  --dia-blue-glow: rgba(59, 130, 246, 0.3);
+  --dia-green: #22C55E;
+  --dia-green-dim: rgba(34, 197, 94, 0.15);
   --dia-purple: #8B5CF6;
-  --dia-purple-light: #A78BFA;
-  --dia-orange: #F59E0B;
-  --dia-orange-light: #FBBF24;
+  --dia-purple-dim: rgba(139, 92, 246, 0.15);
+  --dia-amber: #F59E0B;
+  --dia-amber-dim: rgba(245, 158, 11, 0.15);
   --dia-red: #EF4444;
-  --dia-red-light: #FB7185;
+  --dia-red-dim: rgba(239, 68, 68, 0.15);
   --dia-gray: #6B7280;
-  --dia-gray-light: #9CA3AF;
   --dia-sky: #38BDF8;
 
   /* ========================================
-     Background & Surface
+     Background & Surface (Dark-first)
      ======================================== */
-  --dia-bg: #F0F2F5;
-  --dia-surface: #FFFFFF;
-  --dia-surface-elevated: #FFFFFF;
-  --dia-surface-hover: #F9FAFB;
+  --dia-bg: #0F172A;
+  --dia-bg-elevated: #131B2E;
+  --dia-surface: #1E293B;
+  --dia-surface-elevated: #273549;
+  --dia-surface-hover: #334155;
+  --dia-surface-active: #3B4A63;
 
   /* ========================================
-     Text
+     Text (다크 배경용)
      ======================================== */
-  --dia-text-primary: #111827;
-  --dia-text-secondary: #4B5563;
-  --dia-text-tertiary: #9CA3AF;
+  --dia-text-primary: #F1F5F9;
+  --dia-text-secondary: #94A3B8;
+  --dia-text-tertiary: #64748B;
+  --dia-text-inverse: #0F172A;
 
   /* ========================================
      Border
      ======================================== */
-  --dia-border: #E5E7EB;
-  --dia-border-light: #F3F4F6;
+  --dia-border: rgba(255, 255, 255, 0.08);
+  --dia-border-strong: rgba(255, 255, 255, 0.15);
+  --dia-border-light: rgba(255, 255, 255, 0.04);
 
   /* ========================================
      Spacing (4px grid)
      ======================================== */
+  --dia-space-0: 0px;
   --dia-space-1: 4px;
   --dia-space-2: 8px;
   --dia-space-3: 12px;
@@ -54,37 +60,53 @@
   --dia-space-8: 32px;
   --dia-space-10: 40px;
   --dia-space-12: 48px;
+  --dia-space-16: 64px;
 
   /* ========================================
      Border Radius
      ======================================== */
-  --dia-radius-sm: 6px;
-  --dia-radius-md: 10px;
-  --dia-radius-lg: 14px;
-  --dia-radius-xl: 18px;
+  --dia-radius-xs: 4px;
+  --dia-radius-sm: 8px;
+  --dia-radius-md: 12px;
+  --dia-radius-lg: 16px;
+  --dia-radius-xl: 20px;
+  --dia-radius-2xl: 24px;
   --dia-radius-full: 9999px;
 
   /* ========================================
-     Shadow
+     Shadow (Dark mode — subtle glow)
      ======================================== */
-  --dia-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --dia-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
-  --dia-shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  --dia-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --dia-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --dia-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --dia-shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.2);
+  --dia-shadow-glow-green: 0 0 20px rgba(34, 197, 94, 0.2);
+  --dia-shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.2);
 
   /* ========================================
      Typography
      ======================================== */
-  --dia-font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  --dia-text-xs: 11px;
-  --dia-text-sm: 13px;
-  --dia-text-base: 15px;
-  --dia-text-lg: 17px;
+  --dia-font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --dia-text-xs: 12px;
+  --dia-text-sm: 14px;
+  --dia-text-base: 16px;
+  --dia-text-lg: 18px;
   --dia-text-xl: 20px;
   --dia-text-2xl: 24px;
   --dia-text-3xl: 30px;
+  --dia-text-4xl: 36px;
+
+  --dia-weight-normal: 400;
+  --dia-weight-medium: 500;
+  --dia-weight-semibold: 600;
+  --dia-weight-bold: 700;
+
+  --dia-leading-tight: 1.25;
+  --dia-leading-normal: 1.5;
+  --dia-leading-relaxed: 1.65;
 
   /* ========================================
-     Z-Index Layer System (SSOT)
+     Z-Index Layers
      ======================================== */
   --dia-layer-base: 0;
   --dia-layer-sticky: 10;
@@ -98,43 +120,64 @@
   /* ========================================
      Tab Bar
      ======================================== */
-  --dia-tab-height: 72px;
+  --dia-tab-height: 64px;
+  --dia-tab-height-safe: calc(64px + env(safe-area-inset-bottom, 0px));
 
   /* ========================================
-     Tab Colors (각 페이지 고유 컬러)
+     Tab Accent Colors
      ======================================== */
   --dia-tab-home: var(--dia-blue);
   --dia-tab-calendar: var(--dia-green);
   --dia-tab-line: var(--dia-purple);
-  --dia-tab-compare: var(--dia-orange);
+  --dia-tab-compare: var(--dia-amber);
   --dia-tab-contacts: var(--dia-sky);
   --dia-tab-more: var(--dia-gray);
 
   /* ========================================
+     DIA Type Colors (교번 유형별)
+     ======================================== */
+  --dia-type-day: var(--dia-blue);
+  --dia-type-day-bg: var(--dia-blue-dim);
+  --dia-type-night: var(--dia-purple);
+  --dia-type-night-bg: var(--dia-purple-dim);
+  --dia-type-standby: var(--dia-amber);
+  --dia-type-standby-bg: var(--dia-amber-dim);
+  --dia-type-rest: var(--dia-gray);
+  --dia-type-rest-bg: rgba(107, 114, 128, 0.15);
+
+  /* ========================================
      Transition
      ======================================== */
-  --dia-transition-fast: 150ms;
-  --dia-transition-normal: 250ms;
-  --dia-transition-slow: 350ms;
+  --dia-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dia-transition-fast: 150ms var(--dia-ease);
+  --dia-transition-normal: 250ms var(--dia-ease);
+  --dia-transition-slow: 350ms var(--dia-ease);
 }
 
 /* ==========================================
-   DARK MODE
+   LIGHT MODE (옵션 — 기본은 다크)
    ========================================== */
-:root.dark {
-  --dia-bg: #0F172A;
-  --dia-surface: #1E293B;
-  --dia-surface-elevated: #273549;
-  --dia-surface-hover: #334155;
+:root.light {
+  --dia-bg: #F0F4F8;
+  --dia-bg-elevated: #F8FAFC;
+  --dia-surface: #FFFFFF;
+  --dia-surface-elevated: #FFFFFF;
+  --dia-surface-hover: #F1F5F9;
+  --dia-surface-active: #E2E8F0;
 
-  --dia-text-primary: #F1F5F9;
-  --dia-text-secondary: #94A3B8;
-  --dia-text-tertiary: #64748B;
+  --dia-text-primary: #0F172A;
+  --dia-text-secondary: #475569;
+  --dia-text-tertiary: #94A3B8;
+  --dia-text-inverse: #F1F5F9;
 
-  --dia-border: rgba(255,255,255,0.1);
-  --dia-border-light: rgba(255,255,255,0.05);
+  --dia-border: rgba(0, 0, 0, 0.08);
+  --dia-border-strong: rgba(0, 0, 0, 0.15);
+  --dia-border-light: rgba(0, 0, 0, 0.04);
 
-  --dia-shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-  --dia-shadow-md: 0 2px 8px rgba(0,0,0,0.4);
-  --dia-shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+  --dia-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --dia-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --dia-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --dia-shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.12);
+  --dia-shadow-glow-green: 0 0 20px rgba(34, 197, 94, 0.12);
+  --dia-shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.12);
 }

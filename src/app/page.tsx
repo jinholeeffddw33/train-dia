@@ -1,117 +1,63 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { P } from '@/data/cycle';
-import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getColor, getWorkTime, getNextShift, getBannerState, formatTimeUntil, today } from '@/lib/schedule';
-import { LABELS, DOW } from '@/lib/constants';
-import type { Person } from '@/lib/types';
+import { useState } from 'react';
+import AppShell from '@/components/layout/AppShell';
+import type { TabId } from '@/components/layout/TabBar';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector } from '@/features/home';
 import styles from './page.module.css';
 
-export default function HomePage() {
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const [showSelector, setShowSelector] = useState(false);
+function TabContent({ tab }: { tab: TabId }) {
+  switch (tab) {
+    case 'home':
+      return <HomeTab />;
+    case 'calendar':
+      return <PlaceholderTab name="교번" emoji="📅" color="var(--dia-green)" />;
+    case 'line':
+      return <PlaceholderTab name="5호선" emoji="🚇" color="var(--dia-purple)" />;
+    case 'compare':
+      return <PlaceholderTab name="비교" emoji="⚖️" color="var(--dia-amber)" />;
+    case 'contacts':
+      return <PlaceholderTab name="연락처" emoji="📞" color="var(--dia-sky)" />;
+    case 'more':
+      return <PlaceholderTab name="더보기" emoji="⚙️" color="var(--dia-gray)" />;
+    default:
+      return null;
+  }
+}
 
-  const now = new Date();
-  const td = today();
-  const dow = DOW[td.getDay()];
-  const dateStr = `${td.getMonth() + 1}/${td.getDate()}(${dow})`;
-
-  const dia = useMemo(() => selectedPerson ? getDia(selectedPerson, td) : null, [selectedPerson]);
-  const diaType = useMemo(() => dia ? getType(dia) : null, [dia]);
-  const schedule = useMemo(() => dia ? getSchedule(dia, td) : null, [dia]);
-  const nextShift = useMemo(
-    () => selectedPerson ? getNextShift(selectedPerson, td) : null,
-    [selectedPerson],
-  );
-  const banner = useMemo(
-    () => schedule || nextShift ? getBannerState(schedule, nextShift, now) : null,
-    [schedule, nextShift],
-  );
+function HomeTab() {
+  const [selectorOpen, setSelectorOpen] = useState(false);
 
   return (
-    <main className={styles.main}>
-      {/* 헤더 */}
-      <header className={styles.header}>
-        <h1 className={styles.title}>답십리 DIA</h1>
-        <span className={styles.date}>{dateStr}</span>
-      </header>
+    <>
+      <HomeHeader onDriverSelect={() => setSelectorOpen(true)} />
+      <TodayCard />
+      <WeekStrip />
+      <StatusCards />
+      <MonthSummary />
+      <DriverSelector
+        open={selectorOpen}
+        onClose={() => setSelectorOpen(false)}
+      />
+    </>
+  );
+}
 
-      {/* 기관사 선택 */}
-      <button
-        type="button"
-        className={styles.selectorBtn}
-        onClick={() => setShowSelector(!showSelector)}
-      >
-        {selectedPerson ? `${selectedPerson.n} (${selectedPerson.I}번)` : LABELS.SELECT_DRIVER}
-      </button>
+function PlaceholderTab({ name, emoji, color }: { name: string; emoji: string; color: string }) {
+  return (
+    <div className={styles.placeholder}>
+      <span className={styles.placeholderIcon}>{emoji}</span>
+      {/* STYLE-EXCEPTION: 탭별 동적 컬러 */}
+      <h2 className={styles.placeholderTitle} style={{ color }}>{name}</h2>
+      <p className={styles.placeholderDesc}>준비 중입니다</p>
+    </div>
+  );
+}
 
-      {showSelector && (
-        <div className={styles.selectorList}>
-          {P.map((p) => (
-            <button
-              key={p.I}
-              type="button"
-              className={styles.personItem}
-              onClick={() => {
-                setSelectedPerson(p);
-                setShowSelector(false);
-              }}
-            >
-              <span className={styles.personNum}>{p.I}</span>
-              <span className={styles.personName}>{p.n}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* 교번 카드 */}
-      {selectedPerson && dia ? (
-        <section className={styles.card}>
-          <div className={styles.cardHeader}>
-            <span className={styles.cardLabel}>{LABELS.TODAY_DIA}</span>
-          </div>
-          <div className={styles.diaRow}>
-            <span
-              className={styles.diaBadge}
-              style={{ backgroundColor: getColor(diaType!) }}
-            >
-              {getDiaDisplay(dia)}
-            </span>
-            <span className={styles.diaType}>{getLabel(dia)}</span>
-          </div>
-
-          {schedule && (
-            <div className={styles.scheduleInfo}>
-              <div className={styles.timeRow}>
-                <span>{LABELS.START} {schedule.s}</span>
-                <span>{LABELS.END} {schedule.e}</span>
-                <span>{LABELS.WORK_TIME} {getWorkTime(schedule)}</span>
-              </div>
-              {schedule.m && (
-                <p className={styles.route}>{schedule.m}</p>
-              )}
-            </div>
-          )}
-
-          {/* 배너 */}
-          {banner && (
-            <div className={`${styles.banner} ${styles[`banner_${banner.state}`]}`}>
-              {banner.state === 'working' && <span>{LABELS.WORK} 중</span>}
-              {banner.state === 'done' && <span>{LABELS.GOOD_JOB} 😊</span>}
-              {banner.state === 'preparing' && (
-                <span>출근 준비 · {formatTimeUntil(banner.minsUntil)}</span>
-              )}
-              {banner.state === 'idle' && banner.next && (
-                <span>{LABELS.NEXT_WORK} · {banner.next.dia} ({formatTimeUntil(banner.minsUntil)})</span>
-              )}
-            </div>
-          )}
-        </section>
-      ) : (
-        <section className={styles.empty}>
-          <p>{LABELS.EMPTY_HOME.replace('<br>', '\n')}</p>
-        </section>
-      )}
-    </main>
+export default function HomePage() {
+  return (
+    <AppShell>
+      {(activeTab) => <TabContent tab={activeTab} />}
+    </AppShell>
   );
 }

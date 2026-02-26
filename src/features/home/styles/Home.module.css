@@ -1,0 +1,578 @@
+/* ===== Home Tab — Night Shift Design ===== */
+
+/* ── Header Section ── */
+.headerSection {
+  padding: var(--dia-space-5) var(--dia-space-4) var(--dia-space-3);
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--dia-space-4);
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.appTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.dateText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.clockArea {
+  display: flex;
+  align-items: baseline;
+}
+
+.clockTime {
+  font-size: var(--dia-text-3xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.clockSeconds {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Driver Selector Button ── */
+.driverSelector {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  min-height: 48px;
+  transition: background var(--dia-transition-fast);
+}
+
+.driverSelector:active {
+  background: var(--dia-surface-hover);
+  transform: scale(0.98);
+}
+
+.driverName {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.driverNum {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+.driverPlaceholder {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-tertiary);
+}
+
+.driverArrow {
+  margin-left: auto;
+  font-size: var(--dia-text-xl);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── Today Card ── */
+.todayCard {
+  margin: var(--dia-space-4);
+  padding: var(--dia-space-5);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  box-shadow: var(--dia-shadow-md);
+}
+
+.diaHeader {
+  margin-bottom: var(--dia-space-3);
+}
+
+.cardLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.diaMain {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-3);
+}
+
+.diaBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 56px;
+  padding: 0 var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  transition: transform var(--dia-transition-fast);
+}
+
+.diaBadgeText {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+}
+
+.diaInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.diaTypeLabel {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.diaTime {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.workTime {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── DIA Type Colors ── */
+.type_day .diaBadge,
+.type_day.diaBadge { background: var(--dia-type-day); box-shadow: var(--dia-shadow-glow-blue); }
+.type_night .diaBadge,
+.type_night.diaBadge { background: var(--dia-type-night); box-shadow: var(--dia-shadow-glow-purple); }
+.type_standby .diaBadge,
+.type_standby.diaBadge { background: var(--dia-type-standby); }
+.type_rest .diaBadge,
+.type_rest.diaBadge { background: var(--dia-type-rest); }
+
+/* ── Route Section ── */
+.routeSection {
+  padding-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.routeLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.routeText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-1);
+  word-break: keep-all;
+  line-height: var(--dia-leading-relaxed);
+}
+
+/* ── Status Banner ── */
+.statusBanner {
+  margin-top: var(--dia-space-4);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+}
+
+.bannerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+  background: currentColor;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.banner_working {
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+.banner_done {
+  background: var(--dia-green-dim);
+  color: var(--dia-green);
+}
+
+.banner_preparing {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber);
+}
+
+.banner_idle {
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+}
+
+/* ── Empty Card ── */
+.emptyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: var(--dia-space-4);
+  padding: var(--dia-space-12) var(--dia-space-6);
+  background: var(--dia-surface);
+  border: 1px dashed var(--dia-border-strong);
+  border-radius: var(--dia-radius-xl);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: var(--dia-space-4);
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-tertiary);
+  white-space: pre-line;
+  line-height: var(--dia-leading-relaxed);
+}
+
+/* ── Week Strip ── */
+.weekSection {
+  padding: 0 var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+}
+
+.sectionTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-3);
+  padding: 0 var(--dia-space-1);
+}
+
+.weekScroll {
+  display: flex;
+  gap: var(--dia-space-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--dia-space-1);
+}
+
+.weekScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.weekDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  padding: var(--dia-space-2) var(--dia-space-1);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  scroll-snap-align: center;
+  transition: transform var(--dia-transition-fast), background var(--dia-transition-fast);
+}
+
+.weekDay:active {
+  transform: scale(0.95);
+}
+
+.weekDayToday {
+  border-color: var(--dia-blue);
+  background: var(--dia-blue-dim);
+  box-shadow: var(--dia-shadow-glow-blue);
+}
+
+.weekDow {
+  font-size: 11px;
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-tertiary);
+}
+
+.weekDowWeekend {
+  color: var(--dia-red);
+}
+
+.weekDate {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.weekDia {
+  font-size: 11px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+}
+
+/* 주간 스트립 타입별 색상 */
+.weekType_day .weekDia { color: var(--dia-blue); }
+.weekType_night .weekDia { color: var(--dia-purple); }
+.weekType_standby .weekDia { color: var(--dia-amber); }
+.weekType_rest .weekDia { color: var(--dia-gray); }
+
+/* ── Status Cards (내일/모레) ── */
+.statusCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+  padding: 0 var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+}
+
+.statusCard {
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.statusCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--dia-space-2);
+}
+
+.statusCardLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  text-transform: uppercase;
+}
+
+.statusCardDate {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.statusCardBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statusCardDia {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.statusCardTime {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 내일/모레 타입별 좌측 강조선 */
+.statusCard.type_day { border-left: 3px solid var(--dia-blue); }
+.statusCard.type_night { border-left: 3px solid var(--dia-purple); }
+.statusCard.type_standby { border-left: 3px solid var(--dia-amber); }
+.statusCard.type_rest { border-left: 3px solid var(--dia-gray); }
+
+/* ── Month Summary ── */
+.monthSection {
+  margin: 0 var(--dia-space-4) var(--dia-space-4);
+  padding: var(--dia-space-5);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+}
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-4);
+}
+
+.monthNav {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dia-text-xl);
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  transition: background var(--dia-transition-fast);
+}
+
+.monthNav:hover {
+  background: var(--dia-surface-hover);
+}
+
+.monthTitle {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--dia-space-2);
+}
+
+.monthItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--dia-space-3) 0;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg);
+}
+
+.monthValue {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.monthLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-tertiary);
+}
+
+.monthLabelDay { color: var(--dia-blue); }
+.monthLabelNight { color: var(--dia-purple); }
+.monthLabelStandby { color: var(--dia-amber); }
+
+/* ── Driver Selector Modal ── */
+.selectorSearch {
+  position: relative;
+  padding: var(--dia-space-4) var(--dia-space-5);
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-right: var(--dia-space-10);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+  min-height: 48px;
+}
+
+.searchInput::placeholder {
+  color: var(--dia-text-tertiary);
+}
+
+.searchClear {
+  position: absolute;
+  right: calc(var(--dia-space-5) + var(--dia-space-3));
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+}
+
+.selectorCount {
+  padding: 0 var(--dia-space-5) var(--dia-space-2);
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.selectorList {
+  max-height: 50vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.personItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-5);
+  border-bottom: 1px solid var(--dia-border-light);
+  min-height: 48px;
+  text-align: left;
+  transition: background var(--dia-transition-fast);
+}
+
+.personItem:last-child {
+  border-bottom: none;
+}
+
+.personItem:active {
+  background: var(--dia-surface-hover);
+}
+
+.personItemActive {
+  background: var(--dia-blue-dim);
+}
+
+.personNum {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  min-width: 32px;
+  font-variant-numeric: tabular-nums;
+}
+
+.personName {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-primary);
+  flex: 1;
+}
+
+.personDia {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+.selectorEmpty {
+  padding: var(--dia-space-8);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+}
+
+/* ── Animations ── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

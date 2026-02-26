@@ -1,0 +1,15 @@
+/* ===== App Shell ===== */
+
+.shell {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.content {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: var(--dia-tab-height-safe);
+  min-height: 100vh;
+  min-height: 100dvh;
+}

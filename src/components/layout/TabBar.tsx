@@ -18,7 +18,7 @@ const TABS: TabItem[] = [
   { id: 'line', label: '5호선', Icon: TrainFront },
   { id: 'compare', label: '비교', Icon: GitCompareArrows },
   { id: 'contacts', label: '연락처', Icon: Phone },
-  { id: 'more', label: '더보기', Icon: Settings },
+  { id: 'more', label: '설정', Icon: Settings },
 ];
 
 interface TabBarProps {

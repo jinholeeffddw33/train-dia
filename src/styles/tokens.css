@@ -155,6 +155,34 @@
 }
 
 /* ==========================================
+   FONT SIZE — Small (축소)
+   ========================================== */
+:root.font-small {
+  --dia-text-xs: 10px;
+  --dia-text-sm: 12px;
+  --dia-text-base: 14px;
+  --dia-text-lg: 16px;
+  --dia-text-xl: 18px;
+  --dia-text-2xl: 22px;
+  --dia-text-3xl: 28px;
+  --dia-text-4xl: 34px;
+}
+
+/* ==========================================
+   FONT SIZE — Large (확대)
+   ========================================== */
+:root.font-large {
+  --dia-text-xs: 14px;
+  --dia-text-sm: 16px;
+  --dia-text-base: 18px;
+  --dia-text-lg: 20px;
+  --dia-text-xl: 22px;
+  --dia-text-2xl: 26px;
+  --dia-text-3xl: 32px;
+  --dia-text-4xl: 38px;
+}
+
+/* ==========================================
    LIGHT MODE (옵션 — 기본은 다크)
    ========================================== */
 :root.light {

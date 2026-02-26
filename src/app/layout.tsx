@@ -26,17 +26,17 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#F0F4F8',
+  themeColor: '#0F172A',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className={notoSansKR.variable}>
       <head>
-        {/* 다크모드 FOUC 방지: hydration 전에 즉시 실행 */}
+        {/* 다크모드 + 글자 크기 FOUC 방지: hydration 전에 즉시 실행 */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=JSON.parse(localStorage.getItem('dia-theme')||'{}');if(t&&t.state&&t.state.theme==='dark'){return}document.documentElement.classList.add('light')}catch(e){document.documentElement.classList.add('light')}})()`,
+            __html: `(function(){try{var d=document.documentElement;var t=JSON.parse(localStorage.getItem('dia-theme')||'{}');if(t&&t.state&&t.state.theme==='light'){d.classList.add('light')}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large')}}catch(e){}})()`,
           }}
         />
       </head>

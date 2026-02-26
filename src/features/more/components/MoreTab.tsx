@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
+import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { DAILY_TIPS, QUIZ } from '@/data/tips';
 import styles from '../styles/More.module.css';
@@ -10,6 +11,7 @@ import styles from '../styles/More.module.css';
 export default function MoreTab() {
   const driver = useDriverStore((s) => s.current);
   const { theme, toggle: toggleTheme } = useThemeStore();
+  const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const [quizIdx, setQuizIdx] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
@@ -22,7 +24,7 @@ export default function MoreTab() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.pageTitle}>더보기</h2>
+      <h2 className={styles.pageTitle}>설정</h2>
 
       {/* 현재 기관사 */}
       {driver && (
@@ -55,6 +57,32 @@ export default function MoreTab() {
           >
             <span className={styles.toggleKnob} />
           </button>
+        </div>
+
+        {/* 글자 크기 */}
+        <div className={styles.fontSizeRow}>
+          <div className={styles.fontSizeInfo}>
+            <span className={styles.settingIcon}>🔤</span>
+            <span className={styles.settingLabel}>글자 크기</span>
+          </div>
+          <div className={styles.fontSizeBtnGroup}>
+            {([
+              { key: 'small' as FontSize, label: '작게', cls: styles.fontSizeBtnSmall },
+              { key: 'normal' as FontSize, label: '보통', cls: styles.fontSizeBtnNormal },
+              { key: 'large' as FontSize, label: '크게', cls: styles.fontSizeBtnLarge },
+            ]).map((opt) => (
+              <button
+                key={opt.key}
+                type="button"
+                className={`${styles.fontSizeBtn} ${opt.cls} ${fontSize === opt.key ? styles.fontSizeBtnActive : ''}`}
+                onClick={() => setFontSize(opt.key)}
+                aria-pressed={fontSize === opt.key}
+                aria-label={`글자 크기 ${opt.label}`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 알림 설정 */}

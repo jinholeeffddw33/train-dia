@@ -128,6 +128,69 @@
   transform: translateX(24px);
 }
 
+/* ── Font Size Selector ── */
+.fontSizeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-2);
+  min-height: 56px;
+}
+
+.fontSizeInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+
+.fontSizeBtnGroup {
+  display: flex;
+  gap: 4px;
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-md);
+  padding: 3px;
+}
+
+.fontSizeBtn {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  background: transparent;
+  transition: background var(--dia-transition-fast), color var(--dia-transition-fast);
+  min-height: 36px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fontSizeBtn:active {
+  background: var(--dia-surface-hover);
+}
+
+.fontSizeBtnActive {
+  background: var(--dia-blue);
+  color: white;
+  font-weight: var(--dia-weight-semibold);
+}
+
+.fontSizeBtnSmall {
+  font-size: 12px;
+}
+
+.fontSizeBtnNormal {
+  font-size: 14px;
+}
+
+.fontSizeBtnLarge {
+  font-size: 16px;
+}
+
 /* ── Tip Card ── */
 .tipCard {
   display: flex;

@@ -13,3 +13,59 @@
   min-height: 100vh;
   min-height: 100dvh;
 }
+
+/* ── Update Banner ── */
+.updateBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+}
+
+.updateBtn {
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: white;
+  color: var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  min-height: 32px;
+}
+
+/* ── Install Banner ── */
+.installBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border-bottom: 1px solid var(--dia-border);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+}
+
+.installActions {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+
+.installBtn {
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 32px;
+}
+
+.installDismiss {
+  padding: var(--dia-space-1) var(--dia-space-3);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  min-height: 32px;
+}

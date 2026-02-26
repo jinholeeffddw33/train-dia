@@ -1,7 +1,12 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 정적 빌드 (Vercel 서버리스와 호환 + 필요시 GitHub Pages 폴백)
+  // Vercel 서버리스 호환
   output: 'standalone',
+
+  // lockfile 경고 해결
+  outputFileTracingRoot: path.join(__dirname),
 
   // React strict mode
   reactStrictMode: true,

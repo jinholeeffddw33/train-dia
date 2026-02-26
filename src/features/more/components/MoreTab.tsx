@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
+import { useNotification } from '@/hooks/useNotification';
 import { DAILY_TIPS, QUIZ } from '@/data/tips';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
   const driver = useDriverStore((s) => s.current);
   const { theme, toggle: toggleTheme } = useThemeStore();
-  const [sopOpen, setSopOpen] = useState(false);
-  const [quizOpen, setQuizOpen] = useState(false);
+  const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const [quizIdx, setQuizIdx] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
 
@@ -56,6 +56,29 @@ export default function MoreTab() {
             <span className={styles.toggleKnob} />
           </button>
         </div>
+
+        {/* 알림 설정 */}
+        {notifSupported && (
+          <div className={styles.settingRow}>
+            <div className={styles.settingInfo}>
+              <span className={styles.settingIcon}>🔔</span>
+              <span className={styles.settingLabel}>알림</span>
+            </div>
+            {notifPerm === 'granted' ? (
+              <span className={styles.settingValue}>허용됨</span>
+            ) : notifPerm === 'denied' ? (
+              <span className={styles.settingValue}>차단됨</span>
+            ) : (
+              <button
+                type="button"
+                className={styles.quizNext}
+                onClick={requestPermission}
+              >
+                허용하기
+              </button>
+            )}
+          </div>
+        )}
 
         {/* 앱 정보 */}
         <div className={styles.settingRow}>

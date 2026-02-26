@@ -63,11 +63,11 @@ export default function MonthSummary() {
         </div>
         <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.dayStandby}</span>
-          <span className={`${styles.monthLabel} ${styles.monthLabelDay}`}>주대기</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelDay}`}>주간대기</span>
         </div>
         <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.nightStandby}</span>
-          <span className={`${styles.monthLabel} ${styles.monthLabelNight}`}>야대기</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelNight}`}>야간대기</span>
         </div>
       </div>
     </section>

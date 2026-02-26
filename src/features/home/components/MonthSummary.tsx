@@ -22,8 +22,7 @@ export default function MonthSummary() {
 
   if (!driver || !summary) return null;
 
-  const totalWork = summary.dayWork + summary.nightWork;
-  const totalStandby = summary.dayStandby + summary.nightStandby;
+  const totalWork = summary.dayWork + summary.nightWork + summary.dayStandby + summary.nightStandby;
 
   return (
     <section className={styles.monthSection}>
@@ -50,25 +49,25 @@ export default function MonthSummary() {
       </div>
 
       <div className={styles.monthGrid5}>
-        <div className={styles.monthItem}>
+        <div className={`${styles.monthItem} ${styles.monthItemTotal}`}>
           <span className={styles.monthValue}>{totalWork}</span>
           <span className={styles.monthLabel}>근무일</span>
         </div>
-        <div className={styles.monthItem}>
+        <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.dayWork}</span>
           <span className={`${styles.monthLabel} ${styles.monthLabelDay}`}>주간</span>
         </div>
-        <div className={styles.monthItem}>
+        <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.nightWork}</span>
           <span className={`${styles.monthLabel} ${styles.monthLabelNight}`}>야간</span>
         </div>
-        <div className={styles.monthItem}>
+        <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.dayStandby}</span>
-          <span className={`${styles.monthLabel} ${styles.monthLabelStandby}`}>주대기</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelDay}`}>주대기</span>
         </div>
-        <div className={styles.monthItem}>
+        <div className={styles.monthItemSm}>
           <span className={styles.monthValue}>{summary.nightStandby}</span>
-          <span className={`${styles.monthLabel} ${styles.monthLabelStandby}`}>야대기</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelNight}`}>야대기</span>
         </div>
       </div>
     </section>

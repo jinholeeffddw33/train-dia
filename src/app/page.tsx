@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector } from '@/features/home';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector, QuickActions } from '@/features/home';
 import { CalendarTab } from '@/features/calendar';
 import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
@@ -41,8 +41,6 @@ function HomeTab() {
     <>
       <HomeHeader
         onDriverSelect={() => setSelectorOpen(true)}
-        onCommuteOpen={() => setCommuteOpen(true)}
-        onSubwaySearch={() => setSubwayOpen(true)}
       />
       <WeekStrip
         selectedDate={selectedDate}
@@ -51,6 +49,10 @@ function HomeTab() {
       <TodayCard selectedDate={selectedDate} />
       <StatusCards baseDate={selectedDate} />
       <MonthSummary />
+      <QuickActions
+        onCommuteOpen={() => setCommuteOpen(true)}
+        onSubwaySearch={() => setSubwayOpen(true)}
+      />
       <DriverSelector
         open={selectorOpen}
         onClose={() => setSelectorOpen(false)}

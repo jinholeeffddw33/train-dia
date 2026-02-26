@@ -925,6 +925,34 @@
   background: var(--dia-blue-dim);
 }
 
+/* ── Quick Actions (하단) ── */
+.quickActionsBottom {
+  display: flex;
+  gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+}
+
+.quickBtnBottom {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  min-height: 44px;
+  color: var(--dia-text-secondary);
+  transition: all 0.2s;
+}
+
+.quickBtnBottom:active {
+  background: var(--dia-surface-hover);
+  transform: scale(0.97);
+}
+
 /* ── Animations ── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

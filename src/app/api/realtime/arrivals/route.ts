@@ -43,7 +43,10 @@ export async function GET(request: NextRequest) {
 
     const data = await res.json();
 
-    if (data.errorMessage) {
+    // 서울시 API는 성공(INFO-000)에도 errorMessage를 반환한다.
+    // 실제 에러(심야 등)만 빈 배열로 처리.
+    const errCode = data.errorMessage?.code;
+    if (errCode && errCode !== 'INFO-000') {
       return NextResponse.json({ arrivals: [], message: data.errorMessage.message });
     }
 

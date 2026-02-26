@@ -32,8 +32,10 @@ export async function GET() {
 
     const data = await res.json();
 
-    // 에러 응답 처리 (심야 등 열차 없음)
-    if (data.errorMessage) {
+    // 서울시 API는 성공(INFO-000)에도 errorMessage를 반환한다.
+    // 실제 에러(심야 등 열차 없음)만 빈 배열로 처리.
+    const errCode = data.errorMessage?.code;
+    if (errCode && errCode !== 'INFO-000') {
       return NextResponse.json({ trains: [], message: data.errorMessage.message });
     }
 

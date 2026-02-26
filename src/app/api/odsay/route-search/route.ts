@@ -56,6 +56,21 @@ export async function GET(request: NextRequest) {
 
     const data = await res.json();
 
+    // ODsay API 에러 응답 처리 (인증 실패 등)
+    if (data.error) {
+      const errMsg = data.error[0]?.message ?? 'ODsay API 오류';
+      const isAuthError = errMsg.includes('ApiKey');
+      return NextResponse.json(
+        {
+          code: isAuthError ? 'AUTH_ERROR' : 'UPSTREAM_ERROR',
+          message: isAuthError
+            ? 'ODsay API 인증에 실패했습니다. API 키를 확인하세요.'
+            : `ODsay API 오류: ${errMsg}`,
+        },
+        { status: isAuthError ? 401 : 502 },
+      );
+    }
+
     if (!data.result?.path) {
       return NextResponse.json({ paths: [], message: '경로를 찾을 수 없습니다.' });
     }

@@ -38,6 +38,7 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
           <span className={styles.clockAmPm}>{ampm}</span>
           <span className={styles.clockBig}>{clock.hours}:{clock.minutes}</span>
           <span className={styles.clockSec}>:{clock.seconds}</span>
+          <span className={styles.headerOrg}>답십리승무사업소</span>
         </div>
       </div>
 

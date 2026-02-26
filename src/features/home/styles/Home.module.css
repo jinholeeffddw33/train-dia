@@ -554,6 +554,7 @@
   display: grid;
   grid-template-columns: 1.3fr repeat(4, 1fr);
   gap: var(--dia-space-2);
+  align-items: stretch;
 }
 
 .monthItemTotal {
@@ -565,8 +566,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: var(--dia-space-2) 0;
+  padding: var(--dia-space-3) 0;
   border-radius: var(--dia-radius-md);
   background: var(--dia-bg);
 }

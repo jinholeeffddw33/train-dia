@@ -3,13 +3,13 @@
 import { useState, useMemo } from 'react';
 import { useCompareStore } from '@/stores/compare';
 import { P as P_RAW } from '@/data/cycle';
-
-const P_SORTED = [...P_RAW].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
 import type { Person } from '@/lib/types';
 import styles from '../styles/Compare.module.css';
+
+const P_SORTED = [...P_RAW].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 
 const COUNT_OPTIONS = [2, 3, 4, 5] as const;
 

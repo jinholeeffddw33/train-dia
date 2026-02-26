@@ -8,8 +8,18 @@ export function useServiceWorker() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
+    let refreshing = false;
+
+    const handleControllerChange = () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+
     navigator.serviceWorker.register('/sw.js').then((reg) => {
-      // 업데이트 감지
       reg.addEventListener('updatefound', () => {
         const newWorker = reg.installing;
         if (!newWorker) return;
@@ -22,14 +32,9 @@ export function useServiceWorker() {
       });
     });
 
-    // 컨트롤러 변경 감지 (업데이트 적용)
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
-        refreshing = true;
-        window.location.reload();
-      }
-    });
+    return () => {
+      navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+    };
   }, []);
 
   const applyUpdate = () => {

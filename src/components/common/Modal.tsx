@@ -23,10 +23,11 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     [onClose],
   );
 
-  // 포커스 트랩
+  // 포커스 트랩 + 스크롤 잠금
   useEffect(() => {
     if (!open) return;
 
+    const prevOverflow = document.body.style.overflow;
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
 
@@ -38,7 +39,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      document.body.style.overflow = prevOverflow;
     };
   }, [open, handleKeyDown]);
 

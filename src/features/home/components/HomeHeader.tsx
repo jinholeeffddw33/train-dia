@@ -1,10 +1,10 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
-import { useClock } from '../hooks/useClock';
 import { useDriverStore } from '@/stores/driver';
 import { DOW } from '@/lib/constants';
 import { today } from '@/lib/schedule';
+import HeaderClock from './HeaderClock';
 import styles from '../styles/Home.module.css';
 
 interface HomeHeaderProps {
@@ -13,11 +13,9 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
   const driver = useDriverStore((s) => s.current);
-  const clock = useClock();
   const td = today();
   const dow = DOW[td.getDay()];
   const dateStr = `${td.getMonth() + 1}월 ${td.getDate()}일 (${dow})`;
-  const ampm = parseInt(clock.hours) < 12 ? '오전' : '오후';
 
   return (
     <header className={styles.headerSection}>
@@ -35,9 +33,7 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
           <span className={styles.headerDate}>{dateStr}</span>
         </div>
         <div className={styles.headerRight}>
-          <span className={styles.clockAmPm}>{ampm}</span>
-          <span className={styles.clockBig}>{clock.hours}:{clock.minutes}</span>
-          <span className={styles.clockSec}>:{clock.seconds}</span>
+          <HeaderClock />
           <span className={styles.headerOrg}>답십리승무사업소</span>
         </div>
       </div>

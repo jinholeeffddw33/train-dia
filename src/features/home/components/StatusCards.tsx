@@ -24,7 +24,7 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
       const type = getType(dia);
       const schedule = getSchedule(dia, d);
       return {
-        label: offset === 1 ? '다음날' : '다다음날',
+        label: offset === 1 ? '내일' : '모레',
         date: `${d.getMonth() + 1}/${d.getDate()}(${DOW[d.getDay()]})`,
         dia,
         display: getDiaDisplay(dia),

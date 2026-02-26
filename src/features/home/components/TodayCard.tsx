@@ -78,7 +78,10 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
           )}
         </div>
         {schedule && (
-          <span className={styles.workTime}>{getWorkTime(schedule)}</span>
+          <div className={styles.workTimeWrap}>
+            <span className={styles.workTimeLabel}>근무시간</span>
+            <span className={styles.workTime}>{getWorkTime(schedule)}</span>
+          </div>
         )}
       </div>
 

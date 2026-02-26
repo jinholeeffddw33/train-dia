@@ -45,7 +45,10 @@ export async function GET(request: NextRequest) {
   const url = `${ODSAY_API}/subwayPathSchedule?${params}`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(10000),
+      headers: { Referer: 'https://dia5.kr' },
+    });
 
     if (!res.ok) {
       return NextResponse.json(

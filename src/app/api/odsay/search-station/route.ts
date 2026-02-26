@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
   const url = `${ODSAY_API}/searchStation?lang=0&stationName=${encodeURIComponent(name)}&stationClass=2&apiKey=${encodeURIComponent(key)}`;
 
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(url, {
+      signal: AbortSignal.timeout(8000),
+      headers: { Referer: 'https://dia5.kr' },
+    });
 
     if (!res.ok) {
       return NextResponse.json(

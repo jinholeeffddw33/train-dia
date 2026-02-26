@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useCompareStore } from '@/stores/compare';
-import { P } from '@/data/cycle';
+import { P as P_RAW } from '@/data/cycle';
+
+const P_SORTED = [...P_RAW].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
@@ -132,14 +134,13 @@ export default function CompareTab() {
         title={`기관사 ${selectorTarget !== null ? selectorTarget + 1 : ''} 선택`}
       >
         <div className={styles.modalList}>
-          {P.map((p) => (
+          {P_SORTED.map((p) => (
             <button
               key={p.I}
               type="button"
               className={styles.modalItem}
               onClick={() => handleSelect(p)}
             >
-              <span className={styles.modalNum}>{p.I}</span>
               <span className={styles.modalName}>{p.n}</span>
             </button>
           ))}

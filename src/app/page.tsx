@@ -44,11 +44,11 @@ function HomeTab() {
         onCommuteOpen={() => setCommuteOpen(true)}
         onSubwaySearch={() => setSubwayOpen(true)}
       />
-      <TodayCard selectedDate={selectedDate} />
       <WeekStrip
         selectedDate={selectedDate}
-        onSelectDate={(date) => setSelectedDate(date)}
+        onSelectDate={(date) => setSelectedDate(date || undefined)}
       />
+      <TodayCard selectedDate={selectedDate} />
       <StatusCards />
       <MonthSummary />
       <DriverSelector

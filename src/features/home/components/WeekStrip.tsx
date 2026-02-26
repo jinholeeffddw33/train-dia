@@ -8,7 +8,7 @@ import styles from '../styles/Home.module.css';
 
 interface WeekStripProps {
   selectedDate?: Date;
-  onSelectDate?: (date: Date) => void;
+  onSelectDate?: (date: Date | undefined) => void;
 }
 
 /** 14일 주간 스트립 */
@@ -52,10 +52,23 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
 
   if (!driver) return null;
 
+  const handleSelect = (d: { date: Date; isToday: boolean }) => {
+    if (!onSelectDate) return;
+    // 오늘 클릭 시 선택 해제 (기본 상태 복원)
+    if (d.isToday) {
+      onSelectDate(undefined);
+      return;
+    }
+    onSelectDate(d.date);
+  };
+
   const isSelected = (d: Date) => {
     if (!selectedDate) return false;
     return d.toDateString() === selectedDate.toDateString();
   };
+
+  // selectedDate가 있으면 오늘 강조 숨김 (선택한 날짜만 강조)
+  const hasSelection = selectedDate && selectedDate.toDateString() !== today().toDateString();
 
   return (
     <section className={styles.weekSection}>
@@ -63,15 +76,16 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
       <div ref={scrollRef} className={styles.weekScroll}>
         {days.map((d, i) => {
           const selected = isSelected(d.date);
+          const showToday = d.isToday && !hasSelection;
           return (
             <button
               key={i}
               type="button"
               ref={d.isToday ? todayRef : undefined}
-              className={`${styles.weekDay} ${d.isToday ? styles.weekDayToday : ''} ${selected && !d.isToday ? styles.weekDaySelected : ''} ${styles[`weekType_${d.type}`]}`}
+              className={`${styles.weekDay} ${showToday ? styles.weekDayToday : ''} ${selected ? styles.weekDaySelected : ''} ${styles[`weekType_${d.type}`]}`}
               aria-label={`${d.date.getMonth() + 1}월 ${d.day}일 ${d.dow}요일 ${d.display}`}
               aria-current={d.isToday ? 'date' : undefined}
-              onClick={() => onSelectDate?.(d.date)}
+              onClick={() => handleSelect(d)}
             >
               <span className={`${styles.weekDow} ${d.isWeekend ? styles.weekDowWeekend : ''}`}>
                 {d.dow}

@@ -18,22 +18,33 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
   const td = today();
   const dow = DOW[td.getDay()];
   const dateStr = `${td.getMonth() + 1}월 ${td.getDate()}일 (${dow})`;
+  const ampm = parseInt(clock.hours) < 12 ? '오전' : '오후';
 
   return (
     <header className={styles.headerSection}>
+      {/* v1 스타일: 좌우 분할 */}
       <div className={styles.headerTop}>
-        <div className={styles.headerInfo}>
-          <h1 className={styles.appTitle}>기관사 DIA</h1>
-          <span className={styles.dateText}>{dateStr}</span>
+        <div className={styles.headerLeft}>
+          {driver ? (
+            <>
+              <span className={styles.headerName}>{driver.n} 기관사</span>
+              <span className={styles.headerGreeting}>
+                {parseInt(clock.hours) < 12 ? '좋은 아침이에요' : parseInt(clock.hours) < 18 ? '좋은 오후예요' : '수고하셨어요'}
+              </span>
+            </>
+          ) : (
+            <span className={styles.headerName}>기관사 DIA</span>
+          )}
+          <span className={styles.headerDate}>{dateStr}</span>
         </div>
-        <div className={styles.clockArea}>
-          <span className={styles.clockTime}>
-            {clock.hours}:{clock.minutes}
-          </span>
-          <span className={styles.clockSeconds}>:{clock.seconds}</span>
+        <div className={styles.headerRight}>
+          <span className={styles.clockAmPm}>{ampm}</span>
+          <span className={styles.clockBig}>{clock.hours}:{clock.minutes}</span>
+          <span className={styles.clockSec}>:{clock.seconds}</span>
         </div>
       </div>
 
+      {/* 기관사 선택 버튼 (글래스모피즘) */}
       <button
         type="button"
         className={styles.driverSelector}
@@ -42,13 +53,15 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
       >
         {driver ? (
           <>
-            <span className={styles.driverName}>{driver.n}</span>
-            <span className={styles.driverNum}>{driver.I}번</span>
+            <span className={styles.driverBtnText}>{driver.n} · {driver.I}번</span>
+            <span className={styles.driverBtnArrow}>›</span>
           </>
         ) : (
-          <span className={styles.driverPlaceholder}>기관사를 선택하세요</span>
+          <>
+            <span className={styles.driverBtnText}>기관사를 선택하세요</span>
+            <span className={styles.driverBtnArrow}>›</span>
+          </>
         )}
-        <span className={styles.driverArrow}>›</span>
       </button>
 
       {/* 퀵 액션 */}

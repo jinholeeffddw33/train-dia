@@ -1,6 +1,6 @@
 /* ===== Subway Search ===== */
 
-.container { padding: var(--dia-space-2) 0; }
+.container { padding: var(--dia-space-4) var(--dia-space-5); }
 
 /* ── Input Group ── */
 .inputGroup {

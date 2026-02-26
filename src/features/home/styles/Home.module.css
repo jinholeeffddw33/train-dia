@@ -1,100 +1,141 @@
-/* ===== Home Tab — Night Shift Design ===== */
+/* ===== Home Tab — v1 Night Shift Revival ===== */
 
-/* ── Header Section ── */
+/* ── Header Section (v1 파란색 그래디언트) ── */
 .headerSection {
-  padding: var(--dia-space-5) var(--dia-space-4) var(--dia-space-3);
+  background: linear-gradient(160deg, #0F3490 0%, #1A56DB 50%, #2B6EE8 100%);
+  color: #fff;
+  padding: 16px 20px 14px;
+  position: relative;
+  overflow: hidden;
 }
 
+/* 배경 장식 — 깊이감 */
+.headerSection::after {
+  content: '';
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.headerSection::before {
+  content: '';
+  position: absolute;
+  right: 20px;
+  bottom: -50px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+/* ── Header Top (좌우 분할) ── */
 .headerTop {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--dia-space-4);
+  margin-bottom: 12px;
 }
 
-.headerInfo {
+.headerLeft {
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-1);
+  gap: 4px;
 }
 
-.appTitle {
-  font-size: var(--dia-text-xl);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
+.headerName {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
 }
 
-.dateText {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
+.headerGreeting {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.clockArea {
+.headerDate {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.headerRight {
   display: flex;
   align-items: baseline;
+  gap: 2px;
 }
 
-.clockTime {
-  font-size: var(--dia-text-3xl);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
-  letter-spacing: -0.5px;
+.clockAmPm {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 4px;
+}
+
+.clockBig {
+  font-size: clamp(36px, 10vw, 48px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.clockSec {
+  font-size: clamp(20px, 5vw, 26px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
   font-variant-numeric: tabular-nums;
 }
 
-.clockSeconds {
-  font-size: var(--dia-text-lg);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-tertiary);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Driver Selector Button ── */
+/* ── Driver Selector (글래스모피즘) ── */
 .driverSelector {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--dia-space-2);
-  width: 100%;
-  padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
-  min-height: 48px;
-  transition: background var(--dia-transition-fast);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 4px;
+  transition: all 0.2s;
 }
 
 .driverSelector:active {
-  background: var(--dia-surface-hover);
+  background: rgba(255, 255, 255, 0.25);
   transform: scale(0.98);
 }
 
-.driverName {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
+.driverBtnText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
 }
 
-.driverNum {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-tertiary);
+.driverBtnArrow {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 4px;
 }
 
-.driverPlaceholder {
-  font-size: var(--dia-text-base);
-  color: var(--dia-text-tertiary);
-}
-
-.driverArrow {
-  margin-left: auto;
-  font-size: var(--dia-text-xl);
-  color: var(--dia-text-tertiary);
-}
-
-/* ── Quick Actions ── */
+/* ── Quick Actions (글래스모피즘) ── */
 .quickActions {
   display: flex;
-  gap: var(--dia-space-2);
-  margin-top: var(--dia-space-3);
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .quickBtn {
@@ -102,23 +143,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--dia-space-2);
-  padding: var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
   min-height: 44px;
-  transition: background var(--dia-transition-fast);
+  color: #fff;
+  transition: all 0.2s;
 }
 
-.quickBtn:active { background: var(--dia-surface-hover); }
+.quickBtn:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.97);
+}
 
 .quickIcon { font-size: 18px; }
 
 .quickLabel {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
 }
 
 /* ── Today Card ── */

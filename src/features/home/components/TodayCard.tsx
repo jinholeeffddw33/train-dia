@@ -70,7 +70,9 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
           <span className={styles.diaBadgeText}>{getDiaDisplay(dia)}</span>
         </div>
         <div className={styles.diaInfo}>
-          <span className={styles.diaTypeLabel}>{getLabel(dia)}</span>
+          {diaType !== 'rest' && (
+            <span className={styles.diaTypeLabel}>{getLabel(dia)}</span>
+          )}
           {schedule && (
             <span className={styles.diaTime}>
               {schedule.s} ~ {schedule.e}

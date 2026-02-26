@@ -2,17 +2,17 @@ import { create } from 'zustand';
 import type { Person } from '@/lib/types';
 
 interface CompareState {
-  /** 비교 대상 A */
-  personA: Person | null;
-  /** 비교 대상 B */
-  personB: Person | null;
+  /** 비교 인원 수 (2~5) */
+  count: number;
+  /** 비교 대상 배열 */
+  persons: (Person | null)[];
   /** 비교 연도 */
   year: number;
   /** 비교 월 */
   month: number;
 
-  setPersonA: (p: Person | null) => void;
-  setPersonB: (p: Person | null) => void;
+  setCount: (n: number) => void;
+  setPerson: (index: number, p: Person | null) => void;
   prevMonth: () => void;
   nextMonth: () => void;
   resetMonth: () => void;
@@ -21,13 +21,23 @@ interface CompareState {
 const now = new Date();
 
 export const useCompareStore = create<CompareState>()((set) => ({
-  personA: null,
-  personB: null,
+  count: 2,
+  persons: [null, null],
   year: now.getFullYear(),
   month: now.getMonth() + 1,
 
-  setPersonA: (p) => set({ personA: p }),
-  setPersonB: (p) => set({ personB: p }),
+  setCount: (n) =>
+    set((s) => {
+      const next = Array.from({ length: n }, (_, i) => s.persons[i] ?? null);
+      return { count: n, persons: next };
+    }),
+
+  setPerson: (index, p) =>
+    set((s) => {
+      const next = [...s.persons];
+      next[index] = p;
+      return { persons: next };
+    }),
 
   prevMonth: () =>
     set((s) => {

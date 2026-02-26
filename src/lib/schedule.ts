@@ -2,7 +2,7 @@
 
 import type { Person, DiaType, Schedule, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
 import { LABELS, DIR, dirFull, dirSub } from './constants';
-import { CYCLE, DB_STD, CL } from '@/data/cycle';
+import { CYCLE, DB_STD, CL, P } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 
@@ -283,6 +283,90 @@ export function getMonthSummary(person: Person, year: number, month: number): Mo
     }
   }
   return result;
+}
+
+// ===== 교대 상대 찾기 =====
+
+/** 1xxx 열차번호 판별 (기지 출발 — 교대 없음) */
+function is1xxx(trainNo: number): boolean {
+  return trainNo >= 1000 && trainNo < 2000;
+}
+
+/** 교대 상대 탐색 결과 */
+export interface ExchangePartner {
+  left?: string;  // 내가 받을 때 상대 이름
+  right?: string; // 내가 줄 때 상대 이름
+}
+
+/**
+ * 교대 상대 찾기 (v1 findExchangePartners 포팅)
+ * - 내 구간 첫 열차 = 상대 구간 마지막 열차 → left (내가 받음)
+ * - 내 구간 마지막 열차 = 상대 구간 첫 열차 → right (내가 줌)
+ * - 1xxx 번대 열차는 교대 없음
+ */
+export function findExchangePartners(
+  mySchedule: Schedule,
+  myPerson: Person,
+  date: Date,
+): Record<number, ExchangePartner> {
+  const partners: Record<number, ExchangePartner> = {};
+  const segs = mySchedule.g;
+  if (!segs || segs.length === 0) return partners;
+
+  // 전체 인원 스케줄을 한번에 빌드
+  const allSchedules: { person: Person; schedule: Schedule }[] = [];
+  for (const p of P) {
+    if (p.I === myPerson.I) continue; // 자기 자신 제외
+    const dia = getDia(p, date);
+    const tp = getType(dia);
+    if (tp === 'rest') continue;
+    const sc = getSchedule(dia, date);
+    if (sc && sc.g && sc.g.length > 0) {
+      allSchedules.push({ person: p, schedule: sc });
+    }
+  }
+
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    if (!seg.n || seg.n.length === 0) continue;
+    const firstTrain = seg.n[0];
+    const lastTrain = seg.n[seg.n.length - 1];
+    const p: ExchangePartner = {};
+
+    // 왼쪽: 내 첫 열차 = 상대 마지막 열차 (내가 받음)
+    if (!is1xxx(firstTrain)) {
+      for (const other of allSchedules) {
+        for (const otherSeg of other.schedule.g!) {
+          if (!otherSeg.n || otherSeg.n.length === 0) continue;
+          const otherLast = otherSeg.n[otherSeg.n.length - 1];
+          if (otherLast === firstTrain) {
+            p.left = other.person.n;
+            break;
+          }
+        }
+        if (p.left) break;
+      }
+    }
+
+    // 오른쪽: 내 마지막 열차 = 상대 첫 열차 (내가 줌)
+    if (!is1xxx(lastTrain)) {
+      for (const other of allSchedules) {
+        for (const otherSeg of other.schedule.g!) {
+          if (!otherSeg.n || otherSeg.n.length === 0) continue;
+          const otherFirst = otherSeg.n[0];
+          if (otherFirst === lastTrain) {
+            p.right = other.person.n;
+            break;
+          }
+        }
+        if (p.right) break;
+      }
+    }
+
+    if (p.left || p.right) partners[i] = p;
+  }
+
+  return partners;
 }
 
 // ===== 교대 방향 =====

@@ -1,5 +1,7 @@
 'use client';
 
+import { Home, CalendarDays, TrainFront, GitCompareArrows, Phone, Settings } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import styles from './TabBar.module.css';
 
 export type TabId = 'home' | 'calendar' | 'line' | 'compare' | 'contacts' | 'more';
@@ -7,16 +9,16 @@ export type TabId = 'home' | 'calendar' | 'line' | 'compare' | 'contacts' | 'mor
 interface TabItem {
   id: TabId;
   label: string;
-  icon: string;
+  Icon: LucideIcon;
 }
 
 const TABS: TabItem[] = [
-  { id: 'home', label: '홈', icon: '🏠' },
-  { id: 'calendar', label: '교번', icon: '📅' },
-  { id: 'line', label: '5호선', icon: '🚇' },
-  { id: 'compare', label: '비교', icon: '⚖️' },
-  { id: 'contacts', label: '연락처', icon: '📞' },
-  { id: 'more', label: '더보기', icon: '⚙️' },
+  { id: 'home', label: '홈', Icon: Home },
+  { id: 'calendar', label: '교번', Icon: CalendarDays },
+  { id: 'line', label: '5호선', Icon: TrainFront },
+  { id: 'compare', label: '비교', Icon: GitCompareArrows },
+  { id: 'contacts', label: '연락처', Icon: Phone },
+  { id: 'more', label: '더보기', Icon: Settings },
 ];
 
 interface TabBarProps {
@@ -38,10 +40,9 @@ export default function TabBar({ activeTab, onTabChange, alertCount = 0 }: TabBa
             aria-selected={isActive}
             aria-label={tab.label}
             className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
-            data-tab={tab.id}
             onClick={() => onTabChange(tab.id)}
           >
-            <span className={styles.tabIcon}>{tab.icon}</span>
+            <tab.Icon className={styles.tabIcon} size={22} strokeWidth={isActive ? 2.2 : 1.8} />
             <span className={styles.tabLabel}>{tab.label}</span>
             {tab.id === 'home' && alertCount > 0 && (
               <span className={styles.badge} aria-label={`알림 ${alertCount}개`}>

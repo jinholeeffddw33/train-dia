@@ -38,23 +38,14 @@
   transform: scale(0.95);
 }
 
-/* 활성 탭 */
+/* 활성 탭 — 단일 브랜드 색상 */
 .tabActive {
   color: var(--dia-blue);
 }
 
-/* 홈 탭 활성 */
-.tabActive[data-tab="home"] { color: var(--dia-tab-home); }
-.tabActive[data-tab="calendar"] { color: var(--dia-tab-calendar); }
-.tabActive[data-tab="line"] { color: var(--dia-tab-line); }
-.tabActive[data-tab="compare"] { color: var(--dia-tab-compare); }
-.tabActive[data-tab="contacts"] { color: var(--dia-tab-contacts); }
-.tabActive[data-tab="more"] { color: var(--dia-tab-more); }
-
 /* 아이콘 */
 .tabIcon {
-  font-size: 22px;
-  line-height: 1;
+  flex-shrink: 0;
 }
 
 /* 라벨 */
@@ -72,7 +63,7 @@
   left: 25%;
   right: 25%;
   height: 2px;
-  background: currentColor;
+  background: var(--dia-blue);
   border-radius: 0 0 var(--dia-radius-full) var(--dia-radius-full);
 }
 

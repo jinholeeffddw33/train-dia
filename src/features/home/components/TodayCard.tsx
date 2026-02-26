@@ -4,23 +4,35 @@ import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
-  getWorkTime, getNextShift, getBannerState, formatTimeUntil, today,
+  getWorkTime, getNextShift, getBannerState, formatTimeUntil,
+  getRouteDirection, today,
 } from '@/lib/schedule';
-import { LABELS } from '@/lib/constants';
+import { LABELS, dirShort } from '@/lib/constants';
+import { STATION_ABBR } from '@/data/station-abbr';
+import RouteTimeline from './RouteTimeline';
 import styles from '../styles/Home.module.css';
 
-export default function TodayCard() {
-  const driver = useDriverStore((s) => s.current);
-  const td = today();
-  const now = new Date();
+interface TodayCardProps {
+  selectedDate?: Date;
+}
 
-  const dia = useMemo(() => driver ? getDia(driver, td) : null, [driver]);
+export default function TodayCard({ selectedDate }: TodayCardProps) {
+  const driver = useDriverStore((s) => s.current);
+  const td = selectedDate || today();
+  const now = new Date();
+  const isToday = !selectedDate || td.toDateString() === today().toDateString();
+
+  const dia = useMemo(() => driver ? getDia(driver, td) : null, [driver, td]);
   const diaType = useMemo(() => dia ? getType(dia) : null, [dia]);
-  const schedule = useMemo(() => dia ? getSchedule(dia, td) : null, [dia]);
-  const nextShift = useMemo(() => driver ? getNextShift(driver, td) : null, [driver]);
+  const schedule = useMemo(() => dia ? getSchedule(dia, td) : null, [dia, td]);
+  const nextShift = useMemo(() => driver ? getNextShift(driver, td) : null, [driver, td]);
   const banner = useMemo(
-    () => (schedule || nextShift) ? getBannerState(schedule, nextShift, now) : null,
-    [schedule, nextShift],
+    () => isToday && (schedule || nextShift) ? getBannerState(schedule, nextShift, now) : null,
+    [schedule, nextShift, isToday],
+  );
+  const direction = useMemo(
+    () => schedule?.m ? getRouteDirection(schedule.m, STATION_ABBR) : null,
+    [schedule],
   );
 
   if (!driver || !dia) {
@@ -34,11 +46,16 @@ export default function TodayCard() {
 
   const typeClass = diaType ? styles[`type_${diaType}`] : '';
 
+  // 선택 날짜 표시
+  const dateLabel = isToday
+    ? LABELS.TODAY_DIA
+    : `${td.getMonth() + 1}월 ${td.getDate()}일 교번`;
+
   return (
     <section className={styles.todayCard}>
       {/* 교번 표시 */}
       <div className={styles.diaHeader}>
-        <span className={styles.cardLabel}>{LABELS.TODAY_DIA}</span>
+        <span className={styles.cardLabel}>{dateLabel}</span>
       </div>
 
       <div className={styles.diaMain}>
@@ -58,30 +75,64 @@ export default function TodayCard() {
         )}
       </div>
 
-      {/* 운전행로 */}
-      {schedule?.m && (
-        <div className={styles.routeSection}>
-          <span className={styles.routeLabel}>운전행로</span>
-          <p className={styles.routeText}>{schedule.m}</p>
+      {/* 방향 배너 (v1 스타일) */}
+      {isToday && banner && direction && banner.state === 'working' && (
+        <div className={`${styles.dirBanner} ${styles[`dirBanner_${direction.dir}`]}`}>
+          <div className={styles.dirBannerDir}>{direction.label}</div>
+          <div className={styles.dirBannerSub}>{direction.sub}</div>
+          {schedule?.s && (
+            <div className={styles.dirBannerTime}>출발 {schedule.g?.[0]?.d || schedule.s}</div>
+          )}
         </div>
       )}
 
-      {/* 상태 배너 */}
-      {banner && (
-        <div className={`${styles.statusBanner} ${styles[`banner_${banner.state}`]}`}>
-          {banner.state === 'working' && (
-            <><span className={styles.bannerDot} />{LABELS.WORK} 중</>
-          )}
-          {banner.state === 'done' && (
-            <>{LABELS.GOOD_JOB} 😊</>
-          )}
-          {banner.state === 'preparing' && (
-            <>출근 준비 · {formatTimeUntil(banner.minsUntil)}</>
-          )}
-          {banner.state === 'idle' && banner.next && (
-            <>{LABELS.NEXT_WORK} · {banner.next.dia} ({formatTimeUntil(banner.minsUntil)})</>
+      {isToday && banner && banner.state === 'done' && (
+        <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
+          <div className={styles.dirBannerDir}>근무 완료</div>
+          <div className={styles.dirBannerSub}>수고하셨습니다!</div>
+          {nextShift && nextShift.schedule && (
+            <div className={styles.dirBannerNext}>
+              다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s} {nextShift.schedule.m ? dirShort(getRouteDirection(nextShift.schedule.m, STATION_ABBR)?.dir || '') : ''}
+              {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
+            </div>
           )}
         </div>
+      )}
+
+      {isToday && banner && banner.state === 'idle' && (
+        <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
+          <div className={styles.dirBannerDir}>오늘 근무 완료</div>
+          {nextShift && nextShift.schedule && (
+            <div className={styles.dirBannerNext}>
+              다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s}
+              {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
+            </div>
+          )}
+        </div>
+      )}
+
+      {isToday && banner && banner.state === 'preparing' && (
+        <div className={`${styles.dirBanner} ${styles.dirBanner_prep} ${direction ? styles[`dirBanner_${direction.dir}`] : ''}`}>
+          <div className={styles.dirBannerDir}>
+            {direction ? `다음 근무 · ${direction.label}` : '다음 근무'}
+          </div>
+          {direction && <div className={styles.dirBannerSub}>{direction.sub}</div>}
+          <div className={styles.dirBannerTime}>
+            출근 {banner.next?.schedule?.s || ''} ({formatTimeUntil(banner.minsUntil)})
+          </div>
+        </div>
+      )}
+
+      {/* 배너 없을 때 (비근무 상태 등) - 간단 상태 표시 */}
+      {isToday && banner && !direction && banner.state === 'working' && (
+        <div className={`${styles.statusBanner} ${styles.banner_working}`}>
+          <span className={styles.bannerDot} />{LABELS.WORK} 중
+        </div>
+      )}
+
+      {/* 운전행로 구간 타임라인 */}
+      {schedule && driver && (
+        <RouteTimeline schedule={schedule} person={driver} date={td} />
       )}
     </section>
   );

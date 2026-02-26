@@ -35,6 +35,7 @@ function HomeTab() {
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [commuteOpen, setCommuteOpen] = useState(false);
   const [subwayOpen, setSubwayOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   return (
     <>
@@ -43,8 +44,11 @@ function HomeTab() {
         onCommuteOpen={() => setCommuteOpen(true)}
         onSubwaySearch={() => setSubwayOpen(true)}
       />
-      <TodayCard />
-      <WeekStrip />
+      <TodayCard selectedDate={selectedDate} />
+      <WeekStrip
+        selectedDate={selectedDate}
+        onSelectDate={(date) => setSelectedDate(date)}
+      />
       <StatusCards />
       <MonthSummary />
       <DriverSelector

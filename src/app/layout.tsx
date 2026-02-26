@@ -26,7 +26,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#0F172A',
+  themeColor: '#F0F4F8',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 다크모드 FOUC 방지: hydration 전에 즉시 실행 */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('dia-theme');if(t==='light')document.documentElement.classList.add('light')}catch(e){}})()`,
+            __html: `(function(){try{var t=JSON.parse(localStorage.getItem('dia-theme')||'{}');if(t&&t.state&&t.state.theme==='dark'){return}document.documentElement.classList.add('light')}catch(e){document.documentElement.classList.add('light')}})()`,
           }}
         />
       </head>

@@ -6,8 +6,13 @@ import { getDia, getType, getDiaDisplay, today } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Home.module.css';
 
+interface WeekStripProps {
+  selectedDate?: Date;
+  onSelectDate?: (date: Date) => void;
+}
+
 /** 14일 주간 스트립 */
-export default function WeekStrip() {
+export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps) {
   const driver = useDriverStore((s) => s.current);
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLButtonElement>(null);
@@ -47,26 +52,35 @@ export default function WeekStrip() {
 
   if (!driver) return null;
 
+  const isSelected = (d: Date) => {
+    if (!selectedDate) return false;
+    return d.toDateString() === selectedDate.toDateString();
+  };
+
   return (
     <section className={styles.weekSection}>
       <h3 className={styles.sectionTitle}>주간 일정</h3>
       <div ref={scrollRef} className={styles.weekScroll}>
-        {days.map((d, i) => (
-          <button
-            key={i}
-            type="button"
-            ref={d.isToday ? todayRef : undefined}
-            className={`${styles.weekDay} ${d.isToday ? styles.weekDayToday : ''} ${styles[`weekType_${d.type}`]}`}
-            aria-label={`${d.date.getMonth() + 1}월 ${d.day}일 ${d.dow}요일 ${d.display}`}
-            aria-current={d.isToday ? 'date' : undefined}
-          >
-            <span className={`${styles.weekDow} ${d.isWeekend ? styles.weekDowWeekend : ''}`}>
-              {d.dow}
-            </span>
-            <span className={styles.weekDate}>{d.day}</span>
-            <span className={styles.weekDia}>{d.display}</span>
-          </button>
-        ))}
+        {days.map((d, i) => {
+          const selected = isSelected(d.date);
+          return (
+            <button
+              key={i}
+              type="button"
+              ref={d.isToday ? todayRef : undefined}
+              className={`${styles.weekDay} ${d.isToday ? styles.weekDayToday : ''} ${selected && !d.isToday ? styles.weekDaySelected : ''} ${styles[`weekType_${d.type}`]}`}
+              aria-label={`${d.date.getMonth() + 1}월 ${d.day}일 ${d.dow}요일 ${d.display}`}
+              aria-current={d.isToday ? 'date' : undefined}
+              onClick={() => onSelectDate?.(d.date)}
+            >
+              <span className={`${styles.weekDow} ${d.isWeekend ? styles.weekDowWeekend : ''}`}>
+                {d.dow}
+              </span>
+              <span className={styles.weekDate}>{d.day}</span>
+              <span className={styles.weekDia}>{d.display}</span>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

@@ -213,17 +213,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 80px;
-  height: 80px;
+  min-width: 88px;
+  height: 88px;
   padding: 0 var(--dia-space-3);
-  border-radius: var(--dia-radius-md);
+  border-radius: var(--dia-radius-lg);
   transition: transform var(--dia-transition-fast);
 }
 
 .diaBadgeText {
-  font-size: 42px;
-  font-weight: var(--dia-weight-bold);
+  font-size: 50px;
+  font-weight: 900;
   color: white;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  line-height: 1;
 }
 
 .diaInfo {

@@ -54,7 +54,7 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
       >
         {driver ? (
           <>
-            <span className={styles.driverBtnText}>{driver.n} · {driver.I}번</span>
+            <span className={styles.driverBtnText}>{driver.n}</span>
             <ChevronRight size={18} className={styles.driverBtnArrow} />
           </>
         ) : (

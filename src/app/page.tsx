@@ -4,6 +4,10 @@ import { useState } from 'react';
 import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector } from '@/features/home';
+import { CalendarTab } from '@/features/calendar';
+import { CompareTab } from '@/features/compare';
+import { ContactsTab } from '@/features/contacts';
+import { MoreTab } from '@/features/more';
 import styles from './page.module.css';
 
 function TabContent({ tab }: { tab: TabId }) {
@@ -11,15 +15,15 @@ function TabContent({ tab }: { tab: TabId }) {
     case 'home':
       return <HomeTab />;
     case 'calendar':
-      return <PlaceholderTab name="교번" emoji="📅" color="var(--dia-green)" />;
+      return <CalendarTab />;
     case 'line':
       return <PlaceholderTab name="5호선" emoji="🚇" color="var(--dia-purple)" />;
     case 'compare':
-      return <PlaceholderTab name="비교" emoji="⚖️" color="var(--dia-amber)" />;
+      return <CompareTab />;
     case 'contacts':
-      return <PlaceholderTab name="연락처" emoji="📞" color="var(--dia-sky)" />;
+      return <ContactsTab />;
     case 'more':
-      return <PlaceholderTab name="더보기" emoji="⚙️" color="var(--dia-gray)" />;
+      return <MoreTab />;
     default:
       return null;
   }

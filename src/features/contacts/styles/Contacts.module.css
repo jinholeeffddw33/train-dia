@@ -1,0 +1,106 @@
+/* ===== Contacts Tab ===== */
+
+.container { padding: var(--dia-space-4); }
+
+.pageTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-5);
+}
+
+.section { margin-bottom: var(--dia-space-6); }
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.urgentDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── 관제 카드 (긴급) ── */
+.cardUrgent {
+  padding: var(--dia-space-5);
+  background: var(--dia-red-dim);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--dia-radius-xl);
+  margin-bottom: var(--dia-space-3);
+}
+
+/* ── 일반 카드 ── */
+.card {
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-2);
+}
+
+.cardName {
+  display: block;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-3);
+}
+
+.phones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+}
+
+.phoneBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  min-height: 48px;
+  text-decoration: none;
+  transition: background var(--dia-transition-fast);
+}
+
+.phoneBtn:active { background: var(--dia-surface-active); transform: scale(0.98); }
+
+.phoneIcon { font-size: 18px; }
+
+.phoneBtnSmall {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-blue);
+  font-weight: var(--dia-weight-medium);
+  min-height: 36px;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.phoneBtnSmall:active { background: var(--dia-surface-hover); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

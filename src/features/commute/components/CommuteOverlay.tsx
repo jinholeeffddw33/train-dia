@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { Star } from 'lucide-react';
 import { useCommuteStore } from '@/stores/commute';
 import Modal from '@/components/common/Modal';
 import StationArrivals from './StationArrivals';
@@ -61,7 +62,7 @@ export default function CommuteOverlay({ open, onClose }: { open: boolean; onClo
                   className={styles.stationBtn}
                   onClick={() => handleSelectStation(station)}
                 >
-                  <span className={styles.starIcon}>★</span>
+                  <Star size={16} fill="currentColor" className={styles.starIcon} />
                   <span>{station}</span>
                 </button>
               ))}

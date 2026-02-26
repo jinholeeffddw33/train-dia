@@ -1,5 +1,6 @@
 'use client';
 
+import { TrainFront, Search, ChevronRight } from 'lucide-react';
 import { useClock } from '../hooks/useClock';
 import { useDriverStore } from '@/stores/driver';
 import { DOW } from '@/lib/constants';
@@ -54,12 +55,12 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
         {driver ? (
           <>
             <span className={styles.driverBtnText}>{driver.n} · {driver.I}번</span>
-            <span className={styles.driverBtnArrow}>›</span>
+            <ChevronRight size={18} className={styles.driverBtnArrow} />
           </>
         ) : (
           <>
             <span className={styles.driverBtnText}>기관사를 선택하세요</span>
-            <span className={styles.driverBtnArrow}>›</span>
+            <ChevronRight size={18} className={styles.driverBtnArrow} />
           </>
         )}
       </button>
@@ -68,13 +69,13 @@ export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySear
       <div className={styles.quickActions}>
         {onCommuteOpen && (
           <button type="button" className={styles.quickBtn} onClick={onCommuteOpen}>
-            <span className={styles.quickIcon}>🚉</span>
+            <TrainFront size={18} strokeWidth={2} />
             <span className={styles.quickLabel}>도착 정보</span>
           </button>
         )}
         {onSubwaySearch && (
           <button type="button" className={styles.quickBtn} onClick={onSubwaySearch}>
-            <span className={styles.quickIcon}>🔍</span>
+            <Search size={18} strokeWidth={2} />
             <span className={styles.quickLabel}>경로 검색</span>
           </button>
         )}

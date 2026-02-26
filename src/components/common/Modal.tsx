@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import { X } from 'lucide-react';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -64,7 +65,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
               onClick={onClose}
               aria-label="닫기"
             >
-              ✕
+              <X size={18} strokeWidth={2.5} />
             </button>
           </div>
         )}

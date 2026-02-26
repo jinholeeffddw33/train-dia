@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { TrainFront } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
@@ -9,6 +10,7 @@ import {
 } from '@/lib/schedule';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
+import { useClock } from '../hooks/useClock';
 import RouteTimeline from './RouteTimeline';
 import styles from '../styles/Home.module.css';
 
@@ -19,7 +21,12 @@ interface TodayCardProps {
 export default function TodayCard({ selectedDate }: TodayCardProps) {
   const driver = useDriverStore((s) => s.current);
   const td = selectedDate || today();
-  const now = new Date();
+  const clock = useClock();
+  const now = useMemo(() => {
+    const d = new Date();
+    d.setHours(parseInt(clock.hours), parseInt(clock.minutes), parseInt(clock.seconds));
+    return d;
+  }, [clock.hours, clock.minutes, clock.seconds]);
   const isToday = !selectedDate || td.toDateString() === today().toDateString();
 
   const dia = useMemo(() => driver ? getDia(driver, td) : null, [driver, td]);
@@ -28,7 +35,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
   const nextShift = useMemo(() => driver ? getNextShift(driver, td) : null, [driver, td]);
   const banner = useMemo(
     () => isToday && (schedule || nextShift) ? getBannerState(schedule, nextShift, now) : null,
-    [schedule, nextShift, isToday],
+    [schedule, nextShift, isToday, now],
   );
   const direction = useMemo(
     () => schedule?.m ? getRouteDirection(schedule.m, STATION_ABBR) : null,
@@ -38,7 +45,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
   if (!driver || !dia) {
     return (
       <section className={styles.emptyCard}>
-        <span className={styles.emptyIcon}>🚇</span>
+        <TrainFront size={48} className={styles.emptyIcon} />
         <p className={styles.emptyText}>기관사를 선택하면{'\n'}오늘의 교번을 확인합니다</p>
       </section>
     );

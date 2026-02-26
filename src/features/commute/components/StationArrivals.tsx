@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, RefreshCw, Star } from 'lucide-react';
 import styles from '../styles/Commute.module.css';
 
 interface ArrivalInfo {
@@ -74,7 +75,7 @@ export default function StationArrivals({
     <div className={styles.arrivalsContainer}>
       <div className={styles.arrivalsHeader}>
         <button type="button" className={styles.backBtn} onClick={onClose} aria-label="뒤로">
-          ‹
+          <ChevronLeft size={20} />
         </button>
         <h3 className={styles.arrivalsTitle}>{station}</h3>
         <button
@@ -83,10 +84,10 @@ export default function StationArrivals({
           onClick={onToggleFavorite}
           aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
         >
-          {isFavorite ? '★' : '☆'}
+          <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
         <button type="button" className={styles.refreshSmall} onClick={fetchArrivals} aria-label="새로고침">
-          ↻
+          <RefreshCw size={18} />
         </button>
       </div>
 

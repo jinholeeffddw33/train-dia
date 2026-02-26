@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { ArrowUpDown } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import RouteResult from './RouteResult';
 import styles from '../styles/Subway.module.css';
@@ -66,6 +67,11 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
         fetch(`/api/odsay/search-station?name=${encodeURIComponent(to.trim())}`),
       ]);
 
+      if (!fromRes.ok || !toRes.ok) {
+        setError('역 검색에 실패했습니다. 다시 시도해주세요.');
+        return;
+      }
+
       const fromData = await fromRes.json();
       const toData = await toRes.json();
 
@@ -86,6 +92,10 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
       });
 
       const routeRes = await fetch(`/api/odsay/route-search?${params}`);
+      if (!routeRes.ok) {
+        setError('경로 검색에 실패했습니다. 다시 시도해주세요.');
+        return;
+      }
       const routeData = await routeRes.json();
 
       if (routeData.paths?.length) {
@@ -121,7 +131,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
             onClick={() => { setFrom(to); setTo(from); }}
             aria-label="출발/도착 교환"
           >
-            ⇅
+            <ArrowUpDown size={16} />
           </button>
           <div className={styles.inputRow}>
             <span className={styles.inputLabel}>도착</span>

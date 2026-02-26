@@ -488,9 +488,10 @@
 }
 
 .statusCardDia {
-  font-size: var(--dia-text-lg);
-  font-weight: var(--dia-weight-bold);
+  font-size: 26px;
+  font-weight: 800;
   color: var(--dia-text-primary);
+  letter-spacing: -0.3px;
 }
 
 .statusCardTime {

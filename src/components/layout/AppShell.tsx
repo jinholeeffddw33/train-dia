@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
+import { AlertFab } from '@/features/alerts';
 import { useAlertStore } from '@/stores/alert';
 import styles from './AppShell.module.css';
 
@@ -29,6 +30,7 @@ export default function AppShell({ children }: AppShellProps) {
         onTabChange={handleTabChange}
         alertCount={alertCount}
       />
+      <AlertFab />
       <ToastContainer />
     </div>
   );

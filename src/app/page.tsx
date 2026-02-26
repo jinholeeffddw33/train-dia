@@ -9,6 +9,8 @@ import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import { MoreTab } from '@/features/more';
 import { Line5Tab } from '@/features/line5';
+import { CommuteOverlay } from '@/features/commute';
+import { SubwaySearchOverlay } from '@/features/subway';
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -31,10 +33,16 @@ function TabContent({ tab }: { tab: TabId }) {
 
 function HomeTab() {
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const [commuteOpen, setCommuteOpen] = useState(false);
+  const [subwayOpen, setSubwayOpen] = useState(false);
 
   return (
     <>
-      <HomeHeader onDriverSelect={() => setSelectorOpen(true)} />
+      <HomeHeader
+        onDriverSelect={() => setSelectorOpen(true)}
+        onCommuteOpen={() => setCommuteOpen(true)}
+        onSubwaySearch={() => setSubwayOpen(true)}
+      />
       <TodayCard />
       <WeekStrip />
       <StatusCards />
@@ -42,6 +50,14 @@ function HomeTab() {
       <DriverSelector
         open={selectorOpen}
         onClose={() => setSelectorOpen(false)}
+      />
+      <CommuteOverlay
+        open={commuteOpen}
+        onClose={() => setCommuteOpen(false)}
+      />
+      <SubwaySearchOverlay
+        open={subwayOpen}
+        onClose={() => setSubwayOpen(false)}
       />
     </>
   );

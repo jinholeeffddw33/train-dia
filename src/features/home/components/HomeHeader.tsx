@@ -8,9 +8,11 @@ import styles from '../styles/Home.module.css';
 
 interface HomeHeaderProps {
   onDriverSelect: () => void;
+  onCommuteOpen?: () => void;
+  onSubwaySearch?: () => void;
 }
 
-export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
+export default function HomeHeader({ onDriverSelect, onCommuteOpen, onSubwaySearch }: HomeHeaderProps) {
   const driver = useDriverStore((s) => s.current);
   const clock = useClock();
   const td = today();
@@ -48,6 +50,22 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
         )}
         <span className={styles.driverArrow}>›</span>
       </button>
+
+      {/* 퀵 액션 */}
+      <div className={styles.quickActions}>
+        {onCommuteOpen && (
+          <button type="button" className={styles.quickBtn} onClick={onCommuteOpen}>
+            <span className={styles.quickIcon}>🚉</span>
+            <span className={styles.quickLabel}>도착 정보</span>
+          </button>
+        )}
+        {onSubwaySearch && (
+          <button type="button" className={styles.quickBtn} onClick={onSubwaySearch}>
+            <span className={styles.quickIcon}>🔍</span>
+            <span className={styles.quickLabel}>경로 검색</span>
+          </button>
+        )}
+      </div>
     </header>
   );
 }

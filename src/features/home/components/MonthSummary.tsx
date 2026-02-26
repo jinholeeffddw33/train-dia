@@ -49,7 +49,7 @@ export default function MonthSummary() {
         </button>
       </div>
 
-      <div className={styles.monthGrid}>
+      <div className={styles.monthGrid5}>
         <div className={styles.monthItem}>
           <span className={styles.monthValue}>{totalWork}</span>
           <span className={styles.monthLabel}>근무일</span>
@@ -63,8 +63,12 @@ export default function MonthSummary() {
           <span className={`${styles.monthLabel} ${styles.monthLabelNight}`}>야간</span>
         </div>
         <div className={styles.monthItem}>
-          <span className={styles.monthValue}>{totalStandby}</span>
-          <span className={`${styles.monthLabel} ${styles.monthLabelStandby}`}>대기</span>
+          <span className={styles.monthValue}>{summary.dayStandby}</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelStandby}`}>주대기</span>
+        </div>
+        <div className={styles.monthItem}>
+          <span className={styles.monthValue}>{summary.nightStandby}</span>
+          <span className={`${styles.monthLabel} ${styles.monthLabelStandby}`}>야대기</span>
         </div>
       </div>
     </section>

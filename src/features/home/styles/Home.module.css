@@ -550,6 +550,12 @@
   gap: var(--dia-space-2);
 }
 
+.monthGrid5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--dia-space-2);
+}
+
 .monthItem {
   display: flex;
   flex-direction: column;

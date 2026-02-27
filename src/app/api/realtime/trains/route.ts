@@ -36,7 +36,9 @@ export async function GET() {
     // 실제 에러(심야 등 열차 없음)만 빈 배열로 처리.
     const errCode = data.errorMessage?.code;
     if (errCode && errCode !== 'INFO-000') {
-      return NextResponse.json({ trains: [], message: data.errorMessage.message });
+      return NextResponse.json(
+        { trains: [], error: true, code: errCode, message: data.errorMessage.message },
+      );
     }
 
     const trains = (data.realtimePositionList ?? []).map((t: Record<string, string>) => ({

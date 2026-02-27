@@ -83,12 +83,15 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
 
       // 2) 경로 검색
       const modeMap = { now: '1', first: '3', last: '4' };
+      // 검색 시점의 요일/시간 사용 (캐시된 값 아님)
+      const dayNow = getDayType();
+      const timeNow = getCurrentTime();
       const params = new URLSearchParams({
         sid: String(fromStation.id),
         eid: String(toStation.id),
         mode: modeMap[mode],
-        day: getDayType(),
-        time: getCurrentTime(),
+        day: dayNow,
+        time: timeNow,
       });
 
       const routeRes = await fetch(`/api/odsay/route-search?${params}`);

@@ -17,8 +17,9 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate }
   const driver = useDriverStore((s) => s.current);
   const memos = useMemoStore((s) => s.memos);
 
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  // 매 렌더마다 현재 날짜 계산 (자정 후에도 정확한 오늘 표시)
+  const todayDate = new Date();
+  const todayStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
   const cells = useMemo(() => {
     const firstDay = new Date(year, month - 1, 1).getDay();

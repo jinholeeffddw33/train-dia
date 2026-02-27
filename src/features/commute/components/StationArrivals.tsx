@@ -61,6 +61,9 @@ export default function StationArrivals({
 
   useEffect(() => {
     fetchArrivals();
+    // 30초마다 자동 갱신
+    const id = setInterval(fetchArrivals, 30000);
+    return () => clearInterval(id);
   }, [fetchArrivals]);
 
   // 방향별 그룹핑

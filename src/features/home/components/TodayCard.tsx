@@ -6,7 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
-  getRouteDirection, getCurrentSegmentInfo, today,
+  getRouteDirection, getCurrentSegmentInfo,
 } from '@/lib/schedule';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
@@ -20,14 +20,14 @@ interface TodayCardProps {
 
 export default function TodayCard({ selectedDate }: TodayCardProps) {
   const driver = useDriverStore((s) => s.current);
-  const td = selectedDate || today();
   const clock = useClock();
   const now = useMemo(() => {
     const d = new Date();
     d.setHours(parseInt(clock.hours), parseInt(clock.minutes), parseInt(clock.seconds));
     return d;
   }, [clock.hours, clock.minutes, clock.seconds]);
-  const isToday = !selectedDate || td.toDateString() === today().toDateString();
+  const td = selectedDate || now;
+  const isToday = !selectedDate || td.toDateString() === now.toDateString();
 
   const dia = useMemo(() => driver ? getDia(driver, td) : null, [driver, td]);
   const diaType = useMemo(() => dia ? getType(dia) : null, [dia]);

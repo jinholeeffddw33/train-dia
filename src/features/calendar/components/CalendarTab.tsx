@@ -8,9 +8,8 @@ import styles from '../styles/Calendar.module.css';
 
 export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(() => new Date().getFullYear());
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const prevMonth = () => {
@@ -26,8 +25,9 @@ export default function CalendarTab() {
   };
 
   const goToday = () => {
-    setYear(now.getFullYear());
-    setMonth(now.getMonth() + 1);
+    const fresh = new Date();
+    setYear(fresh.getFullYear());
+    setMonth(fresh.getMonth() + 1);
     setSelectedDate(null);
   };
 

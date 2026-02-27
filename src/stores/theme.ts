@@ -9,10 +9,23 @@ interface ThemeState {
   setTheme: (t: Theme) => void;
 }
 
+/** localStorage에서 테마를 동기적으로 읽기 (persist rehydration 전에 정확한 초기값 보장) */
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+  try {
+    const raw = localStorage.getItem('dia-theme');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.state?.theme === 'light') return 'light';
+    }
+  } catch { /* 무시 */ }
+  return 'dark';
+}
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set, get) => ({
-      theme: 'dark' as Theme,
+      theme: getInitialTheme(),
 
       toggle: () => {
         const next = get().theme === 'dark' ? 'light' : 'dark';
@@ -29,33 +42,16 @@ export const useThemeStore = create<ThemeState>()(
       name: 'dia-theme',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ theme: state.theme }),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          // persist 실패 시 localStorage 직접 읽기
-          readAndApplyTheme();
-          return;
-        }
+      onRehydrateStorage: () => (state) => {
         if (state) applyTheme(state.theme);
       },
     },
   ),
 );
 
-// 클라이언트 안전장치: persist 실패 대비 직접 읽기
+// 모듈 로드 시 즉시 DOM 적용 (FOUC 방지 보강)
 if (typeof window !== 'undefined') {
-  readAndApplyTheme();
-}
-
-/** localStorage에서 직접 읽어 테마 적용 (persist 실패 대비) */
-function readAndApplyTheme() {
-  try {
-    const raw = localStorage.getItem('dia-theme');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const t = parsed?.state?.theme;
-      if (t === 'light' || t === 'dark') applyTheme(t);
-    }
-  } catch { /* 무시 */ }
+  applyTheme(getInitialTheme());
 }
 
 function applyTheme(theme: Theme) {
@@ -66,7 +62,6 @@ function applyTheme(theme: Theme) {
   } else {
     root.classList.remove('light');
   }
-  // 테마 컬러 메타 태그 업데이트
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
     meta.setAttribute('content', theme === 'dark' ? '#0F172A' : '#F0F4F8');

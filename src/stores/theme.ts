@@ -1,12 +1,12 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 type Theme = 'dark' | 'light';
 
 interface ThemeState {
   theme: Theme;
   toggle: () => void;
-  set: (t: Theme) => void;
+  setTheme: (t: Theme) => void;
 }
 
 export const useThemeStore = create<ThemeState>()(
@@ -20,20 +20,43 @@ export const useThemeStore = create<ThemeState>()(
         applyTheme(next);
       },
 
-      set: (t: Theme) => {
+      setTheme: (t: Theme) => {
         set({ theme: t });
         applyTheme(t);
       },
     }),
     {
       name: 'dia-theme',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ theme: state.theme }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          // persist 실패 시 localStorage 직접 읽기
+          readAndApplyTheme();
+          return;
+        }
         if (state) applyTheme(state.theme);
       },
     },
   ),
 );
+
+// 클라이언트 안전장치: persist 실패 대비 직접 읽기
+if (typeof window !== 'undefined') {
+  readAndApplyTheme();
+}
+
+/** localStorage에서 직접 읽어 테마 적용 (persist 실패 대비) */
+function readAndApplyTheme() {
+  try {
+    const raw = localStorage.getItem('dia-theme');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const t = parsed?.state?.theme;
+      if (t === 'light' || t === 'dark') applyTheme(t);
+    }
+  } catch { /* 무시 */ }
+}
 
 function applyTheme(theme: Theme) {
   if (typeof document === 'undefined') return;

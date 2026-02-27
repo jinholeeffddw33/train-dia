@@ -1,6 +1,6 @@
 // ===== 기관사 DIA v2 Service Worker =====
 
-const CACHE_NAME = 'dia-v2-cache';
+const CACHE_NAME = 'dia-v2.1-cache';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',

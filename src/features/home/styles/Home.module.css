@@ -47,31 +47,33 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .headerName {
-  font-size: 24px;
+  font-size: clamp(18px, 5.5vw, 24px);
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
 }
 
 .headerRole {
-  font-size: 14px;
+  font-size: clamp(11px, 3vw, 14px);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
   margin-left: 2px;
 }
 
 .headerGreeting {
-  font-size: 13px;
+  font-size: clamp(11px, 3vw, 13px);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.65);
   margin-top: 1px;
 }
 
 .headerDate {
-  font-size: 16px;
+  font-size: clamp(13px, 3.5vw, 16px);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.75);
   margin-top: 4px;
@@ -107,7 +109,7 @@
 }
 
 .clockBig {
-  font-size: clamp(42px, 12vw, 56px);
+  font-size: clamp(36px, 10vw, 52px);
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;

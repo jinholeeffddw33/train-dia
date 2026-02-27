@@ -1,6 +1,6 @@
 // ===== 교번 스케줄 코어 로직 (SSOT) =====
 
-import type { Person, DiaType, Schedule, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
+import type { Person, DiaType, Schedule, Segment, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
 import { LABELS, DIR, dirFull, dirSub } from './constants';
 import { CYCLE, DB_STD, CL, P } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
@@ -211,11 +211,11 @@ export function getBannerState(
   nextShift: NextShiftInfo | null,
   now: Date,
 ): BannerState {
-  if (!sc || !sc.s || !sc.e) return { state: 'working', next: nextShift };
+  if (!sc || !sc.s || !sc.e) return { state: 'idle', next: nextShift };
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const startMins = timeToMins(sc.s);
   const endMins = timeToMins(sc.e);
-  if (startMins < 0 || endMins < 0) return { state: 'working', next: nextShift };
+  if (startMins < 0 || endMins < 0) return { state: 'idle', next: nextShift };
 
   const isNight = endMins <= startMins;
 
@@ -244,11 +244,36 @@ export function getBannerState(
       const minsAfterNight = nowMins - endMins;
       return calcDoneState(nextShift, nowMins, startMins, minsAfterNight);
     }
-    return { state: 'working', next: nextShift };
+    // 출근 전 (2시간 이상 남음) → 아직 근무 아님
+    const todayAsNext: NextShiftInfo = { schedule: sc, daysAhead: 0, dia: '' };
+    return { state: 'idle', next: todayAsNext, minsUntil: startMins - nowMins };
   }
 
   const minsAfterEnd = nowMins - endMins;
   return calcDoneState(nextShift, nowMins, -1, minsAfterEnd);
+}
+
+/** 현재 시간 기준 진행 중/다음 구간 인덱스 + 상태 */
+export function getCurrentSegmentInfo(
+  segments: Segment[] | undefined,
+  now: Date,
+): { idx: number; status: 'running' | 'waiting' | 'before' | 'after' } | null {
+  if (!segments || segments.length === 0) return null;
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+
+  for (let i = 0; i < segments.length; i++) {
+    const dep = timeToMins(segments[i].d);
+    const arr = timeToMins(segments[i].a);
+    if (dep < 0 || arr < 0) continue;
+    // 현재 이 구간 운행 중
+    if (nowMins >= dep && nowMins < arr) return { idx: i, status: 'running' };
+    // 아직 이 구간 출발 전
+    if (nowMins < dep) {
+      return { idx: i, status: i === 0 ? 'before' : 'waiting' };
+    }
+  }
+  // 모든 구간 종료
+  return { idx: segments.length - 1, status: 'after' };
 }
 
 // ===== 월간/D-Day =====

@@ -6,7 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
-  getRouteDirection, today,
+  getRouteDirection, getCurrentSegmentInfo, today,
 } from '@/lib/schedule';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
@@ -40,6 +40,10 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
   const direction = useMemo(
     () => schedule?.m ? getRouteDirection(schedule.m, STATION_ABBR) : null,
     [schedule],
+  );
+  const segInfo = useMemo(
+    () => getCurrentSegmentInfo(schedule?.g, now),
+    [schedule, now],
   );
 
   if (!driver || !dia) {
@@ -87,13 +91,24 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
         )}
       </div>
 
-      {/* 방향 배너 (v1 스타일) */}
+      {/* 방향 배너 (v1 스타일) — 현재 구간 기준 */}
       {isToday && banner && direction && banner.state === 'working' && (
         <div className={`${styles.dirBanner} ${styles[`dirBanner_${direction.dir}`]}`}>
           <div className={styles.dirBannerDir}>{direction.label}</div>
           <div className={styles.dirBannerSub}>{direction.sub}</div>
-          {schedule?.s && (
-            <div className={styles.dirBannerTime}>출발 {schedule.g?.[0]?.d || schedule.s}</div>
+          {segInfo && schedule?.g && (
+            <div className={styles.dirBannerTime}>
+              {segInfo.status === 'running'
+                ? `운행 중 · ${schedule.g[segInfo.idx].d} → ${schedule.g[segInfo.idx].a}`
+                : segInfo.status === 'waiting'
+                  ? `대기 중 · 다음 출발 ${schedule.g[segInfo.idx].d}`
+                  : segInfo.status === 'after'
+                    ? '운행 완료'
+                    : `출발 ${schedule.g[segInfo.idx].d}`}
+            </div>
+          )}
+          {!segInfo && schedule?.s && (
+            <div className={styles.dirBannerTime}>출발 {schedule.s}</div>
           )}
         </div>
       )}

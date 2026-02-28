@@ -1,69 +1,124 @@
-/* ===== Line 5 Tab ===== */
+/* ===== Line 5 Tab — v1 Track Layout Ported ===== */
 
-.container { padding: var(--dia-space-4); }
+.container {
+  padding: var(--dia-space-4);
+  padding-bottom: var(--dia-space-8);
+}
 
+/* ── Header ── */
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .title {
   font-size: var(--dia-text-xl);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-purple);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-gray);
+  flex-shrink: 0;
+}
+
+.dot_loading {
+  background: var(--dia-blue);
+  animation: dotPulse 1s ease-in-out infinite;
+}
+
+.dot_success {
+  background: var(--dia-green);
+  animation: dotFlash 0.5s ease;
+}
+
+.dot_stale {
+  background: var(--dia-amber);
+}
+
+.dot_idle {
+  background: var(--dia-gray);
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes dotFlash {
+  0% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+.statusText {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-medium);
 }
 
 .refreshBtn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
-  color: var(--dia-text-primary);
+  color: var(--dia-text-secondary);
   font-size: 20px;
   transition: transform var(--dia-transition-fast);
+  box-shadow: var(--dia-shadow-sm);
+  flex-shrink: 0;
 }
 
 .refreshBtn:active { transform: scale(0.9); }
 
-.refreshSpin { animation: spin 1s linear infinite; }
+.refreshSpin { animation: spin 0.8s linear; }
 
-.lastUpdate {
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
-  margin-bottom: var(--dia-space-4);
-}
-
-/* ── Branch Tabs ── */
+/* ── Branch Tabs (v1 pill style) ── */
 .branchTabs {
   display: flex;
   gap: var(--dia-space-2);
-  margin-bottom: var(--dia-space-3);
+  padding-bottom: var(--dia-space-3);
 }
 
 .branchTab {
-  flex: 1;
-  padding: var(--dia-space-2) var(--dia-space-3);
-  border-radius: var(--dia-radius-lg);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  color: var(--dia-text-secondary);
+  padding: var(--dia-space-2) var(--dia-space-5);
+  border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
+  font-weight: var(--dia-weight-bold);
+  background: var(--dia-surface);
+  border: 2px solid transparent;
+  color: var(--dia-text-tertiary);
   min-height: 44px;
   transition: all var(--dia-transition-fast);
 }
 
 .branchTabActive {
-  background: var(--dia-purple);
+  background: var(--dia-purple-dim);
+  color: var(--dia-purple);
   border-color: var(--dia-purple);
-  color: white;
 }
+
+.branchTab:active { transform: scale(0.96); }
 
 /* ── View Toggle ── */
 .viewToggle {
@@ -165,109 +220,238 @@
   color: var(--dia-text-tertiary);
 }
 
-/* ── Train List ── */
-.listContainer {
+/* ============================================
+   TRACK VIEW — v1 ported
+   ============================================ */
+
+.trackWrap {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 var(--dia-space-5);
+}
+
+/* ── Direction header ── */
+.dirHeader {
   display: flex;
-  flex-direction: column;
-  gap: var(--dia-space-5);
+  justify-content: space-between;
+  padding: var(--dia-space-2) var(--dia-space-5) var(--dia-space-3);
 }
 
-.directionGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dia-space-3);
+.dirUp {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: #0D9452;
+  letter-spacing: -0.3px;
 }
 
-.directionLabel {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.dirDown {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: #D32F2F;
+  letter-spacing: -0.3px;
 }
 
-.noTrains {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-tertiary);
-  padding: var(--dia-space-3);
-  text-align: center;
-}
-
-.trainCards {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dia-space-2);
-}
-
-.trainCard {
-  padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
-  transition: border-color var(--dia-transition-fast);
-}
-
-.trainCardArriving {
-  border-color: var(--dia-green);
-  border-left: 3px solid var(--dia-green);
-}
-
-.trainCardTop {
-  display: flex;
+/* ── Track row ── */
+.tkRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
   align-items: center;
-  gap: var(--dia-space-2);
-  margin-bottom: var(--dia-space-1);
+  min-height: 52px;
+  padding: 0 var(--dia-space-3);
+  position: relative;
 }
 
-.trainNo {
+.tkRowHighlight {
+  background: rgba(59, 130, 246, 0.06);
+}
+
+:global(:root.light) .tkRowHighlight {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* ── Track column (center vertical lines) ── */
+.tkTrack {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 52px;
+}
+
+.tkTrack::before,
+.tkTrack::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #996CAC;
+  border-radius: 2px;
+  transition: background var(--dia-transition-fast);
+}
+
+.tkTrack::before { left: 10px; }
+.tkTrack::after { right: 10px; }
+
+/* First/last station — half lines */
+.tkTrackFirst::before,
+.tkTrackFirst::after { top: 50%; }
+.tkTrackLast::before,
+.tkTrackLast::after { bottom: 50%; top: auto; height: 50%; }
+
+/* Highlight row track glow */
+.tkRowHighlight .tkTrack::before,
+.tkRowHighlight .tkTrack::after {
+  background: var(--dia-blue);
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+}
+
+/* Light mode track lines */
+:global(:root.light) .tkTrack::before,
+:global(:root.light) .tkTrack::after {
+  background: #b388d9;
+}
+
+/* ── Station dot ── */
+.tkDot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-bg);
+  border: 3px solid #996CAC;
+  z-index: 2;
+  position: relative;
+}
+
+:global(:root.light) .tkDot {
+  background: #fff;
+  border-color: #996CAC;
+}
+
+.tkDotTransfer {
+  width: 16px;
+  height: 16px;
+  background: rgba(153, 108, 172, 0.15);
+}
+
+:global(:root.light) .tkDotTransfer {
+  background: #f3eef8;
+}
+
+.tkDotDapsimni {
+  width: 18px;
+  height: 18px;
+  border-color: var(--dia-blue);
+  background: rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
+
+:global(:root.light) .tkDotDapsimni {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* ── Left train area (상행) ── */
+.tkLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding-right: var(--dia-space-2);
+}
+
+/* ── Right area (station name + 하행 trains) ── */
+.tkRight {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--dia-space-2);
+  gap: 2px;
+}
+
+.tkName {
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-purple);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+}
+
+.tkNameDapsimni {
+  color: var(--dia-blue);
+  font-weight: 800;
+}
+
+.tkTransfers {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tkTransferTag {
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  padding: 2px 7px;
+  border-radius: var(--dia-radius-xs);
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+/* ── Train indicator box ── */
+.tkTrainBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+  animation: trainPulse 2s ease-in-out infinite;
+}
+
+.tkTrainUp {
+  background: rgba(13, 148, 82, 0.12);
+  color: #0D9452;
+  border: 1px solid rgba(13, 148, 82, 0.25);
+}
+
+.tkTrainDown {
+  background: rgba(211, 47, 47, 0.1);
+  color: #D32F2F;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+@keyframes trainPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.tkCapsule {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+}
+
+.tkCapsuleUp { background: #0D9452; }
+.tkCapsuleDown { background: #D32F2F; }
+
+.tkTrainNo {
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
-.trainDest {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
+.tkTrainArriving {
+  animation: trainArrive 1s ease-in-out infinite;
 }
 
-.trainCardBottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+@keyframes trainArrive {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.trainStation {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-primary);
-  font-weight: var(--dia-weight-medium);
-}
+/* ============================================
+   ROUTE MAP (unchanged)
+   ============================================ */
 
-.trainStatus {
-  font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-semibold);
-  padding: 2px var(--dia-space-2);
-  border-radius: var(--dia-radius-sm);
-  background: var(--dia-surface-hover);
-  color: var(--dia-text-secondary);
-}
-
-.status_0 {
-  background: var(--dia-green-dim);
-  color: var(--dia-green);
-}
-
-.status_1 {
-  background: var(--dia-blue-dim);
-  color: var(--dia-blue);
-}
-
-.status_2 {
-  background: var(--dia-amber-dim);
-  color: var(--dia-amber);
-}
-
-/* ── Route Map ── */
 .mapContainer {
   position: relative;
   border-radius: var(--dia-radius-xl);
@@ -323,15 +507,15 @@
 }
 
 .mapStationName {
-  font-family: var(--dia-font-sans);
+  font-family: var(--dia-font);
   pointer-events: none;
 }
 
 .mapPulse {
-  animation: pulse 2s ease-in-out infinite;
+  animation: mapPulseAnim 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0; r: 8; }
-  50% { opacity: 0.5; r: 14; }
+@keyframes mapPulseAnim {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.5; }
 }

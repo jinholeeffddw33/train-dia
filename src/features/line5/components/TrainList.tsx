@@ -1,40 +1,49 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useTrainStore } from '@/stores/train';
 import {
   LINE5_MAIN,
   LINE5_MACHEON,
   LINE5_HANAM,
+  LINE5_TRANSFERS,
+  LINE_COLORS,
 } from '@/data/line5';
 import styles from '../styles/Line5.module.css';
 
-const TRAIN_STATUS: Record<string, string> = {
-  '0': '도착',
-  '1': '출발',
-  '2': '진입',
-  '3': '전역출발',
-};
-
-const BRANCH_STATIONS = {
-  main: LINE5_MAIN as readonly string[],
-  macheon: LINE5_MACHEON as readonly string[],
-  hanam: LINE5_HANAM as readonly string[],
+const BRANCH_STATIONS: Record<string, readonly string[]> = {
+  main: LINE5_MAIN,
+  macheon: ['강동', ...LINE5_MACHEON] as const,
+  hanam: ['강동', ...LINE5_HANAM] as const,
 };
 
 export default function TrainList() {
   const { data, branch } = useTrainStore();
-  const branchStations = BRANCH_STATIONS[branch];
+  const listRef = useRef<HTMLDivElement>(null);
+  const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
-  const { upTrains, downTrains } = useMemo(() => {
-    const stationSet = new Set(branchStations);
-    const filtered = data.filter((t) => stationSet.has(t.statnNm));
+  const trainsByStation = useMemo(() => {
+    const map = new Map<string, { trainNo: string; direction: string; status: string }[]>();
+    for (const t of data) {
+      const name = t.statnNm.replace(/역$/, '');
+      if (!map.has(name)) map.set(name, []);
+      map.get(name)!.push({
+        trainNo: t.trainNo,
+        direction: t.updnLine,
+        status: t.trainSttus,
+      });
+    }
+    return map;
+  }, [data]);
 
-    return {
-      upTrains: filtered.filter((t) => t.updnLine === '상행'),
-      downTrains: filtered.filter((t) => t.updnLine === '하행'),
-    };
-  }, [data, branchStations]);
+  // 답십리 자동 스크롤
+  useEffect(() => {
+    if (!listRef.current) return;
+    const dapRow = listRef.current.querySelector('[data-station="답십리"]');
+    if (dapRow) {
+      dapRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [branch]);
 
   if (data.length === 0) {
     return (
@@ -46,53 +55,98 @@ export default function TrainList() {
     );
   }
 
-  return (
-    <div className={styles.listContainer}>
-      <DirectionGroup
-        label="상행 (방화 방면)"
-        trains={upTrains}
-      />
-      <DirectionGroup
-        label="하행 (마천·하남 방면)"
-        trains={downTrains}
-      />
-    </div>
-  );
-}
+  const firstStation = stations[0];
+  const lastStation = stations[stations.length - 1];
 
-function DirectionGroup({
-  label,
-  trains,
-}: {
-  label: string;
-  trains: { statnNm: string; trainNo: string; statnTnm: string; trainSttus: string }[];
-}) {
   return (
-    <div className={styles.directionGroup}>
-      <h3 className={styles.directionLabel}>{label}</h3>
-      {trains.length === 0 ? (
-        <p className={styles.noTrains}>이 방향엔 열차가 없어요</p>
-      ) : (
-        <div className={styles.trainCards}>
-          {trains.map((t) => (
-            <div
-              key={t.trainNo}
-              className={`${styles.trainCard} ${t.trainSttus === '0' ? styles.trainCardArriving : ''}`}
-            >
-              <div className={styles.trainCardTop}>
-                <span className={styles.trainNo}>{t.trainNo}</span>
-                <span className={styles.trainDest}>→ {t.statnTnm}</span>
-              </div>
-              <div className={styles.trainCardBottom}>
-                <span className={styles.trainStation}>{t.statnNm}</span>
-                <span className={`${styles.trainStatus} ${styles[`status_${t.trainSttus}`]}`}>
-                  {TRAIN_STATUS[t.trainSttus] ?? t.trainSttus}
-                </span>
-              </div>
+    <div className={styles.trackWrap} ref={listRef}>
+      {/* 방향 헤더 */}
+      <div className={styles.dirHeader}>
+        <span className={styles.dirUp}>▲ {firstStation} 방면</span>
+        <span className={styles.dirDown}>{lastStation} 방면 ▼</span>
+      </div>
+
+      {/* 역 트랙 */}
+      {stations.map((name, i) => {
+        const isFirst = i === 0;
+        const isLast = i === stations.length - 1;
+        const isDapsimni = name === '답십리';
+        const transfers = LINE5_TRANSFERS[name];
+        const hasTransfer = !!transfers && !transfers.some((t) => t.includes('지선'));
+        const trainsHere = trainsByStation.get(name) ?? [];
+        const upTrains = trainsHere.filter((t) => t.direction === '상행' || t.direction === '0');
+        const downTrains = trainsHere.filter((t) => t.direction === '하행' || t.direction === '1');
+
+        const trackClass = [
+          styles.tkTrack,
+          isFirst ? styles.tkTrackFirst : '',
+          isLast ? styles.tkTrackLast : '',
+        ].filter(Boolean).join(' ');
+
+        const dotClass = [
+          styles.tkDot,
+          isDapsimni ? styles.tkDotDapsimni : hasTransfer ? styles.tkDotTransfer : '',
+        ].filter(Boolean).join(' ');
+
+        return (
+          <div
+            key={name}
+            className={`${styles.tkRow} ${isDapsimni ? styles.tkRowHighlight : ''}`}
+            data-station={name}
+          >
+            {/* 좌측: 상행 열차 */}
+            <div className={styles.tkLeft}>
+              {upTrains.map((t) => (
+                <div
+                  key={t.trainNo}
+                  className={`${styles.tkTrainBox} ${styles.tkTrainUp} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                >
+                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
+                  <span className={styles.tkTrainNo}>{t.trainNo}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+
+            {/* 중앙: 트랙 */}
+            <div className={trackClass}>
+              <div className={dotClass} />
+            </div>
+
+            {/* 우측: 역 이름 + 환승 + 하행 열차 */}
+            <div className={styles.tkRight}>
+              <span className={`${styles.tkName} ${isDapsimni ? styles.tkNameDapsimni : ''}`}>
+                {name}{isDapsimni ? ' ★' : ''}
+              </span>
+              {hasTransfer && (
+                <div className={styles.tkTransfers}>
+                  {transfers.map((t) => {
+                    const color = LINE_COLORS[t] || '#888';
+                    return (
+                      <span
+                        key={t}
+                        className={styles.tkTransferTag}
+                        /* STYLE-EXCEPTION: 노선별 고유 컬러 (토큰화 불가능) */
+                        style={{ background: color }}
+                      >
+                        {t}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+              {downTrains.map((t) => (
+                <div
+                  key={t.trainNo}
+                  className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                >
+                  <span className={styles.tkTrainNo}>{t.trainNo}</span>
+                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

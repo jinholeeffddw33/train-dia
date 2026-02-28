@@ -27,7 +27,7 @@
 .navBtn:active { background: var(--dia-surface-hover); }
 
 .navTitle {
-  font-size: var(--dia-text-lg);
+  font-size: var(--dia-text-2xl);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   padding: var(--dia-space-2) var(--dia-space-4);
@@ -36,6 +36,11 @@
 }
 
 .navTitle:active { background: var(--dia-surface-hover); }
+
+.navMonth {
+  color: var(--dia-blue);
+  font-weight: 800;
+}
 
 /* ── Driver Info ── */
 .driverInfo {
@@ -47,9 +52,9 @@
 }
 
 .driverName {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
 }
 
 .driverNum {
@@ -61,13 +66,13 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 4px;
   margin-bottom: var(--dia-space-4);
 }
 
 .dowHeader {
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
   padding: var(--dia-space-2) 0;
@@ -77,7 +82,7 @@
 .dowSat { color: var(--dia-blue); }
 
 .cellEmpty {
-  aspect-ratio: 1;
+  min-height: 52px;
 }
 
 .cell {
@@ -85,12 +90,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  aspect-ratio: 1;
+  gap: 3px;
+  padding: 6px 0;
   border-radius: var(--dia-radius-sm);
   transition: background var(--dia-transition-fast);
   position: relative;
-  min-height: 44px;
+  min-height: 52px;
 }
 
 .cell:active { background: var(--dia-surface-hover); }
@@ -106,8 +111,8 @@
 }
 
 .cellDate {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
+  font-size: 15px;
+  font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   line-height: 1;
 }
@@ -116,7 +121,7 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: var(--dia-weight-semibold);
   line-height: 1;
 }
@@ -128,8 +133,8 @@
 
 .memoDot {
   position: absolute;
-  bottom: 3px;
-  right: 3px;
+  bottom: 4px;
+  right: 4px;
   width: 4px;
   height: 4px;
   border-radius: var(--dia-radius-full);

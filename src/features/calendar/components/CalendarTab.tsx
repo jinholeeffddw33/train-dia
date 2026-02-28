@@ -6,11 +6,16 @@ import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import styles from '../styles/Calendar.module.css';
 
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
 
   const prevMonth = () => {
     if (month === 1) { setYear(year - 1); setMonth(12); }
@@ -28,7 +33,7 @@ export default function CalendarTab() {
     const fresh = new Date();
     setYear(fresh.getFullYear());
     setMonth(fresh.getMonth() + 1);
-    setSelectedDate(null);
+    setSelectedDate(todayStr());
   };
 
   if (!driver) {
@@ -46,7 +51,7 @@ export default function CalendarTab() {
       <div className={styles.nav}>
         <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
         <button type="button" className={styles.navTitle} onClick={goToday}>
-          {year}년 {month}월
+          {year}년 <span className={styles.navMonth}>{month}월</span>
         </button>
         <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
@@ -54,7 +59,6 @@ export default function CalendarTab() {
       {/* 기관사 이름 */}
       <div className={styles.driverInfo}>
         <span className={styles.driverName}>{driver.n}</span>
-        <span className={styles.driverNum}>{driver.I}번</span>
       </div>
 
       {/* 달력 그리드 */}

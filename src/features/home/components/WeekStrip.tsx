@@ -21,9 +21,12 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
 
   const days = useMemo(() => {
     if (!driver) return [];
+    // 이번 주 일요일부터 2주(14일) 표시
+    const sun = new Date(td);
+    sun.setDate(sun.getDate() - sun.getDay());
     const result = [];
-    for (let i = -3; i <= 10; i++) {
-      const d = new Date(td);
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(sun);
       d.setDate(d.getDate() + i);
       const dia = getDia(driver, d);
       const type = getType(dia);
@@ -34,7 +37,7 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
         dia,
         display: getDiaDisplay(dia),
         type,
-        isToday: i === 0,
+        isToday: d.toDateString() === td.toDateString(),
         isWeekend: d.getDay() === 0 || d.getDay() === 6,
       });
     }

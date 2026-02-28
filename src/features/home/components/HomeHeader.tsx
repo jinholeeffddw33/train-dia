@@ -23,10 +23,7 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
       <div className={styles.headerTop}>
         <div className={styles.headerLeft}>
           {driver ? (
-            <>
-              <span className={styles.headerName}>{driver.n} <span className={styles.headerRole}>기관사</span></span>
-              <span className={styles.headerGreeting}>안녕하세요</span>
-            </>
+            <span className={styles.headerName}>{driver.n} <span className={styles.headerRole}>기관사님</span></span>
           ) : (
             <span className={styles.headerName}>기관사 DIA</span>
           )}

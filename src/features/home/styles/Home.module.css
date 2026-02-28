@@ -631,8 +631,8 @@
 }
 
 .monthItemTotal .monthLabel {
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
 }
 
 .monthLabelDay { color: var(--dia-blue); }

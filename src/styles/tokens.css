@@ -46,6 +46,7 @@
   --dia-border: rgba(255, 255, 255, 0.08);
   --dia-border-strong: rgba(255, 255, 255, 0.15);
   --dia-border-light: rgba(255, 255, 255, 0.04);
+  --dia-border-dim: rgba(255, 255, 255, 0.03);
 
   /* ========================================
      Spacing (4px grid)
@@ -201,6 +202,7 @@
   --dia-border: rgba(0, 0, 0, 0.08);
   --dia-border-strong: rgba(0, 0, 0, 0.15);
   --dia-border-light: rgba(0, 0, 0, 0.04);
+  --dia-border-dim: rgba(0, 0, 0, 0.03);
 
   --dia-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --dia-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);

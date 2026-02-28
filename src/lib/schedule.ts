@@ -312,9 +312,9 @@ export function getMonthSummary(person: Person, year: number, month: number): Mo
 
 // ===== 교대 상대 찾기 =====
 
-/** 1xxx 열차번호 판별 (기지 출발 — 교대 없음) */
-function is1xxx(trainNo: number): boolean {
-  return trainNo >= 1000 && trainNo < 2000;
+/** 기지 입출고 열차 판별 (1xxx/2xxx — 교대 없음) */
+function isDepotTrain(trainNo: number): boolean {
+  return trainNo >= 1000 && trainNo < 3000;
 }
 
 /** 교대 상대 탐색 결과 */
@@ -327,7 +327,7 @@ export interface ExchangePartner {
  * 교대 상대 찾기 (v1 findExchangePartners 포팅)
  * - 내 구간 첫 열차 = 상대 구간 마지막 열차 → left (내가 받음)
  * - 내 구간 마지막 열차 = 상대 구간 첫 열차 → right (내가 줌)
- * - 1xxx 번대 열차는 교대 없음
+ * - 1xxx/2xxx 번대 열차는 기지 입출고 — 교대 없음
  */
 export function findExchangePartners(
   mySchedule: Schedule,
@@ -359,7 +359,7 @@ export function findExchangePartners(
     const p: ExchangePartner = {};
 
     // 왼쪽: 내 첫 열차 = 상대 마지막 열차 (내가 받음)
-    if (!is1xxx(firstTrain)) {
+    if (!isDepotTrain(firstTrain)) {
       for (const other of allSchedules) {
         for (const otherSeg of other.schedule.g!) {
           if (!otherSeg.n || otherSeg.n.length === 0) continue;
@@ -374,7 +374,7 @@ export function findExchangePartners(
     }
 
     // 오른쪽: 내 마지막 열차 = 상대 첫 열차 (내가 줌)
-    if (!is1xxx(lastTrain)) {
+    if (!isDepotTrain(lastTrain)) {
       for (const other of allSchedules) {
         for (const otherSeg of other.schedule.g!) {
           if (!otherSeg.n || otherSeg.n.length === 0) continue;

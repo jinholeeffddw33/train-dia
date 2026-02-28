@@ -33,7 +33,9 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
           <span className={styles.headerDate}>{dateStr}</span>
         </div>
         <div className={styles.headerRight}>
-          <HeaderClock />
+          <div className={styles.clockRow}>
+            <HeaderClock />
+          </div>
           <span className={styles.headerOrg}>답십리승무사업소</span>
         </div>
       </div>

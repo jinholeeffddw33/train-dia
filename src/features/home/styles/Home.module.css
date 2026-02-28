@@ -82,21 +82,22 @@
 
 .headerRight {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: flex-end;
-  justify-content: flex-end;
-  gap: 1px;
   flex-shrink: 0;
 }
 
+.clockRow {
+  display: flex;
+  align-items: flex-end;
+}
+
 .headerOrg {
-  width: 100%;
-  text-align: right;
   font-size: 12px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   letter-spacing: 1px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 .clockAmPm {

@@ -64,9 +64,15 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
 
   return (
     <section className={styles.todayCard}>
-      {/* 교번 표시 */}
+      {/* 교번 + 근무시간 헤더 */}
       <div className={styles.diaHeader}>
         <span className={styles.cardLabel}>{dateLabel}</span>
+        {schedule && (
+          <div className={styles.workTimeWrap}>
+            <span className={styles.workTimeLabel}>근무시간</span>
+            <span className={styles.workTime}>{getWorkTime(schedule)}</span>
+          </div>
+        )}
       </div>
 
       <div className={styles.diaMain}>
@@ -85,12 +91,6 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
             </span>
           )}
         </div>
-        {schedule && (
-          <div className={styles.workTimeWrap}>
-            <span className={styles.workTimeLabel}>근무시간</span>
-            <span className={styles.workTime}>{getWorkTime(schedule)}</span>
-          </div>
-        )}
       </div>
 
       {/* 방향 배너 (v1 스타일) — 현재 구간 기준 */}

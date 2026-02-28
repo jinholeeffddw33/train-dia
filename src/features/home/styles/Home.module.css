@@ -202,6 +202,9 @@
 }
 
 .diaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   margin-bottom: var(--dia-space-3);
 }
 
@@ -270,9 +273,8 @@
 
 .workTimeWrap {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .workTimeLabel {

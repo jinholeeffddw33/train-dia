@@ -130,10 +130,15 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
 
       {isToday && banner && banner.state === 'idle' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
-          <div className={styles.dirBannerDir}>오늘 근무가 끝났어요</div>
+          <div className={styles.dirBannerDir}>
+            {diaType === 'rest' ? '오늘은 쉬는 날이에요' : '오늘 근무가 끝났어요'}
+          </div>
+          {diaType === 'rest' && (
+            <div className={styles.dirBannerSub}>푹 쉬고 내일 힘내요</div>
+          )}
           {nextShift && nextShift.schedule && (
             <div className={styles.dirBannerNext}>
-              다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s}
+              다음근무 {nextShift.daysAhead === 0 ? '오늘' : nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s}
               {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
             </div>
           )}

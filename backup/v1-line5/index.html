@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1A56DB">
+<title>답십리 기관사 DIA</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+<script>if(localStorage.getItem('darkMode')==='1')document.documentElement.classList.add('dark');</script>
+</head>
+<body>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div class="splash" id="splash">
+  <div class="splash-inner">
+    <img src="logo.png" alt="서울교통공사" class="splash-logo" width="192" height="192">
+    <div class="splash-divider"></div>
+    <div class="splash-title">기관사 DIA</div>
+    <div class="splash-sub">답십리 승무사업소 · 5호선</div>
+    <div class="splash-loader">
+      <div class="splash-loader-bar"></div>
+    </div>
+  </div>
+  <div class="splash-footer">서울교통공사</div>
+</div>
+
+<!-- ===== PWA INSTALL PROMPT ===== -->
+<div class="pwa-prompt" id="pwaPrompt">
+  <div class="pwa-prompt-card">
+    <div class="pwa-prompt-icon">📲</div>
+    <div class="pwa-prompt-title">앱 설치하기</div>
+    <div class="pwa-prompt-desc" id="pwaDesc">홈 화면에 추가하면 더 빠르게 사용할 수 있습니다</div>
+    <div id="pwaSteps"></div>
+    <button class="pwa-btn-install" id="pwaInstallBtn" type="button" onclick="installPWA()">홈 화면에 추가</button>
+    <button class="pwa-btn-done" type="button" onclick="dismissPWA()">이미 설치했어요</button>
+  </div>
+</div>
+
+<!-- ===== NOTIFICATION PROMPT ===== -->
+<div class="noti-prompt" id="notiPrompt">
+  <div class="noti-prompt-card">
+    <div class="noti-prompt-icon">🚨</div>
+    <div class="noti-prompt-title">알림 허용 필수</div>
+    <div class="noti-prompt-desc">다른 기관사가 등록한 <strong>역 장애 알림</strong>을<br>실시간으로 받을 수 있습니다.<br><br>이 앱의 <strong>핵심 기능</strong>입니다.</div>
+    <div class="noti-prompt-btns">
+      <button class="noti-btn-allow" type="button" onclick="allowNotifications()">알림 허용하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== UPDATE BANNER ===== -->
+<div class="update-banner" id="updateBanner" onclick="location.reload()">
+  새 버전이 있습니다. 탭하여 업데이트
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="pageHome">
+  <div class="home-top">
+    <div class="home-greeting">안녕하세요</div>
+    <div class="home-name" id="homeName">
+      <button class="home-select-btn" type="button" onclick="openModal('home')">기관사를 선택하세요 ▾</button>
+    </div>
+    <div class="home-date-row" id="homeDate"></div>
+    <div class="home-ampm" id="homeAmpm">오후</div>
+    <div class="home-clock-row">
+      <div class="home-time-big" id="homeTime">--:--</div>
+      <div class="home-time-sec" id="homeSec">:--</div>
+    </div>
+  </div>
+  <!-- Alert Banner -->
+  <div id="homeAlertBanner"></div>
+  <div id="homeTodayCard"></div>
+  <div id="homeRoute"></div>
+  <div id="homeWeek"></div>
+  <div id="homeStatus"></div>
+  <!-- 출퇴근 카드 -->
+  <div class="hc-card" id="homeCommuteCard" onclick="openCommute()">
+    <div class="hc-icon">🚇</div>
+    <div class="hc-body">
+      <div class="hc-title">출퇴근</div>
+      <div class="hc-sub" id="hcNextTrain">역을 즐겨찾기하면 실시간 도착정보를 볼 수 있어요</div>
+    </div>
+    <div class="hc-arrow">›</div>
+  </div>
+  <!-- 지하철 경로 검색 카드 -->
+  <div class="hc-card" id="homeSubwayCard" onclick="openSubway()">
+    <div class="hc-icon">🗺️</div>
+    <div class="hc-body">
+      <div class="hc-title">지하철 경로</div>
+      <div class="hc-sub">출발역→도착역 경로 검색 · 환승 · 소요시간</div>
+    </div>
+    <div class="hc-arrow">›</div>
+  </div>
+  <div id="homeExtras"></div>
+</div>
+
+<!-- ===== COMMUTE PAGE (overlay) ===== -->
+<div class="cm-page" id="commutePage">
+  <!-- Alarm bar (sticky top) -->
+  <div class="cm-alarm-bar hidden" id="cmAlarmBar">
+    <div class="cm-alarm-info">
+      <span class="cm-alarm-icon">🔔</span>
+      <span id="cmAlarmText">알람 설정됨</span>
+    </div>
+    <button class="cm-alarm-cancel" type="button" onclick="cancelCommuteAlarm()">취소</button>
+  </div>
+
+  <div class="cm-header">
+    <button class="cm-back" type="button" onclick="closeCommute()">←</button>
+    <div class="cm-title">출퇴근</div>
+    <button class="cm-refresh" type="button" onclick="refreshCommute()">↻</button>
+  </div>
+
+  <!-- Search -->
+  <div class="cm-search-wrap">
+    <input class="cm-search-input" id="cmSearchInput" type="text" placeholder="역 이름 검색 (예: 신도림, 강남)" autocomplete="off">
+    <button class="cm-search-btn" type="button" onclick="searchStation()">검색</button>
+  </div>
+
+  <!-- Favorites -->
+  <div class="cm-fav-wrap" id="cmFavWrap">
+    <div class="cm-section-title">즐겨찾기</div>
+    <div class="cm-fav-list" id="cmFavList">
+      <div class="cm-fav-empty">★ 검색 후 역을 즐겨찾기에 추가하세요</div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="cm-results" id="cmResults"></div>
+</div>
+
+<!-- ===== SUBWAY PAGE (카카오지하철 스타일 경로 검색) ===== -->
+<div class="sw-page" id="subwayPage">
+  <div class="sw-alarm-bar hidden" id="swAlarmBar">
+    <div class="sw-alarm-info">
+      <span class="sw-alarm-icon">🔔</span>
+      <span id="swAlarmText">알람 설정됨</span>
+    </div>
+    <button class="sw-alarm-cancel" type="button" onclick="swClearAlarm()">취소</button>
+  </div>
+  <div class="sw-header">
+    <button class="sw-back" type="button" onclick="closeSubway()">←</button>
+    <div class="sw-title">지하철</div>
+    <button class="sw-map-btn" type="button" onclick="swOpenMap()">노선도</button>
+  </div>
+  <div class="sw-search-area">
+    <div class="sw-input-row">
+      <div class="sw-inputs">
+        <input class="sw-input" id="swFrom" type="text" placeholder="출발역" autocomplete="off">
+        <input class="sw-input" id="swTo" type="text" placeholder="도착역" autocomplete="off">
+      </div>
+      <button class="sw-swap-btn" type="button" onclick="swSwap()">⇅</button>
+    </div>
+    <div class="sw-time-row">
+      <button class="sw-time-btn active" id="swTimeNow" type="button" onclick="swSetTime('now')">지금</button>
+      <button class="sw-time-btn" id="swTimeFirst" type="button" onclick="swSetTime('first')">첫차</button>
+      <button class="sw-time-btn" id="swTimeLast" type="button" onclick="swSetTime('last')">막차</button>
+      <button class="sw-time-btn" id="swTimePick" type="button" onclick="swSetTime('pick')">시간설정</button>
+    </div>
+    <div class="sw-picker-panel hidden" id="swPickerPanel">
+      <div class="sw-day-row">
+        <button class="sw-day-btn active" type="button" onclick="swSetDay('auto',this)">오늘</button>
+        <button class="sw-day-btn" type="button" onclick="swSetDay('weekday',this)">평일</button>
+        <button class="sw-day-btn" type="button" onclick="swSetDay('saturday',this)">토요일</button>
+        <button class="sw-day-btn" type="button" onclick="swSetDay('holiday',this)">일·공휴일</button>
+      </div>
+      <div class="sw-hm-row">
+        <select class="sw-hm-sel" id="swHour"></select>
+        <span class="sw-hm-colon">시</span>
+        <select class="sw-hm-sel" id="swMin"></select>
+        <span class="sw-hm-colon">분</span>
+      </div>
+    </div>
+    <button class="sw-search-btn" type="button" onclick="swSearch()">검색</button>
+    <div class="sw-ac" id="swAC"></div>
+  </div>
+  <div class="sw-favs" id="swFavs"></div>
+  <div class="sw-results" id="swResults"></div>
+  <!-- 실시간 도착정보 패널 -->
+  <div class="sw-realtime hidden" id="swRealtime">
+    <div class="sw-rt-header">
+      <span id="swRTStation">역 이름</span> 실시간 도착
+      <button class="sw-rt-close" type="button" onclick="swCloseRT()">✕</button>
+    </div>
+    <div id="swRTList"></div>
+  </div>
+</div>
+
+<!-- 노선도 오버레이 -->
+<div class="sw-map-overlay hidden" id="swMapOverlay">
+  <div class="sw-mo-header">
+    <button class="sw-mo-back" type="button" onclick="swCloseMap()">←</button>
+    <span class="sw-mo-title">노선도</span>
+  </div>
+  <div class="sw-map-lines" id="swMapLines"></div>
+  <div class="sw-map-stations hidden" id="swMapStations"></div>
+</div>
+
+<!-- ===== CALENDAR ===== -->
+<div class="page" id="pageCal">
+  <div class="cal-nav">
+    <div>
+      <div class="cal-title" id="calMonth"></div>
+      <div class="cal-person-tag" id="calPersonName">선택 안됨</div>
+    </div>
+    <div class="cal-nav-btns">
+      <button class="cal-btn" type="button" onclick="chgMonth(-1)">‹</button>
+      <button class="cal-btn" type="button" onclick="chgMonth(1)">›</button>
+    </div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div id="schedDetail"></div>
+</div>
+
+<!-- ===== LINE 5 REAL-TIME ===== -->
+<div class="page" id="pageLine">
+  <div class="line-header">
+    <div>
+      <div class="line-header-title">5호선 실시간</div>
+      <div class="line-header-status" id="lineUpdateTime"><span class="line-dot" id="lineDot"></span>업데이트 대기중</div>
+    </div>
+    <div class="line-header-btns">
+      <button class="line-view-btn" id="lineViewToggle" type="button" onclick="toggleLineView()" title="노선도 보기">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      </button>
+      <button class="line-refresh-btn" type="button" id="lineRefreshBtn" onclick="fetchTrains()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="line-branch-bar" id="lineBranchBar">
+    <button class="line-branch-tab active" type="button" onclick="switchBranch('main',this)">본선</button>
+    <button class="line-branch-tab" type="button" onclick="switchBranch('macheon',this)">마천</button>
+    <button class="line-branch-tab" type="button" onclick="switchBranch('hanam',this)">하남</button>
+  </div>
+  <div class="line-track-wrap" id="lineTrackWrap">
+    <div id="lineTrackList"></div>
+  </div>
+  <div class="line-map-wrap" id="lineMapWrap">
+    <div class="line-map-toolbar">
+      <div class="line-map-legend">
+        <span class="map-legend-item up">▲ 상행</span>
+        <span class="map-legend-item down">▼ 하행</span>
+        <span class="map-legend-item dapsimni">★ 답십리</span>
+      </div>
+      <div class="line-map-tools">
+        <button class="map-tool-btn" type="button" onclick="mapZoom(-1)" title="축소">−</button>
+        <span class="map-zoom-level" id="mapZoomLevel">100%</span>
+        <button class="map-tool-btn" type="button" onclick="mapZoom(1)" title="확대">+</button>
+        <button class="map-tool-btn fullscreen" type="button" onclick="toggleMapFullscreen()" id="mapFullscreenBtn" title="전체화면">⛶</button>
+      </div>
+    </div>
+    <div class="line-map-scroll" id="lineMapScroll">
+      <div id="lineMapContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== COMPARE ===== -->
+<div class="page" id="pageCmp">
+  <div class="cmp-header">
+    <div class="cal-title">교번 비교</div>
+  </div>
+  <div class="cmp-selectors">
+    <button class="cmp-sel-card" data-slot="1" id="cmpSel1" type="button" onclick="openModal('c1')">
+      <div class="cmp-sel-avatar cmp-avatar-1" id="c1Icon">A</div>
+      <div class="cmp-sel-name" id="c1Name">기관사 1</div>
+      <div class="cmp-sel-sub" id="c1Sub">탭하여 선택</div>
+    </button>
+    <div class="cmp-vs">VS</div>
+    <button class="cmp-sel-card" data-slot="2" id="cmpSel2" type="button" onclick="openModal('c2')">
+      <div class="cmp-sel-avatar cmp-avatar-2" id="c2Icon">B</div>
+      <div class="cmp-sel-name" id="c2Name">기관사 2</div>
+      <div class="cmp-sel-sub" id="c2Sub">탭하여 선택</div>
+    </button>
+  </div>
+  <div class="cmp-nav">
+    <button class="cal-btn" type="button" onclick="chgCmpMonth(-1)">‹</button>
+    <div class="cmp-month" id="cmpMonth"></div>
+    <button class="cal-btn" type="button" onclick="chgCmpMonth(1)">›</button>
+  </div>
+  <div id="cmpResult"></div>
+</div>
+
+<!-- ===== MORE ===== -->
+<div class="page" id="pageMore">
+  <div id="moreMain">
+    <div class="more-top-header">
+      <div class="more-top-title">더보기</div>
+      <div class="more-top-sub" id="morePersonInfo">기관사를 선택해주세요</div>
+    </div>
+
+    <!-- Alert Section -->
+    <div class="more-section">
+      <div class="more-section-title">장애 알림</div>
+      <div class="more-menu-card">
+        <div class="more-menu-item" onclick="showSub('alertPanel')">
+          <span class="more-menu-icon">🚨</span>장애 알림 관리
+          <span class="alert-badge" id="alertBadge"></span>
+          <span class="more-menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="more-section">
+      <div class="more-section-title">비상 매뉴얼</div>
+      <div class="more-menu-card">
+        <div class="more-menu-item" onclick="showSub('sopPanel')">
+          <span class="more-menu-icon">⚠️</span>이례상황 · SOP
+          <span class="more-menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="more-section">
+      <div class="more-section-title">설정</div>
+      <div class="set-section">
+        <div class="set-item">
+          <div class="set-l">선택된 기관사</div>
+          <div class="set-v" id="setName">없음</div>
+        </div>
+        <div class="set-item" onclick="openModal('setting')">
+          <div class="set-l">기관사 변경</div>
+          <div class="set-link">변경 ›</div>
+        </div>
+        <div class="set-item" id="notiSettingItem">
+          <div class="set-l">알림</div>
+          <div class="set-v" id="notiStatus">확인 중...</div>
+        </div>
+        <div class="set-item">
+          <div class="set-l">다크 모드</div>
+          <div class="toggle-wrap">
+            <div class="toggle" id="darkToggle" onclick="toggleDark()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="set-section">
+        <div class="set-item"><div class="set-l">노선</div><div class="set-v">5호선</div></div>
+        <div class="set-item"><div class="set-l">사업소</div><div class="set-v">답십리</div></div>
+        <div class="set-item"><div class="set-l">DB 기준일</div><div class="set-v">2024.11.16</div></div>
+        <div class="set-item"><div class="set-l">DIA 주기</div><div class="set-v">135일 순환</div></div>
+        <div class="set-item"><div class="set-l">버전</div><div class="set-v">Web 3.0 PWA</div></div>
+      </div>
+    </div>
+
+    <div class="more-footer">
+      <img src="logo.png" alt="" class="more-footer-logo">
+      서울교통공사 · 답십리 승무사업소
+    </div>
+  </div>
+
+  <!-- Alert Management Sub -->
+  <div class="sub-view" id="alertPanel">
+    <button class="back-btn" type="button" onclick="hideSub('alertPanel')">← 목록으로</button>
+    <div class="alert-panel-header">
+      <div class="section-label section-label--flush">현재 장애 알림</div>
+      <button class="alert-post-btn" type="button" onclick="openAlertForm()">+ 알림 등록</button>
+    </div>
+    <div id="alertList"></div>
+  </div>
+
+  <!-- SOP Sub -->
+  <div class="sub-view" id="sopPanel">
+    <button class="back-btn" type="button" onclick="hideSub('sopPanel')">← 목록으로</button>
+    <div id="sopList"></div>
+  </div>
+  <div class="sub-view" id="sopDetailPanel">
+    <button class="back-btn" type="button" onclick="backToSopList()">← SOP 목록</button>
+    <div id="sopDetailContent"></div>
+  </div>
+</div>
+
+<!-- FAB (장애 알림 — 활성 알림 있을 때만 표시, 탭하면 목록) -->
+<button class="fab-alert fab-hidden" id="fabAlert" type="button" onclick="goTab('pageMore');setTimeout(()=>showSub('alertPanel'),100)">
+  <span class="fab-icon">🚨</span>
+  <span class="fab-count" id="fabCount"></span>
+</button>
+
+<!-- ===== CONTACTS ===== -->
+<div class="page" id="pageContacts">
+  <div class="ct-header">업무용 전화번호</div>
+  <div id="contactsContent"></div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tabs" id="tabBar">
+  <button class="tab active" data-tab="home" type="button" onclick="goTab('pageHome',this)">
+    <span class="tab-dot" id="tabHomeDot"></span>
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    홈
+  </button>
+  <button class="tab" data-tab="cal" type="button" onclick="goTab('pageCal',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    교번
+  </button>
+  <button class="tab" data-tab="line" type="button" onclick="goTab('pageLine',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="16" rx="3"/><rect x="7.5" y="4.5" width="9" height="5" rx="1.5"/><circle cx="8.5" cy="13" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><line x1="4" y1="20" x2="20" y2="20" stroke-width="2.5"/><line x1="8" y1="18" x2="8" y2="20"/><line x1="16" y1="18" x2="16" y2="20"/></svg>
+    노선
+  </button>
+  <button class="tab" data-tab="cmp" type="button" onclick="goTab('pageCmp',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    비교
+  </button>
+  <button class="tab" data-tab="contacts" type="button" onclick="goTab('pageContacts',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    연락처
+  </button>
+  <button class="tab" data-tab="more" type="button" onclick="goTab('pageMore',this)">
+    <svg class="t-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    더보기
+  </button>
+</div>
+
+<!-- Person Modal -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-bar"></div>
+    <h3>기관사 선택</h3>
+    <input class="modal-search" id="mSearch" placeholder="이름으로 검색" oninput="filterList()" type="text">
+    <div class="modal-list" id="mList"></div>
+  </div>
+</div>
+
+<!-- Alert Form Modal -->
+<div class="modal-bg" id="alertModalBg" onclick="closeAlertModal(event)">
+  <div class="modal-sheet alert-form-sheet">
+    <div class="modal-bar"></div>
+    <h3>장애 알림 등록</h3>
+    <div class="alert-form">
+      <label class="af-label">역명</label>
+      <div class="af-search-wrap">
+        <input class="af-search" id="alertStationInput" type="text" placeholder="역 이름 검색 (예: 답십리)" autocomplete="off">
+        <input type="hidden" id="alertStation" value="">
+        <div class="af-suggest" id="alertSuggest"></div>
+      </div>
+
+      <label class="af-label">심각도</label>
+      <div class="af-severity-row">
+        <button class="af-sev-btn high active" type="button" onclick="pickSeverity('high',this)">긴급</button>
+        <button class="af-sev-btn medium" type="button" onclick="pickSeverity('medium',this)">주의</button>
+        <button class="af-sev-btn low" type="button" onclick="pickSeverity('low',this)">참고</button>
+      </div>
+
+      <label class="af-label">내용</label>
+      <textarea class="af-textarea" id="alertMessage" rows="3" maxlength="200" placeholder="장애 내용을 입력하세요 (예: 스크린도어 고장)"></textarea>
+      <div class="af-char-count" id="alertMsgCount">0/200</div>
+
+      <label class="af-label">사진 (선택 · 최대 3장)</label>
+      <div class="af-photo-area" id="alertPhotoArea" onclick="triggerPhotoInput()">
+        <div class="af-photo-placeholder" id="alertPhotoPlaceholder">
+          <div class="af-photo-icon">📷</div>
+          <div class="af-photo-text">탭하여 사진 추가</div>
+          <div class="af-photo-hint">갤러리 또는 카메라 · 최대 3장</div>
+        </div>
+        <div class="af-photo-grid" id="alertPhotoGrid"></div>
+        <input type="file" id="alertPhotoInput" accept="image/*" multiple style="display:none" onchange="handleAlertPhotos(this)">
+      </div>
+
+      <button class="af-submit" type="button" onclick="postAlert()">알림 등록</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 1회성 SW 핵 리셋 — 모든 캐시+SW 삭제 후 새로고침
+(function(){
+  if(localStorage.getItem('sw-reset-v81'))return;
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      var p=regs.map(function(r){return r.unregister()});
+      return Promise.all(p);
+    }).then(function(){
+      return caches.keys();
+    }).then(function(keys){
+      return Promise.all(keys.map(function(k){return caches.delete(k)}));
+    }).then(function(){
+      localStorage.setItem('sw-reset-v81','1');
+      location.reload();
+    });
+  }
+})();
+// 스플래시 안전장치
+setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.add('hide');document.body.classList.remove('splash-active');setTimeout(function(){s.remove()},600)}},5000);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="subway.js"></script>
+</body>
+</html>

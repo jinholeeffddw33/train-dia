@@ -264,9 +264,14 @@
 
 .diaTime {
   font-size: var(--dia-text-lg);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.diaTimeStart {
+  font-weight: 800;
+  color: var(--dia-blue);
 }
 
 .workTimeWrap {

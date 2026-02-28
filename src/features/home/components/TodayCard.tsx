@@ -79,7 +79,9 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
           )}
           {schedule && (
             <span className={styles.diaTime}>
-              {schedule.s} ~ {schedule.e}
+              <span className={styles.diaTimeStart}>{schedule.s}</span>
+              {' ~ '}
+              {schedule.e}
             </span>
           )}
         </div>

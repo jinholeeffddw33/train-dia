@@ -280,3 +280,46 @@
 }
 
 .quizNext:active { opacity: 0.8; }
+
+/* ── Tool Buttons ── */
+.toolBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-2);
+  min-height: 56px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dia-transition-fast);
+}
+
+.toolBtn:active {
+  background: var(--dia-surface-hover);
+}
+
+.toolIcon {
+  color: var(--dia-text-secondary);
+  flex-shrink: 0;
+}
+
+.toolArrow {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}
+
+.notifBtn {
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 44px;
+}
+
+.notifBtn:active { opacity: 0.8; }

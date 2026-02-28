@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTrainStore } from '@/stores/train';
 import { useTrainPolling } from '../hooks/useTrainPolling';
 import TrainList from './TrainList';
@@ -13,39 +12,21 @@ const BRANCHES = [
   { key: 'hanam' as const, label: '하남' },
 ];
 
-function formatRelativeTime(timestamp: number): string {
-  const diff = Math.floor((Date.now() - timestamp) / 1000);
-  if (diff < 5) return '방금';
-  if (diff < 60) return `${diff}초 전`;
-  const mins = Math.floor(diff / 60);
-  if (mins < 60) return `${mins}분 전`;
-  const hrs = Math.floor(mins / 60);
-  return `${hrs}시간 전`;
-}
-
 export default function Line5Tab() {
   const { branch, viewMode, loading, error, lastFetch, setBranch, setViewMode } = useTrainStore();
   const { refresh } = useTrainPolling();
 
-  // 상대시간 갱신 (10초마다)
-  const [relTime, setRelTime] = useState('');
-  useEffect(() => {
-    if (!lastFetch) return;
-    setRelTime(formatRelativeTime(lastFetch));
-    const id = setInterval(() => setRelTime(formatRelativeTime(lastFetch)), 10000);
-    return () => clearInterval(id);
-  }, [lastFetch]);
+  const lastTime = lastFetch
+    ? new Date(lastFetch).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : null;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.titleRow}>
-          <h2 className={styles.title}>5호선 실시간</h2>
-          <span className={`${styles.liveDot} ${loading ? styles.liveDotLoading : ''}`} />
-        </div>
+        <h2 className={styles.title}>5호선 실시간</h2>
         <button
           type="button"
-          className={styles.refreshBtn}
+          className={`${styles.refreshBtn} ${loading ? styles.refreshSpin : ''}`}
           onClick={refresh}
           disabled={loading}
           aria-label="새로고침"
@@ -54,8 +35,8 @@ export default function Line5Tab() {
         </button>
       </div>
 
-      {relTime && (
-        <p className={styles.lastUpdate}>{relTime} 갱신</p>
+      {lastTime && (
+        <p className={styles.lastUpdate}>마지막 갱신: {lastTime}</p>
       )}
 
       {/* 지선 탭 */}

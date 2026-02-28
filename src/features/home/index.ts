@@ -6,3 +6,4 @@ export { default as MonthSummary } from './components/MonthSummary';
 export { default as DriverSelector } from './components/DriverSelector';
 export { default as RouteTimeline } from './components/RouteTimeline';
 export { default as QuickActions } from './components/QuickActions';
+export { default as HomeTipsQuiz } from './components/HomeTipsQuiz';

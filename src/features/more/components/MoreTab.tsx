@@ -93,16 +93,16 @@ export default function MoreTab() {
               <span className={styles.settingLabel}>알림</span>
             </div>
             {notifPerm === 'granted' ? (
-              <span className={styles.settingValue}>허용됨</span>
+              <span className={styles.settingValue}>허용되어 있어요</span>
             ) : notifPerm === 'denied' ? (
-              <span className={styles.settingValue}>차단됨</span>
+              <span className={styles.settingValue}>차단되어 있어요</span>
             ) : (
               <button
                 type="button"
                 className={styles.quizNext}
                 onClick={requestPermission}
               >
-                허용하기
+                허용할게요
               </button>
             )}
           </div>
@@ -152,7 +152,7 @@ export default function MoreTab() {
           </div>
           {quizAnswer !== null && (
             <div className={styles.quizExplanation}>
-              <p>{quizAnswer === currentQuiz.correct ? '정답!' : '오답!'} {currentQuiz.exp}</p>
+              <p>{quizAnswer === currentQuiz.correct ? '맞았어요!' : '아쉬워요!'} {currentQuiz.exp}</p>
               <button
                 type="button"
                 className={styles.quizNext}

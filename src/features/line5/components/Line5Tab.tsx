@@ -97,7 +97,7 @@ export default function Line5Tab() {
         <div className={styles.errorBanner}>
           <span>{error}</span>
           <button type="button" className={styles.errorRetry} onClick={refresh}>
-            다시 시도
+            다시 시도해볼게요
           </button>
         </div>
       )}
@@ -106,7 +106,7 @@ export default function Line5Tab() {
       {loading && !lastFetch && (
         <div className={styles.loadingState}>
           <div className={styles.spinner} />
-          <p>열차 정보 불러오는 중...</p>
+          <p>열차 정보를 불러오고 있어요...</p>
         </div>
       )}
 

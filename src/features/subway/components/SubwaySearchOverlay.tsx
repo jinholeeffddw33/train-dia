@@ -68,7 +68,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
       ]);
 
       if (!fromRes.ok || !toRes.ok) {
-        setError('역 검색에 실패했습니다. 다시 시도해주세요.');
+        setError('역을 찾지 못했어요. 다시 시도해볼까요?');
         return;
       }
 
@@ -78,8 +78,8 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
       const fromStation = fromData.stations?.[0];
       const toStation = toData.stations?.[0];
 
-      if (!fromStation) { setError(`"${from}" 역을 찾을 수 없습니다.`); return; }
-      if (!toStation) { setError(`"${to}" 역을 찾을 수 없습니다.`); return; }
+      if (!fromStation) { setError(`"${from}" 역을 찾지 못했어요`); return; }
+      if (!toStation) { setError(`"${to}" 역을 찾지 못했어요`); return; }
 
       // 2) 경로 검색
       const modeMap = { now: '1', first: '3', last: '4' };
@@ -96,7 +96,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
 
       const routeRes = await fetch(`/api/odsay/route-search?${params}`);
       if (!routeRes.ok) {
-        setError('경로 검색에 실패했습니다. 다시 시도해주세요.');
+        setError('경로를 찾지 못했어요. 다시 검색해볼까요?');
         return;
       }
       const routeData = await routeRes.json();
@@ -104,10 +104,10 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
       if (routeData.paths?.length) {
         setResults(routeData.paths);
       } else {
-        setError(routeData.message ?? '경로를 찾을 수 없습니다.');
+        setError(routeData.message ?? '경로를 찾지 못했어요');
       }
     } catch {
-      setError('네트워크 오류 — 인터넷 연결을 확인하세요.');
+      setError('인터넷 연결을 확인해주세요');
     } finally {
       setLoading(false);
     }
@@ -171,7 +171,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
           onClick={searchRoute}
           disabled={loading || !from.trim() || !to.trim()}
         >
-          {loading ? '검색 중...' : '경로 검색'}
+          {loading ? '찾고 있어요...' : '경로 검색'}
         </button>
 
         {/* 에러 */}

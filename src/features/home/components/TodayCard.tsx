@@ -50,7 +50,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
     return (
       <section className={styles.emptyCard}>
         <TrainFront size={48} className={styles.emptyIcon} />
-        <p className={styles.emptyText}>기관사를 선택하면{'\n'}오늘의 교번을 확인합니다</p>
+        <p className={styles.emptyText}>기관사를 선택하면{'\n'}오늘의 교번을 볼 수 있어요</p>
       </section>
     );
   }
@@ -103,7 +103,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
                 : segInfo.status === 'waiting'
                   ? `대기 중 · 다음 출발 ${schedule.g[segInfo.idx].d}`
                   : segInfo.status === 'after'
-                    ? '운행 완료'
+                    ? '운행이 끝났어요'
                     : `출발 ${schedule.g[segInfo.idx].d}`}
             </div>
           )}
@@ -116,7 +116,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
       {isToday && banner && banner.state === 'done' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
           <div className={styles.dirBannerDir}>근무 완료</div>
-          <div className={styles.dirBannerSub}>수고하셨습니다!</div>
+          <div className={styles.dirBannerSub}>오늘 하루도 수고 많으셨어요</div>
           {nextShift && nextShift.schedule && (
             <div className={styles.dirBannerNext}>
               다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s} {nextShift.schedule.m ? dirShort(getRouteDirection(nextShift.schedule.m, STATION_ABBR)?.dir || '') : ''}
@@ -128,7 +128,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
 
       {isToday && banner && banner.state === 'idle' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
-          <div className={styles.dirBannerDir}>오늘 근무 완료</div>
+          <div className={styles.dirBannerDir}>오늘 근무가 끝났어요</div>
           {nextShift && nextShift.schedule && (
             <div className={styles.dirBannerNext}>
               다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s}

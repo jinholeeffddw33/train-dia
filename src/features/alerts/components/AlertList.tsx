@@ -24,8 +24,8 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
       {alerts.length === 0 ? (
         <div className={styles.emptyList}>
           <span className={styles.emptyListIcon}>✓</span>
-          <p className={styles.emptyListText}>현재 장애 알림이 없습니다</p>
-          <p className={styles.emptyListHint}>정상 운행 중</p>
+          <p className={styles.emptyListText}>장애 알림이 없어요</p>
+          <p className={styles.emptyListHint}>정상 운행 중이에요</p>
         </div>
       ) : (
         <div className={styles.alertCards}>

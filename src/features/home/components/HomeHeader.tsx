@@ -54,7 +54,7 @@ export default function HomeHeader({ onDriverSelect }: HomeHeaderProps) {
           </>
         ) : (
           <>
-            <span className={styles.driverBtnText}>기관사를 선택하세요</span>
+            <span className={styles.driverBtnText}>기관사를 선택해보세요</span>
             <ChevronRight size={18} className={styles.driverBtnArrow} />
           </>
         )}

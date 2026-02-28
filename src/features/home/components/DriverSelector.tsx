@@ -83,7 +83,7 @@ export default function DriverSelector({ open, onClose }: DriverSelectorProps) {
           </button>
         ))}
         {filtered.length === 0 && (
-          <p className={styles.selectorEmpty}>검색 결과가 없습니다</p>
+          <p className={styles.selectorEmpty}>검색 결과가 없어요</p>
         )}
       </div>
     </Modal>

@@ -30,7 +30,7 @@ export default function AppShell({ children }: AppShellProps) {
       {/* 업데이트 배너 */}
       {updateAvailable && (
         <div className={styles.updateBanner}>
-          <span>새 버전이 있습니다</span>
+          <span>새 버전이 나왔어요</span>
           <button type="button" className={styles.updateBtn} onClick={applyUpdate}>
             업데이트
           </button>

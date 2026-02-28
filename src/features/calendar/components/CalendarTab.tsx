@@ -35,7 +35,7 @@ export default function CalendarTab() {
     return (
       <div className={styles.empty}>
         <span className={styles.emptyIcon}>📅</span>
-        <p className={styles.emptyText}>기관사를 선택하면{'\n'}교번이 달력에 표시됩니다</p>
+        <p className={styles.emptyText}>기관사를 선택하면{'\n'}달력에 교번이 표시돼요</p>
       </div>
     );
   }

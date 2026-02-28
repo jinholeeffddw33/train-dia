@@ -47,13 +47,13 @@ export default function StationArrivals({
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        setError(err.message ?? '도착 정보를 불러올 수 없습니다.');
+        setError(err.message ?? '도착 정보를 불러오지 못했어요');
         return;
       }
       const data = await res.json();
       setArrivals(data.arrivals ?? []);
     } catch {
-      setError('네트워크 오류');
+      setError('네트워크 연결을 확인해주세요');
     } finally {
       setLoading(false);
     }
@@ -97,19 +97,19 @@ export default function StationArrivals({
       {loading && (
         <div className={styles.loadingSmall}>
           <div className={styles.spinnerSmall} />
-          <span>불러오는 중...</span>
+          <span>불러오고 있어요...</span>
         </div>
       )}
 
       {error && (
         <div className={styles.errorSmall}>
           <span>{error}</span>
-          <button type="button" className={styles.errorRetryBtn} onClick={fetchArrivals} aria-label="다시 시도">다시 시도</button>
+          <button type="button" className={styles.errorRetryBtn} onClick={fetchArrivals} aria-label="다시 시도">다시 시도해볼게요</button>
         </div>
       )}
 
       {!loading && !error && arrivals.length === 0 && (
-        <p className={styles.noArrivals}>도착 예정 열차가 없습니다</p>
+        <p className={styles.noArrivals}>도착 예정 열차가 없어요</p>
       )}
 
       {Object.entries(grouped).map(([dir, items]) => (

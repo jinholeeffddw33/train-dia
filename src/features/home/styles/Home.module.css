@@ -583,7 +583,13 @@
 
 .monthItemTotal {
   border: 1.5px solid var(--dia-blue);
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+  animation: ambientPulse 3s ease-in-out infinite;
+}
+
+@keyframes ambientPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(59, 130, 246, 0.15); }
+  50% { box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); }
 }
 
 .monthItemSm {
@@ -618,6 +624,15 @@
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-medium);
   color: var(--dia-text-tertiary);
+}
+
+.monthItemTotal .monthValue {
+  color: var(--dia-blue);
+}
+
+.monthItemTotal .monthLabel {
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
 }
 
 .monthLabelDay { color: var(--dia-blue); }

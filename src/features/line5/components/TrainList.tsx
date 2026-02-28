@@ -40,8 +40,8 @@ export default function TrainList() {
     return (
       <div className={styles.emptyState}>
         <span className={styles.emptyIcon}>🌙</span>
-        <p className={styles.emptyText}>현재 운행 중인 열차가 없습니다</p>
-        <p className={styles.emptyHint}>심야 시간에는 열차 운행이 없습니다</p>
+        <p className={styles.emptyText}>지금은 운행 중인 열차가 없어요</p>
+        <p className={styles.emptyHint}>심야 시간에는 열차가 쉬고 있어요</p>
       </div>
     );
   }
@@ -71,7 +71,7 @@ function DirectionGroup({
     <div className={styles.directionGroup}>
       <h3 className={styles.directionLabel}>{label}</h3>
       {trains.length === 0 ? (
-        <p className={styles.noTrains}>이 방향 열차 없음</p>
+        <p className={styles.noTrains}>이 방향엔 열차가 없어요</p>
       ) : (
         <div className={styles.trainCards}>
           {trains.map((t) => (

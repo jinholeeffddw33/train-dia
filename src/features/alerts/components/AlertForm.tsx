@@ -103,7 +103,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         <textarea
           className={styles.messageInput}
           rows={3}
-          placeholder="장애 상황을 간단히 설명해주세요..."
+          placeholder="어떤 상황인지 알려주세요..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={200}
@@ -119,7 +119,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         onClick={handleSubmit}
         disabled={!station || !message.trim()}
       >
-        등록하기
+        등록할게요
       </button>
     </div>
   );

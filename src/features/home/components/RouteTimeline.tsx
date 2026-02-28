@@ -82,24 +82,26 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
               </div>
 
               {/* 교대 상대 */}
-              {partner && (
-                <div className={styles.rtPartnerRow}>
-                  {partner.left ? (
-                    <span className={`${styles.rtPartner} ${styles.rtPartnerLeft}`}>
-                      교대 <strong>{partner.left}</strong>
-                    </span>
-                  ) : (
-                    <span />
-                  )}
-                  {partner.right ? (
-                    <span className={`${styles.rtPartner} ${styles.rtPartnerRight}`}>
-                      교대 <strong>{partner.right}</strong>
-                    </span>
-                  ) : (
-                    <span />
-                  )}
-                </div>
-              )}
+              <div className={styles.rtPartnerRow}>
+                {partner?.left ? (
+                  <span className={`${styles.rtPartner} ${styles.rtPartnerLeft}`}>
+                    교대 <strong>{partner.left}</strong>
+                  </span>
+                ) : (
+                  <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
+                    타소 교대
+                  </span>
+                )}
+                {partner?.right ? (
+                  <span className={`${styles.rtPartner} ${styles.rtPartnerRight}`}>
+                    교대 <strong>{partner.right}</strong>
+                  </span>
+                ) : (
+                  <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
+                    타소 교대
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* 구간 간 대기시간 */}

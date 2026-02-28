@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={notoSansKR.variable}>
+    <html lang="ko" className={notoSansKR.variable} suppressHydrationWarning>
       <head>
         {/* 다크모드 + 글자 크기 FOUC 방지: hydration 전에 즉시 실행 */}
         <script

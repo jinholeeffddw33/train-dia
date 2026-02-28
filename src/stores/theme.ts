@@ -44,9 +44,13 @@ function saveTheme(theme: Theme) {
   try { localStorage.setItem(STORAGE_KEY, theme); } catch { /* quota 초과 등 무시 */ }
 }
 
+/** 모듈 로드 시 즉시 localStorage에서 테마 확정 (SSR에서는 'dark') */
+const initialTheme: Theme =
+  typeof window !== 'undefined' ? (readStoredTheme() ?? 'dark') : 'dark';
+
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: 'dark',
-  isLoaded: false,
+  theme: initialTheme,
+  isLoaded: typeof window !== 'undefined',
 
   toggle: () => {
     const next = get().theme === 'dark' ? 'light' : 'dark';
@@ -62,12 +66,8 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   },
 }));
 
-// 모듈 로드 시 즉시 초기화 (FOUC 방지)
+// 모듈 로드 시 DOM에 테마 적용 + 레거시 포맷 마이그레이션
 if (typeof window !== 'undefined') {
-  const stored = readStoredTheme();
-  const theme = stored ?? 'dark';
-  applyTheme(theme);
-  // 레거시 포맷이면 새 포맷으로 마이그레이션
-  saveTheme(theme);
-  useThemeStore.setState({ theme, isLoaded: true });
+  applyTheme(initialTheme);
+  saveTheme(initialTheme);
 }

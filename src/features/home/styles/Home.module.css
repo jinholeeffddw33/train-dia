@@ -263,8 +263,9 @@
 }
 
 .diaTimeStart {
+  font-size: var(--dia-text-xl);
   font-weight: 800;
-  color: var(--dia-blue);
+  color: var(--dia-text-primary);
 }
 
 .workTimeWrap {
@@ -878,7 +879,7 @@
 }
 
 .rtDep {
-  font-size: 20px;
+  font-size: var(--dia-text-xl);
   font-weight: 800;
   color: var(--dia-text-primary);
   white-space: nowrap;

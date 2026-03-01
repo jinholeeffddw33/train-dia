@@ -16,8 +16,22 @@ export default function AlertFab() {
   // 마운트 시 서버에서 알림 가져오기 + 실시간 구독
   useEffect(() => {
     fetch();
-    const unsubscribe = subscribe();
-    return unsubscribe;
+    let unsubscribe = subscribe();
+
+    // PWA 백그라운드 → 포그라운드 복귀 시 재연결
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetch();
+        unsubscribe();
+        unsubscribe = subscribe();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [fetch, subscribe]);
 
   return (

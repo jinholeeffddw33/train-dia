@@ -56,7 +56,7 @@
 }
 
 /* ── List ── */
-.listContainer { padding: var(--dia-space-2) 0; }
+.listContainer { padding: var(--dia-space-2) var(--dia-space-4); }
 
 .listHeader {
   display: flex;
@@ -228,7 +228,7 @@
 .addBtn:active { opacity: 0.8; }
 
 /* ── Alert Form ── */
-.formContainer { padding: var(--dia-space-2) 0; }
+.formContainer { padding: var(--dia-space-2) var(--dia-space-4); }
 
 .formSection {
   margin-bottom: var(--dia-space-5);
@@ -439,12 +439,12 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: var(--dia-space-1) var(--dia-space-2);
+  padding: var(--dia-space-1) var(--dia-space-1);
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
-  min-height: 36px;
+  min-height: 34px;
   transition: all var(--dia-transition-fast);
 }
 

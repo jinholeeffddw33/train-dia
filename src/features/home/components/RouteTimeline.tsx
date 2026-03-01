@@ -51,9 +51,17 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
     [schedule, person, date],
   );
 
+  // 시간 괄호 제거: "답방하,하답(05:30),답하답(06:16)" → "답방하,하답,답하답"
+  const routeAbbr = schedule.m && !schedule.m.includes('충당여부') && !schedule.m.includes('대휴')
+    ? schedule.m.replace(/\s*\([^)]*\)/g, '').trim()
+    : null;
+
   return (
     <div className={styles.rt}>
-      <div className={styles.rtLabel}><TrainFront size={14} className={styles.rtLabelIcon} />{LABELS.SEGMENT_RUN}</div>
+      <div className={styles.rtLabel}>
+        <TrainFront size={14} className={styles.rtLabelIcon} />{LABELS.SEGMENT_RUN}
+        {routeAbbr && <span className={styles.rtRoute}> : {routeAbbr}</span>}
+      </div>
 
       {segs.map((seg, i) => {
         const trains = seg.n ? seg.n.join(' / ') : '';
@@ -118,10 +126,6 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
         );
       })}
 
-      {/* 원본 운전행로 텍스트 */}
-      {schedule.m && !schedule.m.includes('충당여부') && !schedule.m.includes('대휴') && (
-        <div className={styles.rtRaw}>{schedule.m}</div>
-      )}
     </div>
   );
 }

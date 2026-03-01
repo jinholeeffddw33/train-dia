@@ -835,11 +835,23 @@
 }
 
 .rtLabel {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
   font-size: 12px;
   font-weight: 700;
   color: var(--dia-blue);
   margin-bottom: var(--dia-space-3);
   letter-spacing: 0.3px;
+}
+
+.rtRoute {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rtLabelIcon {
@@ -959,14 +971,6 @@
   white-space: nowrap;
 }
 
-.rtRaw {
-  margin-top: var(--dia-space-3);
-  padding-top: var(--dia-space-2);
-  border-top: 1px dashed var(--dia-border);
-  font-size: 13px;
-  color: var(--dia-text-tertiary);
-  line-height: 1.6;
-}
 
 /* ── WeekStrip 선택 상태 ── */
 .weekDaySelected {

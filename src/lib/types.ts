@@ -8,6 +8,8 @@ export interface Person {
   d: string;
   /** 이름 */
   n: string;
+  /** 사번 (8자리) */
+  s?: string;
 }
 
 /** 교번 타입 */
@@ -79,7 +81,8 @@ export interface DaysUntilRest {
 /** 장애 알림 */
 export interface Alert {
   id: string;
-  station: string;
+  stationFrom: string;
+  stationTo: string;
   message: string;
   severity: 'high' | 'medium' | 'low';
   photos?: string[];

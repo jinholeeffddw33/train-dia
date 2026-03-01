@@ -1,0 +1,140 @@
+/* AuthGate — 최초 교번 인증 오버레이 */
+
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dia-bg);
+  padding: var(--dia-space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 48px;
+  margin-bottom: var(--dia-space-4);
+}
+
+.title {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-1);
+}
+
+.subtitle {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-8);
+}
+
+.inputGroup {
+  margin-bottom: var(--dia-space-5);
+  text-align: left;
+}
+
+.label {
+  display: block;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.input {
+  width: 100%;
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-lg);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-semibold);
+  text-align: center;
+  letter-spacing: 4px;
+}
+
+.input::placeholder {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-base);
+  letter-spacing: 0;
+  font-weight: var(--dia-weight-normal);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 3px var(--dia-blue-dim);
+}
+
+/* 숫자 스피너 제거 */
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.error {
+  margin-top: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-red);
+  text-align: center;
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+
+.matchedName {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+}
+
+.matchedHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+.btn {
+  width: 100%;
+  padding: var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 48px;
+  transition: opacity var(--dia-transition-fast);
+}
+
+.btn:active {
+  opacity: 0.8;
+}
+
+.btnSecondary {
+  width: 100%;
+  padding: var(--dia-space-3);
+  background: transparent;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  min-height: 44px;
+}
+
+.btnSecondary:active {
+  color: var(--dia-text-secondary);
+}

@@ -5,7 +5,7 @@ import styles from '../styles/Alerts.module.css';
 
 const SEVERITY_LABEL = {
   high: '긴급',
-  medium: '주의',
+  medium: '이례사항',
   low: '참고',
 } as const;
 
@@ -38,7 +38,7 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
                 <span className={`${styles.severityBadge} ${styles[`severityBadge_${alert.severity}`]}`}>
                   {SEVERITY_LABEL[alert.severity]}
                 </span>
-                <span className={styles.alertStation}>{alert.station}</span>
+                <span className={styles.alertStation}>{alert.stationFrom} → {alert.stationTo}</span>
                 <span className={styles.alertTime}>
                   {new Date(alert.created_at).toLocaleTimeString('ko-KR', {
                     hour: '2-digit',

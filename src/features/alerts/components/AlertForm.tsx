@@ -7,23 +7,45 @@ import styles from '../styles/Alerts.module.css';
 
 const ALL_STATIONS = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
 
+type StationField = 'from' | 'to';
+
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
-  const [station, setStation] = useState('');
+  const [stationFrom, setStationFrom] = useState('');
+  const [stationTo, setStationTo] = useState('');
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState<'high' | 'medium' | 'low'>('medium');
   const [stationSearch, setStationSearch] = useState('');
+  const [activeField, setActiveField] = useState<StationField | null>(null);
 
   const filteredStations = stationSearch
     ? ALL_STATIONS.filter((s) => s.includes(stationSearch))
     : ALL_STATIONS;
 
+  const handleStationSelect = (name: string) => {
+    if (activeField === 'from') {
+      setStationFrom(name);
+      setStationSearch('');
+      // 시작역 선택 후 끝역이 비어있으면 자동으로 끝역 선택 모드로
+      if (!stationTo) {
+        setActiveField('to');
+      } else {
+        setActiveField(null);
+      }
+    } else if (activeField === 'to') {
+      setStationTo(name);
+      setStationSearch('');
+      setActiveField(null);
+    }
+  };
+
   const handleSubmit = () => {
-    if (!station || !message.trim()) return;
+    if (!stationFrom || !stationTo || !message.trim()) return;
 
     addAlert({
       id: `local-${Date.now()}`,
-      station,
+      stationFrom,
+      stationTo,
       message: message.trim(),
       severity,
       created_at: new Date().toISOString(),
@@ -52,31 +74,80 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
               className={`${styles.severityOption} ${severity === s ? styles[`severityOption_${s}`] : ''}`}
               onClick={() => setSeverity(s)}
             >
-              {s === 'high' ? '긴급' : s === 'medium' ? '주의' : '참고'}
+              {s === 'high' ? '긴급' : s === 'medium' ? '이례사항' : '참고'}
             </button>
           ))}
         </div>
       </div>
 
-      {/* 역 선택 */}
+      {/* 구간 선택 */}
       <div className={styles.formSection}>
-        <label className={styles.formLabel}>역</label>
-        {station ? (
-          <div className={styles.selectedStation}>
-            <span>{station}</span>
-            <button type="button" className={styles.clearStation} onClick={() => setStation('')}>
-              변경
-            </button>
+        <label className={styles.formLabel}>구간</label>
+        <div className={styles.sectionSelect}>
+          {/* 시작역 */}
+          <div className={styles.sectionRow}>
+            <span className={styles.sectionLabel}>시작역</span>
+            {stationFrom ? (
+              <div className={styles.selectedStation}>
+                <span>{stationFrom}</span>
+                <button
+                  type="button"
+                  className={styles.clearStation}
+                  onClick={() => { setStationFrom(''); setActiveField('from'); }}
+                >
+                  변경
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={`${styles.stationSelectBtn} ${activeField === 'from' ? styles.stationSelectBtnActive : ''}`}
+                onClick={() => setActiveField(activeField === 'from' ? null : 'from')}
+              >
+                역 선택
+              </button>
+            )}
           </div>
-        ) : (
-          <>
+
+          {/* 화살표 구분 */}
+          <div className={styles.sectionArrow}>→</div>
+
+          {/* 끝역 */}
+          <div className={styles.sectionRow}>
+            <span className={styles.sectionLabel}>끝역</span>
+            {stationTo ? (
+              <div className={styles.selectedStation}>
+                <span>{stationTo}</span>
+                <button
+                  type="button"
+                  className={styles.clearStation}
+                  onClick={() => { setStationTo(''); setActiveField('to'); }}
+                >
+                  변경
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className={`${styles.stationSelectBtn} ${activeField === 'to' ? styles.stationSelectBtnActive : ''}`}
+                onClick={() => setActiveField(activeField === 'to' ? null : 'to')}
+              >
+                역 선택
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 역 검색/선택 패널 (activeField 있을 때만 표시) */}
+        {activeField && (
+          <div className={styles.stationPanel}>
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="역 이름 검색..."
+              placeholder={`${activeField === 'from' ? '시작' : '끝'}역 검색...`}
               value={stationSearch}
               onChange={(e) => setStationSearch(e.target.value)}
-              aria-label="역 이름 검색"
+              aria-label={`${activeField === 'from' ? '시작' : '끝'}역 검색`}
             />
             <div className={styles.stationGrid}>
               {filteredStations.slice(0, 20).map((s) => (
@@ -84,7 +155,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
                   key={s}
                   type="button"
                   className={styles.stationChip}
-                  onClick={() => { setStation(s); setStationSearch(''); }}
+                  onClick={() => handleStationSelect(s)}
                 >
                   {s}
                 </button>
@@ -93,7 +164,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
                 <span className={styles.moreHint}>+{filteredStations.length - 20}개</span>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
 
@@ -117,7 +188,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={!station || !message.trim()}
+        disabled={!stationFrom || !stationTo || !message.trim()}
       >
         등록할게요
       </button>

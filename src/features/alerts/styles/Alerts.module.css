@@ -255,10 +255,61 @@
   color: var(--dia-blue);
 }
 
+/* ── Section (구간) Select ── */
+.sectionSelect {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.sectionRow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.sectionLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.sectionArrow {
+  font-size: var(--dia-text-lg);
+  color: var(--dia-text-tertiary);
+  padding-top: var(--dia-space-4);
+}
+
+.stationSelectBtn {
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px dashed var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  min-height: 44px;
+  transition: all var(--dia-transition-fast);
+}
+
+.stationSelectBtnActive {
+  border-color: var(--dia-purple);
+  color: var(--dia-purple);
+  border-style: solid;
+}
+
+.stationPanel {
+  margin-top: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
 .searchInput {
   width: 100%;
   padding: var(--dia-space-3);
-  background: var(--dia-surface);
+  background: var(--dia-bg);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
   color: var(--dia-text-primary);

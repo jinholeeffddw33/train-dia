@@ -30,7 +30,6 @@ export default function AlertFab() {
       <Modal
         open={view === 'list'}
         onClose={() => setView('closed')}
-        title="장애 알림"
       >
         <AlertList onClose={() => setView('closed')} />
         <button
@@ -46,7 +45,6 @@ export default function AlertFab() {
       <Modal
         open={view === 'form'}
         onClose={() => setView('list')}
-        title="장애 등록"
       >
         <AlertForm onClose={() => setView('list')} />
       </Modal>

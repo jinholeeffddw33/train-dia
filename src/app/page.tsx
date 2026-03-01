@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector, HomeTipsQuiz } from '@/features/home';
@@ -56,8 +57,10 @@ function HomeTab() {
 
 export default function HomePage() {
   return (
-    <AppShell>
-      {(activeTab) => <TabContent tab={activeTab} />}
-    </AppShell>
+    <AuthGate>
+      <AppShell>
+        {(activeTab) => <TabContent tab={activeTab} />}
+      </AppShell>
+    </AuthGate>
   );
 }

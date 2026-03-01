@@ -410,3 +410,46 @@
 }
 
 .submitBtn:active:not(:disabled) { opacity: 0.8; }
+
+/* ── Direction Select ── */
+.directionSelect {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+
+.directionOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-3) var(--dia-space-2);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  min-height: 44px;
+  transition: all var(--dia-transition-fast);
+}
+
+.directionOptionActive {
+  background: var(--dia-purple-dim, var(--dia-surface));
+  border-color: var(--dia-purple);
+  color: var(--dia-purple);
+}
+
+.directionIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.directionLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+}
+
+/* ── Alert Direction Badge (in list) ── */
+.alertDirection {
+  font-weight: var(--dia-weight-normal);
+  color: var(--dia-text-tertiary);
+}

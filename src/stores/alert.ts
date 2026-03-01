@@ -6,6 +6,7 @@ interface DbAlert {
   id: string;
   station_from: string;
   station_to: string;
+  direction: string;
   message: string;
   severity: 'high' | 'medium' | 'low';
   created_by: string;
@@ -18,6 +19,7 @@ export interface AlertItem {
   id: string;
   stationFrom: string;
   stationTo: string;
+  direction: string;
   message: string;
   severity: 'high' | 'medium' | 'low';
   createdBy: string;
@@ -30,6 +32,7 @@ function toAlert(row: DbAlert): AlertItem {
     id: row.id,
     stationFrom: row.station_from,
     stationTo: row.station_to,
+    direction: row.direction || '',
     message: row.message,
     severity: row.severity,
     createdBy: row.created_by,
@@ -46,6 +49,7 @@ interface AlertState {
   addAlert: (params: {
     stationFrom: string;
     stationTo: string;
+    direction: string;
     message: string;
     severity: 'high' | 'medium' | 'low';
     authorName: string;
@@ -65,7 +69,7 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
     set({ loading: true });
     const { data, error } = await supabase
       .from('alerts')
-      .select('id,station_from,station_to,message,severity,created_by,created_at,is_active')
+      .select('id,station_from,station_to,direction,message,severity,created_by,created_at,is_active')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
@@ -75,14 +79,15 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
     set({ loading: false });
   },
 
-  addAlert: async ({ stationFrom, stationTo, message, severity, authorName }) => {
+  addAlert: async ({ stationFrom, stationTo, direction, message, severity, authorName }) => {
     if (!supabase) return;
     const { data, error } = await supabase
       .from('alerts')
       .insert({
         station_from: stationFrom,
         station_to: stationTo,
-        station: stationFrom,
+        direction: direction || '',
+        station: stationFrom || '',
         message,
         severity,
         created_by: authorName,

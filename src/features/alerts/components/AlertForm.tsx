@@ -9,16 +9,26 @@ import styles from '../styles/Alerts.module.css';
 const ALL_STATIONS = [...LINE5_MAIN, ...LINE5_MACHEON, ...LINE5_HANAM];
 
 type StationField = 'from' | 'to';
+type Direction = 'both' | 'up' | 'down';
+
+const DIRECTION_OPTIONS: { value: Direction; label: string; icon: string }[] = [
+  { value: 'both', label: '상하선', icon: '⇅' },
+  { value: 'up', label: '상선', icon: '↑' },
+  { value: 'down', label: '하선', icon: '↓' },
+];
 
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
   const driverName = useDriverStore((s) => s.current?.n ?? '');
   const [stationFrom, setStationFrom] = useState('');
   const [stationTo, setStationTo] = useState('');
+  const [direction, setDirection] = useState<Direction>('both');
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState<'high' | 'medium' | 'low'>('medium');
   const [stationSearch, setStationSearch] = useState('');
   const [activeField, setActiveField] = useState<StationField | null>(null);
+
+  const isInfo = severity === 'low';
 
   const filteredStations = stationSearch
     ? ALL_STATIONS.filter((s) => s.includes(stationSearch))
@@ -28,7 +38,6 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     if (activeField === 'from') {
       setStationFrom(name);
       setStationSearch('');
-      // 시작역 선택 후 끝역이 비어있으면 자동으로 끝역 선택 모드로
       if (!stationTo) {
         setActiveField('to');
       } else {
@@ -41,12 +50,17 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     }
   };
 
+  const canSubmit = isInfo
+    ? message.trim().length > 0
+    : stationFrom && stationTo && message.trim().length > 0;
+
   const handleSubmit = async () => {
-    if (!stationFrom || !stationTo || !message.trim()) return;
+    if (!canSubmit) return;
 
     await addAlert({
-      stationFrom,
-      stationTo,
+      stationFrom: isInfo ? '' : stationFrom,
+      stationTo: isInfo ? '' : stationTo,
+      direction: isInfo ? '' : direction,
       message: message.trim(),
       severity,
       authorName: driverName,
@@ -81,93 +95,113 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      {/* 구간 선택 */}
-      <div className={styles.formSection}>
-        <label className={styles.formLabel}>구간</label>
-        <div className={styles.sectionSelect}>
-          {/* 시작역 */}
-          <div className={styles.sectionRow}>
-            <span className={styles.sectionLabel}>시작역</span>
-            {stationFrom ? (
-              <div className={styles.selectedStation}>
-                <span>{stationFrom}</span>
-                <button
-                  type="button"
-                  className={styles.clearStation}
-                  onClick={() => { setStationFrom(''); setActiveField('from'); }}
-                >
-                  변경
-                </button>
+      {/* 구간 + 방향 (긴급/이례사항만) */}
+      {!isInfo && (
+        <>
+          <div className={styles.formSection}>
+            <label className={styles.formLabel}>구간</label>
+            <div className={styles.sectionSelect}>
+              {/* 시작역 */}
+              <div className={styles.sectionRow}>
+                <span className={styles.sectionLabel}>시작역</span>
+                {stationFrom ? (
+                  <div className={styles.selectedStation}>
+                    <span>{stationFrom}</span>
+                    <button
+                      type="button"
+                      className={styles.clearStation}
+                      onClick={() => { setStationFrom(''); setActiveField('from'); }}
+                    >
+                      변경
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${styles.stationSelectBtn} ${activeField === 'from' ? styles.stationSelectBtnActive : ''}`}
+                    onClick={() => setActiveField(activeField === 'from' ? null : 'from')}
+                  >
+                    역 선택
+                  </button>
+                )}
               </div>
-            ) : (
-              <button
-                type="button"
-                className={`${styles.stationSelectBtn} ${activeField === 'from' ? styles.stationSelectBtnActive : ''}`}
-                onClick={() => setActiveField(activeField === 'from' ? null : 'from')}
-              >
-                역 선택
-              </button>
+
+              <div className={styles.sectionArrow}>→</div>
+
+              {/* 끝역 */}
+              <div className={styles.sectionRow}>
+                <span className={styles.sectionLabel}>끝역</span>
+                {stationTo ? (
+                  <div className={styles.selectedStation}>
+                    <span>{stationTo}</span>
+                    <button
+                      type="button"
+                      className={styles.clearStation}
+                      onClick={() => { setStationTo(''); setActiveField('to'); }}
+                    >
+                      변경
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${styles.stationSelectBtn} ${activeField === 'to' ? styles.stationSelectBtnActive : ''}`}
+                    onClick={() => setActiveField(activeField === 'to' ? null : 'to')}
+                  >
+                    역 선택
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {activeField && (
+              <div className={styles.stationPanel}>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder={`${activeField === 'from' ? '시작' : '끝'}역 검색...`}
+                  value={stationSearch}
+                  onChange={(e) => setStationSearch(e.target.value)}
+                  aria-label={`${activeField === 'from' ? '시작' : '끝'}역 검색`}
+                />
+                <div className={styles.stationGrid}>
+                  {filteredStations.slice(0, 20).map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={styles.stationChip}
+                      onClick={() => handleStationSelect(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                  {filteredStations.length > 20 && (
+                    <span className={styles.moreHint}>+{filteredStations.length - 20}개</span>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 
-          {/* 화살표 구분 */}
-          <div className={styles.sectionArrow}>→</div>
-
-          {/* 끝역 */}
-          <div className={styles.sectionRow}>
-            <span className={styles.sectionLabel}>끝역</span>
-            {stationTo ? (
-              <div className={styles.selectedStation}>
-                <span>{stationTo}</span>
+          {/* 방향 선택 */}
+          <div className={styles.formSection}>
+            <label className={styles.formLabel}>방향</label>
+            <div className={styles.directionSelect}>
+              {DIRECTION_OPTIONS.map((opt) => (
                 <button
+                  key={opt.value}
                   type="button"
-                  className={styles.clearStation}
-                  onClick={() => { setStationTo(''); setActiveField('to'); }}
+                  className={`${styles.directionOption} ${direction === opt.value ? styles.directionOptionActive : ''}`}
+                  onClick={() => setDirection(opt.value)}
                 >
-                  변경
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className={`${styles.stationSelectBtn} ${activeField === 'to' ? styles.stationSelectBtnActive : ''}`}
-                onClick={() => setActiveField(activeField === 'to' ? null : 'to')}
-              >
-                역 선택
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* 역 검색/선택 패널 (activeField 있을 때만 표시) */}
-        {activeField && (
-          <div className={styles.stationPanel}>
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder={`${activeField === 'from' ? '시작' : '끝'}역 검색...`}
-              value={stationSearch}
-              onChange={(e) => setStationSearch(e.target.value)}
-              aria-label={`${activeField === 'from' ? '시작' : '끝'}역 검색`}
-            />
-            <div className={styles.stationGrid}>
-              {filteredStations.slice(0, 20).map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={styles.stationChip}
-                  onClick={() => handleStationSelect(s)}
-                >
-                  {s}
+                  <span className={styles.directionIcon}>{opt.icon}</span>
+                  <span className={styles.directionLabel}>{opt.label}</span>
                 </button>
               ))}
-              {filteredStations.length > 20 && (
-                <span className={styles.moreHint}>+{filteredStations.length - 20}개</span>
-              )}
             </div>
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* 메시지 */}
       <div className={styles.formSection}>
@@ -175,7 +209,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         <textarea
           className={styles.messageInput}
           rows={3}
-          placeholder="어떤 상황인지 알려주세요..."
+          placeholder={isInfo ? '참고할 내용을 알려주세요...' : '어떤 상황인지 알려주세요...'}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={200}
@@ -189,7 +223,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={!stationFrom || !stationTo || !message.trim()}
+        disabled={!canSubmit}
       >
         등록할게요
       </button>

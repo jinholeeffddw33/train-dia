@@ -9,6 +9,12 @@ const SEVERITY_LABEL = {
   low: '참고',
 } as const;
 
+const DIRECTION_LABEL: Record<string, string> = {
+  both: '상하선',
+  up: '상선',
+  down: '하선',
+};
+
 export default function AlertList({ onClose }: { onClose: () => void }) {
   const { alerts, deactivate } = useAlertStore();
 
@@ -38,7 +44,16 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
                 <span className={`${styles.severityBadge} ${styles[`severityBadge_${alert.severity}`]}`}>
                   {SEVERITY_LABEL[alert.severity]}
                 </span>
-                <span className={styles.alertStation}>{alert.stationFrom} → {alert.stationTo}</span>
+                {alert.stationFrom && alert.stationTo ? (
+                  <span className={styles.alertStation}>
+                    {alert.stationFrom} → {alert.stationTo}
+                    {alert.direction && DIRECTION_LABEL[alert.direction] && (
+                      <span className={styles.alertDirection}> ({DIRECTION_LABEL[alert.direction]})</span>
+                    )}
+                  </span>
+                ) : (
+                  <span className={styles.alertStation}>전체</span>
+                )}
                 <span className={styles.alertTime}>
                   {new Date(alert.created_at).toLocaleTimeString('ko-KR', {
                     hour: '2-digit',

@@ -12,6 +12,7 @@ interface DbAlert {
   created_by: string;
   created_at: string;
   is_active: boolean;
+  expires_at: string | null;
 }
 
 /** 프론트 Alert 타입 */
@@ -24,6 +25,7 @@ export interface AlertItem {
   severity: 'high' | 'medium' | 'low';
   createdBy: string;
   created_at: string;
+  expires_at: string | null;
 }
 
 /** DB → 프론트 변환 */
@@ -37,6 +39,7 @@ function toAlert(row: DbAlert): AlertItem {
     severity: row.severity,
     createdBy: row.created_by,
     created_at: row.created_at,
+    expires_at: row.expires_at,
   };
 }
 
@@ -53,6 +56,7 @@ interface AlertState {
     message: string;
     severity: 'high' | 'medium' | 'low';
     authorName: string;
+    expiresAt?: string | null;
   }) => Promise<void>;
   /** 알림 해제 (is_active = false) */
   deactivate: (id: string) => Promise<void>;
@@ -69,17 +73,22 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
     set({ loading: true });
     const { data, error } = await supabase
       .from('alerts')
-      .select('id,station_from,station_to,direction,message,severity,created_by,created_at,is_active')
+      .select('id,station_from,station_to,direction,message,severity,created_by,created_at,is_active,expires_at')
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      set({ alerts: (data as DbAlert[]).map(toAlert) });
+      const now = new Date().toISOString();
+      set({
+        alerts: (data as DbAlert[])
+          .filter((row) => !row.expires_at || row.expires_at > now)
+          .map(toAlert),
+      });
     }
     set({ loading: false });
   },
 
-  addAlert: async ({ stationFrom, stationTo, direction, message, severity, authorName }) => {
+  addAlert: async ({ stationFrom, stationTo, direction, message, severity, authorName, expiresAt }) => {
     if (!supabase) return;
     const { data, error } = await supabase
       .from('alerts')
@@ -92,6 +101,7 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
         severity,
         created_by: authorName,
         is_active: true,
+        expires_at: expiresAt || null,
       })
       .select()
       .single();

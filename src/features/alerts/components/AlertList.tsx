@@ -15,6 +15,19 @@ const DIRECTION_LABEL: Record<string, string> = {
   down: '하선',
 };
 
+function formatExpiry(expiresAt: string): string {
+  const expires = new Date(expiresAt);
+  const now = new Date();
+  const diffMs = expires.getTime() - now.getTime();
+  if (diffMs <= 0) return '만료됨';
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 1) return '곧 만료';
+  if (diffHours < 24) return `${diffHours}시간 후 만료`;
+  const month = expires.getMonth() + 1;
+  const day = expires.getDate();
+  return `${month}/${day}까지`;
+}
+
 export default function AlertList({ onClose }: { onClose: () => void }) {
   const { alerts, deactivate } = useAlertStore();
 
@@ -64,6 +77,11 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
               <p className={styles.alertMessage}>{alert.message}</p>
               {alert.createdBy && (
                 <span className={styles.alertAuthor}>{alert.createdBy}</span>
+              )}
+              {alert.expires_at && (
+                <span className={styles.alertExpiry}>
+                  {formatExpiry(alert.expires_at)}
+                </span>
               )}
               <button
                 type="button"

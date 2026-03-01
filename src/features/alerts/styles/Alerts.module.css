@@ -56,7 +56,7 @@
 }
 
 /* ── List ── */
-.listContainer { padding: var(--dia-space-2) var(--dia-space-4); }
+.listContainer { padding: var(--dia-space-3) var(--dia-space-4); }
 
 .listHeader {
   display: flex;
@@ -500,4 +500,49 @@
 .alertDirection {
   font-weight: var(--dia-weight-normal);
   color: var(--dia-text-tertiary);
+}
+
+/* ── Date Input ── */
+.dateInput {
+  width: 100%;
+  padding: var(--dia-space-3);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-family: inherit;
+  min-height: 44px;
+  color-scheme: dark;
+  transition: border-color var(--dia-transition-fast);
+}
+
+.dateInput:focus {
+  border-color: var(--dia-purple);
+  outline: none;
+}
+
+.dateHint {
+  display: block;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  margin-top: var(--dia-space-1);
+}
+
+.autoExpireNote {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-xs);
+  color: var(--dia-amber);
+  margin-bottom: var(--dia-space-3);
+  text-align: center;
+  font-weight: var(--dia-weight-medium);
+}
+
+.alertExpiry {
+  display: block;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-2);
 }

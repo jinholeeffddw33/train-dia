@@ -17,6 +17,13 @@ const DIRECTION_OPTIONS: { value: Direction; label: string; icon: string }[] = [
   { value: 'down', label: '하선', icon: '↓' },
 ];
 
+function getLocalDateStr(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
   const driverName = useDriverStore((s) => s.current?.n ?? '');
@@ -27,6 +34,11 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
   const [severity, setSeverity] = useState<'high' | 'medium' | 'low'>('medium');
   const [stationSearch, setStationSearch] = useState('');
   const [activeField, setActiveField] = useState<StationField | null>(null);
+  const [expiresDate, setExpiresDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 3);
+    return getLocalDateStr(d);
+  });
 
   const isInfo = severity === 'low';
 
@@ -54,6 +66,19 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     ? message.trim().length > 0
     : stationFrom && stationTo && message.trim().length > 0;
 
+  const getExpiresAt = (): string | null => {
+    if (severity === 'high') {
+      const d = new Date(expiresDate + 'T23:59:59');
+      return d.toISOString();
+    }
+    if (severity === 'medium') {
+      const d = new Date();
+      d.setHours(23, 59, 59, 999);
+      return d.toISOString();
+    }
+    return null;
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
@@ -64,6 +89,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
       message: message.trim(),
       severity,
       authorName: driverName,
+      expiresAt: getExpiresAt(),
     });
 
     onClose();
@@ -201,6 +227,29 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         </>
+      )}
+
+      {/* 긴급: 종료 날짜 선택 */}
+      {severity === 'high' && (
+        <div className={styles.formSection}>
+          <label className={styles.formLabel}>종료 날짜</label>
+          <input
+            type="date"
+            className={styles.dateInput}
+            value={expiresDate}
+            onChange={(e) => setExpiresDate(e.target.value)}
+            min={getLocalDateStr()}
+            aria-label="알림 종료 날짜"
+          />
+          <span className={styles.dateHint}>선택한 날짜 자정에 자동 해제됩니다</span>
+        </div>
+      )}
+
+      {/* 이례사항: 자동 만료 안내 */}
+      {severity === 'medium' && (
+        <div className={styles.autoExpireNote}>
+          오늘 자정(24:00)에 자동 해제됩니다
+        </div>
       )}
 
       {/* 메시지 */}

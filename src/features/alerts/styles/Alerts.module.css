@@ -167,6 +167,13 @@
   margin-bottom: var(--dia-space-3);
 }
 
+.alertAuthor {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-3);
+  display: block;
+}
+
 .alertPhotos {
   display: flex;
   gap: var(--dia-space-2);

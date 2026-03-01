@@ -47,17 +47,8 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
                 </span>
               </div>
               <p className={styles.alertMessage}>{alert.message}</p>
-              {alert.photos && alert.photos.length > 0 && (
-                <div className={styles.alertPhotos}>
-                  {alert.photos.map((url, i) => (
-                    <img
-                      key={`${alert.id}-${i}`}
-                      src={url}
-                      alt={`장애 사진 ${i + 1}`}
-                      className={styles.alertPhoto}
-                    />
-                  ))}
-                </div>
+              {alert.createdBy && (
+                <span className={styles.alertAuthor}>{alert.createdBy}</span>
               )}
               <button
                 type="button"

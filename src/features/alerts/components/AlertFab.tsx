@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAlertStore } from '@/stores/alert';
 import Modal from '@/components/common/Modal';
 import AlertList from './AlertList';
@@ -10,6 +10,15 @@ import styles from '../styles/Alerts.module.css';
 export default function AlertFab() {
   const [view, setView] = useState<'closed' | 'list' | 'form'>('closed');
   const alertCount = useAlertStore((s) => s.alerts.length);
+  const fetch = useAlertStore((s) => s.fetch);
+  const subscribe = useAlertStore((s) => s.subscribe);
+
+  // 마운트 시 서버에서 알림 가져오기 + 실시간 구독
+  useEffect(() => {
+    fetch();
+    const unsubscribe = subscribe();
+    return unsubscribe;
+  }, [fetch, subscribe]);
 
   return (
     <>

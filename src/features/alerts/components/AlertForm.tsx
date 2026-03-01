@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAlertStore } from '@/stores/alert';
+import { useDriverStore } from '@/stores/driver';
 import { LINE5_MAIN, LINE5_MACHEON, LINE5_HANAM } from '@/data/line5';
 import styles from '../styles/Alerts.module.css';
 
@@ -11,6 +12,7 @@ type StationField = 'from' | 'to';
 
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
+  const driverName = useDriverStore((s) => s.current?.n ?? '');
   const [stationFrom, setStationFrom] = useState('');
   const [stationTo, setStationTo] = useState('');
   const [message, setMessage] = useState('');
@@ -39,16 +41,15 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!stationFrom || !stationTo || !message.trim()) return;
 
-    addAlert({
-      id: `local-${Date.now()}`,
+    await addAlert({
       stationFrom,
       stationTo,
       message: message.trim(),
       severity,
-      created_at: new Date().toISOString(),
+      authorName: driverName,
     });
 
     onClose();

@@ -1,6 +1,7 @@
 'use client';
 
 import { useAlertStore } from '@/stores/alert';
+import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Alerts.module.css';
 
 const SEVERITY_LABEL = {
@@ -30,6 +31,7 @@ function formatExpiry(expiresAt: string): string {
 
 export default function AlertList({ onClose }: { onClose: () => void }) {
   const { alerts, deactivate } = useAlertStore();
+  const currentName = useDriverStore((s) => s.current?.n ?? '');
 
   return (
     <div className={styles.listContainer}>
@@ -83,13 +85,15 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
                   {formatExpiry(alert.expires_at)}
                 </span>
               )}
-              <button
-                type="button"
-                className={styles.resolveBtn}
-                onClick={() => deactivate(alert.id)}
-              >
-                해제
-              </button>
+              {currentName && currentName === alert.createdBy && (
+                <button
+                  type="button"
+                  className={styles.resolveBtn}
+                  onClick={() => deactivate(alert.id)}
+                >
+                  해제
+                </button>
+              )}
             </div>
           ))}
         </div>

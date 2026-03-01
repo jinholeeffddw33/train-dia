@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, ChevronRight } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, ChevronRight, X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
+import { CompareTab } from '@/features/compare';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
@@ -17,6 +18,7 @@ export default function MoreTab() {
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const [commuteOpen, setCommuteOpen] = useState(false);
   const [subwayOpen, setSubwayOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   return (
     <div className={styles.container}>
@@ -57,6 +59,18 @@ export default function MoreTab() {
           <div className={styles.settingInfo}>
             <Search size={20} className={styles.toolIcon} />
             <span className={styles.settingLabel}>경로 검색</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setCompareOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <GitCompareArrows size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>교번 비교</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -152,6 +166,26 @@ export default function MoreTab() {
         open={subwayOpen}
         onClose={() => setSubwayOpen(false)}
       />
+
+      {/* 교번 비교 오버레이 */}
+      {compareOpen && (
+        <div className={styles.fullOverlay}>
+          <div className={styles.overlayHeader}>
+            <button
+              type="button"
+              className={styles.overlayClose}
+              onClick={() => setCompareOpen(false)}
+              aria-label="닫기"
+            >
+              <X size={22} />
+            </button>
+            <h2 className={styles.overlayTitle}>교번 비교</h2>
+          </div>
+          <div className={styles.overlayBody}>
+            <CompareTab />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

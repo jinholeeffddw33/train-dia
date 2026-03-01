@@ -323,3 +323,51 @@
 }
 
 .notifBtn:active { opacity: 0.8; }
+
+/* ── Full-screen Overlay ── */
+.fullOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--dia-bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overlayHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border);
+  position: sticky;
+  top: 0;
+  background: var(--dia-bg);
+  z-index: 1;
+}
+
+.overlayClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.overlayClose:active {
+  background: var(--dia-surface-hover);
+}
+
+.overlayTitle {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.overlayBody {
+  padding-bottom: var(--dia-space-8);
+}

@@ -1,0 +1,312 @@
+/* ===== Duty Tab — 근무 현황 ===== */
+
+.container { padding: var(--dia-space-4); }
+
+/* ── Date Selector ── */
+.dateSelector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-4);
+}
+
+.dateArrow {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  transition: background var(--dia-transition-fast);
+}
+
+.dateArrow:active {
+  background: var(--dia-surface-hover);
+}
+
+.dateDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: transparent;
+  min-height: 44px;
+}
+
+.dateText {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.dateDow {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.dateHoliday {
+  color: var(--dia-red);
+}
+
+/* ── Filter Tabs ── */
+.filterTabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--dia-space-4);
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-lg);
+  padding: 3px;
+  border: 1px solid var(--dia-border);
+}
+
+.filterTab {
+  flex: 1;
+  padding: var(--dia-space-2);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-tertiary);
+  background: transparent;
+  transition: all var(--dia-transition-fast);
+  min-height: 36px;
+}
+
+.filterTab:active {
+  background: var(--dia-surface-hover);
+}
+
+.filterTabActive {
+  background: var(--dia-blue);
+  color: white;
+  font-weight: var(--dia-weight-semibold);
+}
+
+/* ── Dia List ── */
+.diaList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding-bottom: var(--dia-space-16);
+}
+
+/* ── Dia Card ── */
+.diaCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  overflow: hidden;
+  transition: border-color var(--dia-transition-fast);
+  text-align: left;
+  width: 100%;
+}
+
+.diaCardExpanded {
+  border-color: var(--dia-blue);
+}
+
+.diaCardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  min-height: 52px;
+  cursor: pointer;
+}
+
+.diaCardHeader:active {
+  background: var(--dia-surface-hover);
+}
+
+/* ── Dia Badge ── */
+.diaBadge {
+  min-width: 40px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  flex-shrink: 0;
+}
+
+.diaBadge_day {
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+.diaBadge_night {
+  background: var(--dia-purple-dim);
+  color: var(--dia-purple);
+}
+
+.diaBadge_standby {
+  background: var(--dia-orange-dim);
+  color: var(--dia-orange);
+}
+
+/* ── Driver & Info ── */
+.diaDriver {
+  flex: 1;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diaType {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  padding: 2px 8px;
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+}
+
+.diaType_day {
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+.diaType_night {
+  background: var(--dia-purple-dim);
+  color: var(--dia-purple);
+}
+
+.diaType_standby {
+  background: var(--dia-orange-dim);
+  color: var(--dia-orange);
+}
+
+.diaTime {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ── Expanded Detail ── */
+.diaDetail {
+  padding: 0 var(--dia-space-4) var(--dia-space-4);
+  border-top: 1px solid var(--dia-border);
+  padding-top: var(--dia-space-3);
+}
+
+.routeDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-3);
+  line-height: var(--dia-leading-relaxed);
+  word-break: keep-all;
+}
+
+/* ── Segments ── */
+.segments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.segment {
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-md);
+  padding: var(--dia-space-3);
+}
+
+.segHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-2);
+}
+
+.segLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  text-transform: uppercase;
+}
+
+.segTime {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.segTrains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+  align-items: center;
+}
+
+.trainBubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  height: 26px;
+}
+
+.trainArrow {
+  font-size: 10px;
+  color: var(--dia-text-tertiary);
+}
+
+/* ── Route Visual Bar ── */
+.routeVisual {
+  margin-top: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-md);
+}
+
+.routeBar {
+  position: relative;
+  height: 4px;
+  background: var(--dia-border);
+  border-radius: 2px;
+  margin: var(--dia-space-4) 0;
+}
+
+.routeBarFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.routeBarFill_day { background: var(--dia-blue); }
+.routeBarFill_night { background: var(--dia-purple); }
+.routeBarFill_standby { background: var(--dia-orange); }
+
+.routeStations {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--dia-space-1);
+}
+
+.routeStation {
+  font-size: 10px;
+  color: var(--dia-text-tertiary);
+}
+
+/* ── Vacancy ── */
+.vacancy {
+  color: var(--dia-text-tertiary);
+  font-style: italic;
+}

@@ -6,8 +6,8 @@ import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector, HomeTipsQuiz } from '@/features/home';
 import { CalendarTab } from '@/features/calendar';
-import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
+import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
 import { Line5Tab } from '@/features/line5';
 
@@ -19,8 +19,8 @@ function TabContent({ tab }: { tab: TabId }) {
       return <CalendarTab />;
     case 'line':
       return <Line5Tab />;
-    case 'compare':
-      return <CompareTab />;
+    case 'duty':
+      return <DutyTab />;
     case 'contacts':
       return <ContactsTab />;
     case 'more':

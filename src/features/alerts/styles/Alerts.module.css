@@ -20,6 +20,16 @@
 
 .fab:active { transform: scale(0.9); }
 
+.fabUrgent {
+  background: var(--dia-red);
+  animation: fabPulse 2s ease-in-out infinite;
+}
+
+@keyframes fabPulse {
+  0%, 100% { box-shadow: var(--dia-shadow-lg); }
+  50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.25), var(--dia-shadow-lg); }
+}
+
 .fabIcon { font-size: 24px; }
 
 .fabBadge {

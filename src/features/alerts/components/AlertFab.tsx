@@ -9,7 +9,9 @@ import styles from '../styles/Alerts.module.css';
 
 export default function AlertFab() {
   const [view, setView] = useState<'closed' | 'list' | 'form'>('closed');
-  const alertCount = useAlertStore((s) => s.alerts.length);
+  const alerts = useAlertStore((s) => s.alerts);
+  const alertCount = alerts.length;
+  const hasUrgent = alerts.some((a) => a.severity === 'high');
   const fetch = useAlertStore((s) => s.fetch);
   const subscribe = useAlertStore((s) => s.subscribe);
 
@@ -39,9 +41,9 @@ export default function AlertFab() {
       {/* FAB 버튼 */}
       <button
         type="button"
-        className={styles.fab}
+        className={`${styles.fab} ${hasUrgent ? styles.fabUrgent : ''}`}
         onClick={() => setView('list')}
-        aria-label={`장애 알림 ${alertCount}건`}
+        aria-label={`장애 알림 ${alertCount}건${hasUrgent ? ' (긴급)' : ''}`}
       >
         <span className={styles.fabIcon}>⚠</span>
         {alertCount > 0 && (

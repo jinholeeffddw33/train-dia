@@ -5,15 +5,15 @@ import { P, CYCLE, CL } from '@/data/cycle';
 describe('getDia — 교번 계산', () => {
   it('DB_STD 기준일에 1번 기관사의 교번은 자신의 초기 교번', () => {
     const person = P[0]; // 1번 기관사
-    const dbStd = new Date(2026, 1, 1); // 2026-02-01
+    const dbStd = new Date(2026, 2, 3); // 2026-03-03
     const dia = getDia(person, dbStd);
     expect(dia).toBe(person.d);
   });
 
   it('171일 뒤에 같은 교번으로 순환', () => {
     const person = P[0];
-    const dbStd = new Date(2026, 1, 1);
-    const after171 = new Date(2026, 1, 1);
+    const dbStd = new Date(2026, 2, 3);
+    const after171 = new Date(2026, 2, 3);
     after171.setDate(after171.getDate() + 171);
     expect(getDia(person, after171)).toBe(getDia(person, dbStd));
   });

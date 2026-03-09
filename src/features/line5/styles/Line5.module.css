@@ -449,7 +449,7 @@
 }
 
 /* ============================================
-   ROUTE MAP (unchanged)
+   ROUTE MAP — v2 (홀짝 색상 + 전체화면 UX)
    ============================================ */
 
 .mapContainer {
@@ -465,8 +465,55 @@
   inset: 0;
   z-index: 100;
   border-radius: 0;
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
 }
 
+/* ── 전체화면 헤더 ── */
+.mapFsHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top));
+  background: var(--dia-surface);
+  border-bottom: 1px solid var(--dia-border);
+  z-index: 11;
+  flex-shrink: 0;
+}
+
+.mapFsTitle {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  flex: 1;
+}
+
+.mapFsBadge {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-purple);
+  background: var(--dia-purple-dim);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+}
+
+.mapFsClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  font-size: 18px;
+  color: var(--dia-text-secondary);
+  flex-shrink: 0;
+}
+
+.mapFsClose:active { background: var(--dia-surface-hover); }
+
+/* ── 컨트롤 ── */
 .mapControls {
   position: absolute;
   top: var(--dia-space-3);
@@ -475,6 +522,10 @@
   flex-direction: column;
   gap: var(--dia-space-1);
   z-index: 10;
+}
+
+.mapFullscreen .mapControls {
+  top: calc(60px + env(safe-area-inset-top));
 }
 
 .mapBtn {
@@ -489,10 +540,52 @@
   color: var(--dia-text-primary);
   font-size: 18px;
   font-weight: var(--dia-weight-bold);
+  box-shadow: var(--dia-shadow-sm);
 }
 
 .mapBtn:active { background: var(--dia-surface-hover); }
 
+/* ── 범례 ── */
+.mapLegend {
+  position: absolute;
+  bottom: var(--dia-space-3);
+  left: var(--dia-space-3);
+  display: flex;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: var(--dia-radius-md);
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+:global(:root.light) .mapLegend {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--dia-border);
+}
+
+.mapLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+}
+
+.mapLegendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+}
+
+.mapLegendDot[data-color="up"] { background: #0D9452; }
+.mapLegendDot[data-color="down"] { background: #D32F2F; }
+.mapLegendDot[data-color="arriving"] { background: #22C55E; }
+
+/* ── 맵 스크롤 ── */
 .mapScroll {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -500,10 +593,21 @@
   min-height: 300px;
 }
 
+.mapFullscreen .mapScroll {
+  flex: 1;
+  min-height: 0;
+  padding: var(--dia-space-2);
+}
+
 .mapSvg {
   width: 100%;
   height: auto;
   min-width: 600px;
+  transition: transform 0.2s ease;
+}
+
+.mapFullscreen .mapSvg {
+  min-width: 800px;
 }
 
 .mapStationName {
@@ -519,3 +623,30 @@
   0%, 100% { opacity: 0; }
   50% { opacity: 0.5; }
 }
+
+/* ── 하단 푸터 (비전체화면) ── */
+.mapFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: var(--dia-bg);
+  border-top: 1px solid var(--dia-border);
+}
+
+.mapFooterText {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+}
+
+.mapFooterBtn {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-purple);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  min-height: 36px;
+}
+
+.mapFooterBtn:active { background: var(--dia-purple-dim); }

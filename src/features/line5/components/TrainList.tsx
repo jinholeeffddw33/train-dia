@@ -36,14 +36,24 @@ export default function TrainList() {
     return map;
   }, [data]);
 
-  // 답십리 자동 스크롤
+  // 답십리 자동 스크롤 (탭 진입 + 브랜치 변경 + 첫 데이터 로드)
+  const hasScrolled = useRef(false);
   useEffect(() => {
-    if (!listRef.current) return;
+    hasScrolled.current = false;
+  }, [branch]);
+
+  useEffect(() => {
+    if (hasScrolled.current) return;
+    if (!listRef.current || data.length === 0) return;
     const dapRow = listRef.current.querySelector('[data-station="답십리"]');
     if (dapRow) {
-      dapRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // requestAnimationFrame으로 DOM 렌더 완료 후 스크롤
+      requestAnimationFrame(() => {
+        dapRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      hasScrolled.current = true;
     }
-  }, [branch]);
+  }, [branch, data.length]);
 
   if (data.length === 0) {
     return (

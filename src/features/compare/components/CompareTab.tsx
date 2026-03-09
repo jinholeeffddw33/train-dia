@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useCompareStore } from '@/stores/compare';
 import { P as P_RAW } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
@@ -16,6 +16,8 @@ const COUNT_OPTIONS = [2, 3, 4, 5] as const;
 export default function CompareTab() {
   const { count, persons, year, month, setCount, setPerson, prevMonth, nextMonth, resetMonth } = useCompareStore();
   const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -40,12 +42,24 @@ export default function CompareTab() {
     return result;
   }, [persons, year, month, daysInMonth]);
 
+  const filteredPersons = useMemo(() => {
+    if (!searchQuery.trim()) return P_SORTED;
+    const q = searchQuery.trim().toLowerCase();
+    return P_SORTED.filter((p) => p.n.toLowerCase().includes(q) || p.I.includes(q));
+  }, [searchQuery]);
+
   const handleSelect = (person: Person) => {
     if (selectorTarget !== null) {
       setPerson(selectorTarget, person);
     }
     setSelectorTarget(null);
+    setSearchQuery('');
   };
+
+  const handleModalClose = useCallback(() => {
+    setSelectorTarget(null);
+    setSearchQuery('');
+  }, []);
 
   const hasAnyPerson = persons.some((p) => p !== null);
 
@@ -132,20 +146,49 @@ export default function CompareTab() {
       {/* 기관사 선택 모달 */}
       <Modal
         open={selectorTarget !== null}
-        onClose={() => setSelectorTarget(null)}
+        onClose={handleModalClose}
         title={`기관사 ${selectorTarget !== null ? selectorTarget + 1 : ''} 선택`}
       >
-        <div className={styles.modalList}>
-          {P_SORTED.map((p) => (
+        <div className={styles.searchWrap}>
+          <input
+            ref={searchInputRef}
+            type="text"
+            className={styles.searchInput}
+            placeholder="이름 또는 번호로 검색"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoFocus
+          />
+          {searchQuery && (
             <button
-              key={p.I}
               type="button"
-              className={styles.modalItem}
-              onClick={() => handleSelect(p)}
+              className={styles.searchClear}
+              onClick={() => {
+                setSearchQuery('');
+                searchInputRef.current?.focus();
+              }}
+              aria-label="검색어 지우기"
             >
-              <span className={styles.modalName}>{p.n}</span>
+              ✕
             </button>
-          ))}
+          )}
+        </div>
+        <div className={styles.modalList}>
+          {filteredPersons.length === 0 ? (
+            <div className={styles.searchEmpty}>검색 결과가 없습니다</div>
+          ) : (
+            filteredPersons.map((p) => (
+              <button
+                key={p.I}
+                type="button"
+                className={styles.modalItem}
+                onClick={() => handleSelect(p)}
+              >
+                <span className={styles.modalName}>{p.n}</span>
+                <span className={styles.modalNum}>{p.I}번</span>
+              </button>
+            ))
+          )}
         </div>
       </Modal>
     </div>

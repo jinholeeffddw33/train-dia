@@ -44,7 +44,7 @@ export function getType(dia: string): DiaType {
   if (dia.startsWith('대')) return 'standby';
   const n = parseInt(dia);
   if (n >= 62 && n <= 91) return 'night';
-  if (n >= 1 && n <= 44) return 'day';
+  if ((n >= 1 && n <= 44) || (n >= 51 && n <= 54)) return 'day';
   return 'rest';
 }
 

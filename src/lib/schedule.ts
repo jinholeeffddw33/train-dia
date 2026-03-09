@@ -2,7 +2,7 @@
 
 import type { Person, DiaType, Schedule, Segment, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
 import { LABELS, DIR, dirFull, dirSub } from './constants';
-import { CYCLE, DB_STD, CL, P } from '@/data/cycle';
+import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 
@@ -28,9 +28,36 @@ export function isHoliday(d: Date): boolean {
 
 // ===== 교번 계산 =====
 
+/** 비공휴일 평일 수 카운트 (from ~ to, from 불포함, to 포함) */
+function countWeekdays(from: Date, to: Date): number {
+  const dir = to >= from ? 1 : -1;
+  const start = new Date(from);
+  let count = 0;
+  const d = new Date(start);
+  if (dir === 1) {
+    d.setDate(d.getDate() + 1);
+    while (d <= to) {
+      if (!isHoliday(d)) count++;
+      d.setDate(d.getDate() + 1);
+    }
+  } else {
+    while (d > to) {
+      if (!isHoliday(d)) count--;
+      d.setDate(d.getDate() - 1);
+    }
+  }
+  return count;
+}
+
 /** 특정 인원의 특정일 교번 */
 export function getDia(person: Person | null, date: Date): string {
   if (!person) return '~';
+  // 통상근무 기관사 (평일 51-54 순환)
+  if (person.w !== undefined) {
+    if (isHoliday(date)) return '휴일';
+    const wd = countWeekdays(WEEKDAY_REF, date);
+    return WEEKDAY_DIAS[((wd + person.w) % 4 + 4) % 4];
+  }
   const r = CYCLE.indexOf(person.d);
   if (r === -1) return person.d;
   const diff = Math.floor((date.getTime() - DB_STD.getTime()) / 864e5);

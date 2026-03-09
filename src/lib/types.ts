@@ -10,6 +10,8 @@ export interface Person {
   n: string;
   /** 사번 (8자리) */
   s?: string;
+  /** 통상근무 오프셋 (0-3, 평일만 51-54 순환) */
+  w?: number;
 }
 
 /** 교번 타입 */

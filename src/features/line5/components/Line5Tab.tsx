@@ -48,15 +48,7 @@ export default function Line5Tab() {
     <div className={styles.container}>
       {/* 헤더 */}
       <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h2 className={styles.title}>5호선 실시간</h2>
-          <div className={styles.statusRow}>
-            <span className={`${styles.statusDot} ${styles[`dot_${loading ? 'loading' : dotState}`]}`} />
-            <span className={styles.statusText}>
-              {loading ? '불러오는 중...' : updateLabel}
-            </span>
-          </div>
-        </div>
+        <h2 className={styles.title}>5호선 실시간</h2>
       </div>
 
       {/* 지선 탭 */}
@@ -126,6 +118,7 @@ export default function Line5Tab() {
           <RefreshCw size={20} strokeWidth={2.5} />
         </button>
         <span className={`${styles.fabTime} ${styles[`fabTime_${loading ? 'loading' : dotState}`]}`}>
+          <span className={`${styles.fabDot} ${styles[`dot_${loading ? 'loading' : dotState}`]}`} />
           {loading ? '갱신중' : updateLabel}
         </span>
       </div>

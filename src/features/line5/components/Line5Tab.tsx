@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useTrainStore } from '@/stores/train';
 import { useTrainPolling } from '../hooks/useTrainPolling';
 import TrainList from './TrainList';
@@ -113,16 +114,21 @@ export default function Line5Tab() {
       {/* 콘텐츠 */}
       {viewMode === 'list' ? <TrainList /> : <RouteMap />}
 
-      {/* 플로팅 새로고침 버튼 */}
-      <button
-        type="button"
-        className={`${styles.fab} ${loading ? styles.fabSpin : ''}`}
-        onClick={refresh}
-        disabled={loading}
-        aria-label="새로고침"
-      >
-        ↻
-      </button>
+      {/* 플로팅 새로고침 + 갱신 시간 */}
+      <div className={styles.fabGroup}>
+        <button
+          type="button"
+          className={`${styles.fab} ${loading ? styles.fabSpin : ''}`}
+          onClick={refresh}
+          disabled={loading}
+          aria-label="새로고침"
+        >
+          <RefreshCw size={20} strokeWidth={2.5} />
+        </button>
+        <span className={`${styles.fabTime} ${styles[`fabTime_${loading ? 'loading' : dotState}`]}`}>
+          {loading ? '갱신중' : updateLabel}
+        </span>
+      </div>
     </div>
   );
 }

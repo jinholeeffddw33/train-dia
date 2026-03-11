@@ -176,7 +176,8 @@ export function getWorkTime(sc: Schedule | null): string {
 
 /** 남은 시간 포맷 */
 export function formatTimeUntil(mins: number | null | undefined): string {
-  if (!mins || mins <= 0) return '';
+  if (mins === null || mins === undefined) return '';
+  if (mins <= 0) return '지금';
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   if (h === 0) return `약 ${m}분 후`;
@@ -267,11 +268,7 @@ export function getBannerState(
       const todayAsNext: NextShiftInfo = { schedule: sc, daysAhead: 0, dia: '' };
       return { state: 'preparing', next: todayAsNext, minsUntil: minsUntilToday };
     }
-    if (isNight) {
-      const minsAfterNight = nowMins - endMins;
-      return calcDoneState(nextShift, nowMins, startMins, minsAfterNight);
-    }
-    // 출근 전 (2시간 이상 남음) → 아직 근무 아님
+    // 출근 전 (2시간 이상 남음) → 오늘 근무 대기 (야간/주간 공통)
     const todayAsNext: NextShiftInfo = { schedule: sc, daysAhead: 0, dia: '' };
     return { state: 'idle', next: todayAsNext, minsUntil: startMins - nowMins };
   }

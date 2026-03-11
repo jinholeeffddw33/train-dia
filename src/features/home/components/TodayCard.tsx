@@ -41,6 +41,13 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
     () => schedule?.m ? getRouteDirection(schedule.m, STATION_ABBR) : null,
     [schedule],
   );
+  // preparing/done 상태에서 다음 근무 방향 (banner.next 기준)
+  const nextDirection = useMemo(
+    () => banner?.next?.schedule?.m
+      ? getRouteDirection(banner.next.schedule.m, STATION_ABBR)
+      : null,
+    [banner],
+  );
   const segInfo = useMemo(
     () => getCurrentSegmentInfo(schedule?.g, now),
     [schedule, now],
@@ -119,9 +126,9 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
         <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
           <div className={styles.dirBannerDir}>근무 완료</div>
           <div className={styles.dirBannerSub}>오늘 하루도 수고 많으셨어요</div>
-          {nextShift && nextShift.schedule && (
+          {banner.next && banner.next.schedule && (
             <div className={styles.dirBannerNext}>
-              다음근무 {nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s} {nextShift.schedule.m ? dirShort(getRouteDirection(nextShift.schedule.m, STATION_ABBR)?.dir || '') : ''}
+              다음근무 {banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} {banner.next.schedule.s} {nextDirection ? dirShort(nextDirection.dir) : ''}
               {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
             </div>
           )}
@@ -131,14 +138,23 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
       {isToday && banner && banner.state === 'idle' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
           <div className={styles.dirBannerDir}>
-            {diaType === 'rest' ? '오늘은 쉬는 날이에요' : '오늘 근무가 끝났어요'}
+            {diaType === 'rest'
+              ? '오늘은 쉬는 날이에요'
+              : banner.next?.daysAhead === 0
+                ? '출근 전이에요'
+                : '오늘 근무가 끝났어요'}
           </div>
           {diaType === 'rest' && (
             <div className={styles.dirBannerSub}>푹 쉬고 내일 힘내요</div>
           )}
-          {nextShift && nextShift.schedule && (
+          {banner.next?.daysAhead === 0 && diaType !== 'rest' && (
+            <div className={styles.dirBannerSub}>오늘도 안전 운행 하세요</div>
+          )}
+          {banner.next && banner.next.schedule && (
             <div className={styles.dirBannerNext}>
-              다음근무 {nextShift.daysAhead === 0 ? '오늘' : nextShift.daysAhead === 1 ? '내일' : `${nextShift.daysAhead}일 후`} {nextShift.schedule.s}
+              {banner.next.daysAhead === 0
+                ? `오늘 출근 ${banner.next.schedule.s}`
+                : `다음근무 ${banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} ${banner.next.schedule.s}`}
               {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
             </div>
           )}
@@ -146,11 +162,11 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
       )}
 
       {isToday && banner && banner.state === 'preparing' && (
-        <div className={`${styles.dirBanner} ${styles.dirBanner_prep} ${direction ? styles[`dirBanner_${direction.dir}`] : ''}`}>
+        <div className={`${styles.dirBanner} ${styles.dirBanner_prep} ${nextDirection ? styles[`dirBanner_${nextDirection.dir}`] : ''}`}>
           <div className={styles.dirBannerDir}>
-            {direction ? `다음 근무 · ${direction.label}` : '다음 근무'}
+            {nextDirection ? `다음 근무 · ${nextDirection.label}` : '다음 근무'}
           </div>
-          {direction && <div className={styles.dirBannerSub}>{direction.sub}</div>}
+          {nextDirection && <div className={styles.dirBannerSub}>{nextDirection.sub}</div>}
           <div className={styles.dirBannerTime}>
             출근 {banner.next?.schedule?.s || ''} ({formatTimeUntil(banner.minsUntil)})
           </div>

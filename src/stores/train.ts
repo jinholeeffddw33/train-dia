@@ -32,6 +32,8 @@ interface TrainState {
   mapZoom: number;
   /** 전체화면 여부 */
   mapFullscreen: boolean;
+  /** 답십리 스크롤 트리거 (탭 재클릭 시 증가) */
+  scrollTrigger: number;
 
   setData: (data: TrainPosition[]) => void;
   setBranch: (branch: Branch) => void;
@@ -40,6 +42,7 @@ interface TrainState {
   setError: (error: string | null) => void;
   setMapZoom: (zoom: number) => void;
   toggleFullscreen: () => void;
+  triggerScroll: () => void;
 }
 
 export const useTrainStore = create<TrainState>()((set) => ({
@@ -51,6 +54,7 @@ export const useTrainStore = create<TrainState>()((set) => ({
   error: null,
   mapZoom: 1,
   mapFullscreen: false,
+  scrollTrigger: 0,
 
   setData: (data) => set({ data, lastFetch: Date.now(), error: null }),
   setBranch: (branch) => set({ branch }),
@@ -59,4 +63,5 @@ export const useTrainStore = create<TrainState>()((set) => ({
   setError: (error) => set({ error, loading: false }),
   setMapZoom: (zoom) => set({ mapZoom: Math.max(1, Math.min(3, zoom)) }),
   toggleFullscreen: () => set((s) => ({ mapFullscreen: !s.mapFullscreen })),
+  triggerScroll: () => set((s) => ({ scrollTrigger: s.scrollTrigger + 1 })),
 }));

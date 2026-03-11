@@ -5,6 +5,7 @@ import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
 import { AlertFab } from '@/features/alerts';
 import { useAlertStore } from '@/stores/alert';
+import { useTrainStore } from '@/stores/train';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
 import styles from './AppShell.module.css';
@@ -20,10 +21,13 @@ export default function AppShell({ children }: AppShellProps) {
   const { updateAvailable, applyUpdate } = useServiceWorker();
   const [installDismissed, setInstallDismissed] = useState(false);
 
+  const triggerScroll = useTrainStore((s) => s.triggerScroll);
+
   const handleTabChange = useCallback((tab: TabId) => {
+    if (tab === 'line') triggerScroll();
     setActiveTab(tab);
     window.scrollTo({ top: 0 });
-  }, []);
+  }, [triggerScroll]);
 
   return (
     <div className={styles.shell}>

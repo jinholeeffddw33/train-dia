@@ -18,7 +18,7 @@ const BRANCH_STATIONS: Record<string, readonly string[]> = {
 };
 
 export default function TrainList() {
-  const { data, branch } = useTrainStore();
+  const { data, branch, scrollTrigger } = useTrainStore();
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
@@ -36,24 +36,23 @@ export default function TrainList() {
     return map;
   }, [data]);
 
-  // 답십리 자동 스크롤 (탭 진입 + 브랜치 변경 + 첫 데이터 로드)
+  // 답십리 자동 스크롤 (탭 진입 + 브랜치 변경 + 탭 재클릭 + 첫 데이터 로드)
   const hasScrolled = useRef(false);
   useEffect(() => {
     hasScrolled.current = false;
-  }, [branch]);
+  }, [branch, scrollTrigger]);
 
   useEffect(() => {
     if (hasScrolled.current) return;
     if (!listRef.current || data.length === 0) return;
     const dapRow = listRef.current.querySelector('[data-station="답십리"]');
     if (dapRow) {
-      // requestAnimationFrame으로 DOM 렌더 완료 후 스크롤
       requestAnimationFrame(() => {
         dapRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       hasScrolled.current = true;
     }
-  }, [branch, data.length]);
+  }, [branch, data.length, scrollTrigger]);
 
   if (data.length === 0) {
     return (

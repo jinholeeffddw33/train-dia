@@ -206,7 +206,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dia-space-1);
+  gap: 2px;
   z-index: 50;
 }
 
@@ -217,11 +217,36 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--dia-radius-full);
-  background: var(--dia-purple);
+  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #8B5CF6 100%);
   color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
   transition: transform var(--dia-transition-fast), opacity var(--dia-transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.fab::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 65%,
+    transparent 100%
+  );
+  animation: fabShimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes fabShimmer {
+  0%, 80% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(100%) rotate(25deg); }
 }
 
 :global(:root.light) .fab {

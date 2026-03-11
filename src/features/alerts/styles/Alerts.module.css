@@ -214,9 +214,9 @@
 }
 
 .addBtn {
-  width: 100%;
+  width: calc(100% - var(--dia-space-4) * 2);
   padding: var(--dia-space-3);
-  margin-top: var(--dia-space-4);
+  margin: var(--dia-space-4) var(--dia-space-4) var(--dia-space-5);
   background: var(--dia-amber);
   color: white;
   border-radius: var(--dia-radius-lg);

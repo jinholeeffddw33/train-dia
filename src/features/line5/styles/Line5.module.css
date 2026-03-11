@@ -197,6 +197,44 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Floating Refresh Button ── */
+.fab {
+  position: fixed;
+  right: var(--dia-space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-purple);
+  color: #fff;
+  font-size: 22px;
+  border: none;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
+  z-index: 50;
+  transition: transform var(--dia-transition-fast), opacity var(--dia-transition-fast);
+}
+
+.fab:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.fab:disabled {
+  opacity: 0.7;
+}
+
+.fabSpin {
+  animation: fabSpinAnim 0.8s linear;
+}
+
+@keyframes fabSpinAnim {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
 /* ── Empty State ── */
 .emptyState {
   display: flex;

@@ -56,15 +56,6 @@ export default function Line5Tab() {
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          className={`${styles.refreshBtn} ${loading ? styles.refreshSpin : ''}`}
-          onClick={refresh}
-          disabled={loading}
-          aria-label="새로고침"
-        >
-          ↻
-        </button>
       </div>
 
       {/* 지선 탭 */}
@@ -121,6 +112,17 @@ export default function Line5Tab() {
 
       {/* 콘텐츠 */}
       {viewMode === 'list' ? <TrainList /> : <RouteMap />}
+
+      {/* 플로팅 새로고침 버튼 */}
+      <button
+        type="button"
+        className={`${styles.fab} ${loading ? styles.fabSpin : ''}`}
+        onClick={refresh}
+        disabled={loading}
+        aria-label="새로고침"
+      >
+        ↻
+      </button>
     </div>
   );
 }

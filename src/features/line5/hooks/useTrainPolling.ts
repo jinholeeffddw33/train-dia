@@ -4,9 +4,10 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useTrainStore } from '@/stores/train';
 
 const POLL_INTERVAL = 120_000; // 2분
+const STALE_THRESHOLD = 30_000; // 30초 이상 지났으면 복귀 시 즉시 갱신
 
 export function useTrainPolling() {
-  const { setData, setLoading, setError, loading } = useTrainStore();
+  const { setData, setLoading, setError, loading, lastFetch } = useTrainStore();
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchTrains = useCallback(async () => {
@@ -22,7 +23,6 @@ export function useTrainPolling() {
       }
       const data = await res.json();
       if (data.trains) {
-        // API에서 정제된 데이터를 store 형식으로 매핑
         setData(
           data.trains.map((t: Record<string, string>) => ({
             statnNm: t.station,
@@ -45,13 +45,45 @@ export function useTrainPolling() {
     }
   }, [setData, setLoading, setError]);
 
-  useEffect(() => {
-    fetchTrains();
+  // 폴링 시작/정지 헬퍼
+  const startPolling = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(fetchTrains, POLL_INTERVAL);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
   }, [fetchTrains]);
+
+  const stopPolling = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    // 최초 로드
+    fetchTrains();
+    startPolling();
+
+    // 탭 복귀 시 즉시 갱신 + 폴링 재시작
+    // 탭 이탈 시 폴링 중지 (배터리 절약)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        const elapsed = lastFetch ? Date.now() - lastFetch : Infinity;
+        if (elapsed >= STALE_THRESHOLD) {
+          fetchTrains();
+        }
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [fetchTrains, startPolling, stopPolling, lastFetch]);
 
   return { refresh: fetchTrains, loading };
 }

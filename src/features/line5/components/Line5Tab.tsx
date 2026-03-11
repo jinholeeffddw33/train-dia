@@ -40,9 +40,14 @@ function useUpdateCounter(lastFetch: number | null) {
 }
 
 export default function Line5Tab() {
-  const { branch, viewMode, loading, error, lastFetch, setBranch, setViewMode } = useTrainStore();
+  const { branch, viewMode, loading, error, lastFetch, setBranch, setViewMode, triggerScroll } = useTrainStore();
   const { refresh } = useTrainPolling();
   const { label: updateLabel, dotState } = useUpdateCounter(lastFetch);
+
+  const handleRefresh = () => {
+    refresh();
+    triggerScroll();
+  };
 
   return (
     <div className={styles.container}>
@@ -111,7 +116,7 @@ export default function Line5Tab() {
         <button
           type="button"
           className={`${styles.fab} ${loading ? styles.fabSpin : ''}`}
-          onClick={refresh}
+          onClick={handleRefresh}
           disabled={loading}
           aria-label="새로고침"
         >

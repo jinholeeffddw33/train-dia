@@ -30,7 +30,7 @@ export default function MoreTab() {
           <div className={styles.driverAvatar}>{driver.n[0]}</div>
           <div className={styles.driverInfo}>
             <span className={styles.driverNameText}>{driver.n}</span>
-            <span className={styles.driverNumText}>{driver.I}번 · 답십리 승무사업소</span>
+            <span className={styles.driverNumText}>답십리 승무사업소</span>
           </div>
         </div>
       )}

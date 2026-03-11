@@ -36,6 +36,26 @@
   }
 }
 
+.fabMedium {
+  background: var(--dia-amber);
+  animation: fabPulseMedium 2s ease-in-out infinite;
+}
+
+@keyframes fabPulseMedium {
+  0%, 100% {
+    box-shadow: var(--dia-shadow-lg);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.25), 0 0 0 16px rgba(245, 158, 11, 0.08), var(--dia-shadow-lg);
+    transform: scale(1.04);
+  }
+}
+
+.fabLow {
+  background: var(--dia-blue);
+}
+
 .fabIcon { font-size: 24px; }
 
 .fabBadge {

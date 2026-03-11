@@ -12,6 +12,8 @@ export default function AlertFab() {
   const alerts = useAlertStore((s) => s.alerts);
   const alertCount = alerts.length;
   const hasUrgent = alerts.some((a) => a.severity === 'high');
+  const hasMedium = !hasUrgent && alerts.some((a) => a.severity === 'medium');
+  const hasLow = !hasUrgent && !hasMedium && alertCount > 0;
   const fetch = useAlertStore((s) => s.fetch);
   const subscribe = useAlertStore((s) => s.subscribe);
 
@@ -41,7 +43,7 @@ export default function AlertFab() {
       {/* FAB 버튼 */}
       <button
         type="button"
-        className={`${styles.fab} ${hasUrgent ? styles.fabUrgent : ''}`}
+        className={`${styles.fab} ${hasUrgent ? styles.fabUrgent : hasMedium ? styles.fabMedium : hasLow ? styles.fabLow : ''}`}
         onClick={() => setView('list')}
         aria-label={`장애 알림 ${alertCount}건${hasUrgent ? ' (긴급)' : ''}`}
       >

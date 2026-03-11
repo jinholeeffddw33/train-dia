@@ -275,7 +275,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   background: var(--dia-surface);

@@ -10,11 +10,15 @@
   justify-content: space-around;
   height: var(--dia-tab-height);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: var(--dia-bg-elevated);
-  border-top: 1px solid var(--dia-border);
+  background: rgba(19, 27, 46, 0.85);
+  border-top: 1px solid var(--dia-border-glow);
   z-index: var(--dia-layer-fixed);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+:global(:root.light) .tabBar {
+  background: rgba(248, 250, 252, 0.85);
 }
 
 /* 개별 탭 */
@@ -65,6 +69,7 @@
   height: 2px;
   background: var(--dia-blue);
   border-radius: 0 0 var(--dia-radius-full) var(--dia-radius-full);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
 }
 
 /* 알림 배지 */

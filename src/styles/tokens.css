@@ -86,9 +86,11 @@
   --dia-shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.2);
   --dia-shadow-glow-sky: 0 0 20px rgba(56, 189, 248, 0.2);
 
-  /* Card depth (ZINOSB 참조) */
-  --dia-card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --dia-card-depth: 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Card depth & Ambient (ZINOSB-grade) */
+  --dia-card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --dia-card-depth: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
+  --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.03) 100%);
+  --dia-border-glow: rgba(255, 255, 255, 0.06);
 
   /* ========================================
      Typography
@@ -219,7 +221,9 @@
   --dia-shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.1);
   --dia-shadow-glow-sky: 0 0 20px rgba(56, 189, 248, 0.1);
 
-  /* Card depth (ZINOSB 참조) */
+  /* Card depth & Ambient (ZINOSB-grade) */
   --dia-card-inset: none;
-  --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.10), 0 0 1px rgba(0, 0, 0, 0.06);
+  --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.02) 100%);
+  --dia-border-glow: rgba(0, 0, 0, 0.06);
 }

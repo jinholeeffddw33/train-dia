@@ -7,8 +7,12 @@ const POLL_INTERVAL = 120_000; // 2분
 const STALE_THRESHOLD = 30_000; // 30초 이상 지났으면 복귀 시 즉시 갱신
 
 export function useTrainPolling() {
-  const { setData, setLoading, setError, loading, lastFetch } = useTrainStore();
+  const { setData, setLoading, setError, loading } = useTrainStore();
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastFetchRef = useRef<number | null>(null);
+
+  // lastFetch를 ref로 추적 (useEffect deps 무한루프 방지)
+  lastFetchRef.current = useTrainStore.getState().lastFetch;
 
   const fetchTrains = useCallback(async () => {
     setLoading(true);
@@ -67,7 +71,8 @@ export function useTrainPolling() {
     // 탭 이탈 시 폴링 중지 (배터리 절약)
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
-        const elapsed = lastFetch ? Date.now() - lastFetch : Infinity;
+        const lf = lastFetchRef.current;
+        const elapsed = lf ? Date.now() - lf : Infinity;
         if (elapsed >= STALE_THRESHOLD) {
           fetchTrains();
         }
@@ -83,7 +88,7 @@ export function useTrainPolling() {
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [fetchTrains, startPolling, stopPolling, lastFetch]);
+  }, [fetchTrains, startPolling, stopPolling]);
 
   return { refresh: fetchTrains, loading };
 }

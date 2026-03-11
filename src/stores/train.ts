@@ -56,7 +56,7 @@ export const useTrainStore = create<TrainState>()((set) => ({
   mapFullscreen: false,
   scrollTrigger: 0,
 
-  setData: (data) => set({ data, lastFetch: Date.now(), error: null }),
+  setData: (data) => set({ data, lastFetch: Date.now(), error: null, loading: false }),
   setBranch: (branch) => set({ branch }),
   setViewMode: (mode) => set({ viewMode: mode }),
   setLoading: (loading) => set({ loading }),

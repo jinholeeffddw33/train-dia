@@ -32,6 +32,7 @@ function formatExpiry(expiresAt: string): string {
 export default function AlertList({ onClose }: { onClose: () => void }) {
   const { alerts, deactivate } = useAlertStore();
   const currentName = useDriverStore((s) => s.current?.n ?? '');
+  const currentSabun = useDriverStore((s) => s.current?.s ?? '');
 
   return (
     <div className={styles.listContainer}>
@@ -85,11 +86,11 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
                   {formatExpiry(alert.expires_at)}
                 </span>
               )}
-              {currentName && currentName === alert.createdBy && (
+              {currentName && currentSabun && currentName === alert.createdBy && (
                 <button
                   type="button"
                   className={styles.resolveBtn}
-                  onClick={() => deactivate(alert.id)}
+                  onClick={() => deactivate(alert.id, currentName, currentSabun)}
                 >
                   해제
                 </button>

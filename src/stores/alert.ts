@@ -48,7 +48,7 @@ interface AlertState {
   loading: boolean;
   /** 서버에서 활성 알림 가져오기 */
   fetch: () => Promise<void>;
-  /** 알림 등록 (Supabase에 저장) */
+  /** 알림 등록 (API 서버 검증 후 저장) */
   addAlert: (params: {
     stationFrom: string;
     stationTo: string;
@@ -56,10 +56,11 @@ interface AlertState {
     message: string;
     severity: 'high' | 'medium' | 'low';
     authorName: string;
+    authorSabun: string;
     expiresAt?: string | null;
   }) => Promise<void>;
-  /** 알림 해제 (is_active = false) */
-  deactivate: (id: string) => Promise<void>;
+  /** 알림 해제 (API 서버 검증 후 비활성화) */
+  deactivate: (id: string, name: string, sabun: string) => Promise<void>;
   /** 실시간 구독 시작 */
   subscribe: () => () => void;
 }
@@ -88,43 +89,43 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
     set({ loading: false });
   },
 
-  addAlert: async ({ stationFrom, stationTo, direction, message, severity, authorName, expiresAt }) => {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from('alerts')
-      .insert({
-        station_from: stationFrom,
-        station_to: stationTo,
+  addAlert: async ({ stationFrom, stationTo, direction, message, severity, authorName, authorSabun, expiresAt }) => {
+    const res = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: authorName,
+        sabun: authorSabun,
+        stationFrom,
+        stationTo,
         direction: direction || '',
-        station: stationFrom || '',
         message,
         severity,
-        created_by: authorName,
-        is_active: true,
-        expires_at: expiresAt || null,
-      })
-      .select()
-      .single();
+        expiresAt: expiresAt || null,
+      }),
+    });
 
-    if (!error && data) {
-      set((state) => ({
-        alerts: [toAlert(data as DbAlert), ...state.alerts],
-      }));
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || '알림 등록에 실패했습니다');
     }
+
+    // 실시간 구독이 fetch를 트리거하므로, 구독 없을 때를 위해 직접 fetch
+    get().fetch();
   },
 
-  deactivate: async (id: string) => {
-    if (!supabase) return;
-    const { error } = await supabase
-      .from('alerts')
-      .update({ is_active: false })
-      .eq('id', id);
+  deactivate: async (id: string, name: string, sabun: string) => {
+    const params = new URLSearchParams({ id, name, sabun });
+    const res = await fetch(`/api/alerts?${params}`, { method: 'DELETE' });
 
-    if (!error) {
-      set((state) => ({
-        alerts: state.alerts.filter((a) => a.id !== id),
-      }));
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || '알림 해제에 실패했습니다');
     }
+
+    set((state) => ({
+      alerts: state.alerts.filter((a) => a.id !== id),
+    }));
   },
 
   subscribe: () => {

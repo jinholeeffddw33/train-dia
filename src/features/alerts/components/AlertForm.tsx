@@ -27,6 +27,7 @@ function getLocalDateStr(d: Date = new Date()): string {
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
   const driverName = useDriverStore((s) => s.current?.n ?? '');
+  const driverSabun = useDriverStore((s) => s.current?.s ?? '');
   const [stationFrom, setStationFrom] = useState('');
   const [stationTo, setStationTo] = useState('');
   const [direction, setDirection] = useState<Direction>('both');
@@ -79,20 +80,37 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     return null;
   };
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || submitting) return;
 
-    await addAlert({
-      stationFrom: isInfo ? '' : stationFrom,
-      stationTo: isInfo ? '' : stationTo,
-      direction: isInfo ? '' : direction,
-      message: message.trim(),
-      severity,
-      authorName: driverName,
-      expiresAt: getExpiresAt(),
-    });
+    if (!driverSabun) {
+      setSubmitError('사번 정보가 없습니다. 다시 로그인해주세요.');
+      return;
+    }
 
-    onClose();
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      await addAlert({
+        stationFrom: isInfo ? '' : stationFrom,
+        stationTo: isInfo ? '' : stationTo,
+        direction: isInfo ? '' : direction,
+        message: message.trim(),
+        severity,
+        authorName: driverName,
+        authorSabun: driverSabun,
+        expiresAt: getExpiresAt(),
+      });
+      onClose();
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : '등록에 실패했습니다');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -267,14 +285,17 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
         <span className={styles.charCount}>{message.length}/200</span>
       </div>
 
+      {/* 에러 표시 */}
+      {submitError && <p className={styles.submitError}>{submitError}</p>}
+
       {/* 등록 버튼 */}
       <button
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={!canSubmit}
+        disabled={!canSubmit || submitting}
       >
-        등록할게요
+        {submitting ? '등록 중...' : '등록할게요'}
       </button>
     </div>
   );

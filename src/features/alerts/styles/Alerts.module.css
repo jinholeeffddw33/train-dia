@@ -479,6 +479,14 @@
   transform: scale(0.98);
 }
 
+.submitError {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-red);
+  text-align: center;
+  padding: var(--dia-space-2) 0;
+  font-weight: var(--dia-weight-medium);
+}
+
 /* ── Direction Select (compact chips) ── */
 .directionSelect {
   display: flex;

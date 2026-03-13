@@ -362,7 +362,12 @@ export function findExchangePartners(
   const segs = mySchedule.g;
   if (!segs || segs.length === 0) return partners;
 
-  // 전체 인원 스케줄을 한번에 빌드
+  // 야간 판별: 출근시간 > 퇴근시간이면 자정 넘김
+  const startMins = mySchedule.s ? timeToMins(mySchedule.s) : -1;
+  const endMins = mySchedule.e ? timeToMins(mySchedule.e) : -1;
+  const isNight = startMins >= 0 && endMins >= 0 && startMins > endMins;
+
+  // 전체 인원 스케줄을 한번에 빌드 (같은 날)
   const allSchedules: { person: Person; schedule: Schedule }[] = [];
   for (const p of P) {
     if (p.I === myPerson.I) continue; // 자기 자신 제외
@@ -372,6 +377,22 @@ export function findExchangePartners(
     const sc = getSchedule(dia, date);
     if (sc && sc.g && sc.g.length > 0) {
       allSchedules.push({ person: p, schedule: sc });
+    }
+  }
+
+  // 야간이면 다음 날 스케줄도 풀에 추가 (2근무 아침 교대 매칭용)
+  if (isNight) {
+    const nextDay = new Date(date);
+    nextDay.setDate(nextDay.getDate() + 1);
+    for (const p of P) {
+      if (p.I === myPerson.I) continue;
+      const dia = getDia(p, nextDay);
+      const tp = getType(dia);
+      if (tp === 'rest') continue;
+      const sc = getSchedule(dia, nextDay);
+      if (sc && sc.g && sc.g.length > 0) {
+        allSchedules.push({ person: p, schedule: sc });
+      }
     }
   }
 

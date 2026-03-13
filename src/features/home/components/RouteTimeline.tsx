@@ -69,6 +69,12 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
         const durStr = formatDuration(durMins);
         const partner = partners[i];
 
+        // 1xxx/2xxx = 기지 입출고 → 교대 없음
+        const firstTrain = seg.n?.[0] ?? 0;
+        const lastTrain = seg.n?.[seg.n.length - 1] ?? 0;
+        const isFirstDepot = firstTrain >= 1000 && firstTrain < 3000;
+        const isLastDepot = lastTrain >= 1000 && lastTrain < 3000;
+
         return (
           <div key={i}>
             <div className={styles.rtBlock}>
@@ -89,25 +95,29 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
                 <span className={styles.rtArr}>{seg.a || '-'}</span>
               </div>
 
-              {/* 교대 상대 */}
+              {/* 교대 상대 — 1xxx/2xxx 기지 입출고면 해당 쪽 숨김 */}
               <div className={styles.rtPartnerRow}>
-                {partner?.left ? (
-                  <span className={`${styles.rtPartner} ${styles.rtPartnerLeft}`}>
-                    교대 <strong>{partner.left}</strong>
-                  </span>
-                ) : (
-                  <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
-                    타소 교대
-                  </span>
+                {!isFirstDepot && (
+                  partner?.left ? (
+                    <span className={`${styles.rtPartner} ${styles.rtPartnerLeft}`}>
+                      교대 <strong>{partner.left}</strong>
+                    </span>
+                  ) : (
+                    <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
+                      타소 교대
+                    </span>
+                  )
                 )}
-                {partner?.right ? (
-                  <span className={`${styles.rtPartner} ${styles.rtPartnerRight}`}>
-                    교대 <strong>{partner.right}</strong>
-                  </span>
-                ) : (
-                  <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
-                    타소 교대
-                  </span>
+                {!isLastDepot && (
+                  partner?.right ? (
+                    <span className={`${styles.rtPartner} ${styles.rtPartnerRight}`}>
+                      교대 <strong>{partner.right}</strong>
+                    </span>
+                  ) : (
+                    <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
+                      타소 교대
+                    </span>
+                  )
                 )}
               </div>
             </div>

@@ -350,18 +350,32 @@
   padding: var(--dia-space-2) var(--dia-space-5) var(--dia-space-3);
 }
 
-.dirUp {
+.dirColDown,
+.dirColUp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dirLabel {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
-  color: #0D9452;
   letter-spacing: -0.3px;
 }
 
-.dirDown {
-  font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-bold);
+.dirColDown .dirLabel { color: #D32F2F; }
+.dirColUp .dirLabel { color: #0D9452; }
+
+.dirArrowDown {
+  font-size: 14px;
   color: #D32F2F;
-  letter-spacing: -0.3px;
+  font-weight: var(--dia-weight-bold);
+}
+
+.dirArrowUp {
+  font-size: 14px;
+  color: #0D9452;
+  font-weight: var(--dia-weight-bold);
 }
 
 /* ── Track row ── */
@@ -550,6 +564,13 @@
 .tkTrainNo {
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+
+.tkDest {
+  font-size: 11px;
+  font-weight: var(--dia-weight-semibold);
+  opacity: 0.8;
+  letter-spacing: -0.3px;
 }
 
 .tkTrainArriving {

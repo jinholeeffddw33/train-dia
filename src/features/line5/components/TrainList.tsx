@@ -17,13 +17,21 @@ const BRANCH_STATIONS: Record<string, readonly string[]> = {
   hanam: ['강동', ...LINE5_HANAM] as const,
 };
 
+/** 행선지 축약 (모바일 공간 절약) */
+function shortDest(dest: string): string {
+  return dest
+    .replace(/역$/, '')
+    .replace('하남검단산', '하남검단')
+    .replace('강일', '하남검단');
+}
+
 export default function TrainList() {
   const { data, branch, scrollTrigger } = useTrainStore();
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
   const trainsByStation = useMemo(() => {
-    const map = new Map<string, { trainNo: string; direction: string; status: string }[]>();
+    const map = new Map<string, { trainNo: string; direction: string; status: string; dest: string }[]>();
     for (const t of data) {
       const name = t.statnNm.replace(/역$/, '');
       if (!map.has(name)) map.set(name, []);
@@ -31,6 +39,7 @@ export default function TrainList() {
         trainNo: t.trainNo,
         direction: t.updnLine,
         status: t.trainSttus,
+        dest: shortDest(t.statnTnm || ''),
       });
     }
     return map;
@@ -69,10 +78,16 @@ export default function TrainList() {
 
   return (
     <div className={styles.trackWrap} ref={listRef}>
-      {/* 방향 헤더 */}
+      {/* 방향 헤더 — 하행 LEFT / 상행 RIGHT */}
       <div className={styles.dirHeader}>
-        <span className={styles.dirUp}>▲ {firstStation} 방면</span>
-        <span className={styles.dirDown}>{lastStation} 방면 ▼</span>
+        <div className={styles.dirColDown}>
+          <span className={styles.dirArrowDown}>▼</span>
+          <span className={styles.dirLabel}>{lastStation}행</span>
+        </div>
+        <div className={styles.dirColUp}>
+          <span className={styles.dirLabel}>{firstStation}행</span>
+          <span className={styles.dirArrowUp}>▲</span>
+        </div>
       </div>
 
       {/* 역 트랙 */}
@@ -103,25 +118,26 @@ export default function TrainList() {
             className={`${styles.tkRow} ${isDapsimni ? styles.tkRowHighlight : ''}`}
             data-station={name}
           >
-            {/* 좌측: 상행 열차 */}
+            {/* 좌측: 하행 열차 (홀수, 빨강) */}
             <div className={styles.tkLeft}>
-              {upTrains.map((t) => (
+              {downTrains.map((t) => (
                 <div
                   key={t.trainNo}
-                  className={`${styles.tkTrainBox} ${styles.tkTrainUp} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                  className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
                 >
-                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
+                  {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
+                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
                   <span className={styles.tkTrainNo}>{t.trainNo}</span>
                 </div>
               ))}
             </div>
 
-            {/* 중앙: 트랙 */}
+            {/* 중앙: 트랙 (↓하행 | ↑상행) */}
             <div className={trackClass}>
               <div className={dotClass} />
             </div>
 
-            {/* 우측: 역 이름 + 환승 + 하행 열차 */}
+            {/* 우측: 역 이름 + 상행 열차 (짝수, 초록) */}
             <div className={styles.tkRight}>
               <span className={`${styles.tkName} ${isDapsimni ? styles.tkNameDapsimni : ''}`}>
                 {name}{isDapsimni ? ' ★' : ''}
@@ -143,13 +159,14 @@ export default function TrainList() {
                   })}
                 </div>
               )}
-              {downTrains.map((t) => (
+              {upTrains.map((t) => (
                 <div
                   key={t.trainNo}
-                  className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                  className={`${styles.tkTrainBox} ${styles.tkTrainUp} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
                 >
+                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
                   <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
+                  {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
                 </div>
               ))}
             </div>

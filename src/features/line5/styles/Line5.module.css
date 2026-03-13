@@ -381,11 +381,19 @@
 /* ── Track row ── */
 .tkRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
   align-items: center;
-  min-height: 52px;
+  min-height: 62px;
   padding: 0 var(--dia-space-3);
   position: relative;
+}
+
+.tkRow + .tkRow {
+  border-top: 1px solid rgba(148, 163, 184, 0.06);
+}
+
+:global(:root.light) .tkRow + .tkRow {
+  border-top-color: rgba(100, 116, 139, 0.08);
 }
 
 .tkRowHighlight {
@@ -400,10 +408,11 @@
 .tkTrack {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   height: 100%;
-  min-height: 52px;
+  min-height: 62px;
+  padding: 0 2px;
 }
 
 .tkTrack::before,
@@ -418,8 +427,8 @@
   transition: background var(--dia-transition-fast);
 }
 
-.tkTrack::before { left: 10px; }
-.tkTrack::after { right: 10px; }
+.tkTrack::before { left: 8px; }
+.tkTrack::after { right: 8px; }
 
 /* First/last station — half lines */
 .tkTrackFirst::before,
@@ -478,6 +487,46 @@
   background: rgba(59, 130, 246, 0.1);
 }
 
+/* ── Direction arrows (▾▴) on track lines ── */
+.tkDirDown,
+.tkDirUp {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--dia-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  background: var(--dia-bg);
+  border: 1.5px solid var(--dia-border);
+  z-index: 3;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.tkDirDown {
+  color: rgba(211, 47, 47, 0.45);
+}
+
+.tkDirUp {
+  color: rgba(13, 148, 82, 0.45);
+}
+
+:global(:root.light) .tkDirDown,
+:global(:root.light) .tkDirUp {
+  background: #fff;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+:global(:root.light) .tkDirDown {
+  color: rgba(211, 47, 47, 0.5);
+}
+
+:global(:root.light) .tkDirUp {
+  color: rgba(13, 148, 82, 0.5);
+}
+
 /* ── Left train area (상행) ── */
 .tkLeft {
   display: flex;
@@ -496,10 +545,11 @@
 }
 
 .tkName {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
+  font-size: 17px;
+  font-weight: 800;
   color: var(--dia-text-primary);
   white-space: nowrap;
+  letter-spacing: -0.3px;
 }
 
 .tkNameDapsimni {
@@ -526,13 +576,14 @@
 .tkTrainBox {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: var(--dia-radius-sm);
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   white-space: nowrap;
   animation: trainPulse 2s ease-in-out infinite;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .tkTrainUp {
@@ -549,13 +600,13 @@
 
 @keyframes trainPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
+  50% { opacity: 0.85; }
 }
 
 .tkCapsule {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--dia-radius-full);
+  width: 6px;
+  height: 14px;
+  border-radius: 2px;
 }
 
 .tkCapsuleUp { background: #0D9452; }

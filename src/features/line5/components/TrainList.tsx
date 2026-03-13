@@ -134,7 +134,9 @@ export default function TrainList() {
 
             {/* 중앙: 트랙 (↓하행 | ↑상행) */}
             <div className={trackClass}>
+              <span className={styles.tkDirDown} aria-hidden="true">▾</span>
               <div className={dotClass} />
+              <span className={styles.tkDirUp} aria-hidden="true">▴</span>
             </div>
 
             {/* 우측: 역 이름 + 상행 열차 (짝수, 초록) */}

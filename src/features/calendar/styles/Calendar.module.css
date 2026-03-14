@@ -262,6 +262,25 @@
 .emptyIcon { font-size: 56px; margin-bottom: var(--dia-space-4); opacity: 0.5; }
 .emptyText { font-size: var(--dia-text-base); color: var(--dia-text-tertiary); white-space: pre-line; }
 
+/* ── Exchange FAB ── */
+.exchangeFab {
+  position: fixed;
+  bottom: calc(80px + env(safe-area-inset-bottom));
+  right: var(--dia-space-4);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 50;
+  transition: transform var(--dia-transition-fast);
+}
+.exchangeFab:active { transform: scale(0.92); }
+
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }

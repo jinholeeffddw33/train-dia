@@ -1,0 +1,326 @@
+/* ===== Exchange Request Overlay ===== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border);
+  position: sticky;
+  top: 0;
+  background: var(--dia-bg);
+  z-index: 10;
+}
+
+.closeBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  border-radius: var(--dia-radius-full);
+  transition: background var(--dia-transition-fast);
+}
+.closeBtn:active { background: var(--dia-surface-hover); }
+
+.title {
+  flex: 1;
+  text-align: center;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.spacer { width: 44px; }
+
+/* ── Body ── */
+.body {
+  flex: 1;
+  padding: var(--dia-space-4);
+}
+
+/* ── Date Row ── */
+.dateRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-5);
+}
+
+.dateLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+}
+
+.dateBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  position: relative;
+  transition: border-color var(--dia-transition-fast);
+}
+.dateBtn:active { border-color: var(--dia-blue); }
+
+.dateInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.dateSep {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── Section Title ── */
+.sectionTitle {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-3);
+}
+
+/* ── Day List ── */
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-5);
+}
+
+.dayRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+
+.dayInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  min-width: 0;
+}
+
+.dayDate {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+}
+
+.dayDia {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  min-width: 36px;
+  text-align: center;
+}
+
+/* DiaType 색상 */
+.dia_day { color: var(--dia-blue); }
+.dia_night { color: var(--dia-purple); }
+.dia_standby { color: var(--dia-amber); }
+.dia_rest { color: var(--dia-gray); }
+
+/* ── Wish Buttons ── */
+.wishBtns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wishBtn {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+  transition: all var(--dia-transition-fast);
+  min-height: 32px;
+}
+.wishBtn:active { background: var(--dia-surface-hover); }
+
+/* 선택 상태 */
+.wish_주간 {
+  color: white;
+  background: var(--dia-blue);
+  border-color: var(--dia-blue);
+}
+.wish_야간 {
+  color: white;
+  background: var(--dia-purple);
+  border-color: var(--dia-purple);
+}
+.wish_비번 {
+  color: white;
+  background: var(--dia-gray);
+  border-color: var(--dia-gray);
+}
+.wish_휴무 {
+  color: white;
+  background: var(--dia-amber);
+  border-color: var(--dia-amber);
+}
+
+/* ── Hint ── */
+.hint {
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-8) 0;
+}
+
+/* ── Search Button ── */
+.searchBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  border-radius: var(--dia-radius-lg);
+  min-height: 48px;
+  margin-bottom: var(--dia-space-5);
+  transition: opacity var(--dia-transition-fast);
+}
+.searchBtn:active { opacity: 0.85; }
+
+/* ── Result Section ── */
+.resultSection {
+  margin-bottom: var(--dia-space-5);
+}
+
+.resultCount {
+  color: var(--dia-blue);
+  font-weight: var(--dia-weight-bold);
+}
+
+.noResult {
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-6) 0;
+}
+
+.resultList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+/* ── Match Card ── */
+.matchCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4);
+}
+
+.matchHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-3);
+}
+
+.matchAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+
+.matchName {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.matchDias {
+  display: flex;
+  gap: var(--dia-space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.matchDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  flex-shrink: 0;
+}
+
+.matchDayLabel {
+  font-size: 11px;
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+}
+
+.matchDayDia {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+
+/* ── Memo Section ── */
+.memoSection {
+  padding-top: var(--dia-space-4);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.memoInput {
+  width: 100%;
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  resize: vertical;
+  min-height: 72px;
+}
+.memoInput::placeholder {
+  color: var(--dia-text-tertiary);
+}

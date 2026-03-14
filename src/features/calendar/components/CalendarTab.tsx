@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
+import ExchangeRequest from './ExchangeRequest';
 import styles from '../styles/Calendar.module.css';
 
 function todayStr(): string {
@@ -16,6 +18,7 @@ export default function CalendarTab() {
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
+  const [exchangeOpen, setExchangeOpen] = useState(false);
 
   const prevMonth = () => {
     if (month === 1) { setYear(year - 1); setMonth(12); }
@@ -71,6 +74,22 @@ export default function CalendarTab() {
 
       {/* 선택된 날짜 상세 */}
       {selectedDate && <ScheduleDetail dateStr={selectedDate} />}
+
+      {/* 교체 희망 FAB */}
+      <button
+        type="button"
+        className={styles.exchangeFab}
+        onClick={() => setExchangeOpen(true)}
+        aria-label="교체 희망"
+      >
+        <RefreshCw size={20} />
+      </button>
+
+      {/* 교체 희망 오버레이 */}
+      <ExchangeRequest
+        open={exchangeOpen}
+        onClose={() => setExchangeOpen(false)}
+      />
     </div>
   );
 }

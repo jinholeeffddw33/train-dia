@@ -5,8 +5,7 @@ import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, HomeTipsQuiz } from '@/features/home';
-import { CalendarTab } from '@/features/calendar';
-import { ContactsTab } from '@/features/contacts';
+import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
 import { Line5Tab } from '@/features/line5';
@@ -21,8 +20,8 @@ function TabContent({ tab }: { tab: TabId }) {
       return <Line5Tab />;
     case 'duty':
       return <DutyTab />;
-    case 'contacts':
-      return <ContactsTab />;
+    case 'exchange':
+      return <ExchangeRequest />;
     case 'more':
       return <MoreTab />;
     default:

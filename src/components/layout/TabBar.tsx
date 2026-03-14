@@ -1,10 +1,10 @@
 'use client';
 
-import { Home, CalendarDays, TrainFront, Briefcase, Phone, Settings } from 'lucide-react';
+import { Home, CalendarDays, TrainFront, Briefcase, RefreshCw, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './TabBar.module.css';
 
-export type TabId = 'home' | 'calendar' | 'line' | 'duty' | 'contacts' | 'more';
+export type TabId = 'home' | 'calendar' | 'line' | 'duty' | 'exchange' | 'more';
 
 interface TabItem {
   id: TabId;
@@ -17,7 +17,7 @@ const TABS: TabItem[] = [
   { id: 'calendar', label: '교번', Icon: CalendarDays },
   { id: 'line', label: '5호선', Icon: TrainFront },
   { id: 'duty', label: '근무', Icon: Briefcase },
-  { id: 'contacts', label: '연락처', Icon: Phone },
+  { id: 'exchange', label: '교체', Icon: RefreshCw },
   { id: 'more', label: '설정', Icon: Settings },
 ];
 

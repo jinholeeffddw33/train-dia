@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, ChevronRight, X, UserRoundPen } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, ChevronRight, X, UserRoundPen } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -9,6 +9,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab } from '@/features/compare';
+import { ContactsTab } from '@/features/contacts';
 import { DriverSelector } from '@/features/home';
 import styles from '../styles/More.module.css';
 
@@ -20,6 +21,7 @@ export default function MoreTab() {
   const [commuteOpen, setCommuteOpen] = useState(false);
   const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [contactsOpen, setContactsOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
 
   return (
@@ -79,6 +81,18 @@ export default function MoreTab() {
           <div className={styles.settingInfo}>
             <GitCompareArrows size={20} className={styles.toolIcon} />
             <span className={styles.settingLabel}>교번 비교</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setContactsOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <Phone size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>비상 연락처</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -180,6 +194,26 @@ export default function MoreTab() {
         open={subwayOpen}
         onClose={() => setSubwayOpen(false)}
       />
+
+      {/* 연락처 오버레이 */}
+      {contactsOpen && (
+        <div className={styles.fullOverlay}>
+          <div className={styles.overlayHeader}>
+            <button
+              type="button"
+              className={styles.overlayClose}
+              onClick={() => setContactsOpen(false)}
+              aria-label="닫기"
+            >
+              <X size={22} />
+            </button>
+            <h2 className={styles.overlayTitle}>비상 연락처</h2>
+          </div>
+          <div className={styles.overlayBody}>
+            <ContactsTab />
+          </div>
+        </div>
+      )}
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (

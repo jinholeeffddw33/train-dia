@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { X, Calendar, Search } from 'lucide-react';
+import { Calendar, Search } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
@@ -11,11 +11,6 @@ import styles from '../styles/Exchange.module.css';
 
 const WISH_TYPES = ['주간', '야간', '비번', '휴무'] as const;
 type WishType = typeof WISH_TYPES[number];
-
-interface ExchangeRequestProps {
-  open: boolean;
-  onClose: () => void;
-}
 
 function toISODate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -41,7 +36,7 @@ function matchesWish(dia: string, wish: WishType): boolean {
   }
 }
 
-export default function ExchangeRequest({ open, onClose }: ExchangeRequestProps) {
+export default function ExchangeRequest() {
   const driver = useDriverStore((s) => s.current);
   const todayStr = toISODate(new Date());
 
@@ -100,20 +95,9 @@ export default function ExchangeRequest({ open, onClose }: ExchangeRequestProps)
 
   const wishCount = Object.keys(wishes).length;
 
-  if (!open) return null;
-
   return (
-    <div className={styles.overlay}>
-      {/* 헤더 */}
-      <div className={styles.header}>
-        <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="닫기">
-          <X size={22} />
-        </button>
-        <h2 className={styles.title}>교체 희망</h2>
-        <div className={styles.spacer} />
-      </div>
-
-      <div className={styles.body}>
+    <div className={styles.container}>
+      <h2 className={styles.pageTitle}>교체 희망</h2>
         {/* 날짜 선택 */}
         <div className={styles.dateRow}>
           <span className={styles.dateLabel}>희망일</span>
@@ -227,7 +211,6 @@ export default function ExchangeRequest({ open, onClose }: ExchangeRequestProps)
             rows={3}
           />
         </div>
-      </div>
     </div>
   );
 }

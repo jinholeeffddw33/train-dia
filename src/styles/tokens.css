@@ -92,6 +92,14 @@
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.03) 100%);
   --dia-border-glow: rgba(255, 255, 255, 0.06);
 
+  /* Hero Gradient */
+  --dia-hero-gradient: linear-gradient(160deg, #0A2260 0%, #1247C2 40%, #2563EB 80%, #3B82F6 100%);
+
+  /* Track View Colors */
+  --dia-track-line: #996CAC;
+  --dia-track-up: #0D9452;
+  --dia-track-down: #D32F2F;
+
   /* ========================================
      Typography
      ======================================== */
@@ -227,4 +235,12 @@
   --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.02) 100%);
   --dia-border-glow: rgba(0, 0, 0, 0.06);
+
+  /* Hero Gradient */
+  --dia-hero-gradient: linear-gradient(160deg, #1E40AF 0%, #2563EB 40%, #3B82F6 80%, #60A5FA 100%);
+
+  /* Track View Colors */
+  --dia-track-line: #b388d9;
+  --dia-track-up: #0D9452;
+  --dia-track-down: #D32F2F;
 }

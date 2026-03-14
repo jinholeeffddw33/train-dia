@@ -58,7 +58,7 @@
 }
 
 .previewDow {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   font-weight: var(--dia-weight-semibold);
 }
@@ -71,7 +71,7 @@
 }
 
 .previewDia {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   line-height: 1;
 }
@@ -184,7 +184,7 @@
 
 .wishBtn {
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
   background: var(--dia-bg);
@@ -319,7 +319,7 @@
 }
 
 .matchDayLabel {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   white-space: nowrap;
 }

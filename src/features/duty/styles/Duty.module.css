@@ -263,7 +263,7 @@
 }
 
 .trainArrow {
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
 
@@ -301,7 +301,7 @@
 }
 
 .routeStation {
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
 

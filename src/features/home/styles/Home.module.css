@@ -2,7 +2,7 @@
 
 /* ── Header Section (v1 파란색 그래디언트) ── */
 .headerSection {
-  background: linear-gradient(160deg, #0A2260 0%, #1247C2 40%, #2563EB 80%, #3B82F6 100%);
+  background: var(--dia-hero-gradient);
   color: #fff;
   padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 16px;
   position: relative;
@@ -12,7 +12,7 @@
 }
 
 :global(:root.light) .headerSection {
-  background: linear-gradient(160deg, #1E40AF 0%, #2563EB 40%, #3B82F6 80%, #60A5FA 100%);
+  background: var(--dia-hero-gradient);
 }
 
 /* 배경 장식 — 깊이감 (ZINOSB-grade) */
@@ -58,21 +58,21 @@
 }
 
 .headerName {
-  font-size: clamp(22px, 6.5vw, 28px);
+  font-size: var(--dia-text-2xl);
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
 }
 
 .headerRole {
-  font-size: clamp(13px, 3.5vw, 16px);
+  font-size: var(--dia-text-sm);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
   margin-left: 2px;
 }
 
 .headerDate {
-  font-size: clamp(15px, 4vw, 18px);
+  font-size: var(--dia-text-base);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.75);
   margin-top: 4px;
@@ -92,7 +92,7 @@
 }
 
 .headerOrg {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.3);
   letter-spacing: 1px;
@@ -303,7 +303,7 @@
 }
 
 .workTimeLabel {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
 }
@@ -849,27 +849,27 @@
 }
 
 .dirBannerDir {
-  font-size: 15px;
+  font-size: var(--dia-text-base);
   font-weight: 800;
   letter-spacing: 0.5px;
 }
 
 .dirBannerSub {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   opacity: 0.8;
   margin-top: 2px;
   font-weight: 500;
 }
 
 .dirBannerTime {
-  font-size: 22px;
+  font-size: var(--dia-text-xl);
   font-weight: 900;
   margin-top: 4px;
   letter-spacing: -0.5px;
 }
 
 .dirBannerNext {
-  font-size: 14px;
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   margin-top: 6px;
   padding-top: 6px;
@@ -887,7 +887,7 @@
   display: flex;
   align-items: baseline;
   gap: 2px;
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: 700;
   color: var(--dia-blue);
   margin-bottom: var(--dia-space-3);
@@ -895,7 +895,7 @@
 }
 
 .rtRoute {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: 600;
   color: var(--dia-text-secondary);
   white-space: nowrap;
@@ -922,13 +922,13 @@
 }
 
 .rtNum {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: 700;
   color: var(--dia-blue);
 }
 
 .rtDur {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   font-weight: 600;
 }
@@ -974,7 +974,7 @@
 }
 
 .rtArr {
-  font-size: 14px;
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   color: var(--dia-text-primary);
   white-space: nowrap;
@@ -988,7 +988,7 @@
 }
 
 .rtTn {
-  font-size: 15px;
+  font-size: var(--dia-text-base);
   font-weight: 800;
   color: var(--dia-blue);
   letter-spacing: 0.5px;
@@ -1002,7 +1002,7 @@
 }
 
 .rtPartner {
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: 600;
   color: var(--dia-blue);
   opacity: 0.85;
@@ -1018,14 +1018,14 @@
 .rtPartnerOther {
   opacity: 0.45;
   font-weight: 500;
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
 }
 
 .rtGap {
   display: flex;
   align-items: center;
   padding: 6px 0;
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
 

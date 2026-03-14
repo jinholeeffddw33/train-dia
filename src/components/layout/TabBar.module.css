@@ -54,7 +54,7 @@
 
 /* 라벨 */
 .tabLabel {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-medium);
   line-height: 1;
   white-space: nowrap;
@@ -85,7 +85,7 @@
   justify-content: center;
   background: var(--dia-red);
   color: white;
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   border-radius: var(--dia-radius-full);
   line-height: 1;

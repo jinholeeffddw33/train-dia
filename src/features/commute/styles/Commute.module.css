@@ -196,7 +196,7 @@
 }
 
 .lastBadge {
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   padding: 1px 4px;
   border-radius: var(--dia-radius-sm);

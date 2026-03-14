@@ -275,7 +275,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   background: var(--dia-surface);
@@ -363,18 +363,18 @@
   letter-spacing: -0.3px;
 }
 
-.dirColDown .dirLabel { color: #D32F2F; }
-.dirColUp .dirLabel { color: #0D9452; }
+.dirColDown .dirLabel { color: var(--dia-track-down); }
+.dirColUp .dirLabel { color: var(--dia-track-up); }
 
 .dirArrowDown {
   font-size: 14px;
-  color: #D32F2F;
+  color: var(--dia-track-down);
   font-weight: var(--dia-weight-bold);
 }
 
 .dirArrowUp {
   font-size: 14px;
-  color: #0D9452;
+  color: var(--dia-track-up);
   font-weight: var(--dia-weight-bold);
 }
 
@@ -422,7 +422,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: #996CAC;
+  background: var(--dia-track-line);
   border-radius: 2px;
   transition: background var(--dia-transition-fast);
 }
@@ -446,7 +446,7 @@
 /* Light mode track lines */
 :global(:root.light) .tkTrack::before,
 :global(:root.light) .tkTrack::after {
-  background: #b388d9;
+  background: var(--dia-track-line);
 }
 
 /* ── Station dot ── */
@@ -455,14 +455,14 @@
   height: 14px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-bg);
-  border: 3px solid #996CAC;
+  border: 3px solid var(--dia-track-line);
   z-index: 2;
   position: relative;
 }
 
 :global(:root.light) .tkDot {
   background: #fff;
-  border-color: #996CAC;
+  border-color: var(--dia-track-line);
 }
 
 .tkDotTransfer {
@@ -496,7 +496,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   background: var(--dia-bg);
   border: 1.5px solid var(--dia-border);
   z-index: 3;
@@ -545,7 +545,7 @@
 }
 
 .tkName {
-  font-size: 17px;
+  font-size: var(--dia-text-base);
   font-weight: 800;
   color: var(--dia-text-primary);
   white-space: nowrap;
@@ -564,7 +564,7 @@
 }
 
 .tkTransferTag {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   padding: 2px 7px;
   border-radius: var(--dia-radius-xs);
@@ -588,13 +588,13 @@
 
 .tkTrainUp {
   background: rgba(13, 148, 82, 0.12);
-  color: #0D9452;
+  color: var(--dia-track-up);
   border: 1px solid rgba(13, 148, 82, 0.25);
 }
 
 .tkTrainDown {
   background: rgba(211, 47, 47, 0.1);
-  color: #D32F2F;
+  color: var(--dia-track-down);
   border: 1px solid rgba(211, 47, 47, 0.2);
 }
 
@@ -609,8 +609,8 @@
   border-radius: 2px;
 }
 
-.tkCapsuleUp { background: #0D9452; }
-.tkCapsuleDown { background: #D32F2F; }
+.tkCapsuleUp { background: var(--dia-track-up); }
+.tkCapsuleDown { background: var(--dia-track-down); }
 
 .tkTrainNo {
   font-weight: 800;
@@ -618,7 +618,7 @@
 }
 
 .tkDest {
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   opacity: 0.8;
   letter-spacing: -0.3px;
@@ -753,7 +753,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-secondary);
   white-space: nowrap;
@@ -766,9 +766,9 @@
   flex-shrink: 0;
 }
 
-.mapLegendDot[data-color="up"] { background: #0D9452; }
-.mapLegendDot[data-color="down"] { background: #D32F2F; }
-.mapLegendDot[data-color="arriving"] { background: #22C55E; }
+.mapLegendDot[data-color="up"] { background: var(--dia-track-up); }
+.mapLegendDot[data-color="down"] { background: var(--dia-track-down); }
+.mapLegendDot[data-color="arriving"] { background: var(--dia-green); }
 
 /* ── 맵 스크롤 ── */
 .mapScroll {

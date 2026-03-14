@@ -11,6 +11,71 @@
   margin-bottom: var(--dia-space-5);
 }
 
+/* ── Preview Strip ── */
+.previewSection {
+  margin-bottom: var(--dia-space-5);
+}
+
+.previewLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.previewScroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.previewScroll::-webkit-scrollbar { display: none; }
+
+.previewDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 48px;
+  padding: 8px 6px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  flex-shrink: 0;
+  transition: all var(--dia-transition-fast);
+}
+.previewDay:active { background: var(--dia-surface-hover); }
+
+.previewDayToday {
+  border-color: var(--dia-blue);
+}
+
+.previewDaySelected {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+}
+
+.previewDow {
+  font-size: 11px;
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.previewDate {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  line-height: 1;
+}
+
+.previewDia {
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  line-height: 1;
+}
+
 /* ── Date Row ── */
 .dateRow {
   display: flex;

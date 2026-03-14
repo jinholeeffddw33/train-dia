@@ -36,9 +36,21 @@ function matchesWish(dia: string, wish: WishType): boolean {
   }
 }
 
+/** 오늘 기준 14일 미리보기 배열 */
+function buildPreviewDays(): Date[] {
+  const days: Date[] = [];
+  const d = new Date();
+  for (let i = 0; i < 14; i++) {
+    days.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
 export default function ExchangeRequest() {
   const driver = useDriverStore((s) => s.current);
   const todayStr = toISODate(new Date());
+  const previewDays = useMemo(buildPreviewDays, []);
 
   const [startDate, setStartDate] = useState(todayStr);
   const [endDate, setEndDate] = useState(todayStr);
@@ -53,7 +65,7 @@ export default function ExchangeRequest() {
     if (end < start) return [];
     const dates: Date[] = [];
     const d = new Date(start);
-    while (d <= end && dates.length < 7) {
+    while (d <= end && dates.length < 8) {
       dates.push(new Date(d));
       d.setDate(d.getDate() + 1);
     }
@@ -95,9 +107,48 @@ export default function ExchangeRequest() {
 
   const wishCount = Object.keys(wishes).length;
 
+  // 미리보기 날짜 클릭 → 시작일 설정
+  const handlePreviewTap = useCallback((date: Date) => {
+    const iso = toISODate(date);
+    setStartDate(iso);
+    if (iso > endDate) setEndDate(iso);
+    setSearched(false);
+  }, [endDate]);
+
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>교체 희망</h2>
+
+      {/* 내 근무 미리보기 스트립 */}
+      {driver && (
+        <div className={styles.previewSection}>
+          <h3 className={styles.previewLabel}>내 근무 (2주)</h3>
+          <div className={styles.previewScroll}>
+            {previewDays.map((date) => {
+              const key = toISODate(date);
+              const dia = getDia(driver, date);
+              const type = getType(dia);
+              const display = getDiaDisplay(dia);
+              const isSelected = key >= startDate && key <= endDate;
+              const isToday = key === todayStr;
+
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={`${styles.previewDay} ${isSelected ? styles.previewDaySelected : ''} ${isToday ? styles.previewDayToday : ''}`}
+                  onClick={() => handlePreviewTap(date)}
+                >
+                  <span className={styles.previewDow}>{DOW[date.getDay()]}</span>
+                  <span className={styles.previewDate}>{date.getDate()}</span>
+                  <span className={`${styles.previewDia} ${styles[`dia_${type}`]}`}>{display}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
         {/* 날짜 선택 */}
         <div className={styles.dateRow}>
           <span className={styles.dateLabel}>희망일</span>

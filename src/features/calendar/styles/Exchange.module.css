@@ -234,6 +234,40 @@
   padding: var(--dia-space-8) 0;
 }
 
+/* ── Action Buttons Area ── */
+.actionBtns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-5);
+}
+
+/* ── Open Post Button ── */
+.openPostBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border-strong);
+  min-height: 48px;
+  transition: all var(--dia-transition-fast);
+}
+.openPostBtn:active { opacity: 0.85; }
+
+.openPostBtnDone {
+  background: var(--dia-green-dim);
+  color: var(--dia-green);
+  border-color: var(--dia-green);
+  opacity: 0.8;
+}
+
 /* ── Search Button ── */
 .searchBtn {
   display: flex;
@@ -248,7 +282,6 @@
   font-weight: var(--dia-weight-bold);
   border-radius: var(--dia-radius-lg);
   min-height: 48px;
-  margin-bottom: var(--dia-space-5);
   transition: opacity var(--dia-transition-fast);
 }
 .searchBtn:active { opacity: 0.85; }
@@ -708,3 +741,81 @@
   transition: all var(--dia-transition-fast);
 }
 .removeBtn:active { background: var(--dia-surface-hover); }
+
+/* ── Open Post Card ── */
+.postCardOpen {
+  border-left: 3px solid var(--dia-amber);
+}
+
+.openLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-amber);
+  background: var(--dia-amber-dim);
+  padding: 2px 8px;
+  border-radius: var(--dia-radius-sm);
+  margin-left: 4px;
+}
+
+/* ── Volunteer Button ── */
+.volunteerBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-amber);
+  color: var(--dia-text-inverse);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast);
+}
+.volunteerBtn:active { opacity: 0.85; }
+
+.volunteerBtnDone {
+  background: var(--dia-green);
+  color: white;
+  opacity: 0.8;
+}
+
+.volunteerCount {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-amber);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Volunteer List (for open post owner) ── */
+.volunteerList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+}
+
+.volunteerListLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+}
+
+.volunteerSelectBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  min-height: 32px;
+  transition: opacity var(--dia-transition-fast);
+}
+.volunteerSelectBtn:active { opacity: 0.85; }

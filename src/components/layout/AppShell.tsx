@@ -27,7 +27,12 @@ export default function AppShell({ children }: AppShellProps) {
   const driver = useDriverStore((s) => s.current);
   const exchangePosts = useExchangeStore((s) => s.posts);
   const exchangeCount = driver
-    ? exchangePosts.filter((p) => p.targetId === driver.I && p.status === 'pending').length
+    ? exchangePosts.filter((p) =>
+        p.status === 'pending' && (
+          (p.type === 'direct' && p.targetId === driver.I) ||
+          (p.type === 'open' && p.requesterId === driver.I && p.volunteers.length > 0)
+        )
+      ).length
     : 0;
 
   const handleTabChange = useCallback((tab: TabId) => {

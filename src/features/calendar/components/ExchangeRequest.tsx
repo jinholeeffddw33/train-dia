@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Calendar, Search, Send, Check, X, Trash2, Bell } from 'lucide-react';
+import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
@@ -75,7 +75,10 @@ export default function ExchangeRequest() {
 
   const posts = useExchangeStore((s) => s.posts);
   const pendingCount = driver
-    ? posts.filter((p) => p.targetId === driver.I && p.status === 'pending').length
+    ? posts.filter((p) =>
+        (p.type === 'direct' && p.targetId === driver.I && p.status === 'pending') ||
+        (p.type === 'open' && p.requesterId === driver.I && p.status === 'pending' && p.volunteers.length > 0)
+      ).length
     : 0;
 
   // 시작일~종료일 날짜 배열 (최대 7일)
@@ -128,13 +131,11 @@ export default function ExchangeRequest() {
   const wishCount = Object.keys(wishes).length;
 
   // 미리보기 날짜 클릭: 2탭 범위 선택
-  // 첫 탭 = 시작일(+종료일 리셋), 두 번째 탭 = 종료일 확정
   const [pickPhase, setPickPhase] = useState<'start' | 'end'>('start');
 
   const handlePreviewTap = useCallback((date: Date) => {
     const iso = toISODate(date);
 
-    // 이미 선택된 범위의 시작일을 다시 탭 → 선택 해제
     if (iso === startDate && startDate === endDate) {
       setStartDate(todayStr);
       setEndDate(todayStr);
@@ -148,7 +149,6 @@ export default function ExchangeRequest() {
       setEndDate(iso);
       setPickPhase('end');
     } else {
-      // 같은 날짜 다시 탭 → 1일만 선택 확정
       if (iso === startDate) {
         setPickPhase('start');
       } else if (iso < startDate) {
@@ -250,6 +250,49 @@ function SearchView({
   searched, handleSearch, wishCount, handlePreviewTap,
   dateRange, matchResults, pickPhase,
 }: SearchViewProps) {
+  const addPost = useExchangeStore((s) => s.addPost);
+  const posts = useExchangeStore((s) => s.posts);
+  const [openPosted, setOpenPosted] = useState(false);
+
+  // 이미 같은 날짜로 전체 공지를 올렸는지
+  const alreadyOpenPosted = useMemo(() => {
+    if (!driver || dateRange.length === 0) return false;
+    const dateKeys = dateRange.map(toISODate);
+    return posts.some(
+      (p) =>
+        p.type === 'open' &&
+        p.requesterId === driver.I &&
+        p.status === 'pending' &&
+        JSON.stringify(p.dates) === JSON.stringify(dateKeys),
+    );
+  }, [posts, driver, dateRange]);
+
+  const handleOpenPost = () => {
+    if (!driver || dateRange.length === 0 || alreadyOpenPosted || openPosted) return;
+
+    const dates = dateRange.map(toISODate);
+    const requesterDias: Record<string, string> = {};
+    dateRange.forEach((date) => {
+      const key = toISODate(date);
+      requesterDias[key] = getDiaDisplay(getDia(driver, date));
+    });
+
+    addPost({
+      type: 'open',
+      requesterId: driver.I,
+      requesterName: driver.n,
+      targetId: '',
+      targetName: '',
+      dates,
+      requesterDias,
+      targetDias: {},
+      memo,
+    });
+    setOpenPosted(true);
+  };
+
+  const isOpenDone = openPosted || alreadyOpenPosted;
+
   return (
     <>
       {/* 내 근무 미리보기 스트립 */}
@@ -355,16 +398,53 @@ function SearchView({
         <p className={styles.hint}>시작일과 종료일을 선택하세요</p>
       )}
 
-      {/* 검색 버튼 */}
-      {wishCount > 0 && (
-        <button
-          type="button"
-          className={styles.searchBtn}
-          onClick={handleSearch}
-        >
-          <Search size={18} />
-          매칭되는 기관사 찾기
-        </button>
+      {/* 메모 */}
+      <div className={styles.memoSection}>
+        <h3 className={styles.sectionTitle}>메모</h3>
+        <textarea
+          className={styles.memoInput}
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+          placeholder="교체 사유나 참고 사항을 적어주세요"
+          rows={3}
+        />
+      </div>
+
+      {/* 액션 버튼 영역 */}
+      {dateRange.length > 0 && driver && (
+        <div className={styles.actionBtns}>
+          {/* 전체 공지 올리기 */}
+          <button
+            type="button"
+            className={`${styles.openPostBtn} ${isOpenDone ? styles.openPostBtnDone : ''}`}
+            onClick={handleOpenPost}
+            disabled={isOpenDone}
+          >
+            {isOpenDone ? (
+              <>
+                <Check size={18} />
+                전체 공지 등록됨
+              </>
+            ) : (
+              <>
+                <Megaphone size={18} />
+                전체 공지 올리기
+              </>
+            )}
+          </button>
+
+          {/* 매칭 검색 */}
+          {wishCount > 0 && (
+            <button
+              type="button"
+              className={styles.searchBtn}
+              onClick={handleSearch}
+            >
+              <Search size={18} />
+              매칭되는 기관사 찾기
+            </button>
+          )}
+        </div>
       )}
 
       {/* 매칭 결과 */}
@@ -390,23 +470,11 @@ function SearchView({
           )}
         </div>
       )}
-
-      {/* 메모 */}
-      <div className={styles.memoSection}>
-        <h3 className={styles.sectionTitle}>메모</h3>
-        <textarea
-          className={styles.memoInput}
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="교체 사유나 참고 사항을 적어주세요"
-          rows={3}
-        />
-      </div>
     </>
   );
 }
 
-/* ─── 매칭 카드 ─── */
+/* ─── 매칭 카드 (1:1 요청) ─── */
 function MatchCard({
   person,
   dateRange,
@@ -422,12 +490,12 @@ function MatchCard({
   const posts = useExchangeStore((s) => s.posts);
   const [sent, setSent] = useState(false);
 
-  // 이미 같은 대상에게 같은 날짜로 보낸 요청이 있는지
   const alreadySent = useMemo(() => {
     if (!driver) return false;
     const dateKeys = dateRange.map(toISODate);
     return posts.some(
       (p) =>
+        p.type === 'direct' &&
         p.requesterId === driver.I &&
         p.targetId === person.I &&
         p.status === 'pending' &&
@@ -449,6 +517,7 @@ function MatchCard({
     });
 
     addPost({
+      type: 'direct',
       requesterId: driver.I,
       requesterName: driver.n,
       targetId: person.I,
@@ -512,27 +581,42 @@ function BoardView({ driver }: { driver: Person | null }) {
   const accept = useExchangeStore((s) => s.accept);
   const decline = useExchangeStore((s) => s.decline);
   const remove = useExchangeStore((s) => s.remove);
+  const volunteerFn = useExchangeStore((s) => s.volunteer);
+  const acceptVolunteer = useExchangeStore((s) => s.acceptVolunteer);
 
-  // 나에게 온 요청 (대기 중)
+  // 나에게 온 1:1 요청 (대기 중)
   const incoming = useMemo(
     () =>
       driver
-        ? posts.filter((p) => p.targetId === driver.I && p.status === 'pending')
+        ? posts.filter((p) => p.type === 'direct' && p.targetId === driver.I && p.status === 'pending')
         : [],
     [posts, driver],
   );
 
-  // 내가 보낸 요청
+  // 내가 보낸 요청 (1:1 + open 모두)
   const outgoing = useMemo(
     () => (driver ? posts.filter((p) => p.requesterId === driver.I) : []),
     [posts, driver],
   );
 
-  // 전체 게시글 (나 제외, 대기 중만)
-  const allPending = useMemo(
+  // 전체 공지 (내 것 제외, 대기 중)
+  const openPosts = useMemo(
     () =>
       posts.filter(
         (p) =>
+          p.type === 'open' &&
+          p.status === 'pending' &&
+          (!driver || p.requesterId !== driver.I),
+      ),
+    [posts, driver],
+  );
+
+  // 기타 1:1 (나와 무관, 대기 중)
+  const otherDirect = useMemo(
+    () =>
+      posts.filter(
+        (p) =>
+          p.type === 'direct' &&
           p.status === 'pending' &&
           (!driver || (p.requesterId !== driver.I && p.targetId !== driver.I)),
       ),
@@ -543,7 +627,7 @@ function BoardView({ driver }: { driver: Person | null }) {
     return <p className={styles.hint}>기관사를 선택하면 게시판을 볼 수 있어요</p>;
   }
 
-  const isEmpty = incoming.length === 0 && outgoing.length === 0 && allPending.length === 0;
+  const isEmpty = incoming.length === 0 && outgoing.length === 0 && openPosts.length === 0 && otherDirect.length === 0;
 
   return (
     <div className={styles.boardContainer}>
@@ -551,11 +635,11 @@ function BoardView({ driver }: { driver: Person | null }) {
         <div className={styles.emptyBoard}>
           <Bell size={32} className={styles.emptyIcon} />
           <p>아직 교체 요청이 없어요</p>
-          <p className={styles.emptyHint}>매칭 검색에서 원하는 기관사에게 요청을 보내보세요</p>
+          <p className={styles.emptyHint}>매칭 검색에서 요청을 보내거나 전체 공지를 올려보세요</p>
         </div>
       )}
 
-      {/* 나에게 온 요청 */}
+      {/* 나에게 온 1:1 요청 */}
       {incoming.length > 0 && (
         <section className={styles.boardSection}>
           <h3 className={styles.boardSectionTitle}>
@@ -591,6 +675,50 @@ function BoardView({ driver }: { driver: Person | null }) {
         </section>
       )}
 
+      {/* 전체 공지 */}
+      {openPosts.length > 0 && (
+        <section className={styles.boardSection}>
+          <h3 className={styles.boardSectionTitle}>
+            <Megaphone size={16} />
+            전체 공지
+          </h3>
+          <div className={styles.boardList}>
+            {openPosts.map((post) => {
+              const alreadyVolunteered = post.volunteers.some((v) => v.id === driver.I);
+              return (
+                <PostCard key={post.id} post={post} variant="public">
+                  <div className={styles.postActions}>
+                    <button
+                      type="button"
+                      className={`${styles.volunteerBtn} ${alreadyVolunteered ? styles.volunteerBtnDone : ''}`}
+                      onClick={() => volunteerFn(post.id, driver.I, driver.n)}
+                      disabled={alreadyVolunteered}
+                    >
+                      {alreadyVolunteered ? (
+                        <>
+                          <Check size={14} />
+                          지원 완료
+                        </>
+                      ) : (
+                        <>
+                          <Hand size={14} />
+                          교체 가능
+                        </>
+                      )}
+                    </button>
+                    {post.volunteers.length > 0 && (
+                      <span className={styles.volunteerCount}>
+                        {post.volunteers.length}명 지원
+                      </span>
+                    )}
+                  </div>
+                </PostCard>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* 내가 보낸 요청 */}
       {outgoing.length > 0 && (
         <section className={styles.boardSection}>
@@ -599,20 +727,46 @@ function BoardView({ driver }: { driver: Person | null }) {
             {outgoing.map((post) => (
               <PostCard key={post.id} post={post} variant="outgoing">
                 <div className={styles.postActions}>
-                  <span className={`${styles.statusBadge} ${styles[`status_${post.status}`]}`}>
-                    {post.status === 'pending' && '대기 중'}
-                    {post.status === 'accepted' && '수락됨'}
-                    {post.status === 'declined' && '거절됨'}
-                  </span>
-                  {post.status !== 'pending' && (
-                    <button
-                      type="button"
-                      className={styles.removeBtn}
-                      onClick={() => remove(post.id)}
-                      aria-label="삭제"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                  {post.type === 'open' && post.status === 'pending' && post.volunteers.length > 0 ? (
+                    /* open 공지에 지원자가 있으면 선택 UI */
+                    <div className={styles.volunteerList}>
+                      <span className={styles.volunteerListLabel}>
+                        {post.volunteers.length}명 지원:
+                      </span>
+                      {post.volunteers.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          className={styles.volunteerSelectBtn}
+                          onClick={() => acceptVolunteer(post.id, v.id)}
+                        >
+                          <Check size={12} />
+                          {v.name}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <span className={`${styles.statusBadge} ${styles[`status_${post.status}`]}`}>
+                        {post.status === 'pending' && (post.type === 'open' ? '지원자 대기' : '대기 중')}
+                        {post.status === 'accepted' && (
+                          post.type === 'open' && post.acceptedVolunteerId
+                            ? `${post.volunteers.find((v) => v.id === post.acceptedVolunteerId)?.name || ''} 수락`
+                            : '수락됨'
+                        )}
+                        {post.status === 'declined' && '거절됨'}
+                      </span>
+                      {post.status !== 'pending' && (
+                        <button
+                          type="button"
+                          className={styles.removeBtn}
+                          onClick={() => remove(post.id)}
+                          aria-label="삭제"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               </PostCard>
@@ -621,12 +775,12 @@ function BoardView({ driver }: { driver: Person | null }) {
         </section>
       )}
 
-      {/* 전체 게시판 */}
-      {allPending.length > 0 && (
+      {/* 기타 1:1 요청 */}
+      {otherDirect.length > 0 && (
         <section className={styles.boardSection}>
-          <h3 className={styles.boardSectionTitle}>전체 교체 요청</h3>
+          <h3 className={styles.boardSectionTitle}>다른 교체 요청</h3>
           <div className={styles.boardList}>
-            {allPending.map((post) => (
+            {otherDirect.map((post) => (
               <PostCard key={post.id} post={post} variant="public" />
             ))}
           </div>
@@ -646,31 +800,57 @@ function PostCard({
   variant: 'incoming' | 'outgoing' | 'public';
   children?: React.ReactNode;
 }) {
+  const isOpen = post.type === 'open';
+
   return (
-    <div className={`${styles.postCard} ${variant === 'incoming' ? styles.postCardIncoming : ''}`}>
+    <div className={`${styles.postCard} ${variant === 'incoming' ? styles.postCardIncoming : ''} ${isOpen ? styles.postCardOpen : ''}`}>
       <div className={styles.postHeader}>
-        <div className={styles.postAvatars}>
-          <span className={styles.postAvatar}>{post.requesterName[0]}</span>
-          <span className={styles.postArrow}>→</span>
-          <span className={`${styles.postAvatar} ${styles.postAvatarTarget}`}>
-            {post.targetName[0]}
-          </span>
-        </div>
-        <div className={styles.postNames}>
-          <span className={styles.postRequester}>{post.requesterName}</span>
-          <span className={styles.postArrowText}>→</span>
-          <span className={styles.postTarget}>{post.targetName}</span>
-        </div>
+        {isOpen ? (
+          /* 전체 공지: 요청자만 표시 */
+          <>
+            <span className={styles.postAvatar}>{post.requesterName[0]}</span>
+            <div className={styles.postNames}>
+              <span className={styles.postRequester}>{post.requesterName}</span>
+              <span className={styles.openLabel}>전체 공지</span>
+            </div>
+          </>
+        ) : (
+          /* 1:1 요청: 요청자 → 대상자 */
+          <>
+            <div className={styles.postAvatars}>
+              <span className={styles.postAvatar}>{post.requesterName[0]}</span>
+              <span className={styles.postArrow}>→</span>
+              <span className={`${styles.postAvatar} ${styles.postAvatarTarget}`}>
+                {post.targetName[0]}
+              </span>
+            </div>
+            <div className={styles.postNames}>
+              <span className={styles.postRequester}>{post.requesterName}</span>
+              <span className={styles.postArrowText}>→</span>
+              <span className={styles.postTarget}>{post.targetName}</span>
+            </div>
+          </>
+        )}
         <span className={styles.postTime}>{timeAgo(post.createdAt)}</span>
       </div>
 
-      {/* 교번 비교 */}
+      {/* 교번 표시 */}
       <div className={styles.postDias}>
         {post.dates.map((dateStr) => {
           const date = fromISODate(dateStr);
           const rDia = post.requesterDias[dateStr];
-          const tDia = post.targetDias[dateStr];
           const rType = getType(rDia || '');
+
+          if (isOpen) {
+            return (
+              <div key={dateStr} className={styles.postDiaCol}>
+                <span className={styles.postDiaDate}>{formatShort(date)}</span>
+                <span className={`${styles.postDiaValue} ${styles[`dia_${rType}`]}`}>{rDia}</span>
+              </div>
+            );
+          }
+
+          const tDia = post.targetDias[dateStr];
           const tType = getType(tDia || '');
           return (
             <div key={dateStr} className={styles.postDiaCol}>

@@ -3,19 +3,21 @@ import { persist } from 'zustand/middleware';
 
 export interface ExchangePost {
   id: string;
+  /** 게시글 타입: direct=1:1 요청, open=전체 공지 */
+  type: 'direct' | 'open';
   /** 요청자 ID (Person.I) */
   requesterId: string;
   /** 요청자 이름 */
   requesterName: string;
-  /** 대상자 ID (Person.I) */
+  /** 대상자 ID — direct일 때만 */
   targetId: string;
-  /** 대상자 이름 */
+  /** 대상자 이름 — direct일 때만 */
   targetName: string;
   /** 교체 날짜들 (ISO date strings) */
   dates: string[];
   /** 요청자의 해당 날짜 교번 */
   requesterDias: Record<string, string>;
-  /** 대상자의 해당 날짜 교번 */
+  /** 대상자의 해당 날짜 교번 — direct일 때만 */
   targetDias: Record<string, string>;
   /** 메모 */
   memo: string;
@@ -23,19 +25,26 @@ export interface ExchangePost {
   status: 'pending' | 'accepted' | 'declined';
   /** 생성 시간 */
   createdAt: string;
+  /** open 공지에 응답한 사람들 */
+  volunteers: Array<{ id: string; name: string }>;
+  /** open 공지에서 최종 수락된 사람 */
+  acceptedVolunteerId?: string;
 }
 
 interface ExchangeStore {
   posts: ExchangePost[];
-  /** 게시글 추가 */
-  addPost: (post: Omit<ExchangePost, 'id' | 'status' | 'createdAt'>) => void;
-  /** 수락 */
+  addPost: (post: Omit<ExchangePost, 'id' | 'status' | 'createdAt' | 'volunteers' | 'acceptedVolunteerId'>) => void;
+  /** 1:1 수락 */
   accept: (id: string) => void;
-  /** 거절 */
+  /** 1:1 거절 */
   decline: (id: string) => void;
-  /** 삭제 (본인 게시글만) */
+  /** 삭제 */
   remove: (id: string) => void;
-  /** 특정 기관사에게 온 대기 요청 수 */
+  /** open 공지에 지원 */
+  volunteer: (postId: string, personId: string, personName: string) => void;
+  /** open 공지 지원자 수락 */
+  acceptVolunteer: (postId: string, volunteerId: string) => void;
+  /** 특정 기관사에게 온 대기 요청 수 (direct만) */
   pendingCountFor: (personId: string) => number;
 }
 
@@ -52,6 +61,7 @@ export const useExchangeStore = create<ExchangeStore>()(
           id: String(counter++),
           status: 'pending',
           createdAt: new Date().toISOString(),
+          volunteers: [],
         };
         set((s) => ({ posts: [post, ...s.posts] }));
       },
@@ -76,9 +86,29 @@ export const useExchangeStore = create<ExchangeStore>()(
         set((s) => ({ posts: s.posts.filter((p) => p.id !== id) }));
       },
 
+      volunteer: (postId, personId, personName) => {
+        set((s) => ({
+          posts: s.posts.map((p) => {
+            if (p.id !== postId) return p;
+            if (p.volunteers.some((v) => v.id === personId)) return p;
+            return { ...p, volunteers: [...p.volunteers, { id: personId, name: personName }] };
+          }),
+        }));
+      },
+
+      acceptVolunteer: (postId, volunteerId) => {
+        set((s) => ({
+          posts: s.posts.map((p) =>
+            p.id === postId
+              ? { ...p, status: 'accepted' as const, acceptedVolunteerId: volunteerId }
+              : p,
+          ),
+        }));
+      },
+
       pendingCountFor: (personId) => {
         return get().posts.filter(
-          (p) => p.targetId === personId && p.status === 'pending',
+          (p) => p.type === 'direct' && p.targetId === personId && p.status === 'pending',
         ).length;
       },
     }),

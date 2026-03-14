@@ -265,7 +265,7 @@
 /* ── Exchange FAB ── */
 .exchangeFab {
   position: fixed;
-  bottom: calc(80px + env(safe-area-inset-bottom));
+  bottom: calc(var(--dia-tab-height) + env(safe-area-inset-bottom) + 72px);
   right: var(--dia-space-4);
   width: 52px;
   height: 52px;

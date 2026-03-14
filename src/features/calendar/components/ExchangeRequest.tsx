@@ -127,17 +127,45 @@ export default function ExchangeRequest() {
 
   const wishCount = Object.keys(wishes).length;
 
-  // 미리보기 날짜 클릭
+  // 미리보기 날짜 클릭: 2탭 범위 선택
+  // 첫 탭 = 시작일(+종료일 리셋), 두 번째 탭 = 종료일 확정
+  const [pickPhase, setPickPhase] = useState<'start' | 'end'>('start');
+
   const handlePreviewTap = useCallback((date: Date) => {
     const iso = toISODate(date);
-    setStartDate(iso);
-    if (iso > endDate) setEndDate(iso);
+
+    // 이미 선택된 범위의 시작일을 다시 탭 → 선택 해제
+    if (iso === startDate && startDate === endDate) {
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+      setPickPhase('start');
+      setSearched(false);
+      return;
+    }
+
+    if (pickPhase === 'start') {
+      setStartDate(iso);
+      setEndDate(iso);
+      setPickPhase('end');
+    } else {
+      // 같은 날짜 다시 탭 → 1일만 선택 확정
+      if (iso === startDate) {
+        setPickPhase('start');
+      } else if (iso < startDate) {
+        setEndDate(startDate);
+        setStartDate(iso);
+        setPickPhase('start');
+      } else {
+        setEndDate(iso);
+        setPickPhase('start');
+      }
+    }
     setSearched(false);
-  }, [endDate]);
+  }, [pickPhase, startDate, endDate, todayStr]);
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.pageTitle}>교체 희망</h2>
+      <h2 className={styles.pageTitle}>교번 교체</h2>
 
       {/* 서브 탭 */}
       <div className={styles.subTabs} role="tablist" aria-label="교체 탭">
@@ -185,6 +213,7 @@ export default function ExchangeRequest() {
           handlePreviewTap={handlePreviewTap}
           dateRange={dateRange}
           matchResults={matchResults}
+          pickPhase={pickPhase}
         />
       ) : (
         <BoardView driver={driver} />
@@ -212,20 +241,26 @@ interface SearchViewProps {
   handlePreviewTap: (d: Date) => void;
   dateRange: Date[];
   matchResults: Person[];
+  pickPhase: 'start' | 'end';
 }
 
 function SearchView({
   driver, todayStr, previewDays, startDate, endDate,
   setStartDate, setEndDate, wishes, handleWish, memo, setMemo,
   searched, handleSearch, wishCount, handlePreviewTap,
-  dateRange, matchResults,
+  dateRange, matchResults, pickPhase,
 }: SearchViewProps) {
   return (
     <>
       {/* 내 근무 미리보기 스트립 */}
       {driver && (
         <div className={styles.previewSection}>
-          <h3 className={styles.previewLabel}>내 근무 (2주)</h3>
+          <h3 className={styles.previewLabel}>
+            내 근무 (2주)
+            <span className={styles.pickHint}>
+              {pickPhase === 'start' ? '시작일을 선택하세요' : '종료일을 선택하세요'}
+            </span>
+          </h3>
           <div className={styles.previewScroll}>
             {previewDays.map((date) => {
               const key = toISODate(date);

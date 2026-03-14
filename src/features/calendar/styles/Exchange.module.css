@@ -17,10 +17,19 @@
 }
 
 .previewLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
   margin-bottom: var(--dia-space-2);
+}
+
+.pickHint {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-blue);
 }
 
 .previewScroll {

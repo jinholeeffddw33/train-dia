@@ -4,7 +4,7 @@ import { useState } from 'react';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DriverSelector, HomeTipsQuiz } from '@/features/home';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, HomeTipsQuiz } from '@/features/home';
 import { CalendarTab } from '@/features/calendar';
 import { ContactsTab } from '@/features/contacts';
 import { DutyTab } from '@/features/duty';
@@ -31,14 +31,11 @@ function TabContent({ tab }: { tab: TabId }) {
 }
 
 function HomeTab() {
-  const [selectorOpen, setSelectorOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   return (
     <>
-      <HomeHeader
-        onDriverSelect={() => setSelectorOpen(true)}
-      />
+      <HomeHeader />
       <WeekStrip
         selectedDate={selectedDate}
         onSelectDate={(date) => setSelectedDate(date || undefined)}
@@ -47,10 +44,6 @@ function HomeTab() {
       <StatusCards baseDate={selectedDate} />
       <MonthSummary />
       <HomeTipsQuiz />
-      <DriverSelector
-        open={selectorOpen}
-        onClose={() => setSelectorOpen(false)}
-      />
     </>
   );
 }

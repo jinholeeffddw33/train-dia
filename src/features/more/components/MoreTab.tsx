@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, ChevronRight, X } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, ChevronRight, X, UserRoundPen } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -9,6 +9,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab } from '@/features/compare';
+import { DriverSelector } from '@/features/home';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
@@ -19,21 +20,28 @@ export default function MoreTab() {
   const [commuteOpen, setCommuteOpen] = useState(false);
   const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>설정</h2>
 
       {/* 현재 기관사 */}
-      {driver && (
-        <div className={styles.driverCard}>
-          <div className={styles.driverAvatar}>{driver.n[0]}</div>
-          <div className={styles.driverInfo}>
-            <span className={styles.driverNameText}>{driver.n}</span>
-            <span className={styles.driverNumText}>답십리 승무사업소</span>
-          </div>
+      <button
+        type="button"
+        className={styles.driverCard}
+        onClick={() => setDriverOpen(true)}
+        aria-label="기관사 변경"
+      >
+        <div className={styles.driverAvatar}>
+          {driver ? driver.n[0] : <UserRoundPen size={20} />}
         </div>
-      )}
+        <div className={styles.driverInfo}>
+          <span className={styles.driverNameText}>{driver ? driver.n : '기관사 선택'}</span>
+          <span className={styles.driverNumText}>답십리 승무사업소</span>
+        </div>
+        <ChevronRight size={18} className={styles.toolArrow} />
+      </button>
 
       {/* 도구 섹션 */}
       <section className={styles.section}>
@@ -156,6 +164,12 @@ export default function MoreTab() {
           <span className={styles.settingValue}>v2.0.0</span>
         </div>
       </section>
+
+      {/* 기관사 선택 모달 */}
+      <DriverSelector
+        open={driverOpen}
+        onClose={() => setDriverOpen(false)}
+      />
 
       {/* 모달 오버레이 */}
       <CommuteOverlay

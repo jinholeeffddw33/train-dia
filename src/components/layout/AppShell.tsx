@@ -6,6 +6,8 @@ import ToastContainer from '../common/Toast';
 import { AlertFab } from '@/features/alerts';
 import { useAlertStore } from '@/stores/alert';
 import { useTrainStore } from '@/stores/train';
+import { useExchangeStore } from '@/stores/exchange';
+import { useDriverStore } from '@/stores/driver';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
 import styles from './AppShell.module.css';
@@ -22,6 +24,11 @@ export default function AppShell({ children }: AppShellProps) {
   const [installDismissed, setInstallDismissed] = useState(false);
 
   const triggerScroll = useTrainStore((s) => s.triggerScroll);
+  const driver = useDriverStore((s) => s.current);
+  const exchangePosts = useExchangeStore((s) => s.posts);
+  const exchangeCount = driver
+    ? exchangePosts.filter((p) => p.targetId === driver.I && p.status === 'pending').length
+    : 0;
 
   const handleTabChange = useCallback((tab: TabId) => {
     if (tab === 'line') triggerScroll();
@@ -63,6 +70,7 @@ export default function AppShell({ children }: AppShellProps) {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         alertCount={alertCount}
+        exchangeCount={exchangeCount}
       />
       <AlertFab />
       <ToastContainer />

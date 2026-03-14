@@ -25,9 +25,10 @@ interface TabBarProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
   alertCount?: number;
+  exchangeCount?: number;
 }
 
-export default function TabBar({ activeTab, onTabChange, alertCount = 0 }: TabBarProps) {
+export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchangeCount = 0 }: TabBarProps) {
   return (
     <nav className={styles.tabBar} role="tablist" aria-label="메인 내비게이션">
       {TABS.map((tab) => {
@@ -47,6 +48,11 @@ export default function TabBar({ activeTab, onTabChange, alertCount = 0 }: TabBa
             {tab.id === 'home' && alertCount > 0 && (
               <span className={styles.badge} aria-label={`알림 ${alertCount}개`}>
                 {alertCount > 9 ? '9+' : alertCount}
+              </span>
+            )}
+            {tab.id === 'exchange' && exchangeCount > 0 && (
+              <span className={styles.badge} aria-label={`교체 요청 ${exchangeCount}개`}>
+                {exchangeCount > 9 ? '9+' : exchangeCount}
               </span>
             )}
             {isActive && <span className={styles.tabIndicator} />}

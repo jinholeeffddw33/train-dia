@@ -349,3 +349,353 @@
 .memoInput::placeholder {
   color: var(--dia-text-tertiary);
 }
+
+/* ── Sub Tabs ── */
+.subTabs {
+  display: flex;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-5);
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-lg);
+  padding: 4px;
+  border: 1px solid var(--dia-border);
+}
+
+.subTab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: all var(--dia-transition-fast);
+  position: relative;
+}
+
+.subTabActive {
+  background: var(--dia-blue);
+  color: white;
+}
+
+.subTabBadge {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red);
+  color: white;
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ── Send Button (MatchCard) ── */
+.sendBtn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: white;
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  min-height: 36px;
+  transition: all var(--dia-transition-fast);
+}
+.sendBtn:active { opacity: 0.85; }
+
+.sendBtnSent {
+  background: var(--dia-green);
+  opacity: 0.8;
+}
+.sendBtnSent:active { opacity: 0.8; }
+
+/* ── Board View ── */
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+}
+
+.emptyBoard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-12) var(--dia-space-4);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-base);
+}
+
+.emptyIcon {
+  opacity: 0.4;
+}
+
+.emptyHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  opacity: 0.7;
+}
+
+.boardSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.boardSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.boardBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red);
+  color: white;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  line-height: 1;
+}
+
+.boardList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+/* ── Post Card ── */
+.postCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.postCardIncoming {
+  border-color: var(--dia-blue);
+  box-shadow: var(--dia-shadow-glow-blue);
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
+}
+
+.postAvatars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.postAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  flex-shrink: 0;
+}
+
+.postAvatarTarget {
+  background: var(--dia-purple-dim);
+  color: var(--dia-purple);
+}
+
+.postArrow {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.postNames {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.postRequester {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+}
+
+.postArrowText {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.postTarget {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-purple);
+  white-space: nowrap;
+}
+
+.postTime {
+  margin-left: auto;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Post Dias Comparison ── */
+.postDias {
+  display: flex;
+  gap: var(--dia-space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.postDias::-webkit-scrollbar { display: none; }
+
+.postDiaCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 56px;
+  flex-shrink: 0;
+}
+
+.postDiaDate {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+}
+
+.postDiaValue {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+
+.postDiaSwap {
+  font-size: 10px;
+  color: var(--dia-text-tertiary);
+  opacity: 0.5;
+}
+
+.postMemo {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-sm);
+  line-height: var(--dia-leading-normal);
+}
+
+/* ── Post Actions ── */
+.postActions {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding-top: var(--dia-space-2);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.acceptBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-blue);
+  color: white;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast);
+}
+.acceptBtn:active { opacity: 0.85; }
+
+.declineBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast);
+}
+.declineBtn:active { opacity: 0.85; }
+
+/* ── Status Badge ── */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  border-radius: var(--dia-radius-sm);
+}
+
+.status_pending {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber);
+}
+
+.status_accepted {
+  background: var(--dia-green-dim);
+  color: var(--dia-green);
+}
+
+.status_declined {
+  background: var(--dia-red-dim);
+  color: var(--dia-red);
+}
+
+.removeBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-sm);
+  transition: all var(--dia-transition-fast);
+}
+.removeBtn:active { background: var(--dia-surface-hover); }

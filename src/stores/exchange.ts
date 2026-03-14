@@ -23,6 +23,8 @@ export interface ExchangePost {
   memo: string;
   /** 상태 */
   status: 'pending' | 'accepted' | 'declined';
+  /** 거절 사유 (선택) */
+  declineReason?: string;
   /** 생성 시간 */
   createdAt: string;
   /** open 공지에 응답한 사람들 */
@@ -36,8 +38,8 @@ interface ExchangeStore {
   addPost: (post: Omit<ExchangePost, 'id' | 'status' | 'createdAt' | 'volunteers' | 'acceptedVolunteerId'>) => void;
   /** 1:1 수락 */
   accept: (id: string) => void;
-  /** 1:1 거절 */
-  decline: (id: string) => void;
+  /** 1:1 거절 (사유 선택) */
+  decline: (id: string, reason?: string) => void;
   /** 삭제 */
   remove: (id: string) => void;
   /** open 공지에 지원 */
@@ -74,10 +76,10 @@ export const useExchangeStore = create<ExchangeStore>()(
         }));
       },
 
-      decline: (id) => {
+      decline: (id, reason) => {
         set((s) => ({
           posts: s.posts.map((p) =>
-            p.id === id ? { ...p, status: 'declined' as const } : p,
+            p.id === id ? { ...p, status: 'declined' as const, declineReason: reason } : p,
           ),
         }));
       },

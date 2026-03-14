@@ -819,3 +819,167 @@
   transition: opacity var(--dia-transition-fast);
 }
 .volunteerSelectBtn:active { opacity: 0.85; }
+
+/* ── Cancel Button (outgoing pending) ── */
+.cancelBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-red);
+  background: var(--dia-red-dim);
+  border: 1px solid transparent;
+  border-radius: var(--dia-radius-md);
+  min-height: 32px;
+  transition: all var(--dia-transition-fast);
+}
+.cancelBtn:active { opacity: 0.85; }
+
+/* ── Guidance Text (after accepted) ── */
+.guidanceText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-blue);
+  background: var(--dia-blue-dim);
+  padding: 6px 10px;
+  border-radius: var(--dia-radius-sm);
+  line-height: var(--dia-leading-normal);
+}
+
+/* ── Decline Reason Text ── */
+.declineReasonText {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-medium);
+}
+
+/* ── Confirm Dialog ── */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--dia-space-4);
+}
+
+.confirmDialog {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-5);
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.confirmTitle {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.confirmMessage {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-normal);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+
+.confirmCancelBtn {
+  flex: 1;
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface-hover);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast);
+}
+.confirmCancelBtn:active { opacity: 0.85; }
+
+.confirmOkBtn {
+  flex: 1;
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast);
+}
+.confirmOkBtn:active { opacity: 0.85; }
+
+.confirmOkBtnDanger {
+  background: var(--dia-red);
+}
+
+/* ── Decline Reason Section ── */
+.declineReasonSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.declineReasonLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+}
+
+.declineReasonOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.declineReasonBtn {
+  padding: 6px 12px;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+  min-height: 32px;
+  transition: all var(--dia-transition-fast);
+}
+.declineReasonBtn:active { background: var(--dia-surface-hover); }
+
+.declineReasonBtnActive {
+  background: var(--dia-red-dim);
+  color: var(--dia-red);
+  border-color: var(--dia-red);
+}
+
+.customReasonInput {
+  width: 100%;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+.customReasonInput::placeholder {
+  color: var(--dia-text-tertiary);
+}
+.customReasonInput:focus {
+  border-color: var(--dia-blue);
+  outline: none;
+}

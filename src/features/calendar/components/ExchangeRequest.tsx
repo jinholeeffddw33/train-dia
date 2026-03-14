@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand } from 'lucide-react';
+import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand, Info } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
+import { showToast } from '@/components/common/Toast';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import { P } from '@/data/cycle';
@@ -74,10 +75,14 @@ export default function ExchangeRequest() {
   const [searched, setSearched] = useState(false);
 
   const posts = useExchangeStore((s) => s.posts);
+  // 게시판 배지: 나에게 온 요청 + 내가 올린 대기 중 게시물
   const pendingCount = driver
     ? posts.filter((p) =>
-        (p.type === 'direct' && p.targetId === driver.I && p.status === 'pending') ||
-        (p.type === 'open' && p.requesterId === driver.I && p.status === 'pending' && p.volunteers.length > 0)
+        p.status === 'pending' && (
+          (p.type === 'direct' && p.targetId === driver.I) ||
+          (p.type === 'open' && p.requesterId === driver.I && p.volunteers.length > 0) ||
+          (p.type === 'direct' && p.requesterId === driver.I)
+        )
       ).length
     : 0;
 
@@ -289,6 +294,7 @@ function SearchView({
       memo,
     });
     setOpenPosted(true);
+    showToast('전체 공지가 등록되었어요', 'success');
   };
 
   const isOpenDone = openPosted || alreadyOpenPosted;
@@ -528,6 +534,7 @@ function MatchCard({
       memo,
     });
     setSent(true);
+    showToast(`${person.n}에게 교체 요청을 보냈어요`, 'success');
   };
 
   const isSent = sent || alreadySent;
@@ -575,6 +582,23 @@ function MatchCard({
   );
 }
 
+/* ─── 거절 사유 선택지 ─── */
+const DECLINE_REASONS = [
+  '일정이 맞지 않아요',
+  '개인 사정이 있어요',
+  '이미 다른 교체가 진행 중이에요',
+  '직접 입력',
+] as const;
+
+/* ─── 확인 다이얼로그 상태 타입 ─── */
+interface ConfirmState {
+  type: 'accept' | 'decline' | 'cancel' | 'acceptVolunteer';
+  postId: string;
+  volunteerId?: string;
+  volunteerName?: string;
+  requesterName?: string;
+}
+
 /* ─── 게시판 뷰 ─── */
 function BoardView({ driver }: { driver: Person | null }) {
   const posts = useExchangeStore((s) => s.posts);
@@ -583,6 +607,58 @@ function BoardView({ driver }: { driver: Person | null }) {
   const remove = useExchangeStore((s) => s.remove);
   const volunteerFn = useExchangeStore((s) => s.volunteer);
   const acceptVolunteer = useExchangeStore((s) => s.acceptVolunteer);
+
+  // 확인 다이얼로그
+  const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+  // 거절 사유
+  const [declineReason, setDeclineReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
+  const [showDeclineForm, setShowDeclineForm] = useState(false);
+
+  const handleConfirmAction = useCallback(() => {
+    if (!confirm) return;
+
+    switch (confirm.type) {
+      case 'accept':
+        accept(confirm.postId);
+        showToast('교체 요청을 수락했어요', 'success');
+        break;
+      case 'decline': {
+        const reason = declineReason === '직접 입력' ? customReason : declineReason;
+        decline(confirm.postId, reason || undefined);
+        showToast('교체 요청을 거절했어요', 'info');
+        break;
+      }
+      case 'cancel':
+        remove(confirm.postId);
+        showToast('요청을 취소했어요', 'info');
+        break;
+      case 'acceptVolunteer':
+        if (confirm.volunteerId) {
+          acceptVolunteer(confirm.postId, confirm.volunteerId);
+          showToast(`${confirm.volunteerName || '지원자'}를 수락했어요`, 'success');
+        }
+        break;
+    }
+
+    setConfirm(null);
+    setDeclineReason('');
+    setCustomReason('');
+    setShowDeclineForm(false);
+  }, [confirm, accept, decline, remove, acceptVolunteer, declineReason, customReason]);
+
+  const handleCancelConfirm = useCallback(() => {
+    setConfirm(null);
+    setDeclineReason('');
+    setCustomReason('');
+    setShowDeclineForm(false);
+  }, []);
+
+  const handleVolunteer = useCallback((postId: string) => {
+    if (!driver) return;
+    volunteerFn(postId, driver.I, driver.n);
+    showToast('교체 가능으로 지원했어요', 'success');
+  }, [driver, volunteerFn]);
 
   // 나에게 온 1:1 요청 (대기 중)
   const incoming = useMemo(
@@ -653,7 +729,7 @@ function BoardView({ driver }: { driver: Person | null }) {
                   <button
                     type="button"
                     className={styles.acceptBtn}
-                    onClick={() => accept(post.id)}
+                    onClick={() => setConfirm({ type: 'accept', postId: post.id, requesterName: post.requesterName })}
                     aria-label="수락"
                   >
                     <Check size={16} />
@@ -662,7 +738,10 @@ function BoardView({ driver }: { driver: Person | null }) {
                   <button
                     type="button"
                     className={styles.declineBtn}
-                    onClick={() => decline(post.id)}
+                    onClick={() => {
+                      setConfirm({ type: 'decline', postId: post.id, requesterName: post.requesterName });
+                      setShowDeclineForm(true);
+                    }}
                     aria-label="거절"
                   >
                     <X size={16} />
@@ -691,7 +770,7 @@ function BoardView({ driver }: { driver: Person | null }) {
                     <button
                       type="button"
                       className={`${styles.volunteerBtn} ${alreadyVolunteered ? styles.volunteerBtnDone : ''}`}
-                      onClick={() => volunteerFn(post.id, driver.I, driver.n)}
+                      onClick={() => handleVolunteer(post.id)}
                       disabled={alreadyVolunteered}
                     >
                       {alreadyVolunteered ? (
@@ -738,7 +817,12 @@ function BoardView({ driver }: { driver: Person | null }) {
                           key={v.id}
                           type="button"
                           className={styles.volunteerSelectBtn}
-                          onClick={() => acceptVolunteer(post.id, v.id)}
+                          onClick={() => setConfirm({
+                            type: 'acceptVolunteer',
+                            postId: post.id,
+                            volunteerId: v.id,
+                            volunteerName: v.name,
+                          })}
                         >
                           <Check size={12} />
                           {v.name}
@@ -756,6 +840,35 @@ function BoardView({ driver }: { driver: Person | null }) {
                         )}
                         {post.status === 'declined' && '거절됨'}
                       </span>
+
+                      {/* 수락됨 → 안내 텍스트 */}
+                      {post.status === 'accepted' && (
+                        <div className={styles.guidanceText}>
+                          <Info size={14} />
+                          관리자에게 교체 근무 전달하세요
+                        </div>
+                      )}
+
+                      {/* 거절 사유 표시 */}
+                      {post.status === 'declined' && post.declineReason && (
+                        <span className={styles.declineReasonText}>
+                          사유: {post.declineReason}
+                        </span>
+                      )}
+
+                      {/* 대기 중 → 취소 버튼 */}
+                      {post.status === 'pending' && (
+                        <button
+                          type="button"
+                          className={styles.cancelBtn}
+                          onClick={() => setConfirm({ type: 'cancel', postId: post.id })}
+                          aria-label="요청 취소"
+                        >
+                          <X size={14} />
+                          취소
+                        </button>
+                      )}
+
                       {post.status !== 'pending' && (
                         <button
                           type="button"
@@ -785,6 +898,76 @@ function BoardView({ driver }: { driver: Person | null }) {
             ))}
           </div>
         </section>
+      )}
+
+      {/* 확인 다이얼로그 */}
+      {confirm && (
+        <div className={styles.confirmOverlay} onClick={handleCancelConfirm}>
+          <div className={styles.confirmDialog} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <h4 className={styles.confirmTitle}>
+              {confirm.type === 'accept' && '교체 요청 수락'}
+              {confirm.type === 'decline' && '교체 요청 거절'}
+              {confirm.type === 'cancel' && '요청 취소'}
+              {confirm.type === 'acceptVolunteer' && '지원자 수락'}
+            </h4>
+            <p className={styles.confirmMessage}>
+              {confirm.type === 'accept' && `${confirm.requesterName}의 교체 요청을 수락할까요?`}
+              {confirm.type === 'decline' && `${confirm.requesterName}의 교체 요청을 거절할까요?`}
+              {confirm.type === 'cancel' && '이 요청을 취소할까요? 상대방에게 알림이 사라져요.'}
+              {confirm.type === 'acceptVolunteer' && `${confirm.volunteerName}을(를) 교체 대상자로 수락할까요?`}
+            </p>
+
+            {/* 거절 시 사유 선택 */}
+            {showDeclineForm && (
+              <div className={styles.declineReasonSection}>
+                <span className={styles.declineReasonLabel}>거절 사유 (선택)</span>
+                <div className={styles.declineReasonOptions}>
+                  {DECLINE_REASONS.map((reason) => (
+                    <button
+                      key={reason}
+                      type="button"
+                      className={`${styles.declineReasonBtn} ${declineReason === reason ? styles.declineReasonBtnActive : ''}`}
+                      onClick={() => setDeclineReason(prev => prev === reason ? '' : reason)}
+                    >
+                      {reason}
+                    </button>
+                  ))}
+                </div>
+                {declineReason === '직접 입력' && (
+                  <input
+                    type="text"
+                    className={styles.customReasonInput}
+                    value={customReason}
+                    onChange={(e) => setCustomReason(e.target.value)}
+                    placeholder="거절 사유를 입력하세요"
+                    maxLength={50}
+                    autoFocus
+                  />
+                )}
+              </div>
+            )}
+
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmCancelBtn}
+                onClick={handleCancelConfirm}
+              >
+                돌아가기
+              </button>
+              <button
+                type="button"
+                className={`${styles.confirmOkBtn} ${confirm.type === 'decline' || confirm.type === 'cancel' ? styles.confirmOkBtnDanger : ''}`}
+                onClick={handleConfirmAction}
+              >
+                {confirm.type === 'accept' && '수락'}
+                {confirm.type === 'decline' && '거절'}
+                {confirm.type === 'cancel' && '취소'}
+                {confirm.type === 'acceptVolunteer' && '수락'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand, Info } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
@@ -66,6 +66,15 @@ export default function ExchangeRequest() {
   const driver = useDriverStore((s) => s.current);
   const todayStr = toISODate(new Date());
   const previewDays = useMemo(buildPreviewDays, []);
+
+  // Supabase에서 게시글 로드 + 실시간 구독
+  const fetchPosts = useExchangeStore((s) => s.fetchPosts);
+  const subscribe = useExchangeStore((s) => s.subscribe);
+  useEffect(() => {
+    fetchPosts();
+    const unsubscribe = subscribe();
+    return unsubscribe;
+  }, [fetchPosts, subscribe]);
 
   const [subTab, setSubTab] = useState<SubTab>('search');
   const [startDate, setStartDate] = useState(todayStr);

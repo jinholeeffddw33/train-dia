@@ -439,6 +439,80 @@ export function findExchangePartners(
   return partners;
 }
 
+// ===== 열차번호 → 기관사 매핑 =====
+
+/**
+ * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
+ * - 현재 시간 기준으로 각 기관사의 활성 구간(segment)에 포함된 열차번호를 수집
+ * - 야간 근무(자정 넘김) 대응: 오늘 + 어제 스케줄 모두 탐색
+ * - 매칭 안 되면 영등포 기관사 → 표시하지 않음
+ */
+export function buildTrainDriverMap(now: Date): Map<string, string> {
+  const map = new Map<string, string>();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  // 어제 날짜 (야간 근무 자정 넘김 대응)
+  const yesterday = new Date(todayDate);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const dates = [todayDate, yesterday];
+
+  for (const date of dates) {
+    const isYesterday = date.getTime() < todayDate.getTime();
+
+    for (const person of P) {
+      if (person.n.startsWith('결원')) continue;
+      const dia = getDia(person, date);
+      const tp = getType(dia);
+      if (tp === 'rest') continue;
+
+      const sc = getSchedule(dia, date);
+      if (!sc || !sc.g || sc.g.length === 0) continue;
+
+      // 어제 스케줄은 야간(자정 넘김)만 확인
+      if (isYesterday) {
+        const startMins = sc.s ? timeToMins(sc.s) : -1;
+        const endMins = sc.e ? timeToMins(sc.e) : -1;
+        if (startMins < 0 || endMins < 0 || endMins >= startMins) continue; // 야간 아님
+      }
+
+      for (const seg of sc.g) {
+        if (!seg.n || seg.n.length === 0) continue;
+        const depMins = timeToMins(seg.d);
+        const arrMins = timeToMins(seg.a);
+        if (depMins < 0 || arrMins < 0) continue;
+
+        let isActive = false;
+
+        if (arrMins > depMins) {
+          // 같은 날 구간
+          if (!isYesterday && nowMins >= depMins && nowMins < arrMins) {
+            isActive = true;
+          }
+        } else {
+          // 자정 넘김 구간 (예: 23:00 ~ 02:00)
+          if (isYesterday) {
+            // 어제 시작 → 오늘 새벽
+            if (nowMins < arrMins) isActive = true;
+          } else {
+            // 오늘 시작 → 내일 새벽
+            if (nowMins >= depMins) isActive = true;
+          }
+        }
+
+        if (isActive) {
+          for (const trainNo of seg.n) {
+            map.set(String(trainNo), person.n);
+          }
+        }
+      }
+    }
+  }
+
+  return map;
+}
+
 // ===== 교대 방향 =====
 
 /** 운전행로 문자열 → 교대 방향 판별 */

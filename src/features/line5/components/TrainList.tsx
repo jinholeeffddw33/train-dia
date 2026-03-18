@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { useTrainStore } from '@/stores/train';
+import { buildTrainDriverMap } from '@/lib/schedule';
 import {
   LINE5_MAIN,
   LINE5_MACHEON,
@@ -29,6 +30,15 @@ export default function TrainList() {
   const { data, branch, scrollTrigger } = useTrainStore();
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
+
+  // 열차번호 → 답십리 기관사 이름 매핑 (1분마다 갱신)
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const driverMap = useMemo(() => buildTrainDriverMap(now), [now]);
 
   const trainsByStation = useMemo(() => {
     const map = new Map<string, { trainNo: string; direction: string; status: string; dest: string }[]>();
@@ -120,16 +130,20 @@ export default function TrainList() {
           >
             {/* 좌측: 하행 열차 (홀수, 빨강) */}
             <div className={styles.tkLeft}>
-              {downTrains.map((t) => (
-                <div
-                  key={t.trainNo}
-                  className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
-                >
-                  {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
-                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
-                  <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                </div>
-              ))}
+              {downTrains.map((t) => {
+                const driver = driverMap.get(t.trainNo);
+                return (
+                  <div
+                    key={t.trainNo}
+                    className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                  >
+                    {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
+                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
+                    <span className={styles.tkTrainNo}>{t.trainNo}</span>
+                  </div>
+                );
+              })}
             </div>
 
             {/* 중앙: 트랙 (↓하행 | ↑상행) */}
@@ -161,16 +175,20 @@ export default function TrainList() {
                   })}
                 </div>
               )}
-              {upTrains.map((t) => (
-                <div
-                  key={t.trainNo}
-                  className={`${styles.tkTrainBox} ${styles.tkTrainUp} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
-                >
-                  <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
-                  <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                  {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
-                </div>
-              ))}
+              {upTrains.map((t) => {
+                const driver = driverMap.get(t.trainNo);
+                return (
+                  <div
+                    key={t.trainNo}
+                    className={`${styles.tkTrainBox} ${styles.tkTrainUp} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
+                  >
+                    <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
+                    <span className={styles.tkTrainNo}>{t.trainNo}</span>
+                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );

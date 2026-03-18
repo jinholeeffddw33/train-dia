@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useEffect, useCallback, useState } from 'react';
 import { useTrainStore } from '@/stores/train';
+import { buildTrainDriverMap } from '@/lib/schedule';
 import { LINE5_MAP, LINE5_ROUTES, LINE5_TRANSFERS } from '@/data/line5';
 import styles from '../styles/Line5.module.css';
 
@@ -27,6 +28,9 @@ function getTrainDir(trainNo: string): 'up' | 'down' {
 
 export default function RouteMap() {
   const { data, branch, mapZoom, mapFullscreen, setMapZoom, toggleFullscreen } = useTrainStore();
+
+  // 열차번호 → 답십리 기관사 이름 매핑
+  const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
 
@@ -260,39 +264,69 @@ export default function RouteMap() {
                 </text>
 
                 {/* 열차 번호 — 상행(짝수) 왼쪽, 하행(홀수) 오른쪽 분리 */}
-                {upTrains.map((t, ti) => (
-                  <text
-                    key={t.trainNo}
-                    x={x - 22}
-                    y={y + 18 + ti * 12}
-                    textAnchor="middle"
-                    fontSize={9}
-                    fill={getTrainColor(t.trainNo, t.status)}
-                    fontWeight="bold"
-                  >
-                    {t.trainNo}
-                  </text>
-                ))}
-                {downTrains.map((t, ti) => (
-                  <text
-                    key={t.trainNo}
-                    x={x + 22}
-                    y={y + 18 + ti * 12}
-                    textAnchor="middle"
-                    fontSize={9}
-                    fill={getTrainColor(t.trainNo, t.status)}
-                    fontWeight="bold"
-                  >
-                    {t.trainNo}
-                  </text>
-                ))}
+                {upTrains.map((t, ti) => {
+                  const driver = driverMap.get(t.trainNo);
+                  return (
+                    <g key={t.trainNo}>
+                      <text
+                        x={x - 22}
+                        y={y + 18 + ti * 24}
+                        textAnchor="middle"
+                        fontSize={9}
+                        fill={getTrainColor(t.trainNo, t.status)}
+                        fontWeight="bold"
+                      >
+                        {t.trainNo}
+                      </text>
+                      {driver && (
+                        <text
+                          x={x - 22}
+                          y={y + 27 + ti * 24}
+                          textAnchor="middle"
+                          fontSize={7}
+                          fill="#3B82F6"
+                        >
+                          {driver}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+                {downTrains.map((t, ti) => {
+                  const driver = driverMap.get(t.trainNo);
+                  return (
+                    <g key={t.trainNo}>
+                      <text
+                        x={x + 22}
+                        y={y + 18 + ti * 24}
+                        textAnchor="middle"
+                        fontSize={9}
+                        fill={getTrainColor(t.trainNo, t.status)}
+                        fontWeight="bold"
+                      >
+                        {t.trainNo}
+                      </text>
+                      {driver && (
+                        <text
+                          x={x + 22}
+                          y={y + 27 + ti * 24}
+                          textAnchor="middle"
+                          fontSize={7}
+                          fill="#3B82F6"
+                        >
+                          {driver}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
 
                 {/* 선택된 역: 목적지 정보 표시 */}
                 {isSelected && trains && trains.length > 0 && (
                   <g>
                     <rect
                       x={x - 60}
-                      y={y + 22 + Math.max(upTrains.length, downTrains.length) * 12}
+                      y={y + 22 + Math.max(upTrains.length, downTrains.length) * 24}
                       width={120}
                       height={6 + trains.length * 14}
                       rx={4}
@@ -304,7 +338,7 @@ export default function RouteMap() {
                       <text
                         key={`info-${t.trainNo}`}
                         x={x}
-                        y={y + 34 + Math.max(upTrains.length, downTrains.length) * 12 + ti * 14}
+                        y={y + 34 + Math.max(upTrains.length, downTrains.length) * 24 + ti * 14}
                         textAnchor="middle"
                         fontSize={9}
                         fill={getTrainColor(t.trainNo, t.status)}

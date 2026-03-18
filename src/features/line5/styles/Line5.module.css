@@ -617,6 +617,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+.tkDriverName {
+  font-size: 10px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-blue);
+  opacity: 0.9;
+  letter-spacing: -0.3px;
+}
+
 .tkDest {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);

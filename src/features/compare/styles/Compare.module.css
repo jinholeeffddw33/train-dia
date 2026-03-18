@@ -2,7 +2,7 @@
 
 .container { padding: var(--dia-space-4); }
 
-/* ── Count Selector ── */
+/* ── Count Selector (Stepper) ── */
 .countSelector {
   display: flex;
   align-items: center;
@@ -17,47 +17,62 @@
   color: var(--dia-text-secondary);
 }
 
-.countChips {
-  display: flex;
-  gap: var(--dia-space-2);
-}
-
-.countChip {
-  min-width: 44px;
-  height: 44px;
+.countStepper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-tertiary);
+  gap: var(--dia-space-2);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-full);
-  transition: all var(--dia-transition-fast);
+  padding: 4px;
 }
 
-.countChip:active { background: var(--dia-surface-hover); }
+.countStepBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  transition: background var(--dia-transition-fast);
+}
 
-.countChipActive {
-  background: var(--dia-blue);
-  color: #fff;
-  border-color: var(--dia-blue);
+.countStepBtn:active:not(:disabled) {
+  background: var(--dia-surface-hover);
+}
+
+.countStepBtn:disabled {
+  opacity: 0.3;
+}
+
+.countValue {
+  min-width: 36px;
+  text-align: center;
+  font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Selector Row ── */
+/* ── Selector Row (horizontal scroll) ── */
+.selectorScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--dia-space-4);
+  padding-bottom: var(--dia-space-1);
+}
+
 .selectorRow {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: var(--dia-space-2);
-  margin-bottom: var(--dia-space-4);
+  min-width: min-content;
 }
 
 .personCard {
-  flex: 1;
-  min-width: 0;
+  flex-shrink: 0;
+  width: 80px;
   padding: var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px dashed var(--dia-border-strong);
@@ -126,12 +141,18 @@
 
 .navTitle:active { background: var(--dia-surface-hover); }
 
-/* ── Table ── */
+/* ── Table (horizontal scroll wrapper) ── */
+.tableScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .table {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl);
   overflow: hidden;
+  min-width: max-content;
 }
 
 .tableHeader {
@@ -149,6 +170,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 40px;
 }
 
 .tableRow {
@@ -180,6 +202,7 @@
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   text-align: center;
+  min-width: 40px;
 }
 
 .cmpType_day { color: var(--dia-blue); }

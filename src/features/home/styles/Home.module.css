@@ -1013,7 +1013,7 @@
 }
 
 .rtPartnerLeft {}
-.rtPartnerRight {}
+.rtPartnerRight { margin-left: auto; }
 
 .rtPartnerOther {
   opacity: 0.45;

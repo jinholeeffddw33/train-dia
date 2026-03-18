@@ -114,7 +114,7 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
                       교대 <strong>{partner.right}</strong>
                     </span>
                   ) : (
-                    <span className={`${styles.rtPartner} ${styles.rtPartnerOther}`}>
+                    <span className={`${styles.rtPartner} ${styles.rtPartnerOther} ${styles.rtPartnerRight}`}>
                       타소 교대
                     </span>
                   )

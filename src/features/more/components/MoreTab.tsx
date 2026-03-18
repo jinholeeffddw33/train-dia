@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, ChevronRight, X, UserRoundPen } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -11,6 +11,7 @@ import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import { DriverSelector } from '@/features/home';
+import HealingCardOverlay from './HealingCardOverlay';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
@@ -22,6 +23,7 @@ export default function MoreTab() {
   const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
+  const [healingOpen, setHealingOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
 
   return (
@@ -52,11 +54,23 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.toolBtn}
-          onClick={() => setCommuteOpen(true)}
+          onClick={() => setCompareOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <TrainFront size={20} className={styles.toolIcon} />
-            <span className={styles.settingLabel}>도착 정보</span>
+            <GitCompareArrows size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>교번 비교</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setContactsOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <Phone size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>비상 연락처</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -76,11 +90,11 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.toolBtn}
-          onClick={() => setCompareOpen(true)}
+          onClick={() => setCommuteOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <GitCompareArrows size={20} className={styles.toolIcon} />
-            <span className={styles.settingLabel}>교번 비교</span>
+            <TrainFront size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>도착 정보</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -88,11 +102,11 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.toolBtn}
-          onClick={() => setContactsOpen(true)}
+          onClick={() => setHealingOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <Phone size={20} className={styles.toolIcon} />
-            <span className={styles.settingLabel}>비상 연락처</span>
+            <CreditCard size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>힐링카드 잔액조회</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -214,6 +228,12 @@ export default function MoreTab() {
           </div>
         </div>
       )}
+
+      {/* 힐링카드 오버레이 */}
+      <HealingCardOverlay
+        open={healingOpen}
+        onClose={() => setHealingOpen(false)}
+      />
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (

@@ -422,13 +422,25 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: var(--dia-track-line);
   border-radius: 2px;
-  transition: background var(--dia-transition-fast);
+  transition: background var(--dia-transition-fast), box-shadow var(--dia-transition-fast);
 }
 
-.tkTrack::before { left: 8px; }
-.tkTrack::after { right: 8px; }
+/* Left rail = 하행 (빨강) */
+.tkTrack::before {
+  left: 8px;
+  background: var(--dia-rail-down);
+  box-shadow: 0 0 6px var(--dia-rail-down-glow);
+  animation: railFlowDown 2.5s linear infinite;
+}
+
+/* Right rail = 상행 (초록) */
+.tkTrack::after {
+  right: 8px;
+  background: var(--dia-rail-up);
+  box-shadow: 0 0 6px var(--dia-rail-up-glow);
+  animation: railFlowUp 2.5s linear infinite;
+}
 
 /* First/last station — half lines */
 .tkTrackFirst::before,
@@ -437,16 +449,72 @@
 .tkTrackLast::after { bottom: 50%; top: auto; height: 50%; }
 
 /* Highlight row track glow */
-.tkRowHighlight .tkTrack::before,
+.tkRowHighlight .tkTrack::before {
+  background: rgba(211, 47, 47, 0.75);
+  box-shadow: 0 0 10px rgba(211, 47, 47, 0.35);
+}
 .tkRowHighlight .tkTrack::after {
-  background: var(--dia-blue);
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+  background: rgba(13, 148, 82, 0.75);
+  box-shadow: 0 0 10px rgba(13, 148, 82, 0.35);
 }
 
 /* Light mode track lines */
-:global(:root.light) .tkTrack::before,
+:global(:root.light) .tkTrack::before {
+  background: var(--dia-rail-down);
+  box-shadow: 0 0 4px var(--dia-rail-down-glow);
+}
 :global(:root.light) .tkTrack::after {
-  background: var(--dia-track-line);
+  background: var(--dia-rail-up);
+  box-shadow: 0 0 4px var(--dia-rail-up-glow);
+}
+
+/* Rail flow animations — subtle moving gradient */
+@keyframes railFlowDown {
+  0%   { background-position: 0 -40px; }
+  100% { background-position: 0 40px; }
+}
+@keyframes railFlowUp {
+  0%   { background-position: 0 40px; }
+  100% { background-position: 0 -40px; }
+}
+
+/* Apply gradient for animation (overrides solid bg) */
+.tkTrack::before {
+  background: linear-gradient(
+    180deg,
+    rgba(211, 47, 47, 0.3) 0%,
+    rgba(211, 47, 47, 0.65) 50%,
+    rgba(211, 47, 47, 0.3) 100%
+  );
+  background-size: 4px 80px;
+}
+.tkTrack::after {
+  background: linear-gradient(
+    0deg,
+    rgba(13, 148, 82, 0.3) 0%,
+    rgba(13, 148, 82, 0.65) 50%,
+    rgba(13, 148, 82, 0.3) 100%
+  );
+  background-size: 4px 80px;
+}
+
+:global(:root.light) .tkTrack::before {
+  background: linear-gradient(
+    180deg,
+    rgba(211, 47, 47, 0.25) 0%,
+    rgba(211, 47, 47, 0.55) 50%,
+    rgba(211, 47, 47, 0.25) 100%
+  );
+  background-size: 4px 80px;
+}
+:global(:root.light) .tkTrack::after {
+  background: linear-gradient(
+    0deg,
+    rgba(13, 148, 82, 0.25) 0%,
+    rgba(13, 148, 82, 0.55) 50%,
+    rgba(13, 148, 82, 0.25) 100%
+  );
+  background-size: 4px 80px;
 }
 
 /* ── Station dot ── */
@@ -458,11 +526,13 @@
   border: 3px solid var(--dia-track-line);
   z-index: 2;
   position: relative;
+  box-shadow: 0 0 4px rgba(153, 108, 172, 0.25);
 }
 
 :global(:root.light) .tkDot {
   background: #fff;
   border-color: var(--dia-track-line);
+  box-shadow: 0 0 3px rgba(153, 108, 172, 0.15);
 }
 
 .tkDotTransfer {
@@ -490,41 +560,61 @@
 /* ── Direction arrows (▾▴) on track lines ── */
 .tkDirDown,
 .tkDirUp {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: var(--dia-radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--dia-text-xs);
+  font-size: 14px;
+  font-weight: 900;
   background: var(--dia-bg);
-  border: 1.5px solid var(--dia-border);
   z-index: 3;
   flex-shrink: 0;
   line-height: 1;
   user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tkDirDown {
-  color: rgba(211, 47, 47, 0.45);
+  color: rgba(211, 47, 47, 0.85);
+  border: 2px solid rgba(211, 47, 47, 0.4);
+  box-shadow: 0 0 6px rgba(211, 47, 47, 0.15);
+  animation: arrowPulseDown 2s ease-in-out infinite;
 }
 
 .tkDirUp {
-  color: rgba(13, 148, 82, 0.45);
+  color: rgba(13, 148, 82, 0.85);
+  border: 2px solid rgba(13, 148, 82, 0.4);
+  box-shadow: 0 0 6px rgba(13, 148, 82, 0.15);
+  animation: arrowPulseUp 2s ease-in-out infinite;
+}
+
+@keyframes arrowPulseDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+}
+
+@keyframes arrowPulseUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 :global(:root.light) .tkDirDown,
 :global(:root.light) .tkDirUp {
   background: #fff;
-  border-color: rgba(148, 163, 184, 0.3);
 }
 
 :global(:root.light) .tkDirDown {
-  color: rgba(211, 47, 47, 0.5);
+  color: rgba(211, 47, 47, 0.8);
+  border-color: rgba(211, 47, 47, 0.35);
+  box-shadow: 0 0 4px rgba(211, 47, 47, 0.1);
 }
 
 :global(:root.light) .tkDirUp {
-  color: rgba(13, 148, 82, 0.5);
+  color: rgba(13, 148, 82, 0.8);
+  border-color: rgba(13, 148, 82, 0.35);
+  box-shadow: 0 0 4px rgba(13, 148, 82, 0.1);
 }
 
 /* ── Left train area (상행) ── */

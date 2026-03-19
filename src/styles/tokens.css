@@ -99,6 +99,11 @@
   --dia-track-line: #996CAC;
   --dia-track-up: #0D9452;
   --dia-track-down: #D32F2F;
+  /* Per-rail colors (left=down, right=up) */
+  --dia-rail-down: rgba(211, 47, 47, 0.55);
+  --dia-rail-down-glow: rgba(211, 47, 47, 0.20);
+  --dia-rail-up: rgba(13, 148, 82, 0.55);
+  --dia-rail-up-glow: rgba(13, 148, 82, 0.20);
 
   /* ========================================
      Typography
@@ -243,4 +248,8 @@
   --dia-track-line: #b388d9;
   --dia-track-up: #0D9452;
   --dia-track-down: #D32F2F;
+  --dia-rail-down: rgba(211, 47, 47, 0.50);
+  --dia-rail-down-glow: rgba(211, 47, 47, 0.12);
+  --dia-rail-up: rgba(13, 148, 82, 0.50);
+  --dia-rail-up-glow: rgba(13, 148, 82, 0.12);
 }

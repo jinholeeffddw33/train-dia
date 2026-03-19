@@ -10,6 +10,12 @@ interface EduHomeProps {
   onQuiz: () => void;
 }
 
+function scoreGradeClass(score: number): string {
+  if (score >= 80) return styles.gradeGreen;
+  if (score >= 60) return styles.gradeOrange;
+  return styles.gradeRed;
+}
+
 export default function EduHome({ onBack, onStudy, onQuiz }: EduHomeProps) {
   const { readCount, totalQuizzes, bestScore, latestScore, previousScore, streak, avgScore } = useEduStore();
 
@@ -38,20 +44,22 @@ export default function EduHome({ onBack, onStudy, onQuiz }: EduHomeProps) {
             <div className={styles.statLabel}>시험 횟수</div>
           </div>
           <div className={styles.statCard}>
-            <div className={styles.statValue}>{bestScore}%</div>
+            <div className={`${styles.statValue} ${totalQuizzes > 0 ? scoreGradeClass(bestScore) : ''}`}>
+              {totalQuizzes > 0 ? `${bestScore}점` : '-'}
+            </div>
             <div className={styles.statLabel}>최고 점수</div>
           </div>
         </div>
 
         {/* 성장 피드백 */}
         {growth !== null && (
-          <div className={styles.growthBanner}>
+          <div className={`${styles.growthBanner} ${growth < 0 ? styles.growthBannerDown : ''}`}>
             <div className={styles.growthText}>
               {growth > 0
-                ? `이전보다 ${growth}%p 올랐어요! 계속 성장 중!`
+                ? `이전보다 ${growth}점 올랐어요! 계속 성장 중!`
                 : growth === 0
                   ? '이전과 동일한 점수예요. 한 번 더 도전!'
-                  : `이전보다 ${Math.abs(growth)}%p 내렸어요. 복습하면 금방 올라요!`}
+                  : `이전보다 ${Math.abs(growth)}점 내렸어요. 복습하면 금방 올라요!`}
             </div>
             {streak >= 2 && (
               <div className={styles.streakBadge}>🔥 {streak}일 연속 학습 중</div>
@@ -60,10 +68,9 @@ export default function EduHome({ onBack, onStudy, onQuiz }: EduHomeProps) {
         )}
 
         {totalQuizzes > 0 && avgScore > 0 && (
-          <div className={styles.growthBanner}>
-            <div className={styles.growthText}>
-              평균 점수 {avgScore}% · 시험 {totalQuizzes}회
-            </div>
+          <div className={styles.avgBanner}>
+            <span className={`${styles.avgScore} ${scoreGradeClass(avgScore)}`}>{avgScore}점</span>
+            <span className={styles.avgLabel}>평균 · {totalQuizzes}회 시험</span>
           </div>
         )}
 

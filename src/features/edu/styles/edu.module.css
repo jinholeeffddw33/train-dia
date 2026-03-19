@@ -52,6 +52,11 @@
   text-overflow: ellipsis;
 }
 
+/* ── 점수 등급 컬러 ── */
+.gradeGreen { color: var(--dia-green); }
+.gradeOrange { color: var(--dia-amber); }
+.gradeRed { color: var(--dia-red); }
+
 /* ── 홈 화면 ── */
 .homeContent {
   padding: var(--dia-space-4);
@@ -158,6 +163,36 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-green);
   font-weight: var(--dia-weight-semibold);
+}
+
+.growthBannerDown {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(245, 158, 11, 0.08));
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.growthBannerDown .growthText {
+  color: var(--dia-amber);
+}
+
+.avgBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+
+.avgScore {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+}
+
+.avgLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
 }
 
 .streakBadge {
@@ -594,6 +629,17 @@
   margin-top: var(--dia-space-1);
 }
 
+/* quiz score chip (in topBar) */
+.quizScoreChip {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-green);
+  background: var(--dia-green-dim);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  white-space: nowrap;
+}
+
 /* quiz in progress */
 .quizProgress {
   padding: var(--dia-space-3) var(--dia-space-4);
@@ -794,13 +840,30 @@
   color: var(--dia-text-tertiary);
 }
 
+.historyMeta {
+  flex: 1;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+}
+
 .historyScore {
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
+  min-width: 48px;
+  text-align: right;
 }
 
 .historyHigh {
-  color: var(--dia-green);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.emptyHistory {
+  padding: var(--dia-space-6) var(--dia-space-4);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
 }
 
 /* empty state */

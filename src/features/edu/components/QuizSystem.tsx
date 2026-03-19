@@ -22,6 +22,18 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+/** 100점 만점 환산 */
+function toScore100(score: number, total: number): number {
+  return total > 0 ? Math.round((score / total) * 100) : 0;
+}
+
+/** 점수대별 등급 CSS 클래스 */
+function scoreGradeClass(score100: number): string {
+  if (score100 >= 80) return styles.gradeGreen;
+  if (score100 >= 60) return styles.gradeOrange;
+  return styles.gradeRed;
+}
+
 export default function QuizSystem({ onBack }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
   const [phase, setPhase] = useState<Phase>('setup');
@@ -46,7 +58,6 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
       pool = allQuestions.filter(q => q.chapter === chapter);
     }
     const shuffled = shuffle(pool).slice(0, count);
-    // shuffle choices too
     const withShuffledChoices = shuffled.map(q => {
       const indices: number[] = q.choices.map((_: any, i: number) => i);
       const shuffledIndices = shuffle(indices) as number[];
@@ -79,23 +90,32 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
       setSelected(null);
       setAnswered(false);
     } else {
-      const percent = Math.round((score / questions.length) * 100);
+      const percent = toScore100(score, questions.length);
       addQuizRecord({ score, total: questions.length, percent });
       setPhase('result');
     }
   }, [currentIdx, questions.length, score, addQuizRecord]);
 
-  const percent = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  const score100 = toScore100(score, questions.length);
 
   const resultEmoji = useMemo(() => {
-    if (percent >= 90) return '🏆';
-    if (percent >= 70) return '👏';
-    if (percent >= 50) return '💪';
+    if (score100 >= 90) return '🏆';
+    if (score100 >= 70) return '👏';
+    if (score100 >= 50) return '💪';
     return '📚';
-  }, [percent]);
+  }, [score100]);
 
-  const growth = previousScore !== null ? percent - previousScore : null;
+  const resultMessage = useMemo(() => {
+    if (score100 >= 90) return '대단해요! 거의 완벽합니다!';
+    if (score100 >= 80) return '잘하고 있어요! 조금만 더!';
+    if (score100 >= 70) return '좋은 성적이에요. 복습하면 더 오를 수 있어요!';
+    if (score100 >= 50) return '절반 이상 맞혔어요. 교재를 다시 읽어보면 금방!';
+    return '아직 공부가 필요해요. 교재부터 다시 시작해봐요!';
+  }, [score100]);
 
+  const growth = previousScore !== null ? score100 - previousScore : null;
+
+  /* ── Setup Phase ── */
   if (phase === 'setup') {
     return (
       <div className={styles.screen}>
@@ -120,17 +140,20 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
             <div className={styles.quizOptionDesc}>모든 문제에 도전</div>
           </button>
 
-          {totalQuizzes > 0 && (
-            <>
-              <div className={styles.heading}>시험 기록</div>
-              <QuizHistory />
-            </>
+          <div className={styles.heading}>시험 기록</div>
+          {totalQuizzes > 0 ? (
+            <QuizHistory />
+          ) : (
+            <div className={styles.emptyHistory}>
+              아직 시험 기록이 없어요. 위에서 시험을 선택해보세요!
+            </div>
           )}
         </div>
       </div>
     );
   }
 
+  /* ── Result Phase ── */
   if (phase === 'result') {
     return (
       <div className={styles.screen}>
@@ -143,26 +166,20 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
 
         <div className={styles.resultWrap}>
           <div className={styles.resultEmoji}>{resultEmoji}</div>
-          <div className={styles.resultScore}>{percent}%</div>
+          <div className={`${styles.resultScore} ${scoreGradeClass(score100)}`}>
+            {score100}점
+          </div>
           <div className={styles.resultLabel}>
             {questions.length}문제 중 {score}문제 정답
           </div>
 
           {growth !== null && growth !== 0 && (
             <div className={`${styles.resultGrowth} ${growth < 0 ? styles.resultDown : ''}`}>
-              {growth > 0 ? `▲ ${growth}%p 향상!` : `▼ ${Math.abs(growth)}%p`}
+              {growth > 0 ? `▲ ${growth}점 향상!` : `▼ ${Math.abs(growth)}점`}
             </div>
           )}
 
-          {percent >= 90 && (
-            <div className={styles.growthText}>대단해요! 거의 완벽합니다!</div>
-          )}
-          {percent >= 70 && percent < 90 && (
-            <div className={styles.growthText}>잘하고 있어요! 조금만 더 복습하면 완벽!</div>
-          )}
-          {percent < 70 && (
-            <div className={styles.growthText}>교재를 한 번 더 읽어보면 금방 올라요!</div>
-          )}
+          <div className={styles.growthText}>{resultMessage}</div>
 
           <div className={styles.resultActions}>
             <button type="button" className={`${styles.resultBtn} ${styles.resultBtnOutline}`} onClick={onBack}>
@@ -177,7 +194,7 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
     );
   }
 
-  // quiz phase
+  /* ── Quiz Phase ── */
   const q = questions[currentIdx];
   if (!q) return null;
 
@@ -188,6 +205,9 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.topTitle}>문제 {currentIdx + 1}</h1>
+        <span className={styles.quizScoreChip}>
+          {score}/{currentIdx + (answered ? 1 : 0)}
+        </span>
       </div>
 
       <div className={styles.quizProgress}>
@@ -250,16 +270,23 @@ function QuizHistory() {
 
   return (
     <div className={styles.historyList}>
-      {recent.map((record, i) => (
-        <div key={i} className={styles.historyItem}>
-          <span className={styles.historyDate}>
-            {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-          </span>
-          <span className={`${styles.historyScore} ${record.percent === best ? styles.historyHigh : ''}`}>
-            {record.score}/{record.total} ({record.percent}%)
-          </span>
-        </div>
-      ))}
+      {recent.map((record, i) => {
+        const s = record.percent;
+        const gradeClass = s >= 80 ? styles.gradeGreen : s >= 60 ? styles.gradeOrange : styles.gradeRed;
+        return (
+          <div key={i} className={styles.historyItem}>
+            <span className={styles.historyDate}>
+              {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+            </span>
+            <span className={styles.historyMeta}>
+              {record.score}/{record.total}
+            </span>
+            <span className={`${styles.historyScore} ${gradeClass} ${record.percent === best ? styles.historyHigh : ''}`}>
+              {record.percent}점
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -36,7 +36,7 @@ const WORLDS: WorldDef[] = [
   },
   {
     id: 'edu',
-    label: '교육',
+    label: '스마트승무원',
     desc: '규정 · 학습 · 평가',
     lottie: '/lottie/edu.json',
     iconClass: styles.iconEdu,
@@ -106,7 +106,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
     <div className={styles.hub}>
       <header className={styles.header}>
         {name && <p className={styles.greeting}>{name} 기관사님, 안녕하세요</p>}
-        <h1 className={styles.title}>DIA Station</h1>
+        <h1 className={styles.title}>답십리 승무사업소</h1>
         <p className={styles.subtitle}>업무 영역을 선택하세요</p>
       </header>
 

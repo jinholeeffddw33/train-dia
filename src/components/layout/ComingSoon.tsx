@@ -10,7 +10,7 @@ interface ComingSoonProps {
 }
 
 const WORLD_META: Record<Exclude<WorldId, 'duty'>, { emoji: string; label: string; iconClass: string }> = {
-  edu: { emoji: '📚', label: '교육', iconClass: styles.iconEdu },
+  edu: { emoji: '📚', label: '스마트승무원', iconClass: styles.iconEdu },
   safety: { emoji: '🛡️', label: '안전', iconClass: styles.iconSafety },
 };
 

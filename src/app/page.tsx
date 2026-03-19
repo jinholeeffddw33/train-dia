@@ -11,6 +11,7 @@ import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
 import { Line5Tab } from '@/features/line5';
+import { EduTab } from '@/features/edu';
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -68,6 +69,8 @@ export default function HomePage() {
         <AppShell onBack={handleBack}>
           {(activeTab) => <TabContent tab={activeTab} />}
         </AppShell>
+      ) : world === 'edu' ? (
+        <EduTab onBack={handleBack} />
       ) : (
         <ComingSoon worldId={world} onBack={handleBack} />
       )}

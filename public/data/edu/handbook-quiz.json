@@ -1,0 +1,406 @@
+{
+  "documentId": "handbook",
+  "title": "신규기관사 핸드북 퀴즈",
+  "questions": [
+    {
+      "id": "q01",
+      "chapter": "ch1",
+      "question": "출무(후반) 시 본선 교대를 위해 몇 분 전에 출발해야 하는가?",
+      "choices": ["20분전", "30분전", "40분전", "1시간전"],
+      "answer": 1,
+      "explanation": "본선 교대 시 열차출발 30분전에 출발해야 합니다."
+    },
+    {
+      "id": "q02",
+      "chapter": "ch1",
+      "question": "입고 시 일단정차는 총 몇 회 시행하는가?",
+      "choices": ["2회", "3회", "4회", "5회"],
+      "answer": 2,
+      "explanation": "입고 시 일단정차는 총 4회 시행합니다: ①1A신호기 ②검사고 앞 ③정차위치 전방 20m ④정차위치 전방 3m"
+    },
+    {
+      "id": "q03",
+      "chapter": "ch1",
+      "question": "출고 시 \"열차 출발합니다\" 차외 방송은 몇 회 실시하는가?",
+      "choices": ["1회", "2회", "3회", "4회"],
+      "answer": 1,
+      "explanation": "출고 시 차외 방송은 2회 실시합니다."
+    },
+    {
+      "id": "q04",
+      "chapter": "ch1",
+      "question": "검사고 내 제한속도는 몇 km/h 이하인가?",
+      "choices": ["5km/h", "10km/h", "15km/h", "25km/h"],
+      "answer": 0,
+      "explanation": "검사고 내 제한속도는 5km/h 이하입니다."
+    },
+    {
+      "id": "q05",
+      "chapter": "ch1",
+      "question": "세척고 세척 시 운전속도는 몇 km/h 이하인가?",
+      "choices": ["3km/h", "5km/h", "10km/h", "15km/h"],
+      "answer": 1,
+      "explanation": "세척 시 5km/h 이하, 미세척 시 15km/h 이하입니다."
+    },
+    {
+      "id": "q06",
+      "chapter": "ch1",
+      "question": "입고 시 잔류승객 확인에서 1호차는 누가 확인하는가?",
+      "choices": ["역직원", "기관사", "관제사", "검수원"],
+      "answer": 1,
+      "explanation": "1호차는 기관사가, 2-8호차는 역직원이 확인합니다."
+    },
+    {
+      "id": "q07",
+      "chapter": "ch2",
+      "question": "TCMS에서 TC(Train Computer)의 역할은?",
+      "choices": ["해당 차량 시스템 제어", "전동차 전체 시스템 제어 및 감시", "기관사와 컴퓨터 간 인터페이스", "보조전원장치 제어"],
+      "answer": 1,
+      "explanation": "TC는 전동차 전체 시스템의 제어 및 감시를 담당합니다."
+    },
+    {
+      "id": "q08",
+      "chapter": "ch2",
+      "question": "ATC 정지코드(01) 현시 시 운전속도는?",
+      "choices": ["5km/h이하", "15km/h이하", "25km/h이하", "45km/h이하"],
+      "answer": 1,
+      "explanation": "정지코드 현시 시 15km/h 스위치 취급하여 15km/h이하로 수동운전합니다."
+    },
+    {
+      "id": "q09",
+      "chapter": "ch2",
+      "question": "지령식 운전 시 제한속도는?",
+      "choices": ["15km/h이하", "25km/h이하", "45km/h이하", "60km/h이하"],
+      "answer": 2,
+      "explanation": "지령식은 45km/h 이하로, 폐색구간마다 관제 출발지시를 받아 운행합니다."
+    },
+    {
+      "id": "q10",
+      "chapter": "ch2",
+      "question": "퇴행운전 시 제한속도와 특이사항으로 맞는 것은?",
+      "choices": ["15km/h, 열차 표지 변경", "25km/h, 열차 표지 변경", "15km/h, 열차 표지 변경하지 않음", "25km/h, 열차 표지 변경하지 않음"],
+      "answer": 2,
+      "explanation": "퇴행운전은 15km/h 이하이며, 열차 표지를 변경하지 않고 최초 진행방향 반대방향으로 운전합니다."
+    },
+    {
+      "id": "q11",
+      "chapter": "ch2",
+      "question": "비상모드에서 가능한 출입문모드는?",
+      "choices": ["자동열림/자동닫힘", "자동열림/수동닫힘", "수동열림/수동닫힘", "자동열림/자동닫힘과 수동열림/수동닫힘"],
+      "answer": 2,
+      "explanation": "비상모드에서는 수동열림/수동닫힘만 가능합니다."
+    },
+    {
+      "id": "q12",
+      "chapter": "ch2",
+      "question": "주간제어기(MC)의 역행 단계는?",
+      "choices": ["P1~P3", "P1~P4", "P1~P5", "P1~P7"],
+      "answer": 1,
+      "explanation": "주간제어기는 역행(P1~P4), 중립(타행), 상용제동(B1~B7), 비상제동(EB)의 4개 위치가 있습니다."
+    },
+    {
+      "id": "q13",
+      "chapter": "ch2",
+      "question": "역전기 투입 시 공급되는 축전지전원의 전압은?",
+      "choices": ["DC 24V", "DC 48V", "DC 100V", "DC 200V"],
+      "answer": 2,
+      "explanation": "역전기 투입으로 DC 100V 축전지전원이 각 장치에 공급됩니다."
+    },
+    {
+      "id": "q14",
+      "chapter": "ch2",
+      "question": "Information 4번 버튼은 어떤 상황에 사용하는가?",
+      "choices": ["터널 내 정차", "출입문 닫힘 안내", "열차 지연", "열차화재 발생"],
+      "answer": 3,
+      "explanation": "Information 4번은 열차화재 발생 시 사용합니다(적색 커버 OPEN 후 누름)."
+    },
+    {
+      "id": "q15",
+      "chapter": "ch2",
+      "question": "냉방 시 객실 표준온도는?",
+      "choices": ["22℃", "24℃", "26℃", "28℃"],
+      "answer": 2,
+      "explanation": "냉방 시 객실표준온도는 26℃입니다."
+    },
+    {
+      "id": "q16",
+      "chapter": "ch2",
+      "question": "난방 시 객실 표준온도는?",
+      "choices": ["16℃", "18℃", "20℃", "22℃"],
+      "answer": 1,
+      "explanation": "난방 시 객실표준온도는 18℃입니다."
+    },
+    {
+      "id": "q17",
+      "chapter": "ch2",
+      "question": "출입문 닫힘 예고방송은 인포메이션 몇 번 버튼인가?",
+      "choices": ["1번", "2번", "3번", "4번"],
+      "answer": 1,
+      "explanation": "출입문 닫힘 예고방송은 인포메이션 2번 버튼입니다."
+    },
+    {
+      "id": "q18",
+      "chapter": "ch2",
+      "question": "PBET(비상전원차단스위치)는 어떤 상황에서 사용하는가?",
+      "choices": ["비상제동 체결", "판토그래프 즉시 하강", "출입문 긴급 개방", "관제 통신"],
+      "answer": 1,
+      "explanation": "PBET는 전차선 단선 등 비상상황에서 즉시 판토그래프를 하강시키고자 할 때 사용합니다."
+    },
+    {
+      "id": "q19",
+      "chapter": "ch3",
+      "question": "ABB 전동차의 데드맨 스위치 동작 후 최종 제동은?",
+      "choices": ["비상제동(EB) 체결", "FSB 체결", "상용제동(B7) 체결", "주차제동 체결"],
+      "answer": 1,
+      "explanation": "ABB는 데드맨 동작 후 3초 경보음 → 10초 후 FSB(Full Service Brake) 체결입니다."
+    },
+    {
+      "id": "q20",
+      "chapter": "ch3",
+      "question": "우진 전동차의 데드맨 스위치 최종 제동은 ABB와 어떻게 다른가?",
+      "choices": ["동일하게 FSB 체결", "비상제동 체결", "상용제동(B7) 체결", "주차제동 체결"],
+      "answer": 1,
+      "explanation": "우진은 데드맨 동작 후 비상제동이 체결됩니다(ABB·로템은 FSB)."
+    },
+    {
+      "id": "q21",
+      "chapter": "ch3",
+      "question": "ABB 전동차의 출입문 방식은?",
+      "choices": ["전기모터 방식(DCU제어)", "공기압력으로 열림·닫힘(CC제어)", "유압식 제어", "자기력 방식"],
+      "answer": 1,
+      "explanation": "ABB는 공기압력으로 열림·닫힘(CC제어)이며, 출입문 코크로 수동취급 가능합니다."
+    },
+    {
+      "id": "q22",
+      "chapter": "ch3",
+      "question": "EO모드가 없는 차종은?",
+      "choices": ["우진", "로템", "ABB", "우진과 로템 모두"],
+      "answer": 2,
+      "explanation": "ABB는 EO모드가 없습니다. 우진은 최고 45km/h, 로템은 35km/h로 운행 가능합니다."
+    },
+    {
+      "id": "q23",
+      "chapter": "ch3",
+      "question": "우진 전동차 EO모드의 최고속도는?",
+      "choices": ["25km/h", "35km/h", "45km/h", "55km/h"],
+      "answer": 2,
+      "explanation": "우진 EO모드는 최고속도 45km/h 이하로 주행 가능합니다."
+    },
+    {
+      "id": "q24",
+      "chapter": "ch3",
+      "question": "ABB 전동차의 비상전원차단등은 언제 점등되는가?",
+      "choices": ["전체 PAN 하강 시", "일부 PAN 하강 시", "비상제동 체결 시", "배터리 전압 저하 시"],
+      "answer": 1,
+      "explanation": "ABB는 일부 PAN이 하강하면 점등됩니다(우진·로템은 전체 PAN 하강해야 점등)."
+    },
+    {
+      "id": "q25",
+      "chapter": "ch3",
+      "question": "ABB 전동차에서 MC KEY 취거 가능한 위치는?",
+      "choices": ["중립위치에서만", "제동 및 중립위치에서", "역행위치에서만", "모든 위치에서"],
+      "answer": 1,
+      "explanation": "ABB는 MC 제동 및 중립위치에서 역전기 KEY를 취거할 수 있습니다(우진·로템은 중립위치에서만)."
+    },
+    {
+      "id": "q26",
+      "chapter": "ch3",
+      "question": "우진-우진 구원운전 시 고장차의 PAN 상태는?",
+      "choices": ["상승", "하강", "관계없음", "반상승"],
+      "answer": 1,
+      "explanation": "우진-우진 구원운전 시 고장차 PAN은 반드시 하강해야 합니다."
+    },
+    {
+      "id": "q27",
+      "chapter": "ch3",
+      "question": "로템-우진 구원운전 시 구원차(우진)의 EROS 설정은?",
+      "choices": ["N", "R1(전동차)", "EO", "R2"],
+      "answer": 1,
+      "explanation": "로템-우진 구원운전 시 구원차(우진)는 EROS를 R1(전동차)으로 설정합니다."
+    },
+    {
+      "id": "q28",
+      "chapter": "ch4",
+      "question": "주박 시 기동을 위한 기상 시각은?",
+      "choices": ["03:30", "04:00", "04:30", "05:00"],
+      "answer": 2,
+      "explanation": "04:30분에 기상하여 기지운용(5972)에 출장보고 및 음주측정을 합니다."
+    },
+    {
+      "id": "q29",
+      "chapter": "ch4",
+      "question": "기동 시 배터리전압이 최소 몇 V 이상이어야 하는가?",
+      "choices": ["60V", "70V", "80V", "90V"],
+      "answer": 2,
+      "explanation": "기동 시 역전기 전진 후 배터리전압 80V 이상을 확인해야 합니다."
+    },
+    {
+      "id": "q30",
+      "chapter": "ch4",
+      "question": "판상승 후 확인해야 할 전차선 전압은?",
+      "choices": ["1.0kV", "1.5kV", "2.0kV", "3.0kV"],
+      "answer": 1,
+      "explanation": "판상승 후 전차선전압계 1.5kV를 확인합니다."
+    },
+    {
+      "id": "q31",
+      "chapter": "ch4",
+      "question": "5호선 주박지가 아닌 곳은?",
+      "choices": ["왕십리", "군자", "방화", "마천"],
+      "answer": 2,
+      "explanation": "5호선 주박지는 왕십리, 군자, 강동, 마천, 하남검단산입니다. 방화는 차량기지입니다."
+    },
+    {
+      "id": "q32",
+      "chapter": "ch5",
+      "question": "출입문 1개 닫힘 불능 시 최종 조치는?",
+      "choices": ["영업운전 계속", "관제 승인 후 회송", "안전막 설치 후 운행", "감시자 승차 후 운행"],
+      "answer": 2,
+      "explanation": "조치 불가 시 안전막 설치(출입문 닫음 및 쇄정 시 감시자 승차 후 출발), 1개 이상 닫힘 불량 시 회송."
+    },
+    {
+      "id": "q33",
+      "chapter": "ch5",
+      "question": "구원운전 시 밀기운전 제한속도는?",
+      "choices": ["15km/h", "25km/h", "35km/h", "45km/h"],
+      "answer": 1,
+      "explanation": "구원운전 시 밀기운전 제한속도는 25km/h 이하이며, 폐색방식은 지령식입니다."
+    },
+    {
+      "id": "q34",
+      "chapter": "ch5",
+      "question": "완전 재기동의 올바른 방법은?",
+      "choices": ["역전기 재투입", "PAN 하강 후 재상승", "MC를 EB로 전환", "ATC 리셋만"],
+      "answer": 1,
+      "explanation": "완전 재기동은 PAN 하강이 정답입니다. 역전기 재투입은 올바른 방법이 아닙니다."
+    },
+    {
+      "id": "q35",
+      "chapter": "ch5",
+      "question": "ABB 전동차 역행 불능 시 첫 번째 조치는?",
+      "choices": ["EO모드 취급", "완전 재기동", "AP.CBSUTC 차단 → 후부TC 절체", "구원 요청"],
+      "answer": 2,
+      "explanation": "ABB는 AP.CBSUTC 차단하여 후부TC로 절체합니다. ABB에는 EO모드가 없습니다."
+    },
+    {
+      "id": "q36",
+      "chapter": "ch5",
+      "question": "우진 전동차 LIU1,2 모두 고장 시 조치는?",
+      "choices": ["후부TC 절체", "ATC 리셋", "EO모드 운전", "즉시 구원 요청"],
+      "answer": 2,
+      "explanation": "우진은 LIU1,2 모두 고장 시 EO모드로 45km/h 이하 운전이 가능합니다."
+    },
+    {
+      "id": "q37",
+      "chapter": "ch6",
+      "question": "ATC 고장 시 조치 순서로 올바른 것은?",
+      "choices": ["지령식 → 리셋 → 절체", "리셋 → 절체 → 지령식", "절체 → 리셋 → 지령식", "리셋 → 지령식 → 절체"],
+      "answer": 1,
+      "explanation": "ATC 고장: 1차 리셋 → 2차 강제절체 시도 → 3차 지령식 순서입니다."
+    },
+    {
+      "id": "q38",
+      "chapter": "ch6",
+      "question": "정위치 조정운전 시 역전기와 운전모드 순서로 올바른 것은?",
+      "choices": ["비상모드+전진 → 수동모드+후진", "수동모드+후진 → 비상모드+전진", "비상모드+후진 → 수동모드+전진", "수동모드+전진 → 비상모드+후진"],
+      "answer": 2,
+      "explanation": "출입문 수/수 → 비상모드+역전기 후진 → 수동모드+역전기 전진 순서입니다."
+    },
+    {
+      "id": "q39",
+      "chapter": "ch6",
+      "question": "PSD 고장 시 관제승인 후 취급하는 것은?",
+      "choices": ["ALL-DOOR BY-PASS", "운전실 BY-PASS 스위치", "출입문 코크", "DCS 스위치"],
+      "answer": 1,
+      "explanation": "PSD 고장 시 관제승인 후 운전실 BY-PASS 스위치를 취급합니다."
+    },
+    {
+      "id": "q40",
+      "chapter": "ch7",
+      "question": "선로전환기 훼손 사고의 직접적인 원인은?",
+      "choices": ["ATC 고장", "선로전환기 반위상태에서 입환", "출입문 고장", "관제 통신 두절"],
+      "answer": 1,
+      "explanation": "112번 선로전환기가 반위상태에서 513편성이 입환하여 훼손되었습니다."
+    },
+    {
+      "id": "q41",
+      "chapter": "ch7",
+      "question": "승강장 안전문 미개방 시 경보 현상은?",
+      "choices": ["비상벨 작동", "'PSD를 개방하시오!!' 플래싱 + 경보음", "관제 자동통보", "출입문 자동 닫힘"],
+      "answer": 1,
+      "explanation": "PSD 전체 미열림 시 'PSD를 개방하시오!!' 플래싱 문구 점멸 및 경보음이 발생합니다."
+    },
+    {
+      "id": "q42",
+      "chapter": "ch7",
+      "question": "5~8호선에서 PSD가 몇 개 이상 동작하면 속도코드가 현시되는가?",
+      "choices": ["전체", "1개 이상", "과반수 이상", "2개 이상"],
+      "answer": 1,
+      "explanation": "5~8호선은 PSD 1개 이상 동작하면 속도코드가 현시되어 출발조건이 됩니다."
+    },
+    {
+      "id": "q43",
+      "chapter": "ch2",
+      "question": "추진운전의 제한속도는?",
+      "choices": ["15km/h이하", "25km/h이하", "35km/h이하", "45km/h이하"],
+      "answer": 1,
+      "explanation": "구원연결하여 추진운전 시 25km/h 이하입니다."
+    },
+    {
+      "id": "q44",
+      "chapter": "ch2",
+      "question": "차량기지구내(YARD) 운전 시 속도코드와 제한속도는?",
+      "choices": ["코드 15, 15km/h이하", "코드 25, 25km/h이하", "코드 45, 45km/h이하", "코드 01, 5km/h이하"],
+      "answer": 1,
+      "explanation": "YARD(기지)는 속도코드 25, 25km/h이하 수동운전입니다."
+    },
+    {
+      "id": "q45",
+      "chapter": "ch1",
+      "question": "출고 시 고덕차량기지에서 반드시 시행해야 하는 것은?",
+      "choices": ["음주측정", "종별보고", "완전 재기동", "PAN 시험"],
+      "answer": 1,
+      "explanation": "고덕차량기지 출고 시 종별보고를 시행해야 합니다."
+    },
+    {
+      "id": "q46",
+      "chapter": "ch3",
+      "question": "로템 전동차 EO모드의 특이사항은?",
+      "choices": ["정차제동 정상 작동", "정차제동 체결 안됨", "비상제동만 가능", "자동운전 가능"],
+      "answer": 1,
+      "explanation": "로템 EO모드는 35km/h 이하 역행 가능하나 정차제동이 체결되지 않습니다."
+    },
+    {
+      "id": "q47",
+      "chapter": "ch5",
+      "question": "ABB 전동차 MRPS 비상제동 체결 시 취급하는 스위치는?",
+      "choices": ["EBCOS만", "MRBPSW 또는 EBCOPB", "강제완해 스위치", "주차제동 bypass"],
+      "answer": 1,
+      "explanation": "ABB는 MRBPSW 또는 EBCOPB를 취급합니다."
+    },
+    {
+      "id": "q48",
+      "chapter": "ch2",
+      "question": "기지모드에서 사용 가능한 출입문모드는?",
+      "choices": ["자동열림/자동닫힘", "자동열림/수동닫힘", "수동열림/수동닫힘", "모든 모드"],
+      "answer": 2,
+      "explanation": "기지모드에서는 수동열림/수동닫힘만 가능합니다."
+    },
+    {
+      "id": "q49",
+      "chapter": "ch5",
+      "question": "출입문 전체 닫힘 불능 시 ABB 전동차의 특수 조치는?",
+      "choices": ["ZVS 취급", "반대편 운전실 DCS S/W 취급", "TCUCB1 차단", "EO모드"],
+      "answer": 1,
+      "explanation": "ABB는 출입문 재개폐 불능 시 반대편 운전실 DCS S/W를 취급합니다."
+    },
+    {
+      "id": "q50",
+      "chapter": "ch3",
+      "question": "ABB-ABB 구원운전 시 고장차와 구원차의 PAN 상태는?",
+      "choices": ["둘 다 하강", "고장차 하강, 구원차 상승", "둘 다 상승", "고장차 상승, 구원차 하강"],
+      "answer": 2,
+      "explanation": "ABB-ABB 구원운전 시 고장차와 구원차 모두 PAN 상승 상태입니다."
+    }
+  ]
+}

@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
-import { Briefcase, GraduationCap, ShieldCheck } from 'lucide-react';
 import styles from './WorldHub.module.css';
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 export type WorldId = 'duty' | 'edu' | 'safety';
 
@@ -11,44 +13,61 @@ interface WorldHubProps {
   onEnter: (world: WorldId) => void;
 }
 
-const WORLDS: {
-  id: WorldId;
-  label: string;
-  desc: string;
-  icon: typeof Briefcase;
-  iconClass: string;
-  cardClass: string;
-}[] = [
+const WORLDS = [
   {
-    id: 'duty',
+    id: 'duty' as WorldId,
     label: '근무',
     desc: '교번 · 일정 · 노선',
-    icon: Briefcase,
+    lottie: '/lottie/duty.json',
     iconClass: styles.iconDuty,
     cardClass: styles.cardDuty,
   },
   {
-    id: 'edu',
+    id: 'edu' as WorldId,
     label: '교육',
     desc: '규정 · 학습 · 평가',
-    icon: GraduationCap,
+    lottie: '/lottie/edu.json',
     iconClass: styles.iconEdu,
     cardClass: styles.cardEdu,
   },
   {
-    id: 'safety',
+    id: 'safety' as WorldId,
     label: '안전',
     desc: '점검 · 보고 · 매뉴얼',
-    icon: ShieldCheck,
+    lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
   },
 ];
 
+function LottieIcon({ src, className }: { src: string; className: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [data, setData] = useState<Record<string, any> | null>(null);
+
+  useEffect(() => {
+    fetch(src)
+      .then((r) => r.json())
+      .then(setData)
+      .catch(() => {});
+  }, [src]);
+
+  return (
+    <div className={`${styles.iconWrap} ${className}`}>
+      {data && (
+        <Lottie
+          animationData={data}
+          loop
+          autoplay
+          className={styles.lottieIcon}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function WorldHub({ onEnter }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
-  const gridRef = useRef<HTMLDivElement>(null);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>, worldId: WorldId) => {
     const btn = e.currentTarget;
@@ -76,26 +95,21 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
         <p className={styles.subtitle}>업무 영역을 선택하세요</p>
       </header>
 
-      <div className={styles.grid} ref={gridRef}>
+      <div className={styles.grid}>
         <div className={styles.topRow}>
-          {topWorlds.map((w) => {
-            const Icon = w.icon;
-            return (
-              <button
-                key={w.id}
-                type="button"
-                className={`${styles.card} ${w.cardClass}`}
-                onClick={(e) => handleClick(e, w.id)}
-                aria-label={w.label}
-              >
-                <div className={`${styles.iconWrap} ${w.iconClass}`}>
-                  <Icon />
-                </div>
-                <span className={styles.cardTitle}>{w.label}</span>
-                <span className={styles.cardDesc}>{w.desc}</span>
-              </button>
-            );
-          })}
+          {topWorlds.map((w) => (
+            <button
+              key={w.id}
+              type="button"
+              className={`${styles.card} ${w.cardClass}`}
+              onClick={(e) => handleClick(e, w.id)}
+              aria-label={w.label}
+            >
+              <LottieIcon src={w.lottie} className={w.iconClass} />
+              <span className={styles.cardTitle}>{w.label}</span>
+              <span className={styles.cardDesc}>{w.desc}</span>
+            </button>
+          ))}
         </div>
 
         <div className={styles.bottomRow}>
@@ -105,9 +119,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             onClick={(e) => handleClick(e, bottomWorld.id)}
             aria-label={bottomWorld.label}
           >
-            <div className={`${styles.iconWrap} ${bottomWorld.iconClass}`}>
-              <bottomWorld.icon />
-            </div>
+            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} />
             <span className={styles.cardTitle}>{bottomWorld.label}</span>
             <span className={styles.cardDesc}>{bottomWorld.desc}</span>
           </button>

@@ -105,7 +105,7 @@
   align-items: center;
   gap: var(--dia-space-4);
   width: 100%;
-  max-width: 340px;
+  max-width: 300px;
   z-index: 1;
 }
 
@@ -277,8 +277,8 @@
 
 /* ── Bottom card (wider) ── */
 .bottomRow .card {
-  width: 66%;
-  min-width: 200px;
+  width: 55%;
+  min-width: 160px;
 }
 
 /* ── Card Icon ── */

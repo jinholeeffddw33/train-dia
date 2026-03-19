@@ -171,6 +171,13 @@
   background-position: center;
 }
 
+.cardFavicon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--dia-radius-xs);
+  object-fit: contain;
+}
+
 .cardInfo {
   flex: 1;
   min-width: 0;

@@ -176,6 +176,26 @@ function AddModal({ onClose, onAdd }: {
   );
 }
 
+/* ─── Favicon with fallback ─── */
+function FaviconImg({ url }: { url: string }) {
+  const [failed, setFailed] = useState(false);
+  let hostname = '';
+  try { hostname = new URL(url).hostname; } catch { /* invalid url */ }
+
+  if (failed || !hostname) return <Globe size={20} />;
+
+  return (
+    <img
+      className={styles.cardFavicon}
+      src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+      alt=""
+      width={24}
+      height={24}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 /* ─── Shortcut Card ─── */
 function ShortcutCard({ item, onEdit, onDelete, onTogglePin }: {
   item: Shortcut;
@@ -212,6 +232,8 @@ function ShortcutCard({ item, onEdit, onDelete, onTogglePin }: {
               /* STYLE-EXCEPTION: 동적 base64 이미지 배경 — CSS로 표현 불가 */
               style={{ backgroundImage: `url(${item.url})` }}
             />
+          ) : item.type === 'web' ? (
+            <FaviconImg url={item.url} />
           ) : (
             <Icon size={20} />
           )}

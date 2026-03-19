@@ -237,6 +237,11 @@
   border-left: 1px solid var(--dia-border);
 }
 
+.cardActionBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
 .cardActionDanger {
   color: var(--dia-red);
 }

@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import {
   X, Plus, Globe, ImageIcon, FileText, Trash2, Pin, PinOff,
-  ExternalLink, Download, Upload, ChevronDown, Pencil, Check,
+  ExternalLink, Download, Upload, ChevronDown, ChevronUp, Pencil, Check,
 } from 'lucide-react';
 import { useShortcutsStore, type ShortcutType, type Shortcut } from '@/stores/shortcuts';
 import styles from '../styles/Shortcuts.module.css';
@@ -197,11 +197,13 @@ function FaviconImg({ url }: { url: string }) {
 }
 
 /* ─── Shortcut Card ─── */
-function ShortcutCard({ item, onEdit, onDelete, onTogglePin }: {
+function ShortcutCard({ item, onEdit, onDelete, onTogglePin, onMoveUp, onMoveDown }: {
   item: Shortcut;
   onEdit: () => void;
   onDelete: () => void;
   onTogglePin: () => void;
+  onMoveUp: (() => void) | null;
+  onMoveDown: (() => void) | null;
 }) {
   const Icon = TYPE_ICONS[item.type];
   const isImage = item.type === 'image';
@@ -248,6 +250,12 @@ function ShortcutCard({ item, onEdit, onDelete, onTogglePin }: {
       </button>
 
       <div className={styles.cardActions}>
+        <button type="button" className={styles.cardActionBtn} onClick={onMoveUp ?? undefined} disabled={!onMoveUp} aria-label="위로">
+          <ChevronUp size={16} />
+        </button>
+        <button type="button" className={styles.cardActionBtn} onClick={onMoveDown ?? undefined} disabled={!onMoveDown} aria-label="아래로">
+          <ChevronDown size={16} />
+        </button>
         <button type="button" className={styles.cardActionBtn} onClick={onTogglePin} aria-label={item.pinned ? '고정 해제' : '고정'}>
           {item.pinned ? <PinOff size={16} /> : <Pin size={16} />}
         </button>
@@ -316,7 +324,7 @@ function EditModal({ item, onClose, onSave }: {
 
 /* ─── Main Overlay ─── */
 export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProps) {
-  const { items, add, update, remove } = useShortcutsStore();
+  const { items, add, update, remove, reorder } = useShortcutsStore();
   const [filter, setFilter] = useState<FilterTab>('all');
   const [addOpen, setAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Shortcut | null>(null);
@@ -433,19 +441,24 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
               : '이 카테고리에 저장된 항목이 없습니다.'}
           </div>
         ) : (
-          filtered.map((item) => (
-            <ShortcutCard
-              key={item.id}
-              item={item}
-              onEdit={() => setEditTarget(item)}
-              onDelete={() => {
-                if (confirm(`"${item.title}" 바로가기를 삭제할까요?`)) {
-                  remove(item.id);
-                }
-              }}
-              onTogglePin={() => update(item.id, { pinned: !item.pinned })}
-            />
-          ))
+          filtered.map((item, idx) => {
+            const realIdx = items.findIndex((it) => it.id === item.id);
+            return (
+              <ShortcutCard
+                key={item.id}
+                item={item}
+                onEdit={() => setEditTarget(item)}
+                onDelete={() => {
+                  if (confirm(`"${item.title}" 바로가기를 삭제할까요?`)) {
+                    remove(item.id);
+                  }
+                }}
+                onTogglePin={() => update(item.id, { pinned: !item.pinned })}
+                onMoveUp={realIdx > 0 ? () => reorder(realIdx, realIdx - 1) : null}
+                onMoveDown={realIdx < items.length - 1 ? () => reorder(realIdx, realIdx + 1) : null}
+              />
+            );
+          })
         )}
       </div>
 

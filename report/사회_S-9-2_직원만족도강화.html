@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사회 S-⑨-2 직원 만족도 강화</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm 15mm 18mm; }
+  body { font-family: '휴먼명조', '바탕', serif; font-size: 14pt; line-height: 1.6; color: #000; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #000; padding: 3pt 6pt; vertical-align: middle; }
+  .no-border td, .no-border th { border: none; }
+  .header-table td { text-align: center; }
+  .section-title { font-family: '한컴돋움', '돋움', sans-serif; font-size: 15pt; font-weight: bold; }
+  .body14 { font-family: '휴먼명조', '바탕', serif; font-size: 14pt; }
+  .body14b { font-family: '휴먼명조', '바탕', serif; font-size: 14pt; font-weight: bold; }
+  .body13 { font-family: '휴먼명조', '바탕', serif; font-size: 13pt; }
+  .hancom-bold { font-family: '한컴돋움', '돋움', sans-serif; font-weight: bold; }
+  .small { font-size: 11pt; }
+  .blue { color: #0055CC; }
+  .center { text-align: center; }
+  .right { text-align: right; }
+  .badge { display: inline-block; border: 1px solid #0055CC; color: #0055CC; padding: 1pt 8pt; font-size: 12pt; margin-left: 8pt; }
+  .gantt-fill { background-color: #003399; }
+  .footer-line { border-top: 2px solid #000; padding-top: 4pt; font-size: 11pt; text-align: center; margin-top: 12pt; }
+</style>
+</head>
+<body>
+
+<!-- ===== 상단 헤더 ===== -->
+<table class="header-table" style="margin-bottom: 0;">
+<tr>
+  <td rowspan="2" style="width: 18%; font-family: '한컴돋움','돋움',sans-serif; font-size: 13pt; font-weight: bold;">사회 S-⑨-2</td>
+  <td style="font-size: 12pt; color: #0055CC; font-family: '한컴돋움','돋움',sans-serif; border-bottom: none;">[ 전략과제: 디지털 기반 서비스 역량 강화 ]</td>
+  <td rowspan="2" style="width: 18%; font-size: 12pt; font-family: '한컴돋움','돋움',sans-serif;">답십리승무사업소</td>
+</tr>
+<tr>
+  <td style="font-family: '한컴돋움','돋움',sans-serif; font-size: 20pt; font-weight: bold; border-top: none;">직원 만족도 강화</td>
+</tr>
+</table>
+
+<br>
+
+<!-- ===== 과제명 ===== -->
+<p style="margin: 6pt 0;">
+  <span class="body14b">□ 승무원 디지털 업무 플랫폼 구축을 통한 서비스 역량 강화</span>
+  <span class="badge">신규</span>
+</p>
+
+<!-- ===== 추진개요 ===== -->
+<p style="margin: 10pt 0 4pt 12pt;">
+  <span class="section-title">○ 추진개요</span>
+</p>
+
+<p class="body14" style="margin: 2pt 0 2pt 28pt;">
+  - 5호선 답십리 승무사업소 기관사 <span class="hancom-bold">175명</span>의 교번(<span class="hancom-bold">171일 주기 순환</span>) 확인·교체·노선정보 조회를 디지털화하는 <span class="hancom-bold">PWA 기반 모바일 앱 「기관사 DIA」</span>를 자체 개발·도입
+</p>
+<p class="body14" style="margin: 2pt 0 2pt 28pt;">
+  - 현재 수기 대장·전화·구두 의존 → 교번 확인 지연, 교체 누락·오류, 정보 비대칭으로 <span class="hancom-bold">업무 스트레스 및 서비스 품질 편차</span> 발생
+</p>
+<p class="body13" style="margin: 2pt 0 2pt 42pt;">
+  • 별도 앱 설치 없이 브라우저에서 즉시 사용 (Progressive Web App)<br>
+  • 오프라인(지하 터널) 대응, 다크모드·글자 크기 조절 등 현장 특화
+</p>
+
+<!-- ===== 추진내용 ===== -->
+<p style="margin: 10pt 0 4pt 12pt;">
+  <span class="section-title">○ 추진내용</span>
+</p>
+
+<p class="body14" style="margin: 2pt 0 6pt 28pt;">
+  - 「기관사 DIA」 <span class="hancom-bold">6대 핵심 기능</span> 구축
+</p>
+
+<table style="width: 92%; margin-left: 28pt; font-size: 13pt;">
+<tr style="background-color: #E8EAF0;">
+  <th style="width: 18%;">기능</th>
+  <th>주요 내용</th>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">① 홈<br><span style="font-size:11pt; font-weight:normal;">(대시보드)</span></td>
+  <td>오늘의 교번·주간 일정 즉시 표시, 실시간 시계 + 근무 시작·종료 시간 안내</td>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">② 교번<br><span style="font-size:11pt; font-weight:normal;">(캘린더)</span></td>
+  <td>월간 캘린더 형태 교번 조회, 날짜별 상세 카드, 개인 메모, 상대방 교번 비교</td>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">③ 5호선<br><span style="font-size:11pt; font-weight:normal;">(노선도)</span></td>
+  <td>전 역사 인터랙티브 노선도, 환승 정보(7개 노선), 실시간 열차 도착 정보</td>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">④ 근무<br><span style="font-size:11pt; font-weight:normal;">(현황)</span></td>
+  <td>당일 전체 승무원 현황 실시간 조회, 유형별 필터(주간/야간/대기), 날짜 이동</td>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">⑤ 교체<br><span style="font-size:11pt; font-weight:normal;">(게시판)</span></td>
+  <td>교번 교체 매칭 검색 + 게시판, 실시간 알림, 거절 사유, 수락 후 후속 안내 자동화</td>
+</tr>
+<tr>
+  <td class="center" style="font-weight: bold;">⑥ 설정</td>
+  <td>프로필, 도착정보, 경로검색, 비상연락처, 다크모드, 글자 크기, 알림 설정</td>
+</tr>
+</table>
+
+<p class="body13 blue" style="margin: 4pt 0 2pt 28pt;">
+  ※ 사진, 그림, 도표 등 시각자료를 활용하여 작성 → 별첨 앱 캡처 6매 참조
+</p>
+
+<!-- ===== 페이지 구분선 (인쇄 시 페이지 넘김) ===== -->
+<div style="margin: 14pt 0; border-top: 1px solid #999; padding-top: 2pt; font-size: 10pt; color: #999;">/</div>
+
+<!-- ===== 소요예산 ===== -->
+<p style="margin: 8pt 0 4pt 0;">
+  <span class="body14b">□ 소요예산 : &nbsp;<span style="font-size: 16pt;">0</span>백만원</span>
+</p>
+<p class="right small" style="margin: 0 0 2pt 0;">(단위: 백만원)</p>
+
+<table style="width: 80%; font-size: 13pt;">
+<tr style="background-color: #E8EAF0;">
+  <th>구 분</th><th style="width:12%;">계</th><th style="width:12%;">1분기</th><th style="width:12%;">2분기</th><th style="width:12%;">3분기</th><th style="width:12%;">4분기</th>
+</tr>
+<tr>
+  <td class="center">기관사 DIA 개발·운영</td>
+  <td class="center">0</td><td class="center">0</td><td class="center">0</td><td class="center">0</td><td class="center">0</td>
+</tr>
+</table>
+<p class="body13" style="margin: 2pt 0 2pt 8pt;">
+  ※ 자체 개발(직원 역량) + 무료 플랫폼(Vercel/Supabase 무료 티어) 활용 → 별도 예산 없음
+</p>
+
+<!-- ===== 추진일정 ===== -->
+<p style="margin: 12pt 0 4pt 0;">
+  <span class="body14b">□ 추진일정</span>
+</p>
+
+<table style="width: 100%; font-size: 12pt;">
+<tr style="background-color: #E8EAF0;">
+  <th rowspan="2" style="width: 22%;">구 분</th>
+  <th colspan="12">월별 추진계획</th>
+</tr>
+<tr style="background-color: #E8EAF0;">
+  <th colspan="3" style="width: 19.5%;">1/4</th>
+  <th colspan="3" style="width: 19.5%;">2/4</th>
+  <th colspan="3" style="width: 19.5%;">3/4</th>
+  <th colspan="3" style="width: 19.5%;">4/4</th>
+</tr>
+<tr style="background-color: #F5F5F5; font-size: 10pt;">
+  <td></td>
+  <td class="center">1</td><td class="center">2</td><td class="center">3</td>
+  <td class="center">4</td><td class="center">5</td><td class="center">6</td>
+  <td class="center">7</td><td class="center">8</td><td class="center">9</td>
+  <td class="center">10</td><td class="center">11</td><td class="center">12</td>
+</tr>
+<tr>
+  <td>설계·개발</td>
+  <td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td>
+  <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td>현장 테스트·안정화</td>
+  <td></td><td></td><td></td>
+  <td class="gantt-fill"></td><td class="gantt-fill"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+</tr>
+<tr>
+  <td>정식 운영</td>
+  <td></td><td></td><td></td><td></td><td></td>
+  <td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td>
+</tr>
+<tr>
+  <td>타 사업소 확대 검토</td>
+  <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+  <td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td><td class="gantt-fill"></td>
+</tr>
+</table>
+
+<!-- ===== 성과지표(KPI) ===== -->
+<p style="margin: 12pt 0 4pt 0;">
+  <span class="body14b">□ 성과지표(KPI)</span>
+</p>
+
+<table style="width: 100%; font-size: 13pt;">
+<tr style="background-color: #E8EAF0;">
+  <th rowspan="2" style="width: 22%;">구 분</th>
+  <th rowspan="2" style="width: 20%;">'26년 목표<br><span style="font-size:11pt;">(단위)</span></th>
+  <th colspan="3">최근 3년간 실적</th>
+</tr>
+<tr style="background-color: #E8EAF0;">
+  <th style="width: 18%;">'23년</th>
+  <th style="width: 18%;">'24년</th>
+  <th style="width: 18%;">'25년</th>
+</tr>
+<tr>
+  <td class="center">교번 확인<br>소요 시간</td>
+  <td class="center"><b>3초 이내</b><br>(97% 단축)</td>
+  <td class="center">약 5분<br><span style="font-size:11pt;">(수기)</span></td>
+  <td class="center">약 5분<br><span style="font-size:11pt;">(수기)</span></td>
+  <td class="center">약 5분<br><span style="font-size:11pt;">(수기)</span></td>
+</tr>
+<tr>
+  <td class="center">교체 요청<br>완료 시간</td>
+  <td class="center"><b>수 분 이내</b><br>(99% 단축)</td>
+  <td class="center">2~3일<br><span style="font-size:11pt;">(전화)</span></td>
+  <td class="center">2~3일<br><span style="font-size:11pt;">(전화)</span></td>
+  <td class="center">2~3일<br><span style="font-size:11pt;">(전화)</span></td>
+</tr>
+<tr>
+  <td class="center">디지털 처리<br>비율</td>
+  <td class="center"><b>100%</b></td>
+  <td class="center">0%</td>
+  <td class="center">0%</td>
+  <td class="center">0%</td>
+</tr>
+<tr>
+  <td class="center">직원 앱<br>활용률</td>
+  <td class="center"><b>80% 이상</b><br>(175명 중)</td>
+  <td class="center">-<br><span style="font-size:11pt;">(미도입)</span></td>
+  <td class="center">-<br><span style="font-size:11pt;">(미도입)</span></td>
+  <td class="center">-<br><span style="font-size:11pt;">(미도입)</span></td>
+</tr>
+</table>
+
+<p class="body13" style="margin: 4pt 0 2pt 8pt;">
+  ※ 기타: 서울교통공사 디지털 전환 전략 연계, 자체 개발로 예산 절감 효과
+</p>
+
+<!-- ===== 하단 결재선 ===== -->
+<div class="footer-line">
+  ○ ○ ○ 처장: ○ ○ ○ &nbsp;☎6311-0000 &nbsp;&nbsp;&nbsp; 팀장: ○ ○ ○ &nbsp;☎0000 &nbsp;&nbsp;&nbsp; 담당: 이진호 &nbsp;☎0000
+</div>
+
+</body>
+</html>

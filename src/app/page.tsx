@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
+import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, HomeTipsQuiz } from '@/features/home';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
@@ -48,11 +49,25 @@ function HomeTab() {
 }
 
 export default function HomePage() {
+  const [world, setWorld] = useState<WorldId | null>(null);
+
+  const handleEnter = useCallback((w: WorldId) => {
+    setWorld(w);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setWorld(null);
+  }, []);
+
   return (
     <AuthGate>
-      <AppShell>
-        {(activeTab) => <TabContent tab={activeTab} />}
-      </AppShell>
+      {world === null ? (
+        <WorldHub onEnter={handleEnter} />
+      ) : world === 'duty' ? (
+        <AppShell onBack={handleBack}>
+          {(activeTab) => <TabContent tab={activeTab} />}
+        </AppShell>
+      ) : null}
     </AuthGate>
   );
 }

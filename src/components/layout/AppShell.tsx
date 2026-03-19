@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
 import { AlertFab } from '@/features/alerts';
@@ -14,9 +15,10 @@ import styles from './AppShell.module.css';
 
 interface AppShellProps {
   children: (activeTab: TabId) => React.ReactNode;
+  onBack?: () => void;
 }
 
-export default function AppShell({ children }: AppShellProps) {
+export default function AppShell({ children, onBack }: AppShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const alertCount = useAlertStore((s) => s.alerts.length);
   const { canInstall, install } = useInstallPrompt();
@@ -66,6 +68,17 @@ export default function AppShell({ children }: AppShellProps) {
             </button>
           </div>
         </div>
+      )}
+
+      {onBack && (
+        <button
+          type="button"
+          className={styles.backBtn}
+          onClick={onBack}
+          aria-label="세계 선택으로 돌아가기"
+        >
+          <ArrowLeft size={20} strokeWidth={2} />
+        </button>
       )}
 
       <main className={styles.content}>

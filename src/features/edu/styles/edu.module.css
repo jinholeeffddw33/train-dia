@@ -1133,6 +1133,175 @@
   text-align: center;
 }
 
+/* ── 오답 액션 행 ── */
+.wrongActions {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-4);
+}
+.wrongLinkBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  font-size: var(--dia-text-xs);
+  color: var(--dia-blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--dia-space-1) 0;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+.wrongLinkBtn:active { opacity: 0.7; }
+
+/* ── 오답 해결 상태 ── */
+.wrongResolved {
+  opacity: 0.6;
+}
+.wrongResolvedBadge {
+  display: inline-flex;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-green);
+  background: var(--dia-green-dim);
+  padding: 1px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  margin-right: var(--dia-space-2);
+  font-weight: var(--dia-weight-bold);
+  vertical-align: middle;
+}
+
+/* ── 최근 본 섹션 목록 ── */
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+.recentItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--dia-border-light);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+.recentItem:last-child { border-bottom: none; }
+.recentItem:active { background: var(--dia-surface-hover); }
+.recentIcon {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}
+.recentTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 오답 메뉴 아이콘 ── */
+.menuIconWrong {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.15));
+}
+
+/* ── 교육자료 기준일 배너 ── */
+.docVersionBanner {
+  padding: var(--dia-space-3) var(--dia-space-4);
+  text-align: center;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  border-top: 1px solid var(--dia-border-light);
+  margin-top: var(--dia-space-2);
+}
+
+/* ── 섹션 요약 카드 ── */
+.summaryCard {
+  margin: var(--dia-space-3) var(--dia-space-4) 0;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: var(--dia-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.summarySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+.summaryLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+}
+.summaryList {
+  margin: 0;
+  padding-left: var(--dia-space-5);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-normal);
+}
+.summaryList li {
+  margin-bottom: var(--dia-space-1);
+}
+.summaryList li:last-child {
+  margin-bottom: 0;
+}
+.summaryCaution {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-amber);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: rgba(245, 158, 11, 0.08);
+  border-radius: var(--dia-radius-sm);
+}
+.summaryCaution svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.summaryKeywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dia-space-1);
+}
+.keywordChip {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  background: var(--dia-surface);
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+}
+
+/* ── 섹션 메타 정보 ── */
+.sectionMeta {
+  padding: var(--dia-space-3) var(--dia-space-4);
+  text-align: right;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── 검색 하이라이트 ── */
+.searchHighlight {
+  background: rgba(245, 158, 11, 0.25);
+  color: var(--dia-amber);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 /* empty state */
 .emptyState {
   padding: var(--dia-space-10) var(--dia-space-4);

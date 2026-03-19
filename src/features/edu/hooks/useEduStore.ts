@@ -1,12 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
 
 /* ── 타입 ── */
+
+export type QuizMode = 'quick' | 'standard' | 'full' | 'chapter' | 'wrong-only';
+
 export interface QuizRecord {
   date: string;       // ISO
   score: number;      // 정답 수
   total: number;      // 총 문제 수
   percent: number;    // 100점 만점 환산
-  chapter?: string;   // 챕터별이면 챕터 ID
+  mode: QuizMode;
+  chapterId?: string;
+  solvedAt: string;   // ISO
 }
 
 export interface WrongAnswer {
@@ -16,8 +21,10 @@ export interface WrongAnswer {
   answer: number;       // 정답 인덱스
   selected: number;     // 사용자가 선택한 인덱스
   explanation: string;
-  chapter: string;
+  chapter: string;      // 챕터 레이블
+  chapterId: string;    // 챕터 ID (ch1, ch2...)
   date: string;         // ISO
+  resolved?: boolean;   // 오답 재시험에서 맞힌 경우
 }
 
 export interface ReadRecord {
@@ -31,14 +38,17 @@ export interface EduProgress {
   bookmarks: string[];                          // 즐겨찾기 섹션 ID
   quizHistory: QuizRecord[];                    // 퀴즈 기록
   wrongAnswers: WrongAnswer[];                  // 오답노트
-  lastReadSection?: string;                     // 마지막으로 읽던 섹션
-  lastReadChapter?: string;                     // 마지막으로 읽던 챕터
+  lastReadSectionId?: string;                   // 마지막으로 읽던 섹션 ID
+  lastReadChapter?: string;                     // 마지막으로 읽던 챕터 ID
+  lastActiveAt?: string;                        // 마지막 활동 시각 ISO
+  recentSections: string[];                     // 최근 본 섹션 ID (최대 10개, 최신이 앞)
   streak: number;
   lastStudyDate?: string;                       // YYYY-MM-DD
 }
 
 const STORAGE_KEY = 'train-dia-edu-progress';
-const CURRENT_VERSION = 3;
+const CURRENT_VERSION = 4;
+const MAX_RECENT_SECTIONS = 10;
 
 const EMPTY_PROGRESS: EduProgress = {
   version: CURRENT_VERSION,
@@ -46,6 +56,7 @@ const EMPTY_PROGRESS: EduProgress = {
   bookmarks: [],
   quizHistory: [],
   wrongAnswers: [],
+  recentSections: [],
   streak: 0,
 };
 
@@ -59,16 +70,49 @@ function migrateProgress(data: any): EduProgress {
     }
     data = { ...data, readSections: migrated };
   }
-  // v2 → v3: add bookmarks, wrongAnswers, version, lastReadChapter
+  // v2 → v3: add bookmarks, wrongAnswers
   if (!data.version || data.version < 3) {
     data = {
       ...data,
-      version: CURRENT_VERSION,
+      version: 3,
       bookmarks: data.bookmarks ?? [],
       wrongAnswers: data.wrongAnswers ?? [],
       lastReadChapter: data.lastReadChapter ?? undefined,
     };
   }
+  // v3 → v4: add lastReadSectionId, lastActiveAt, recentSections, quizHistory 확장, wrongAnswers.chapterId
+  if (data.version < 4) {
+    // lastReadSection → lastReadSectionId (rename)
+    const lastReadSectionId = data.lastReadSectionId ?? data.lastReadSection ?? undefined;
+
+    // quizHistory 마이그레이션: mode, solvedAt 추가
+    const quizHistory = (data.quizHistory ?? []).map((r: any) => ({
+      ...r,
+      mode: r.mode ?? 'standard',
+      solvedAt: r.solvedAt ?? r.date ?? new Date().toISOString(),
+    }));
+
+    // wrongAnswers 마이그레이션: chapterId, resolved 추가
+    const wrongAnswers = (data.wrongAnswers ?? []).map((w: any) => ({
+      ...w,
+      chapterId: w.chapterId ?? '',
+      resolved: w.resolved ?? false,
+    }));
+
+    data = {
+      ...data,
+      version: CURRENT_VERSION,
+      lastReadSectionId,
+      lastActiveAt: data.lastActiveAt ?? undefined,
+      recentSections: data.recentSections ?? [],
+      quizHistory,
+      wrongAnswers,
+    };
+
+    // 이전 필드 정리
+    delete data.lastReadSection;
+  }
+
   return data as EduProgress;
 }
 
@@ -91,6 +135,23 @@ function getTodayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function updateStreak(prev: EduProgress): { streak: number; lastStudyDate: string } {
+  const today = getTodayStr();
+  if (prev.lastStudyDate === today) {
+    return { streak: prev.streak, lastStudyDate: today };
+  }
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().slice(0, 10);
+  const streak = prev.lastStudyDate === yStr ? prev.streak + 1 : 1;
+  return { streak, lastStudyDate: today };
+}
+
+function pushRecent(prev: string[], sectionId: string): string[] {
+  const filtered = prev.filter(id => id !== sectionId);
+  return [sectionId, ...filtered].slice(0, MAX_RECENT_SECTIONS);
+}
+
 export function useEduStore() {
   const [progress, setProgress] = useState<EduProgress>(loadProgress);
 
@@ -107,20 +168,16 @@ export function useEduStore() {
         ? { lastRead: today, count: existing.count + 1 }
         : { lastRead: today, count: 1 };
 
-      let streak = prev.streak;
-      if (prev.lastStudyDate !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yStr = yesterday.toISOString().slice(0, 10);
-        streak = prev.lastStudyDate === yStr ? prev.streak + 1 : 1;
-      }
+      const { streak, lastStudyDate } = updateStreak(prev);
       return {
         ...prev,
         readSections: { ...prev.readSections, [sectionId]: updated },
-        lastReadSection: sectionId,
+        lastReadSectionId: sectionId,
         lastReadChapter: chapterId ?? prev.lastReadChapter,
+        lastActiveAt: new Date().toISOString(),
+        recentSections: pushRecent(prev.recentSections, sectionId),
         streak,
-        lastStudyDate: today,
+        lastStudyDate,
       };
     });
   }, []);
@@ -143,33 +200,28 @@ export function useEduStore() {
   }, [progress.bookmarks]);
 
   /* ── 퀴즈 ── */
-  const addQuizRecord = useCallback((record: Omit<QuizRecord, 'date'>) => {
+  const addQuizRecord = useCallback((record: Omit<QuizRecord, 'date' | 'solvedAt'>) => {
     setProgress(prev => {
-      const today = getTodayStr();
-      let streak = prev.streak;
-      if (prev.lastStudyDate !== today) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yStr = yesterday.toISOString().slice(0, 10);
-        streak = prev.lastStudyDate === yStr ? prev.streak + 1 : 1;
-      }
+      const now = new Date().toISOString();
+      const { streak, lastStudyDate } = updateStreak(prev);
       return {
         ...prev,
-        quizHistory: [...prev.quizHistory, { ...record, date: new Date().toISOString() }],
+        quizHistory: [...prev.quizHistory, { ...record, date: now, solvedAt: now }],
+        lastActiveAt: now,
         streak,
-        lastStudyDate: today,
+        lastStudyDate,
       };
     });
   }, []);
 
   /* ── 오답노트 ── */
-  const addWrongAnswer = useCallback((wrong: Omit<WrongAnswer, 'date'>) => {
+  const addWrongAnswer = useCallback((wrong: Omit<WrongAnswer, 'date' | 'resolved'>) => {
     setProgress(prev => {
       // 같은 문제 중복 시 최신으로 교체
       const filtered = prev.wrongAnswers.filter(w => w.questionId !== wrong.questionId);
       return {
         ...prev,
-        wrongAnswers: [...filtered, { ...wrong, date: new Date().toISOString() }],
+        wrongAnswers: [...filtered, { ...wrong, date: new Date().toISOString(), resolved: false }],
       };
     });
   }, []);
@@ -178,6 +230,16 @@ export function useEduStore() {
     setProgress(prev => ({
       ...prev,
       wrongAnswers: prev.wrongAnswers.filter(w => w.questionId !== questionId),
+    }));
+  }, []);
+
+  /** 오답 재시험에서 맞힌 문제를 resolved 처리 */
+  const resolveWrongAnswer = useCallback((questionId: string) => {
+    setProgress(prev => ({
+      ...prev,
+      wrongAnswers: prev.wrongAnswers.map(w =>
+        w.questionId === questionId ? { ...w, resolved: true } : w
+      ),
     }));
   }, []);
 
@@ -198,6 +260,8 @@ export function useEduStore() {
     ? Math.round(progress.quizHistory.reduce((s, r) => s + r.percent, 0) / progress.quizHistory.length)
     : 0;
 
+  const unresolvedWrongs = progress.wrongAnswers.filter(w => !w.resolved);
+
   return {
     progress,
     markSectionRead,
@@ -206,6 +270,7 @@ export function useEduStore() {
     addQuizRecord,
     addWrongAnswer,
     removeWrongAnswer,
+    resolveWrongAnswer,
     bestScore,
     latestScore,
     previousScore,
@@ -214,5 +279,7 @@ export function useEduStore() {
     readCount: Object.keys(progress.readSections).length,
     streak: progress.streak,
     wrongCount: progress.wrongAnswers.length,
+    unresolvedWrongCount: unresolvedWrongs.length,
+    unresolvedWrongs,
   };
 }

@@ -11,6 +11,7 @@ type EduView =
   | { type: 'home' }
   | { type: 'study'; initSection?: string; initChapter?: string }
   | { type: 'quiz'; chapter?: string }
+  | { type: 'wrong-quiz' }
   | { type: 'wrong-review' };
 
 interface EduTabProps {
@@ -35,8 +36,15 @@ export default function EduTab({ onBack }: EduTabProps) {
       );
     case 'quiz':
       return <QuizSystem onBack={goHome} initChapter={view.chapter} />;
+    case 'wrong-quiz':
+      return <QuizSystem onBack={goHome} wrongOnly />;
     case 'wrong-review':
-      return <WrongReview onBack={goHome} />;
+      return (
+        <WrongReview
+          onBack={goHome}
+          onSection={(id) => setView({ type: 'study', initSection: id })}
+        />
+      );
     default:
       return (
         <EduHome
@@ -46,6 +54,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onSection={(id) => setView({ type: 'study', initSection: id })}
           onChapter={(id) => setView({ type: 'study', initChapter: id })}
           onWrongReview={() => setView({ type: 'wrong-review' })}
+          onWrongQuiz={() => setView({ type: 'wrong-quiz' })}
         />
       );
   }

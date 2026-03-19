@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ArrowLeft, Search, Bookmark } from 'lucide-react';
+import { ArrowLeft, Search, Bookmark, AlertTriangle, Info } from 'lucide-react';
 import ContentRenderer from './ContentRenderer';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -15,6 +15,80 @@ interface DocumentViewerProps {
 }
 
 type ViewMode = 'toc' | 'section';
+
+/** 현장 검색 별칭 맵 — 기관사가 실제 사용하는 약어/동의어 */
+const SEARCH_ALIAS_MAP: Record<string, string[]> = {
+  'ATC': ['자동열차제어', '자동열차제어장치', 'ATC장치'],
+  'ATO': ['자동열차운전', '자동운전'],
+  'ATP': ['자동열차방호', '열차방호장치'],
+  'EB': ['비상제동', '비상브레이크', 'Emergency Brake'],
+  'TGIS': ['열차종합정보', '종합정보시스템'],
+  'SIV': ['보조전원장치', '정적인버터'],
+  'VVVF': ['추진제어', '인버터'],
+  '출입문': ['도어', '차문', '승객문', '승강문'],
+  '구원': ['구원운전', '구원열차', '합병운전'],
+  '대피': ['승객대피', '비상대피', '여객대피'],
+  '화재': ['화재발생', '차량화재', '객실화재'],
+  '고장': ['차량고장', '장애', '고장조치'],
+  '지연': ['열차지연', '운행지연'],
+  '역행': ['역행운전', '역주행'],
+  '퇴행': ['퇴행운전'],
+  '무선': ['무선통신', '열차무선'],
+  '관제': ['종합관제', '관제실', '운영관제'],
+  '기지': ['차량기지', '차량사업소'],
+  '주박': ['주박위치', '야간주박'],
+  '입고': ['입고절차', '차량입고'],
+  '출고': ['출고절차', '차량출고'],
+  '절연': ['절연구간'],
+  'ABB': ['ABB차량', 'ABB전동차'],
+  '우진': ['우진차량', '우진산전', '우진전동차'],
+  '로템': ['현대로템', '로템차량', '로템전동차'],
+};
+
+/** 검색어 정규화: 공백 제거 + 소문자 */
+function normalizeSearchTerm(term: string): string {
+  return term.replace(/\s+/g, '').toLowerCase();
+}
+
+/** 별칭 맵에서 확장된 검색어 목록 반환 */
+function expandSearchTerms(query: string): string[] {
+  const q = query.trim();
+  const qLower = q.toLowerCase();
+  const qNorm = normalizeSearchTerm(q);
+  const terms = new Set<string>([qLower, qNorm]);
+
+  // alias 맵에서 정확히 매칭되는 키/값 찾기
+  for (const [key, aliases] of Object.entries(SEARCH_ALIAS_MAP)) {
+    const keyNorm = normalizeSearchTerm(key);
+    if (keyNorm === qNorm || qNorm.includes(keyNorm)) {
+      terms.add(keyNorm);
+      for (const a of aliases) {
+        terms.add(normalizeSearchTerm(a));
+      }
+    }
+    for (const a of aliases) {
+      if (normalizeSearchTerm(a) === qNorm) {
+        terms.add(keyNorm);
+        for (const aa of aliases) {
+          terms.add(normalizeSearchTerm(aa));
+        }
+      }
+    }
+  }
+
+  return [...terms];
+}
+
+type SearchMatchType = 'title' | 'alias' | 'content';
+
+interface SearchResult {
+  chapterId: string;
+  chapterTitle: string;
+  sectionId: string;
+  sectionTitle: string;
+  preview: string;
+  matchType: SearchMatchType;
+}
 
 export default function DocumentViewer({ onBack, initSection, initChapter }: DocumentViewerProps) {
   const [doc, setDoc] = useState<any>(null);
@@ -33,7 +107,6 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
         if (initSection) {
           setCurrentSection(initSection);
           setMode('section');
-          // 해당 섹션의 챕터 찾아서 기록
           for (const ch of data.chapters) {
             for (const sec of ch.sections) {
               if (sec.id === initSection) {
@@ -62,12 +135,10 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
   }, [doc]);
 
   const currentIdx = allSections.findIndex(s => s.sectionId === currentSection);
-  const currentChapterId = currentIdx >= 0 ? allSections[currentIdx].chapterId : undefined;
 
   const openSection = useCallback((sectionId: string) => {
     setCurrentSection(sectionId);
     setMode('section');
-    // 찾아서 chapterId 전달
     const info = allSections.find(s => s.sectionId === sectionId);
     markSectionRead(sectionId, info?.chapterId);
     window.scrollTo(0, 0);
@@ -82,39 +153,79 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
     });
   }, []);
 
-  // 검색 결과 (미리보기 포함)
+  // 현장형 검색 (별칭 확장 + 정렬)
   const searchResults = useMemo(() => {
     if (!doc || !search.trim()) return null;
-    const q = search.toLowerCase();
-    const results: { chapterId: string; chapterTitle: string; sectionId: string; sectionTitle: string; preview: string }[] = [];
+    const terms = expandSearchTerms(search);
+    const results: SearchResult[] = [];
 
     for (const ch of doc.chapters) {
       for (const sec of ch.sections) {
-        const titleMatch = sec.title.toLowerCase().includes(q);
-        const contentStr = JSON.stringify(sec.content).toLowerCase();
-        const contentMatch = contentStr.includes(q);
-        if (titleMatch || contentMatch) {
-          // 미리보기 추출
+        const titleNorm = normalizeSearchTerm(sec.title);
+        const flat = extractText(sec.content);
+        const flatNorm = normalizeSearchTerm(flat);
+
+        // 매칭 판정: title > alias > content
+        let matchType: SearchMatchType | null = null;
+
+        // 1) 제목 일치
+        if (terms.some(t => titleNorm.includes(t))) {
+          matchType = 'title';
+        }
+
+        // 2) 별칭/키워드 확장 일치 (제목이 아닌 경우)
+        if (!matchType) {
+          // 원본 검색어로 제목 체크를 이미 했으니, 확장 term으로 제목 체크
+          if (terms.length > 1 && terms.some(t => titleNorm.includes(t))) {
+            matchType = 'alias';
+          }
+        }
+
+        // 3) 본문 일치
+        if (!matchType) {
+          if (terms.some(t => flatNorm.includes(t))) {
+            matchType = 'content';
+          }
+        }
+
+        if (matchType) {
+          // 미리보기 추출 (원본 검색어 기준)
           let preview = '';
-          if (contentMatch) {
-            const flat = extractText(sec.content);
-            const idx = flat.toLowerCase().indexOf(q);
-            if (idx >= 0) {
-              const start = Math.max(0, idx - 20);
-              const end = Math.min(flat.length, idx + q.length + 40);
-              preview = (start > 0 ? '...' : '') + flat.slice(start, end) + (end < flat.length ? '...' : '');
+          const qLower = search.toLowerCase();
+          const idx = flat.toLowerCase().indexOf(qLower);
+          if (idx >= 0) {
+            const start = Math.max(0, idx - 20);
+            const end = Math.min(flat.length, idx + qLower.length + 40);
+            preview = (start > 0 ? '...' : '') + flat.slice(start, end) + (end < flat.length ? '...' : '');
+          } else {
+            // 확장 term으로 미리보기 찾기
+            for (const t of terms) {
+              const tIdx = flat.toLowerCase().indexOf(t);
+              if (tIdx >= 0) {
+                const start = Math.max(0, tIdx - 20);
+                const end = Math.min(flat.length, tIdx + t.length + 40);
+                preview = (start > 0 ? '...' : '') + flat.slice(start, end) + (end < flat.length ? '...' : '');
+                break;
+              }
             }
           }
+
           results.push({
             chapterId: ch.id,
             chapterTitle: ch.title,
             sectionId: sec.id,
             sectionTitle: sec.title,
             preview,
+            matchType,
           });
         }
       }
     }
+
+    // 정렬: title > alias > content
+    const order: Record<SearchMatchType, number> = { title: 0, alias: 1, content: 2 };
+    results.sort((a, b) => order[a.matchType] - order[b.matchType]);
+
     return results;
   }, [doc, search]);
 
@@ -145,6 +256,11 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
   /* ── 섹션 뷰어 ── */
   if (mode === 'section' && currentSectionData) {
     const bookmarked = isBookmarked(currentSection!);
+    const hasSummary = currentSectionData.summary && currentSectionData.summary.length > 0;
+    const hasCaution = !!currentSectionData.caution;
+    const hasKeywords = currentSectionData.keywords && currentSectionData.keywords.length > 0;
+    const showMeta = hasSummary || hasCaution || hasKeywords;
+
     return (
       <div className={styles.screen}>
         <div className={styles.topBar}>
@@ -167,9 +283,48 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
           </button>
         </div>
 
+        {/* 빠른 요약 카드 — 데이터에 메타가 있을 때만 표시 */}
+        {showMeta && (
+          <div className={styles.summaryCard}>
+            {hasSummary && (
+              <div className={styles.summarySection}>
+                <div className={styles.summaryLabel}>
+                  <Info size={14} />
+                  핵심 요약
+                </div>
+                <ul className={styles.summaryList}>
+                  {currentSectionData.summary.map((s: string, i: number) => (
+                    <li key={i}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {hasCaution && (
+              <div className={styles.summaryCaution}>
+                <AlertTriangle size={14} />
+                <span>{currentSectionData.caution}</span>
+              </div>
+            )}
+            {hasKeywords && (
+              <div className={styles.summaryKeywords}>
+                {currentSectionData.keywords.map((kw: string, i: number) => (
+                  <span key={i} className={styles.keywordChip}>{kw}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className={styles.sectionContent}>
           <ContentRenderer blocks={currentSectionData.content} />
         </div>
+
+        {/* 섹션 메타 정보 (updatedAt) */}
+        {currentSectionData.updatedAt && (
+          <div className={styles.sectionMeta}>
+            최종 개정: {currentSectionData.updatedAt}
+          </div>
+        )}
 
         <div className={styles.sectionNav}>
           {currentIdx > 0 && (
@@ -222,7 +377,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
           <input
             type="search"
             className={styles.searchInput}
-            placeholder="검색 (예: ATC, 출입문, 구원)"
+            placeholder="검색 (예: ATC, 출입문, 구원, 화재)"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -245,9 +400,13 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
                 onClick={() => openSection(r.sectionId)}
               >
                 <span className={styles.searchResultChapter}>{r.chapterTitle}</span>
-                <span className={styles.searchResultTitle}>{r.sectionTitle}</span>
+                <span className={styles.searchResultTitle}>
+                  <HighlightText text={r.sectionTitle} query={search} />
+                </span>
                 {r.preview && (
-                  <span className={styles.searchResultPreview}>{r.preview}</span>
+                  <span className={styles.searchResultPreview}>
+                    <HighlightText text={r.preview} query={search} />
+                  </span>
                 )}
               </button>
             ))
@@ -322,9 +481,33 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
               );
             })}
           </div>
+
+          {/* 교육자료 기준일 — 목차 하단 */}
+          {doc.version && (
+            <div className={styles.docVersionBanner}>
+              교육자료 기준: {doc.version}
+              {doc.updatedAt && ` · 최종 개정 ${doc.updatedAt}`}
+            </div>
+          )}
         </>
       )}
     </div>
+  );
+}
+
+/** 검색어 하이라이트 컴포넌트 */
+function HighlightText({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+  const qLower = query.toLowerCase();
+  const idx = text.toLowerCase().indexOf(qLower);
+  if (idx < 0) return <>{text}</>;
+
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className={styles.searchHighlight}>{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length)}
+    </>
   );
 }
 
@@ -339,6 +522,8 @@ function extractText(blocks: any[]): string {
       for (const item of b.items) {
         if (typeof item === 'string') parts.push(item);
         else if (item.label) parts.push(item.label);
+        else if (item.term) parts.push(item.term);
+        else if (item.desc) parts.push(item.desc);
         if (item.items) parts.push(...item.items.filter((x: any) => typeof x === 'string'));
       }
     }
@@ -352,6 +537,9 @@ function extractText(blocks: any[]): string {
       for (const row of b.rows) {
         parts.push(...row.filter((x: any) => typeof x === 'string'));
       }
+    }
+    if (b.headers) {
+      parts.push(...b.headers.filter((x: any) => typeof x === 'string'));
     }
   }
   return parts.join(' ');

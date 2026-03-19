@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
+import type { QuizMode } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -10,6 +11,7 @@ import styles from '../styles/edu.module.css';
 interface QuizSystemProps {
   onBack: () => void;
   initChapter?: string;
+  wrongOnly?: boolean;
 }
 
 type Phase = 'setup' | 'quiz' | 'result';
@@ -45,19 +47,49 @@ const CHAPTER_LABELS: Record<string, string> = {
   ch8: '방송문안',
 };
 
-export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
+export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
-  const [phase, setPhase] = useState<Phase>('setup');
+  const [phase, setPhase] = useState<Phase>(wrongOnly ? 'quiz' : 'setup');
+  const [quizMode, setQuizMode] = useState<QuizMode>(wrongOnly ? 'wrong-only' : 'standard');
+  const [quizChapterId, setQuizChapterId] = useState<string | undefined>(initChapter);
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [wrongInSession, setWrongInSession] = useState(0);
+  const [resolvedInSession, setResolvedInSession] = useState(0);
 
-  const { addQuizRecord, addWrongAnswer, previousScore, totalQuizzes } = useEduStore();
+  const {
+    addQuizRecord, addWrongAnswer, resolveWrongAnswer,
+    previousScore, totalQuizzes, unresolvedWrongs,
+  } = useEduStore();
+
+  // 오답 전용 모드: store에서 오답 문제를 퀴즈 형식으로 변환
+  const startWrongOnlyQuiz = useCallback(() => {
+    if (unresolvedWrongs.length === 0) return;
+    const pool = unresolvedWrongs.map(w => ({
+      id: w.questionId,
+      chapter: w.chapterId,
+      question: w.question,
+      choices: w.choices,
+      answer: w.answer,
+      explanation: w.explanation,
+      _isFromWrongNote: true,
+    }));
+    startQuizWith(pool, pool.length, 'wrong-only');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [unresolvedWrongs]);
 
   useEffect(() => {
+    if (wrongOnly) {
+      // 오답 전용 모드: quiz JSON 불필요, store 데이터로 직접 시작
+      if (unresolvedWrongs.length > 0) {
+        startWrongOnlyQuiz();
+      }
+      return;
+    }
+
     fetch('/data/edu/handbook-quiz.json')
       .then(r => r.json())
       .then(data => {
@@ -66,7 +98,7 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
         if (initChapter && data.questions.length > 0) {
           const pool = data.questions.filter((q: any) => q.chapter === initChapter);
           if (pool.length > 0) {
-            startQuizWith(pool, Math.min(pool.length, 20));
+            startQuizWith(pool, Math.min(pool.length, 20), 'chapter', initChapter);
           }
         }
       })
@@ -74,7 +106,7 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const startQuizWith = useCallback((pool: any[], count: number) => {
+  const startQuizWith = useCallback((pool: any[], count: number, mode: QuizMode = 'standard', chapterId?: string) => {
     const shuffled = shuffle(pool).slice(0, count);
     const withShuffledChoices = shuffled.map(q => {
       const indices: number[] = q.choices.map((_: any, i: number) => i);
@@ -91,17 +123,20 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
     setCurrentIdx(0);
     setScore(0);
     setWrongInSession(0);
+    setResolvedInSession(0);
     setSelected(null);
     setAnswered(false);
+    setQuizMode(mode);
+    setQuizChapterId(chapterId);
     setPhase('quiz');
   }, []);
 
-  const startQuiz = useCallback((count: number, chapter?: string) => {
+  const startQuiz = useCallback((count: number, mode: QuizMode = 'standard', chapter?: string) => {
     let pool = allQuestions;
     if (chapter) {
       pool = allQuestions.filter(q => q.chapter === chapter);
     }
-    startQuizWith(pool, count);
+    startQuizWith(pool, count, mode, chapter);
   }, [allQuestions, startQuizWith]);
 
   const handleSelect = useCallback((choiceIdx: number) => {
@@ -111,20 +146,28 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
     const q = questions[currentIdx];
     if (choiceIdx === q.answer) {
       setScore(prev => prev + 1);
+      // 오답 재시험 모드에서 맞힌 문제는 resolved 처리
+      if (q._isFromWrongNote) {
+        resolveWrongAnswer(q.id);
+        setResolvedInSession(prev => prev + 1);
+      }
     } else {
       setWrongInSession(prev => prev + 1);
-      // 오답 저장
-      addWrongAnswer({
-        questionId: q.id,
-        question: q.question,
-        choices: q.originalChoices,
-        answer: q.originalAnswer,
-        selected: q.originalChoices.indexOf(q.choices[choiceIdx]),
-        explanation: q.explanation,
-        chapter: CHAPTER_LABELS[q.chapter] ?? q.chapter,
-      });
+      // 오답 재시험 모드가 아닌 경우에만 오답노트에 추가
+      if (!q._isFromWrongNote) {
+        addWrongAnswer({
+          questionId: q.id,
+          question: q.question,
+          choices: q.originalChoices,
+          answer: q.originalAnswer,
+          selected: q.originalChoices.indexOf(q.choices[choiceIdx]),
+          explanation: q.explanation,
+          chapter: CHAPTER_LABELS[q.chapter] ?? q.chapter,
+          chapterId: q.chapter,
+        });
+      }
     }
-  }, [answered, questions, currentIdx, addWrongAnswer]);
+  }, [answered, questions, currentIdx, addWrongAnswer, resolveWrongAnswer]);
 
   const handleNext = useCallback(() => {
     if (currentIdx < questions.length - 1) {
@@ -133,20 +176,29 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
       setAnswered(false);
     } else {
       const percent = toScore100(score, questions.length);
-      addQuizRecord({ score, total: questions.length, percent });
+      addQuizRecord({
+        score, total: questions.length, percent,
+        mode: quizMode,
+        chapterId: quizChapterId,
+      });
       setPhase('result');
     }
-  }, [currentIdx, questions.length, score, addQuizRecord]);
+  }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizChapterId]);
 
   const score100 = toScore100(score, questions.length);
 
   const resultMessage = useMemo(() => {
-    if (score100 >= 90) return '거의 완벽합니다.';
-    if (score100 >= 80) return '잘하고 있습니다. 조금만 더 보완하세요.';
-    if (score100 >= 70) return '복습하면 충분히 올릴 수 있습니다.';
-    if (score100 >= 50) return '교재를 다시 읽어보세요.';
-    return '기초부터 다시 학습이 필요합니다.';
-  }, [score100]);
+    if (quizMode === 'wrong-only') {
+      if (score100 === 100) return '오답을 모두 정복했습니다.';
+      if (score100 >= 80) return '대부분 보완되었습니다. 남은 문제를 한번 더 확인하세요.';
+      return '오답 교재를 다시 확인하고 재도전하세요.';
+    }
+    if (score100 >= 90) return '충분히 숙달되었습니다.';
+    if (score100 >= 80) return '양호합니다. 취약 부분만 보완하세요.';
+    if (score100 >= 70) return '복습이 필요합니다. 오답 교재를 확인하세요.';
+    if (score100 >= 50) return '관련 교재를 다시 학습하세요.';
+    return '기본 내용부터 재학습이 필요합니다.';
+  }, [score100, quizMode]);
 
   const growth = previousScore !== null ? score100 - previousScore : null;
 
@@ -158,6 +210,23 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
     }
     return counts;
   }, [allQuestions]);
+
+  /* ── 오답 전용 모드인데 문제 없음 ── */
+  if (wrongOnly && unresolvedWrongs.length === 0) {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.topBar}>
+          <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+            <ArrowLeft size={20} strokeWidth={2} />
+          </button>
+          <h1 className={styles.topTitle}>오답 재시험</h1>
+        </div>
+        <div className={styles.emptyState}>
+          미해결 오답이 없습니다. 시험을 먼저 풀어보세요.
+        </div>
+      </div>
+    );
+  }
 
   /* ── Setup ── */
   if (phase === 'setup') {
@@ -172,17 +241,17 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
 
         <div className={styles.quizSetup}>
           <div className={styles.sectionDivider}>전체 시험</div>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(10)}>
+          <button type="button" className={styles.quizOption} onClick={() => startQuiz(10, 'quick')}>
             <div className={styles.quizOptionTitle}>빠른 테스트 (10문제)</div>
             <div className={styles.quizOptionDesc}>가볍게 실력 점검</div>
           </button>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(20)}>
+          <button type="button" className={styles.quizOption} onClick={() => startQuiz(20, 'standard')}>
             <div className={styles.quizOptionTitle}>표준 시험 (20문제)</div>
-            <div className={styles.quizOptionDesc}>본격적인 역량 평가</div>
+            <div className={styles.quizOptionDesc}>실력 평가</div>
           </button>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(allQuestions.length)}>
-            <div className={styles.quizOptionTitle}>전체 도전 ({allQuestions.length}문제)</div>
-            <div className={styles.quizOptionDesc}>모든 문제에 도전</div>
+          <button type="button" className={styles.quizOption} onClick={() => startQuiz(allQuestions.length, 'full')}>
+            <div className={styles.quizOptionTitle}>전체 ({allQuestions.length}문제)</div>
+            <div className={styles.quizOptionDesc}>전 범위 점검</div>
           </button>
 
           {/* 챕터별 퀴즈 */}
@@ -195,7 +264,7 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
                 key={chId}
                 type="button"
                 className={styles.quizOption}
-                onClick={() => startQuiz(cnt, chId)}
+                onClick={() => startQuiz(cnt, 'chapter', chId)}
               >
                 <div className={styles.quizOptionTitle}>{label}</div>
                 <div className={styles.quizOptionDesc}>{cnt}문제</div>
@@ -218,13 +287,14 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
 
   /* ── Result ── */
   if (phase === 'result') {
+    const isWrongMode = quizMode === 'wrong-only';
     return (
       <div className={styles.screen}>
         <div className={styles.topBar}>
           <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.topTitle}>결과</h1>
+          <h1 className={styles.topTitle}>{isWrongMode ? '오답 재시험 결과' : '결과'}</h1>
         </div>
 
         <div className={styles.resultWrap}>
@@ -233,12 +303,13 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
           </div>
           <div className={styles.resultLabel}>
             {questions.length}문제 중 {score}문제 정답
-            {wrongInSession > 0 && ` · ${wrongInSession}문제 오답노트에 저장됨`}
+            {isWrongMode && resolvedInSession > 0 && ` · ${resolvedInSession}문제 해결됨`}
+            {!isWrongMode && wrongInSession > 0 && ` · ${wrongInSession}문제 오답노트 저장`}
           </div>
 
-          {growth !== null && growth !== 0 && (
+          {!isWrongMode && growth !== null && growth !== 0 && (
             <div className={`${styles.resultGrowth} ${growth < 0 ? styles.resultDown : ''}`}>
-              {growth > 0 ? `▲ ${growth}점 향상` : `▼ ${Math.abs(growth)}점`}
+              {growth > 0 ? `이전 대비 +${growth}점` : `이전 대비 ${growth}점`}
             </div>
           )}
 
@@ -248,9 +319,22 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
             <button type="button" className={`${styles.resultBtn} ${styles.resultBtnOutline}`} onClick={onBack}>
               돌아가기
             </button>
-            <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => setPhase('setup')}>
-              다시 도전
-            </button>
+            {isWrongMode ? (
+              <button
+                type="button"
+                className={`${styles.resultBtn} ${styles.resultBtnPrimary}`}
+                onClick={() => {
+                  // 미해결 오답으로 재시작
+                  startWrongOnlyQuiz();
+                }}
+              >
+                다시 풀기
+              </button>
+            ) : (
+              <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => setPhase('setup')}>
+                다시 도전
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -261,13 +345,17 @@ export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
   const q = questions[currentIdx];
   if (!q) return null;
 
+  const isWrongMode = quizMode === 'wrong-only';
+
   return (
     <div className={styles.screen}>
       <div className={styles.topBar}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        <h1 className={styles.topTitle}>문제 {currentIdx + 1}</h1>
+        <h1 className={styles.topTitle}>
+          {isWrongMode ? '오답 재시험' : `문제 ${currentIdx + 1}`}
+        </h1>
         <span className={styles.quizScoreChip}>
           {score}/{currentIdx + (answered ? 1 : 0)}
         </span>
@@ -331,6 +419,16 @@ function QuizHistory() {
     ? Math.max(...progress.quizHistory.map(r => r.percent))
     : 0;
 
+  const modeLabel = (mode?: QuizMode) => {
+    switch (mode) {
+      case 'quick': return '빠른';
+      case 'full': return '전체';
+      case 'chapter': return '챕터';
+      case 'wrong-only': return '오답';
+      default: return '표준';
+    }
+  };
+
   return (
     <div className={styles.historyList}>
       {recent.map((record, i) => {
@@ -342,7 +440,7 @@ function QuizHistory() {
               {new Date(record.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
             </span>
             <span className={styles.historyMeta}>
-              {record.score}/{record.total}
+              {modeLabel(record.mode)} · {record.score}/{record.total}
             </span>
             <span className={`${styles.historyScore} ${gradeClass} ${record.percent === best ? styles.historyHigh : ''}`}>
               {record.percent}점

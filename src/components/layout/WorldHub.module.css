@@ -406,7 +406,7 @@
 .footer {
   position: absolute;
   bottom: var(--dia-space-6);
-  font-size: 11px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   opacity: 0.5;
   z-index: 1;

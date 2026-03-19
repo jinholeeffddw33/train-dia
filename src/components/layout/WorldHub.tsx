@@ -50,8 +50,7 @@ const WORLDS: WorldDef[] = [
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
-    lottieW: 280,
-    lottieH: 160,
+    lottieW: 100,
   },
 ];
 

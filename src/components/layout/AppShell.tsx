@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
@@ -36,6 +37,11 @@ export default function AppShell({ children, onBack }: AppShellProps) {
         )
       ).length
     : 0;
+
+  const goHomeTab = useCallback(() => setActiveTab('home'), []);
+
+  // home 탭이 아닐 때 뒤로가기 → home 탭 복귀
+  useHistoryBack(`tab-${activeTab}`, goHomeTab, activeTab !== 'home');
 
   const handleTabChange = useCallback((tab: TabId) => {
     if (tab === 'line') triggerScroll();

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
@@ -60,6 +61,9 @@ export default function HomePage() {
   const handleBack = useCallback(() => {
     setWorld(null);
   }, []);
+
+  // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
+  useHistoryBack(`world-${world}`, handleBack, world !== null);
 
   return (
     <AuthGate>

@@ -93,7 +93,7 @@
 }
 
 .subtitle {
-  font-size: var(--dia-text-xs);
+  font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
   margin-top: var(--dia-space-2);
 }
@@ -363,7 +363,7 @@
 }
 
 .cardDesc {
-  font-size: var(--dia-text-xs);
+  font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
   text-align: center;
   line-height: var(--dia-leading-normal);
@@ -406,7 +406,7 @@
 .footer {
   position: absolute;
   bottom: var(--dia-space-6);
-  font-size: var(--dia-text-xs);
+  font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
   opacity: 0.5;
   z-index: 1;

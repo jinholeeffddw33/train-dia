@@ -13,37 +13,49 @@ interface WorldHubProps {
   onEnter: (world: WorldId) => void;
 }
 
-const WORLDS = [
+interface WorldDef {
+  id: WorldId;
+  label: string;
+  desc: string;
+  lottie: string;
+  iconClass: string;
+  cardClass: string;
+  lottieW: number;
+  lottieH?: number;
+}
+
+const WORLDS: WorldDef[] = [
   {
-    id: 'duty' as WorldId,
+    id: 'duty',
     label: '근무',
     desc: '교번 · 일정 · 노선',
     lottie: '/lottie/duty.json',
     iconClass: styles.iconDuty,
     cardClass: styles.cardDuty,
-    lottieSize: 62,
+    lottieW: 62,
   },
   {
-    id: 'edu' as WorldId,
+    id: 'edu',
     label: '교육',
     desc: '규정 · 학습 · 평가',
     lottie: '/lottie/edu.json',
     iconClass: styles.iconEdu,
     cardClass: styles.cardEdu,
-    lottieSize: 80,
+    lottieW: 80,
   },
   {
-    id: 'safety' as WorldId,
+    id: 'safety',
     label: '안전',
     desc: '점검 · 보고 · 매뉴얼',
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
-    lottieSize: 220,
+    lottieW: 280,
+    lottieH: 160,
   },
 ];
 
-function LottieIcon({ src, className, size = 62 }: { src: string; className: string; size?: number }) {
+function LottieIcon({ src, className, width = 62, height }: { src: string; className: string; width?: number; height?: number }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<Record<string, any> | null>(null);
 
@@ -62,7 +74,7 @@ function LottieIcon({ src, className, size = 62 }: { src: string; className: str
           loop
           autoplay
           /* STYLE-EXCEPTION: Lottie 파일별 캔버스 비율이 달라 런타임 크기 보정 필요 */
-          style={{ width: size, height: size }}
+          style={{ width, height: height ?? width }}
         />
       )}
     </div>
@@ -109,7 +121,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
               onClick={(e) => handleClick(e, w.id)}
               aria-label={w.label}
             >
-              <LottieIcon src={w.lottie} className={w.iconClass} size={w.lottieSize} />
+              <LottieIcon src={w.lottie} className={w.iconClass} width={w.lottieW} height={w.lottieH} />
               <span className={styles.cardTitle}>{w.label}</span>
               <span className={styles.cardDesc}>{w.desc}</span>
             </button>
@@ -123,7 +135,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             onClick={(e) => handleClick(e, bottomWorld.id)}
             aria-label={bottomWorld.label}
           >
-            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} size={bottomWorld.lottieSize} />
+            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} width={bottomWorld.lottieW} height={bottomWorld.lottieH} />
             <span className={styles.cardTitle}>{bottomWorld.label}</span>
             <span className={styles.cardDesc}>{bottomWorld.desc}</span>
           </button>

@@ -9,8 +9,13 @@ export interface QuizRecord {
   chapter?: string;   // 챕터별이면 챕터 ID
 }
 
+export interface ReadRecord {
+  lastRead: string;   // ISO date (YYYY-MM-DD)
+  count: number;      // 읽은 횟수
+}
+
 export interface EduProgress {
-  readSections: string[];        // 읽은 섹션 ID 목록
+  readSections: Record<string, ReadRecord>;  // 섹션ID → 읽은 기록
   quizHistory: QuizRecord[];     // 퀴즈 기록
   lastReadSection?: string;      // 마지막으로 읽던 섹션
   streak: number;                // 연속 학습 일수
@@ -19,15 +24,27 @@ export interface EduProgress {
 
 const STORAGE_KEY = 'train-dia-edu-progress';
 
-function loadProgress(): EduProgress {
-  if (typeof window === 'undefined') {
-    return { readSections: [], quizHistory: [], streak: 0 };
+const EMPTY_PROGRESS: EduProgress = { readSections: {}, quizHistory: [], streak: 0 };
+
+function migrateProgress(data: any): EduProgress {
+  // v1 → v2: string[] → Record<string, ReadRecord>
+  if (Array.isArray(data.readSections)) {
+    const migrated: Record<string, ReadRecord> = {};
+    for (const id of data.readSections) {
+      migrated[id] = { lastRead: data.lastStudyDate ?? getTodayStr(), count: 1 };
+    }
+    return { ...data, readSections: migrated };
   }
+  return data;
+}
+
+function loadProgress(): EduProgress {
+  if (typeof window === 'undefined') return EMPTY_PROGRESS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return migrateProgress(JSON.parse(raw));
   } catch { /* ignore */ }
-  return { readSections: [], quizHistory: [], streak: 0 };
+  return EMPTY_PROGRESS;
 }
 
 function saveProgress(p: EduProgress) {
@@ -50,10 +67,12 @@ export function useEduStore() {
 
   const markSectionRead = useCallback((sectionId: string) => {
     setProgress(prev => {
-      if (prev.readSections.includes(sectionId)) {
-        return { ...prev, lastReadSection: sectionId };
-      }
       const today = getTodayStr();
+      const existing = prev.readSections[sectionId];
+      const updated: ReadRecord = existing
+        ? { lastRead: today, count: existing.count + 1 }
+        : { lastRead: today, count: 1 };
+
       let streak = prev.streak;
       if (prev.lastStudyDate !== today) {
         const yesterday = new Date();
@@ -63,7 +82,7 @@ export function useEduStore() {
       }
       return {
         ...prev,
-        readSections: [...prev.readSections, sectionId],
+        readSections: { ...prev.readSections, [sectionId]: updated },
         lastReadSection: sectionId,
         streak,
         lastStudyDate: today,
@@ -115,7 +134,7 @@ export function useEduStore() {
     previousScore,
     avgScore,
     totalQuizzes: progress.quizHistory.length,
-    readCount: progress.readSections.length,
+    readCount: Object.keys(progress.readSections).length,
     streak: progress.streak,
   };
 }

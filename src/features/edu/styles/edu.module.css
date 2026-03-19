@@ -255,9 +255,19 @@
   background: var(--dia-surface-hover);
 }
 
+.tocSecTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tocRead {
-  color: var(--dia-green);
+  color: var(--dia-text-tertiary);
   font-size: var(--dia-text-xs);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── 검색 ── */

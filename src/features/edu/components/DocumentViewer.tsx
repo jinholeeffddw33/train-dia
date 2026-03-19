@@ -141,7 +141,16 @@ export default function DocumentViewer({ onBack }: DocumentViewerProps) {
   }
 
   // TOC mode
-  const readSet = new Set(progress.readSections);
+  const readMap = progress.readSections;
+
+  function formatReadLabel(sectionId: string): string | null {
+    const rec = readMap[sectionId];
+    if (!rec) return null;
+    const d = rec.lastRead; // YYYY-MM-DD
+    const short = `${parseInt(d.slice(5, 7))}/${parseInt(d.slice(8, 10))}`;
+    return rec.count >= 2 ? `${rec.count}회 · ${short}` : short;
+  }
+
   return (
     <div className={styles.screen}>
       <div className={styles.topBar}>
@@ -171,7 +180,7 @@ export default function DocumentViewer({ onBack }: DocumentViewerProps) {
       <div className={styles.tocList}>
         {filteredChapters.map((ch: any) => {
           const isExpanded = expandedChapters.has(ch.id) || search.trim().length > 0;
-          const readCountInCh = ch.sections.filter((s: any) => readSet.has(s.id)).length;
+          const readCountInCh = ch.sections.filter((s: any) => readMap[s.id]).length;
 
           return (
             <div key={ch.id} className={styles.tocChapter}>
@@ -194,8 +203,10 @@ export default function DocumentViewer({ onBack }: DocumentViewerProps) {
                       className={styles.tocSectionBtn}
                       onClick={() => openSection(sec.id)}
                     >
-                      <span style={{ flex: 1 }}>{sec.title}</span>
-                      {readSet.has(sec.id) && <span className={styles.tocRead}>✓</span>}
+                      <span className={styles.tocSecTitle}>{sec.title}</span>
+                      {formatReadLabel(sec.id) && (
+                        <span className={styles.tocRead}>{formatReadLabel(sec.id)}</span>
+                      )}
                     </button>
                   ))}
                 </div>

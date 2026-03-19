@@ -283,9 +283,9 @@
 
 /* ── Card Icon ── */
 .iconWrap {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--dia-radius-lg);
+  width: 80px;
+  height: 80px;
+  border-radius: var(--dia-radius-xl);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -300,8 +300,8 @@
 }
 
 .lottieIcon {
-  width: 44px;
-  height: 44px;
+  width: 62px;
+  height: 62px;
 }
 
 /* Per-world icon colors */

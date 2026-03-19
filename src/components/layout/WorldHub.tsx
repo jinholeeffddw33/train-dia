@@ -21,6 +21,7 @@ const WORLDS = [
     lottie: '/lottie/duty.json',
     iconClass: styles.iconDuty,
     cardClass: styles.cardDuty,
+    lottieSize: 62,
   },
   {
     id: 'edu' as WorldId,
@@ -29,6 +30,7 @@ const WORLDS = [
     lottie: '/lottie/edu.json',
     iconClass: styles.iconEdu,
     cardClass: styles.cardEdu,
+    lottieSize: 68,
   },
   {
     id: 'safety' as WorldId,
@@ -37,10 +39,11 @@ const WORLDS = [
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
+    lottieSize: 90,
   },
 ];
 
-function LottieIcon({ src, className }: { src: string; className: string }) {
+function LottieIcon({ src, className, size = 62 }: { src: string; className: string; size?: number }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<Record<string, any> | null>(null);
 
@@ -58,7 +61,8 @@ function LottieIcon({ src, className }: { src: string; className: string }) {
           animationData={data}
           loop
           autoplay
-          className={styles.lottieIcon}
+          /* STYLE-EXCEPTION: Lottie 파일별 캔버스 비율이 달라 런타임 크기 보정 필요 */
+          style={{ width: size, height: size }}
         />
       )}
     </div>
@@ -105,7 +109,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
               onClick={(e) => handleClick(e, w.id)}
               aria-label={w.label}
             >
-              <LottieIcon src={w.lottie} className={w.iconClass} />
+              <LottieIcon src={w.lottie} className={w.iconClass} size={w.lottieSize} />
               <span className={styles.cardTitle}>{w.label}</span>
               <span className={styles.cardDesc}>{w.desc}</span>
             </button>
@@ -119,7 +123,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             onClick={(e) => handleClick(e, bottomWorld.id)}
             aria-label={bottomWorld.label}
           >
-            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} />
+            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} size={bottomWorld.lottieSize} />
             <span className={styles.cardTitle}>{bottomWorld.label}</span>
             <span className={styles.cardDesc}>{bottomWorld.desc}</span>
           </button>

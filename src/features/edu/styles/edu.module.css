@@ -507,6 +507,13 @@
 .table tr:last-child td {
   border-bottom: none;
 }
+.tableRowHighlight {
+  background: rgba(239, 68, 68, 0.12);
+}
+.tableRowHighlight td {
+  color: var(--dia-red);
+  font-weight: var(--dia-weight-bold);
+}
 
 /* compare cards */
 .compareCard {

@@ -29,7 +29,8 @@ function FlowBlock({ title, steps }: { title?: string; steps: any[] }) {
   );
 }
 
-function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) {
+function TableBlock({ headers, rows, highlightRows }: { headers: string[]; rows: string[][]; highlightRows?: number[] }) {
+  const hlSet = highlightRows ? new Set(highlightRows) : null;
   return (
     <div className={styles.tableWrap}>
       <table className={styles.table}>
@@ -40,7 +41,7 @@ function TableBlock({ headers, rows }: { headers: string[]; rows: string[][] }) 
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i}>
+            <tr key={i} className={hlSet?.has(i) ? styles.tableRowHighlight : undefined}>
               {row.map((cell, j) => (
                 <td key={j}>{cell.split('\n').map((line, k) => (
                   <span key={k}>{line}{k < cell.split('\n').length - 1 && <br />}</span>
@@ -125,7 +126,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
           case 'flow':
             return <FlowBlock key={i} title={block.title} steps={block.steps} />;
           case 'table':
-            return <TableBlock key={i} headers={block.headers} rows={block.rows} />;
+            return <TableBlock key={i} headers={block.headers} rows={block.rows} highlightRows={block.highlightRows} />;
           case 'compare':
             return <CompareBlock key={i} items={block.items} />;
           case 'list':

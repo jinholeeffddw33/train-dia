@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
+import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, HomeTipsQuiz } from '@/features/home';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
@@ -63,10 +64,12 @@ export default function HomePage() {
     <AuthGate>
       {world === null ? (
         <WorldHub onEnter={handleEnter} />
-      ) : (
+      ) : world === 'duty' ? (
         <AppShell onBack={handleBack}>
           {(activeTab) => <TabContent tab={activeTab} />}
         </AppShell>
+      ) : (
+        <ComingSoon worldId={world} onBack={handleBack} />
       )}
     </AuthGate>
   );

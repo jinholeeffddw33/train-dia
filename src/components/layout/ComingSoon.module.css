@@ -1,0 +1,101 @@
+/* ===== Coming Soon Screen ===== */
+
+.wrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-6);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: var(--dia-bg);
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: var(--dia-space-4);
+  left: var(--dia-space-4);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  box-shadow: var(--dia-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  transition: background var(--dia-transition-fast), color var(--dia-transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.backBtn:hover {
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-primary);
+}
+
+.backBtn:active {
+  transform: scale(0.95);
+}
+
+.content {
+  text-align: center;
+  animation: fadeIn 0.4s var(--dia-ease) both;
+}
+
+.icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--dia-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--dia-space-6);
+  font-size: var(--dia-text-3xl);
+}
+
+.iconEdu {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(56, 189, 248, 0.15));
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+}
+
+.iconSafety {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.15));
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+:global(:root.light) .iconEdu {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(56, 189, 248, 0.08));
+}
+
+:global(:root.light) .iconSafety {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08));
+}
+
+.title {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.desc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  line-height: var(--dia-leading-normal);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

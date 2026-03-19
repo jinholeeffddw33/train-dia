@@ -9,6 +9,7 @@ import styles from '../styles/edu.module.css';
 
 interface QuizSystemProps {
   onBack: () => void;
+  initChapter?: string;
 }
 
 type Phase = 'setup' | 'quiz' | 'result';
@@ -22,19 +23,29 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-/** 100점 만점 환산 */
 function toScore100(score: number, total: number): number {
   return total > 0 ? Math.round((score / total) * 100) : 0;
 }
 
-/** 점수대별 등급 CSS 클래스 */
 function scoreGradeClass(score100: number): string {
   if (score100 >= 80) return styles.gradeGreen;
   if (score100 >= 60) return styles.gradeOrange;
   return styles.gradeRed;
 }
 
-export default function QuizSystem({ onBack }: QuizSystemProps) {
+/** 챕터 ID → 짧은 이름 */
+const CHAPTER_LABELS: Record<string, string> = {
+  ch1: '근무작업절차',
+  ch2: '전동차 일반',
+  ch3: '차종 비교',
+  ch4: '기지/주박',
+  ch5: '이례사항',
+  ch6: '한줄노트',
+  ch7: '사고사례',
+  ch8: '방송문안',
+};
+
+export default function QuizSystem({ onBack, initChapter }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
   const [phase, setPhase] = useState<Phase>('setup');
   const [questions, setQuestions] = useState<any[]>([]);
@@ -42,14 +53,47 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(false);
+  const [wrongInSession, setWrongInSession] = useState(0);
 
-  const { addQuizRecord, previousScore, totalQuizzes } = useEduStore();
+  const { addQuizRecord, addWrongAnswer, previousScore, totalQuizzes } = useEduStore();
 
   useEffect(() => {
     fetch('/data/edu/handbook-quiz.json')
       .then(r => r.json())
-      .then(data => setAllQuestions(data.questions))
+      .then(data => {
+        setAllQuestions(data.questions);
+        // 챕터 직진입 시 자동 시작
+        if (initChapter && data.questions.length > 0) {
+          const pool = data.questions.filter((q: any) => q.chapter === initChapter);
+          if (pool.length > 0) {
+            startQuizWith(pool, Math.min(pool.length, 20));
+          }
+        }
+      })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startQuizWith = useCallback((pool: any[], count: number) => {
+    const shuffled = shuffle(pool).slice(0, count);
+    const withShuffledChoices = shuffled.map(q => {
+      const indices: number[] = q.choices.map((_: any, i: number) => i);
+      const shuffledIndices = shuffle(indices) as number[];
+      return {
+        ...q,
+        originalChoices: q.choices,
+        choices: shuffledIndices.map((i) => q.choices[i]),
+        answer: shuffledIndices.indexOf(q.answer),
+        originalAnswer: q.answer,
+      };
+    });
+    setQuestions(withShuffledChoices);
+    setCurrentIdx(0);
+    setScore(0);
+    setWrongInSession(0);
+    setSelected(null);
+    setAnswered(false);
+    setPhase('quiz');
   }, []);
 
   const startQuiz = useCallback((count: number, chapter?: string) => {
@@ -57,32 +101,30 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
     if (chapter) {
       pool = allQuestions.filter(q => q.chapter === chapter);
     }
-    const shuffled = shuffle(pool).slice(0, count);
-    const withShuffledChoices = shuffled.map(q => {
-      const indices: number[] = q.choices.map((_: any, i: number) => i);
-      const shuffledIndices = shuffle(indices) as number[];
-      return {
-        ...q,
-        choices: shuffledIndices.map((i) => q.choices[i]),
-        answer: shuffledIndices.indexOf(q.answer),
-      };
-    });
-    setQuestions(withShuffledChoices);
-    setCurrentIdx(0);
-    setScore(0);
-    setSelected(null);
-    setAnswered(false);
-    setPhase('quiz');
-  }, [allQuestions]);
+    startQuizWith(pool, count);
+  }, [allQuestions, startQuizWith]);
 
   const handleSelect = useCallback((choiceIdx: number) => {
     if (answered) return;
     setSelected(choiceIdx);
     setAnswered(true);
-    if (choiceIdx === questions[currentIdx].answer) {
+    const q = questions[currentIdx];
+    if (choiceIdx === q.answer) {
       setScore(prev => prev + 1);
+    } else {
+      setWrongInSession(prev => prev + 1);
+      // 오답 저장
+      addWrongAnswer({
+        questionId: q.id,
+        question: q.question,
+        choices: q.originalChoices,
+        answer: q.originalAnswer,
+        selected: q.originalChoices.indexOf(q.choices[choiceIdx]),
+        explanation: q.explanation,
+        chapter: CHAPTER_LABELS[q.chapter] ?? q.chapter,
+      });
     }
-  }, [answered, questions, currentIdx]);
+  }, [answered, questions, currentIdx, addWrongAnswer]);
 
   const handleNext = useCallback(() => {
     if (currentIdx < questions.length - 1) {
@@ -98,24 +140,26 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
 
   const score100 = toScore100(score, questions.length);
 
-  const resultEmoji = useMemo(() => {
-    if (score100 >= 90) return '🏆';
-    if (score100 >= 70) return '👏';
-    if (score100 >= 50) return '💪';
-    return '📚';
-  }, [score100]);
-
   const resultMessage = useMemo(() => {
-    if (score100 >= 90) return '대단해요! 거의 완벽합니다!';
-    if (score100 >= 80) return '잘하고 있어요! 조금만 더!';
-    if (score100 >= 70) return '좋은 성적이에요. 복습하면 더 오를 수 있어요!';
-    if (score100 >= 50) return '절반 이상 맞혔어요. 교재를 다시 읽어보면 금방!';
-    return '아직 공부가 필요해요. 교재부터 다시 시작해봐요!';
+    if (score100 >= 90) return '거의 완벽합니다.';
+    if (score100 >= 80) return '잘하고 있습니다. 조금만 더 보완하세요.';
+    if (score100 >= 70) return '복습하면 충분히 올릴 수 있습니다.';
+    if (score100 >= 50) return '교재를 다시 읽어보세요.';
+    return '기초부터 다시 학습이 필요합니다.';
   }, [score100]);
 
   const growth = previousScore !== null ? score100 - previousScore : null;
 
-  /* ── Setup Phase ── */
+  // 챕터별 문제 수
+  const chapterCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const q of allQuestions) {
+      counts[q.chapter] = (counts[q.chapter] || 0) + 1;
+    }
+    return counts;
+  }, [allQuestions]);
+
+  /* ── Setup ── */
   if (phase === 'setup') {
     return (
       <div className={styles.screen}>
@@ -127,25 +171,44 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
         </div>
 
         <div className={styles.quizSetup}>
+          <div className={styles.sectionDivider}>전체 시험</div>
           <button type="button" className={styles.quizOption} onClick={() => startQuiz(10)}>
-            <div className={styles.quizOptionTitle}>🎯 빠른 테스트 (10문제)</div>
+            <div className={styles.quizOptionTitle}>빠른 테스트 (10문제)</div>
             <div className={styles.quizOptionDesc}>가볍게 실력 점검</div>
           </button>
           <button type="button" className={styles.quizOption} onClick={() => startQuiz(20)}>
-            <div className={styles.quizOptionTitle}>📝 표준 시험 (20문제)</div>
+            <div className={styles.quizOptionTitle}>표준 시험 (20문제)</div>
             <div className={styles.quizOptionDesc}>본격적인 역량 평가</div>
           </button>
           <button type="button" className={styles.quizOption} onClick={() => startQuiz(allQuestions.length)}>
-            <div className={styles.quizOptionTitle}>🔥 전체 도전 ({allQuestions.length}문제)</div>
+            <div className={styles.quizOptionTitle}>전체 도전 ({allQuestions.length}문제)</div>
             <div className={styles.quizOptionDesc}>모든 문제에 도전</div>
           </button>
 
-          <div className={styles.heading}>시험 기록</div>
+          {/* 챕터별 퀴즈 */}
+          <div className={styles.sectionDivider}>챕터별 시험</div>
+          {Object.entries(CHAPTER_LABELS).map(([chId, label]) => {
+            const cnt = chapterCounts[chId] || 0;
+            if (cnt === 0) return null;
+            return (
+              <button
+                key={chId}
+                type="button"
+                className={styles.quizOption}
+                onClick={() => startQuiz(cnt, chId)}
+              >
+                <div className={styles.quizOptionTitle}>{label}</div>
+                <div className={styles.quizOptionDesc}>{cnt}문제</div>
+              </button>
+            );
+          })}
+
+          <div className={styles.sectionDivider}>시험 기록</div>
           {totalQuizzes > 0 ? (
             <QuizHistory />
           ) : (
             <div className={styles.emptyHistory}>
-              아직 시험 기록이 없어요. 위에서 시험을 선택해보세요!
+              아직 시험 기록이 없습니다.
             </div>
           )}
         </div>
@@ -153,7 +216,7 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
     );
   }
 
-  /* ── Result Phase ── */
+  /* ── Result ── */
   if (phase === 'result') {
     return (
       <div className={styles.screen}>
@@ -165,25 +228,25 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
         </div>
 
         <div className={styles.resultWrap}>
-          <div className={styles.resultEmoji}>{resultEmoji}</div>
           <div className={`${styles.resultScore} ${scoreGradeClass(score100)}`}>
             {score100}점
           </div>
           <div className={styles.resultLabel}>
             {questions.length}문제 중 {score}문제 정답
+            {wrongInSession > 0 && ` · ${wrongInSession}문제 오답노트에 저장됨`}
           </div>
 
           {growth !== null && growth !== 0 && (
             <div className={`${styles.resultGrowth} ${growth < 0 ? styles.resultDown : ''}`}>
-              {growth > 0 ? `▲ ${growth}점 향상!` : `▼ ${Math.abs(growth)}점`}
+              {growth > 0 ? `▲ ${growth}점 향상` : `▼ ${Math.abs(growth)}점`}
             </div>
           )}
 
-          <div className={styles.growthText}>{resultMessage}</div>
+          <div className={styles.resultMessage}>{resultMessage}</div>
 
           <div className={styles.resultActions}>
             <button type="button" className={`${styles.resultBtn} ${styles.resultBtnOutline}`} onClick={onBack}>
-              홈으로
+              돌아가기
             </button>
             <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => setPhase('setup')}>
               다시 도전
@@ -194,7 +257,7 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
     );
   }
 
-  /* ── Quiz Phase ── */
+  /* ── Quiz ── */
   const q = questions[currentIdx];
   if (!q) return null;
 
@@ -214,7 +277,7 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
         <div className={styles.progressBar}>
           <div
             className={styles.progressFill}
-            /* STYLE-EXCEPTION: 동적 진행률 width는 CSS 변수 브릿지 불가 */
+            /* STYLE-EXCEPTION: 동적 진행률 */
             style={{ width: `${((currentIdx + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -248,7 +311,7 @@ export default function QuizSystem({ onBack }: QuizSystemProps) {
         {answered && (
           <>
             <div className={styles.explanation}>
-              {selected === q.answer ? '✅ 정답! ' : '❌ 오답. '}
+              {selected === q.answer ? '정답. ' : '오답. '}
               {q.explanation}
             </div>
             <button type="button" className={styles.nextBtn} onClick={handleNext}>

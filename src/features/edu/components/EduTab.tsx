@@ -5,32 +5,47 @@ import { useHistoryBack } from '@/hooks/useHistoryBack';
 import EduHome from './EduHome';
 import DocumentViewer from './DocumentViewer';
 import QuizSystem from './QuizSystem';
+import WrongReview from './WrongReview';
 
-type EduView = 'home' | 'study' | 'quiz';
+type EduView =
+  | { type: 'home' }
+  | { type: 'study'; initSection?: string; initChapter?: string }
+  | { type: 'quiz'; chapter?: string }
+  | { type: 'wrong-review' };
 
 interface EduTabProps {
   onBack: () => void;
 }
 
 export default function EduTab({ onBack }: EduTabProps) {
-  const [view, setView] = useState<EduView>('home');
+  const [view, setView] = useState<EduView>({ type: 'home' });
 
-  const goHome = useCallback(() => setView('home'), []);
+  const goHome = useCallback(() => setView({ type: 'home' }), []);
 
-  // study/quiz 진입 시 히스토리 push → 뒤로가기로 edu home 복귀
-  useHistoryBack(`edu-${view}`, goHome, view !== 'home');
+  useHistoryBack(`edu-${view.type}`, goHome, view.type !== 'home');
 
-  switch (view) {
+  switch (view.type) {
     case 'study':
-      return <DocumentViewer onBack={goHome} />;
+      return (
+        <DocumentViewer
+          onBack={goHome}
+          initSection={view.initSection}
+          initChapter={view.initChapter}
+        />
+      );
     case 'quiz':
-      return <QuizSystem onBack={goHome} />;
+      return <QuizSystem onBack={goHome} initChapter={view.chapter} />;
+    case 'wrong-review':
+      return <WrongReview onBack={goHome} />;
     default:
       return (
         <EduHome
           onBack={onBack}
-          onStudy={() => setView('study')}
-          onQuiz={() => setView('quiz')}
+          onStudy={() => setView({ type: 'study' })}
+          onQuiz={() => setView({ type: 'quiz' })}
+          onSection={(id) => setView({ type: 'study', initSection: id })}
+          onChapter={(id) => setView({ type: 'study', initChapter: id })}
+          onWrongReview={() => setView({ type: 'wrong-review' })}
         />
       );
   }

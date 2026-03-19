@@ -63,11 +63,11 @@ export default function HomePage() {
     <AuthGate>
       {world === null ? (
         <WorldHub onEnter={handleEnter} />
-      ) : world === 'duty' ? (
+      ) : (
         <AppShell onBack={handleBack}>
           {(activeTab) => <TabContent tab={activeTab} />}
         </AppShell>
-      ) : null}
+      )}
     </AuthGate>
   );
 }

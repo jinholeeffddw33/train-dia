@@ -292,6 +292,7 @@
   margin-bottom: var(--dia-space-3);
   position: relative;
   animation: iconFloat 3s ease-in-out infinite;
+  overflow: visible;
 }
 
 @keyframes iconFloat {

@@ -39,7 +39,7 @@ const WORLDS = [
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
-    lottieSize: 140,
+    lottieSize: 220,
   },
 ];
 

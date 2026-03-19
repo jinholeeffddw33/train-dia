@@ -32,7 +32,7 @@ const WORLDS: WorldDef[] = [
     lottie: '/lottie/duty.json',
     iconClass: styles.iconDuty,
     cardClass: styles.cardDuty,
-    lottieW: 62,
+    lottieW: 75,
   },
   {
     id: 'edu',
@@ -41,7 +41,7 @@ const WORLDS: WorldDef[] = [
     lottie: '/lottie/edu.json',
     iconClass: styles.iconEdu,
     cardClass: styles.cardEdu,
-    lottieW: 80,
+    lottieW: 90,
   },
   {
     id: 'safety',
@@ -50,7 +50,7 @@ const WORLDS: WorldDef[] = [
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
-    lottieW: 40,
+    lottieW: 50,
   },
 ];
 

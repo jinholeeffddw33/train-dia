@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -12,6 +12,7 @@ import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import { DriverSelector } from '@/features/home';
 import HealingCardOverlay from './HealingCardOverlay';
+import ShortcutsOverlay from './ShortcutsOverlay';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
@@ -25,6 +26,7 @@ export default function MoreTab() {
   const [contactsOpen, setContactsOpen] = useState(false);
   const [healingOpen, setHealingOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
 
   return (
     <div className={styles.container}>
@@ -50,6 +52,18 @@ export default function MoreTab() {
       {/* 도구 섹션 */}
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>도구</h3>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setShortcutsOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <Bookmark size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>내 바로가기</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
 
         <button
           type="button"
@@ -233,6 +247,12 @@ export default function MoreTab() {
       <HealingCardOverlay
         open={healingOpen}
         onClose={() => setHealingOpen(false)}
+      />
+
+      {/* 바로가기 오버레이 */}
+      <ShortcutsOverlay
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
       />
 
       {/* 교번 비교 오버레이 */}

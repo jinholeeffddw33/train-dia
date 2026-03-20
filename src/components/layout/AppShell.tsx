@@ -50,7 +50,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
   }, [triggerScroll]);
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} data-has-back={onBack ? '' : undefined}>
       {/* 업데이트 배너 */}
       {updateAvailable && (
         <div className={styles.updateBanner}>

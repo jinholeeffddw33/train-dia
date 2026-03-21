@@ -119,7 +119,7 @@
 
 .cheerText {
   font-size: var(--dia-text-base);
-  color: var(--dia-text-secondary);
+  color: var(--dia-text-primary);
   line-height: 1.6;
 }
 
@@ -132,7 +132,7 @@
 
 .cheerSub {
   font-size: var(--dia-text-base);
-  color: var(--dia-text-tertiary);
+  color: var(--dia-text-primary);
   font-weight: var(--dia-weight-medium);
 }
 

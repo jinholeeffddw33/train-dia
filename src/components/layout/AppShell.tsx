@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
-import Modal from '../common/Modal';
+
 import { AlertFab } from '@/features/alerts';
 import { useAlertStore } from '@/stores/alert';
 import { useTrainStore } from '@/stores/train';
@@ -15,7 +15,6 @@ import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
 import styles from './AppShell.module.css';
 
-const CHEER_KEY = 'cheer_dismissed_20260321';
 
 interface AppShellProps {
   children: (activeTab: TabId) => React.ReactNode;
@@ -29,17 +28,6 @@ export default function AppShell({ children, onBack }: AppShellProps) {
   const { updateAvailable, applyUpdate } = useServiceWorker();
   const [installDismissed, setInstallDismissed] = useState(false);
 
-  // 응원 팝업 (X 누르면 다시 안 뜸)
-  const [cheerOpen, setCheerOpen] = useState(false);
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(CHEER_KEY)) setCheerOpen(true);
-    } catch { /* SSR/private mode */ }
-  }, []);
-  const dismissCheer = useCallback(() => {
-    setCheerOpen(false);
-    try { localStorage.setItem(CHEER_KEY, '1'); } catch { /* ignore */ }
-  }, []);
 
   const triggerScroll = useTrainStore((s) => s.triggerScroll);
   const driver = useDriverStore((s) => s.current);
@@ -64,9 +52,6 @@ export default function AppShell({ children, onBack }: AppShellProps) {
     window.scrollTo({ top: 0 });
   }, [triggerScroll]);
 
-  const cheerTitle = driver
-    ? `${driver.n} 기관사님께`
-    : '답십리 기관사 여러분께';
 
   return (
     <div className={styles.shell} data-has-back={onBack ? '' : undefined}>
@@ -117,26 +102,6 @@ export default function AppShell({ children, onBack }: AppShellProps) {
       />
       <AlertFab />
       <ToastContainer />
-
-      {/* 응원 팝업 */}
-      <Modal open={cheerOpen} onClose={dismissCheer} title={cheerTitle}>
-        <div className={styles.cheerBody}>
-          <p className={styles.cheerEmoji}>🚇</p>
-          <p className={styles.cheerText}>
-            BTS 공연으로 전국이 들썩이는 오늘,<br />
-            묵묵히 현장을 지키는 여러분 감사합니다.
-          </p>
-          <p className={styles.cheerHighlight}>고생 많으십니다!</p>
-          <p className={styles.cheerWarn}>광화문역 통과열차는<br />주의 운전하시기 바랍니다!</p>
-          <button
-            type="button"
-            className={styles.cheerBtn}
-            onClick={dismissCheer}
-          >
-            확인
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 }

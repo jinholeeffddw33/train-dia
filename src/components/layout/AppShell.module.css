@@ -136,6 +136,13 @@
   font-weight: var(--dia-weight-medium);
 }
 
+.cheerWarn {
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  color: #FB7185;
+  letter-spacing: -0.5px;
+}
+
 .cheerBtn {
   width: 100%;
   padding: var(--dia-space-3) var(--dia-space-4);

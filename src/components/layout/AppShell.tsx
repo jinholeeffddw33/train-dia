@@ -127,7 +127,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
             묵묵히 현장을 지키는 여러분 감사합니다.
           </p>
           <p className={styles.cheerHighlight}>고생 많으십니다!</p>
-          <p className={styles.cheerHighlight}>광화문역 통과열차는<br />주의 운전하시기 바랍니다!</p>
+          <p className={styles.cheerWarn}>광화문역 통과열차는<br />주의 운전하시기 바랍니다!</p>
           <button
             type="button"
             className={styles.cheerBtn}

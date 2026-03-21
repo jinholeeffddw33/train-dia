@@ -102,53 +102,64 @@
   transform: scale(0.95);
 }
 
-/* ── Cheer Popup ── */
-.cheerBody {
+/* ── Cheer Banner (상단) ── */
+.cheerBanner {
+  background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+  color: white;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  animation: cheerSlideDown 0.4s var(--dia-ease);
+}
+
+@keyframes cheerSlideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.cheerContent {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--dia-space-6) var(--dia-space-5) var(--dia-space-5);
+  align-items: flex-start;
   gap: var(--dia-space-3);
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 .cheerEmoji {
-  font-size: 48px;
+  font-size: 28px;
   line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cheerTexts {
+  flex: 1;
+  min-width: 0;
 }
 
 .cheerText {
-  font-size: var(--dia-text-base);
-  color: var(--dia-text-secondary);
-  line-height: 1.6;
+  font-size: var(--dia-text-sm);
+  line-height: 1.5;
+  opacity: 0.9;
 }
 
 .cheerHighlight {
-  font-size: var(--dia-text-xl);
+  font-size: var(--dia-text-base);
   font-weight: 800;
-  color: var(--dia-blue);
-  letter-spacing: -0.5px;
+  margin-top: 4px;
+  letter-spacing: -0.3px;
 }
 
-.cheerSub {
-  font-size: var(--dia-text-base);
-  color: var(--dia-text-tertiary);
-  font-weight: var(--dia-weight-medium);
+.cheerClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--dia-radius-full);
+  color: rgba(255, 255, 255, 0.8);
+  margin: -8px -8px 0 0;
 }
 
-.cheerBtn {
-  width: 100%;
-  padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
-  border-radius: var(--dia-radius-lg);
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
-  min-height: 48px;
-  margin-top: var(--dia-space-2);
-  transition: transform var(--dia-transition-fast);
-}
-
-.cheerBtn:active {
-  transform: scale(0.97);
+.cheerClose:active {
+  background: rgba(255, 255, 255, 0.15);
 }

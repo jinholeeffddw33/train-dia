@@ -3,8 +3,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useTrainStore } from '@/stores/train';
 
-const POLL_INTERVAL = 120_000; // 2분
-const STALE_THRESHOLD = 30_000; // 30초 이상 지났으면 복귀 시 즉시 갱신
+const POLL_INTERVAL = 30_000; // 30초
+const STALE_THRESHOLD = 15_000; // 15초 이상 지났으면 복귀 시 즉시 갱신
 
 export function useTrainPolling() {
   const { setData, setLoading, setError, loading } = useTrainStore();

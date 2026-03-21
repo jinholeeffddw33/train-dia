@@ -617,7 +617,7 @@
   box-shadow: 0 0 4px rgba(13, 148, 82, 0.1);
 }
 
-/* ── Left train area (상행) ── */
+/* ── Left train area (하행) ── */
 .tkLeft {
   display: flex;
   flex-direction: column;
@@ -626,7 +626,7 @@
   padding-right: var(--dia-space-2);
 }
 
-/* ── Right area (station name + 하행 trains) ── */
+/* ── Right area (station name + 상행 trains) ── */
 .tkRight {
   display: flex;
   flex-direction: column;
@@ -929,7 +929,7 @@
   color: var(--dia-purple);
   padding: var(--dia-space-2) var(--dia-space-3);
   border-radius: var(--dia-radius-md);
-  min-height: 36px;
+  min-height: 44px;
 }
 
 .mapFooterBtn:active { background: var(--dia-purple-dim); }

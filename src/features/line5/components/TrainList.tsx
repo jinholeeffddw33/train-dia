@@ -108,8 +108,8 @@ export default function TrainList() {
         const transfers = LINE5_TRANSFERS[name];
         const hasTransfer = !!transfers && !transfers.some((t) => t.includes('지선'));
         const trainsHere = trainsByStation.get(name) ?? [];
-        const upTrains = trainsHere.filter((t) => t.direction === '상행' || t.direction === '0');
-        const downTrains = trainsHere.filter((t) => t.direction === '하행' || t.direction === '1');
+        const upTrains = trainsHere.filter((t) => t.direction === '상행');
+        const downTrains = trainsHere.filter((t) => t.direction === '하행');
 
         const trackClass = [
           styles.tkTrack,

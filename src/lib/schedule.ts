@@ -444,6 +444,7 @@ export function findExchangePartners(
 /**
  * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
  * - 현재 시간 기준으로 각 기관사의 활성 구간(segment)에 포함된 열차번호를 수집
+ * - 구간 전환 마진: 도착 후 + 다음 구간 출발 전까지 이전/다음 구간 열차번호 유지
  * - 야간 근무(자정 넘김) 대응: 오늘 + 어제 스케줄 모두 탐색
  * - 매칭 안 되면 영등포 기관사 → 표시하지 않음
  */
@@ -477,7 +478,9 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
         if (startMins < 0 || endMins < 0 || endMins >= startMins) continue; // 야간 아님
       }
 
-      for (const seg of sc.g) {
+      const segs = sc.g;
+      for (let si = 0; si < segs.length; si++) {
+        const seg = segs[si];
         if (!seg.n || seg.n.length === 0) continue;
         const depMins = timeToMins(seg.d);
         const arrMins = timeToMins(seg.a);
@@ -493,11 +496,27 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
         } else {
           // 자정 넘김 구간 (예: 23:00 ~ 02:00)
           if (isYesterday) {
-            // 어제 시작 → 오늘 새벽
             if (nowMins < arrMins) isActive = true;
           } else {
-            // 오늘 시작 → 내일 새벽
             if (nowMins >= depMins) isActive = true;
+          }
+        }
+
+        // 구간 전환 마진: 이전 구간 도착 ~ 현재 구간 출발 사이에도 양쪽 열차번호 유지
+        if (!isActive && !isYesterday && si > 0) {
+          const prevSeg = segs[si - 1];
+          const prevArr = timeToMins(prevSeg.a);
+          if (prevArr >= 0 && prevArr <= depMins && nowMins >= prevArr && nowMins < depMins) {
+            // 이전 구간 도착 후 ~ 현재 구간 출발 전 (전환 시간)
+            // 현재 구간 열차번호도 매핑 (곧 탈 열차)
+            isActive = true;
+          }
+        }
+
+        // 마지막 구간 도착 후 5분 마진 (열차가 아직 역에 정차 중일 수 있음)
+        if (!isActive && !isYesterday && si === segs.length - 1 && arrMins > depMins) {
+          if (nowMins >= arrMins && nowMins < arrMins + 5) {
+            isActive = true;
           }
         }
 

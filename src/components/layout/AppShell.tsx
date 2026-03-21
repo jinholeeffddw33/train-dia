@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
+import Modal from '../common/Modal';
 import { AlertFab } from '@/features/alerts';
 import { useAlertStore } from '@/stores/alert';
 import { useTrainStore } from '@/stores/train';
@@ -63,31 +64,12 @@ export default function AppShell({ children, onBack }: AppShellProps) {
     window.scrollTo({ top: 0 });
   }, [triggerScroll]);
 
+  const cheerTitle = driver
+    ? `${driver.n} 기관사님께`
+    : '답십리 기관사 여러분께';
+
   return (
     <div className={styles.shell} data-has-back={onBack ? '' : undefined}>
-      {/* 응원 배너 */}
-      {cheerOpen && (
-        <div className={styles.cheerBanner}>
-          <div className={styles.cheerContent}>
-            <span className={styles.cheerEmoji}>🚇</span>
-            <div className={styles.cheerTexts}>
-              <p className={styles.cheerText}>
-                {driver ? `${driver.n} 기관사님, ` : ''}BTS 공연으로 전국이 들썩이는 오늘, 묵묵히 현장을 지키는 여러분 감사합니다.
-              </p>
-              <p className={styles.cheerHighlight}>고생 많으십니다! 안전 귀가하세요!</p>
-            </div>
-            <button
-              type="button"
-              className={styles.cheerClose}
-              onClick={dismissCheer}
-              aria-label="닫기"
-            >
-              <X size={16} strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 업데이트 배너 */}
       {updateAvailable && (
         <div className={styles.updateBanner}>
@@ -136,6 +118,25 @@ export default function AppShell({ children, onBack }: AppShellProps) {
       <AlertFab />
       <ToastContainer />
 
+      {/* 응원 팝업 */}
+      <Modal open={cheerOpen} onClose={dismissCheer} title={cheerTitle}>
+        <div className={styles.cheerBody}>
+          <p className={styles.cheerEmoji}>🚇</p>
+          <p className={styles.cheerText}>
+            BTS 공연으로 전국이 들썩이는 오늘,<br />
+            묵묵히 현장을 지키는 여러분 감사합니다.
+          </p>
+          <p className={styles.cheerHighlight}>고생 많으십니다!</p>
+          <p className={styles.cheerSub}>안전 귀가하세요!</p>
+          <button
+            type="button"
+            className={styles.cheerBtn}
+            onClick={dismissCheer}
+          >
+            확인
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

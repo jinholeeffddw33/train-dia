@@ -27,7 +27,12 @@ function getTrainDir(trainNo: string): 'up' | 'down' {
 }
 
 export default function RouteMap() {
-  const { data, branch, mapZoom, mapFullscreen, setMapZoom, toggleFullscreen } = useTrainStore();
+  const data = useTrainStore((s) => s.data);
+  const branch = useTrainStore((s) => s.branch);
+  const mapZoom = useTrainStore((s) => s.mapZoom);
+  const mapFullscreen = useTrainStore((s) => s.mapFullscreen);
+  const setMapZoom = useTrainStore((s) => s.setMapZoom);
+  const toggleFullscreen = useTrainStore((s) => s.toggleFullscreen);
 
   // 열차번호 → 답십리 기관사 이름 매핑
   const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);

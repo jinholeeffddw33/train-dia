@@ -441,14 +441,23 @@ export function findExchangePartners(
 
 // ===== 열차번호 → 기관사 매핑 =====
 
+// 분 단위 캐시: 같은 분(minute)이면 이전 결과 재사용
+let cachedMinute = -1;
+let cachedMap: Map<string, string> | null = null;
+
 /**
  * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
  * - 현재 시간 기준으로 각 기관사의 활성 구간(segment)에 포함된 열차번호를 수집
  * - 구간 전환 마진: 도착 후 + 다음 구간 출발 전까지 이전/다음 구간 열차번호 유지
  * - 야간 근무(자정 넘김) 대응: 오늘 + 어제 스케줄 모두 탐색
  * - 매칭 안 되면 영등포 기관사 → 표시하지 않음
+ * - 분 단위 캐싱: 같은 분이면 이전 결과 재사용
  */
 export function buildTrainDriverMap(now: Date): Map<string, string> {
+  const currentMinute = now.getHours() * 60 + now.getMinutes();
+  if (cachedMap !== null && cachedMinute === currentMinute) {
+    return cachedMap;
+  }
   const map = new Map<string, string>();
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -529,6 +538,8 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
     }
   }
 
+  cachedMinute = currentMinute;
+  cachedMap = map;
   return map;
 }
 

@@ -20,7 +20,7 @@ export async function GET() {
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(8000),
-      next: { revalidate: 15 },
+      next: { revalidate: 25 },
     });
 
     if (!res.ok) {

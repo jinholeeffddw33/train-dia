@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useTrainStore } from '@/stores/train';
 import { buildTrainDriverMap } from '@/lib/schedule';
 import {
@@ -27,18 +27,14 @@ function shortDest(dest: string): string {
 }
 
 export default function TrainList() {
-  const { data, branch, scrollTrigger } = useTrainStore();
+  const data = useTrainStore((s) => s.data);
+  const branch = useTrainStore((s) => s.branch);
+  const scrollTrigger = useTrainStore((s) => s.scrollTrigger);
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
-  // 열차번호 → 답십리 기관사 이름 매핑 (1분마다 갱신)
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60_000);
-    return () => clearInterval(id);
-  }, []);
-
-  const driverMap = useMemo(() => buildTrainDriverMap(now), [now]);
+  // 열차번호 → 답십리 기관사 이름 매핑 (data 변경 시에만 재계산)
+  const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);
 
   const trainsByStation = useMemo(() => {
     const map = new Map<string, { trainNo: string; direction: string; status: string; dest: string }[]>();
@@ -71,7 +67,7 @@ export default function TrainList() {
       });
       hasScrolled.current = true;
     }
-  }, [branch, data.length, scrollTrigger]);
+  }, [scrollTrigger, branch]);
 
   if (data.length === 0) {
     return (

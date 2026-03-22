@@ -1230,7 +1230,7 @@
 }
 
 .weekSwapLabel {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: var(--dia-weight-bold);
   color: #34D399;
   margin-top: 1px;
@@ -1242,7 +1242,7 @@
 }
 
 .statusSwapTag {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: var(--dia-weight-bold);
   color: #34D399;
   margin-left: auto;

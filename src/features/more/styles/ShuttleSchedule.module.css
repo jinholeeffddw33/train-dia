@@ -95,7 +95,7 @@
 .scheduleTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
   white-space: nowrap;
   min-width: 560px;
 }
@@ -107,7 +107,7 @@
 .scheduleTable th {
   padding: var(--dia-space-2) var(--dia-space-2);
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: var(--dia-weight-bold);
   color: var(--dia-blue);
   border-bottom: 1px solid var(--dia-border);
@@ -116,7 +116,7 @@
 .scheduleTable td {
   padding: var(--dia-space-2) var(--dia-space-2);
   border-bottom: 1px solid var(--dia-border);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--dia-text-primary);
 }
 
@@ -183,7 +183,7 @@
 .tdNote {
   white-space: normal;
   word-break: keep-all;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--dia-text-secondary);
   line-height: 1.5;
   min-width: 100px;

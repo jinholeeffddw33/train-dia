@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useMemoStore } from '@/stores/memo';
+import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Calendar.module.css';
@@ -14,6 +15,7 @@ interface ScheduleDetailProps {
 export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
   const driver = useDriverStore((s) => s.current);
   const { getMemo, setMemo, removeMemo } = useMemoStore();
+  const swap = useSwapStore((s) => s.getSwap(dateStr));
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -21,24 +23,37 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
 
   const info = useMemo(() => {
     if (!driver) return null;
-    const dia = getDia(driver, date);
+    const originalDia = getDia(driver, date);
+    const dia = swap ? swap.dia : originalDia;
     const type = getType(dia);
     const schedule = getSchedule(dia, date);
-    return { dia, type, display: getDiaDisplay(dia), label: getLabel(dia), schedule };
-  }, [driver, dateStr]);
+    return {
+      dia,
+      type,
+      display: getDiaDisplay(dia),
+      label: getLabel(dia),
+      schedule,
+      isSwapped: !!swap,
+      originalDia,
+      originalDisplay: getDiaDisplay(originalDia),
+    };
+  }, [driver, dateStr, swap]);
 
   const memo = getMemo(dateStr);
 
   if (!info) return null;
 
   return (
-    <div className={styles.detail}>
+    <div className={`${styles.detail} ${info.isSwapped ? styles.detailSwapped : ''}`}>
       <div className={styles.detailHeader}>
         <span className={styles.detailDate}>{month}월 {day}일 ({dow})</span>
-        <span className={`${styles.detailBadge} ${styles[`detailType_${info.type}`]}`}>
+        <span className={`${styles.detailBadge} ${info.isSwapped ? styles.detailTypeSwapped : styles[`detailType_${info.type}`]}`}>
           {info.display}
         </span>
         <span className={styles.detailLabel}>{info.label}</span>
+        {info.isSwapped && (
+          <span className={styles.detailSwapTag}>변경 (원래: {info.originalDisplay})</span>
+        )}
       </div>
 
       {info.schedule && (

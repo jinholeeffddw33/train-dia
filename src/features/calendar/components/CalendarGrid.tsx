@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
+import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { useMemoStore } from '@/stores/memo';
 import styles from '../styles/Calendar.module.css';
@@ -11,31 +12,44 @@ interface CalendarGridProps {
   month: number;
   selectedDate: string | null;
   onSelectDate: (dateStr: string) => void;
+  swapMode?: boolean;
 }
 
-export default function CalendarGrid({ year, month, selectedDate, onSelectDate }: CalendarGridProps) {
+export default function CalendarGrid({ year, month, selectedDate, onSelectDate, swapMode }: CalendarGridProps) {
   const driver = useDriverStore((s) => s.current);
   const memos = useMemoStore((s) => s.memos);
+  const swaps = useSwapStore((s) => s.swaps);
 
   // 매 렌더마다 현재 날짜 계산 (자정 후에도 정확한 오늘 표시)
   const todayDate = new Date();
   const todayStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
-  const cells = useMemo(() => {
+  type EmptyCell = { key: string; empty: true };
+  type DateCell = {
+    key: string; empty: false; d: number; dateStr: string;
+    dia: string | null; type: string | null; display: string;
+    hol: boolean; hasMemo: boolean; isToday: boolean; isSelected: boolean;
+    isSun: boolean; isSat: boolean; isSwapped: boolean;
+  };
+  type CalendarCell = EmptyCell | DateCell;
+
+  const cells = useMemo((): CalendarCell[] => {
     const firstDay = new Date(year, month - 1, 1).getDay();
     const daysInMonth = new Date(year, month, 0).getDate();
-    const result = [];
+    const result: CalendarCell[] = [];
 
     // 빈 셀
     for (let i = 0; i < firstDay; i++) {
-      result.push({ key: `e${i}`, empty: true } as const);
+      result.push({ key: `e${i}`, empty: true });
     }
 
     // 날짜 셀
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(year, month - 1, d);
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const dia = driver ? getDia(driver, date) : null;
+      const originalDia = driver ? getDia(driver, date) : null;
+      const swap = swaps[dateStr] || null;
+      const dia = swap ? swap.dia : originalDia;
       const type = dia ? getType(dia) : null;
       const display = dia ? getDiaDisplay(dia) : '';
       const hol = isHoliday(date);
@@ -44,6 +58,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate }
       const isSelected = dateStr === selectedDate;
       const isSun = date.getDay() === 0;
       const isSat = date.getDay() === 6;
+      const isSwapped = !!swap;
 
       result.push({
         key: dateStr,
@@ -59,10 +74,11 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate }
         isSelected,
         isSun,
         isSat,
-      } as const);
+        isSwapped,
+      });
     }
     return result;
-  }, [driver, year, month, selectedDate, memos, todayStr]);
+  }, [driver, year, month, selectedDate, memos, swaps, todayStr]);
 
   return (
     <div className={styles.grid}>
@@ -84,20 +100,21 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate }
           <button
             key={cell.key}
             type="button"
-            className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''}`}
+            className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''} ${swapMode ? styles.cellSwapMode : ''} ${cell.isSwapped ? styles.cellSwapped : ''}`}
             onClick={() => onSelectDate(cell.dateStr)}
-            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}`}
+            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
             aria-current={cell.isToday ? 'date' : undefined}
           >
             <span className={`${styles.cellDate} ${cell.isSun || cell.hol ? styles.cellDateSun : ''} ${cell.isSat ? styles.cellDateSat : ''}`}>
               {cell.d}
             </span>
             {cell.type && (
-              <span className={`${styles.cellDia} ${styles[`cellType_${cell.type}`]}`}>
+              <span className={`${styles.cellDia} ${cell.isSwapped ? styles.cellDiaSwapped : styles[`cellType_${cell.type}`]}`}>
                 {cell.display}
               </span>
             )}
-            {cell.hasMemo && <span className={styles.memoDot} />}
+            {cell.isSwapped && <span className={styles.swapTag}>변경</span>}
+            {cell.hasMemo && !cell.isSwapped && <span className={styles.memoDot} />}
           </button>
         ),
       )}

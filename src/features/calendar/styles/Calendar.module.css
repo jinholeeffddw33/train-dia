@@ -266,3 +266,339 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== 교번변경 (Swap) ===== */
+
+/* 교번변경 버튼 영역 */
+.swapBtnRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--dia-space-4);
+}
+
+.swapToggleBtn {
+  padding: var(--dia-space-2) var(--dia-space-5);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  transition: all var(--dia-transition-fast);
+  min-height: 44px;
+}
+
+.swapToggleBtn:active {
+  transform: scale(0.98);
+}
+
+.swapToggleBtnActive {
+  color: white;
+  background: var(--dia-red);
+  border-color: var(--dia-red);
+}
+
+/* 교번변경 모드 안내 배너 */
+.swapBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-blue-dim);
+  border: 1px solid var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  margin-bottom: var(--dia-space-3);
+  animation: slideUp 200ms var(--dia-ease);
+}
+
+.swapBannerText {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-blue);
+}
+
+.swapBannerClose {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-sm);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.swapBannerClose:active {
+  background: var(--dia-surface-hover);
+}
+
+/* 교번변경 모드 셀 (dotted 보더 힌트) */
+.cellSwapMode {
+  border: 1px dashed var(--dia-blue);
+  border-radius: var(--dia-radius-sm);
+}
+
+/* 변경된 날짜 셀 */
+.cellSwapped {
+  background: rgba(52, 211, 153, 0.08);
+}
+
+/* 변경된 교번 텍스트 색상 (민트) */
+.cellDiaSwapped {
+  color: #34D399;
+}
+
+/* 변경 태그 (셀 내 우하단) */
+.swapTag {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 9px;
+  font-weight: var(--dia-weight-bold);
+  color: #34D399;
+  line-height: 1;
+}
+
+/* 상세카드 변경 스타일 */
+.detailSwapped {
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.detailTypeSwapped {
+  background: #34D399;
+}
+
+.detailSwapTag {
+  font-size: var(--dia-text-xs);
+  color: #34D399;
+  font-weight: var(--dia-weight-semibold);
+}
+
+/* ===== 바텀시트 오버레이 ===== */
+.swapOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--dia-layer-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 150ms var(--dia-ease);
+}
+
+.swapSheet {
+  width: 100%;
+  max-width: 480px;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
+  padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-6);
+  padding-bottom: calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
+  animation: sheetUp 250ms var(--dia-ease);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.swapHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  margin: 0 auto var(--dia-space-4);
+  opacity: 0.4;
+}
+
+.swapHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-5);
+}
+
+.swapTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.swapDate {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+/* 현재 교번 표시 */
+.swapCurrentRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-5);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-md);
+}
+
+.swapCurrentLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+.swapCurrentBadge {
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+}
+
+/* 교번 입력 */
+.swapInputGroup {
+  margin-bottom: var(--dia-space-4);
+}
+
+.swapInputLabel {
+  display: block;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.swapInput {
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  text-align: center;
+  min-height: 48px;
+}
+
+.swapInput::placeholder {
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-normal);
+  font-size: var(--dia-text-sm);
+}
+
+.swapInput:focus {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: -1px;
+  border-color: var(--dia-blue);
+}
+
+/* 프리뷰 */
+.swapPreview {
+  padding: var(--dia-space-4);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  margin-bottom: var(--dia-space-5);
+  animation: slideUp 150ms var(--dia-ease);
+}
+
+.swapPreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-3);
+}
+
+.swapPreviewBadge {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-sm);
+  color: white;
+}
+
+.swapType_day { background: var(--dia-blue); }
+.swapType_night { background: var(--dia-purple); }
+.swapType_standby { background: var(--dia-amber); }
+.swapType_rest { background: var(--dia-gray); }
+
+.swapPreviewLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.swapPreviewTimes {
+  display: flex;
+  gap: var(--dia-space-6);
+}
+
+.swapPreviewTimeItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swapPreviewTimeLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.swapPreviewTimeValue {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.swapPreviewRest {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
+/* 버튼 영역 */
+.swapActions {
+  display: flex;
+  gap: var(--dia-space-3);
+}
+
+.swapRemoveBtn {
+  flex: 1;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface-elevated);
+  border: 1px solid var(--dia-border);
+  min-height: 48px;
+  transition: all var(--dia-transition-fast);
+}
+
+.swapRemoveBtn:active {
+  transform: scale(0.98);
+  background: var(--dia-surface-hover);
+}
+
+.swapSaveBtn {
+  flex: 2;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+  background: #34D399;
+  min-height: 48px;
+  transition: all var(--dia-transition-fast);
+}
+
+.swapSaveBtn:active {
+  transform: scale(0.98);
+}
+
+.swapSaveBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

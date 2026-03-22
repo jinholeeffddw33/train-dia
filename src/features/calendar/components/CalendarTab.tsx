@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDriverStore } from '@/stores/driver';
+import { useSwapStore } from '@/stores/swap';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
+import SwapBottomSheet from './SwapBottomSheet';
 import styles from '../styles/Calendar.module.css';
 
 function todayStr(): string {
@@ -13,9 +15,18 @@ function todayStr(): string {
 
 export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
+  const cleanExpired = useSwapStore((s) => s.cleanExpired);
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
+  const [swapMode, setSwapMode] = useState(false);
+  const [swapTargetDate, setSwapTargetDate] = useState<string | null>(null);
+
+  // 앱 시작 시 만료된 교번변경 정리
+  useEffect(() => {
+    cleanExpired();
+  }, [cleanExpired]);
+
   const prevMonth = () => {
     if (month === 1) { setYear(year - 1); setMonth(12); }
     else setMonth(month - 1);
@@ -33,6 +44,20 @@ export default function CalendarTab() {
     setYear(fresh.getFullYear());
     setMonth(fresh.getMonth() + 1);
     setSelectedDate(todayStr());
+  };
+
+  const handleDateSelect = (dateStr: string) => {
+    if (swapMode) {
+      // 교번변경 모드: 날짜 탭 → 바텀시트 열기
+      setSwapTargetDate(dateStr);
+    } else {
+      setSelectedDate(dateStr);
+    }
+  };
+
+  const toggleSwapMode = () => {
+    setSwapMode((prev) => !prev);
+    setSwapTargetDate(null);
   };
 
   if (!driver) {
@@ -60,16 +85,46 @@ export default function CalendarTab() {
         <span className={styles.driverName}>{driver.n}</span>
       </div>
 
+      {/* 교번변경 모드 안내 배너 */}
+      {swapMode && (
+        <div className={styles.swapBanner}>
+          <span className={styles.swapBannerText}>변경할 날짜를 탭하세요</span>
+          <button type="button" className={styles.swapBannerClose} onClick={toggleSwapMode}>
+            취소
+          </button>
+        </div>
+      )}
+
       {/* 달력 그리드 */}
       <CalendarGrid
         year={year}
         month={month}
         selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
+        onSelectDate={handleDateSelect}
+        swapMode={swapMode}
       />
 
+      {/* 교번변경 버튼 */}
+      <div className={styles.swapBtnRow}>
+        <button
+          type="button"
+          className={`${styles.swapToggleBtn} ${swapMode ? styles.swapToggleBtnActive : ''}`}
+          onClick={toggleSwapMode}
+        >
+          {swapMode ? '변경 취소' : '교번변경'}
+        </button>
+      </div>
+
       {/* 선택된 날짜 상세 */}
-      {selectedDate && <ScheduleDetail dateStr={selectedDate} />}
+      {selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
+
+      {/* 교번변경 바텀시트 */}
+      {swapTargetDate && (
+        <SwapBottomSheet
+          dateStr={swapTargetDate}
+          onClose={() => setSwapTargetDate(null)}
+        />
+      )}
     </div>
   );
 }

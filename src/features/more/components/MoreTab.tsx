@@ -82,7 +82,9 @@ export default function MoreTab() {
           onClick={() => setShuttleOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <Car size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+              <Car size={20} />
+            </div>
             <span className={styles.settingLabel}>승용차 운행 시간표</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -94,7 +96,9 @@ export default function MoreTab() {
           onClick={() => setShortcutsOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <Bookmark size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconAmber}`}>
+              <Bookmark size={20} />
+            </div>
             <span className={styles.settingLabel}>내 바로가기</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -106,7 +110,9 @@ export default function MoreTab() {
           onClick={() => setCompareOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <GitCompareArrows size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
+              <GitCompareArrows size={20} />
+            </div>
             <span className={styles.settingLabel}>교번 비교</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -118,7 +124,9 @@ export default function MoreTab() {
           onClick={() => setContactsOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <Phone size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconRed}`}>
+              <Phone size={20} />
+            </div>
             <span className={styles.settingLabel}>비상 연락처</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -130,7 +138,9 @@ export default function MoreTab() {
           onClick={() => setSubwayOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <Search size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <Search size={20} />
+            </div>
             <span className={styles.settingLabel}>경로 검색</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -142,7 +152,9 @@ export default function MoreTab() {
           onClick={() => setCommuteOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <TrainFront size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+              <TrainFront size={20} />
+            </div>
             <span className={styles.settingLabel}>도착 정보</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
@@ -154,7 +166,9 @@ export default function MoreTab() {
           onClick={() => setHealingOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <CreditCard size={20} className={styles.toolIcon} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <CreditCard size={20} />
+            </div>
             <span className={styles.settingLabel}>힐링카드 잔액조회</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />

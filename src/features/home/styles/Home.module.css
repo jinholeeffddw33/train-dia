@@ -1229,12 +1229,12 @@
   color: #34D399 !important;
 }
 
-.weekSwapDot {
-  width: 4px;
-  height: 4px;
-  border-radius: var(--dia-radius-full);
-  background: #34D399;
-  margin-top: 2px;
+.weekSwapLabel {
+  font-size: 9px;
+  font-weight: var(--dia-weight-bold);
+  color: #34D399;
+  margin-top: 1px;
+  line-height: 1;
 }
 
 .statusCardSwapped {

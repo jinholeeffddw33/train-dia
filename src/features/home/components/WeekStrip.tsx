@@ -101,7 +101,7 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
               </span>
               <span className={styles.weekDate}>{d.day}</span>
               <span className={`${styles.weekDia} ${d.isSwapped ? styles.weekDiaSwapped : ''}`}>{d.display}</span>
-              {d.isSwapped && <span className={styles.weekSwapDot} />}
+              {d.isSwapped && <span className={styles.weekSwapLabel}>변경</span>}
             </button>
           );
         })}

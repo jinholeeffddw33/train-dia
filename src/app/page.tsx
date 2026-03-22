@@ -7,7 +7,7 @@ import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DutyInfoCard, HomeTipsQuiz } from '@/features/home';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, MonthSummary, DutyInfoCard, HomeTipsQuiz, HomeNotice } from '@/features/home';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
@@ -39,6 +39,7 @@ function HomeTab() {
   return (
     <>
       <HomeHeader />
+      <HomeNotice />
       <WeekStrip
         selectedDate={selectedDate}
         onSelectDate={(date) => setSelectedDate(date || undefined)}

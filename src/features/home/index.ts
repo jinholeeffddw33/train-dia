@@ -8,3 +8,4 @@ export { default as RouteTimeline } from './components/RouteTimeline';
 export { default as QuickActions } from './components/QuickActions';
 export { default as HomeTipsQuiz } from './components/HomeTipsQuiz';
 export { default as DutyInfoCard } from './components/DutyInfoCard';
+export { default as HomeNotice } from './components/HomeNotice';

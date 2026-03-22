@@ -1325,6 +1325,104 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── Home Notice (공지 배너) ── */
+.homeNotice {
+  margin: var(--dia-space-4);
+  margin-bottom: 0;
+  position: relative;
+  border-radius: var(--dia-radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(139, 92, 246, 0.14) 50%, rgba(59, 130, 246, 0.10) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  box-shadow:
+    0 4px 24px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  animation: homeNoticeFadeIn 400ms var(--dia-ease);
+}
+
+@keyframes homeNoticeFadeIn {
+  from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.homeNoticeGlow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.homeNoticeContent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4) var(--dia-space-4);
+  position: relative;
+  z-index: 1;
+}
+
+.homeNoticeIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--dia-radius-lg);
+  background: linear-gradient(135deg, var(--dia-blue) 0%, #6366F1 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.homeNoticeBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.homeNoticeTitle {
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.2px;
+}
+
+.homeNoticeDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-relaxed);
+  white-space: pre-line;
+}
+
+.homeNoticeDesc em {
+  font-style: normal;
+  font-weight: var(--dia-weight-bold);
+  color: #34D399;
+}
+
+.homeNoticeClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+  margin: -8px -8px 0 0;
+  transition: background var(--dia-transition-fast);
+}
+
+.homeNoticeClose:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* ── Animations ── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

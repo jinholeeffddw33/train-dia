@@ -121,7 +121,7 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: var(--dia-text-xs);
+  font-size: 13px;
   font-weight: var(--dia-weight-semibold);
   line-height: 1;
 }
@@ -272,7 +272,7 @@
 /* 교번변경 버튼 영역 */
 .swapBtnRow {
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-end;
   margin-bottom: var(--dia-space-4);
 }
 
@@ -281,21 +281,24 @@
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
-  color: #34D399;
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: white;
+  background: linear-gradient(135deg, #059669 0%, #34D399 100%);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  box-shadow: 0 2px 12px rgba(52, 211, 153, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition: all var(--dia-transition-fast);
   min-height: 44px;
 }
 
 .swapToggleBtn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  box-shadow: 0 1px 6px rgba(52, 211, 153, 0.2);
 }
 
 .swapToggleBtnActive {
   color: white;
-  background: var(--dia-red);
-  border-color: var(--dia-red);
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 2px 12px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* 교번변경 모드 안내 배너 */

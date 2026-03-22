@@ -52,7 +52,10 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       const isMySwap = swap && driver && swap.driverId === driver.I;
       const dia = isMySwap ? swap.dia : originalDia;
       const type = dia ? getType(dia) : null;
-      const display = dia ? getDiaDisplay(dia) : '';
+      // 캘린더에서는 휴무 번호 표시 (휴37 등), 비번은 라벨만
+      const display = dia
+        ? (dia.startsWith('휴') ? dia : getDiaDisplay(dia))
+        : '';
       const hol = isHoliday(date);
       const hasMemo = !!memos[dateStr];
       const isToday = dateStr === todayStr;

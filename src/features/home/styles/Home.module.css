@@ -286,6 +286,21 @@
   font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.depotBadge {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ff4444;
+}
+
+.diaTypeSub {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
 }
 
 .diaTime {

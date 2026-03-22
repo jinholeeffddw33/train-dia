@@ -5,15 +5,15 @@ import { P, CYCLE, CL } from '@/data/cycle';
 describe('getDia — 교번 계산', () => {
   it('DB_STD 기준일에 1번 기관사의 교번은 자신의 초기 교번', () => {
     const person = P[0]; // 1번 기관사
-    const dbStd = new Date(2026, 1, 1); // 2026-02-01
+    const dbStd = new Date(2026, 2, 23); // 2026-03-23
     const dia = getDia(person, dbStd);
     expect(dia).toBe(person.d);
   });
 
   it('171일 뒤에 같은 교번으로 순환', () => {
     const person = P[0];
-    const dbStd = new Date(2026, 1, 1);
-    const after171 = new Date(2026, 1, 1);
+    const dbStd = new Date(2026, 2, 23);
+    const after171 = new Date(2026, 2, 23);
     after171.setDate(after171.getDate() + 171);
     expect(getDia(person, after171)).toBe(getDia(person, dbStd));
   });
@@ -28,7 +28,7 @@ describe('getDia — 교번 계산', () => {
   });
 
   it('모든 기관사(171명)가 유효한 교번을 가짐', () => {
-    const date = new Date(2026, 1, 15);
+    const date = new Date(2026, 3, 1);
     for (const p of P) {
       const dia = getDia(p, date);
       expect(dia).toBeTruthy();
@@ -40,7 +40,7 @@ describe('getDia — 교번 계산', () => {
     const person = P[0];
     const dias = new Set<string>();
     for (let i = 0; i < 7; i++) {
-      const d = new Date(2026, 1, 10 + i);
+      const d = new Date(2026, 2, 23 + i);
       dias.add(getDia(person, d));
     }
     // 7일 연속 완전히 같은 교번은 불가능
@@ -64,10 +64,10 @@ describe('getType — 교번 타입 판별', () => {
     expect(getType('대62')).toBe('standby');
   });
 
-  it('1~44 → day', () => {
+  it('1~43 → day', () => {
     expect(getType('1')).toBe('day');
     expect(getType('22')).toBe('day');
-    expect(getType('44')).toBe('day');
+    expect(getType('43')).toBe('day');
   });
 
   it('62~91 → night', () => {
@@ -147,13 +147,13 @@ describe('calcWorkTime — 근무시간 계산', () => {
 });
 
 describe('getMonthSummary — 월간 요약', () => {
-  it('171명 중 1번째 기관사 2026년 2월', () => {
+  it('171명 중 1번째 기관사 2026년 4월', () => {
     const person = P[0];
-    const summary = getMonthSummary(person, 2026, 2);
+    const summary = getMonthSummary(person, 2026, 4);
     const total = summary.dayWork + summary.nightWork + summary.dayStandby + summary.nightStandby;
-    // 2월 28일 중 근무일 수는 일부 (나머지는 비번/휴무)
+    // 4월 30일 중 근무일 수는 일부 (나머지는 비번/휴무)
     expect(total).toBeGreaterThan(0);
-    expect(total).toBeLessThanOrEqual(28);
+    expect(total).toBeLessThanOrEqual(30);
   });
 });
 
@@ -179,7 +179,7 @@ describe('getSchedule — 스케줄 조회', () => {
 describe('getNextShift — 다음 근무일 탐색', () => {
   it('비번/휴무 후 다음 근무일을 찾음', () => {
     const person = P[0];
-    const result = getNextShift(person, new Date(2026, 1, 1));
+    const result = getNextShift(person, new Date(2026, 2, 23));
     // 최대 7일 내에 근무일이 있어야 함
     if (result) {
       expect(result.daysAhead).toBeGreaterThan(0);
@@ -191,8 +191,8 @@ describe('getNextShift — 다음 근무일 탐색', () => {
 describe('전수 검증 — 171명 × 30일', () => {
   it('모든 기관사 × 모든 날짜에서 getDia 에러 없음', () => {
     for (const person of P) {
-      for (let d = 1; d <= 30; d++) {
-        const date = new Date(2026, 1, d);
+      for (let d = 23; d <= 31; d++) {
+        const date = new Date(2026, 2, d);
         const dia = getDia(person, date);
         expect(typeof dia).toBe('string');
         expect(dia.length).toBeGreaterThan(0);
@@ -203,8 +203,8 @@ describe('전수 검증 — 171명 × 30일', () => {
   it('모든 기관사 × 모든 날짜에서 getType 유효한 타입', () => {
     const validTypes = ['day', 'night', 'standby', 'rest'];
     for (const person of P) {
-      for (let d = 1; d <= 28; d++) {
-        const date = new Date(2026, 1, d);
+      for (let d = 1; d <= 30; d++) {
+        const date = new Date(2026, 3, d); // 4월
         const dia = getDia(person, date);
         const type = getType(dia);
         expect(validTypes).toContain(type);

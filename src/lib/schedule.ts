@@ -71,7 +71,7 @@ export function getType(dia: string): DiaType {
   if (dia.startsWith('대')) return 'standby';
   const n = parseInt(dia);
   if (n >= 62 && n <= 91) return 'night';
-  if ((n >= 1 && n <= 44) || (n >= 51 && n <= 54)) return 'day';
+  if ((n >= 1 && n <= 43) || (n >= 51 && n <= 54)) return 'day';
   return 'rest';
 }
 
@@ -117,6 +117,30 @@ export function getLabel(dia: string): string {
   const n = parseInt(dia);
   if (n >= 62) return '야간';
   return '주간';
+}
+
+/** 운휴/대휴 판별 — 스케줄의 s 필드가 운휴/대휴로 시작하면 true */
+export function isSpecialRest(schedule: Schedule | null): boolean {
+  if (!schedule || !schedule.s) return false;
+  return schedule.s.startsWith('운휴') || schedule.s.startsWith('대휴');
+}
+
+/** 운휴/대휴 라벨 반환 */
+export function getSpecialRestLabel(schedule: Schedule | null): string {
+  if (!schedule || !schedule.s) return '';
+  if (schedule.s.startsWith('운휴')) return '운휴';
+  if (schedule.s.startsWith('대휴')) return '대휴';
+  return '';
+}
+
+/** 기지 출근 DIA 판별 — 평일: 7,12,18 / 휴일: 16,19 */
+export function isDepotStart(dia: string, date: Date): boolean {
+  const n = parseInt(dia);
+  if (isNaN(n)) return false;
+  if (isHoliday(date)) {
+    return n === 16 || n === 19;
+  }
+  return n === 7 || n === 12 || n === 18;
 }
 
 /** DiaType → 한글 근무명 */

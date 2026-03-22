@@ -7,6 +7,7 @@ import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
   getRouteDirection, getCurrentSegmentInfo,
+  isSpecialRest, getSpecialRestLabel, isDepotStart,
 } from '@/lib/schedule';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
@@ -62,7 +63,12 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
     );
   }
 
-  const typeClass = diaType ? styles[`type_${diaType}`] : '';
+  // 운휴/대휴 체크 — 휴무와 동일하게 표시
+  const specialRest = isSpecialRest(schedule);
+  const specialRestLabel = getSpecialRestLabel(schedule);
+  const effectiveType = specialRest ? 'rest' : diaType;
+  const typeClass = effectiveType ? styles[`type_${effectiveType}`] : '';
+  const depotStart = dia ? isDepotStart(dia, td) : false;
 
   // 선택 날짜 표시
   const dateLabel = isToday
@@ -74,7 +80,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
       {/* 교번 + 근무시간 헤더 */}
       <div className={styles.diaHeader}>
         <span className={styles.cardLabel}>{dateLabel}</span>
-        {schedule && (
+        {schedule && !specialRest && (
           <div className={styles.workTimeWrap}>
             <span className={styles.workTimeLabel}>근무시간</span>
             <span className={styles.workTime}>{getWorkTime(schedule)}</span>
@@ -84,13 +90,26 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
 
       <div className={styles.diaMain}>
         <div className={`${styles.diaBadge} ${typeClass}`}>
-          <span className={styles.diaBadgeText}>{getDiaDisplay(dia)}</span>
+          <span className={styles.diaBadgeText}>
+            {specialRest ? specialRestLabel : getDiaDisplay(dia)}
+          </span>
         </div>
         <div className={styles.diaInfo}>
-          {diaType !== 'rest' && (
-            <span className={styles.diaTypeLabel}>{getLabel(dia)}</span>
+          {effectiveType !== 'rest' && (
+            <span className={styles.diaTypeLabel}>
+              {getLabel(dia)}
+              {depotStart && (
+                <span className={styles.depotBadge}>기지 출근</span>
+              )}
+            </span>
           )}
-          {schedule && (
+          {specialRest && (
+            <span className={styles.diaTypeLabel}>
+              {specialRestLabel}
+              <span className={styles.diaTypeSub}>{schedule?.s}</span>
+            </span>
+          )}
+          {schedule && !specialRest && (
             <span className={styles.diaTime}>
               <span className={styles.diaTimeStart}>{schedule.s}</span>
               {' ~ '}
@@ -138,13 +157,13 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
       {isToday && banner && banner.state === 'idle' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
           <div className={styles.dirBannerDir}>
-            {diaType === 'rest'
+            {effectiveType === 'rest'
               ? '오늘은 쉬는 날이에요'
               : banner.next?.daysAhead === 0
                 ? '출근 전이에요'
                 : '오늘 근무가 끝났어요'}
           </div>
-          {diaType === 'rest' && (
+          {effectiveType === 'rest' && (
             <div className={styles.dirBannerSub}>푹 쉬고 내일 힘내요</div>
           )}
           {banner.next?.daysAhead === 0 && diaType !== 'rest' && (

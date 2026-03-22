@@ -9,6 +9,7 @@ import {
   getRouteDirection, getCurrentSegmentInfo,
   isSpecialRest, getSpecialRestLabel, isDepotStart,
 } from '@/lib/schedule';
+import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
 import { useClock } from '../hooks/useClock';
@@ -21,6 +22,7 @@ interface TodayCardProps {
 
 export default function TodayCard({ selectedDate }: TodayCardProps) {
   const driver = useDriverStore((s) => s.current);
+  const getSwappedDia = useGetSwappedDia();
   const clock = useClock();
   const now = useMemo(() => {
     const d = new Date();
@@ -30,7 +32,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
   const td = selectedDate || now;
   const isToday = !selectedDate || td.toDateString() === now.toDateString();
 
-  const dia = useMemo(() => driver ? getDia(driver, td) : null, [driver, td]);
+  const dia = useMemo(() => driver ? getSwappedDia(driver, td) : null, [driver, td, getSwappedDia]);
   const diaType = useMemo(() => dia ? getType(dia) : null, [dia]);
   const schedule = useMemo(() => dia ? getSchedule(dia, td) : null, [dia, td]);
   const nextShift = useMemo(() => driver ? getNextShift(driver, td) : null, [driver, td]);

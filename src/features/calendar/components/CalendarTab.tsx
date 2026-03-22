@@ -122,7 +122,12 @@ export default function CalendarTab() {
       {swapTargetDate && (
         <SwapBottomSheet
           dateStr={swapTargetDate}
-          onClose={() => setSwapTargetDate(null)}
+          onClose={() => {
+            setSwapTargetDate(null);
+            // 바텀시트 닫으면 변경 모드 자동 해제 + 해당 날짜 선택
+            setSwapMode(false);
+            setSelectedDate(swapTargetDate);
+          }}
         />
       )}
     </div>

@@ -1220,6 +1220,34 @@
 
 .quizNext:active { opacity: 0.8; }
 
+/* ── 교번변경 표시 ── */
+.weekDaySwapped {
+  border-color: rgba(52, 211, 153, 0.4) !important;
+}
+
+.weekDiaSwapped {
+  color: #34D399 !important;
+}
+
+.weekSwapDot {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--dia-radius-full);
+  background: #34D399;
+  margin-top: 2px;
+}
+
+.statusCardSwapped {
+  border-color: rgba(52, 211, 153, 0.4) !important;
+}
+
+.statusSwapTag {
+  font-size: 10px;
+  font-weight: var(--dia-weight-bold);
+  color: #34D399;
+  margin-left: auto;
+}
+
 /* ── Animations ── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

@@ -16,6 +16,7 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
   const driver = useDriverStore((s) => s.current);
   const { getMemo, setMemo, removeMemo } = useMemoStore();
   const swap = useSwapStore((s) => s.getSwap(dateStr));
+  const removeSwap = useSwapStore((s) => s.removeSwap);
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -55,6 +56,17 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
           <span className={styles.detailSwapTag}>변경 (원래: {info.originalDisplay})</span>
         )}
       </div>
+
+      {/* 교번 변경 취소 버튼 */}
+      {info.isSwapped && (
+        <button
+          type="button"
+          className={styles.detailRevertBtn}
+          onClick={() => removeSwap(dateStr)}
+        >
+          원래 교번으로 되돌리기
+        </button>
+      )}
 
       {info.schedule && (
         <div className={styles.detailSchedule}>

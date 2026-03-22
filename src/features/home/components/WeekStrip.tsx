@@ -3,6 +3,8 @@
 import { useRef, useEffect, useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { getDia, getType, getDiaDisplay, today } from '@/lib/schedule';
+import { useGetSwappedDia } from '@/hooks/useSwappedDia';
+import { useSwapStore } from '@/stores/swap';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Home.module.css';
 
@@ -14,6 +16,7 @@ interface WeekStripProps {
 /** 14일 주간 스트립 */
 export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps) {
   const driver = useDriverStore((s) => s.current);
+  const swaps = useSwapStore((s) => s.swaps);
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLButtonElement>(null);
 
@@ -28,7 +31,9 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
     for (let i = 0; i < 14; i++) {
       const d = new Date(sun);
       d.setDate(d.getDate() + i);
-      const dia = getDia(driver, d);
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const swap = swaps[dateStr];
+      const dia = swap ? swap.dia : getDia(driver, d);
       const type = getType(dia);
       result.push({
         date: d,
@@ -39,10 +44,11 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
         type,
         isToday: d.toDateString() === td.toDateString(),
         isWeekend: d.getDay() === 0 || d.getDay() === 6,
+        isSwapped: !!swap,
       });
     }
     return result;
-  }, [driver]);
+  }, [driver, swaps]);
 
   // 오늘 위치로 자동 스크롤
   useEffect(() => {
@@ -85,8 +91,8 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
               key={i}
               type="button"
               ref={d.isToday ? todayRef : undefined}
-              className={`${styles.weekDay} ${showToday ? styles.weekDayToday : ''} ${selected ? styles.weekDaySelected : ''} ${styles[`weekType_${d.type}`]}`}
-              aria-label={`${d.date.getMonth() + 1}월 ${d.day}일 ${d.dow}요일 ${d.display}`}
+              className={`${styles.weekDay} ${showToday ? styles.weekDayToday : ''} ${selected ? styles.weekDaySelected : ''} ${styles[`weekType_${d.type}`]} ${d.isSwapped ? styles.weekDaySwapped : ''}`}
+              aria-label={`${d.date.getMonth() + 1}월 ${d.day}일 ${d.dow}요일 ${d.display}${d.isSwapped ? ' (변경됨)' : ''}`}
               aria-current={d.isToday ? 'date' : undefined}
               onClick={() => handleSelect(d)}
             >
@@ -94,7 +100,8 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
                 {d.dow}
               </span>
               <span className={styles.weekDate}>{d.day}</span>
-              <span className={styles.weekDia}>{d.display}</span>
+              <span className={`${styles.weekDia} ${d.isSwapped ? styles.weekDiaSwapped : ''}`}>{d.display}</span>
+              {d.isSwapped && <span className={styles.weekSwapDot} />}
             </button>
           );
         })}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAlertStore } from '@/stores/alert';
 import Modal from '@/components/common/Modal';
 import AlertList from './AlertList';
@@ -9,6 +9,8 @@ import styles from '../styles/Alerts.module.css';
 
 export default function AlertFab() {
   const [view, setView] = useState<'closed' | 'list' | 'form'>('closed');
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
   const alerts = useAlertStore((s) => s.alerts);
   const alertCount = alerts.length;
   const hasUrgent = alerts.some((a) => a.severity === 'high');
@@ -38,12 +40,28 @@ export default function AlertFab() {
     };
   }, [fetch, subscribe]);
 
+  // 스크롤 방향 감지: 아래로 → 숨김, 위로 → 표시
+  useEffect(() => {
+    const threshold = 10;
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY - lastScrollY.current > threshold) {
+        setHidden(true);
+      } else if (lastScrollY.current - currentY > threshold) {
+        setHidden(false);
+      }
+      lastScrollY.current = currentY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
       {/* FAB 버튼 */}
       <button
         type="button"
-        className={`${styles.fab} ${hasUrgent ? styles.fabUrgent : hasMedium ? styles.fabMedium : hasLow ? styles.fabLow : ''}`}
+        className={`${styles.fab} ${hasUrgent ? styles.fabUrgent : hasMedium ? styles.fabMedium : hasLow ? styles.fabLow : ''} ${hidden ? styles.fabHidden : ''}`}
         onClick={() => setView('list')}
         aria-label={`장애 알림 ${alertCount}건${hasUrgent ? ' (긴급)' : ''}`}
       >

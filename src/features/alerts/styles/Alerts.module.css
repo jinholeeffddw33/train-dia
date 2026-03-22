@@ -15,10 +15,16 @@
   justify-content: center;
   box-shadow: var(--dia-shadow-lg);
   z-index: 50;
-  transition: transform var(--dia-transition-fast);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .fab:active { transform: scale(0.9); }
+
+.fabHidden {
+  transform: translateY(calc(100% + var(--dia-space-4) + 20px));
+  opacity: 0;
+  pointer-events: none;
+}
 
 .fabUrgent {
   background: var(--dia-red);

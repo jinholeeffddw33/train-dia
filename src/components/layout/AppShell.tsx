@@ -30,13 +30,16 @@ export default function AppShell({ children, onBack }: AppShellProps) {
 
 
   const triggerScroll = useTrainStore((s) => s.triggerScroll);
-  const driver = useDriverStore((s) => s.current);
+  const myDriver = useDriverStore((s) => s.myDriver ?? s.current);
+  const viewDriver = useDriverStore((s) => s.current);
+  const isViewMode = useDriverStore((s) => s.isViewMode);
+  const backToMe = useDriverStore((s) => s.backToMe);
   const exchangePosts = useExchangeStore((s) => s.posts);
-  const exchangeCount = driver
+  const exchangeCount = myDriver
     ? exchangePosts.filter((p) =>
         p.status === 'pending' && (
-          (p.type === 'direct' && p.targetId === driver.I) ||
-          (p.type === 'open' && p.requesterId === driver.I && p.volunteers.length > 0)
+          (p.type === 'direct' && p.targetId === myDriver.I) ||
+          (p.type === 'open' && p.requesterId === myDriver.I && p.volunteers.length > 0)
         )
       ).length
     : 0;
@@ -77,6 +80,18 @@ export default function AppShell({ children, onBack }: AppShellProps) {
               나중에
             </button>
           </div>
+        </div>
+      )}
+
+      {/* 조회 모드 배너 */}
+      {isViewMode && viewDriver && myDriver && (
+        <div className={styles.viewModeBanner}>
+          <span className={styles.viewModeText}>
+            <strong>{viewDriver.n}</strong> 조회 중 (내 계정: {myDriver.n})
+          </span>
+          <button type="button" className={styles.viewModeBtn} onClick={backToMe}>
+            내 보기
+          </button>
         </div>
       )}
 

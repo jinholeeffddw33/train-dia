@@ -4,28 +4,71 @@ import type { Person } from '@/lib/types';
 import { P } from '@/data/cycle';
 
 interface DriverState {
-  /** 현재 선택된 기관사 */
+  /** 본인 기관사 (최초 설정 후 잠금 — 행위 주체) */
+  myDriver: Person | null;
+  /** 현재 조회 중인 기관사 (달력/스케줄 표시용) */
   current: Person | null;
-  /** 기관사 선택 (P 배열에서 ID로 검색) */
+  /** 조회 모드 여부 (current !== myDriver) */
+  isViewMode: boolean;
+  /** 기관사 조회 전환 (다른 사람 스케줄 보기) */
   pick: (id: string) => void;
-  /** 직접 Person 객체 설정 (P 배열 외 사용자용) */
+  /** 직접 Person 객체 설정 */
   setCurrent: (person: Person) => void;
+  /** 내 기관사 설정 (최초 또는 설정에서 변경) */
+  setMyDriver: (person: Person) => void;
+  /** 내 기관사 ID로 설정 */
+  setMyDriverById: (id: string) => void;
+  /** 내 보기로 돌아가기 */
+  backToMe: () => void;
   /** 초기화 (localStorage에서 복원) */
   restore: () => void;
 }
 
 export const useDriverStore = create<DriverState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      myDriver: null,
       current: null,
+      isViewMode: false,
 
       pick: (id: string) => {
         const person = P.find((p) => p.I === id) ?? null;
-        set({ current: person });
+        const { myDriver } = get();
+        // 최초 선택 시 myDriver도 함께 설정
+        if (!myDriver && person) {
+          set({ current: person, myDriver: person, isViewMode: false });
+        } else {
+          const viewing = person && myDriver ? person.I !== myDriver.I : false;
+          set({ current: person, isViewMode: viewing });
+        }
       },
 
       setCurrent: (person: Person) => {
-        set({ current: person });
+        const { myDriver } = get();
+        if (!myDriver) {
+          set({ current: person, myDriver: person, isViewMode: false });
+        } else {
+          const viewing = person.I !== myDriver.I;
+          set({ current: person, isViewMode: viewing });
+        }
+      },
+
+      setMyDriver: (person: Person) => {
+        set({ myDriver: person, current: person, isViewMode: false });
+      },
+
+      setMyDriverById: (id: string) => {
+        const person = P.find((p) => p.I === id) ?? null;
+        if (person) {
+          set({ myDriver: person, current: person, isViewMode: false });
+        }
+      },
+
+      backToMe: () => {
+        const { myDriver } = get();
+        if (myDriver) {
+          set({ current: myDriver, isViewMode: false });
+        }
       },
 
       restore: () => {
@@ -34,7 +77,10 @@ export const useDriverStore = create<DriverState>()(
     }),
     {
       name: 'dp',
-      partialize: (state) => ({ current: state.current }),
+      partialize: (state) => ({
+        current: state.current,
+        myDriver: state.myDriver,
+      }),
     },
   ),
 );

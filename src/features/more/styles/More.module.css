@@ -379,3 +379,96 @@
 .overlayBody {
   padding-bottom: var(--dia-space-8);
 }
+
+/* ── View Mode Info ── */
+.viewModeInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-amber-dim);
+  border: 1px solid var(--dia-amber);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-4);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+}
+
+.viewModeInfo strong {
+  color: var(--dia-amber);
+  font-weight: var(--dia-weight-bold);
+}
+
+.viewModeBackBtn {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-amber);
+  color: var(--dia-text-inverse);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+/* ── Confirm Dialog ── */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: var(--dia-layer-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-4);
+}
+
+.confirmDialog {
+  width: 100%;
+  max-width: 320px;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-6);
+  text-align: center;
+}
+
+.confirmTitle {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-3);
+}
+
+.confirmDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-relaxed);
+  margin-bottom: var(--dia-space-5);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--dia-space-3);
+}
+
+.confirmCancel {
+  flex: 1;
+  padding: var(--dia-space-3);
+  background: var(--dia-surface-elevated);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  min-height: 48px;
+}
+
+.confirmOk {
+  flex: 1;
+  padding: var(--dia-space-3);
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+  min-height: 48px;
+}

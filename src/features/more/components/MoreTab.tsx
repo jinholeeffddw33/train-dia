@@ -17,6 +17,10 @@ import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
   const driver = useDriverStore((s) => s.current);
+  const myDriver = useDriverStore((s) => s.myDriver);
+  const isViewMode = useDriverStore((s) => s.isViewMode);
+  const setMyDriver = useDriverStore((s) => s.setMyDriver);
+  const backToMe = useDriverStore((s) => s.backToMe);
   const { theme, toggle: toggleTheme } = useThemeStore();
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
@@ -27,27 +31,44 @@ export default function MoreTab() {
   const [healingOpen, setHealingOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>설정</h2>
 
-      {/* 현재 기관사 */}
+      {/* 내 기관사 (행위 주체) */}
       <button
         type="button"
         className={styles.driverCard}
-        onClick={() => setDriverOpen(true)}
-        aria-label="기관사 변경"
+        onClick={() => {
+          if (myDriver) {
+            setConfirmChangeOpen(true);
+          } else {
+            setDriverOpen(true);
+          }
+        }}
+        aria-label="내 기관사 변경"
       >
         <div className={styles.driverAvatar}>
-          {driver ? driver.n[0] : <UserRoundPen size={20} />}
+          {myDriver ? myDriver.n[0] : driver ? driver.n[0] : <UserRoundPen size={20} />}
         </div>
         <div className={styles.driverInfo}>
-          <span className={styles.driverNameText}>{driver ? driver.n : '기관사 선택'}</span>
-          <span className={styles.driverNumText}>답십리 승무사업소</span>
+          <span className={styles.driverNameText}>{myDriver ? myDriver.n : driver ? driver.n : '기관사 선택'}</span>
+          <span className={styles.driverNumText}>답십리 승무사업소 · 내 계정</span>
         </div>
         <ChevronRight size={18} className={styles.toolArrow} />
       </button>
+
+      {/* 조회 모드 안내 */}
+      {isViewMode && (
+        <div className={styles.viewModeInfo}>
+          <span>현재 <strong>{driver?.n}</strong> 조회 중</span>
+          <button type="button" className={styles.viewModeBackBtn} onClick={backToMe}>
+            내 보기로 돌아가기
+          </button>
+        </div>
+      )}
 
       {/* 도구 섹션 */}
       <section className={styles.section}>
@@ -207,10 +228,46 @@ export default function MoreTab() {
         </div>
       </section>
 
-      {/* 기관사 선택 모달 */}
+      {/* 내 기관사 변경 확인 팝업 */}
+      {confirmChangeOpen && (
+        <div className={styles.confirmOverlay} onClick={() => setConfirmChangeOpen(false)}>
+          <div className={styles.confirmDialog} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.confirmTitle}>내 기관사를 변경하시겠어요?</h3>
+            <p className={styles.confirmDesc}>
+              변경하면 게시글 작성, 교대 요청 등이<br />
+              새 기관사 이름으로 동작합니다.
+            </p>
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmCancel}
+                onClick={() => setConfirmChangeOpen(false)}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className={styles.confirmOk}
+                onClick={() => {
+                  setConfirmChangeOpen(false);
+                  setDriverOpen(true);
+                }}
+              >
+                변경하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 기관사 선택 모달 (설정에서 열면 myDriver로 설정) */}
       <DriverSelector
         open={driverOpen}
         onClose={() => setDriverOpen(false)}
+        onSelectOverride={(person) => {
+          setMyDriver(person);
+          setDriverOpen(false);
+        }}
       />
 
       {/* 모달 오버레이 */}

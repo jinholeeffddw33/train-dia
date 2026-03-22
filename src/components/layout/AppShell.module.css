@@ -72,6 +72,41 @@
   min-height: 44px;
 }
 
+/* ── View Mode Banner ── */
+.viewModeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-amber-dim);
+  border-bottom: 1px solid var(--dia-amber);
+  font-size: var(--dia-text-sm);
+}
+
+.viewModeText {
+  color: var(--dia-text-primary);
+}
+
+.viewModeText strong {
+  color: var(--dia-amber);
+  font-weight: var(--dia-weight-bold);
+}
+
+.viewModeBtn {
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: var(--dia-amber);
+  color: var(--dia-text-inverse);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  min-height: 44px;
+  transition: transform var(--dia-transition-fast);
+}
+
+.viewModeBtn:active {
+  transform: scale(0.98);
+}
+
 /* ── Back to Hub button ── */
 .backBtn {
   position: fixed;

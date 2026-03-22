@@ -13,9 +13,11 @@ const SORTED_P = [...P].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 interface DriverSelectorProps {
   open: boolean;
   onClose: () => void;
+  /** 설정에서 열 때: 선택 시 myDriver로 설정하는 오버라이드 */
+  onSelectOverride?: (person: import('@/lib/types').Person) => void;
 }
 
-export default function DriverSelector({ open, onClose }: DriverSelectorProps) {
+export default function DriverSelector({ open, onClose, onSelectOverride }: DriverSelectorProps) {
   const [query, setQuery] = useState('');
   const pick = useDriverStore((s) => s.pick);
   const current = useDriverStore((s) => s.current);
@@ -37,8 +39,13 @@ export default function DriverSelector({ open, onClose }: DriverSelectorProps) {
   }, [open]);
 
   const handlePick = (id: string) => {
-    pick(id);
-    onClose();
+    if (onSelectOverride) {
+      const person = P.find((p) => p.I === id);
+      if (person) onSelectOverride(person);
+    } else {
+      pick(id);
+      onClose();
+    }
   };
 
   return (

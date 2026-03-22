@@ -31,8 +31,8 @@ function formatExpiry(expiresAt: string): string {
 
 export default function AlertList({ onClose }: { onClose: () => void }) {
   const { alerts, deactivate } = useAlertStore();
-  const currentName = useDriverStore((s) => s.current?.n ?? '');
-  const currentSabun = useDriverStore((s) => s.current?.s ?? '');
+  const currentName = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
+  const currentSabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
 
   return (
     <div className={styles.listContainer}>

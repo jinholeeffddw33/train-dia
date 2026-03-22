@@ -160,9 +160,7 @@ export function getDiaDisplay(dia: string): string {
     return dia;
   }
   if (dia.endsWith('~')) {
-    // "78~" → "비78", "대65~" → "비대65"
-    const num = dia.slice(0, -1);
-    return `비${num}`;
+    return '비번';
   }
   return dia;
 }

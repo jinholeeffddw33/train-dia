@@ -153,9 +153,17 @@ export function getRestLabel(dia: string): string {
   return dia.startsWith('휴') ? '휴무' : '비번';
 }
 
-/** 교번 표시명 (캘린더/주간에서 사용) */
+/** 교번 표시명 (캘린더/주간에서 사용) — 휴무/비번에 번호 포함 */
 export function getDiaDisplay(dia: string): string {
-  if (dia.startsWith('휴') || dia.endsWith('~')) return getRestLabel(dia);
+  if (dia.startsWith('휴')) {
+    // "휴37" → "휴37", "휴일" → "휴일"
+    return dia;
+  }
+  if (dia.endsWith('~')) {
+    // "78~" → "비78", "대65~" → "비대65"
+    const num = dia.slice(0, -1);
+    return `비${num}`;
+  }
   return dia;
 }
 

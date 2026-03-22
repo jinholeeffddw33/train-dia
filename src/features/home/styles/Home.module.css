@@ -1248,6 +1248,83 @@
   margin-left: auto;
 }
 
+/* ── Duty Info Card (운용계획 근무 배치) ── */
+.dutyInfoSection {
+  padding: 0 var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+}
+
+.dutyInfoCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  overflow: hidden;
+}
+
+.dutyTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dutyTh {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  text-align: center;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-tertiary);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.dutyTh:first-child {
+  width: 64px;
+}
+
+.dutyShiftDay {
+  color: var(--dia-blue);
+}
+
+.dutyShiftNight {
+  color: var(--dia-purple);
+}
+
+.dutyLocationCell {
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-secondary);
+  border-bottom: 1px solid var(--dia-border);
+  border-right: 1px solid var(--dia-border);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dutyTable tbody tr:last-child .dutyLocationCell,
+.dutyTable tbody tr:last-child .dutyNameCell {
+  border-bottom: none;
+}
+
+.dutyNameCell {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid var(--dia-border);
+  white-space: nowrap;
+}
+
+.dutyName {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.dutyNameSep {
+  color: var(--dia-text-tertiary);
+  margin: 0 2px;
+}
+
+.dutyOff {
+  color: var(--dia-text-tertiary);
+}
+
 /* ── Animations ── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

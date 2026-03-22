@@ -7,3 +7,4 @@ export { default as DriverSelector } from './components/DriverSelector';
 export { default as RouteTimeline } from './components/RouteTimeline';
 export { default as QuickActions } from './components/QuickActions';
 export { default as HomeTipsQuiz } from './components/HomeTipsQuiz';
+export { default as DutyInfoCard } from './components/DutyInfoCard';

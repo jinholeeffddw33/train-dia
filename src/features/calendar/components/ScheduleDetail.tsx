@@ -25,7 +25,8 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
   const info = useMemo(() => {
     if (!driver) return null;
     const originalDia = getDia(driver, date);
-    const dia = swap ? swap.dia : originalDia;
+    const isMySwap = swap && swap.driverId === driver.I;
+    const dia = isMySwap ? swap.dia : originalDia;
     const type = getType(dia);
     const schedule = getSchedule(dia, date);
     return {
@@ -34,7 +35,7 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
       display: getDiaDisplay(dia),
       label: getLabel(dia),
       schedule,
-      isSwapped: !!swap,
+      isSwapped: !!isMySwap,
       originalDia,
       originalDisplay: getDiaDisplay(originalDia),
     };

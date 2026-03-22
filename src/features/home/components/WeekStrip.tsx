@@ -33,7 +33,8 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
       d.setDate(d.getDate() + i);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const swap = swaps[dateStr];
-      const dia = swap ? swap.dia : getDia(driver, d);
+      const isMySwap = swap && swap.driverId === driver.I;
+      const dia = isMySwap ? swap.dia : getDia(driver, d);
       const type = getType(dia);
       result.push({
         date: d,
@@ -44,7 +45,7 @@ export default function WeekStrip({ selectedDate, onSelectDate }: WeekStripProps
         type,
         isToday: d.toDateString() === td.toDateString(),
         isWeekend: d.getDay() === 0 || d.getDay() === 6,
-        isSwapped: !!swap,
+        isSwapped: !!isMySwap,
       });
     }
     return result;

@@ -11,7 +11,7 @@ export function useGetSwappedDia() {
   return (person: Person, date: Date): string => {
     const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     const swap = swaps[dateStr];
-    if (swap) return swap.dia;
+    if (swap && swap.driverId === person.I) return swap.dia;
     return getDia(person, date);
   };
 }

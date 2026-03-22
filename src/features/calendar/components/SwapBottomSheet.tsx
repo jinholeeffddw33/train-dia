@@ -67,8 +67,8 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
   }, [onClose]);
 
   const handleSave = () => {
-    if (!isValid) return;
-    setSwap(dateStr, previewDia);
+    if (!isValid || !driver) return;
+    setSwap(dateStr, previewDia, driver.I);
     onClose();
   };
 

@@ -24,7 +24,8 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
       d.setDate(d.getDate() + offset);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       const swap = swaps[dateStr];
-      const dia = swap ? swap.dia : getDia(driver, d);
+      const isMySwap = swap && swap.driverId === driver.I;
+      const dia = isMySwap ? swap.dia : getDia(driver, d);
       const type = getType(dia);
       const schedule = getSchedule(dia, d);
       return {
@@ -35,7 +36,7 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
         type,
         typeName: getLabel(dia),
         time: schedule ? `${schedule.s} ~ ${schedule.e}` : null,
-        isSwapped: !!swap,
+        isSwapped: !!isMySwap,
       };
     });
   }, [driver, base, swaps]);

@@ -49,7 +49,8 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const originalDia = driver ? getDia(driver, date) : null;
       const swap = swaps[dateStr] || null;
-      const dia = swap ? swap.dia : originalDia;
+      const isMySwap = swap && driver && swap.driverId === driver.I;
+      const dia = isMySwap ? swap.dia : originalDia;
       const type = dia ? getType(dia) : null;
       const display = dia ? getDiaDisplay(dia) : '';
       const hol = isHoliday(date);
@@ -58,7 +59,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       const isSelected = dateStr === selectedDate;
       const isSun = date.getDay() === 0;
       const isSat = date.getDay() === 6;
-      const isSwapped = !!swap;
+      const isSwapped = !!isMySwap;
 
       result.push({
         key: dateStr,

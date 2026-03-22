@@ -20,7 +20,7 @@ export default function DutyInfoCard() {
 
   return (
     <section className={styles.dutyInfoSection}>
-      <h3 className={styles.sectionTitle}>오늘의 근무 배치</h3>
+      <h3 className={styles.sectionTitle}>오늘의 내근 근무</h3>
       <div className={styles.dutyInfoCard}>
         <table className={styles.dutyTable}>
           <thead>

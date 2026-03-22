@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -12,6 +12,7 @@ import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import { DriverSelector } from '@/features/home';
 import HealingCardOverlay from './HealingCardOverlay';
+import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import styles from '../styles/More.module.css';
 
@@ -31,6 +32,7 @@ export default function MoreTab() {
   const [healingOpen, setHealingOpen] = useState(false);
   const [driverOpen, setDriverOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [shuttleOpen, setShuttleOpen] = useState(false);
   const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   return (
@@ -73,6 +75,18 @@ export default function MoreTab() {
       {/* 도구 섹션 */}
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>도구</h3>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setShuttleOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <Car size={20} className={styles.toolIcon} />
+            <span className={styles.settingLabel}>승용차 운행 시간표</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
 
         <button
           type="button"
@@ -304,6 +318,12 @@ export default function MoreTab() {
       <HealingCardOverlay
         open={healingOpen}
         onClose={() => setHealingOpen(false)}
+      />
+
+      {/* 승용차 운행 시간표 오버레이 */}
+      <ShuttleScheduleOverlay
+        open={shuttleOpen}
+        onClose={() => setShuttleOpen(false)}
       />
 
       {/* 바로가기 오버레이 */}

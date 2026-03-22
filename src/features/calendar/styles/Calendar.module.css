@@ -121,8 +121,8 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-semibold);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
   line-height: 1;
 }
 

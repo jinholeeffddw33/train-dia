@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, X, Megaphone } from 'lucide-react';
 import { P } from '@/data/cycle';
 import { getDia, getType, getSchedule, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import type { Person, Schedule } from '@/lib/types';
 import styles from '../styles/Duty.module.css';
+
+// ===== 공지 팝업 설정 =====
+const NOTICE_ID = 'dia-update-2026-03-23';
+const NOTICE_START = new Date('2026-03-22T15:00:00+09:00').getTime();
+const NOTICE_EXPIRE = NOTICE_START + 72 * 60 * 60 * 1000;
 
 /** 주간 다이아 1~44 */
 const DAY_DIAS = Array.from({ length: 44 }, (_, i) => String(i + 1));
@@ -41,6 +46,23 @@ export default function DutyTab() {
   });
   const [filter, setFilter] = useState<FilterType>('all');
   const [expandedDia, setExpandedDia] = useState<string | null>(null);
+  const [showNotice, setShowNotice] = useState(false);
+
+  // 공지 팝업: 72시간 이내 + 사용자가 닫지 않았으면 표시
+  useEffect(() => {
+    const now = Date.now();
+    if (now >= NOTICE_START && now < NOTICE_EXPIRE) {
+      const dismissed = localStorage.getItem(`notice-dismissed-${NOTICE_ID}`);
+      if (!dismissed) {
+        setShowNotice(true);
+      }
+    }
+  }, []);
+
+  const dismissNotice = () => {
+    setShowNotice(false);
+    localStorage.setItem(`notice-dismissed-${NOTICE_ID}`, 'true');
+  };
 
   // 역방향 조회: 다이아 → 기관사
   const entries = useMemo(() => {
@@ -95,6 +117,22 @@ export default function DutyTab() {
 
   return (
     <div className={styles.container}>
+      {/* 공지 팝업 */}
+      {showNotice && (
+        <div className={styles.noticeBanner}>
+          <div className={styles.noticeContent}>
+            <Megaphone size={18} className={styles.noticeIcon} />
+            <div className={styles.noticeText}>
+              <strong>3/23 다이아 개정 적용 완료</strong>
+              <span>행로표가 새롭게 업데이트되었습니다. 교번 탭의 <em>교번변경</em> 기능도 추가되었으니 활용해보세요!</span>
+            </div>
+          </div>
+          <button type="button" className={styles.noticeClose} onClick={dismissNotice} aria-label="공지 닫기">
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       {/* 날짜 선택 */}
       <div className={styles.dateSelector}>
         <button type="button" onClick={prevDay} className={styles.dateArrow} aria-label="이전 날짜">

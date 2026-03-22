@@ -2,6 +2,75 @@
 
 .container { padding: var(--dia-space-4); }
 
+/* ── Notice Banner (공지 팝업) ── */
+.noticeBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: linear-gradient(135deg, var(--dia-blue-dim) 0%, var(--dia-purple-dim) 100%);
+  border: 1px solid var(--dia-blue);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-4);
+  animation: noticeFadeIn 300ms var(--dia-ease);
+}
+
+@keyframes noticeFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.noticeContent {
+  display: flex;
+  gap: var(--dia-space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.noticeIcon {
+  color: var(--dia-blue);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noticeText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: var(--dia-leading-normal);
+}
+
+.noticeText strong {
+  font-weight: var(--dia-weight-bold);
+  font-size: var(--dia-text-base);
+  color: var(--dia-blue);
+}
+
+.noticeText em {
+  font-style: normal;
+  font-weight: var(--dia-weight-bold);
+  color: #34D399;
+}
+
+.noticeClose {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+  margin: -8px -8px 0 0;
+  transition: background var(--dia-transition-fast);
+}
+
+.noticeClose:active {
+  background: var(--dia-surface-hover);
+}
+
 /* ── Date Selector ── */
 .dateSelector {
   display: flex;

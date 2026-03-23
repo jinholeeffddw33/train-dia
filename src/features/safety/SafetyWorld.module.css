@@ -90,3 +90,23 @@
   border-bottom: 1px solid var(--dia-border);
   margin: var(--dia-space-2) 0;
 }
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-8) var(--dia-space-4);
+  text-align: center;
+}
+
+.errorText {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-primary);
+}
+
+.errorHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}

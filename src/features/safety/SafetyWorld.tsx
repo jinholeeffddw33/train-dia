@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Component, type ReactNode, useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
@@ -14,6 +14,42 @@ import styles from './SafetyWorld.module.css';
 
 interface SafetyWorldProps {
   onBack: () => void;
+}
+
+class HazardErrorBoundary extends Component<
+  { children: ReactNode; onBack: () => void },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className={styles.wrap}>
+          <header className={styles.header}>
+            <button
+              type="button"
+              className={styles.backBtn}
+              onClick={this.props.onBack}
+              aria-label="돌아가기"
+            >
+              <ArrowLeft size={20} strokeWidth={2} />
+            </button>
+            <h1 className={styles.title}>위험요소</h1>
+          </header>
+          <main className={styles.content}>
+            <div className={styles.errorState}>
+              <p className={styles.errorText}>화면을 불러오지 못했어요</p>
+              <p className={styles.errorHint}>잠시 후 다시 시도해주세요</p>
+            </div>
+          </main>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 type SafetyView = 'main' | { type: 'hazard'; id: string };
@@ -49,10 +85,12 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   // 위험요소 상세 화면
   if (view !== 'main' && view.type === 'hazard') {
     return (
-      <HazardDetail
-        reportId={view.id}
-        onBack={() => setView('main')}
-      />
+      <HazardErrorBoundary onBack={() => setView('main')}>
+        <HazardDetail
+          reportId={view.id}
+          onBack={() => setView('main')}
+        />
+      </HazardErrorBoundary>
     );
   }
 

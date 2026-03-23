@@ -4,7 +4,8 @@ import { useHazardStore } from '@/stores/hazard';
 import styles from './Hazard.module.css';
 
 function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
+  const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
+  const diff = Date.now() - new Date(normalized).getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return '방금';
   if (m < 60) return `${m}분 전`;

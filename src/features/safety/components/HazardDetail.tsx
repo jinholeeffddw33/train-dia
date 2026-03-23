@@ -2,12 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useHazardStore } from '@/stores/hazard';
+import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
 
+// Stable empty array — prevents useSyncExternalStore from triggering infinite re-renders
+// when comments[reportId] is undefined (React 19 + Zustand 5 strict reference equality check)
+const EMPTY_COMMENTS: HazardComment[] = [];
+
 function formatDate(iso: string): string {
-  const d = new Date(iso);
+  if (!iso) return '';
+  // Supabase timestamps: "2026-03-23 14:26:56.577709+00" — Safari requires ISO 8601 with T separator
+  const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return '';
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
@@ -23,7 +31,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const report = useHazardStore((s) => s.reports.find((r) => r.id === reportId));
-  const comments = useHazardStore((s) => s.comments[reportId] ?? []);
+  const comments = useHazardStore((s) => s.comments[reportId] ?? EMPTY_COMMENTS);
   const loadingComments = useHazardStore((s) => s.loadingComments);
   const fetchComments = useHazardStore((s) => s.fetchComments);
   const addComment = useHazardStore((s) => s.addComment);

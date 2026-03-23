@@ -95,7 +95,8 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     const res = await fetch('/api/safety/hazards', { method: 'POST', body: formData });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error((err as { message?: string }).message || '등록에 실패했습니다');
+      const e = err as { message?: string; detail?: string; code?: string };
+      throw new Error(`${e.message || '등록에 실패했습니다'}${e.detail ? ` (${e.detail})` : ''}${e.code ? ` [${e.code}]` : ''}`);
     }
     await get().fetchReports();
   },

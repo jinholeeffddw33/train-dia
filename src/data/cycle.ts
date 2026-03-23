@@ -30,8 +30,8 @@ export const DB_STD = new Date(2026, 2, 23);
 /** 주기 일수 */
 export const CL = 171;
 
-/** 통상근무 기준일 (2026-03-24 월요일, 첫 비공휴일 평일) */
-export const WEEKDAY_REF = new Date(2026, 2, 24);
+/** 통상근무 기준일 (2026-03-23 월요일) */
+export const WEEKDAY_REF = new Date(2026, 2, 23);
 
 /** 통상근무 교번 순환 */
 export const WEEKDAY_DIAS: string[] = ['51', '52', '53', '54'];

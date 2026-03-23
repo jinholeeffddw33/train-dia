@@ -6,8 +6,6 @@ import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
 
-import { AlertFab } from '@/features/alerts';
-import { useAlertStore } from '@/stores/alert';
 import { useTrainStore } from '@/stores/train';
 import { useExchangeStore } from '@/stores/exchange';
 import { useDriverStore } from '@/stores/driver';
@@ -23,7 +21,6 @@ interface AppShellProps {
 
 export default function AppShell({ children, onBack }: AppShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>('home');
-  const alertCount = useAlertStore((s) => s.alerts.length);
   const { canInstall, install } = useInstallPrompt();
   const { updateAvailable, applyUpdate } = useServiceWorker();
   const [installDismissed, setInstallDismissed] = useState(false);
@@ -112,10 +109,8 @@ export default function AppShell({ children, onBack }: AppShellProps) {
       <TabBar
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        alertCount={alertCount}
         exchangeCount={exchangeCount}
       />
-      <AlertFab />
       <ToastContainer />
     </div>
   );

@@ -29,7 +29,7 @@ function formatExpiry(expiresAt: string): string {
   return `${month}/${day}까지`;
 }
 
-export default function AlertList({ onClose }: { onClose: () => void }) {
+export default function AlertList({ onClose }: { onClose?: () => void }) {
   const { alerts, deactivate } = useAlertStore();
   const currentName = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
   const currentSabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
@@ -38,9 +38,11 @@ export default function AlertList({ onClose }: { onClose: () => void }) {
     <div className={styles.listContainer}>
       <div className={styles.listHeader}>
         <h2 className={styles.listTitle}>장애 알림</h2>
-        <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="닫기">
-          ✕
-        </button>
+        {onClose && (
+          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="닫기">
+            ✕
+          </button>
+        )}
       </div>
 
       {alerts.length === 0 ? (

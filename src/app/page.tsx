@@ -48,7 +48,7 @@ function HomeTab() {
       <TodayCard selectedDate={selectedDate} />
       <StatusCards baseDate={selectedDate} />
       <MonthSummary />
-      <DutyInfoCard />
+      <DutyInfoCard selectedDate={selectedDate} />
       <HomeTipsQuiz />
     </>
   );

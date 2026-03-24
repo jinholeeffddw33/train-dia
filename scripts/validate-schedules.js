@@ -36,24 +36,30 @@ function main() {
 
       const hasG = line.includes('g:[');
       const hasM = line.includes(',m:');
+      const hasW = line.includes(',w:"');
 
       if (hasG && !hasM) {
         totalMissing++;
-        issues.push({ table, dia });
+        issues.push({ table, dia, field: 'm' });
+      }
+      if (hasG && !hasW) {
+        totalMissing++;
+        issues.push({ table, dia, field: 'w' });
       }
     }
   }
 
   if (totalMissing === 0) {
-    console.log('✅ schedules.ts 검증 통과 — 모든 근무 다이아에 m(운전행로) 필드 존재');
+    console.log('✅ schedules.ts 검증 통과 — 모든 근무 다이아에 m(운전행로) + w(근무시간) 필드 존재');
   } else {
-    console.log(`❌ schedules.ts 검증 실패 — m 필드 누락 ${totalMissing}건`);
+    console.log(`❌ schedules.ts 검증 실패 — 필드 누락 ${totalMissing}건`);
     console.log('');
     console.log('   m 필드가 없으면 홈 화면 행로 약호 + 방향 배너가 깨집니다.');
-    console.log('   행로표 교체 시 반드시 m 필드를 포함해주세요.');
+    console.log('   w 필드가 없으면 근무시간이 출퇴근 시간 차이로 계산됩니다 (부정확).');
+    console.log('   행로표 교체 시 반드시 m, w 필드를 포함해주세요.');
     console.log('');
-    for (const { table, dia } of issues.slice(0, 10)) {
-      console.log(`   ${table} > dia "${dia}": m 필드 없음`);
+    for (const { table, dia, field } of issues.slice(0, 10)) {
+      console.log(`   ${table} > dia "${dia}": ${field} 필드 없음`);
     }
     if (issues.length > 10) {
       console.log(`   ... 외 ${issues.length - 10}건`);

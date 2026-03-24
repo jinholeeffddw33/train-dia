@@ -37,6 +37,8 @@ export interface Schedule {
   t?: string;
   /** 운전행로 문자열 */
   m?: string;
+  /** 근무시간 (H:MM 형식, 행로표 기준) */
+  w?: string;
   /** 구간 배열 */
   g?: Segment[];
 }

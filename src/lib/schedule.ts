@@ -194,6 +194,7 @@ export function calcWorkTime(s: string, e: string): string {
 /** 스케줄에서 근무시간 추출 */
 export function getWorkTime(sc: Schedule | null): string {
   if (!sc) return '-';
+  if (sc.w) return sc.w;
   if (sc.t && !/\.png$/i.test(sc.t)) return sc.t;
   return calcWorkTime(sc.s, sc.e);
 }

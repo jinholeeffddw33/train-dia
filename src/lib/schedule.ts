@@ -574,7 +574,7 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
 export function getRouteDirection(m: string | undefined, stationAbbr: Record<string, string>): DirectionInfo | null {
   if (!m || m.includes('충당여부') || m.includes('대휴')) return null;
   const UP = new Set(['방', '왕', '영', '여', '애', '화', '다']);
-  const DOWN = new Set(['군', '마', '상', '기', '둔', '강']);
+  const DOWN = new Set(['군', '마', '상', '기', '둔', '강', '하']);
   const parts = m.split(',');
   for (const p of parts) {
     const t = p.trim();

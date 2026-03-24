@@ -78,18 +78,19 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
         return (
           <div key={i}>
             <div className={styles.rtBlock}>
-              {/* 다근무 시 N근무 헤더 + 행로 약호 */}
+              {/* N근무 헤더 + 행로 약호 */}
               {multi && (
                 <div className={styles.rtHead}>
-                  <span className={styles.rtNum}>{i + 1}근무</span>
-                  {routeParts[i] && <span className={styles.rtRoute}>{routeParts[i]}</span>}
+                  <span className={styles.rtNum}>
+                    {i + 1}근무{routeParts[i] && <> : {routeParts[i]}</>}
+                  </span>
                   {durStr && <span className={styles.rtDur}>{durStr}</span>}
                 </div>
               )}
               {/* 단일 구간일 때도 행로 약호 표시 */}
               {!multi && routeParts[0] && (
                 <div className={styles.rtHead}>
-                  <span className={styles.rtRoute}>{routeParts[0]}</span>
+                  <span className={styles.rtNum}>{routeParts[0]}</span>
                   {durStr && <span className={styles.rtDur}>{durStr}</span>}
                 </div>
               )}

@@ -51,16 +51,16 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
     [schedule, person, date],
   );
 
-  // 시간 괄호 제거: "답방하,하답(05:30),답하답(06:16)" → "답방하,하답,답하답"
-  const routeAbbr = schedule.m && !schedule.m.includes('충당여부') && !schedule.m.includes('대휴')
-    ? schedule.m.replace(/\s*\([^)]*\)/g, '').trim()
-    : null;
+  // 구간별 행로 약호 분리: "답마방기,기방마답" → ["답마방기", "기방마답"]
+  const routeParts = useMemo(() => {
+    if (!schedule.m || schedule.m.includes('충당여부') || schedule.m.includes('대휴')) return [];
+    return schedule.m.split(',').map(p => p.replace(/\s*\([^)]*\)/g, '').trim()).filter(Boolean);
+  }, [schedule.m]);
 
   return (
     <div className={styles.rt}>
       <div className={styles.rtLabel}>
         <TrainFront size={14} className={styles.rtLabelIcon} />{LABELS.SEGMENT_RUN}
-        {routeAbbr && <span className={styles.rtRoute}> : {routeAbbr}</span>}
       </div>
 
       {segs.map((seg, i) => {
@@ -78,10 +78,18 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
         return (
           <div key={i}>
             <div className={styles.rtBlock}>
-              {/* 다근무 시 N근무 헤더 */}
+              {/* 다근무 시 N근무 헤더 + 행로 약호 */}
               {multi && (
                 <div className={styles.rtHead}>
                   <span className={styles.rtNum}>{i + 1}근무</span>
+                  {routeParts[i] && <span className={styles.rtRoute}>{routeParts[i]}</span>}
+                  {durStr && <span className={styles.rtDur}>{durStr}</span>}
+                </div>
+              )}
+              {/* 단일 구간일 때도 행로 약호 표시 */}
+              {!multi && routeParts[0] && (
+                <div className={styles.rtHead}>
+                  <span className={styles.rtRoute}>{routeParts[0]}</span>
                   {durStr && <span className={styles.rtDur}>{durStr}</span>}
                 </div>
               )}

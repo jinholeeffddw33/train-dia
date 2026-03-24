@@ -183,18 +183,19 @@ function DiaCard({
       {/* 확장: 행로 상세 */}
       {expanded && schedule && (
         <div className={styles.diaDetail}>
-          {/* 운전행로 설명 */}
-          {schedule.m && (
-            <div className={styles.routeDesc}>{schedule.m}</div>
-          )}
-
           {/* 구간별 열차 정보 */}
           {schedule.g && schedule.g.length > 0 && (
             <div className={styles.segments}>
-              {schedule.g.map((seg, i) => (
+              {schedule.g.map((seg, i) => {
+                const routeParts = schedule.m && !schedule.m.includes('충당여부') && !schedule.m.includes('대휴')
+                  ? schedule.m.split(',').map(p => p.replace(/\s*\([^)]*\)/g, '').trim())
+                  : [];
+                return (
                 <div key={i} className={styles.segment}>
                   <div className={styles.segHeader}>
-                    <span className={styles.segLabel}>{i + 1}구간</span>
+                    <span className={styles.segLabel}>
+                      {i + 1}근무{routeParts[i] && <> : {routeParts[i]}</>}
+                    </span>
                     <span className={styles.segTime}>{seg.d} → {seg.a}</span>
                   </div>
                   <div className={styles.segTrains}>
@@ -206,7 +207,8 @@ function DiaCard({
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

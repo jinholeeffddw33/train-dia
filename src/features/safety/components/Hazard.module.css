@@ -524,3 +524,240 @@
 }
 
 .submitBtn:active:not(:disabled) { opacity: 0.8; }
+
+/* ── Card Likes ── */
+.cardLikes {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── Detail Header Menu ── */
+.menuWrap {
+  position: relative;
+  margin-left: auto;
+}
+
+.menuBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--dia-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  transition: background var(--dia-transition-fast);
+}
+
+.menuBtn:hover { background: var(--dia-surface-hover); }
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 50;
+  min-width: 120px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-lg);
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  text-align: left;
+  min-height: 44px;
+  transition: background var(--dia-transition-fast);
+}
+
+.menuItem:hover { background: var(--dia-surface-hover); }
+
+.menuItemDanger { color: var(--dia-red); }
+
+/* ── Edit Mode ── */
+.editField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.editLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+}
+
+.editActions {
+  display: flex;
+  gap: var(--dia-space-2);
+  justify-content: flex-end;
+}
+
+.editCancelBtn,
+.editSaveBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  min-height: 44px;
+  transition: background var(--dia-transition-fast), opacity var(--dia-transition-fast);
+}
+
+.editCancelBtn {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+}
+
+.editCancelBtn:hover { background: var(--dia-surface-hover); }
+
+.editSaveBtn {
+  background: var(--dia-purple);
+  color: white;
+}
+
+.editSaveBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.editSaveBtn:hover:not(:disabled) { opacity: 0.9; }
+
+/* ── Like Section ── */
+.likeSection {
+  padding: var(--dia-space-2) var(--dia-space-4);
+}
+
+.likeBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  min-height: 44px;
+  transition: background var(--dia-transition-fast), border-color var(--dia-transition-fast);
+}
+
+.likeBtn:hover { background: var(--dia-surface-hover); }
+
+.likeBtnActive {
+  border-color: var(--dia-red);
+  background: rgba(251, 113, 133, 0.08);
+}
+
+.likeCount {
+  font-weight: var(--dia-weight-medium);
+  min-width: 1ch;
+}
+
+/* ── Comment Menu ── */
+.commentHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+}
+
+.commentMenuWrap {
+  position: relative;
+}
+
+.commentMenuBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--dia-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-tertiary);
+  transition: background var(--dia-transition-fast);
+}
+
+.commentMenuBtn:hover { background: var(--dia-surface-hover); }
+
+.commentMenuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 50;
+  min-width: 100px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-lg);
+  overflow: hidden;
+}
+
+/* ── Comment Edit ── */
+.commentEditWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.commentEditInput {
+  width: 100%;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-family: inherit;
+  resize: none;
+  line-height: var(--dia-leading-normal);
+  min-width: 0;
+  box-sizing: border-box;
+  transition: border-color var(--dia-transition-fast);
+}
+
+.commentEditInput:focus {
+  border-color: var(--dia-purple);
+  outline: none;
+}
+
+.commentEditActions {
+  display: flex;
+  gap: var(--dia-space-2);
+  justify-content: flex-end;
+}
+
+.commentEditCancel,
+.commentEditSave {
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-medium);
+  min-height: 32px;
+  transition: background var(--dia-transition-fast), opacity var(--dia-transition-fast);
+}
+
+.commentEditCancel {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+}
+
+.commentEditCancel:hover { background: var(--dia-surface-hover); }
+
+.commentEditSave {
+  background: var(--dia-purple);
+  color: white;
+}
+
+.commentEditSave:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

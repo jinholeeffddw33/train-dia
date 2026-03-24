@@ -70,6 +70,12 @@ export default function HazardList({ onSelect }: HazardListProps) {
               <span className={styles.cardTime}>{timeAgo(r.createdAt)}</span>
               <span className={styles.cardDot}>·</span>
               <span className={styles.cardComments}>💬 {r.commentCount}</span>
+              {r.likeCount > 0 && (
+                <>
+                  <span className={styles.cardDot}>·</span>
+                  <span className={styles.cardLikes}>❤️ {r.likeCount}</span>
+                </>
+              )}
             </div>
           </div>
         </button>

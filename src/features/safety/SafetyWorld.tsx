@@ -4,6 +4,7 @@ import { Component, type ReactNode, useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
+import { useDriverStore } from '@/stores/driver';
 import Modal from '@/components/common/Modal';
 import AlertList from '@/features/alerts/components/AlertList';
 import AlertForm from '@/features/alerts/components/AlertForm';
@@ -62,16 +63,17 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
+  const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
 
   useEffect(() => {
     fetchAlerts();
-    fetchHazards();
+    fetchHazards(sabun);
     const unsubscribe = subscribeAlerts();
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         fetchAlerts();
-        fetchHazards();
+        fetchHazards(sabun);
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -80,7 +82,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
       unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [fetchAlerts, fetchHazards, subscribeAlerts]);
+  }, [fetchAlerts, fetchHazards, subscribeAlerts, sabun]);
 
   // 위험요소 상세 화면
   if (view !== 'main' && view.type === 'hazard') {

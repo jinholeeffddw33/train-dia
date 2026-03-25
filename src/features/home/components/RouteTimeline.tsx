@@ -82,7 +82,7 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
               {multi && (
                 <div className={styles.rtHead}>
                   <span className={styles.rtNum}>
-                    {i + 1}근무{routeParts[i] && <> : {routeParts[i]}</>}
+                    {i + 1}근무{routeParts[i] && <> : <span className={styles.rtRoute}>{routeParts[i]}</span></>}
                   </span>
                   {durStr && <span className={styles.rtDur}>{durStr}</span>}
                 </div>
@@ -90,7 +90,7 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
               {/* 단일 구간일 때도 행로 약호 표시 */}
               {!multi && routeParts[0] && (
                 <div className={styles.rtHead}>
-                  <span className={styles.rtNum}>{routeParts[0]}</span>
+                  <span className={`${styles.rtNum} ${styles.rtRoute}`}>{routeParts[0]}</span>
                   {durStr && <span className={styles.rtDur}>{durStr}</span>}
                 </div>
               )}

@@ -570,11 +570,12 @@
 }
 
 .statusCardDia {
-  font-size: 26px;
+  font-size: 39px;
   font-weight: 800;
   color: var(--dia-text-primary);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
   flex-shrink: 0;
+  margin-right: var(--dia-space-2);
 }
 
 .statusCardTime {
@@ -951,6 +952,10 @@
   font-size: var(--dia-text-xs);
   font-weight: 700;
   color: var(--dia-blue);
+}
+
+.rtRoute {
+  color: var(--dia-text-primary);
 }
 
 .rtDur {

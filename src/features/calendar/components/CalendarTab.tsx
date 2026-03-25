@@ -116,12 +116,12 @@ export default function CalendarTab() {
         </button>
       </div>
 
+      {/* 선택된 날짜 상세 */}
+      {selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
+
       {/* 월간 근무 요약 + 내근 근무 */}
       <MonthSummary />
       <DutyInfoCard selectedDate={selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined} />
-
-      {/* 선택된 날짜 상세 */}
-      {selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
 
       {/* 교번변경 바텀시트 */}
       {swapTargetDate && (

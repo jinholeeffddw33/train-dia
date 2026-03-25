@@ -47,16 +47,18 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
     <div className={styles.statusCards}>
       {cards.map((card) => (
         <div key={card.label} className={`${styles.statusCard} ${styles[`type_${card.type}`]} ${card.isSwapped ? styles.statusCardSwapped : ''}`}>
-          <div className={styles.statusCardTop}>
-            <span className={styles.statusCardLabel}>{card.label}</span>
-            <span className={styles.statusCardDate}>{card.date}</span>
-            {card.isSwapped && <span className={styles.statusSwapTag}>변경</span>}
-          </div>
-          <div className={styles.statusCardBottom}>
+          <div className={styles.statusCardRow}>
+            <div className={styles.statusCardInfo}>
+              <span className={styles.statusCardLabel}>
+                {card.label}
+                {card.isSwapped && <span className={styles.statusSwapTag}>변경</span>}
+              </span>
+              <span className={styles.statusCardDate}>{card.date}</span>
+              {card.time && (
+                <span className={styles.statusCardTime}>{card.time}</span>
+              )}
+            </div>
             <span className={styles.statusCardDia}>{card.display}</span>
-            {card.time && (
-              <span className={styles.statusCardTime}>{card.time}</span>
-            )}
           </div>
         </div>
       ))}

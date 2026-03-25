@@ -6,6 +6,7 @@ import { useSwapStore } from '@/stores/swap';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import SwapBottomSheet from './SwapBottomSheet';
+import { MonthSummary, DutyInfoCard } from '@/features/home';
 import styles from '../styles/Calendar.module.css';
 
 function todayStr(): string {
@@ -114,6 +115,10 @@ export default function CalendarTab() {
           {swapMode ? '변경 취소' : '교번변경'}
         </button>
       </div>
+
+      {/* 월간 근무 요약 + 내근 근무 */}
+      <MonthSummary />
+      <DutyInfoCard selectedDate={selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined} />
 
       {/* 선택된 날짜 상세 */}
       {selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}

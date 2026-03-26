@@ -2,6 +2,44 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { verifyUser } from '@/lib/auth';
 
+// ── GET: 댓글 목록 조회 ──
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  if (!serverSupabase) {
+    return NextResponse.json(
+      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다' },
+      { status: 500 },
+    );
+  }
+
+  const { id: reportId } = await params;
+
+  const { data, error } = await serverSupabase
+    .from('hazard_comments')
+    .select('id, report_id, comment, created_by, created_at')
+    .eq('report_id', reportId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    return NextResponse.json(
+      { code: 'FETCH_FAILED', message: '댓글 조회에 실패했습니다', detail: error.message },
+      { status: 500 },
+    );
+  }
+
+  const comments = (data ?? []).map((c: Record<string, unknown>) => ({
+    id: c.id,
+    reportId: c.report_id,
+    comment: c.comment,
+    createdBy: c.created_by,
+    createdAt: c.created_at,
+  }));
+
+  return NextResponse.json({ data: comments });
+}
+
 // ── POST: 댓글 등록 ──
 export async function POST(
   req: NextRequest,

@@ -2,6 +2,56 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { verifyUser } from '@/lib/auth';
 
+// ── GET: 위험요소 목록 조회 ──
+export async function GET(req: NextRequest) {
+  if (!serverSupabase) {
+    return NextResponse.json(
+      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다' },
+      { status: 500 },
+    );
+  }
+
+  const sabun = req.nextUrl.searchParams.get('sabun') ?? '';
+
+  const { data, error } = await serverSupabase
+    .from('hazard_reports')
+    .select('id, photo_url, description, location, created_by, created_at, hazard_comments(count), hazard_likes(count)')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return NextResponse.json(
+      { code: 'FETCH_FAILED', message: '목록 조회에 실패했습니다', detail: error.message },
+      { status: 500 },
+    );
+  }
+
+  // 좋아요 여부 조회
+  let likedIds = new Set<string>();
+  if (sabun) {
+    const { data: likes } = await serverSupabase
+      .from('hazard_likes')
+      .select('report_id')
+      .eq('user_sabun', sabun);
+    if (likes) {
+      likedIds = new Set(likes.map((l: { report_id: string }) => l.report_id));
+    }
+  }
+
+  const reports = (data ?? []).map((r: Record<string, unknown>) => ({
+    id: r.id,
+    photoUrl: r.photo_url,
+    description: r.description,
+    location: r.location || '',
+    createdBy: r.created_by,
+    createdAt: r.created_at,
+    commentCount: (r.hazard_comments as { count: number }[])?.[0]?.count ?? 0,
+    likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
+    likedByMe: likedIds.has(r.id as string),
+  }));
+
+  return NextResponse.json({ data: reports });
+}
+
 // ── POST: 위험요소 등록 (사진 + 설명) ──
 export async function POST(req: NextRequest) {
   if (!serverSupabase) {

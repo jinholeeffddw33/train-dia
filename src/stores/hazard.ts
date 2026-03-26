@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { supabase } from '@/lib/supabase';
 
 export interface HazardReport {
   id: string;
@@ -19,25 +18,6 @@ export interface HazardComment {
   comment: string;
   createdBy: string;
   createdAt: string;
-}
-
-interface DbReport {
-  id: string;
-  photo_url: string;
-  description: string;
-  location: string;
-  created_by: string;
-  created_at: string;
-  hazard_comments: { count: number }[];
-  hazard_likes: { count: number }[];
-}
-
-interface DbComment {
-  id: string;
-  report_id: string;
-  comment: string;
-  created_by: string;
-  created_at: string;
 }
 
 interface HazardState {
@@ -69,39 +49,20 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
   loadingComments: false,
 
   fetchReports: async (currentSabun?: string) => {
-    if (!supabase) return;
     set({ loadingReports: true });
-    const { data, error } = await supabase
-      .from('hazard_reports')
-      .select('id, photo_url, description, location, created_by, created_at, hazard_comments(count), hazard_likes(count)')
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      // 현재 사용자의 좋아요 목록 조회
-      let likedReportIds: Set<string> = new Set();
-      if (currentSabun) {
-        const { data: likes } = await supabase
-          .from('hazard_likes')
-          .select('report_id')
-          .eq('user_sabun', currentSabun);
-        if (likes) {
-          likedReportIds = new Set(likes.map((l: { report_id: string }) => l.report_id));
-        }
+    try {
+      const url = currentSabun
+        ? `/api/safety/hazards?sabun=${encodeURIComponent(currentSabun)}`
+        : '/api/safety/hazards';
+      const res = await fetch(url);
+      if (!res.ok) {
+        set({ loadingReports: false });
+        return;
       }
-
-      set({
-        reports: (data as DbReport[]).map((r) => ({
-          id: r.id,
-          photoUrl: r.photo_url,
-          description: r.description,
-          location: r.location || '',
-          createdBy: r.created_by,
-          createdAt: r.created_at,
-          commentCount: r.hazard_comments?.[0]?.count ?? 0,
-          likeCount: r.hazard_likes?.[0]?.count ?? 0,
-          likedByMe: likedReportIds.has(r.id),
-        })),
-      });
+      const json = await res.json() as { data: HazardReport[] };
+      set({ reports: json.data ?? [] });
+    } catch {
+      // 네트워크 에러 등
     }
     set({ loadingReports: false });
   },
@@ -124,27 +85,22 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
   },
 
   fetchComments: async (reportId: string) => {
-    if (!supabase) return;
     set({ loadingComments: true });
-    const { data, error } = await supabase
-      .from('hazard_comments')
-      .select('id, report_id, comment, created_by, created_at')
-      .eq('report_id', reportId)
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
+    try {
+      const res = await fetch(`/api/safety/hazards/${reportId}/comments`);
+      if (!res.ok) {
+        set({ loadingComments: false });
+        return;
+      }
+      const json = await res.json() as { data: HazardComment[] };
       set((state) => ({
         comments: {
           ...state.comments,
-          [reportId]: (data as DbComment[]).map((c) => ({
-            id: c.id,
-            reportId: c.report_id,
-            comment: c.comment,
-            createdBy: c.created_by,
-            createdAt: c.created_at,
-          })),
+          [reportId]: json.data ?? [],
         },
       }));
+    } catch {
+      // 네트워크 에러
     }
     set({ loadingComments: false });
   },

@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, ChevronRight, BookOpen, AlertTriangle, Radio, GitCompare, ClipboardList, RotateCcw, Clock } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import {
+  ArrowLeft, ChevronRight, BookOpen, AlertTriangle,
+  Mic, TrainFront, DoorOpen, Wrench,
+  GraduationCap, Award, User, ClipboardList,
+  RotateCcw, Clock,
+} from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
 
@@ -17,6 +22,33 @@ interface EduHomeProps {
   onChapter: (chapterId: string) => void;
 }
 
+const MENU_ITEMS = [
+  { id: 'duty',     label: '근무절차', icon: ClipboardList, color: 'blue'   as const, action: 'chapter', target: 'ch1' },
+  { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapter', target: 'ch8' },
+  { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapter', target: 'ch2' },
+  { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapter', target: 'ch6' },
+  { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapter', target: 'ch5' },
+  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'study',   target: ''   },
+  { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz',    target: ''   },
+  { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'stats',   target: ''   },
+] as const;
+
+const ICON_COLOR_MAP = {
+  blue:   styles.quickIconBlue,
+  purple: styles.quickIconViolet,
+  green:  styles.quickIconGreen,
+  amber:  styles.quickIconWarn,
+  red:    styles.quickIconRed,
+} as const;
+
+const ICON_BG_MAP = {
+  blue:   styles.iconBgBlue,
+  purple: styles.iconBgPurple,
+  green:  styles.iconBgGreen,
+  amber:  styles.iconBgAmber,
+  red:    styles.iconBgRed,
+} as const;
+
 function scoreGradeClass(score: number): string {
   if (score >= 80) return styles.gradeGreen;
   if (score >= 60) return styles.gradeOrange;
@@ -28,6 +60,8 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     readCount, totalQuizzes, bestScore, latestScore, previousScore,
     streak, avgScore, progress, wrongCount, unresolvedWrongCount,
   } = useEduStore();
+
+  const statsRef = useRef<HTMLDivElement>(null);
 
   const [docMeta, setDocMeta] = useState<{ version?: string; updatedAt?: string } | null>(null);
 
@@ -56,9 +90,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     .filter(id => id !== progress.lastReadSectionId)
     .slice(0, 5);
 
-  // allSections는 handbook 데이터 로드 후에만 사용 가능하므로,
-  // 섹션 이름은 ID를 표시하고 DocumentViewer에서 resolve
-  // → 대안: handbook 데이터를 로드해서 이름 매핑
   const [sectionNames, setSectionNames] = useState<Record<string, string>>({});
   useEffect(() => {
     fetch('/data/edu/handbook.json')
@@ -75,16 +106,76 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
       .catch(() => {});
   }, []);
 
+  const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
+    switch (item.action) {
+      case 'chapter': onChapter(item.target); break;
+      case 'study':   onStudy(); break;
+      case 'quiz':    onQuiz(); break;
+      case 'stats':
+        statsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        break;
+    }
+  };
+
   return (
     <div className={styles.screen}>
-      <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+      {/* ── 히어로 배너 ── */}
+      <div className={styles.heroBanner}>
+        <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        <h1 className={styles.topTitle}>스마트승무원</h1>
+
+        <div className={styles.heroBadge}>LINE 5</div>
+        <h1 className={styles.heroTitle}>Smart Crew<br />Assistant</h1>
+        <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
+        <p className={styles.heroDesc}>5호선 승무원을 위한 실무 교육 시스템</p>
+
+        {/* 5호선 심볼 */}
+        <div className={styles.heroSymbol}>
+          <span className={styles.heroSymbolNum}>5</span>
+          <span className={styles.heroSymbolLabel}>Line 5</span>
+        </div>
+
+        <p className={styles.heroTagline}>
+          현장에서 필요한 모든 정보를<br />
+          한 화면에서 <strong>빠르고 설계</strong>
+        </p>
+
+        {/* 5호선 노선 미니맵 */}
+        <div className={styles.heroRoute}>
+          <div className={styles.routeLine} />
+          <div className={styles.routeStations}>
+            {['방화', '여의도', '광화문', '왕십리', '마천'].map((st, i) => (
+              <div key={st} className={styles.routeStation}>
+                <div className={`${styles.routeDot} ${i === 0 ? styles.routeDotFirst : ''}`} />
+                <span className={styles.routeStName}>{st}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className={styles.homeContent}>
+        {/* ── 8개 아이콘 메뉴 그리드 ── */}
+        <div className={styles.menuGrid8}>
+          {MENU_ITEMS.map(item => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={styles.menuGridItem}
+                onClick={() => handleMenuClick(item)}
+              >
+                <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[item.color]}`}>
+                  <Icon size={26} className={ICON_COLOR_MAP[item.color]} />
+                </div>
+                <span className={styles.menuGridLabel}>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* 이어보기 */}
         {hasLastRead && (
           <button
@@ -100,7 +191,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </button>
         )}
 
-        {/* 오답 재시험 — 진짜 오답 퀴즈 모드로 진입 */}
+        {/* 오답 재시험 */}
         {hasUnresolvedWrong && (
           <button
             type="button"
@@ -113,27 +204,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </button>
         )}
 
-        {/* 바로가기 — 5개: 근무절차(ch1) + 이례사항(ch5) + 방송문안(ch8) + 차종비교(ch3) + 기지/주박(ch4) */}
-        <div className={styles.quickGrid}>
-          <button type="button" className={styles.quickCard} onClick={() => onChapter('ch1')}>
-            <ClipboardList size={22} className={styles.quickIconBlue} />
-            <span className={styles.quickLabel}>근무절차</span>
-          </button>
-          <button type="button" className={styles.quickCard} onClick={() => onChapter('ch5')}>
-            <AlertTriangle size={22} className={styles.quickIconWarn} />
-            <span className={styles.quickLabel}>이례사항</span>
-          </button>
-          <button type="button" className={styles.quickCard} onClick={() => onChapter('ch8')}>
-            <Radio size={22} className={styles.quickIconBlue} />
-            <span className={styles.quickLabel}>방송문안</span>
-          </button>
-          <button type="button" className={styles.quickCard} onClick={() => onChapter('ch3')}>
-            <GitCompare size={22} className={styles.quickIconViolet} />
-            <span className={styles.quickLabel}>차종비교</span>
-          </button>
-        </div>
-
-        {/* 메뉴 */}
+        {/* 교재 학습 / 실력 테스트 카드 */}
         <button type="button" className={styles.menuCard} onClick={onStudy}>
           <div className={`${styles.menuIcon} ${styles.menuIconStudy}`}>
             <BookOpen size={24} />
@@ -200,50 +271,52 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </>
         )}
 
-        {/* 학습 현황 — 하단 */}
-        {(totalQuizzes > 0 || readCount > 0) && (
-          <>
-            <div className={styles.sectionDivider}>학습 현황</div>
-            <div className={styles.statsRow}>
-              <div className={styles.statCard}>
-                <div className={styles.statValue}>{readCount}</div>
-                <div className={styles.statLabel}>학습 섹션</div>
-              </div>
-              <div className={styles.statCard}>
-                <div className={styles.statValue}>{totalQuizzes}</div>
-                <div className={styles.statLabel}>시험 횟수</div>
-              </div>
-              <div className={styles.statCard}>
-                <div className={`${styles.statValue} ${totalQuizzes > 0 ? scoreGradeClass(bestScore) : ''}`}>
-                  {totalQuizzes > 0 ? `${bestScore}점` : '-'}
+        {/* 학습 현황 — 내 정보 스크롤 타겟 */}
+        <div ref={statsRef}>
+          {(totalQuizzes > 0 || readCount > 0) && (
+            <>
+              <div className={styles.sectionDivider}>학습 현황</div>
+              <div className={styles.statsRow}>
+                <div className={styles.statCard}>
+                  <div className={styles.statValue}>{readCount}</div>
+                  <div className={styles.statLabel}>학습 섹션</div>
                 </div>
-                <div className={styles.statLabel}>최고 점수</div>
-              </div>
-            </div>
-
-            {growth !== null && (
-              <div className={`${styles.growthBanner} ${growth < 0 ? styles.growthBannerDown : ''}`}>
-                <div className={styles.growthText}>
-                  {growth > 0
-                    ? `이전보다 ${growth}점 향상`
-                    : growth === 0
-                      ? '이전과 동일한 점수'
-                      : `이전보다 ${Math.abs(growth)}점 하락`}
+                <div className={styles.statCard}>
+                  <div className={styles.statValue}>{totalQuizzes}</div>
+                  <div className={styles.statLabel}>시험 횟수</div>
                 </div>
-                {streak >= 2 && (
-                  <div className={styles.streakBadge}>{streak}일 연속 학습</div>
-                )}
+                <div className={styles.statCard}>
+                  <div className={`${styles.statValue} ${totalQuizzes > 0 ? scoreGradeClass(bestScore) : ''}`}>
+                    {totalQuizzes > 0 ? `${bestScore}점` : '-'}
+                  </div>
+                  <div className={styles.statLabel}>최고 점수</div>
+                </div>
               </div>
-            )}
 
-            {totalQuizzes > 0 && avgScore > 0 && (
-              <div className={styles.avgBanner}>
-                <span className={`${styles.avgScore} ${scoreGradeClass(avgScore)}`}>{avgScore}점</span>
-                <span className={styles.avgLabel}>평균 · {totalQuizzes}회</span>
-              </div>
-            )}
-          </>
-        )}
+              {growth !== null && (
+                <div className={`${styles.growthBanner} ${growth < 0 ? styles.growthBannerDown : ''}`}>
+                  <div className={styles.growthText}>
+                    {growth > 0
+                      ? `이전보다 ${growth}점 향상`
+                      : growth === 0
+                        ? '이전과 동일한 점수'
+                        : `이전보다 ${Math.abs(growth)}점 하락`}
+                  </div>
+                  {streak >= 2 && (
+                    <div className={styles.streakBadge}>{streak}일 연속 학습</div>
+                  )}
+                </div>
+              )}
+
+              {totalQuizzes > 0 && avgScore > 0 && (
+                <div className={styles.avgBanner}>
+                  <span className={`${styles.avgScore} ${scoreGradeClass(avgScore)}`}>{avgScore}점</span>
+                  <span className={styles.avgLabel}>평균 · {totalQuizzes}회</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
 
         {/* 교육자료 기준일 */}
         {docMeta?.version && (

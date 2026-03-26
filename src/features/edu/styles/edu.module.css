@@ -67,6 +67,181 @@
   padding-top: var(--dia-space-2);
 }
 
+/* ── 히어로 배너 ── */
+.heroBanner {
+  position: relative;
+  background: linear-gradient(165deg, #f0eef8 0%, #e8e4f0 40%, #f5f3fa 100%);
+  padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-5);
+  text-align: center;
+  overflow: hidden;
+}
+
+:root.light .heroBanner {
+  background: linear-gradient(165deg, #f0eef8 0%, #e8e4f0 40%, #f5f3fa 100%);
+}
+
+:root .heroBanner {
+  background: linear-gradient(165deg, #1a1530 0%, #1e1a3a 40%, #151225 100%);
+}
+
+.heroBackBtn {
+  position: absolute;
+  top: var(--dia-space-3);
+  left: var(--dia-space-3);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 2;
+}
+
+:root.light .heroBackBtn {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--dia-text-primary);
+}
+
+.heroBackBtn:active {
+  transform: scale(0.95);
+}
+
+.heroBadge {
+  display: inline-block;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-purple);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: var(--dia-radius-full);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  margin-top: var(--dia-space-6);
+  letter-spacing: 0.08em;
+}
+
+.heroTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  line-height: 1.2;
+  margin-top: var(--dia-space-3);
+  letter-spacing: -0.02em;
+}
+
+.heroSub {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  letter-spacing: 0.15em;
+  margin-top: var(--dia-space-2);
+}
+
+.heroDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-2);
+}
+
+.heroSymbol {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: var(--dia-space-4);
+}
+
+.heroSymbolNum {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-purple);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+.heroSymbolLabel {
+  font-size: 11px;
+  color: var(--dia-purple);
+  font-weight: var(--dia-weight-semibold);
+  margin-top: var(--dia-space-1);
+}
+
+.heroTagline {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  line-height: 1.5;
+  margin-top: var(--dia-space-4);
+}
+
+.heroTagline strong {
+  color: var(--dia-purple);
+}
+
+/* ── 노선 미니맵 ── */
+.heroRoute {
+  position: relative;
+  margin-top: var(--dia-space-5);
+  padding: 0 var(--dia-space-2);
+}
+
+.routeLine {
+  position: absolute;
+  top: 6px;
+  left: var(--dia-space-4);
+  right: var(--dia-space-4);
+  height: 3px;
+  background: var(--dia-purple);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.routeStations {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.routeStation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-1);
+}
+
+.routeDot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-purple);
+  border: 2px solid var(--dia-bg);
+  position: relative;
+  z-index: 1;
+}
+
+.routeDotFirst {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+.routeStName {
+  font-size: 11px;
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+}
+
 /* ── 홈 화면 ── */
 .homeContent {
   padding: var(--dia-space-4);
@@ -74,6 +249,58 @@
   flex-direction: column;
   gap: var(--dia-space-3);
 }
+
+/* ── 8개 메뉴 그리드 ── */
+.menuGrid8 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--dia-space-3) var(--dia-space-2);
+}
+
+.menuGridItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+
+.menuGridItem:active .menuGridIcon {
+  transform: scale(0.92);
+}
+
+.menuGridIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--dia-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dia-transition-fast);
+}
+
+.menuGridLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 아이콘 배경색 */
+.iconBgBlue   { background: rgba(59, 130, 246, 0.12); }
+.iconBgPurple { background: rgba(139, 92, 246, 0.12); }
+.iconBgGreen  { background: rgba(34, 197, 94, 0.12); }
+.iconBgAmber  { background: rgba(245, 158, 11, 0.12); }
+.iconBgRed    { background: rgba(239, 68, 68, 0.10); }
+
+/* 아이콘 색상 (기존 + 추가) */
+.quickIconRed { color: var(--dia-red); }
 
 /* 이어보기 */
 .resumeCard {

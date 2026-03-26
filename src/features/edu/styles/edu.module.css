@@ -67,28 +67,16 @@
   padding-top: var(--dia-space-2);
 }
 
-/* ── 히어로 배너 ── */
+/* ── 히어로 배너 (이미지) ── */
 .heroBanner {
   position: relative;
-  /* 다크 모드 기본 (train-dia: :root = 다크) */
-  background: linear-gradient(165deg, #1a1530 0%, #1e1a3a 40%, #151225 100%);
-  padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-5);
-  text-align: center;
   overflow: hidden;
 }
 
-:root.light .heroBanner {
-  background: linear-gradient(165deg, #f0eef8 0%, #e8e4f0 40%, #f5f3fa 100%);
-}
-
-/* 히어로 이미지 (파일 있으면 표시) */
-.heroImage {
+.heroBannerImg {
   width: 100%;
-  max-width: 280px;
   height: auto;
-  margin: var(--dia-space-4) auto 0;
-  border-radius: var(--dia-radius-lg);
-  object-fit: contain;
+  display: block;
 }
 
 .heroBackBtn {
@@ -99,196 +87,20 @@
   height: 40px;
   min-width: 40px;
   border-radius: var(--dia-radius-full);
-  /* 다크 기본 */
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: #334155;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 2;
-}
-
-:root.light .heroBackBtn {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(0, 0, 0, 0.08);
-  color: #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .heroBackBtn:active {
   transform: scale(0.95);
-}
-
-.heroBadge {
-  display: inline-block;
-  font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-bold);
-  /* 다크: 밝은 퍼플 */
-  color: #a78bfa;
-  background: rgba(139, 92, 246, 0.2);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  border-radius: var(--dia-radius-full);
-  padding: var(--dia-space-1) var(--dia-space-3);
-  margin-top: var(--dia-space-6);
-  letter-spacing: 0.08em;
-}
-
-:root.light .heroBadge {
-  color: var(--dia-purple);
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.25);
-}
-
-.heroTitle {
-  font-size: 28px;
-  font-weight: 800;
-  /* 다크: 밝은 흰색 */
-  color: #f1f5f9;
-  line-height: 1.2;
-  margin-top: var(--dia-space-3);
-  letter-spacing: -0.02em;
-}
-
-:root.light .heroTitle {
-  color: #1e293b;
-}
-
-.heroSub {
-  font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-semibold);
-  /* 다크: 중간 밝기 */
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.15em;
-  margin-top: var(--dia-space-2);
-}
-
-:root.light .heroSub {
-  color: #64748b;
-}
-
-.heroDesc {
-  font-size: var(--dia-text-sm);
-  color: rgba(255, 255, 255, 0.65);
-  margin-top: var(--dia-space-2);
-}
-
-:root.light .heroDesc {
-  color: #475569;
-}
-
-.heroSymbol {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: var(--dia-space-4);
-}
-
-.heroSymbolNum {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--dia-radius-full);
-  background: var(--dia-purple);
-  color: #fff;
-  font-size: 24px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
-}
-
-.heroSymbolLabel {
-  font-size: 11px;
-  color: #a78bfa;
-  font-weight: var(--dia-weight-semibold);
-  margin-top: var(--dia-space-1);
-}
-
-:root.light .heroSymbolLabel {
-  color: var(--dia-purple);
-}
-
-.heroTagline {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
-  color: #e2e8f0;
-  line-height: 1.5;
-  margin-top: var(--dia-space-4);
-}
-
-:root.light .heroTagline {
-  color: #1e293b;
-}
-
-.heroTagline strong {
-  color: #a78bfa;
-}
-
-:root.light .heroTagline strong {
-  color: var(--dia-purple);
-}
-
-/* ── 노선 미니맵 ── */
-.heroRoute {
-  position: relative;
-  margin-top: var(--dia-space-5);
-  padding: 0 var(--dia-space-2);
-}
-
-.routeLine {
-  position: absolute;
-  top: 6px;
-  left: var(--dia-space-4);
-  right: var(--dia-space-4);
-  height: 3px;
-  background: var(--dia-purple);
-  border-radius: 2px;
-  opacity: 0.6;
-}
-
-.routeStations {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-}
-
-.routeStation {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--dia-space-1);
-}
-
-.routeDot {
-  width: 12px;
-  height: 12px;
-  border-radius: var(--dia-radius-full);
-  background: var(--dia-purple);
-  border: 2px solid var(--dia-bg);
-  position: relative;
-  z-index: 1;
-}
-
-.routeDotFirst {
-  width: 14px;
-  height: 14px;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-}
-
-.routeStName {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.55);
-  white-space: nowrap;
-}
-
-:root.light .routeStName {
-  color: #64748b;
-}
-
-:root.light .routeDot {
-  border-color: #f0eef8;
 }
 
 /* ── 홈 화면 ── */

@@ -121,49 +121,17 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
 
   return (
     <div className={styles.screen}>
-      {/* ── 히어로 배너 ── */}
+      {/* ── 히어로 배너 (이미지) ── */}
       <div className={styles.heroBanner}>
         <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-
-        <div className={styles.heroBadge}>LINE 5</div>
-        <h1 className={styles.heroTitle}>Smart Crew<br />Assistant</h1>
-        <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
-        <p className={styles.heroDesc}>5호선 승무원을 위한 실무 교육 시스템</p>
-
-        {/* 히어로 이미지 — public/images/hero-train.png 있으면 표시 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/hero-train.png"
-          alt="5호선 전동차"
-          className={styles.heroImage}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          src="/images/hero-banner.png"
+          alt="Smart Crew Assistant — 5호선 승무원 실무 교육"
+          className={styles.heroBannerImg}
         />
-
-        {/* 5호선 심볼 */}
-        <div className={styles.heroSymbol}>
-          <span className={styles.heroSymbolNum}>5</span>
-          <span className={styles.heroSymbolLabel}>Line 5</span>
-        </div>
-
-        <p className={styles.heroTagline}>
-          현장에서 필요한 모든 정보를<br />
-          한 화면에서 <strong>빠르고 설계</strong>
-        </p>
-
-        {/* 5호선 노선 미니맵 */}
-        <div className={styles.heroRoute}>
-          <div className={styles.routeLine} />
-          <div className={styles.routeStations}>
-            {['방화', '여의도', '광화문', '왕십리', '마천'].map((st, i) => (
-              <div key={st} className={styles.routeStation}>
-                <div className={`${styles.routeDot} ${i === 0 ? styles.routeDotFirst : ''}`} />
-                <span className={styles.routeStName}>{st}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className={styles.homeContent}>

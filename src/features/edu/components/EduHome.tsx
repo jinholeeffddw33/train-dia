@@ -30,7 +30,7 @@ const MENU_ITEMS = [
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch3', 'ch6'] },
   { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'coming'   as const, targets: [] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapters' as const, targets: ['ch5', 'ch7'] },
-  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'study'    as const, targets: [] },
+  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'coming'   as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
 ];
@@ -109,10 +109,8 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
     switch (item.action) {
       case 'chapters':
-        if (item.targets.length === 1) onChapter(item.targets[0]);
-        else onChapters(item.targets);
+        onChapters([...item.targets]);
         break;
-      case 'study':   onStudy(); break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
       case 'coming':  break; // 준비 중
@@ -121,17 +119,48 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
 
   return (
     <div className={styles.screen}>
-      {/* ── 히어로 배너 (이미지) ── */}
+      {/* ── 히어로 배너 ── */}
       <div className={styles.heroBanner}>
         <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/hero-banner.png"
-          alt="Smart Crew Assistant — 5호선 승무원 실무 교육"
-          className={styles.heroBannerImg}
-        />
+
+        {/* 장식 요소 */}
+        <div className={styles.heroGlow} />
+        <div className={styles.heroOrb} />
+
+        <div className={styles.heroBadge}>LINE 5</div>
+        <h1 className={styles.heroTitle}>Smart Crew<br />Assistant</h1>
+        <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
+
+        {/* 5호선 심볼 */}
+        <div className={styles.heroSymbol}>
+          <span className={styles.heroSymbolNum}>5</span>
+        </div>
+
+        <p className={styles.heroTagline}>
+          5호선 승무원을 위한<br />실무 교육 시스템
+        </p>
+
+        {/* 5호선 노선 미니맵 */}
+        <div className={styles.heroRoute}>
+          <div className={styles.routeLine} />
+          <div className={styles.routeStations}>
+            {[
+              { ko: '방화', en: 'Banghwa' },
+              { ko: '여의도', en: 'Yeouido' },
+              { ko: '광화문', en: 'Gwanghwamun' },
+              { ko: '왕십리', en: 'Wangsimni' },
+              { ko: '마천', en: 'Macheon' },
+            ].map((st, i) => (
+              <div key={st.ko} className={styles.routeStation}>
+                <div className={`${styles.routeDot} ${i === 0 ? styles.routeDotActive : ''}`} />
+                <span className={styles.routeStName}>{st.ko}</span>
+                <span className={styles.routeStEn}>{st.en}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className={styles.homeContent}>

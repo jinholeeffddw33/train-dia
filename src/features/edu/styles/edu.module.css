@@ -67,16 +67,45 @@
   padding-top: var(--dia-space-2);
 }
 
-/* ── 히어로 배너 (이미지) ── */
+/* ── 히어로 배너 ── */
 .heroBanner {
   position: relative;
+  background: linear-gradient(170deg, #1a1035 0%, #211748 35%, #16103a 100%);
+  padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-6);
+  text-align: center;
   overflow: hidden;
 }
 
-.heroBannerImg {
-  width: 100%;
-  height: auto;
-  display: block;
+:root.light .heroBanner {
+  background: linear-gradient(170deg, #f5f0ff 0%, #ede8fa 35%, #f8f5ff 100%);
+}
+
+/* 장식: 퍼플 글로우 */
+.heroGlow {
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+:root.light .heroGlow {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+}
+
+/* 장식: 오른쪽 상단 작은 오브 */
+.heroOrb {
+  position: absolute;
+  top: 20px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .heroBackBtn {
@@ -87,20 +116,191 @@
   height: 40px;
   min-width: 40px;
   border-radius: var(--dia-radius-full);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #334155;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+:root.light .heroBackBtn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .heroBackBtn:active {
   transform: scale(0.95);
+}
+
+.heroBadge {
+  display: inline-block;
+  position: relative;
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: var(--dia-radius-full);
+  padding: 4px 14px;
+  margin-top: var(--dia-space-6);
+  letter-spacing: 0.12em;
+}
+
+:root.light .heroBadge {
+  color: var(--dia-purple);
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.heroTitle {
+  position: relative;
+  font-size: 30px;
+  font-weight: 800;
+  color: #f8fafc;
+  line-height: 1.15;
+  margin-top: var(--dia-space-3);
+  letter-spacing: -0.02em;
+}
+
+:root.light .heroTitle {
+  color: #1e1b4b;
+}
+
+.heroSub {
+  position: relative;
+  font-size: 11px;
+  font-weight: var(--dia-weight-semibold);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.18em;
+  margin-top: var(--dia-space-2);
+}
+
+:root.light .heroSub {
+  color: #94a3b8;
+}
+
+.heroSymbol {
+  display: inline-flex;
+  position: relative;
+  margin-top: var(--dia-space-5);
+}
+
+.heroSymbolNum {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 4px 20px rgba(124, 58, 237, 0.4),
+    0 0 0 4px rgba(124, 58, 237, 0.12);
+}
+
+:root.light .heroSymbolNum {
+  box-shadow:
+    0 4px 20px rgba(124, 58, 237, 0.25),
+    0 0 0 4px rgba(124, 58, 237, 0.08);
+}
+
+.heroTagline {
+  position: relative;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.6;
+  margin-top: var(--dia-space-4);
+}
+
+:root.light .heroTagline {
+  color: #64748b;
+}
+
+/* ── 노선 미니맵 ── */
+.heroRoute {
+  position: relative;
+  margin-top: var(--dia-space-5);
+  padding: 0 var(--dia-space-1);
+}
+
+.routeLine {
+  position: absolute;
+  top: 6px;
+  left: 10%;
+  right: 10%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--dia-purple), rgba(99, 102, 241, 0.6));
+  border-radius: 2px;
+}
+
+:root.light .routeLine {
+  background: linear-gradient(90deg, rgba(139, 92, 246, 0.5), rgba(99, 102, 241, 0.3));
+}
+
+.routeStations {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.routeStation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.routeDot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(139, 92, 246, 0.6);
+  border: 2px solid #211748;
+  position: relative;
+  z-index: 1;
+}
+
+:root.light .routeDot {
+  background: rgba(139, 92, 246, 0.5);
+  border-color: #f5f0ff;
+}
+
+.routeDotActive {
+  width: 14px;
+  height: 14px;
+  background: var(--dia-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.routeStName {
+  font-size: 11px;
+  font-weight: var(--dia-weight-semibold);
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+:root.light .routeStName {
+  color: #475569;
+}
+
+.routeStEn {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+}
+
+:root.light .routeStEn {
+  color: #94a3b8;
 }
 
 /* ── 홈 화면 ── */

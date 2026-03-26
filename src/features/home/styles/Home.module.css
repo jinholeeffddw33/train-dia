@@ -546,6 +546,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--dia-space-2);
+  min-height: 68px;
 }
 
 .statusCardInfo {
@@ -553,6 +554,7 @@
   flex-direction: column;
   gap: 1px;
   min-width: 0;
+  flex: 1;
 }
 
 .statusCardLabel {
@@ -575,7 +577,10 @@
   color: var(--dia-text-primary);
   letter-spacing: -0.5px;
   flex-shrink: 0;
-  margin-right: var(--dia-space-2);
+  /* 고정 너비로 숫자/한글 동일 정렬 */
+  width: 80px;
+  text-align: center;
+  line-height: 1;
 }
 
 .statusCardTime {

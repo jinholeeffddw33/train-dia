@@ -6,9 +6,15 @@ import { verifyUser } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json(
-      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다' },
+      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다', detail: 'SUPABASE_URL 또는 키가 설정되지 않았습니다' },
       { status: 500 },
     );
+  }
+
+  // service_role 키 사용 여부 확인 (anon 키면 Storage/RLS 문제 가능)
+  const hasServiceKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY ?? '').trim();
+  if (!hasServiceKey) {
+    console.warn('[hazard] SUPABASE_SERVICE_ROLE_KEY 미설정 — anon 키 폴백, RLS 제한 가능');
   }
 
   let formData: FormData;
@@ -60,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   if (uploadError) {
     return NextResponse.json(
-      { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: uploadError.message },
+      { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: `${uploadError.message} (bucket: hazard-photos, key: ${hasServiceKey ? 'service_role' : 'anon'})` },
       { status: 500 },
     );
   }
@@ -78,7 +84,7 @@ export async function POST(req: NextRequest) {
 
   if (dbError) {
     return NextResponse.json(
-      { code: 'INSERT_FAILED', message: '등록에 실패했습니다', detail: dbError.message },
+      { code: 'INSERT_FAILED', message: '등록에 실패했습니다', detail: `${dbError.message} (table: hazard_reports, key: ${hasServiceKey ? 'service_role' : 'anon'})` },
       { status: 500 },
     );
   }

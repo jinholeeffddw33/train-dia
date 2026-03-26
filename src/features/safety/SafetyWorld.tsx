@@ -13,6 +13,7 @@ import AlertForm from '@/features/alerts/components/AlertForm';
 import HazardList from './components/HazardList';
 import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
+import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
 interface SafetyWorldProps {
@@ -98,7 +99,7 @@ const CATEGORY_EMPTY: Record<SafetyCategory, { icon: string; text: string; hint:
 /** 카테고리별 리스트 화면 (위험/조치/점검 공통) */
 function CategoryListView({
   category, label, emptyConfig, sabun,
-  onBack, onSelect, onShowForm, showForm, onCloseForm,
+  onBack, onSelect, onShowForm, showForm, onCloseForm, onCountsChanged,
 }: {
   category: SafetyCategory;
   label: string;
@@ -108,6 +109,7 @@ function CategoryListView({
   onSelect: (id: string) => void;
   onShowForm: () => void;
   showForm: boolean;
+  onCountsChanged?: () => void;
   onCloseForm: () => void;
 }) {
   const fetchReports = useHazardStore((s) => s.fetchReports);
@@ -152,6 +154,7 @@ function CategoryListView({
           onClose={() => {
             onCloseForm();
             fetchReports(sabun, category);
+            onCountsChanged?.();
           }}
         />
       </Modal>
@@ -168,10 +171,12 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
   const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const { getUnread, alertUnread, markAsRead, markAlertAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
     fetchAlerts();
     fetchHazards(sabun);
+    fetchCounts();
     const unsubscribe = subscribeAlerts();
 
     const handleVisibility = () => {
@@ -190,8 +195,12 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   const goHome = useCallback(() => setView('home'), []);
 
+  const alerts = useAlertStore((s) => s.alerts);
+
   const handleMenu = (id: string) => {
     if (id === 'alert') {
+      // 장애 진입 시 현재 알림 전부 읽음 처리
+      alerts.forEach(a => markAlertAsRead(a.id));
       setView('alert');
     } else if (id === 'hazard' || id === 'action' || id === 'inspect') {
       setView({ type: 'list', category: id });
@@ -227,6 +236,8 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   // ── 상세 화면 (위험/조치/점검 공통) ──
   if (typeof view === 'object' && view.type === 'detail') {
+    // 상세 진입 시 읽음 처리
+    markAsRead(view.id);
     return (
       <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category })}>
         <HazardDetail
@@ -252,6 +263,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
         onShowForm={() => setShowHazardForm(true)}
         showForm={showHazardForm}
         onCloseForm={() => setShowHazardForm(false)}
+        onCountsChanged={fetchCounts}
       />
     );
   }
@@ -314,6 +326,11 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
         <div className={styles.menuGrid}>
           {MENU_ITEMS.map(item => {
             const Icon = item.icon;
+            const unread = item.id === 'alert'
+              ? alertUnread
+              : (item.id === 'hazard' || item.id === 'action' || item.id === 'inspect')
+                ? getUnread(item.id)
+                : 0;
             return (
               <button
                 key={item.id}
@@ -324,6 +341,9 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
               >
                 <div className={`${styles.menuIcon} ${ICON_BG[item.color]}`}>
                   <Icon size={26} className={ICON_COLOR[item.color]} />
+                  {unread > 0 && (
+                    <span className={styles.menuBadge}>{unread > 99 ? '99+' : unread}</span>
+                  )}
                 </div>
                 <span className={styles.menuLabel}>{item.label}</span>
               </button>

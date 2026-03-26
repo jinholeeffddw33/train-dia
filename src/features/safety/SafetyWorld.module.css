@@ -238,6 +238,7 @@
 }
 
 .menuIcon {
+  position: relative;
   width: 52px;
   height: 52px;
   border-radius: var(--dia-radius-lg);
@@ -245,6 +246,25 @@
   align-items: center;
   justify-content: center;
   transition: transform var(--dia-transition-fast);
+}
+
+.menuBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--dia-red);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
 .menuLabel {

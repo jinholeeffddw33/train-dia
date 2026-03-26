@@ -12,6 +12,8 @@ interface DocumentViewerProps {
   onBack: () => void;
   initSection?: string;
   initChapter?: string;
+  /** 여러 챕터를 펼쳐서 보여줄 때 (아이콘 메뉴 진입) */
+  initChapters?: string[];
 }
 
 type ViewMode = 'toc' | 'section';
@@ -90,7 +92,7 @@ interface SearchResult {
   matchType: SearchMatchType;
 }
 
-export default function DocumentViewer({ onBack, initSection, initChapter }: DocumentViewerProps) {
+export default function DocumentViewer({ onBack, initSection, initChapter, initChapters }: DocumentViewerProps) {
   const [doc, setDoc] = useState<any>(null);
   const [mode, setMode] = useState<ViewMode>('toc');
   const [currentSection, setCurrentSection] = useState<string | null>(null);
@@ -115,6 +117,8 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
               }
             }
           }
+        } else if (initChapters && initChapters.length > 0) {
+          setExpandedChapters(new Set(initChapters));
         } else if (initChapter) {
           setExpandedChapters(new Set([initChapter]));
         }
@@ -441,7 +445,10 @@ export default function DocumentViewer({ onBack, initSection, initChapter }: Doc
           )}
 
           <div className={styles.tocList}>
-            {doc.chapters.map((ch: any) => {
+            {(initChapters && initChapters.length > 0
+              ? doc.chapters.filter((ch: any) => initChapters.includes(ch.id))
+              : doc.chapters
+            ).map((ch: any) => {
               const isExpanded = expandedChapters.has(ch.id);
               const readCountInCh = ch.sections.filter((s: any) => readMap[s.id]).length;
 

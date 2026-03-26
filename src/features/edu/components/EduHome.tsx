@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-  ArrowLeft, ChevronRight, BookOpen, AlertTriangle,
+  ArrowLeft, ChevronRight,
   Mic, TrainFront, DoorOpen, Wrench,
   GraduationCap, Award, User, ClipboardList,
   RotateCcw, Clock,
@@ -20,19 +20,20 @@ interface EduHomeProps {
   onWrongReview: () => void;
   onWrongQuiz: () => void;
   onChapter: (chapterId: string) => void;
+  onChapters: (chapterIds: string[]) => void;
   onMyInfo: () => void;
 }
 
 const MENU_ITEMS = [
-  { id: 'duty',     label: '근무절차', icon: ClipboardList, color: 'blue'   as const, action: 'chapter', target: 'ch1' },
-  { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapter', target: 'ch8' },
-  { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapter', target: 'ch2' },
-  { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapter', target: 'ch6' },
-  { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapter', target: 'ch5' },
-  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'study',   target: ''   },
-  { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz',    target: ''   },
-  { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo',  target: ''   },
-] as const;
+  { id: 'duty',     label: '근무절차', icon: ClipboardList, color: 'blue'   as const, action: 'chapters' as const, targets: ['ch1', 'ch4'] },
+  { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8'] },
+  { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch3', 'ch6'] },
+  { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'coming'   as const, targets: [] },
+  { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapters' as const, targets: ['ch5', 'ch7'] },
+  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'study'    as const, targets: [] },
+  { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
+  { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
+];
 
 const ICON_COLOR_MAP = {
   blue:   styles.quickIconBlue,
@@ -56,7 +57,7 @@ function scoreGradeClass(score: number): string {
   return styles.gradeRed;
 }
 
-export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onMyInfo }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onChapters, onMyInfo }: EduHomeProps) {
   const {
     readCount, totalQuizzes, bestScore, latestScore, previousScore,
     streak, avgScore, progress, wrongCount, unresolvedWrongCount,
@@ -107,10 +108,14 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
     switch (item.action) {
-      case 'chapter': onChapter(item.target); break;
+      case 'chapters':
+        if (item.targets.length === 1) onChapter(item.targets[0]);
+        else onChapters(item.targets);
+        break;
       case 'study':   onStudy(); break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
+      case 'coming':  break; // 준비 중
     }
   };
 
@@ -126,6 +131,15 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
         <h1 className={styles.heroTitle}>Smart Crew<br />Assistant</h1>
         <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
         <p className={styles.heroDesc}>5호선 승무원을 위한 실무 교육 시스템</p>
+
+        {/* 히어로 이미지 — public/images/hero-train.png 있으면 표시 */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/hero-train.png"
+          alt="5호선 전동차"
+          className={styles.heroImage}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+        />
 
         {/* 5호선 심볼 */}
         <div className={styles.heroSymbol}>
@@ -157,12 +171,14 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
         <div className={styles.menuGrid8}>
           {MENU_ITEMS.map(item => {
             const Icon = item.icon;
+            const isComing = item.action === 'coming';
             return (
               <button
                 key={item.id}
                 type="button"
-                className={styles.menuGridItem}
+                className={`${styles.menuGridItem} ${isComing ? styles.menuGridItemDisabled : ''}`}
                 onClick={() => handleMenuClick(item)}
+                disabled={isComing}
               >
                 <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[item.color]}`}>
                   <Icon size={26} className={ICON_COLOR_MAP[item.color]} />
@@ -201,33 +217,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </button>
         )}
 
-        {/* 교재 학습 / 실력 테스트 카드 */}
-        <button type="button" className={styles.menuCard} onClick={onStudy}>
-          <div className={`${styles.menuIcon} ${styles.menuIconStudy}`}>
-            <BookOpen size={24} />
-          </div>
-          <div className={styles.menuInfo}>
-            <div className={styles.menuTitle}>교재 학습</div>
-            <div className={styles.menuDesc}>핸드북 전체 · 검색 · 즐겨찾기</div>
-          </div>
-          <ChevronRight size={20} className={styles.menuArrow} />
-        </button>
-
-        <button type="button" className={styles.menuCard} onClick={onQuiz}>
-          <div className={`${styles.menuIcon} ${styles.menuIconQuiz}`}>
-            <AlertTriangle size={24} />
-          </div>
-          <div className={styles.menuInfo}>
-            <div className={styles.menuTitle}>실력 테스트</div>
-            <div className={styles.menuDesc}>
-              {totalQuizzes > 0
-                ? `최근 ${latestScore}점 · ${totalQuizzes}회 응시`
-                : '역량 점검 · 챕터별 시험'}
-            </div>
-          </div>
-          <ChevronRight size={20} className={styles.menuArrow} />
-        </button>
-
+        {/* 오답 재시험 바로가기 (오답 있을 때만) */}
         {wrongCount > 0 && (
           <button type="button" className={styles.menuCard} onClick={onWrongReview}>
             <div className={`${styles.menuIcon} ${styles.menuIconWrong}`}>

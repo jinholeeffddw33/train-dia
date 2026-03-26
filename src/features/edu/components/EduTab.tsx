@@ -10,7 +10,7 @@ import MyInfo from './MyInfo';
 
 type EduView =
   | { type: 'home' }
-  | { type: 'study'; initSection?: string; initChapter?: string }
+  | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[] }
   | { type: 'quiz'; chapter?: string }
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
@@ -34,6 +34,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onBack={goHome}
           initSection={view.initSection}
           initChapter={view.initChapter}
+          initChapters={view.initChapters}
         />
       );
     case 'quiz':
@@ -62,6 +63,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onQuiz={() => setView({ type: 'quiz' })}
           onSection={(id) => setView({ type: 'study', initSection: id })}
           onChapter={(id) => setView({ type: 'study', initChapter: id })}
+          onChapters={(ids) => setView({ type: 'study', initChapters: ids })}
           onWrongReview={() => setView({ type: 'wrong-review' })}
           onWrongQuiz={() => setView({ type: 'wrong-quiz' })}
           onMyInfo={() => setView({ type: 'myinfo' })}

@@ -236,8 +236,6 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   // ── 상세 화면 (위험/조치/점검 공통) ──
   if (typeof view === 'object' && view.type === 'detail') {
-    // 상세 진입 시 읽음 처리
-    markAsRead(view.id);
     return (
       <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category })}>
         <HazardDetail
@@ -259,7 +257,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
         emptyConfig={CATEGORY_EMPTY[cat]}
         sabun={sabun}
         onBack={goHome}
-        onSelect={(id) => setView({ type: 'detail', category: cat, id })}
+        onSelect={(id) => { markAsRead(id); setView({ type: 'detail', category: cat, id }); }}
         onShowForm={() => setShowHazardForm(true)}
         showForm={showHazardForm}
         onCloseForm={() => setShowHazardForm(false)}

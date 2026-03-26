@@ -1455,6 +1455,156 @@
   margin-top: var(--dia-space-2);
 }
 
+/* ── 내 정보 화면 ── */
+.myInfoSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dia-space-3);
+}
+
+.myInfoStat {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4) var(--dia-space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.myInfoStatValue {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.myInfoStatLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.myInfoGrowthRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
+}
+
+.myInfoGrowthChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  padding: var(--dia-space-1) var(--dia-space-3);
+}
+
+.myInfoWrongCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: var(--dia-radius-lg);
+  color: var(--dia-red);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+
+.myInfoWrongCard:active { opacity: 0.8; }
+
+.myInfoWrongInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.myInfoWrongTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+
+.myInfoWrongDesc {
+  font-size: var(--dia-text-xs);
+  opacity: 0.8;
+}
+
+.myInfoEmpty {
+  text-align: center;
+  padding: var(--dia-space-6) var(--dia-space-4);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  line-height: 1.6;
+}
+
+.myInfoHistoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.myInfoHistoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+}
+
+.myInfoHistoryLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.myInfoHistoryDate {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.myInfoHistoryMode {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.myInfoHistoryRight {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.myInfoHistoryScore {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+}
+
+.myInfoHistoryDetail {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.myInfoHistoryDiff {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  padding: 1px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-hover);
+}
+
 /* ── 섹션 요약 카드 ── */
 .summaryCard {
   margin: var(--dia-space-3) var(--dia-space-4) 0;

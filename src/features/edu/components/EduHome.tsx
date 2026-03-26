@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowLeft, ChevronRight, BookOpen, AlertTriangle,
   Mic, TrainFront, DoorOpen, Wrench,
@@ -20,6 +20,7 @@ interface EduHomeProps {
   onWrongReview: () => void;
   onWrongQuiz: () => void;
   onChapter: (chapterId: string) => void;
+  onMyInfo: () => void;
 }
 
 const MENU_ITEMS = [
@@ -30,7 +31,7 @@ const MENU_ITEMS = [
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapter', target: 'ch5' },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'study',   target: ''   },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz',    target: ''   },
-  { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'stats',   target: ''   },
+  { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo',  target: ''   },
 ] as const;
 
 const ICON_COLOR_MAP = {
@@ -55,13 +56,11 @@ function scoreGradeClass(score: number): string {
   return styles.gradeRed;
 }
 
-export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onMyInfo }: EduHomeProps) {
   const {
     readCount, totalQuizzes, bestScore, latestScore, previousScore,
     streak, avgScore, progress, wrongCount, unresolvedWrongCount,
   } = useEduStore();
-
-  const statsRef = useRef<HTMLDivElement>(null);
 
   const [docMeta, setDocMeta] = useState<{ version?: string; updatedAt?: string } | null>(null);
 
@@ -111,9 +110,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
       case 'chapter': onChapter(item.target); break;
       case 'study':   onStudy(); break;
       case 'quiz':    onQuiz(); break;
-      case 'stats':
-        statsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
+      case 'myinfo':  onMyInfo(); break;
     }
   };
 
@@ -271,52 +268,28 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </>
         )}
 
-        {/* 학습 현황 — 내 정보 스크롤 타겟 */}
-        <div ref={statsRef}>
-          {(totalQuizzes > 0 || readCount > 0) && (
-            <>
-              <div className={styles.sectionDivider}>학습 현황</div>
-              <div className={styles.statsRow}>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{readCount}</div>
-                  <div className={styles.statLabel}>학습 섹션</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statValue}>{totalQuizzes}</div>
-                  <div className={styles.statLabel}>시험 횟수</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={`${styles.statValue} ${totalQuizzes > 0 ? scoreGradeClass(bestScore) : ''}`}>
-                    {totalQuizzes > 0 ? `${bestScore}점` : '-'}
-                  </div>
-                  <div className={styles.statLabel}>최고 점수</div>
-                </div>
+        {/* 학습 현황 미니 요약 */}
+        {(totalQuizzes > 0 || readCount > 0) && (
+          <>
+            <div className={styles.sectionDivider}>학습 현황</div>
+            <div className={styles.statsRow}>
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>{readCount}</div>
+                <div className={styles.statLabel}>학습 섹션</div>
               </div>
-
-              {growth !== null && (
-                <div className={`${styles.growthBanner} ${growth < 0 ? styles.growthBannerDown : ''}`}>
-                  <div className={styles.growthText}>
-                    {growth > 0
-                      ? `이전보다 ${growth}점 향상`
-                      : growth === 0
-                        ? '이전과 동일한 점수'
-                        : `이전보다 ${Math.abs(growth)}점 하락`}
-                  </div>
-                  {streak >= 2 && (
-                    <div className={styles.streakBadge}>{streak}일 연속 학습</div>
-                  )}
+              <div className={styles.statCard}>
+                <div className={styles.statValue}>{totalQuizzes}</div>
+                <div className={styles.statLabel}>시험 횟수</div>
+              </div>
+              <div className={styles.statCard}>
+                <div className={`${styles.statValue} ${totalQuizzes > 0 ? scoreGradeClass(bestScore) : ''}`}>
+                  {totalQuizzes > 0 ? `${bestScore}점` : '-'}
                 </div>
-              )}
-
-              {totalQuizzes > 0 && avgScore > 0 && (
-                <div className={styles.avgBanner}>
-                  <span className={`${styles.avgScore} ${scoreGradeClass(avgScore)}`}>{avgScore}점</span>
-                  <span className={styles.avgLabel}>평균 · {totalQuizzes}회</span>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                <div className={styles.statLabel}>최고 점수</div>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* 교육자료 기준일 */}
         {docMeta?.version && (

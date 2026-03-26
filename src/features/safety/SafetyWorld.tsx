@@ -58,8 +58,8 @@ class SafetyErrorBoundary extends Component<
 const MENU_ITEMS = [
   { id: 'alert',   label: '장애',   icon: AlertTriangle,  color: 'amber' as const, ready: true },
   { id: 'hazard',  label: '위험',   icon: ShieldAlert,    color: 'red'   as const, ready: true },
-  { id: 'action',  label: '조치',   icon: Wrench,         color: 'blue'  as const, ready: false },
-  { id: 'inspect', label: '점검',   icon: ClipboardCheck, color: 'green' as const, ready: false },
+  { id: 'action',  label: '조치',   icon: Wrench,         color: 'blue'  as const, ready: true },
+  { id: 'inspect', label: '점검',   icon: ClipboardCheck, color: 'green' as const, ready: true },
 ] as const;
 
 const ICON_COLOR = {
@@ -76,11 +76,88 @@ const ICON_BG = {
   green: styles.iconBgGreen,
 } as const;
 
+type SafetyCategory = 'hazard' | 'action' | 'inspect';
 type SafetyView =
   | 'home'
   | 'alert'
-  | 'hazard'
-  | { type: 'hazard-detail'; id: string };
+  | { type: 'list'; category: SafetyCategory }
+  | { type: 'detail'; category: SafetyCategory; id: string };
+
+const CATEGORY_LABELS: Record<SafetyCategory, string> = {
+  hazard: '위험요소',
+  action: '조치',
+  inspect: '점검',
+};
+
+const CATEGORY_EMPTY: Record<SafetyCategory, { icon: string; text: string; hint: string }> = {
+  hazard:  { icon: '📷', text: '등록된 위험요소가 없어요', hint: '발견한 위험요소를 사진으로 공유해주세요' },
+  action:  { icon: '🔧', text: '등록된 조치 내역이 없어요', hint: '조치한 내용을 사진과 함께 기록해주세요' },
+  inspect: { icon: '📋', text: '등록된 점검 내역이 없어요', hint: '점검 결과를 사진과 함께 기록해주세요' },
+};
+
+/** 카테고리별 리스트 화면 (위험/조치/점검 공통) */
+function CategoryListView({
+  category, label, emptyConfig, sabun,
+  onBack, onSelect, onShowForm, showForm, onCloseForm,
+}: {
+  category: SafetyCategory;
+  label: string;
+  emptyConfig: { icon: string; text: string; hint: string };
+  sabun: string;
+  onBack: () => void;
+  onSelect: (id: string) => void;
+  onShowForm: () => void;
+  showForm: boolean;
+  onCloseForm: () => void;
+}) {
+  const fetchReports = useHazardStore((s) => s.fetchReports);
+  const reports = useHazardStore((s) => s.reports);
+  const loading = useHazardStore((s) => s.loadingReports);
+
+  useEffect(() => {
+    fetchReports(sabun, category);
+  }, [fetchReports, sabun, category]);
+
+  return (
+    <div className={styles.wrap}>
+      <header className={styles.header}>
+        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+          <ArrowLeft size={20} strokeWidth={2} />
+        </button>
+        <h1 className={styles.headerTitle}>{label}</h1>
+        <button type="button" className={styles.addBtn} onClick={onShowForm}>
+          + 등록
+        </button>
+      </header>
+      <main className={styles.content}>
+        {loading && reports.length === 0 ? (
+          <div className={styles.loadingState}>
+            <span className={styles.loadingDot} />
+            <span className={styles.loadingDot} />
+            <span className={styles.loadingDot} />
+          </div>
+        ) : reports.length === 0 ? (
+          <div className={styles.emptyState}>
+            <span className={styles.emptyIcon}>{emptyConfig.icon}</span>
+            <p className={styles.emptyText}>{emptyConfig.text}</p>
+            <p className={styles.emptyHint}>{emptyConfig.hint}</p>
+          </div>
+        ) : (
+          <HazardList onSelect={onSelect} />
+        )}
+      </main>
+      <Modal open={showForm} onClose={onCloseForm}>
+        <HazardForm
+          category={category}
+          onClose={() => {
+            onCloseForm();
+            fetchReports(sabun, category);
+          }}
+        />
+      </Modal>
+    </div>
+  );
+}
 
 export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const [view, setView] = useState<SafetyView>('home');
@@ -114,10 +191,10 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const goHome = useCallback(() => setView('home'), []);
 
   const handleMenu = (id: string) => {
-    switch (id) {
-      case 'alert':  setView('alert'); break;
-      case 'hazard': setView('hazard'); break;
-      default: break; // 준비 중
+    if (id === 'alert') {
+      setView('alert');
+    } else if (id === 'hazard' || id === 'action' || id === 'inspect') {
+      setView({ type: 'list', category: id });
     }
   };
 
@@ -148,42 +225,34 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     );
   }
 
-  // ── 위험요소 상세 ──
-  if (typeof view === 'object' && view.type === 'hazard-detail') {
+  // ── 상세 화면 (위험/조치/점검 공통) ──
+  if (typeof view === 'object' && view.type === 'detail') {
     return (
-      <SafetyErrorBoundary onBack={() => setView('hazard')}>
+      <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category })}>
         <HazardDetail
           reportId={view.id}
-          onBack={() => setView('hazard')}
+          onBack={() => setView({ type: 'list', category: view.category })}
         />
       </SafetyErrorBoundary>
     );
   }
 
-  // ── 위험요소 리스트 화면 ──
-  if (view === 'hazard') {
+  // ── 리스트 화면 (위험/조치/점검 공통) ──
+  if (typeof view === 'object' && view.type === 'list') {
+    const cat = view.category;
+    const label = CATEGORY_LABELS[cat];
     return (
-      <div className={styles.wrap}>
-        <header className={styles.header}>
-          <button type="button" className={styles.backBtn} onClick={goHome} aria-label="뒤로가기">
-            <ArrowLeft size={20} strokeWidth={2} />
-          </button>
-          <h1 className={styles.headerTitle}>위험요소</h1>
-          <button
-            type="button"
-            className={styles.addBtn}
-            onClick={() => setShowHazardForm(true)}
-          >
-            + 등록
-          </button>
-        </header>
-        <main className={styles.content}>
-          <HazardList onSelect={(id) => setView({ type: 'hazard-detail', id })} />
-        </main>
-        <Modal open={showHazardForm} onClose={() => setShowHazardForm(false)}>
-          <HazardForm onClose={() => setShowHazardForm(false)} />
-        </Modal>
-      </div>
+      <CategoryListView
+        category={cat}
+        label={label}
+        emptyConfig={CATEGORY_EMPTY[cat]}
+        sabun={sabun}
+        onBack={goHome}
+        onSelect={(id) => setView({ type: 'detail', category: cat, id })}
+        onShowForm={() => setShowHazardForm(true)}
+        showForm={showHazardForm}
+        onCloseForm={() => setShowHazardForm(false)}
+      />
     );
   }
 

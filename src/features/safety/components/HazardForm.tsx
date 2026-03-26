@@ -33,9 +33,17 @@ async function compressImage(file: File): Promise<File> {
 
 interface HazardFormProps {
   onClose: () => void;
+  category?: 'hazard' | 'action' | 'inspect';
+  title?: string;
 }
 
-export default function HazardForm({ onClose }: HazardFormProps) {
+const CATEGORY_TITLES: Record<string, string> = {
+  hazard: '위험요소 등록',
+  action: '조치 등록',
+  inspect: '점검 등록',
+};
+
+export default function HazardForm({ onClose, category = 'hazard', title }: HazardFormProps) {
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [description, setDescription] = useState('');
@@ -65,7 +73,7 @@ export default function HazardForm({ onClose }: HazardFormProps) {
     setSubmitting(true);
     setError('');
     try {
-      await createReport({ photo, description: description.trim(), location: location.trim(), name, sabun });
+      await createReport({ photo, description: description.trim(), location: location.trim(), name, sabun, category });
       if (preview) URL.revokeObjectURL(preview);
       onClose();
     } catch (e) {
@@ -77,7 +85,7 @@ export default function HazardForm({ onClose }: HazardFormProps) {
 
   return (
     <div className={styles.formWrap}>
-      <h2 className={styles.formTitle}>위험요소 등록</h2>
+      <h2 className={styles.formTitle}>{title ?? CATEGORY_TITLES[category] ?? '등록'}</h2>
 
       {/* 사진 선택 */}
       <div

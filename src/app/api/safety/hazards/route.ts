@@ -2,7 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { verifyUser } from '@/lib/auth';
 
-// ── GET: 위험요소 목록 조회 ──
+const VALID_CATEGORIES = ['hazard', 'action', 'inspect'] as const;
+type Category = typeof VALID_CATEGORIES[number];
+
+function parseCategory(val: string | null): Category {
+  if (val && VALID_CATEGORIES.includes(val as Category)) return val as Category;
+  return 'hazard';
+}
+
+// ── GET: 목록 조회 (category 필터) ──
 export async function GET(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json(
@@ -12,13 +20,38 @@ export async function GET(req: NextRequest) {
   }
 
   const sabun = req.nextUrl.searchParams.get('sabun') ?? '';
+  const category = parseCategory(req.nextUrl.searchParams.get('category'));
 
-  const { data, error } = await serverSupabase
+  let query = serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, hazard_comments(count), hazard_likes(count)')
+    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
     .order('created_at', { ascending: false });
 
+  // category 컬럼이 있으면 필터, 없으면 전체 (하위 호환)
+  query = query.eq('category', category);
+
+  const { data, error } = await query;
+
   if (error) {
+    // category 컬럼이 없는 경우 — 컬럼 없이 재시도
+    if (error.message?.includes('category')) {
+      const { data: fallback, error: fallbackErr } = await serverSupabase
+        .from('hazard_reports')
+        .select('id, photo_url, description, location, created_by, created_at, hazard_comments(count), hazard_likes(count)')
+        .order('created_at', { ascending: false });
+
+      if (fallbackErr) {
+        return NextResponse.json(
+          { code: 'FETCH_FAILED', message: '목록 조회에 실패했습니다', detail: fallbackErr.message },
+          { status: 500 },
+        );
+      }
+
+      // category 컬럼 없으면 hazard만 해당
+      const reports = category === 'hazard' ? (fallback ?? []) : [];
+      return NextResponse.json({ data: mapReports(reports, new Set()) });
+    }
+
     return NextResponse.json(
       { code: 'FETCH_FAILED', message: '목록 조회에 실패했습니다', detail: error.message },
       { status: 500 },
@@ -37,34 +70,36 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const reports = (data ?? []).map((r: Record<string, unknown>) => ({
+  return NextResponse.json({ data: mapReports(data ?? [], likedIds) });
+}
+
+function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
+  return data.map((r) => ({
     id: r.id,
     photoUrl: r.photo_url,
     description: r.description,
     location: r.location || '',
     createdBy: r.created_by,
     createdAt: r.created_at,
+    category: r.category || 'hazard',
     commentCount: (r.hazard_comments as { count: number }[])?.[0]?.count ?? 0,
     likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
     likedByMe: likedIds.has(r.id as string),
   }));
-
-  return NextResponse.json({ data: reports });
 }
 
-// ── POST: 위험요소 등록 (사진 + 설명) ──
+// ── POST: 등록 (사진 + 설명 + category) ──
 export async function POST(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json(
-      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다', detail: 'SUPABASE_URL 또는 키가 설정되지 않았습니다' },
+      { code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다' },
       { status: 500 },
     );
   }
 
-  // service_role 키 사용 여부 확인 (anon 키면 Storage/RLS 문제 가능)
   const hasServiceKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY ?? '').trim();
   if (!hasServiceKey) {
-    console.warn('[hazard] SUPABASE_SERVICE_ROLE_KEY 미설정 — anon 키 폴백, RLS 제한 가능');
+    console.warn('[safety] SUPABASE_SERVICE_ROLE_KEY 미설정 — anon 키 폴백');
   }
 
   let formData: FormData;
@@ -82,6 +117,7 @@ export async function POST(req: NextRequest) {
   const location = ((formData.get('location') as string | null) ?? '').trim();
   const name = (formData.get('name') as string | null)?.trim();
   const sabun = (formData.get('sabun') as string | null)?.trim();
+  const category = parseCategory(formData.get('category') as string | null);
 
   if (!photo || !description || !name || !sabun) {
     return NextResponse.json(
@@ -107,7 +143,7 @@ export async function POST(req: NextRequest) {
 
   // Storage 업로드
   const ext = photo.type.includes('png') ? 'png' : 'jpg';
-  const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const fileName = `${category}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
   const buffer = Buffer.from(await photo.arrayBuffer());
 
   const { error: uploadError } = await serverSupabase.storage
@@ -116,7 +152,7 @@ export async function POST(req: NextRequest) {
 
   if (uploadError) {
     return NextResponse.json(
-      { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: `${uploadError.message} (bucket: hazard-photos, key: ${hasServiceKey ? 'service_role' : 'anon'})` },
+      { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: uploadError.message },
       { status: 500 },
     );
   }
@@ -125,16 +161,41 @@ export async function POST(req: NextRequest) {
     .from('hazard-photos')
     .getPublicUrl(fileName);
 
-  // DB 삽입
+  // DB 삽입 (category 포함)
+  const insertData: Record<string, string> = {
+    photo_url: publicUrl,
+    description,
+    location,
+    created_by: verified.n,
+    category,
+  };
+
   const { data, error: dbError } = await serverSupabase
     .from('hazard_reports')
-    .insert({ photo_url: publicUrl, description, location, created_by: verified.n })
+    .insert(insertData)
     .select('id')
     .single();
 
   if (dbError) {
+    // category 컬럼 없으면 category 빼고 재시도
+    if (dbError.message?.includes('category')) {
+      const { category: _, ...withoutCategory } = insertData;
+      const { data: d2, error: e2 } = await serverSupabase
+        .from('hazard_reports')
+        .insert(withoutCategory)
+        .select('id')
+        .single();
+      if (e2) {
+        return NextResponse.json(
+          { code: 'INSERT_FAILED', message: '등록에 실패했습니다', detail: e2.message },
+          { status: 500 },
+        );
+      }
+      return NextResponse.json({ id: d2.id });
+    }
+
     return NextResponse.json(
-      { code: 'INSERT_FAILED', message: '등록에 실패했습니다', detail: `${dbError.message} (table: hazard_reports, key: ${hasServiceKey ? 'service_role' : 'anon'})` },
+      { code: 'INSERT_FAILED', message: '등록에 실패했습니다', detail: dbError.message },
       { status: 500 },
     );
   }

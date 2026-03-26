@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+export type SafetyCategory = 'hazard' | 'action' | 'inspect';
+
 export interface HazardReport {
   id: string;
   photoUrl: string;
@@ -7,6 +9,7 @@ export interface HazardReport {
   location: string;
   createdBy: string;
   createdAt: string;
+  category?: SafetyCategory;
   commentCount: number;
   likeCount: number;
   likedByMe: boolean;
@@ -25,13 +28,14 @@ interface HazardState {
   comments: Record<string, HazardComment[]>;
   loadingReports: boolean;
   loadingComments: boolean;
-  fetchReports: (currentSabun?: string) => Promise<void>;
+  fetchReports: (currentSabun?: string, category?: SafetyCategory) => Promise<void>;
   createReport: (params: {
     photo: File;
     description: string;
     location: string;
     name: string;
     sabun: string;
+    category?: SafetyCategory;
   }) => Promise<void>;
   fetchComments: (reportId: string) => Promise<void>;
   addComment: (reportId: string, comment: string, name: string, sabun: string) => Promise<void>;
@@ -48,12 +52,14 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
   loadingReports: false,
   loadingComments: false,
 
-  fetchReports: async (currentSabun?: string) => {
+  fetchReports: async (currentSabun?: string, category?: SafetyCategory) => {
     set({ loadingReports: true });
     try {
-      const url = currentSabun
-        ? `/api/safety/hazards?sabun=${encodeURIComponent(currentSabun)}`
-        : '/api/safety/hazards';
+      const params = new URLSearchParams();
+      if (currentSabun) params.set('sabun', currentSabun);
+      if (category) params.set('category', category);
+      const qs = params.toString();
+      const url = `/api/safety/hazards${qs ? `?${qs}` : ''}`;
       const res = await fetch(url);
       if (!res.ok) {
         set({ loadingReports: false });
@@ -62,18 +68,19 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       const json = await res.json() as { data: HazardReport[] };
       set({ reports: json.data ?? [] });
     } catch {
-      // 네트워크 에러 등
+      // 네트워크 에러
     }
     set({ loadingReports: false });
   },
 
-  createReport: async ({ photo, description, location, name, sabun }) => {
+  createReport: async ({ photo, description, location, name, sabun, category }) => {
     const formData = new FormData();
     formData.append('photo', photo);
     formData.append('description', description);
     formData.append('location', location);
     formData.append('name', name);
     formData.append('sabun', sabun);
+    if (category) formData.append('category', category);
 
     const res = await fetch('/api/safety/hazards', { method: 'POST', body: formData });
     if (!res.ok) {
@@ -81,7 +88,7 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       const e = err as { message?: string; detail?: string; code?: string };
       throw new Error(`${e.message || '등록에 실패했습니다'}${e.detail ? ` (${e.detail})` : ''}${e.code ? ` [${e.code}]` : ''}`);
     }
-    await get().fetchReports();
+    await get().fetchReports(undefined, category);
   },
 
   fetchComments: async (reportId: string) => {

@@ -148,8 +148,8 @@ export async function DELETE(
   // 1) 댓글 삭제
   await serverSupabase.from('hazard_comments').delete().eq('report_id', reportId);
 
-  // 2) 좋아요 삭제
-  await serverSupabase.from('hazard_likes').delete().eq('report_id', reportId);
+  // 2) 좋아요 삭제 (테이블 없으면 무시)
+  try { await serverSupabase.from('hazard_likes').delete().eq('report_id', reportId); } catch { /* ignore */ }
 
   // 3) Storage 사진 삭제
   if (report.photo_url) {

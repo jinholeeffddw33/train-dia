@@ -22,58 +22,23 @@ export async function GET(req: NextRequest) {
   const sabun = req.nextUrl.searchParams.get('sabun') ?? '';
   const category = parseCategory(req.nextUrl.searchParams.get('category'));
 
-  let query = serverSupabase
+  const { data, error } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
+    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count)')
+    .eq('category', category)
     .order('created_at', { ascending: false });
 
-  // category 컬럼이 있으면 필터, 없으면 전체 (하위 호환)
-  query = query.eq('category', category);
-
-  const { data, error } = await query;
-
   if (error) {
-    // category 컬럼이 없는 경우 — 컬럼 없이 재시도
-    if (error.message?.includes('category')) {
-      const { data: fallback, error: fallbackErr } = await serverSupabase
-        .from('hazard_reports')
-        .select('id, photo_url, description, location, created_by, created_at, hazard_comments(count), hazard_likes(count)')
-        .order('created_at', { ascending: false });
-
-      if (fallbackErr) {
-        return NextResponse.json(
-          { code: 'FETCH_FAILED', message: '목록 조회에 실패했습니다', detail: fallbackErr.message },
-          { status: 500 },
-        );
-      }
-
-      // category 컬럼 없으면 hazard만 해당
-      const reports = category === 'hazard' ? (fallback ?? []) : [];
-      return NextResponse.json({ data: mapReports(reports, new Set()) });
-    }
-
     return NextResponse.json(
       { code: 'FETCH_FAILED', message: '목록 조회에 실패했습니다', detail: error.message },
       { status: 500 },
     );
   }
 
-  // 좋아요 여부 조회
-  let likedIds = new Set<string>();
-  if (sabun) {
-    const { data: likes } = await serverSupabase
-      .from('hazard_likes')
-      .select('report_id')
-      .eq('user_sabun', sabun);
-    if (likes) {
-      likedIds = new Set(likes.map((l: { report_id: string }) => l.report_id));
-    }
-  }
-
-  return NextResponse.json({ data: mapReports(data ?? [], likedIds) });
+  return NextResponse.json({ data: mapReports(data ?? []) });
 }
 
-function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
+function mapReports(data: Record<string, unknown>[]) {
   return data.map((r) => ({
     id: r.id,
     photoUrl: r.photo_url,
@@ -83,8 +48,8 @@ function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
     createdAt: r.created_at,
     category: r.category || 'hazard',
     commentCount: (r.hazard_comments as { count: number }[])?.[0]?.count ?? 0,
-    likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
-    likedByMe: likedIds.has(r.id as string),
+    likeCount: 0,
+    likedByMe: false,
   }));
 }
 

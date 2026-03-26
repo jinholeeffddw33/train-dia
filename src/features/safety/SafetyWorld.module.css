@@ -11,19 +11,21 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* ── 서브 화면 헤더 (장애/위험 리스트) ── */
 .header {
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
-  padding: var(--dia-space-4);
-  padding-top: calc(var(--dia-space-4) + env(safe-area-inset-top, 0px));
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--dia-border);
   flex-shrink: 0;
 }
 
 .backBtn {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
@@ -31,18 +33,33 @@
   align-items: center;
   justify-content: center;
   color: var(--dia-text-secondary);
-  flex-shrink: 0;
-  transition: background var(--dia-transition-fast);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.backBtn:hover { background: var(--dia-surface-hover); }
 .backBtn:active { transform: scale(0.95); }
 
-.title {
+.headerTitle {
+  flex: 1;
   font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
 }
+
+.addBtn {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-amber);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  border: 1px solid var(--dia-amber);
+  border-radius: var(--dia-radius-full);
+  min-height: 36px;
+  min-width: 44px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.addBtn:active { background: var(--dia-amber-dim); }
 
 .content {
   flex: 1;
@@ -50,47 +67,207 @@
   padding-bottom: var(--dia-space-6);
 }
 
-/* ── Section ── */
-.section {
-  padding-top: var(--dia-space-4);
+/* ── 히어로 배너 ── */
+.heroBanner {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 24px 0;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(245, 158, 11, 0.12), transparent 40%),
+    linear-gradient(to bottom, var(--dia-bg), var(--dia-bg));
 }
 
-.sectionHeader {
+:root.light .heroBanner {
+  background:
+    radial-gradient(circle at top, rgba(245, 158, 11, 0.06), transparent 40%),
+    linear-gradient(to bottom, var(--dia-bg), var(--dia-bg));
+}
+
+.heroHaze {
+  position: absolute;
+  left: 0;
+  top: 100px;
+  height: 150px;
+  width: 100%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08), rgba(239, 68, 68, 0.03), transparent);
+}
+
+:root.light .heroHaze {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.06), rgba(239, 68, 68, 0.02), transparent);
+}
+
+.heroFade {
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--dia-bg));
+  margin-top: -8px;
+}
+
+.heroBackBtn {
+  position: absolute;
+  top: var(--dia-space-3);
+  left: var(--dia-space-3);
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--dia-space-4) var(--dia-space-3);
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 10;
 }
 
-.sectionTitle {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
+:root.light .heroBackBtn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #475569;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.heroBackBtn:active { transform: scale(0.95); }
+
+.heroTitle {
+  position: relative;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
   color: var(--dia-text-primary);
 }
 
-.sectionAddBtn {
-  font-size: var(--dia-text-sm);
+.heroSub {
+  position: relative;
+  font-size: 12px;
   font-weight: var(--dia-weight-semibold);
+  letter-spacing: 0.3em;
+  margin-top: 12px;
   color: var(--dia-amber);
-  padding: var(--dia-space-1) var(--dia-space-3);
-  border: 1px solid var(--dia-amber);
-  border-radius: var(--dia-radius-full);
-  min-height: 32px;
-  transition: background var(--dia-transition-fast);
 }
 
-.sectionAddBtn:active {
-  background: var(--dia-amber-dim);
+.heroDesc {
+  position: relative;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 12px;
+  color: var(--dia-text-secondary);
 }
 
-.sectionDivider {
-  height: 8px;
-  background: var(--dia-bg);
-  border-top: 1px solid var(--dia-border);
-  border-bottom: 1px solid var(--dia-border);
-  margin: var(--dia-space-2) 0;
+/* ── 히어로 비주얼 ── */
+.heroVisual {
+  position: relative;
+  margin-top: 24px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.heroLineSvg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  display: block;
+}
+
+.heroBigBadge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.heroBigIcon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f59e0b, #ef4444);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.25);
+  outline: 4px solid rgba(245, 158, 11, 0.15);
+}
+
+:root.light .heroBigIcon {
+  outline-color: #fff;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.18);
+}
+
+/* ── 메뉴 콘텐츠 ── */
+.menuContent {
+  padding: var(--dia-space-4);
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--dia-space-3) var(--dia-space-2);
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 44px;
+}
+
+.menuItem:active .menuIcon {
+  transform: scale(0.92);
+}
+
+.menuItemDisabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.menuItemDisabled .menuIcon {
+  transform: none !important;
+}
+
+.menuIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--dia-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--dia-transition-fast);
+}
+
+.menuLabel {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 아이콘 배경 */
+.iconBgAmber { background: rgba(245, 158, 11, 0.12); }
+.iconBgRed   { background: rgba(239, 68, 68, 0.10); }
+.iconBgBlue  { background: rgba(59, 130, 246, 0.12); }
+.iconBgGreen { background: rgba(34, 197, 94, 0.12); }
+
+/* 아이콘 색상 */
+.iconAmber { color: var(--dia-amber); }
+.iconRed   { color: var(--dia-red); }
+.iconBlue  { color: var(--dia-blue); }
+.iconGreen { color: var(--dia-green); }
+
+/* ── 에러 상태 ── */
 .errorState {
   display: flex;
   flex-direction: column;

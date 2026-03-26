@@ -135,35 +135,14 @@
 
 .heroBackBtn:active { transform: scale(0.95); }
 
-/* 배지 */
-.heroBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  font-size: 12px;
-  font-weight: var(--dia-weight-bold);
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  border-radius: var(--dia-radius-full);
-  padding: 4px 16px;
-  letter-spacing: 0.18em;
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25);
-}
-
 /* 타이틀 */
 .heroTitle {
   position: relative;
   font-size: 28px;
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.15;
   letter-spacing: -0.03em;
-  margin-top: 16px;
-  color: #e2e8f0;
-}
-
-:root.light .heroTitle {
-  color: #1f2a44;
+  color: var(--dia-text-primary);
 }
 
 /* 서브타이틀 */
@@ -171,88 +150,33 @@
   position: relative;
   font-size: 12px;
   font-weight: var(--dia-weight-semibold);
-  letter-spacing: 0.35em;
-  margin-top: 16px;
+  letter-spacing: 0.3em;
+  margin-top: 12px;
   color: #a78bfa;
 }
 
 :root.light .heroSub {
-  color: #8b5cf6;
+  color: #7c3aed;
 }
 
 /* 설명 */
 .heroDesc {
   position: relative;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
-  margin-top: 16px;
-  color: rgba(255, 255, 255, 0.55);
+  margin-top: 12px;
+  color: var(--dia-text-secondary);
 }
 
-:root.light .heroDesc {
-  color: #5d6476;
-}
-
-/* ── 히어로 비주얼 (열차 + 노선) ── */
+/* ── 히어로 비주얼 (노선 곡선 + 5번 배지) ── */
 .heroVisual {
   position: relative;
-  margin-top: 40px;
-  min-height: 180px;
-}
-
-/* 스카이라인 */
-.heroSkyline {
-  position: absolute;
-  left: 0;
-  top: 8px;
+  margin-top: 24px;
+  min-height: 120px;
   display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  opacity: 0.3;
+  align-items: center;
+  justify-content: center;
 }
-
-:root.light .heroSkyline { opacity: 0.45; }
-
-.skyBar1 { height: 64px; width: 3px;  border-radius: 99px; background: #c4b5fd; }
-.skyBar2 { height: 36px; width: 16px; border-radius: 6px 6px 0 0; background: #d8ccff; }
-.skyBar3 { height: 48px; width: 20px; border-radius: 6px 6px 0 0; background: #d8ccff; }
-.skyBar4 { height: 80px; width: 6px;  border-radius: 99px; background: #b9a7ff; }
-.skyBar5 { height: 40px; width: 24px; border-radius: 8px 8px 0 0; background: #ddd4ff; }
-.skyBar6 { height: 56px; width: 16px; border-radius: 8px 8px 0 0; background: #d8ccff; }
-
-:root .skyBar1, :root .skyBar2, :root .skyBar3,
-:root .skyBar4, :root .skyBar5, :root .skyBar6 {
-  filter: brightness(0.4);
-}
-:root.light .skyBar1, :root.light .skyBar2, :root.light .skyBar3,
-:root.light .skyBar4, :root.light .skyBar5, :root.light .skyBar6 {
-  filter: none;
-}
-
-/* 다리 장식 */
-.heroBridge {
-  position: absolute;
-  right: 8px;
-  top: 48px;
-  height: 2px;
-  width: 112px;
-  opacity: 0.5;
-  background: #cfc7f9;
-}
-
-:root .heroBridge { filter: brightness(0.5); }
-:root.light .heroBridge { filter: none; opacity: 0.7; }
-
-.bridgePillar {
-  position: absolute;
-  top: 0;
-  width: 2px;
-  height: 20px;
-  background: #d8d2f8;
-}
-
-:root .bridgePillar { filter: brightness(0.5); }
-:root.light .bridgePillar { filter: none; }
 
 /* 노선 SVG */
 .heroLineSvg {
@@ -262,141 +186,11 @@
   display: block;
 }
 
-/* 열차 */
-.heroTrain {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 245px;
-  transform: translate(-50%, -44%) rotate(-2deg);
-}
-
-.trainBody {
-  position: relative;
-  height: 72px;
-  width: 245px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #ffffff, #edf2ff);
-  box-shadow: 0 20px 40px rgba(132, 94, 247, 0.18);
-  border: 1px solid #ece8ff;
-}
-
-:root .trainBody {
-  background: linear-gradient(180deg, #2a2545, #1e1a38);
-  border-color: rgba(139, 92, 246, 0.2);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-.trainNose {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 72px;
-  width: 70px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, #fbfdff, #dfe7f6);
-  border: 1px solid #e6eaf7;
-}
-
-:root .trainNose {
-  background: linear-gradient(180deg, #302a50, #252040);
-  border-color: rgba(139, 92, 246, 0.15);
-}
-
-.trainWindow {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  height: 24px;
-  width: 38px;
-  border-radius: 12px 12px 10px 10px;
-  background: linear-gradient(180deg, #15284d, #0f1834);
-}
-
-:root .trainWindow {
-  background: linear-gradient(180deg, #0a1628, #060e1e);
-  box-shadow: inset 0 0 4px rgba(59, 130, 246, 0.15);
-}
-
-.trainLight {
-  position: absolute;
-  top: 36px;
-  height: 10px;
-  width: 12px;
-  border-radius: 50%;
-  background: #ffd7a1;
-}
-
-.trainLight:nth-child(4) { left: 8px; }
-.trainLight:nth-child(5) { left: 46px; }
-
-.trainBumper {
-  position: absolute;
-  left: 14px;
-  top: 56px;
-  height: 9px;
-  width: 24px;
-  border-radius: 2px;
-  background: #2d3550;
-}
-
-.trainStripe {
-  position: absolute;
-  left: 60px;
-  top: 24px;
-  height: 6px;
-  width: 170px;
-  background: linear-gradient(90deg, #c084fc, #8b5cf6, #ddd6fe);
-}
-
-:root .trainStripe {
-  background: linear-gradient(90deg, #9f67f8, #7c3aed, #6340c7);
-}
-
-.trainWindows {
-  position: absolute;
-  left: 78px;
-  top: 16px;
-  display: flex;
-  gap: 8px;
-}
-
-.trainWin {
-  height: 20px;
-  width: 18px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #1b2850, #233563);
-  opacity: 0.95;
-}
-
-:root .trainWin {
-  background: linear-gradient(180deg, #0c1a34, #0f1f3e);
-  box-shadow: inset 0 0 3px rgba(56, 189, 248, 0.1);
-}
-
-/* 역 점 (열차 비주얼 위) */
-.heroStationDot {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-:root .heroStationDot {
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.heroStationDot1 { left: 26%; top: 70%; background: #a855f7; }
-.heroStationDot2 { left: 65%; top: 56%; background: #8b5cf6; }
-.heroStationDot3 { left: 81%; top: 60%; background: #c4b5fd; }
-
 /* 5번 배지 (큰) */
 .heroBigBadge {
   position: absolute;
   left: 50%;
-  top: 68%;
+  top: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -404,35 +198,32 @@
 }
 
 .heroBigNum {
-  width: 80px;
-  height: 80px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background: linear-gradient(180deg, #9d62f7, #7c3aed);
   color: #fff;
-  font-size: 42px;
+  font-size: 36px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 16px 34px rgba(124, 58, 237, 0.26);
-  outline: 5px solid #fff;
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.3);
+  outline: 4px solid rgba(124, 58, 237, 0.15);
 }
 
-:root .heroBigNum {
-  outline-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 16px 34px rgba(124, 58, 237, 0.5);
+:root.light .heroBigNum {
+  outline-color: #fff;
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.2);
 }
 
 .heroBigLabel {
-  margin-top: 8px;
-  font-size: 15px;
+  margin-top: 6px;
+  font-size: 13px;
   font-weight: var(--dia-weight-semibold);
-  color: #7c3aed;
-}
-
-:root .heroBigLabel {
   color: #a78bfa;
 }
+
 :root.light .heroBigLabel {
   color: #7c3aed;
 }

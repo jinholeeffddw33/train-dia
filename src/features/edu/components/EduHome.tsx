@@ -126,50 +126,31 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
         </button>
         <div className={styles.heroHaze} />
 
-        <div className={styles.heroBadge}>LINE 5</div>
-        <h1 className={styles.heroTitle}>Smart Crew Assistant</h1>
+        <h1 className={styles.heroTitle}>Smart Crew<br />Assistant</h1>
         <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
         <p className={styles.heroDesc}>5호선 승무원을 위한 실무 교육 시스템</p>
 
-        {/* 열차 비주얼 */}
+        {/* 5번 심볼 + 노선 곡선 */}
         <div className={styles.heroVisual}>
-          {/* 스카이라인 */}
-          <div className={styles.heroSkyline}>
-            <div className={styles.skyBar1} />
-            <div className={styles.skyBar2} />
-            <div className={styles.skyBar3} />
-            <div className={styles.skyBar4} />
-            <div className={styles.skyBar5} />
-            <div className={styles.skyBar6} />
-          </div>
-
-          {/* 다리 */}
-          <div className={styles.heroBridge}>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className={styles.bridgePillar} style={{ left: `${i * 33}%` }} />
-            ))}
-          </div>
-
-          {/* 노선 곡선 SVG */}
-          <svg viewBox="0 0 380 140" className={styles.heroLineSvg} fill="none">
+          <svg viewBox="0 0 380 100" className={styles.heroLineSvg} fill="none">
             <path
-              d="M-10 88C48 94 84 103 130 102C177 100 216 72 263 73C307 74 346 92 392 86"
+              d="M-10 50C60 58 120 65 190 50C260 35 320 55 392 48"
               stroke="url(#heroLineGlow)"
-              strokeWidth="18"
+              strokeWidth="16"
               strokeLinecap="round"
-              opacity="0.18"
+              opacity="0.12"
             />
             <path
-              d="M-10 88C48 94 84 103 130 102C177 100 216 72 263 73C307 74 346 92 392 86"
+              d="M-10 50C60 58 120 65 190 50C260 35 320 55 392 48"
               stroke="url(#heroLineMain)"
-              strokeWidth="8"
+              strokeWidth="5"
               strokeLinecap="round"
             />
             <defs>
               <linearGradient id="heroLineMain" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#a855f7" />
-                <stop offset="0.45" stopColor="#7c3aed" />
-                <stop offset="1" stopColor="#d8b4fe" />
+                <stop offset="0.5" stopColor="#7c3aed" />
+                <stop offset="1" stopColor="#c4b5fd" />
               </linearGradient>
               <linearGradient id="heroLineGlow" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#c084fc" />
@@ -178,36 +159,12 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
             </defs>
           </svg>
 
-          {/* 열차 */}
-          <div className={styles.heroTrain}>
-            <div className={styles.trainBody}>
-              <div className={styles.trainNose} />
-              <div className={styles.trainWindow} />
-              <div className={styles.trainLight} />
-              <div className={styles.trainLight} />
-              <div className={styles.trainBumper} />
-              <div className={styles.trainStripe} />
-              <div className={styles.trainWindows}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className={styles.trainWin} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* 역 점 */}
-          <div className={`${styles.heroStationDot} ${styles.heroStationDot1}`} />
-          <div className={`${styles.heroStationDot} ${styles.heroStationDot2}`} />
-          <div className={`${styles.heroStationDot} ${styles.heroStationDot3}`} />
-
-          {/* 5번 배지 */}
           <div className={styles.heroBigBadge}>
             <div className={styles.heroBigNum}>5</div>
             <span className={styles.heroBigLabel}>Line 5</span>
           </div>
         </div>
 
-        {/* 하단 페이드 — 배경색과 자연스럽게 연결 */}
         <div className={styles.heroFade} />
       </div>
 
@@ -280,27 +237,19 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </button>
         )}
 
-        {/* 최근 본 섹션 */}
+        {/* 최근 본 섹션 — 1건만 표시 */}
         {recentList.length > 0 && (
-          <>
-            <div className={styles.sectionDivider}>최근 본 항목</div>
-            <div className={styles.recentList}>
-              {recentList.map(secId => (
-                <button
-                  key={secId}
-                  type="button"
-                  className={styles.recentItem}
-                  onClick={() => onSection(secId)}
-                >
-                  <Clock size={14} className={styles.recentIcon} />
-                  <span className={styles.recentTitle}>
-                    {sectionNames[secId] ?? secId}
-                  </span>
-                  <ChevronRight size={14} className={styles.resumeArrow} />
-                </button>
-              ))}
-            </div>
-          </>
+          <button
+            type="button"
+            className={styles.recentItem}
+            onClick={() => onSection(recentList[0])}
+          >
+            <Clock size={14} className={styles.recentIcon} />
+            <span className={styles.recentTitle}>
+              {sectionNames[recentList[0]] ?? recentList[0]}
+            </span>
+            <ChevronRight size={14} className={styles.resumeArrow} />
+          </button>
         )}
 
         {/* 학습 현황 미니 요약 */}

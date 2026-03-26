@@ -207,61 +207,8 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </div>
         </div>
 
-        {/* 메시지 */}
-        <p className={styles.heroMessage}>
-          현장에서 필요한 모든 정보를<br />
-          한 화면에서 <span className={styles.heroAccent}>빠르고 쉽게</span>
-        </p>
-
-        {/* 하단 노선도 */}
-        <div className={styles.heroBottom}>
-          <div className={styles.heroBottomGlow} />
-          <svg viewBox="0 0 380 60" className={styles.heroWaveSvg} fill="none">
-            <path
-              d="M0 30C45 18 87 14 126 18C166 22 205 37 252 35C300 33 335 20 380 13V60H0V30Z"
-              fill="url(#heroBottomWave)"
-              opacity="0.6"
-            />
-            <path
-              d="M0 39C41 29 83 25 129 28C171 31 214 43 259 41C307 39 343 29 380 22"
-              stroke="#c4b5fd"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            <defs>
-              <linearGradient id="heroBottomWave" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#f3e8ff" />
-                <stop offset="1" stopColor="#ede9fe" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          <div className={styles.heroStations}>
-            {[
-              { ko: '방화', en: 'Banghwa' },
-              { ko: '여의도', en: 'Yeouido' },
-              { ko: '광화문', en: 'Gwanghwamun' },
-              { ko: '왕십리', en: 'Wangsimni' },
-              { ko: '마천', en: 'Macheon' },
-            ].map((st, i) => (
-              <div key={st.ko} className={styles.heroSt}>
-                <div className={i === 0 ? styles.heroStDotFirst : styles.heroStDot}>
-                  {i === 0 && '5'}
-                </div>
-                <span className={styles.heroStKo}>{st.ko}</span>
-                <span className={styles.heroStEn}>{st.en}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.heroLogo}>
-            <div className={styles.heroLogoCircle}>S</div>
-            <div className={styles.heroLogoText}>
-              <div className={styles.heroLogoKo}>서울교통공사</div>
-              <div className={styles.heroLogoEn}>Seoul Metro</div>
-            </div>
-          </div>
-        </div>
+        {/* 하단 페이드 — 배경색과 자연스럽게 연결 */}
+        <div className={styles.heroFade} />
       </div>
 
       <div className={styles.homeContent}>

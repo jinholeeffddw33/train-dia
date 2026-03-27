@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
+import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import styles from './WorldHub.module.css';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
@@ -83,6 +84,8 @@ function LottieIcon({ src, className, width = 62, height }: { src: string; class
 export default function WorldHub({ onEnter }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
+  const { getUnread, alertUnread } = useSafetyUnread();
+  const safetyTotal = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>, worldId: WorldId) => {
     const btn = e.currentTarget;
@@ -134,6 +137,9 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             onClick={(e) => handleClick(e, bottomWorld.id)}
             aria-label={bottomWorld.label}
           >
+            {safetyTotal > 0 && (
+              <span className={styles.worldBadge}>{safetyTotal > 99 ? '99+' : safetyTotal}</span>
+            )}
             <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} width={bottomWorld.lottieW} height={bottomWorld.lottieH} />
             <span className={styles.cardTitle}>{bottomWorld.label}</span>
             <span className={styles.cardDesc}>{bottomWorld.desc}</span>

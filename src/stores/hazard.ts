@@ -53,7 +53,7 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
   loadingComments: false,
 
   fetchReports: async (currentSabun?: string, category?: SafetyCategory) => {
-    set({ loadingReports: true });
+    set({ loadingReports: true, reports: [] });
     try {
       const params = new URLSearchParams();
       if (currentSabun) params.set('sabun', currentSabun);

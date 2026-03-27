@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count)')
+    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
 
@@ -35,10 +35,22 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ data: mapReports(data ?? []) });
+  // 좋아요 여부 조회
+  let likedIds = new Set<string>();
+  if (sabun) {
+    const { data: likes } = await serverSupabase
+      .from('hazard_likes')
+      .select('report_id')
+      .eq('user_sabun', sabun);
+    if (likes) {
+      likedIds = new Set(likes.map((l: { report_id: string }) => l.report_id));
+    }
+  }
+
+  return NextResponse.json({ data: mapReports(data ?? [], likedIds) });
 }
 
-function mapReports(data: Record<string, unknown>[]) {
+function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
   return data.map((r) => ({
     id: r.id,
     photoUrl: r.photo_url,
@@ -48,8 +60,8 @@ function mapReports(data: Record<string, unknown>[]) {
     createdAt: r.created_at,
     category: r.category || 'hazard',
     commentCount: (r.hazard_comments as { count: number }[])?.[0]?.count ?? 0,
-    likeCount: 0,
-    likedByMe: false,
+    likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
+    likedByMe: likedIds.has(r.id as string),
   }));
 }
 

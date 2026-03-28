@@ -2054,14 +2054,6 @@
                 {
                   "src": "/images/edu/abb/img_042.jpg",
                   "caption": "출입문 대표 COCK 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_043.jpg",
-                  "caption": "출입문/안전문 표시등 확인 (5106호)"
-                },
-                {
-                  "src": "/images/edu/abb/img_044.jpg",
-                  "caption": "ALL DOOR BY PASS — 도어엔진 구동장치"
                 }
               ]
             }
@@ -2142,12 +2134,16 @@
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_045.jpg",
-                  "caption": "닫힘계전기 확인 및 교환"
+                  "src": "/images/edu/abb/img_043.jpg",
+                  "caption": "전량 출입문 닫힘 표시등 점등 상태 확인"
                 },
                 {
-                  "src": "/images/edu/abb/img_046.jpg",
-                  "caption": "출입문 도어엔진 동작상태 확인 (5153호)"
+                  "src": "/images/edu/abb/img_044.jpg",
+                  "caption": "5106호 L1위 출입문 도어엔진 동작상태 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_045.jpg",
+                  "caption": "전차량 닫힘 계전기교환"
                 }
               ]
             }

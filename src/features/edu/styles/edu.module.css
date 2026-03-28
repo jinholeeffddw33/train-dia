@@ -875,6 +875,34 @@
   line-height: var(--dia-leading-normal);
 }
 
+/* images */
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--dia-space-3);
+  margin: var(--dia-space-3) 0;
+}
+
+.imageFigure {
+  margin: 0;
+  text-align: center;
+}
+
+.imageBlock {
+  width: 100%;
+  height: auto;
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface);
+}
+
+.imageCaption {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-1);
+  line-height: var(--dia-leading-normal);
+}
+
 /* nav buttons */
 .sectionNav {
   display: flex;

@@ -131,6 +131,17 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
             return <CompareBlock key={i} items={block.items} />;
           case 'list':
             return <ListBlock key={i} items={block.items} />;
+          case 'images':
+            return (
+              <div key={i} className={styles.imageGrid}>
+                {block.items.map((img: { src: string; caption?: string }, j: number) => (
+                  <figure key={j} className={styles.imageFigure}>
+                    <img src={img.src} alt={img.caption || ''} className={styles.imageBlock} loading="lazy" />
+                    {img.caption && <figcaption className={styles.imageCaption}>{img.caption}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            );
           default:
             return null;
         }

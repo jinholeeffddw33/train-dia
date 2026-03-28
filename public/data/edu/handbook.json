@@ -1425,20 +1425,24 @@
               "type": "images",
               "items": [
                 {
+                  "src": "/images/edu/abb/img_005.jpg",
+                  "caption": "주공기압력계"
+                },
+                {
+                  "src": "/images/edu/abb/img_006.jpg",
+                  "caption": "CMCN, CMGN"
+                },
+                {
                   "src": "/images/edu/abb/img_007.jpg",
-                  "caption": "CMCN, CMGN 회로차단기 확인"
+                  "caption": "EBCOS"
                 },
                 {
                   "src": "/images/edu/abb/img_008.jpg",
-                  "caption": "CM(공기압축기) 장치 확인"
+                  "caption": "해당량 객실하부 공기누기"
                 },
                 {
                   "src": "/images/edu/abb/img_009.jpg",
-                  "caption": "EBCOS 취급"
-                },
-                {
-                  "src": "/images/edu/abb/img_010.jpg",
-                  "caption": "TCMS 모니터 확인"
+                  "caption": "EBCOS"
                 }
               ]
             }

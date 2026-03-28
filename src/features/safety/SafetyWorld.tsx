@@ -57,10 +57,10 @@ class SafetyErrorBoundary extends Component<
 }
 
 const MENU_ITEMS = [
-  { id: 'alert',   label: '장애',   icon: AlertTriangle,  color: 'amber' as const, ready: true },
-  { id: 'hazard',  label: '위험',   icon: ShieldAlert,    color: 'red'   as const, ready: true },
-  { id: 'action',  label: '조치',   icon: Wrench,         color: 'blue'  as const, ready: true },
-  { id: 'inspect', label: '점검',   icon: ClipboardCheck, color: 'green' as const, ready: true },
+  { id: 'alert',   label: '장애신고',   icon: AlertTriangle,  color: 'amber' as const, ready: true },
+  { id: 'hazard',  label: '위험개소',   icon: ShieldAlert,    color: 'red'   as const, ready: true },
+  { id: 'action',  label: '조치내용',   icon: Wrench,         color: 'blue'  as const, ready: true },
+  { id: 'inspect', label: '알림마당',   icon: ClipboardCheck, color: 'green' as const, ready: true },
 ] as const;
 
 const ICON_COLOR = {

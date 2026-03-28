@@ -1,23 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run build:*)",
-      "Bash(npm run dev:*)",
-      "Bash(npm run test:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run typecheck:*)",
-      "Bash(cd /c/Users/smrt2/train-dia*)",
-      "Bash(ls *)",
-      "Bash(cat *)",
-      "Bash(mkdir *)",
-      "Bash(mv *)",
-      "Bash(find *)",
-      "Bash(git *)",
+      "Bash(*)",
       "Read",
       "Write",
       "Edit",
       "Glob",
-      "Grep"
+      "Grep",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Agent(*)"
     ]
   }
 }

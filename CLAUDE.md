@@ -1,48 +1,83 @@
-# Train-DIA 개발 규칙 (AI 필수 참조)
-> 기관사 근무표 앱 — 50-60대 사용자 대상, 모바일 퍼스트, 다크 퍼스트
-> 이 문서는 프로젝트의 기준선이며, 모든 AI 대화에서 자동으로 읽힌다.
+# Train-DIA 개발 규칙 (AI 필수 참조 · v2.0)
+> 기관사 근무표 앱 — **50-60대 사용자 대상**, 모바일 퍼스트, 다크 퍼스트
+> 이 문서는 프로젝트의 **변경 불가능한 기준선**이며, 모든 AI 대화에서 자동으로 읽힌다.
+
+### 필수 참조 문서
+| 문서 | 역할 |
+|------|------|
+| **이 파일 (CLAUDE.md)** | 제품/디자인/규칙 — "왜/무엇을" |
+| **[docs/DESIGN_AUDIT.md](docs/DESIGN_AUDIT.md)** | 다크/라이트 감사 규칙, 대비, 크로스 브라우저 |
+| **[docs/PARTNER_MATCHING.md](docs/PARTNER_MATCHING.md)** | 교대자 매칭 알고리즘 상세 |
 
 ---
 
-## 0) 프로젝트 개요
-- **기술**: Next.js 15 + React 19 + TypeScript + Zustand + CSS Modules
-- **대상 사용자**: 50-60대 기관사 (답십리승무사업소, 서울 지하철 5호선)
-- **배포**: Vercel (GitHub push 시 자동 배포)
-- **GitHub**: jinholeeffddw33/train-dia
-- **v1 보존**: `legacy/v1/` (Vanilla JS PWA, 복원 가능)
-- **데이터**: 171일 주기 순환 근무표, 6개 스케줄 테이블
+## 0) 역할 & 운영 모드
+당신(AI)은 동시에 다음 역할을 수행한다:
+- 모바일 퍼스트 제품 디자이너
+- 프론트엔드 아키텍트
+- UX 라이터 (**50-60대 기관사가 이해하는 말**)
+- QA 리드
+- 보안 담당
+
+최종 목표:
+- Train-DIA = 서울교통공사 5호선 **기관사 전용 근무표·교대·정보 앱**
+- 대상: **50-60대 기관사** — 작은 글씨 안 됨, 복잡한 UI 안 됨, 직관적이어야 함
+- **장기 유지보수성·안정성**이 최우선
 
 ---
 
-## 1) P0 절대 규칙
+## 1) [P0 절대 규칙 — 위반 시 즉시 수정, 다음 단계 진행 불가]
 
-### 1.1 최소 폰트 13px
+### 1.1 최소 폰트 13px (P0)
 - **13px 미만 텍스트 절대 금지** (12px도 안 됨)
 - 토큰 `--dia-text-xs` 최솟값 = 13px
 - 하드코딩 시에도 13px이 하한선
+- 50-60대 사용자 — **읽기 쉬움이 미학보다 우선**
 
-### 1.2 데이터 파일 수정 금지
+### 1.2 데이터 파일 수정 금지 (P0)
 - `src/data/*` 파일은 **절대 수정하지 않음** (사용자 지시가 있어도)
-- cycle.ts, schedules.ts, holidays.ts, line5.ts, contacts.ts, tips.ts
+- cycle.ts, schedules.ts, holidays.ts, line5.ts, contacts.ts, tips.ts, station-abbr.ts
 - 문제는 알고리즘으로 해결
 
-### 1.3 모바일 무결성
-- 360px에서 깨짐/겹침/가로스크롤 = P0 버그
-- 터치 타겟 최소 44px x 44px
-- 인접 버튼 간격 최소 8px
+### 1.3 모바일 무결성 (P0)
+- 모바일 UI 깨짐(overflow/겹침/가로 스크롤) **0 허용**
+- 작은 화면 + 폰트 확대(접근성)에서도 레이아웃 유지
+- Safe-area 완전 대응 (iOS notch + 하단 홈바)
 
-### 1.4 다크/라이트 동시 검증
+### 1.4 다크/라이트 동시 검증 (P0)
 - UI 변경 시 **다크 + 라이트 모두 확인 필수**
 - 한쪽에서만 안 보이는 UI = P0 버그
 
-### 1.5 색상은 반드시 토큰으로
+### 1.5 색상은 반드시 토큰으로 (P0)
 - 모든 색상은 `src/styles/tokens.css`의 `--dia-*` 변수 사용
 - 하드코딩 색상(`#fff`, `rgba(...)`) 사용 금지
 - 예외: `@keyframes` 내부 애니메이션 전용 값
 
-### 1.6 보안
-- `.env.local` 키(API 키, Supabase 키) 코드/로그 노출 금지
+### 1.6 보안 (P0)
+- **보안 키(API 키, Supabase 키, 시크릿) 코드/로그 노출 절대 금지**
+- 클라이언트 번들에 시크릿 포함 금지
 - `console.log`로 키 값 출력 금지
+- 민감정보(password, token, phone) 로그 마스킹
+
+### 1.7 상태/로딩/에러 표시 (P0)
+- 상태·로딩·에러를 UI에서 숨기거나 생략 금지
+- 실패 시 사용자가 "무엇을 하면 되는지" 안내 필수 (재시도/새로고침 등)
+- `alert()` 사용 금지 → 인라인 UI/토스트/상태 컴포넌트 사용
+
+### 1.8 접근성 (P0) — WCAG 2.1 기본
+- **모든 인터랙티브 요소**에 `:focus-visible` 포커스 링 보장 (`outline: none` 단독 사용 금지)
+- **모든 모달**에 `role="dialog"` + `aria-modal` + focus trap + ESC 닫기
+- **모든 `<button>`에 `type` 명시** (`type="button"` 또는 `type="submit"`)
+- 탭: `role="tablist"` + `role="tab"` + `aria-selected` + `tabIndex`
+
+### 1.9 인라인 스타일 금지 (P0)
+- `style={{ ... }}` 사용 금지
+- **예외(STYLE-EXCEPTION)**: 동적 런타임 값(CSS로 불가능) 또는 브라우저 버그 회피
+- 예외 사용 시 필수: `// STYLE-EXCEPTION: [사유]`
+
+### 1.10 임시 땜빵 금지 (P0)
+- 임시 하드코딩/땜빵 처리 금지
+- 프로토타입 단계 한정 허용 시: `// TODO: [사유] - 48시간 내 해결`
 
 ---
 
@@ -51,31 +86,62 @@
 ```
 src/
 ├── app/           — page.tsx, layout.tsx, globals.css, api/
-├── components/    — layout/(AppShell, TabBar), common/(Modal, Toast)
-├── features/      — home, calendar, compare, contacts, more, line5, alerts, commute, subway
-├── hooks/         — useInstallPrompt, useServiceWorker
-├── stores/        — driver, theme, alert, commute, memo, quiz, train, compare (Zustand)
-├── data/          — cycle, schedules, holidays, line5, contacts, tips (수정 금지!)
-├── lib/           — schedule, types, constants
-└── styles/        — tokens.css (Night Shift 디자인)
+├── components/    — layout/(AppShell, TabBar, WorldHub), common/(Modal, Toast, AuthGate)
+├── features/      — home, calendar, duty, compare, contacts, more,
+│                    line5, alerts, commute, subway, edu, safety
+├── hooks/         — useHistoryBack, useInstallPrompt, useServiceWorker,
+│                    useNotification, useSwappedDia
+├── stores/        — 14개 Zustand 스토어 (theme, fontSize, driver, alert,
+│                    commute, compare, exchange, hazard, train, swap,
+│                    memo, quiz, shortcuts, healingCard)
+├── data/          — cycle, schedules, holidays, line5, contacts,
+│                    station-abbr, tips (수정 금지!)
+├── lib/           — schedule, types, constants, auth, supabase
+└── styles/        — tokens.css (Night Shift 디자인 토큰 SSOT)
 ```
+
+### Feature 모듈 패턴
+- `features/{domain}/(components|hooks|styles|index.ts)` 기본 구조
+- 각 feature는 자체 CSS Module 소유 (컴포넌트 격리)
+- 공용 컴포넌트(Modal, Toast, TabBar) 중복 구현 금지
 
 ---
 
 ## 3) 디자인: Night Shift (다크 퍼스트)
+
+### 3.1 브랜드 공식
+- **다크 모드 = 야간 운전실**: 딥 네이비 + 차분한 블루 포인트
+- **라이트 모드 = 주간 승무실**: 쿨 그레이 배경 + 높은 가독성
 - `:root` = 다크 모드 (기본, 야간 근무 최적화)
 - `:root.light` = 라이트 모드 오버라이드
-- 배경 `#0F172A`, 카드 `#1E293B`, 블루 `#3B82F6`, 그린 `#22C55E`
-- **50-60대 최적화**: 본문 16px, 핵심 숫자 24-32px, 터치 타겟 48px
+- 새 토큰 추가 시 **양쪽 모드 모두 정의 필수**
 
-### 대비 기준
+### 3.2 50-60대 최적화 (핵심 차별점)
+- 본문 16px (일반 앱보다 큼)
+- 핵심 숫자(교번/시간) 24-32px
+- 터치 타겟 48px (44px보다 넉넉하게)
+- **글자 크기 설정**: small/normal/large (fontSize 스토어)
+
+### 3.3 색상 팔레트
+| 컬러 | Hex | 용도 |
+|------|-----|------|
+| 배경 | `#0F172A` | 다크 기본 배경 |
+| 카드 | `#1E293B` | 카드/서피스 |
+| 블루 | `#3B82F6` | 홈탭, 기본 CTA |
+| 그린 | `#22C55E` | 캘린더탭, 성공 |
+| 퍼플 | `#8B5CF6` | 라인5탭, 커뮤니티 |
+| 앰버 | `#F59E0B` | 비교탭, 경고 |
+| 스카이 | `#38BDF8` | 연락처탭, 정보 |
+| 레드 | `#EF4444` | 위험/삭제 |
+
+### 3.4 대비 기준
 | 텍스트 역할 | 다크 모드 | 라이트 모드 | 최소 대비 |
 |-------------|-----------|-------------|-----------|
 | Primary | `#F1F5F9` on `#0F172A` | `#0F172A` on `#F0F4F8` | 4.5:1 |
 | Secondary | `#94A3B8` on `#0F172A` | `#475569` on `#F0F4F8` | 4.5:1 |
 | Tertiary | `#64748B` on `#1E293B` | `#94A3B8` on `#FFFFFF` | 3.5:1 |
 
-### 보더 토큰
+### 3.5 보더 토큰
 | 토큰 | 용도 |
 |------|------|
 | `--dia-border` | 기본 보더 |
@@ -83,23 +149,191 @@ src/
 | `--dia-border-light` | 미세 구분선 |
 | `--dia-border-dim` | 최미세 구분선 |
 
+### 3.6 인터랙션 계층
+| 상태 | 스타일 |
+|------|--------|
+| Default | 카드 + 미세 보더 |
+| Hover/Focus | 밝기 살짝 올라옴 |
+| Pressed | 깊이 감소 (scale 0.98) |
+| Selected | 블루/그린 강조 |
+
 ---
 
-## 4) API 라우트
+## 4) 모바일 무결성 설계 원칙
+
+### 4.1 레이아웃 기본
+- 레이아웃 크기에 픽셀 고정 금지 (clamp/grid 기반)
+- 단, 아이콘·보더·터치타겟 등 고정값이 자연스러운 곳은 px 허용
+- 텍스트·숫자·시간은 **최악 케이스 기준 설계**
+- 긴 이름(20자 한글)/이모지 포함 시 깨짐 0
+
+### 4.2 [P0] 화면 폭 기준
+| 폭 | 의미 | 검증 |
+|----|------|------|
+| **320px** | 절대 하한선 — 이 폭에서 깨지면 출시 불가 | 필수 |
+| **360px** | Android 표준 (Galaxy S 시리즈 기본) | **주력 테스트 폭** |
+| **375px** | iPhone SE 3 / iPhone 8 | 필수 |
+| **390px** | iPhone 14/15 기본 | 필수 |
+| **430px** | iPhone Pro Max / 대형 Android | 권장 |
+
+### 4.3 [P0] 터치 타겟
+- 모든 탭/선택 가능 요소 **최소 44px × 44px** hit area
+- 인접 버튼·칩 사이 간격: **최소 8px**, 권장 12px
+- 50-60대 사용자 — **48px 권장** (44px보다 넉넉하게)
+- 텍스트가 작아도 padding으로 터치 영역 확보
+
+### 4.4 텍스트 크기 기준 (P0) — train-dia 전용
+| 구분 | 최소 | 권장 | 대비 |
+|------|------|------|------|
+| 본문 | 16px | 16-18px | 4.5:1+ |
+| 보조 텍스트 | **13px** | 14px | 4.5:1+ |
+| CTA 버튼 | 16px | 16-18px | 4.5:1+ |
+| 핵심 숫자 (교번/시간) | 20px | 24-32px | 7:1 권장 |
+| 최소 허용 | **13px** | - | 3.5:1+ |
+
+### 4.5 Safe-area · 가로 모드
+- `env(safe-area-inset-*)` 4방향 전체 적용 (iOS notch + 하단 홈바)
+- 하단 고정 TabBar: `padding-bottom: env(safe-area-inset-bottom)` 필수
+- iOS 가로 모드: 좌우 safe-area-inset 필수
+
+### 4.6 극단 케이스 시뮬레이션 (필수)
+- 긴 기관사 이름 (20자 한글)
+- 긴 열차번호 조합
+- 3근무 야간 행로 (행로 텍스트 길어짐)
+- 빈 값 (교대자 없음, 비번)
+- 폰트 확대 설정 (large 모드)
+
+---
+
+## 5) 스타일링 규칙
+
+### 5.1 스타일 구현 우선순위
+1. CSS Modules (.module.css) — 기본 표준
+2. Design Tokens (`--dia-*` CSS Variables) — 색상/간격/라운드/그림자
+3. globals.css 유틸 클래스 — `.srOnly`, `.diaTruncate`, `.diaBtnIcon`, `.safeBottom` 등
+
+### 5.2 토큰 규칙 (매직 넘버 금지)
+- 모든 색상/간격/라운드/그림자 = `--dia-*` 토큰 사용
+- 매직 넘버(`16px`, `#fff`, `rgba(...)`) 직접 사용 금지
+- **CSS 변수는 silent fail** — 토큰 존재 여부 `tokens.css` grep 후 사용
+- `--dia-spacing-*` 없으면 `--dia-space-*` 확인 (네이밍 주의)
+
+### 5.3 CSS Module 클래스명
+- `.body`, `.header` 같은 범용 이름 금지 → 접두사 사용 (예: `.homeBody`, `.calendarHeader`)
+
+### 5.4 CSS 함정 방지
+- **flex 자식 `min-width: auto` 함정** → 상대 너비 부모 안 자식은 `min-width: 0` 필수
+- **flex 안 input/textarea** → `min-width: 0` + `width: 100%` + `box-sizing: border-box`
+- **카드 안 버튼 행** → `flex-wrap: wrap` + `white-space: nowrap` (좁은 화면 대응)
+- `overflow: hidden` 텍스트 컨테이너/sticky에 함부로 쓰지 말 것
+- fixed/sticky spacer 높이 하드코딩 금지 → `ResizeObserver` 사용
+
+### 5.5 애니메이션 규칙
+- 허용: `box-shadow` 펄스, `opacity` 전환, `transform: scale()`
+- 금지: `filter: drop-shadow` 애니메이션, `width/height` 애니메이션, 3초 미만 루프
+- `prefers-reduced-motion: reduce` 대응 필수
+
+### 5.6 크로스 브라우저
+| 브라우저 | 우선순위 |
+|----------|----------|
+| Chrome (Android) | **주력** |
+| Safari (iOS) | **P0 필수** |
+| Samsung Internet | 권장 |
+| Firefox | 권장 |
+
+- iOS Safari: `-webkit-backdrop-filter` 접두사 필수
+- `env(safe-area-inset-*)` 4방향 적용
+
+---
+
+## 6) 에러/로딩/빈 상태 표시 (P0)
+
+### 6.1 3가지 상태 필수 표시
+| 상태 | 필수 표시 |
+|------|----------|
+| 로딩 중 | 스피너/스켈레톤 + "불러오는 중" |
+| 빈 상태 | 아이콘 + 상태 설명 + 다음 행동 안내 |
+| 에러 | 에러 설명 + **재시도 버튼** |
+
+### 6.2 에러 메시지 (사용자 관점)
+- "오류가 발생했습니다" ❌
+- "네트워크 연결을 확인해주세요" ✅
+- "열차 정보를 불러올 수 없어요. 다시 시도해주세요" ✅
+- 에러 + **행동 가능한 안내** 필수
+
+### 6.3 콘솔/alert 금지
+- `alert()` 금지 → 인라인 UI/Toast 사용
+- `console.log/error` 커밋 전 제거 (로컬 디버깅 중에만 허용)
+
+---
+
+## 7) UX 규칙 — 50-60대 기관사를 위한 설계
+
+### 7.1 3초 규칙
+사용자는 화면 진입 후 **3초 안에**:
+1. 여기가 어딘지 이해
+2. 다음에 뭘 해야 하는지 파악
+
+### 7.2 CTA 배치
+- Primary CTA는 한 화면에 **1개만**
+- 엄지 도달 범위 (하단 1/3)
+- 높이 52-56px, 최소 폭 200px 또는 전체폭
+- CTA 문구: "확인" ❌ → "교번 저장하기" ✅ (동사 + 목적어)
+
+### 7.3 탭/네비게이션
+- 현재 6탭 구조 (TabBar)
+- 탭 전환 시 스크롤 위치 유지
+- 빈 탭에 `min-height: 40vh` (높이 급변 방지)
+
+### 7.4 모달
+- 닫기: X 버튼 + ESC + 배경 클릭 (3가지 모두)
+- focus trap + 이전 포커스 복원
+
+### 7.5 문구 규칙 (50-60대 사용자)
+- 전문 IT 용어 금지 → 일상 한국어
+- "렌더링 실패" ❌ → "화면을 불러올 수 없어요" ✅
+- "세션 만료" ❌ → "다시 로그인해주세요" ✅
+- "API 에러" ❌ → "서버 연결이 안 돼요" ✅
+
+### 7.6 동일 기능 중복 금지
+- 한 화면에 같은 기능 2곳 이상 → 이유 없으면 통합
+- Primary 1개 + 보조 최대 1개
+
+### 7.7 데이터 최소주의
+- 새 필드/기능 추가 시 **사용자에게 당장 필요한 최소한만**
+- 기관사에게 불필요한 입력 강요 금지
+
+---
+
+## 8) API/백엔드 규칙
+
+### 8.1 API 라우트
 - `/api/realtime/trains` — 5호선 열차 위치 (서울시 오픈API)
 - `/api/realtime/arrivals` — 역별 도착 정보
 - `/api/odsay/search-station` — ODsay 역 ID
 - `/api/odsay/route-search` — 지하철 경로 검색
+- `/api/alerts/*` — 장애 알림 CRUD
+- `/api/safety/hazards/*` — 안전 보고 CRUD + 댓글/좋아요
+
+### 8.2 에러 응답 표준
+```json
+{ "code": "TRAIN_NOT_FOUND", "message": "열차 정보를 찾을 수 없습니다.", "detail": {} }
+```
+
+### 8.3 API 핸들러 패턴
+- 인증 필요 시 `requireActiveUser()` 또는 동등 검증
+- 입력 검증: Zod `.safeParse()` 사용 (수동 if/else 금지)
+- 에러: 표준 에러 응답 포맷으로 반환
 
 ---
 
-## 5) 교대자 규칙 (절대 변경 금지)
+## 9) 교대자 규칙 (절대 변경 금지)
 
 ### 핵심 규칙
 1. **1xxx 또는 2xxx 열차로 시작하는 구간** → 해당 쪽 교대자 없음
 2. **1xxx 또는 2xxx 열차로 끝나는 구간** → 해당 쪽 교대자 없음
 3. **교대는 항상 1:1** (한 명)
-4. **교대 조건**: 같은 열차번호 + 같은 시간대
+4. **교대 조건**: 같은 열차번호 + 같은 시간대 (두 조건 모두 충족)
 5. **UI 용어**: "인수/인계" 사용 금지 → **"교대"**로만 표기
 
 ### UI 배치 규칙
@@ -117,12 +351,12 @@ src/
 | 상태 | 표시 |
 |------|------|
 | 교대 상대 있음 | `교대 ← 이름` 또는 `교대 → 이름` |
-| 기지 입출고 (1xxx/2xxx) | 표시 안 함 |
+| 기지 입출고 (1xxx/2xxx) | 표시 안 함 (교대 없음) |
 | 매칭 실패 (5xxx인데 상대 없음) | `교대` (이름 없이) |
 
 ---
 
-## 6) 열차번호 체계
+## 10) 열차번호 체계
 
 ### 방향
 - **짝수 끝** = 상선(상행, 방화 방면)
@@ -139,7 +373,7 @@ src/
 
 ---
 
-## 7) 행로(m 필드) 읽는 법
+## 11) 행로(m 필드) 읽는 법
 - **경유하는 주요 역의 첫 글자**를 순서대로 나열
 - 근무별 구분은 쉼표(,)로 나눔
 - 예시: "답하방답,답마둔상기" = 1근무(답→하남→방화→답십리), 2근무(답→마천→둔촌동→상일동→기지)
@@ -165,7 +399,7 @@ src/
 
 ---
 
-## 8) 데이터 구조
+## 12) 데이터 구조
 - 6개 스케줄 테이블: `S.p_ord` / `p_hol` / `p_ordord` / `p_ordhol` / `p_holord` / `p_holhol`
 - 각 스케줄: `{s: 출근, e: 퇴근, m: 운전행로, g: [{d: 출발, a: 도착, n: [열차번호]}]}`
 - w 필드: 운전행로 텍스트 (일부 스케줄)
@@ -174,7 +408,7 @@ src/
 
 ---
 
-## 9) Excel 임포트 시스템
+## 13) Excel 임포트 시스템
 
 ### 스크립트: `scripts/import-excel.js`
 ```bash
@@ -201,30 +435,143 @@ m/w 필드 누락 검증 — 반드시 실행
 
 ---
 
-## 10) 스타일링 규칙
-- **CSS Modules 기본** (인라인 스타일 금지)
-- 모든 색상/간격은 `--dia-*` 토큰 사용
-- 새 토큰 추가 시 다크/라이트 **양쪽 정의 필수**
-- iOS Safari: `-webkit-backdrop-filter` 접두사 필수
-- `env(safe-area-inset-*)` 4방향 적용
+## 14) Quality Gate — 커밋/push 전 필수 검증
 
-### 애니메이션 규칙
-- 허용: `box-shadow` 펄스, `opacity` 전환, `transform: scale()`
-- 금지: `filter: drop-shadow` 애니메이션, `width/height` 애니메이션, 3초 미만 루프
-- `prefers-reduced-motion: reduce` 대응 필수
+### 14.1 UI/접근성
+- 가로 스크롤 0 (320px 폭에서도)
+- 긴 문자열/이름/이모지 포함 시 깨짐 0
+- 폰트 확대 시 레이아웃 유지
+- Safe-area 완전 대응
+- 360px에서 모든 UI 정상 확인
+- 터치 타겟 44px 미달 0개
+- 인접 버튼 간격 8px 미만 0개
+- **13px 미만 텍스트 0개**
+- 다크/라이트 모두 가독성 확인
+
+### 14.2 코드/구조
+- `style={{` 0개 (STYLE-EXCEPTION 제외)
+- 토큰 미사용 매직 넘버 금지
+- 공용 컴포넌트(Modal, Toast, TabBar) 중복 구현 금지
+- `console.log` 커밋 전 제거
+
+### 14.3 테스트/빌드
+- `npm run build` 통과
+- `npm run typecheck` 통과
+- `npm run test` 통과
+- import 미해결 상태 커밋 금지
+
+### 14.4 보안
+- 시크릿 노출 0
+- API 키 하드코딩 0
 
 ---
 
-## 11) 협업 규칙
-- **말투**: 자연스러운 한국어, 반말
-- 확신 없으면 추측하지 말고 질문
-- 구조적 변경(상태/API/DB)은 확인 후 진행
-- push 전 `npm run build` 통과 확인
+## 15) Self-QA 체크리스트 (커밋 전 필수)
+
+모든 커밋 전에 아래를 점검한다. **"내가 알아서 잡겠지" 금지 — 체크리스트로 잡는다.**
+
+- [ ] **인라인 스타일?** → `style={{` 검색 → 있으면 CSS Module로 교체
+- [ ] **빈 catch block?** → catch 안에 에러 처리 없으면 P0
+- [ ] **버튼 type?** → 새 `<button>`에 `type` 명시 확인
+- [ ] **focus-visible?** → 새 인터랙티브 요소에 포커스 링 확인
+- [ ] **CSS 토큰?** → 하드코딩 색상/수치 금지
+- [ ] **13px 미만?** → 텍스트 최소 크기 위반 없는지
+- [ ] **다크/라이트?** → 양쪽 모드 모두 확인
+- [ ] **360px?** → 모바일 뷰에서 깨짐 없는지
+- [ ] **console.log?** → 커밋 전 제거
+- [ ] **에러/빈 상태?** → UI에 표시되는지
 
 ---
 
-## 12) 참조 문서
-| 문서 | 내용 |
-|------|------|
-| [docs/DESIGN_AUDIT.md](docs/DESIGN_AUDIT.md) | 다크/라이트 감사 규칙, 대비 기준, 크로스 브라우저 |
-| [docs/PARTNER_MATCHING.md](docs/PARTNER_MATCHING.md) | 교대자 매칭 알고리즘 상세 |
+## 16) 협업 모드 — AI 행동 규칙
+
+### 16.1 말투 & 스타일
+- 자연스럽고 부드러운 한국어, 반말
+- "명령 수행자"가 아니라 **"시니어 개발 파트너"**처럼 행동
+- 확신 없으면 추측하지 말고 짧게 질문
+
+### 16.2 무단 수정 금지 (Safety-First)
+다음 중 하나라도 해당되면 **절대 바로 코드 수정하지 않는다**:
+- 정확한 파일 경로가 제공되지 않았다
+- 어떤 컴포넌트인지 명확하지 않다
+- 인증/상태관리/라우팅 등 구조적 위험 영역이다
+- 요청이 모호하다
+
+이 경우: 질문하거나 2~3개 선택지 제안 → 확인 후 수정
+
+### 16.3 수정 전 2단계 확인
+**[계획]** — 무엇을 / 어느 파일에서 / 왜 변경하는지
+**[확인]** — "이대로 진행할까?" + 대안이 있으면 제시
+
+### 16.4 확신도 80% 미만이면 멈춤
+- 확신도 80% 미만이면 수정하지 않는다
+- 질문하거나 선택지를 제시한다
+
+### 16.5 UI 변경 전 필수 자문 5개
+1. 이 화면에 같은 기능이 이미 있나?
+2. 360px에서 깨지지 않나?
+3. 3초 안에 찾을 수 있나?
+4. 최악 케이스 시뮬레이션 했나? (긴 이름, 긴 행로, 빈 값)
+5. 다크/라이트 양쪽 다 괜찮나?
+
+---
+
+## 17) 커밋/배포 규칙
+
+### 17.1 push 전 빌드 검증 (필수)
+```bash
+npm run build
+```
+- push 전 반드시 로컬 빌드 통과 확인
+- 빌드 실패 상태로 push 금지
+
+### 17.2 중간 커밋 단독 push 금지
+- 모든 import가 해결된 상태에서만 push
+- 의존 파일이 다른 커밋에 있으면 합쳐서 push
+
+### 17.3 현재 모드: main 직접 push
+- 수정 → build → test → commit → main push
+- 문제 시 `git revert` 또는 Vercel Instant Rollback
+
+---
+
+## 18) 버그 수정 프로토콜
+1. 재현 조건 + 원인 후보
+2. 근본 원인 분석 (RCA)
+3. 구조적 수정안 (임시 땜빵 금지)
+4. 부작용/트레이드오프
+5. 회귀 테스트
+
+---
+
+## 19) 성능/메모리 규칙
+- 이미지 미리보기 blob URL 사용 시 `URL.revokeObjectURL`로 누수 방지
+- localStorage 저장은 debounce 표준으로 유지
+- 성능 최적화는 "측정 후 적용" (React Profiler로 병목 확인)
+- memo는 남발 금지 (병목 구간에만)
+
+---
+
+## 20) 디자인 철학 — 최종 기준
+> **"감성보다 가독성, 장식보다 명확성"**
+> **"50-60대 기관사가 야간 근무 중에도 한눈에 읽을 수 있어야 한다"**
+
+- 예쁜데 안 보이면 실패 — **가독성이 미학보다 우선**
+- 과장 없는 절제된 디자인
+- 핵심 정보(교번, 시간, 교대자)는 **즉시 인지 가능**해야 한다
+- 부가 정보는 계층적으로 축소
+- "와" 소리보다 "아, 바로 보인다"가 목표
+
+---
+
+## 21) AI 리스크 체크 (3줄 원칙)
+- **P0 위반이 보이면 즉시 말한다** (13px 미만, 모바일 깨짐, 접근성, 보안)
+- **구조적 변경이면 한 줄 리스크 언급한다** (상태 구조, API 스키마, DB 변경)
+- **단순 수정이면 긴 설계 설명 생략 가능** — 단, Quality Gate(§14) 검증은 항상 실행
+
+---
+
+## 22) SW 버전 관리
+- `public/sw.js`: 네트워크 우선 + 캐시 폴백 전략
+- PWA 지원: `useServiceWorker` + `useInstallPrompt`
+- 현재 기준일: `DB_STD = new Date(2026, 1, 1)` (2026-02-01)

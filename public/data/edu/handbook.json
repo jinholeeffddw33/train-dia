@@ -1365,14 +1365,6 @@
                 {
                   "src": "/images/edu/abb/img_004.jpg",
                   "caption": "해당차량 객실 회로차단기 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_005.jpg",
-                  "caption": "판타그라프 상승 후 계기판"
-                },
-                {
-                  "src": "/images/edu/abb/img_006.jpg",
-                  "caption": "TCMS 모니터 확인"
                 }
               ]
             }
@@ -1441,19 +1433,19 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_007.jpg",
-                  "caption": "주공기압력계"
+                  "caption": "CMCN, CMGN 회로차단기 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_008.jpg",
-                  "caption": "CMCN, CMGN 확인"
+                  "caption": "CM(공기압축기) 장치 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_009.jpg",
-                  "caption": "EBCOS"
+                  "caption": "EBCOS 취급"
                 },
                 {
                   "src": "/images/edu/abb/img_010.jpg",
-                  "caption": "해당량 객실하부 공기누기 / EBCOS"
+                  "caption": "TCMS 모니터 확인"
                 }
               ]
             }
@@ -1535,11 +1527,11 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_011.jpg",
-                  "caption": "TCMS 화면"
+                  "caption": "비상제동등 점등상태"
                 },
                 {
                   "src": "/images/edu/abb/img_012.jpg",
-                  "caption": "비상제동등 점등상태"
+                  "caption": "주공기압력계(MR,BC)"
                 },
                 {
                   "src": "/images/edu/abb/img_013.jpg",
@@ -1625,27 +1617,27 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_015.jpg",
-                  "caption": "주공기압력계(MR,BC)"
+                  "caption": "운전모드 스위치 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_016.jpg",
-                  "caption": "주차제동스위치 / 주공기압력"
+                  "caption": "주공기압력계(MR,BC) — 압력 저하 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_017.jpg",
-                  "caption": "운전실 회로차단기"
+                  "caption": "TCMS 고장상태 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_018.jpg",
-                  "caption": "주차제동 완해 스위치"
+                  "caption": "강제제동완해 버튼"
                 },
                 {
                   "src": "/images/edu/abb/img_019.jpg",
-                  "caption": "임펄스 전자변"
+                  "caption": "강제제동완해 표시등 점등"
                 },
                 {
                   "src": "/images/edu/abb/img_020.jpg",
-                  "caption": "주차제동 당김 고리"
+                  "caption": "ECU차단기 OFF/ON"
                 }
               ]
             }
@@ -1723,31 +1715,31 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_021.jpg",
-                  "caption": "주차제동스위치"
+                  "caption": "차량 하부 주차제동 장치(SB)"
                 },
                 {
                   "src": "/images/edu/abb/img_022.jpg",
-                  "caption": "주공기압력"
+                  "caption": "주차제동 표시등"
                 },
                 {
                   "src": "/images/edu/abb/img_023.jpg",
-                  "caption": "운전실 회로차단기"
+                  "caption": "주차제동/비상제동 스위치 패널"
                 },
                 {
                   "src": "/images/edu/abb/img_024.jpg",
-                  "caption": "주차제동 완해 스위치"
+                  "caption": "주공기압력계 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_025.jpg",
-                  "caption": "임펄스 전자변"
+                  "caption": "주차제동밸브 (완해/잠김)"
                 },
                 {
                   "src": "/images/edu/abb/img_026.jpg",
-                  "caption": "주차제동 NFB"
+                  "caption": "주차제동 NFB 위치"
                 },
                 {
                   "src": "/images/edu/abb/img_027.jpg",
-                  "caption": "주차제동 당김 고리"
+                  "caption": "주차제동 당김 고리 (차량 하부)"
                 }
               ]
             }
@@ -1819,7 +1811,7 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_028.jpg",
-                  "caption": "TCMS 화면"
+                  "caption": "TCMS 출입문 상태 화면"
                 },
                 {
                   "src": "/images/edu/abb/img_029.jpg",
@@ -1915,15 +1907,15 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_032.jpg",
-                  "caption": "출입문 조작패널"
+                  "caption": "출입문 스위치 패널 (비상전원차단/출입문선택)"
                 },
                 {
                   "src": "/images/edu/abb/img_033.jpg",
-                  "caption": "출입문 수동 스위치"
+                  "caption": "출입문 수동 스위치 (중/비상 전환)"
                 },
                 {
                   "src": "/images/edu/abb/img_034.jpg",
-                  "caption": "LDE,RDE 동작상태 확인"
+                  "caption": "LDE,RDE 동작상태 확인 (고압 배전반)"
                 },
                 {
                   "src": "/images/edu/abb/img_035.jpg",
@@ -1983,7 +1975,7 @@
                 {
                   "label": "③",
                   "items": [
-                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인"
+                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인 → 불량시 교환"
                   ]
                 },
                 {
@@ -2010,13 +2002,18 @@
                 {
                   "label": "②",
                   "items": [
-                    "전량 출입문 닫힘 불가시 — 출입문 닫힘버튼 확인 후 또 다른 출입문 버튼취급, 전차량 출입문 회로차단기 차단"
+                    "전량 출입문 닫힘 불가시",
+                    "출입문 닫힘버튼 확인 후 또 다른 출입문 버튼취급",
+                    "전차량 출입문 회로차단기를 차단함"
                   ]
                 },
                 {
                   "label": "③",
                   "items": [
-                    "한량 출입문 닫힘 불가시 — CC 불량 확인, 한량 출입문회로 차단 NFB 취급, 출입문 대표 COCK 확인"
+                    "한량 출입문 닫힘 불가시",
+                    "CC 불량으로 출입문 개방신호 계속 출력 확인",
+                    "한량 출입문회로 차단 NFB를 취급한다",
+                    "출입문 대표 COCK 확인 → 차단시 COCK를 복귀시킴"
                   ]
                 }
               ]
@@ -2035,11 +2032,11 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_037.jpg",
-                  "caption": "출입문 개별 버튼(닫힘/재개폐/열림)"
+                  "caption": "출입문 개별 버튼 (닫힘/재개폐/열림)"
                 },
                 {
                   "src": "/images/edu/abb/img_038.jpg",
-                  "caption": "출입문 닫힘 표시등 점등 상태 확인"
+                  "caption": "출입문 닫힘 표시등 점등 상태 확인 (ATC 속도계 패널)"
                 },
                 {
                   "src": "/images/edu/abb/img_039.jpg",
@@ -2047,7 +2044,7 @@
                 },
                 {
                   "src": "/images/edu/abb/img_040.jpg",
-                  "caption": "각량 출입문 닫힘상태(도어스위치 부위) 확인"
+                  "caption": "각량 출입문 닫힘상태 (도어스위치 부위) 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_041.jpg",
@@ -2059,11 +2056,11 @@
                 },
                 {
                   "src": "/images/edu/abb/img_043.jpg",
-                  "caption": "출입문 표시등 확인"
+                  "caption": "출입문/안전문 표시등 확인 (5106호)"
                 },
                 {
                   "src": "/images/edu/abb/img_044.jpg",
-                  "caption": "ALL DOOR BY PASS 취급"
+                  "caption": "ALL DOOR BY PASS — 도어엔진 구동장치"
                 }
               ]
             }
@@ -2145,11 +2142,11 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_045.jpg",
-                  "caption": "전량 출입문 닫힘 표시등 점등 상태 확인"
+                  "caption": "닫힘계전기 확인 및 교환"
                 },
                 {
                   "src": "/images/edu/abb/img_046.jpg",
-                  "caption": "도어엔진 동작상태 확인 / 전차량 닫힘 계전기 교환"
+                  "caption": "출입문 도어엔진 동작상태 확인 (5153호)"
                 }
               ]
             }
@@ -2246,15 +2243,15 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_047.jpg",
-                  "caption": "전압계, 전류계 OFF"
+                  "caption": "TCMS 모니터 고장확인"
                 },
                 {
                   "src": "/images/edu/abb/img_048.jpg",
-                  "caption": "Pan Up 스위치 취급"
+                  "caption": "Pan Up / 주회로차단기투입 스위치"
                 },
                 {
                   "src": "/images/edu/abb/img_049.jpg",
-                  "caption": "ATC 배전반 확인"
+                  "caption": "ATO/ATC PCB LED 상태 확인"
                 }
               ]
             }
@@ -2330,19 +2327,19 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_050.jpg",
-                  "caption": "ATC 전원공급기 확인"
+                  "caption": "ATC 리셋스위치"
                 },
                 {
                   "src": "/images/edu/abb/img_051.jpg",
-                  "caption": "ATO/ATC 각 PCB LED 상태 확인"
+                  "caption": "ATC 장치 내부 — P/S 전원 LED 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_052.jpg",
-                  "caption": "리셋스위치 reset 취급"
+                  "caption": "ATC 회로차단기로 ATC reset 취급"
                 },
                 {
                   "src": "/images/edu/abb/img_053.jpg",
-                  "caption": "ATC 회로차단기로 ATC reset 취급"
+                  "caption": "ATC PCB LED 상태 확인"
                 }
               ]
             }
@@ -2409,7 +2406,9 @@
                 {
                   "label": "①",
                   "items": [
-                    "LIU Reset 스위치 취급 (22초 이상) — LIU 절체등 점등, ADU 현시상태 확인"
+                    "LIU Reset 스위치 취급 (22초 이상) — LIU 절체등 점등, ADU 현시상태 확인",
+                    "(FIS 모니터현시불가, 전압계/전류계 OFF)",
+                    "운전실 배전반 Stall Relay2가 여자되었는지 확인"
                   ]
                 },
                 {
@@ -2435,19 +2434,19 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_054.jpg",
-                  "caption": "P/S LED 확인"
+                  "caption": "인버터 캐비넷 — P/S LED 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_055.jpg",
-                  "caption": "TC LED 확인"
+                  "caption": "역전기/마스콘 — PAN하강, 역전기 OFF 재기동"
                 },
                 {
                   "src": "/images/edu/abb/img_056.jpg",
-                  "caption": "LIU 절체등 점등 확인"
+                  "caption": "LIU 장치 — 절체등 점등 확인"
                 },
                 {
                   "src": "/images/edu/abb/img_057.jpg",
-                  "caption": "조치 안될시 PAN하강, 역전기 OFF로 열차 재기동"
+                  "caption": "LIU 절체 표시등 확인 (5138호)"
                 }
               ]
             }
@@ -2509,7 +2508,8 @@
                 {
                   "label": "4",
                   "items": [
-                    "1/2출력(L/B개방) 되는 경우 — MIM1,2, AIM 동시 병발고장. 판상승 L/B투입 버튼 취급은 신중해야 함"
+                    "1/2출력(L/B개방) 되는 경우 — MIM1,2, AIM 동시 병발고장",
+                    "판상승 L/B투입 버튼 취급은 신중해야 함 (내부회로단락 포함될 경우)"
                   ]
                 },
                 {
@@ -2529,11 +2529,11 @@
               "items": [
                 {
                   "src": "/images/edu/abb/img_058.jpg",
-                  "caption": "TCMS 모니터 고장확인"
+                  "caption": "역전기/마스콘 — TCMS 모니터 고장확인"
                 },
                 {
                   "src": "/images/edu/abb/img_059.jpg",
-                  "caption": "Pan Up 스위치 취급"
+                  "caption": "Pan Up / 주회로차단기투입 스위치 취급"
                 }
               ]
             }

@@ -1523,6 +1523,10 @@
               "type": "images",
               "items": [
                 {
+                  "src": "/images/edu/abb/img_010.jpg",
+                  "caption": "TCMS 화면"
+                },
+                {
                   "src": "/images/edu/abb/img_011.jpg",
                   "caption": "비상제동등 점등상태"
                 },
@@ -1536,7 +1540,11 @@
                 },
                 {
                   "src": "/images/edu/abb/img_014.jpg",
-                  "caption": "EBCOS / 운전모드스위치(비상)"
+                  "caption": "EBCOS"
+                },
+                {
+                  "src": "/images/edu/abb/img_015.jpg",
+                  "caption": "운전모드스위치(비상)"
                 }
               ]
             }
@@ -1612,10 +1620,6 @@
             {
               "type": "images",
               "items": [
-                {
-                  "src": "/images/edu/abb/img_015.jpg",
-                  "caption": "운전모드 스위치 확인"
-                },
                 {
                   "src": "/images/edu/abb/img_016.jpg",
                   "caption": "주공기압력계(MR,BC) — 압력 저하 확인"

@@ -39,9 +39,8 @@ function scoreGradeClass(score100: number): string {
 const CHAPTER_LABELS: Record<string, string> = {
   ch1: '근무작업절차',
   ch2: '전동차 일반',
-  ch3: '차종 비교',
   ch4: '기지/주박',
-  ch5: '이례사항',
+  ch5: '전동차 비교',
   ch6: '한줄노트',
   ch7: '사고사례',
   ch8: '방송문안',

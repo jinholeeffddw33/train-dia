@@ -815,72 +815,6 @@
       ]
     },
     {
-      "id": "ch3",
-      "title": "ABB·우진·로템 비교",
-      "icon": "⚡",
-      "sections": [
-        {
-          "id": "ch3-1",
-          "title": "차종별 주요 비교",
-          "content": [
-            {
-              "type": "compare",
-              "items": [
-                {
-                  "category": "ATC 리셋",
-                  "abb": "AP.CBATC 차단기 OFF → ON",
-                  "woojin": "ATCN1,2 OFF/ON (역전기 중립 → KEY OFF/ON → 역전기 전진)",
-                  "rotem": "ATCCB1,2 OFF/ON (역전기 중립 → ATC 차단기 OFF/ON → 역전기 전진)"
-                },
-                {
-                  "category": "LIU1 고장 시",
-                  "abb": "LIU2로 자동절체(전출력). 불가 시 후부TC절체(1/2출력)",
-                  "woojin": "LIU2로 자동절체. LIU1,2 리셋(TCUN OFF/ON). TCUCB1 차단으로 강제절체",
-                  "rotem": "LIU2로 자동절체. LIU2로 강제절체(TCUCB1 OFF)"
-                },
-                {
-                  "category": "주차제동 완해불능",
-                  "abb": "주차제동 bypass 취급 → 주차제동등 소등. 당김고리 완해 확인 철저",
-                  "woojin": "주차제동 바이패스 스위치(PABBPSW) + 완해버튼 취급. 당김고리 확인",
-                  "rotem": "주차제동 bypass 취급 → 주차제동등 소등 안됨. 완해버튼 취급. 당김고리 확인"
-                },
-                {
-                  "category": "데드맨 스위치",
-                  "abb": "중립·역행 시 동작 → 3초 경보음 → 10초 후 FSB 체결",
-                  "woojin": "중립·역행 시 동작 → 3초 경보음 → 10초 후 비상제동 체결",
-                  "rotem": "중립(3km/h이상)·역행 시 동작 → 3초 경보음 → 10초 후 FSB 체결"
-                },
-                {
-                  "category": "출입문 방식",
-                  "abb": "공기압력으로 열림·닫힘(CC제어). 출입문 코크로 수동취급 가능",
-                  "woojin": "전기모터 방식(DCU제어). 비상레버로 수동열림(KEY ON 상태). ISO스위치 개별 bypass",
-                  "rotem": "전기모터 방식(DCU제어). 비상레버로 수동열림. ISO스위치 개별 bypass"
-                },
-                {
-                  "category": "EO모드",
-                  "abb": "없음",
-                  "woojin": "TCU(LIU1&2) 고장 시 비상/구원스위치 \"EO\" 선택 → 최고속도 45km/h",
-                  "rotem": "컴퓨터(TC, LIU) 고장 시 35km/h 이하 역행 가능. 정차제동 체결 안됨"
-                },
-                {
-                  "category": "비상전원차단등",
-                  "abb": "일부 PAN 하강 시 점등",
-                  "woojin": "전체 PAN 하강해야 점등",
-                  "rotem": "전체 PAN 하강해야 점등"
-                },
-                {
-                  "category": "주간제어기 KEY 취거",
-                  "abb": "MC 제동 및 중립위치에서 역전기 KEY 취거",
-                  "woojin": "MC 중립위치에서 역전기 KEY 취거",
-                  "rotem": "MC 중립위치에서 역전기 KEY 취거"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
       "id": "ch4",
       "title": "차량기지 및 주박지",
       "icon": "🏗️",
@@ -968,6 +902,65 @@
       "title": "전동차 비교 조치",
       "icon": "🔴",
       "sections": [
+        {
+          "id": "ch5-0",
+          "title": "차종별 주요 비교 (ABB·우진·로템)",
+          "content": [
+            {
+              "type": "compare",
+              "items": [
+                {
+                  "category": "ATC 리셋",
+                  "abb": "AP.CBATC 차단기 OFF → ON",
+                  "woojin": "ATCN1,2 OFF/ON (역전기 중립 → KEY OFF/ON → 역전기 전진)",
+                  "rotem": "ATCCB1,2 OFF/ON (역전기 중립 → ATC 차단기 OFF/ON → 역전기 전진)"
+                },
+                {
+                  "category": "LIU1 고장 시",
+                  "abb": "LIU2로 자동절체(전출력). 불가 시 후부TC절체(1/2출력)",
+                  "woojin": "LIU2로 자동절체. LIU1,2 리셋(TCUN OFF/ON). TCUCB1 차단으로 강제절체",
+                  "rotem": "LIU2로 자동절체. LIU2로 강제절체(TCUCB1 OFF)"
+                },
+                {
+                  "category": "주차제동 완해불능",
+                  "abb": "주차제동 bypass 취급 → 주차제동등 소등. 당김고리 완해 확인 철저",
+                  "woojin": "주차제동 바이패스 스위치(PABBPSW) + 완해버튼 취급. 당김고리 확인",
+                  "rotem": "주차제동 bypass 취급 → 주차제동등 소등 안됨. 완해버튼 취급. 당김고리 확인"
+                },
+                {
+                  "category": "데드맨 스위치",
+                  "abb": "중립·역행 시 동작 → 3초 경보음 → 10초 후 FSB 체결",
+                  "woojin": "중립·역행 시 동작 → 3초 경보음 → 10초 후 비상제동 체결",
+                  "rotem": "중립(3km/h이상)·역행 시 동작 → 3초 경보음 → 10초 후 FSB 체결"
+                },
+                {
+                  "category": "출입문 방식",
+                  "abb": "공기압력으로 열림·닫힘(CC제어). 출입문 코크로 수동취급 가능",
+                  "woojin": "전기모터 방식(DCU제어). 비상레버로 수동열림(KEY ON 상태). ISO스위치 개별 bypass",
+                  "rotem": "전기모터 방식(DCU제어). 비상레버로 수동열림. ISO스위치 개별 bypass"
+                },
+                {
+                  "category": "EO모드",
+                  "abb": "없음",
+                  "woojin": "TCU(LIU1&2) 고장 시 비상/구원스위치 \"EO\" 선택 → 최고속도 45km/h",
+                  "rotem": "컴퓨터(TC, LIU) 고장 시 35km/h 이하 역행 가능. 정차제동 체결 안됨"
+                },
+                {
+                  "category": "비상전원차단등",
+                  "abb": "일부 PAN 하강 시 점등",
+                  "woojin": "전체 PAN 하강해야 점등",
+                  "rotem": "전체 PAN 하강해야 점등"
+                },
+                {
+                  "category": "주간제어기 KEY 취거",
+                  "abb": "MC 제동 및 중립위치에서 역전기 KEY 취거",
+                  "woojin": "MC 중립위치에서 역전기 KEY 취거",
+                  "rotem": "MC 중립위치에서 역전기 KEY 취거"
+                }
+              ]
+            }
+          ]
+        },
         {
           "id": "ch5-1",
           "title": "출입문 고장조치",

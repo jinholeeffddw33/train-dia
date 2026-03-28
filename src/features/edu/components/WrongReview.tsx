@@ -16,7 +16,7 @@ interface WrongReviewProps {
 const CHAPTER_ID_MAP: Record<string, string> = {
   '근무작업절차': 'ch1',
   '전동차 일반': 'ch2',
-  '차종 비교': 'ch3',
+  '차종 비교': 'ch5',
   '기지/주박': 'ch4',
   '이례사항': 'ch5',
   '한줄노트': 'ch6',

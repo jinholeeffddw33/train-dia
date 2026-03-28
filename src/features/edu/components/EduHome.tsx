@@ -27,7 +27,7 @@ interface EduHomeProps {
 const MENU_ITEMS = [
   { id: 'duty',     label: '근무절차', icon: ClipboardList, color: 'blue'   as const, action: 'chapters' as const, targets: ['ch1', 'ch4'] },
   { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
-  { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch3', 'ch6'] },
+  { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch6'] },
   { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'coming'   as const, targets: [] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'coming'   as const, targets: [] },
@@ -112,7 +112,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     { id: 'abb',     label: 'ABB\n전동차',   color: 'blue'   as const, targets: ['ch5a'],       coming: false },
     { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
     { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: [],             coming: true },
-    { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5', 'ch3'], coming: false },
+    { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {

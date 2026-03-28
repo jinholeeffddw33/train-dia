@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import {
-  ArrowLeft, ChevronRight,
+  ArrowLeft, ChevronRight, X,
   Mic, TrainFront, DoorOpen, Wrench,
   GraduationCap, Award, User, ClipboardList,
-  RotateCcw, Clock,
+  RotateCcw, Clock, GitCompareArrows,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -29,7 +29,7 @@ const MENU_ITEMS = [
   { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch3', 'ch6'] },
   { id: 'door',     label: '출입문',   icon: DoorOpen,      color: 'amber'  as const, action: 'coming'   as const, targets: [] },
-  { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'chapters' as const, targets: ['ch5', 'ch5a', 'ch5b', 'ch7'] },
+  { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'coming'   as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
@@ -106,14 +106,26 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
       .catch(() => {});
   }, []);
 
+  const [repairOpen, setRepairOpen] = useState(false);
+
+  const REPAIR_SUB = [
+    { id: 'abb',     label: 'ABB\n전동차',   color: 'blue'   as const, targets: ['ch5a'],       coming: false },
+    { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
+    { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: [],             coming: true },
+    { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5', 'ch3'], coming: false },
+  ];
+
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
     switch (item.action) {
       case 'chapters':
         onChapters([...item.targets]);
         break;
+      case 'submenu':
+        if (item.id === 'repair') setRepairOpen(true);
+        break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
-      case 'coming':  break; // 준비 중
+      case 'coming':  break;
     }
   };
 
@@ -283,6 +295,52 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
           </div>
         )}
       </div>
+
+      {/* 고장조치 서브메뉴 */}
+      {repairOpen && (
+        <div className={styles.subMenuOverlay} onClick={() => setRepairOpen(false)}>
+          <div className={styles.subMenuPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.subMenuHeader}>
+              <Wrench size={20} className={styles.quickIconRed} />
+              <h3 className={styles.subMenuTitle}>고장조치</h3>
+              <button type="button" className={styles.subMenuClose} onClick={() => setRepairOpen(false)} aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+            <div className={styles.subMenuGrid}>
+              {REPAIR_SUB.map((sub) => {
+                const iconMap = {
+                  abb: Wrench,
+                  woojin: Wrench,
+                  rotem: Wrench,
+                  compare: GitCompareArrows,
+                } as const;
+                const SubIcon = iconMap[sub.id as keyof typeof iconMap];
+                return (
+                  <button
+                    key={sub.id}
+                    type="button"
+                    className={`${styles.subMenuItem} ${sub.coming ? styles.menuGridItemDisabled : ''}`}
+                    disabled={sub.coming}
+                    onClick={() => {
+                      if (!sub.coming) {
+                        setRepairOpen(false);
+                        onChapters([...sub.targets]);
+                      }
+                    }}
+                  >
+                    <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[sub.color]}`}>
+                      <SubIcon size={26} className={ICON_COLOR_MAP[sub.color]} />
+                    </div>
+                    <span className={styles.subMenuLabel}>{sub.label}</span>
+                    {sub.coming && <span className={styles.subMenuComing}>준비중</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

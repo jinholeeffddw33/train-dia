@@ -45,6 +45,8 @@ const CHAPTER_LABELS: Record<string, string> = {
   ch6: '한줄노트',
   ch7: '사고사례',
   ch8: '방송문안',
+  ch9: '통화요령',
+  ch10: 'All-Call',
 };
 
 export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSystemProps) {

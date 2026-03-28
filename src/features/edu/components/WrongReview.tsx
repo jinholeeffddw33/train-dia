@@ -22,6 +22,8 @@ const CHAPTER_ID_MAP: Record<string, string> = {
   '한줄노트': 'ch6',
   '사고사례': 'ch7',
   '방송문안': 'ch8',
+  '통화요령': 'ch9',
+  'All-Call': 'ch10',
 };
 
 export default function WrongReview({ onBack, onSection }: WrongReviewProps) {

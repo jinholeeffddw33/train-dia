@@ -1,16 +1,19 @@
 'use client';
 
-import { useMemo } from 'react';
-import { TrainFront } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { TrainFront, Bell, BellOff } from 'lucide-react';
 import type { Schedule, Person } from '@/lib/types';
 import { findExchangePartners, timeToMins } from '@/lib/schedule';
 import { LABELS } from '@/lib/constants';
+import { useAlarmStore, NORMAL_OPTIONS, DEPOT_OPTIONS, ALARM_LABELS, FIXED_TIME_OPTIONS } from '@/stores/alarm';
+import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
 
 interface RouteTimelineProps {
   schedule: Schedule;
   person: Person;
   date: Date;
+  dia?: string;
 }
 
 /** 분 → "N시간 M분" 포맷 */
@@ -21,6 +24,14 @@ function formatDuration(mins: number): string {
   if (h > 0 && m > 0) return `${h}시간 ${m}분`;
   if (h > 0) return `${h}시간`;
   return `${m}분`;
+}
+
+/** 기지 출고 열번 여부 */
+function isDepotTrain(n?: number[]): boolean {
+  if (!n) return false;
+  return n.some(
+    (num) => (num >= 1000 && num <= 1499) || (num >= 1500 && num <= 1599) || (num >= 2000 && num <= 2999),
+  );
 }
 
 /** 두 시각 사이 분 차이 계산 */
@@ -41,11 +52,25 @@ function calcWaitMin(arr: string, dep: string): number {
  * - 구간 간 대기시간
  * - 원본 약호 텍스트
  */
-export default function RouteTimeline({ schedule, person, date }: RouteTimelineProps) {
+export default function RouteTimeline({ schedule, person, date, dia }: RouteTimelineProps) {
   const segs = schedule.g;
   if (!segs || segs.length === 0) return null;
 
   const multi = segs.length > 1;
+  const myDriver = useDriverStore((s) => s.myDriver);
+  const isMe = myDriver && person.I === myDriver.I;
+  const { selected: alarmSelected, toggle: toggleAlarm, fixedTimes, toggleFixed } = useAlarmStore();
+  // DIA 85~91 판별
+  const diaNum = dia ? parseInt(dia.replace(/\D/g, '')) : 0;
+  const isDia85to91 = diaNum >= 85 && diaNum <= 91;
+  const [alarmOpenIdx, setAlarmOpenIdx] = useState<number | null>(null);
+
+  // 야간 여부 (익일 근무 판별)
+  const isOvernight = useMemo(() => {
+    if (!schedule.s || !schedule.e) return false;
+    return timeToMins(schedule.e) <= timeToMins(schedule.s);
+  }, [schedule.s, schedule.e]);
+
   const partners = useMemo(
     () => findExchangePartners(schedule, person, date),
     [schedule, person, date],
@@ -131,13 +156,114 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
               </div>
             </div>
 
-            {/* 구간 간 대기시간 */}
+            {/* 구간 간 대기시간 + 알람 설정 (내 기관사만) */}
             {multi && i < segs.length - 1 && seg.a && segs[i + 1].d && (() => {
               const wait = calcWaitMin(seg.a, segs[i + 1].d);
               if (wait <= 0) return null;
+
+              const nextSeg = segs[i + 1];
+              const depot = isDepotTrain(nextSeg.n);
+              const nextIdx = i + 1;
+              const isOpen = alarmOpenIdx === nextIdx;
+              // 익일 근무 판별: 다음 구간 출발이 현재 구간 도착보다 4시간+ 이르면 익일
+              const nextDep = timeToMins(nextSeg.d);
+              const curArr = timeToMins(seg.a);
+              const isNextDay = nextDep < curArr - 240;
+              // DIA 85~91 익일 구간: 04:30/04:40 고정 알람
+              const useFixedAlarm = isDia85to91 && isNextDay;
+              const hasAlarm = useFixedAlarm
+                ? fixedTimes.length > 0
+                : alarmSelected.length > 0;
+
               return (
-                <div className={styles.rtGap}>
-                  <span>{formatDuration(wait)} 대기</span>
+                <div className={styles.rtGapAlarm}>
+                  <div className={styles.rtGap}>
+                    <span>{formatDuration(wait)} 대기</span>
+                  </div>
+                  {/* 알람 토글 버튼 */}
+                  <button
+                    type="button"
+                    className={`${styles.alarmToggle} ${hasAlarm ? styles.alarmToggleOn : ''}`}
+                    onClick={() => setAlarmOpenIdx(isOpen ? null : nextIdx)}
+                    aria-label={`${nextIdx + 1}근무 알람 설정`}
+                  >
+                    {hasAlarm ? <Bell size={14} /> : <BellOff size={14} />}
+                    <span>{hasAlarm
+                      ? useFixedAlarm
+                        ? `알람 ${fixedTimes.join(', ')}`
+                        : `알람 ${alarmSelected.length}개`
+                      : '알람'}</span>
+                    {isNextDay && <span className={styles.alarmNextDay}>익일</span>}
+                  </button>
+                  {/* 알람 칩 피커 */}
+                  {isOpen && (
+                    <div className={styles.alarmPicker}>
+                      <div className={styles.alarmPickerLabel}>
+                        {nextIdx + 1}근무 출발 알람{isNextDay ? ' (익일)' : ''}
+                      </div>
+                      {/* DIA 85~91 익일: 04:30/04:40 고정 시각만 */}
+                      {useFixedAlarm ? (
+                        <div className={styles.alarmChips}>
+                          {FIXED_TIME_OPTIONS.map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              className={`${styles.alarmChip} ${fixedTimes.includes(t) ? styles.alarmChipOn : ''}`}
+                              onClick={() => toggleFixed(t)}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+                      ) : isNextDay && depot ? (
+                        /* 익일 기지 출고 (85~91 외): 1시간/1시간10분전만 */
+                        <div className={styles.alarmChips}>
+                          {DEPOT_OPTIONS.map((m) => (
+                            <button
+                              key={m}
+                              type="button"
+                              className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                              onClick={() => toggleAlarm(m)}
+                            >
+                              {ALARM_LABELS[m]}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <>
+                          <div className={styles.alarmChips}>
+                            {NORMAL_OPTIONS.map((m) => (
+                              <button
+                                key={m}
+                                type="button"
+                                className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                                onClick={() => toggleAlarm(m)}
+                              >
+                                {ALARM_LABELS[m]}
+                              </button>
+                            ))}
+                          </div>
+                          {depot && (
+                            <>
+                              <div className={styles.alarmPickerLabel}>기지 출고</div>
+                              <div className={styles.alarmChips}>
+                                {DEPOT_OPTIONS.map((m) => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                                    onClick={() => toggleAlarm(m)}
+                                  >
+                                    {ALARM_LABELS[m]}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })()}

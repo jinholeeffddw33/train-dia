@@ -1287,373 +1287,3236 @@
         {
           "id": "ch5a-1",
           "title": "판타그라프 상승불량",
-          "summary": ["전량/1량 판타그라프 상승불량 시 응급조치"],
+          "summary": [
+            "전량/1량 판타그라프 상승불량 시 응급조치"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "전량 판타그라프 상승불량" },
-              { "term": "2", "desc": "1량 판타그라프 상승불량" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["축전지 전압(70V), ACM 기동상태, 주공기압력 확인"] },
-              { "label": "2", "items": ["운전실 회로차단기(PanUN) 확인"] },
-              { "label": "3", "items": ["운전실 비상판타하강스위치 취급상태 확인"] },
-              { "label": "4", "items": ["판타그라프 상승 스위치(PanUS) 2~3초 누름"] },
-              { "label": "5", "items": ["객실 내 회로차단기(PanVN), Pan 전자변·Cock 상태 확인"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_002.jpg", "caption": "축전지 전압계, 주공기압력계 확인" },
-              { "src": "/images/edu/abb/img_003.jpg", "caption": "판타그라프 상승·하강 S/W" },
-              { "src": "/images/edu/abb/img_004.jpg", "caption": "해당차량 객실 회로차단기 확인" },
-              { "src": "/images/edu/abb/img_005.jpg", "caption": "판타그라프 상승 후 계기판" },
-              { "src": "/images/edu/abb/img_006.jpg", "caption": "TCMS 모니터 확인" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "전량 판타그라프 상승불량"
+                },
+                {
+                  "term": "2",
+                  "desc": "1량 판타그라프 상승불량"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "축전지 전압(70V), ACM 기동상태, 주공기압력 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 회로차단기(PanUN) 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "운전실 비상판타하강스위치 취급상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "판타그라프 상승 스위치(PanUS) 2~3초 누름"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "객실 내 회로차단기(PanVN), Pan 전자변·Cock 상태 확인"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_002.jpg",
+                  "caption": "축전지 전압계, 주공기압력계 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_003.jpg",
+                  "caption": "판타그라프 상승·하강 S/W"
+                },
+                {
+                  "src": "/images/edu/abb/img_004.jpg",
+                  "caption": "해당차량 객실 회로차단기 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_005.jpg",
+                  "caption": "판타그라프 상승 후 계기판"
+                },
+                {
+                  "src": "/images/edu/abb/img_006.jpg",
+                  "caption": "TCMS 모니터 확인"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-2",
           "title": "주공기압력 상승 불량",
-          "summary": ["운전실 주공기압력계 상승불량 시 응급조치"],
+          "summary": [
+            "운전실 주공기압력계 상승불량 시 응급조치"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "text", "text": "운전실 주공기압력계 상승불량" },
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["판타그라프 상승상태 확인"] },
-              { "label": "2", "items": ["TCMS(FIS) 모니터 CM 기동상태 확인"] },
-              { "label": "3", "items": ["객실내 CMCN, CMGN 상태 확인"] },
-              { "label": "4", "items": ["객실 하부, 연결기 부위 공기누기 소음 확인"] },
-              { "label": "5", "items": ["MRPS 동작시 EBCOS 취급"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_007.jpg", "caption": "주공기압력계" },
-              { "src": "/images/edu/abb/img_008.jpg", "caption": "CMCN, CMGN 확인" },
-              { "src": "/images/edu/abb/img_009.jpg", "caption": "EBCOS" },
-              { "src": "/images/edu/abb/img_010.jpg", "caption": "해당량 객실하부 공기누기 / EBCOS" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "text",
+              "text": "운전실 주공기압력계 상승불량"
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "판타그라프 상승상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "TCMS(FIS) 모니터 CM 기동상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "객실내 CMCN, CMGN 상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "객실 하부, 연결기 부위 공기누기 소음 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "MRPS 동작시 EBCOS 취급"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_007.jpg",
+                  "caption": "주공기압력계"
+                },
+                {
+                  "src": "/images/edu/abb/img_008.jpg",
+                  "caption": "CMCN, CMGN 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_009.jpg",
+                  "caption": "EBCOS"
+                },
+                {
+                  "src": "/images/edu/abb/img_010.jpg",
+                  "caption": "해당량 객실하부 공기누기 / EBCOS"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-3",
           "title": "비상제동 풀기 불량",
-          "summary": ["비상제동표시등 점등, BC 4.1㎏/㎠ 현시, 7 step시 해방 불능"],
+          "summary": [
+            "비상제동표시등 점등, BC 4.1㎏/㎠ 현시, 7 step시 해방 불능"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "비상제동표시등 점등" },
-              { "term": "2", "desc": "제동압력(BC) 4.1㎏/㎠ 현시" },
-              { "term": "3", "desc": "제동 7 step시 비상제동 해방 불능" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["주공기압력 확인, 운전모드 확인, 주간제어기 제동취급 위치 확인"] },
-              { "label": "2", "items": ["비상·보안제동스위치 취급상태 확인"] },
-              { "label": "3", "items": ["운전실 회로차단기·계전기(비상제동 NFB, ATC NFB 등) 상태 확인"] },
-              { "label": "4", "items": ["복귀 불가시 EBCOS 취급"] },
-              { "label": "5", "items": ["운전모드 스위치를 비상으로 전환"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_011.jpg", "caption": "TCMS 화면" },
-              { "src": "/images/edu/abb/img_012.jpg", "caption": "비상제동등 점등상태" },
-              { "src": "/images/edu/abb/img_013.jpg", "caption": "운전실 회로차단기, 계전기" },
-              { "src": "/images/edu/abb/img_014.jpg", "caption": "EBCOS / 운전모드스위치(비상)" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "비상제동표시등 점등"
+                },
+                {
+                  "term": "2",
+                  "desc": "제동압력(BC) 4.1㎏/㎠ 현시"
+                },
+                {
+                  "term": "3",
+                  "desc": "제동 7 step시 비상제동 해방 불능"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "주공기압력 확인, 운전모드 확인, 주간제어기 제동취급 위치 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "비상·보안제동스위치 취급상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "운전실 회로차단기·계전기(비상제동 NFB, ATC NFB 등) 상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "복귀 불가시 EBCOS 취급"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "운전모드 스위치를 비상으로 전환"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_011.jpg",
+                  "caption": "TCMS 화면"
+                },
+                {
+                  "src": "/images/edu/abb/img_012.jpg",
+                  "caption": "비상제동등 점등상태"
+                },
+                {
+                  "src": "/images/edu/abb/img_013.jpg",
+                  "caption": "운전실 회로차단기, 계전기"
+                },
+                {
+                  "src": "/images/edu/abb/img_014.jpg",
+                  "caption": "EBCOS / 운전모드스위치(비상)"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-4",
           "title": "제동 풀기 불량",
-          "summary": ["주차제동등 점등, 역행(동력운전) 불능"],
+          "summary": [
+            "주차제동등 점등, 역행(동력운전) 불능"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "주차제동등 점등" },
-              { "term": "2", "desc": "역행(동력운전) 불능" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["주공기압력 확인, 제동압력 확인"] },
-              { "label": "2", "items": ["TCMS 고장상태 확인"] },
-              { "label": "3", "items": ["강제완해 스위치 취급 (강제완해 스위치 취급 중 ECUN 취급금지)"] },
-              { "label": "4", "items": ["해당차호 ECU차단기 OFF/ON (대차 타는냄새 확인)"] },
-              { "label": "5", "items": ["해당차호 SR 콕크 개방"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_015.jpg", "caption": "주공기압력계(MR,BC)" },
-              { "src": "/images/edu/abb/img_016.jpg", "caption": "주차제동스위치 / 주공기압력" },
-              { "src": "/images/edu/abb/img_017.jpg", "caption": "운전실 회로차단기" },
-              { "src": "/images/edu/abb/img_018.jpg", "caption": "주차제동 완해 스위치" },
-              { "src": "/images/edu/abb/img_019.jpg", "caption": "임펄스 전자변" },
-              { "src": "/images/edu/abb/img_020.jpg", "caption": "주차제동 당김 고리" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "주차제동등 점등"
+                },
+                {
+                  "term": "2",
+                  "desc": "역행(동력운전) 불능"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "주공기압력 확인, 제동압력 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "TCMS 고장상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "강제완해 스위치 취급 (강제완해 스위치 취급 중 ECUN 취급금지)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "해당차호 ECU차단기 OFF/ON (대차 타는냄새 확인)"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "해당차호 SR 콕크 개방"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_015.jpg",
+                  "caption": "주공기압력계(MR,BC)"
+                },
+                {
+                  "src": "/images/edu/abb/img_016.jpg",
+                  "caption": "주차제동스위치 / 주공기압력"
+                },
+                {
+                  "src": "/images/edu/abb/img_017.jpg",
+                  "caption": "운전실 회로차단기"
+                },
+                {
+                  "src": "/images/edu/abb/img_018.jpg",
+                  "caption": "주차제동 완해 스위치"
+                },
+                {
+                  "src": "/images/edu/abb/img_019.jpg",
+                  "caption": "임펄스 전자변"
+                },
+                {
+                  "src": "/images/edu/abb/img_020.jpg",
+                  "caption": "주차제동 당김 고리"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-5",
           "title": "주차제동 풀기 불량",
-          "summary": ["주차제동등 점등, 역행(동력운전) 불능"],
+          "summary": [
+            "주차제동등 점등, 역행(동력운전) 불능"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "주차제동등 점등" },
-              { "term": "2", "desc": "역행(동력운전) 불능" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["주차제동 완해스위치 확인"] },
-              { "label": "2", "items": ["운전실 좌측 하부의 주차제동변의 완해측 타격"] },
-              { "label": "3", "items": ["완해불능시 반대편 운전실에서 1,2항 실시"] },
-              { "label": "4", "items": ["운전실 배전반 주차제동 NFB ON"] },
-              { "label": "5", "items": ["주차제동 완해고리 당김"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_021.jpg", "caption": "주차제동스위치" },
-              { "src": "/images/edu/abb/img_022.jpg", "caption": "주공기압력" },
-              { "src": "/images/edu/abb/img_023.jpg", "caption": "운전실 회로차단기" },
-              { "src": "/images/edu/abb/img_024.jpg", "caption": "주차제동 완해 스위치" },
-              { "src": "/images/edu/abb/img_025.jpg", "caption": "임펄스 전자변" },
-              { "src": "/images/edu/abb/img_026.jpg", "caption": "주차제동 NFB" },
-              { "src": "/images/edu/abb/img_027.jpg", "caption": "주차제동 당김 고리" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "주차제동등 점등"
+                },
+                {
+                  "term": "2",
+                  "desc": "역행(동력운전) 불능"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "주차제동 완해스위치 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 좌측 하부의 주차제동변의 완해측 타격"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "완해불능시 반대편 운전실에서 1,2항 실시"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "운전실 배전반 주차제동 NFB ON"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "주차제동 완해고리 당김"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_021.jpg",
+                  "caption": "주차제동스위치"
+                },
+                {
+                  "src": "/images/edu/abb/img_022.jpg",
+                  "caption": "주공기압력"
+                },
+                {
+                  "src": "/images/edu/abb/img_023.jpg",
+                  "caption": "운전실 회로차단기"
+                },
+                {
+                  "src": "/images/edu/abb/img_024.jpg",
+                  "caption": "주차제동 완해 스위치"
+                },
+                {
+                  "src": "/images/edu/abb/img_025.jpg",
+                  "caption": "임펄스 전자변"
+                },
+                {
+                  "src": "/images/edu/abb/img_026.jpg",
+                  "caption": "주차제동 NFB"
+                },
+                {
+                  "src": "/images/edu/abb/img_027.jpg",
+                  "caption": "주차제동 당김 고리"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-6",
           "title": "운전실 출입문표시등 점등불량",
-          "summary": ["운전실 데스크 출입문 표시등 소등, 동력운전 불능"],
+          "summary": [
+            "운전실 데스크 출입문 표시등 소등, 동력운전 불능"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "운전실 데스크 출입문 표시등 소등" },
-              { "term": "2", "desc": "동력운전 불능" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["TCMS 출입문 닫힘상태 확인"] },
-              { "label": "2", "items": ["운전실 출입문 표시등 상태, 전차량 계전기 투입상태 확인"] },
-              { "label": "3", "items": ["운전모드 수동, 출입문 모드 수/수 취급"] },
-              { "label": "4", "items": ["출입문 2~3회 개·폐, ALL DOOR BYPASS 취급 (사령에 보고)"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_028.jpg", "caption": "TCMS 화면" },
-              { "src": "/images/edu/abb/img_029.jpg", "caption": "운전실 출입문 표시등" },
-              { "src": "/images/edu/abb/img_030.jpg", "caption": "전차량 닫힘계전기" },
-              { "src": "/images/edu/abb/img_031.jpg", "caption": "운전모드 수동 / 출입문 모드 수/수 / ALL DOOR BYPASS" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "운전실 데스크 출입문 표시등 소등"
+                },
+                {
+                  "term": "2",
+                  "desc": "동력운전 불능"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 출입문 닫힘상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 출입문 표시등 상태, 전차량 계전기 투입상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "운전모드 수동, 출입문 모드 수/수 취급"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "출입문 2~3회 개·폐, ALL DOOR BYPASS 취급 (사령에 보고)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_028.jpg",
+                  "caption": "TCMS 화면"
+                },
+                {
+                  "src": "/images/edu/abb/img_029.jpg",
+                  "caption": "운전실 출입문 표시등"
+                },
+                {
+                  "src": "/images/edu/abb/img_030.jpg",
+                  "caption": "전차량 닫힘계전기"
+                },
+                {
+                  "src": "/images/edu/abb/img_031.jpg",
+                  "caption": "운전모드 수동 / 출입문 모드 수/수 / ALL DOOR BYPASS"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-7",
           "title": "전 차량 출입문 열림 불량",
-          "summary": ["역사 정위치정차 후 출입문 열리지 않음"],
+          "summary": [
+            "역사 정위치정차 후 출입문 열리지 않음"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "역사 정위치정차 후 출입문 열리지 않음" },
-              { "term": "2", "desc": "약 10초후 개별 출입문 개방불량 고장현시" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["정위치정차 상태 확인, 승강장안전문 열림상태 확인"] },
-              { "label": "2", "items": ["운전실 ATC 배전반내 계전기(LDE,RDE) 동작상태 확인"] },
-              { "label": "3", "items": ["배전반 전차량 출입문 회로차단기 TRIP 확인"] },
-              { "label": "4", "items": ["운전모드 수동, 출입문 모드 수/수 취급"] },
-              { "label": "5", "items": ["출입문 수동 열림취급, 차내의 CR 코크 확인"] },
-              { "label": "6", "items": ["비상모드로 전환, 출입문모드 수/수 취급후 출입문 열림취급"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_032.jpg", "caption": "출입문 조작패널" },
-              { "src": "/images/edu/abb/img_033.jpg", "caption": "출입문 수동 스위치" },
-              { "src": "/images/edu/abb/img_034.jpg", "caption": "LDE,RDE 동작상태 확인" },
-              { "src": "/images/edu/abb/img_035.jpg", "caption": "전차량 출입문 회로차단기 TRIP 확인" },
-              { "src": "/images/edu/abb/img_036.jpg", "caption": "비상모드 전환, 출입문모드 수/수 취급" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "역사 정위치정차 후 출입문 열리지 않음"
+                },
+                {
+                  "term": "2",
+                  "desc": "약 10초후 개별 출입문 개방불량 고장현시"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "정위치정차 상태 확인, 승강장안전문 열림상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 ATC 배전반내 계전기(LDE,RDE) 동작상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "배전반 전차량 출입문 회로차단기 TRIP 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "운전모드 수동, 출입문 모드 수/수 취급"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "출입문 수동 열림취급, 차내의 CR 코크 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "비상모드로 전환, 출입문모드 수/수 취급후 출입문 열림취급"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_032.jpg",
+                  "caption": "출입문 조작패널"
+                },
+                {
+                  "src": "/images/edu/abb/img_033.jpg",
+                  "caption": "출입문 수동 스위치"
+                },
+                {
+                  "src": "/images/edu/abb/img_034.jpg",
+                  "caption": "LDE,RDE 동작상태 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_035.jpg",
+                  "caption": "전차량 출입문 회로차단기 TRIP 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_036.jpg",
+                  "caption": "비상모드 전환, 출입문모드 수/수 취급"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-8",
           "title": "전 차량 출입문 닫힘불량",
-          "summary": ["실제 출입문 닫힘 후 표시등 소등 / 실제 닫힘불가(전량)"],
+          "summary": [
+            "실제 출입문 닫힘 후 표시등 소등 / 실제 닫힘불가(전량)"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1. 실제 출입문 닫힘", "desc": "① 운전실 출입문표시등 소등 ② 역행불가, 해당차호 차측등 점등" },
-              { "term": "2. 실제 출입문 닫힘불가(전량)", "desc": "① 운전실 출입문표시등 소등 ② TCMS 모니터 출입문 열림 표시 ③ 전 차량 차측등 점등" }
-            ]},
-            { "type": "heading", "text": "1. 실제 출입문 닫힘 (TCMS 모니터 닫힘불가 고장없음)" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"] },
-              { "label": "②", "items": ["운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"] },
-              { "label": "③", "items": ["각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인"] },
-              { "label": "④", "items": ["전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행가능"] }
-            ]},
-            { "type": "heading", "text": "2. 실제 출입문 닫힘 불량 (TCMS 모니터 닫힘불가 고장현시)" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"] },
-              { "label": "②", "items": ["전량 출입문 닫힘 불가시 — 출입문 닫힘버튼 확인 후 또 다른 출입문 버튼취급, 전차량 출입문 회로차단기 차단"] },
-              { "label": "③", "items": ["한량 출입문 닫힘 불가시 — CC 불량 확인, 한량 출입문회로 차단 NFB 취급, 출입문 대표 COCK 확인"] }
-            ]},
-            { "type": "callout", "variant": "warning", "text": "※ ALL DOOR BY-PASS 스위치 취급시 확인사항: 운전모드 수동모드, 출입문모드 수/수모드" },
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_037.jpg", "caption": "출입문 개별 버튼(닫힘/재개폐/열림)" },
-              { "src": "/images/edu/abb/img_038.jpg", "caption": "출입문 닫힘 표시등 점등 상태 확인" },
-              { "src": "/images/edu/abb/img_039.jpg", "caption": "전차량 닫힘 계전기 동작확인 및 교환" },
-              { "src": "/images/edu/abb/img_040.jpg", "caption": "각량 출입문 닫힘상태(도어스위치 부위) 확인" },
-              { "src": "/images/edu/abb/img_041.jpg", "caption": "CC 출입문 개방신호 계속 출력 확인" },
-              { "src": "/images/edu/abb/img_042.jpg", "caption": "출입문 대표 COCK 확인" },
-              { "src": "/images/edu/abb/img_043.jpg", "caption": "출입문 표시등 확인" },
-              { "src": "/images/edu/abb/img_044.jpg", "caption": "ALL DOOR BY PASS 취급" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1. 실제 출입문 닫힘",
+                  "desc": "① 운전실 출입문표시등 소등 ② 역행불가, 해당차호 차측등 점등"
+                },
+                {
+                  "term": "2. 실제 출입문 닫힘불가(전량)",
+                  "desc": "① 운전실 출입문표시등 소등 ② TCMS 모니터 출입문 열림 표시 ③ 전 차량 차측등 점등"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "1. 실제 출입문 닫힘 (TCMS 모니터 닫힘불가 고장없음)"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행가능"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "2. 실제 출입문 닫힘 불량 (TCMS 모니터 닫힘불가 고장현시)"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "전량 출입문 닫힘 불가시 — 출입문 닫힘버튼 확인 후 또 다른 출입문 버튼취급, 전차량 출입문 회로차단기 차단"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "한량 출입문 닫힘 불가시 — CC 불량 확인, 한량 출입문회로 차단 NFB 취급, 출입문 대표 COCK 확인"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ ALL DOOR BY-PASS 스위치 취급시 확인사항: 운전모드 수동모드, 출입문모드 수/수모드"
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_037.jpg",
+                  "caption": "출입문 개별 버튼(닫힘/재개폐/열림)"
+                },
+                {
+                  "src": "/images/edu/abb/img_038.jpg",
+                  "caption": "출입문 닫힘 표시등 점등 상태 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_039.jpg",
+                  "caption": "전차량 닫힘 계전기 동작확인 및 교환"
+                },
+                {
+                  "src": "/images/edu/abb/img_040.jpg",
+                  "caption": "각량 출입문 닫힘상태(도어스위치 부위) 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_041.jpg",
+                  "caption": "CC 출입문 개방신호 계속 출력 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_042.jpg",
+                  "caption": "출입문 대표 COCK 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_043.jpg",
+                  "caption": "출입문 표시등 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_044.jpg",
+                  "caption": "ALL DOOR BY PASS 취급"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-9",
           "title": "출입문(1개) 닫힘불량",
-          "summary": ["운전실 출입문표시등 점등 안됨, TCMS 출입문 열림표시"],
+          "summary": [
+            "운전실 출입문표시등 점등 안됨, TCMS 출입문 열림표시"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "운전실 출입문표시등 점등 안됨" },
-              { "term": "2", "desc": "TCMS 출입문 열림표시" },
-              { "term": "3", "desc": "해당 차량 차측등 점등" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["TCMS 출입문 위치 확인, 해당 차량 차측등 확인"] },
-              { "label": "2", "items": ["해당 차량 출입문 열림상태 확인"] },
-              { "label": "3", "items": ["출입문 개별코크, 도어엔진 V패킹너트, 출입문 압봉, 전자변, 소음기, 에어누기여부 확인 조치"] },
-              { "label": "4", "items": ["DOOR POCKET 출입문 간섭확인"] },
-              { "label": "5", "items": ["출입문 개별 By-Pass 스위치 취급"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_045.jpg", "caption": "전량 출입문 닫힘 표시등 점등 상태 확인" },
-              { "src": "/images/edu/abb/img_046.jpg", "caption": "도어엔진 동작상태 확인 / 전차량 닫힘 계전기 교환" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "운전실 출입문표시등 점등 안됨"
+                },
+                {
+                  "term": "2",
+                  "desc": "TCMS 출입문 열림표시"
+                },
+                {
+                  "term": "3",
+                  "desc": "해당 차량 차측등 점등"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 출입문 위치 확인, 해당 차량 차측등 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "해당 차량 출입문 열림상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "출입문 개별코크, 도어엔진 V패킹너트, 출입문 압봉, 전자변, 소음기, 에어누기여부 확인 조치"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "DOOR POCKET 출입문 간섭확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "출입문 개별 By-Pass 스위치 취급"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_045.jpg",
+                  "caption": "전량 출입문 닫힘 표시등 점등 상태 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_046.jpg",
+                  "caption": "도어엔진 동작상태 확인 / 전차량 닫힘 계전기 교환"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-10",
           "title": "역행불능",
-          "summary": ["역행 취급 시 전류계 상승불량, 전차선 전압계 0 현시"],
+          "summary": [
+            "역행 취급 시 전류계 상승불량, 전차선 전압계 0 현시"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "역행(동력운전) 취급 시 전류계 상승불량" },
-              { "term": "2", "desc": "전차선 전압계 \"0\" 현시" },
-              { "term": "3", "desc": "운전실 출입문표시등 점등 안됨" }
-            ]},
-            { "type": "heading", "text": "1. 전류계 상승불량, 전차선 전압계 \"0\" 현시" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["TCMS 고장 확인. 해당 차호 MIM 회로차단기 차단"] },
-              { "label": "②", "items": ["PAN UP 스위치 취급"] }
-            ]},
-            { "type": "heading", "text": "2. 운전실 출입문표시등 점등 안됨" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"] },
-              { "label": "②", "items": ["운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"] },
-              { "label": "③", "items": ["각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인 → 불량시 교환"] },
-              { "label": "④", "items": ["원인불명시 전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_047.jpg", "caption": "전압계, 전류계 OFF" },
-              { "src": "/images/edu/abb/img_048.jpg", "caption": "Pan Up 스위치 취급" },
-              { "src": "/images/edu/abb/img_049.jpg", "caption": "ATC 배전반 확인" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "역행(동력운전) 취급 시 전류계 상승불량"
+                },
+                {
+                  "term": "2",
+                  "desc": "전차선 전압계 \"0\" 현시"
+                },
+                {
+                  "term": "3",
+                  "desc": "운전실 출입문표시등 점등 안됨"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "1. 전류계 상승불량, 전차선 전압계 \"0\" 현시"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "TCMS 고장 확인. 해당 차호 MIM 회로차단기 차단"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "PAN UP 스위치 취급"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "2. 운전실 출입문표시등 점등 안됨"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인 → 불량시 교환"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "원인불명시 전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_047.jpg",
+                  "caption": "전압계, 전류계 OFF"
+                },
+                {
+                  "src": "/images/edu/abb/img_048.jpg",
+                  "caption": "Pan Up 스위치 취급"
+                },
+                {
+                  "src": "/images/edu/abb/img_049.jpg",
+                  "caption": "ATC 배전반 확인"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-11",
           "title": "ATO/ATC 동작불량",
-          "summary": ["ADU 주/예비 ATC 고장등 점등, 비상제동 표시등 점등"],
+          "summary": [
+            "ADU 주/예비 ATC 고장등 점등, 비상제동 표시등 점등"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "ADU 주/예비 ATC 고장등 점등" },
-              { "term": "2", "desc": "비상제동 표시등 점등" },
-              { "term": "3", "desc": "TCMS 모니터 ATC 통신고장, ATO 통신고장 현시" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["ATC 전원공급기 확인"] },
-              { "label": "2", "items": ["ATO/ATC 각 PCB LED 상태 확인"] },
-              { "label": "3", "items": ["ATC CPU 보드를 통하여 ATC Event Log 확인"] },
-              { "label": "4", "items": ["전동차 정지, 출입문 닫힘상태에서 ATO/ATC Reset"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_050.jpg", "caption": "ATC 전원공급기 확인" },
-              { "src": "/images/edu/abb/img_051.jpg", "caption": "ATO/ATC 각 PCB LED 상태 확인" },
-              { "src": "/images/edu/abb/img_052.jpg", "caption": "리셋스위치 reset 취급" },
-              { "src": "/images/edu/abb/img_053.jpg", "caption": "ATC 회로차단기로 ATC reset 취급" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "ADU 주/예비 ATC 고장등 점등"
+                },
+                {
+                  "term": "2",
+                  "desc": "비상제동 표시등 점등"
+                },
+                {
+                  "term": "3",
+                  "desc": "TCMS 모니터 ATC 통신고장, ATO 통신고장 현시"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "ATC 전원공급기 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "ATO/ATC 각 PCB LED 상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "ATC CPU 보드를 통하여 ATC Event Log 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "전동차 정지, 출입문 닫힘상태에서 ATO/ATC Reset"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_050.jpg",
+                  "caption": "ATC 전원공급기 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_051.jpg",
+                  "caption": "ATO/ATC 각 PCB LED 상태 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_052.jpg",
+                  "caption": "리셋스위치 reset 취급"
+                },
+                {
+                  "src": "/images/edu/abb/img_053.jpg",
+                  "caption": "ATC 회로차단기로 ATC reset 취급"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-12",
           "title": "전부 TC, LIU 불량",
-          "summary": ["TC 고장 — 계기등 소등, FIS 현시불가 / LIU 고장 — ADU off, 계기등 소등"],
+          "summary": [
+            "TC 고장 — 계기등 소등, FIS 현시불가 / LIU 고장 — ADU off, 계기등 소등"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1. TC고장", "desc": "운전실 계기등(전압계,전류계) 소등, FIS 모니터 현시불가, 비상전원차단등·연장급전등·LIU절체등 점등" },
-              { "term": "2. LIU고장 (LIU2 자동절체 안된 경우)", "desc": "FIS 모니터 현시불가, ADU off, HCR/TCR계전기 소자, 전류·전압·밧데리 계기등 소등, LIU1,2 STALL계전기 소자, L/B 개방 및 AC형광등 소등" }
-            ]},
-            { "type": "heading", "text": "TC 고장 조치" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["차량을 재기동 (PAN하강, 역전기 중립 후 다시 기동)"] },
-              { "label": "②", "items": ["TC 컴퓨터 고장원인 소멸시 FIS 정상 기동 — 정상운행(4/4출력) 가능"] },
-              { "label": "③", "items": ["재기동 후에도 동일고장이면 1/2출력으로 차량기지 입고"] }
-            ]},
-            { "type": "heading", "text": "LIU 고장 조치 (LIU2 자동절체 안된 경우)" },
-            { "type": "flow", "steps": [
-              { "label": "①", "items": ["LIU Reset 스위치 취급 (22초 이상) — LIU 절체등 점등, ADU 현시상태 확인"] },
-              { "label": "②", "items": ["정상 절체 되면 전동차 출력 정상"] },
-              { "label": "③", "items": ["절체 안될시 차량을 재기동"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_054.jpg", "caption": "P/S LED 확인" },
-              { "src": "/images/edu/abb/img_055.jpg", "caption": "TC LED 확인" },
-              { "src": "/images/edu/abb/img_056.jpg", "caption": "LIU 절체등 점등 확인" },
-              { "src": "/images/edu/abb/img_057.jpg", "caption": "조치 안될시 PAN하강, 역전기 OFF로 열차 재기동" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1. TC고장",
+                  "desc": "운전실 계기등(전압계,전류계) 소등, FIS 모니터 현시불가, 비상전원차단등·연장급전등·LIU절체등 점등"
+                },
+                {
+                  "term": "2. LIU고장 (LIU2 자동절체 안된 경우)",
+                  "desc": "FIS 모니터 현시불가, ADU off, HCR/TCR계전기 소자, 전류·전압·밧데리 계기등 소등, LIU1,2 STALL계전기 소자, L/B 개방 및 AC형광등 소등"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "TC 고장 조치"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "차량을 재기동 (PAN하강, 역전기 중립 후 다시 기동)"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "TC 컴퓨터 고장원인 소멸시 FIS 정상 기동 — 정상운행(4/4출력) 가능"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "재기동 후에도 동일고장이면 1/2출력으로 차량기지 입고"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "LIU 고장 조치 (LIU2 자동절체 안된 경우)"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "LIU Reset 스위치 취급 (22초 이상) — LIU 절체등 점등, ADU 현시상태 확인"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "정상 절체 되면 전동차 출력 정상"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "절체 안될시 차량을 재기동"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_054.jpg",
+                  "caption": "P/S LED 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_055.jpg",
+                  "caption": "TC LED 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_056.jpg",
+                  "caption": "LIU 절체등 점등 확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_057.jpg",
+                  "caption": "조치 안될시 PAN하강, 역전기 OFF로 열차 재기동"
+                }
+              ]
+            }
           ]
         },
         {
           "id": "ch5a-13",
           "title": "인버터(MIM/AIM) 불량",
-          "summary": ["TCMS 인버터 고장기록 현시, 모듈콘텍터 차단, 비상전원차단등 점등"],
+          "summary": [
+            "TCMS 인버터 고장기록 현시, 모듈콘텍터 차단, 비상전원차단등 점등"
+          ],
           "content": [
-            { "type": "heading", "text": "불량현상" },
-            { "type": "list", "items": [
-              { "term": "1", "desc": "TCMS 인버터 고장기록 현시" },
-              { "term": "2", "desc": "인버터 모듈콘텍터 차단, 주회로 차단기 개방" },
-              { "term": "3", "desc": "운전실 표시등(비상전원차단등) 점등" }
-            ]},
-            { "type": "heading", "text": "단계별 조치요령" },
-            { "type": "flow", "steps": [
-              { "label": "1", "items": ["TCMS 고장정보 확인"] },
-              { "label": "2", "items": ["판타그라프 상승, L/B 투입 버튼 누름 (3/4출력으로 운행가능) — MIM1,2 단독고장일 경우"] },
-              { "label": "3", "items": ["인버터모듈 자체블록 되는 경우 (MIM1,2 동시) — 열차 재기동 하여야 함"] },
-              { "label": "4", "items": ["1/2출력(L/B개방) 되는 경우 — MIM1,2, AIM 동시 병발고장. 판상승 L/B투입 버튼 취급은 신중해야 함"] },
-              { "label": "5", "items": ["AIM고장으로 인한 연장급전 — 판타그라프 상승, L/B 투입 버튼 누름 (4/4출력으로 운행가능)"] }
-            ]},
-            { "type": "heading", "text": "조치방법 참고 사진" },
-            { "type": "images", "items": [
-              { "src": "/images/edu/abb/img_058.jpg", "caption": "TCMS 모니터 고장확인" },
-              { "src": "/images/edu/abb/img_059.jpg", "caption": "Pan Up 스위치 취급" }
-            ]}
+            {
+              "type": "heading",
+              "text": "불량현상"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "1",
+                  "desc": "TCMS 인버터 고장기록 현시"
+                },
+                {
+                  "term": "2",
+                  "desc": "인버터 모듈콘텍터 차단, 주회로 차단기 개방"
+                },
+                {
+                  "term": "3",
+                  "desc": "운전실 표시등(비상전원차단등) 점등"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "단계별 조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 고장정보 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "판타그라프 상승, L/B 투입 버튼 누름 (3/4출력으로 운행가능) — MIM1,2 단독고장일 경우"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "인버터모듈 자체블록 되는 경우 (MIM1,2 동시) — 열차 재기동 하여야 함"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "1/2출력(L/B개방) 되는 경우 — MIM1,2, AIM 동시 병발고장. 판상승 L/B투입 버튼 취급은 신중해야 함"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "AIM고장으로 인한 연장급전 — 판타그라프 상승, L/B 투입 버튼 누름 (4/4출력으로 운행가능)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "조치방법 참고 사진"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/abb/img_058.jpg",
+                  "caption": "TCMS 모니터 고장확인"
+                },
+                {
+                  "src": "/images/edu/abb/img_059.jpg",
+                  "caption": "Pan Up 스위치 취급"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch5b",
+      "title": "우진 전동차 고장조치",
+      "icon": "🔧",
+      "sections": [
+        {
+          "id": "ch5b-1",
+          "title": "기동요령 및 운전준비",
+          "summary": [
+            "MC키 ON → Pan 상승 → 기능시험 → PDT 시험 → 출고 준비"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "기동요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "MC 키 삽입 후 시계방향으로 돌려 ON 위치(19선 가압) — TCMS, ATC 초기화, 축전지 전압 75V 이상"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "Pan 상승 안내방송 2~3회 반복 실시"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "운전실 판토그라프 상승 버튼 취급(ACM ON) — 약 10분 이내 상승 완료 및 SIV 기동"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "주공기 압력 8~9kg/cm² 이상 대기 후 역전기 제동 취급, 기능시험"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_001.jpg",
+                  "caption": "MC ON"
+                },
+                {
+                  "src": "/images/edu/woojin/img_002.jpg",
+                  "caption": "TCMS 초기화"
+                },
+                {
+                  "src": "/images/edu/woojin/img_003.jpg",
+                  "caption": "ATC 초기화"
+                },
+                {
+                  "src": "/images/edu/woojin/img_004.jpg",
+                  "caption": "축전지 전압계"
+                },
+                {
+                  "src": "/images/edu/woojin/img_005.jpg",
+                  "caption": "PAN 상승 안내방송"
+                },
+                {
+                  "src": "/images/edu/woojin/img_006.jpg",
+                  "caption": "PAN 상승 S/W 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_007.jpg",
+                  "caption": "PAN 상승"
+                },
+                {
+                  "src": "/images/edu/woojin/img_008.jpg",
+                  "caption": "전차선 전압계"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "기능시험"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "제동장치 상태 및 기능시험 — 상용제동, EBS, 보안제동, EBCOS, 주차제동"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "역행시험 — 역전기 전진, 보안제동 체결, 주간제어기 역행 1단"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "전·후 운전실 열차무선장치(LTE) 성능 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "기적, 표시등, 계기등, 전조등, 후미등, 객실등, 행선표시기 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "각종 NFB 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "자동안내 방송장치 기능 확인"
+                  ]
+                },
+                {
+                  "label": "7",
+                  "items": [
+                    "전·후 운전실 PDT 시험(ATC) — 시험 도중 중단 금지"
+                  ]
+                },
+                {
+                  "label": "8",
+                  "items": [
+                    "출고준비 완료 후 관계처에 통보"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_009.jpg",
+                  "caption": "상용제동"
+                },
+                {
+                  "src": "/images/edu/woojin/img_010.jpg",
+                  "caption": "EBS(비상제동)"
+                },
+                {
+                  "src": "/images/edu/woojin/img_011.jpg",
+                  "caption": "보안제동 체결/완해"
+                },
+                {
+                  "src": "/images/edu/woojin/img_012.jpg",
+                  "caption": "EBCOS(비상제동차단)"
+                },
+                {
+                  "src": "/images/edu/woojin/img_013.jpg",
+                  "caption": "주차제동 체결"
+                },
+                {
+                  "src": "/images/edu/woojin/img_014.jpg",
+                  "caption": "주차제동 완해"
+                },
+                {
+                  "src": "/images/edu/woojin/img_015.jpg",
+                  "caption": "역전기 전진"
+                },
+                {
+                  "src": "/images/edu/woojin/img_016.jpg",
+                  "caption": "보안제동 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_017.jpg",
+                  "caption": "DU 상태확인 → 인버터"
+                },
+                {
+                  "src": "/images/edu/woojin/img_018.jpg",
+                  "caption": "주간제어기 역행 1단(P1)"
+                },
+                {
+                  "src": "/images/edu/woojin/img_021.jpg",
+                  "caption": "열차무선(LTE)"
+                },
+                {
+                  "src": "/images/edu/woojin/img_035.jpg",
+                  "caption": "ADU / PDT 시험"
+                },
+                {
+                  "src": "/images/edu/woojin/img_037.jpg",
+                  "caption": "출고 준비 완료통보"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-2",
+          "title": "축전지전압 75V 이하 시 기동방법",
+          "summary": [
+            "Key ON 시 전동차 기동 불능, 축전지 전압 75V 미만"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "Key ON → OFF → ON 2~3회 취급 후 기동 상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 배전반 내 BATK1, 2 차단 여부 확인(차단 시 복귀)"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "Key ON, 역전기 전진하여 기동 상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "계속 기동 불능 시 후부 운전실 이동하여 기동상태 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "조치 완료 후 Pan 상승 → 전차선 전압 확인 → 정상운행"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_038.jpg",
+                  "caption": "Key ON"
+                },
+                {
+                  "src": "/images/edu/woojin/img_039.jpg",
+                  "caption": "BATK1, 2"
+                },
+                {
+                  "src": "/images/edu/woojin/img_040.jpg",
+                  "caption": "역전기 전진"
+                },
+                {
+                  "src": "/images/edu/woojin/img_041.jpg",
+                  "caption": "후부 운전실 Key ON"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-3",
+          "title": "축전지전압 0V인 경우",
+          "summary": [
+            "Key ON 시 축전지전압 0V 현시"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "전부차 BATK1, 2 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "주간제어기 전후진 핸들 F 또는 R 위치로 투입"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "축전지 제어박스 BIS ON 확인(검수원)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "BATKN2 차단 시 축전지 전압계만 0V 현시"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "전부 조치불능 시 후부 운전실에서 BATKN3 ON → 선두 EBON ON"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_042.jpg",
+                  "caption": "Key ON, 역전기 F/R"
+                },
+                {
+                  "src": "/images/edu/woojin/img_043.jpg",
+                  "caption": "축전지 제어박스 BIS ON 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-4",
+          "title": "보조공기압축기(ACM) 구동 불능",
+          "summary": [
+            "PANUS 누르고 1분 경과해도 Pan 그림 변화 없음"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "KEY 위치 검수 또는 ON 조작"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "축전지전압 75V 이상 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "선두 운전실 배전반 HCR 여자상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "PANUN 취급으로 PANR 미동작시 M1차 ACMCS 취급 요청"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "공기충만으로 ACMG 차단 시 판토 자동상승"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_044.jpg",
+                  "caption": "Key 검수 또는 ON"
+                },
+                {
+                  "src": "/images/edu/woojin/img_045.jpg",
+                  "caption": "축전지 전압계 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_046.jpg",
+                  "caption": "운전실 배전반 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_047.jpg",
+                  "caption": "일반배전반 PaVN"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-5",
+          "title": "전체 판토 상승 불능",
+          "summary": [
+            "판토 상승 버튼 취급 시 하강 표시, 전차선 전압계 0V"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "모니터 경고 메시지 확인 (IVS, IES, EPanDS)"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "축전지 전압 75V 이상 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "MR 압력 게이지 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "ACM 구동상태 확인 (2호, 6호 객실 구동음)"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "전·후 운전실 EPanDS 취급 상태 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "해당 차호 판토 제어공기 코크 차단 시 복귀"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_048.jpg",
+                  "caption": "모니터 경고, Pan 상태 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_049.jpg",
+                  "caption": "가선 정전 표시등"
+                },
+                {
+                  "src": "/images/edu/woojin/img_050.jpg",
+                  "caption": "축전지 전압 75V 이상"
+                },
+                {
+                  "src": "/images/edu/woojin/img_051.jpg",
+                  "caption": "MR 압력 게이지"
+                },
+                {
+                  "src": "/images/edu/woojin/img_052.jpg",
+                  "caption": "ACM 구동음 확인 (2호, 6호)"
+                },
+                {
+                  "src": "/images/edu/woojin/img_053.jpg",
+                  "caption": "전·후 운전실 EPanDS 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-6",
+          "title": "1량 판토 상승 불능",
+          "summary": [
+            "모니터에 2호차 또는 6호차 판토 상승 불가"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "모니터에서 판토 상승/하강 상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 개별 판토 하강 스위치 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "해당 차호 일반배전반 PanVN 상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "해당 차호 Pan 개방 코크(2개) 확인"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_054.jpg",
+                  "caption": "해당 유니트 VVVF, SIV OFF"
+                },
+                {
+                  "src": "/images/edu/woojin/img_055.jpg",
+                  "caption": "해당 차호 Pan 하강 표시"
+                },
+                {
+                  "src": "/images/edu/woojin/img_056.jpg",
+                  "caption": "운전실 개별 Pan 하강 스위치"
+                },
+                {
+                  "src": "/images/edu/woojin/img_057.jpg",
+                  "caption": "일반배전반 PaVN 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_058.jpg",
+                  "caption": "Pan 개방 코크 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-7",
+          "title": "전 차량 판토 하강 불능",
+          "summary": [
+            "PanDS, EPanDS 눌렀으나 전체 판토 하강 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "PANDS 취급 불능 시 EPanDS 취급"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "후부 운전실에서 EPanDS 취급 시도"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "배전반 내 BATKN1, PANDN 차단 시 복귀 후 PanDS 취급"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "위 조치 불능 시 M차 배전반 PANVN 및 PAN 콕크 차단"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_059.jpg",
+                  "caption": "판토하강 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_060.jpg",
+                  "caption": "EPANDS 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_061.jpg",
+                  "caption": "운전실 PANDN 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_062.jpg",
+                  "caption": "PANVN 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-8",
+          "title": "피뢰기 동작",
+          "summary": [
+            "전차선 단전 발생 시"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "승객 제보에 의해 해당차량 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "해당차량 완전부동취급 후 연장급전 (PANDN OFF → SIVCN1,2 OFF)"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "SIVN 오취급 방지: 운전측 SIVN1, 반대측 SIVN2"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_063.jpg",
+                  "caption": "DCArr 동작"
+                },
+                {
+                  "src": "/images/edu/woojin/img_064.jpg",
+                  "caption": "PANDN OFF"
+                },
+                {
+                  "src": "/images/edu/woojin/img_065.jpg",
+                  "caption": "해당 SIVCN1, 2 OFF"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-9",
+          "title": "개별 판토 하강 취급요령",
+          "summary": [
+            "일부 차량 Pan 상승 불가 또는 완전부동 취급 필요시"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "관제 보고 후 IPANDS 취급 (2호차 또는 6호차)"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "자동 연장급전 불능 시: 고장 유니트 SIVCN1, 2 수동 차단"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_066.jpg",
+                  "caption": "개별판토하강 스위치"
+                },
+                {
+                  "src": "/images/edu/woojin/img_067.jpg",
+                  "caption": "해당 SIVCN1, 2 OFF"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-10",
+          "title": "SIV 고장 및 연장급전",
+          "summary": [
+            "모니터 SIV NG 현시, 가선 전압계 0V"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치사항"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "모니터에서 판토 상태 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "배전반 내 SIVCN 1, 2 차단 상태 확인 — 중고장 시 연장급전 운행"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "중고장 이외 시 고장 리셋스위치 취급 (B7)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "복귀불능 시 연장급전 상태로 기지입고"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_068.jpg",
+                  "caption": "모니터 Pan 상태 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_069.jpg",
+                  "caption": "SIVCN 1, 2 상태 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_070.jpg",
+                  "caption": "주간제어기 B7"
+                },
+                {
+                  "src": "/images/edu/woojin/img_071.jpg",
+                  "caption": "고장 리셋 스위치 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-11",
+          "title": "DOOR등 점등 불능",
+          "summary": [
+            "DOOR등 점등 불능, 역행 불능, 출입문 동작 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "불량 차호 모니터 확인 — DCUL(R)N OFF, 장애물 검지, 비상핸들취급 등"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "DROS 수회 개폐 취급"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "해당 출입문 비상핸들(EH) 취급 후 복귀"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "비상핸들 취급 후 출입문 수동 개폐하여 이물질 확인"
+                  ]
+                },
+                {
+                  "label": "⑤",
+                  "items": [
+                    "DCU 상태확인 및 고장 시 MCB1 차단하여 2계 절환"
+                  ]
+                },
+                {
+                  "label": "⑥",
+                  "items": [
+                    "전/후 운전실 배전반 DILN 차단 확인"
+                  ]
+                },
+                {
+                  "label": "⑦",
+                  "items": [
+                    "DOOR등 소손 여부 확인"
+                  ]
+                },
+                {
+                  "label": "⑧",
+                  "items": [
+                    "원인불명 시 관제 승인 후 DBS (BY PASS) 취급 회송"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 운행 중 DOOR등 소등 시: 즉시 비상정차, 원인 제거 후 잔여 운행"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_072.jpg",
+                  "caption": "전/후 DILN 차단 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_073.jpg",
+                  "caption": "DOOR등 상태 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-12",
+          "title": "출입문 1개 또는 1량 열림 불량",
+          "summary": [
+            "출입문 개방 불능 — 1개 또는 1량"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "1개 출입문 열림 불량"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "모니터로 불량 출입문 및 비상핸들 취급 여부 확인"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "비상핸들 비상 위치 절환 후 이물질 확인"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "출입문 차단장치 봉을 밀어 차단(쇄정) 위치로 절환 (By-pass)"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "비상핸들 정상 위치 복귀"
+                  ]
+                },
+                {
+                  "label": "⑤",
+                  "items": [
+                    "고장 안내문 부착 및 여객 안내방송 → 차량 교체역까지 운행"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "1량 출입문 열림 불량"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "불량 차호 확인, DOS 수회 개폐 취급"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "해당 차량 LDCUN, RDCUN 확인 복귀"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "관제 승인 후 회송조치"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_074.jpg",
+                  "caption": "비상핸들 취급 후 이물질 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_075.jpg",
+                  "caption": "출입문차단장치 차단(쇄정) 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_076.jpg",
+                  "caption": "비상핸들 복귀 후 폐문"
+                },
+                {
+                  "src": "/images/edu/woojin/img_077.jpg",
+                  "caption": "여객안내방송 후 운행"
+                },
+                {
+                  "src": "/images/edu/woojin/img_078.jpg",
+                  "caption": "DOC 3회 연속 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_079.jpg",
+                  "caption": "해당차 LDCUN, RDCUN 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-13",
+          "title": "전 차량 출입문 열림 불량",
+          "summary": [
+            "전체 출입문 개방 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "DOS 연속 3회 열림 취급 → 불능 시 DBS 취급"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "전부 운전실 ATCN1, 2 확인복귀"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "전, 후부차 DCLN 또는 DCRN 동시 차단 시 확인 복귀"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "TCMS PN1, 2 확인 복귀 → 불능 시 DBS 취급"
+                  ]
+                },
+                {
+                  "label": "⑤",
+                  "items": [
+                    "위 조치 불능 시: 차량 재기동 후 열기 시도 (관제 지시)"
+                  ]
+                },
+                {
+                  "label": "⑥",
+                  "items": [
+                    "각 차량 출입문 수동 개방하여 여객 하차 후 회송 (관제 승인)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ MC KEY OFF 후 출입문 개방 시: 반드시 폐문 후 ON 위치로 취급할 것"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_080.jpg",
+                  "caption": "DOS 3회 연속 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_081.jpg",
+                  "caption": "운전실 DRN"
+                },
+                {
+                  "src": "/images/edu/woojin/img_082.jpg",
+                  "caption": "운전실 DCLN, DCRN"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-14",
+          "title": "출입문 닫힘 불량",
+          "summary": [
+            "DOOR등 소등, 역행 불능 — 1개/1량/전체"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "1개 출입문 닫힘 불량"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "①",
+                  "items": [
+                    "모니터로 불량차 출입문 및 비상핸들 확인"
+                  ]
+                },
+                {
+                  "label": "②",
+                  "items": [
+                    "DCS 수회 개·폐 취급"
+                  ]
+                },
+                {
+                  "label": "③",
+                  "items": [
+                    "비상핸들 비상 위치 절환 → 이물질 확인"
+                  ]
+                },
+                {
+                  "label": "④",
+                  "items": [
+                    "출입문 차단장치 차단(쇄정) 위치 절환 (By-pass)"
+                  ]
+                },
+                {
+                  "label": "⑤",
+                  "items": [
+                    "비상핸들 정상 위치 복귀"
+                  ]
+                },
+                {
+                  "label": "⑥",
+                  "items": [
+                    "고장 안내문 부착 → 차량 교체역까지 운행"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "1량 출입문 닫힘 불량"
+            },
+            {
+              "type": "text",
+              "text": "불량 차호 확인 → DCS 수회 개폐 → 해당차 DCLN, DCRN 확인 복귀 → 불능 시 관제 승인 후 회송"
+            },
+            {
+              "type": "heading",
+              "text": "전체 출입문 닫힘 불량"
+            },
+            {
+              "type": "text",
+              "text": "DCS 연속 3회 → 반대편 운전실 DCS 시도 → DOS 고착 확인 → 관제 승인 후 회송조치"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_083.jpg",
+                  "caption": "비상핸들 취급 후 이물질 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_084.jpg",
+                  "caption": "출입문 차단장치 차단(쇄정) 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_085.jpg",
+                  "caption": "비상핸들 복귀 후 폐문"
+                },
+                {
+                  "src": "/images/edu/woojin/img_086.jpg",
+                  "caption": "관제사 통화 차량 교체역까지 운행"
+                },
+                {
+                  "src": "/images/edu/woojin/img_087.jpg",
+                  "caption": "DCS 수회 개폐 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_088.jpg",
+                  "caption": "해당차 LDCUN, RDCUN 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_089.jpg",
+                  "caption": "DCS 3회 연속 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_090.jpg",
+                  "caption": "관제사 통화 회송"
+                },
+                {
+                  "src": "/images/edu/woojin/img_091.jpg",
+                  "caption": "출입문 비상핸들 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-15",
+          "title": "전부차 ZVR 동작 불량",
+          "summary": [
+            "ZVR 여자 불능, DSD 미취급 시 비상제동"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "관제 보고 후 EBCOS 취급 후 회송 조치"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "비상모드 절환, TZVR, ZVR 동작상태 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "ZVR을 예비 계전기와 맞교환 (100V용)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "주/보조 ATC 동작상태 확인 — 고장 시 ATC1,2 NFB OFF/ON"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_092.jpg",
+                  "caption": "DSD 누름 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_093.jpg",
+                  "caption": "필요시 EBCOS 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-16",
+          "title": "객실 냉방 불능",
+          "summary": [
+            "전차량 객실 냉방 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "전차량: TCMS 냉난방 상태 확인 → SIV 동작상태 확인 → 제어스위치 반복 취급"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "일부차량: HVACN 확인 → LOCAL MODE S/W 확인 → 온도센서 확인 → MICOM NFB OFF/ON"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_094.jpg",
+                  "caption": "냉방 제어스위치 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_095.jpg",
+                  "caption": "HVACN 차단 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-17",
+          "title": "객실 난방 불능",
+          "summary": [
+            "객실 난방 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "전차량: TCMS 냉난방 상태 확인 → 제어스위치 반복 취급"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "일부차량: RHeN1, RHeN2, HVACN 확인 → LOCAL MODE S/W 확인 → MICOM NFB OFF/ON"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_096.jpg",
+                  "caption": "난방 제어스위치 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_097.jpg",
+                  "caption": "RHeN1, RHeN2 차단 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-18",
+          "title": "객실등 점등 불능",
+          "summary": [
+            "객실등 소등"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 등구로 상태 화면 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 배전반 RALpN, RDLpN 차단 시 복귀"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "제어대 RALpN, RDLpN 차단 시 복귀"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_098.jpg",
+                  "caption": "RALpN, RDLpN 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_099.jpg",
+                  "caption": "배전반 RALpN, RDLpN 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-19",
+          "title": "동력운전 불능",
+          "summary": [
+            "주간제어기 핸들 동력위치 운행 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "DOOR등 점등 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "TCMS 주차 현시 시 → 전, 후부차 PBN 확인 복귀 후 주차제동 완해"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "15km/h 설정 불능 시: 관제승인 후 비상 + HBCOS 취급"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "축전지 전압 75V 이하, 전차선 900V 이하 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "엔코더 고장 시: ENCN 확인 → EROS EO모드(관제 협의)"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "VVVF 고장 시 → 1차 리셋(재부팅)"
+                  ]
+                },
+                {
+                  "label": "7",
+                  "items": [
+                    "VVVF 3개 이상 고장 시 → 차량 재기동"
+                  ]
+                },
+                {
+                  "label": "8",
+                  "items": [
+                    "위 조치 불능 시: EROS EO 취급 회송"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_100.jpg",
+                  "caption": "PBN 차단 확인 및 복귀"
+                },
+                {
+                  "src": "/images/edu/woojin/img_101.jpg",
+                  "caption": "ENCDN1, ENCDN2 차단 확인 및 복귀"
+                },
+                {
+                  "src": "/images/edu/woojin/img_102.jpg",
+                  "caption": "EROS EO 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_103.jpg",
+                  "caption": "주간제어기 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-20",
+          "title": "추진제어장치(VVVF) 고장",
+          "summary": [
+            "해당 차량 동력운전 및 회생제동 불능"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "고장차호 확인(TCMS)"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "VVVF 3개 이상 고장 시 차량 재기동 (PANDS → MC키 OFF → 10초 후 ON)"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "VVVF 1개 이상 고장 시 재부팅 (주간제어기 N → 역전기 N → 10초 후 F)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "재부팅 불능 시 해당 PECN OFF 후 ON"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "복귀 불능 시 CUT 상태 유지 (PECN 취급 금지)"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_104.jpg",
+                  "caption": "PECN 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_105.jpg",
+                  "caption": "전후진핸들 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-21",
+          "title": "역행 불능",
+          "summary": [
+            "역행 불능 시 단계별 조치"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "MC KEY 검수모드이면 ON 취급"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "역전기 F/R 취급 및 주간제어기 충분히 역행"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "정지위치 초과 시: 비상모드 → 역전기 후진 → 제동 후 동력"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "DOOR등, 주공기압(6kgf), 주차제동 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "ATC 관련 스위치, 보안/비상제동 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "정차제동(HB) 체결 시 HBCOS 개방 취급"
+                  ]
+                },
+                {
+                  "label": "7",
+                  "items": [
+                    "제동 불완해 시 BOUN OFF 취급"
+                  ]
+                },
+                {
+                  "label": "8",
+                  "items": [
+                    "불능 시 재기동 → 후부 운전실 → 관제사 지시운전"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ HBCOS 개방 후 역정차 시 정차제동 체결 불가 / Reset 시 보안제동 취급 후 시행"
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_106.jpg",
+                  "caption": "강제제동완해 스위치 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_107.jpg",
+                  "caption": "전후진 핸들 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-22",
+          "title": "전 차량 비상제동 체결",
+          "summary": [
+            "TCMS EB 표시, 비상제동 적색 램프, BC 2.0~2.2kgf 이상"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "주간제어기 비상 → B7스텝, 역전기 N → F 또는 R"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "후부 역전기 F/R → N 전환"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "전부/후부 EBS 취급 → 복귀 불능 시 EBCOS"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "전부/후부 MRPS 동작 → 복귀 불능 시 EBCOS"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "전부/후부 EROS 위치 → N 복귀"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "ADUN 또는 ATCN1,2 차단 후 복귀 불능 시: 관제승인 후 OMS 비상"
+                  ]
+                },
+                {
+                  "label": "7",
+                  "items": [
+                    "전부 복귀 불능 시 EROS EO + EBCOS, 응급운전"
+                  ]
+                },
+                {
+                  "label": "8",
+                  "items": [
+                    "후부 자력운전 불능 시 → 구원 합병, 전차량 SR 콕크 차단"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_108.jpg",
+                  "caption": "운전모드선택(OMS) 비상 취급"
+                },
+                {
+                  "src": "/images/edu/woojin/img_109.jpg",
+                  "caption": "EROS EO 취급 확인"
+                },
+                {
+                  "src": "/images/edu/woojin/img_110.jpg",
+                  "caption": "EBCOS 취급"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-23",
+          "title": "ATC 1, 2 고장",
+          "summary": [
+            "ADU 통신 실패, ATC 통신고장 경고"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "ADU 및 모니터 경고 메시지 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "차상신호 장치함 내 ATC1,2 LED 점등 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "배전반 내 ATCN1,2 상태 확인"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "ATCN1,2 동시에 OFF → ON하여 복귀 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "ATC2 고장 시 종착역까지 운행"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "ATC1 고장 절체 불능 시 ATCN1 OFF하여 ATC2 강제 절체"
+                  ]
+                },
+                {
+                  "label": "7",
+                  "items": [
+                    "ATC1,2 동시 고장 시 ATCN1, ATCN2 동시 리셋"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/img_111.jpg",
+                  "caption": "ADU 상태 확인"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-24",
+          "title": "상용제동 불량 및 제동력 부족",
+          "summary": [
+            "상용제동 걸림 불량, B7 취급 5초 후 고장 경보"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 제동상태정보 화면에서 단계별 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "일부차량 상용제동 불량 → M-T Pair 제어로 인접차량 제동"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "제동력 부족: 고장 차호 BOUN OFF/ON 리셋"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "MCS 모드 전환 후 마스콘 N → B7 수회 취급하여 소거 확인"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-25",
+          "title": "주차제동 풀림 불능",
+          "summary": [
+            "주차제동 체결 상태 풀림 불가, PB 적색표시"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "주차제동동작 램프(PABAIL) 점등 확인"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "주공기압력 6.0kgf 이하 확인"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "주차제동 완해스위치(PABRS) 취급"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "스위치 완해 안될 시 강제완해 — 주차제동전자밸브 수동조작기구 완해측 봉 밀기"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "Tc차 수동완해 고리 당겨서 완해 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "동력운전 불가 시 PABBPS 취급 (관제 협의)"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-26",
+          "title": "운행 중 제동 불완해",
+          "summary": [
+            "추진 시 TCMS 고장차량 현시, 제동불완해 검지"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "MCS 모드 전환 후 마스콘 N → B7 수회 취급"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "지속 시 강제제동완해 스위치(CPRS) 취급"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "해소 안 될 시: 관제보고 → 고장 차호 BOUN OFF/ON 리셋"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "해당 차호 제동풀림콕크 90° 취급"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-27",
+          "title": "TCMS 통신고장",
+          "summary": [
+            "TCMS 고장경보음, 프로토콜 통신불량"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "조치요령"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "TCMS 무현시 → 배전반 내 TCUN 차단 시 복귀"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "열차정보 에러 → TCMSDON 차단 후 30초 후 복귀"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "원인불명 → 차량 재기동 (관제 지시)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "조치불능 → 수동운전 및 EROS EO 운행"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "TCMS함 내 LIU1,2 고장 LED 확인"
+                  ]
+                },
+                {
+                  "label": "6",
+                  "items": [
+                    "LIU1 고장 시 CPU 보드 절체 스위치로 강제 절체"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5b-28",
+          "title": "EO모드 운전",
+          "summary": [
+            "EROS EO 취급 — 속도 45km/h 이하, B7 고정, P4노치, 후진 불가"
+          ],
+          "content": [
+            {
+              "type": "heading",
+              "text": "취급시기"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "ENCDN1,2 차단 복귀불능",
+                  "desc": "또는 엔코더 고장 시"
+                },
+                {
+                  "term": "LIU1,2 동시 고장",
+                  "desc": ""
+                },
+                {
+                  "term": "ATCN1,2 고장",
+                  "desc": ""
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "절차"
+            },
+            {
+              "type": "flow",
+              "steps": [
+                {
+                  "label": "1",
+                  "items": [
+                    "운전실 배전반 내 엔코더 NFB(ENCON 1,2) OFF"
+                  ]
+                },
+                {
+                  "label": "2",
+                  "items": [
+                    "운전실 배전반 내 EROS에서 EO 모드 선택"
+                  ]
+                },
+                {
+                  "label": "3",
+                  "items": [
+                    "운전모드 수동 또는 비상(ATC OFF 시) 선택"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ EO모드: 속도 45km/h 이하, 상용제동 B7 고정, 동력 P4노치, 후진 불가"
+            }
           ]
         }
       ]

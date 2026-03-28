@@ -199,6 +199,66 @@
   font-size: 16px;
 }
 
+/* ── Alarm Settings ── */
+.alarmRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-2);
+}
+
+.alarmHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+
+.alarmDesc {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  margin-left: 32px;
+}
+
+.alarmChipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: 32px;
+}
+
+.alarmChip {
+  padding: 6px 14px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  transition: background var(--dia-transition-fast), color var(--dia-transition-fast), border-color var(--dia-transition-fast);
+  cursor: pointer;
+}
+
+.alarmChip:active {
+  background: var(--dia-surface-hover);
+}
+
+.alarmChipActive {
+  background: var(--dia-blue);
+  color: white;
+  border-color: var(--dia-blue);
+}
+
+.alarmChipLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  margin-left: 32px;
+  margin-top: 2px;
+}
+
 /* ── Tip Card ── */
 .tipCard {
   display: flex;

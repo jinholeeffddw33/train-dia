@@ -302,27 +302,53 @@ export function getBannerState(
   return calcDoneState(nextShift, nowMins, -1, minsAfterEnd);
 }
 
-/** 현재 시간 기준 진행 중/다음 구간 인덱스 + 상태 */
+/** 구간 시각을 야간 교번 대응 보정 분(minute)으로 변환 */
+function buildAdjustedTimes(segments: Segment[]): { dep: number; arr: number }[] {
+  const result: { dep: number; arr: number }[] = [];
+  for (let i = 0; i < segments.length; i++) {
+    let dep = timeToMins(segments[i].d);
+    let arr = timeToMins(segments[i].a);
+    if (dep < 0 || arr < 0) { result.push({ dep, arr }); continue; }
+    // 이전 구간 도착보다 4시간 이상 이르면 → 익일
+    if (i > 0 && result[i - 1].dep >= 0 && dep < result[i - 1].arr - 240) {
+      dep += 1440; arr += 1440;
+    }
+    // 도착이 출발보다 이르면 → 자정 넘김
+    if (arr < dep) arr += 1440;
+    result.push({ dep, arr });
+  }
+  return result;
+}
+
+/** 현재 시간 기준 진행 중/다음 구간 인덱스 + 상태 (야간 교번 대응) */
 export function getCurrentSegmentInfo(
   segments: Segment[] | undefined,
   now: Date,
+  scheduleStart?: string,
 ): { idx: number; status: 'running' | 'waiting' | 'before' | 'after' } | null {
   if (!segments || segments.length === 0) return null;
-  const nowMins = now.getHours() * 60 + now.getMinutes();
+  let nowMins = now.getHours() * 60 + now.getMinutes();
 
-  for (let i = 0; i < segments.length; i++) {
-    const dep = timeToMins(segments[i].d);
-    const arr = timeToMins(segments[i].a);
+  const adj = buildAdjustedTimes(segments);
+  // 야간 교번: 오후 출근인데 현재가 오전(< 12시)이면 → 익일 판정
+  if (scheduleStart) {
+    const startMins = timeToMins(scheduleStart);
+    if (startMins >= 720 && nowMins < startMins && nowMins < 720) {
+      nowMins += 1440;
+    }
+  } else if (adj.length > 0 && adj[0].dep >= 720 && nowMins < 720) {
+    nowMins += 1440;
+  }
+
+  for (let i = 0; i < adj.length; i++) {
+    const { dep, arr } = adj[i];
     if (dep < 0 || arr < 0) continue;
-    // 현재 이 구간 운행 중
     if (nowMins >= dep && nowMins < arr) return { idx: i, status: 'running' };
-    // 아직 이 구간 출발 전
     if (nowMins < dep) {
       return { idx: i, status: i === 0 ? 'before' : 'waiting' };
     }
   }
-  // 모든 구간 종료
-  return { idx: segments.length - 1, status: 'after' };
+  return { idx: adj.length - 1, status: 'after' };
 }
 
 // ===== 월간/D-Day =====
@@ -570,30 +596,89 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
 
 // ===== 교대 방향 =====
 
-/** 운전행로 문자열 → 교대 방향 판별 */
-export function getRouteDirection(m: string | undefined, stationAbbr: Record<string, string>): DirectionInfo | null {
+/** 열차번호로 하선 분기 판별 (마천 / 하남검단산) */
+function detectDownBranch(seg?: Segment): string {
+  if (seg?.n) {
+    for (const num of seg.n) {
+      if (num >= 5000 && num <= 5499) return '하남검단산 방면 승강장';
+      if (num >= 5500 && num <= 5899) return '마천 방면 승강장';
+    }
+  }
+  return DIR.DOWN_SUB;
+}
+
+/** 열차번호로 기지 출고 방면 판별 */
+function detectDepotSub(seg?: Segment): string {
+  if (seg?.n) {
+    for (const num of seg.n) {
+      if (num >= 1000 && num <= 1499) return '고덕기지 출발 · 상일동 방향';
+      if (num >= 1500 && num <= 1599) return '방화기지 출발';
+      if (num >= 2000 && num <= 2999) return '고덕기지 출발 · 하남검단산 방향';
+    }
+  }
+  return DIR.DEPOT_SUB;
+}
+
+const UP_CHARS = new Set(['방', '왕', '영', '여', '애', '화', '다']);
+const DOWN_CHARS = new Set(['군', '마', '상', '기', '둔', '강', '하']);
+
+/** 운전행로 단일 구간 → 방향 판별 */
+function parseRoutePartDirection(routePart: string, seg?: Segment): DirectionInfo | null {
+  const t = routePart.trim();
+  if (/^\d{4}$/.test(t) || t.includes('편승')) return null;
+  // 기지 출발 (답 미포함: 순수 기지 이동)
+  if (t[0] === '기' && !t.includes('답')) {
+    return { dir: 'depot', label: dirFull('depot'), sub: detectDepotSub(seg) };
+  }
+  const dIdx = t.indexOf('답');
+  // "답X..." → 답십리에서 X 방향으로 출발
+  if (dIdx >= 0 && dIdx < t.length - 1) {
+    const next = t[dIdx + 1];
+    if (next === '(') return null;
+    if (UP_CHARS.has(next)) {
+      return { dir: 'up', label: dirFull('up'), sub: dirSub('up') };
+    }
+    if (DOWN_CHARS.has(next)) {
+      return { dir: 'down', label: dirFull('down'), sub: detectDownBranch(seg) };
+    }
+  }
+  // "...X답" → X 방면에서 답십리로 도착 (기지출발 행로 등)
+  if (dIdx > 0 && dIdx === t.length - 1) {
+    const prev = t[dIdx - 1];
+    if (UP_CHARS.has(prev)) {
+      return { dir: 'up', label: dirFull('up'), sub: dirSub('up') };
+    }
+    if (DOWN_CHARS.has(prev)) {
+      return { dir: 'down', label: dirFull('down'), sub: detectDownBranch(seg) };
+    }
+  }
+  return null;
+}
+
+/** 운전행로 문자열 → 교대 방향 판별 (전체 스케줄 기준, 첫 방향) */
+export function getRouteDirection(m: string | undefined, stationAbbr: Record<string, string>, segments?: Segment[]): DirectionInfo | null {
   if (!m || m.includes('충당여부') || m.includes('대휴')) return null;
-  const UP = new Set(['방', '왕', '영', '여', '애', '화', '다']);
-  const DOWN = new Set(['군', '마', '상', '기', '둔', '강', '하']);
   const parts = m.split(',');
-  for (const p of parts) {
-    const t = p.trim();
-    if (/^\d{4}$/.test(t)) continue;
-    if (t.includes('편승')) continue;
-    if (t[0] === '기' && !t.includes('답')) {
-      return { dir: 'depot', label: dirFull('depot'), sub: dirSub('depot') };
-    }
-    const dIdx = t.indexOf('답');
-    if (dIdx >= 0 && dIdx < t.length - 1) {
-      const next = t[dIdx + 1];
-      if (next === '(') continue;
-      if (UP.has(next)) {
-        return { dir: 'up', label: dirFull('up'), sub: dirSub('up') };
-      }
-      if (DOWN.has(next)) {
-        return { dir: 'down', label: dirFull('down'), sub: dirSub('down') };
-      }
-    }
+  for (let i = 0; i < parts.length; i++) {
+    const result = parseRoutePartDirection(parts[i], segments?.[i]);
+    if (result) return result;
+  }
+  return null;
+}
+
+/** 특정 구간(segIndex) 기준 방향 판별 */
+export function getSegmentDirection(m: string | undefined, segIndex: number, segments?: Segment[]): DirectionInfo | null {
+  if (!m || m.includes('충당여부') || m.includes('대휴')) return null;
+  const parts = m.split(',');
+  // 해당 구간의 행로 파트 사용
+  if (segIndex < parts.length) {
+    const result = parseRoutePartDirection(parts[segIndex], segments?.[segIndex]);
+    if (result) return result;
+  }
+  // 폴백: 전체에서 첫 번째 방향
+  for (let i = 0; i < parts.length; i++) {
+    const result = parseRoutePartDirection(parts[i], segments?.[i]);
+    if (result) return result;
   }
   return null;
 }

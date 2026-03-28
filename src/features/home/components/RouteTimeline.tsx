@@ -27,11 +27,11 @@ function formatDuration(mins: number): string {
 }
 
 /** 기지 출고 열번 여부 */
+/** 기지 출고 열번 여부 — 첫 번째 열차번호가 1000/1500/2000대일 때만 */
 function isDepotTrain(n?: number[]): boolean {
-  if (!n) return false;
-  return n.some(
-    (num) => (num >= 1000 && num <= 1499) || (num >= 1500 && num <= 1599) || (num >= 2000 && num <= 2999),
-  );
+  if (!n || n.length === 0) return false;
+  const first = n[0];
+  return (first >= 1000 && first <= 1499) || (first >= 1500 && first <= 1599) || (first >= 2000 && first <= 2999);
 }
 
 /** 두 시각 사이 분 차이 계산 */

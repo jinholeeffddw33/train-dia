@@ -1078,6 +1078,98 @@
   white-space: nowrap;
 }
 
+/* ── Segment Alarm ── */
+.rtGapAlarm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.rtGapAlarm .rtGap {
+  width: 100%;
+  padding: 2px 0;
+}
+
+.alarmToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--dia-radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  transition: all var(--dia-transition-fast);
+  cursor: pointer;
+}
+
+.alarmToggle:active {
+  background: var(--dia-surface-hover);
+}
+
+.alarmToggleOn {
+  color: var(--dia-blue);
+  border-color: var(--dia-blue);
+  background: var(--dia-blue-dim);
+}
+
+.alarmNextDay {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--dia-radius-sm);
+  background: var(--dia-amber);
+  color: #fff;
+  font-weight: 600;
+}
+
+.alarmPicker {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alarmPickerLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+}
+
+.alarmChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.alarmChip {
+  padding: 5px 12px;
+  border-radius: var(--dia-radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  transition: all var(--dia-transition-fast);
+  cursor: pointer;
+}
+
+.alarmChip:active {
+  background: var(--dia-surface-hover);
+}
+
+.alarmChipOn {
+  background: var(--dia-blue);
+  color: white;
+  border-color: var(--dia-blue);
+}
 
 /* ── WeekStrip 선택 상태 ── */
 .weekDaySelected {

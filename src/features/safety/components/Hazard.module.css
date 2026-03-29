@@ -687,6 +687,10 @@
 
 .noticeCard:active { background: var(--dia-surface-hover); }
 
+.noticeCardImportant {
+  border-left: 3px solid var(--dia-red, #ef4444);
+}
+
 .noticeHeader {
   display: flex;
   align-items: center;
@@ -699,14 +703,45 @@
   border-radius: var(--dia-radius-sm);
   font-weight: 600;
   font-size: 11px;
+}
+
+.noticeTypeRollcall {
   background: var(--dia-blue-dim);
   color: var(--dia-blue);
 }
 
-.noticeDate {
+.noticeTypeImportant {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--dia-red, #ef4444);
+}
+
+.noticeDateWrap {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.noticeDateMonth {
+  font-size: 11px;
+  color: var(--dia-text-tertiary);
+  font-weight: 500;
+}
+
+.noticeDateDay {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--dia-blue);
-  font-weight: 700;
-  font-size: 12px;
+  line-height: 1;
+}
+
+.noticeDateDow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+}
+
+.noticeDateHoliday {
+  color: var(--dia-red, #ef4444);
 }
 
 .noticeAuthor {

@@ -15,13 +15,19 @@ function timeAgo(iso: string): string {
   return `${d}일 전`;
 }
 
-const DOW = ['일', '월', '화', '수', '목', '금', '토'] as const;
+const DOW_FULL = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'] as const;
 
-function formatDate(iso: string): string {
+function parseDateInfo(iso: string) {
   const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
   const d = new Date(normalized);
-  if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
+  if (isNaN(d.getTime())) return null;
+  const day = d.getDay();
+  return {
+    month: `${d.getMonth() + 1}월`,
+    date: String(d.getDate()),
+    dow: DOW_FULL[day],
+    isHoliday: day === 0 || day === 6,
+  };
 }
 
 interface HazardListProps {
@@ -62,18 +68,30 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
           const lines = r.description.split('\n');
           const isPlaceholder = r.photoUrl.includes('placeholder');
           const hasFile = !isPlaceholder && r.photoUrl;
+          const isImportant = r.location === '중요알림';
+          const dateInfo = parseDateInfo(r.createdAt);
           return (
             <button
               key={r.id}
               type="button"
-              className={styles.noticeCard}
+              className={`${styles.noticeCard} ${isImportant ? styles.noticeCardImportant : ''}`}
               onClick={() => onSelect(r.id)}
             >
               <div className={styles.noticeHeader}>
                 {r.location && (
-                  <span className={styles.noticeType}>{r.location}</span>
+                  <span className={`${styles.noticeType} ${isImportant ? styles.noticeTypeImportant : styles.noticeTypeRollcall}`}>
+                    {r.location}
+                  </span>
                 )}
-                <span className={styles.noticeDate}>{formatDate(r.createdAt)}</span>
+                {dateInfo && (
+                  <span className={styles.noticeDateWrap}>
+                    <span className={styles.noticeDateMonth}>{dateInfo.month}</span>
+                    <span className={styles.noticeDateDay}>{dateInfo.date}</span>
+                    <span className={`${styles.noticeDateDow} ${dateInfo.isHoliday ? styles.noticeDateHoliday : ''}`}>
+                      {dateInfo.dow}
+                    </span>
+                  </span>
+                )}
                 <span className={styles.noticeAuthor}>{r.createdBy}</span>
               </div>
               <div className={styles.noticeBody}>

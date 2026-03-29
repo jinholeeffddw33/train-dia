@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, type ReactNode, useState, useEffect, useCallback } from 'react';
+import { Component, type ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ArrowLeft, AlertTriangle, ShieldAlert, Wrench, ClipboardCheck,
 } from 'lucide-react';
@@ -15,6 +15,7 @@ import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
 import { isAdmin } from '@/lib/auth';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
@@ -221,6 +222,27 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   }, [fetchAlerts, fetchHazards, subscribeAlerts, sabun]);
 
   const goHome = useCallback(() => setView('home'), []);
+
+  // 뒤로가기 히스토리 관리
+  const viewKey = useMemo(() => {
+    if (view === 'home') return 'home';
+    if (view === 'alert') return 'alert';
+    if (typeof view === 'object' && view.type === 'detail') return `detail-${view.id}`;
+    if (typeof view === 'object' && view.type === 'list') return `list-${view.category}`;
+    return 'home';
+  }, [view]);
+
+  const handleHistoryBack = useCallback(() => {
+    if (typeof view === 'object' && view.type === 'detail') {
+      setView({ type: 'list', category: view.category });
+    } else if (typeof view === 'object' && view.type === 'list') {
+      setView('home');
+    } else if (view === 'alert') {
+      setView('home');
+    }
+  }, [view]);
+
+  useHistoryBack(`safety-${viewKey}`, handleHistoryBack, view !== 'home');
 
   const alerts = useAlertStore((s) => s.alerts);
 

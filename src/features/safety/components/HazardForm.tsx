@@ -40,7 +40,7 @@ interface HazardFormProps {
 const CATEGORY_TITLES: Record<string, string> = {
   hazard: '위험요소 등록',
   action: '조치 등록',
-  inspect: '점검 등록',
+  inspect: '알림마당 등록',
 };
 
 export default function HazardForm({ onClose, category = 'hazard', title }: HazardFormProps) {

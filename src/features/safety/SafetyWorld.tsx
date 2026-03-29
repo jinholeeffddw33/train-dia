@@ -89,13 +89,13 @@ type SafetyView =
 const CATEGORY_LABELS: Record<SafetyCategory, string> = {
   hazard: '위험요소',
   action: '조치',
-  inspect: '점검',
+  inspect: '알림마당',
 };
 
 const CATEGORY_EMPTY: Record<SafetyCategory, { icon: string; text: string; hint: string }> = {
   hazard:  { icon: '📷', text: '등록된 위험요소가 없어요', hint: '발견한 위험요소를 사진으로 공유해주세요' },
   action:  { icon: '🔧', text: '등록된 조치 내역이 없어요', hint: '조치한 내용을 사진과 함께 기록해주세요' },
-  inspect: { icon: '📋', text: '등록된 점검 내역이 없어요', hint: '점검 결과를 사진과 함께 기록해주세요' },
+  inspect: { icon: '📋', text: '등록된 알림이 없어요', hint: '관리자가 등록한 알림이 여기에 표시됩니다' },
 };
 
 /** 카테고리별 리스트 화면 (위험/조치/점검 공통) */

@@ -127,10 +127,10 @@
 }
 
 :root.light .heroBackBtn {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.12);
-  color: var(--dia-text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(15, 23, 42, 0.08);
+  border-color: rgba(15, 23, 42, 0.15);
+  color: #0F172A;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }

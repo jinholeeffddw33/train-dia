@@ -4,11 +4,15 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import { P } from '@/data/cycle';
+import { EXTRA_USERS } from '@/lib/auth';
 import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
 
-/** 가나다순 정렬된 기관사 목록 */
-const SORTED_P = [...P].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
+/** 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원) */
+const ALL_PEOPLE = [...P, ...EXTRA_USERS];
+const SORTED_P = [...ALL_PEOPLE].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
+/** EXTRA_USERS의 I는 '0'이므로 구분용 Set */
+const EXTRA_SET = new Set(EXTRA_USERS.map((u) => u.s));
 
 interface DriverSelectorProps {
   open: boolean;
@@ -23,11 +27,14 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
   const current = useDriverStore((s) => s.current);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const setCurrent = useDriverStore((s) => s.setCurrent);
+  const myDriver = useDriverStore((s) => s.myDriver);
+
   const filtered = useMemo(() => {
     if (!query.trim()) return SORTED_P;
     const q = query.trim();
     return SORTED_P.filter(
-      (p) => p.n.includes(q) || p.I.includes(q) || p.d.includes(q),
+      (p) => p.n.includes(q) || (p.I !== '0' && p.I.includes(q)) || p.d.includes(q) || (p.s && p.s.includes(q)),
     );
   }, [query]);
 
@@ -38,12 +45,15 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
     }
   }, [open]);
 
-  const handlePick = (id: string) => {
+  const handlePick = (person: import('@/lib/types').Person) => {
     if (onSelectOverride) {
-      const person = P.find((p) => p.I === id);
-      if (person) onSelectOverride(person);
+      onSelectOverride(person);
+    } else if (person.I !== '0') {
+      pick(person.I);
+      onClose();
     } else {
-      pick(id);
+      // EXTRA_USERS (I='0') — setCurrent으로 직접 설정
+      setCurrent(person);
       onClose();
     }
   };
@@ -77,18 +87,36 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
       </div>
 
       <div className={styles.selectorList}>
-        {filtered.map((p) => (
+        {/* 본인(myDriver)이 있으면 맨 위에 고정 표시 */}
+        {myDriver && (
           <button
-            key={p.I}
             type="button"
-            className={`${styles.personItem} ${current?.I === p.I ? styles.personItemActive : ''}`}
-            onClick={() => handlePick(p.I)}
+            className={`${styles.personItem} ${styles.personItemMyDriver} ${current?.n === myDriver.n && current?.s === myDriver.s ? styles.personItemActive : ''}`}
+            onClick={() => handlePick(myDriver)}
           >
-            <span className={styles.personNum}>{p.I}</span>
-            <span className={styles.personName}>{p.n}</span>
-            <span className={styles.personDia}>{p.d}</span>
+            <span className={styles.personNum}>★</span>
+            <span className={styles.personName}>{myDriver.n}</span>
+            <span className={styles.personDia}>내 계정</span>
           </button>
-        ))}
+        )}
+        {filtered.map((p) => {
+          const isExtra = EXTRA_SET.has(p.s);
+          const isMe = myDriver && p.n === myDriver.n && p.s === myDriver.s;
+          if (isMe) return null; // 위에 고정 표시했으므로 중복 제거
+          const isActive = current?.n === p.n && current?.s === p.s;
+          return (
+            <button
+              key={`${p.I}-${p.s}`}
+              type="button"
+              className={`${styles.personItem} ${isActive ? styles.personItemActive : ''}`}
+              onClick={() => handlePick(p)}
+            >
+              <span className={styles.personNum}>{isExtra ? '' : p.I}</span>
+              <span className={styles.personName}>{p.n}</span>
+              <span className={styles.personDia}>{isExtra ? '직원' : p.d}</span>
+            </button>
+          );
+        })}
         {filtered.length === 0 && (
           <p className={styles.selectorEmpty}>검색 결과가 없어요</p>
         )}

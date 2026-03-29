@@ -778,6 +778,12 @@
   background: var(--dia-blue-dim);
 }
 
+.personItemMyDriver {
+  border: 1px solid var(--dia-blue);
+  background: var(--dia-blue-dim);
+  margin-bottom: var(--dia-space-2);
+}
+
 .personNum {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);

@@ -115,24 +115,16 @@
   height: 40px;
   min-width: 40px;
   border-radius: var(--dia-radius-full);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 10;
-}
-
-:root.light .heroBackBtn {
-  background: rgba(15, 23, 42, 0.08);
-  border-color: rgba(15, 23, 42, 0.15);
-  color: #0F172A;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .heroBackBtn:active { transform: scale(0.95); }

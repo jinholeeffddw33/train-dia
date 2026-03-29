@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import { isAdmin } from '@/lib/auth';
 import styles from './Hazard.module.css';
 
 // Stable empty array — prevents useSyncExternalStore from triggering infinite re-renders
@@ -69,6 +70,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
 
   const isMyReport = report && name && report.createdBy === name;
+  const adminUser = isAdmin(sabun);
+  const canManage = isMyReport || adminUser;
   const isNotice = report?.category === 'inspect';
 
   // 알림마당 수정용: description을 번호별 items로 파싱
@@ -219,7 +222,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.detailTitle}>상세보기</h1>
-        {isMyReport && (
+        {canManage && (
           <div className={styles.menuWrap} ref={menuRef}>
             <button
               type="button"
@@ -231,9 +234,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             </button>
             {showMenu && (
               <div className={styles.menuDropdown}>
-                <button type="button" className={styles.menuItem} onClick={handleEditStart}>
-                  <Pencil size={16} /> 수정
-                </button>
+                {isMyReport && (
+                  <button type="button" className={styles.menuItem} onClick={handleEditStart}>
+                    <Pencil size={16} /> 수정
+                  </button>
+                )}
                 <button type="button" className={`${styles.menuItem} ${styles.menuItemDanger}`} onClick={handleDelete}>
                   <Trash2 size={16} /> 삭제
                 </button>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
-import { verifyUser } from '@/lib/auth';
+import { verifyUser, isAdmin } from '@/lib/auth';
 
 // ── PATCH: 위험요소 수정 (description, location) ──
 export async function PATCH(
@@ -158,9 +158,9 @@ export async function DELETE(
     );
   }
 
-  if (report.created_by !== verified.n) {
+  if (report.created_by !== verified.n && !isAdmin(sabun!)) {
     return NextResponse.json(
-      { code: 'FORBIDDEN', message: '본인 글만 삭제할 수 있습니다' },
+      { code: 'FORBIDDEN', message: '본인 글 또는 관리자만 삭제할 수 있습니다' },
       { status: 403 },
     );
   }

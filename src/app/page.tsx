@@ -68,7 +68,7 @@ export default function HomePage() {
 
   return (
     <AuthGate>
-      <div id="_dia_dbg" style={{ position:'fixed',bottom:0,left:0,right:0,background:'#000',color:'#0f0',fontSize:10,padding:4,zIndex:99999,opacity:0.8 }} />
+      <div id="_dia_dbg" style={{ position:'fixed',top:0,left:0,right:0,background:'#000',color:'#0f0',fontSize:11,padding:'2px 8px',zIndex:99999,opacity:0.9,pointerEvents:'none' }} />
       {world === null ? (
         <WorldHub onEnter={handleEnter} />
       ) : world === 'duty' ? (

@@ -48,6 +48,19 @@ export const EXTRA_USERS: Person[] = [
 
 const ALL_USERS = [...P, ...EXTRA_USERS];
 
+/** 알림마당 관리자 사번 목록 */
+const ADMIN_SABUNS = new Set([
+  '21711694', // 이현구
+  '21714898', // 강병우
+  '21715437', // 석영훈
+  '21715494', // 김준홍
+]);
+
 export function verifyUser(name: string, sabun: string): Person | null {
   return ALL_USERS.find((p) => p.n === name && p.s === sabun) ?? null;
+}
+
+/** 알림마당 관리자 여부 */
+export function isAdmin(sabun: string): boolean {
+  return ADMIN_SABUNS.has(sabun);
 }

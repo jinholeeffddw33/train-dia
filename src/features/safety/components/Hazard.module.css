@@ -531,6 +531,198 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── Notice Form (알림마당) ── */
+.noticeTypeGroup {
+  display: flex;
+  gap: 6px;
+}
+
+.noticeTypeBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  cursor: pointer;
+  transition: all var(--dia-transition-fast);
+}
+
+.noticeTypeBtnActive {
+  background: var(--dia-blue);
+  color: white;
+  border-color: var(--dia-blue);
+}
+
+.noticeItemList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noticeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+
+.noticeItemHighlight {
+  border-color: var(--dia-amber);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.noticeItemNum {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}
+
+.noticeItemNumHighlight {
+  background: var(--dia-amber);
+  color: white;
+}
+
+.noticeItemInput {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  outline: none;
+  min-width: 0;
+}
+
+.noticeItemInput::placeholder {
+  color: var(--dia-text-tertiary);
+}
+
+.noticeItemDel {
+  background: none;
+  border: none;
+  color: var(--dia-text-tertiary);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+}
+
+.noticeAddBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1px dashed var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  background: none;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.noticeAddBtn:active { background: var(--dia-surface-hover); }
+
+.filePickerBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  cursor: pointer;
+  width: 100%;
+}
+
+.filePickerBtn:active { background: var(--dia-surface-hover); }
+
+.fileRemove {
+  margin-left: auto;
+  color: var(--dia-text-tertiary);
+  display: flex;
+}
+
+/* ── Notice Card (알림마당 리스트) ── */
+.noticeCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  text-align: left;
+  width: 100%;
+  transition: background var(--dia-transition-fast);
+}
+
+.noticeCard:active { background: var(--dia-surface-hover); }
+
+.noticeHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-xs);
+}
+
+.noticeType {
+  padding: 2px 8px;
+  border-radius: var(--dia-radius-sm);
+  font-weight: 600;
+  font-size: 11px;
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+.noticeDate {
+  color: var(--dia-text-tertiary);
+  font-weight: 500;
+}
+
+.noticeAuthor {
+  color: var(--dia-text-tertiary);
+  margin-left: auto;
+}
+
+.noticeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.noticeLine {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: 1.5;
+}
+
+.noticeLineHighlight {
+  font-weight: 700;
+  color: var(--dia-amber);
+}
+
+.noticeFile {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-blue);
+  font-weight: 500;
+}
+
 /* ── Detail Header Menu ── */
 .menuWrap {
   position: relative;

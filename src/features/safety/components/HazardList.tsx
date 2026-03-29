@@ -1,6 +1,6 @@
 'use client';
 
-import { useHazardStore } from '@/stores/hazard';
+import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
 import styles from './Hazard.module.css';
 
 function timeAgo(iso: string): string {
@@ -15,13 +15,22 @@ function timeAgo(iso: string): string {
   return `${d}일 전`;
 }
 
-interface HazardListProps {
-  onSelect: (id: string) => void;
+function formatDate(iso: string): string {
+  const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export default function HazardList({ onSelect }: HazardListProps) {
+interface HazardListProps {
+  onSelect: (id: string) => void;
+  category?: SafetyCategory;
+}
+
+export default function HazardList({ onSelect, category }: HazardListProps) {
   const reports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
+  const isNotice = category === 'inspect';
 
   if (loading && reports.length === 0) {
     return (
@@ -36,13 +45,63 @@ export default function HazardList({ onSelect }: HazardListProps) {
   if (reports.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <span className={styles.emptyIcon}>📷</span>
-        <p className={styles.emptyText}>등록된 위험요소가 없어요</p>
-        <p className={styles.emptyHint}>발견한 위험요소를 사진으로 공유해주세요</p>
+        <span className={styles.emptyIcon}>{isNotice ? '📋' : '📷'}</span>
+        <p className={styles.emptyText}>{isNotice ? '등록된 알림이 없어요' : '등록된 위험요소가 없어요'}</p>
+        <p className={styles.emptyHint}>{isNotice ? '관리자가 등록한 알림이 여기에 표시됩니다' : '발견한 위험요소를 사진으로 공유해주세요'}</p>
       </div>
     );
   }
 
+  // 알림마당: 번호 리스트 형태
+  if (isNotice) {
+    return (
+      <div className={styles.list}>
+        {reports.map((r) => {
+          const lines = r.description.split('\n');
+          const isPlaceholder = r.photoUrl.includes('placeholder');
+          const hasFile = !isPlaceholder && r.photoUrl;
+          return (
+            <button
+              key={r.id}
+              type="button"
+              className={styles.noticeCard}
+              onClick={() => onSelect(r.id)}
+            >
+              <div className={styles.noticeHeader}>
+                {r.location && (
+                  <span className={styles.noticeType}>{r.location}</span>
+                )}
+                <span className={styles.noticeDate}>{formatDate(r.createdAt)}</span>
+                <span className={styles.noticeAuthor}>{r.createdBy}</span>
+              </div>
+              <div className={styles.noticeBody}>
+                {lines.map((line, i) => {
+                  const num = parseInt(line);
+                  const isHighlight = num === 1 || num === 2;
+                  return (
+                    <div
+                      key={i}
+                      className={`${styles.noticeLine} ${isHighlight ? styles.noticeLineHighlight : ''}`}
+                    >
+                      {line}
+                    </div>
+                  );
+                })}
+              </div>
+              {hasFile && (
+                <div className={styles.noticeFile}>📎 첨부파일</div>
+              )}
+              <div className={styles.cardMeta}>
+                <span className={styles.cardComments}>💬 {r.commentCount}</span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // 기존: 위험/조치
   return (
     <div className={styles.list}>
       {reports.map((r) => (

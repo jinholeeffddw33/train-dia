@@ -13,6 +13,8 @@ import AlertForm from '@/features/alerts/components/AlertForm';
 import HazardList from './components/HazardList';
 import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
+import NoticeForm from './components/NoticeForm';
+import { isAdmin } from '@/lib/auth';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
@@ -115,6 +117,7 @@ function CategoryListView({
   const fetchReports = useHazardStore((s) => s.fetchReports);
   const reports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
+  const canWrite = category !== 'inspect' || isAdmin(sabun);
 
   useEffect(() => {
     fetchReports(sabun, category);
@@ -127,9 +130,11 @@ function CategoryListView({
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.headerTitle}>{label}</h1>
-        <button type="button" className={styles.addBtn} onClick={onShowForm}>
-          + 등록
-        </button>
+        {canWrite && (
+          <button type="button" className={styles.addBtn} onClick={onShowForm}>
+            + 등록
+          </button>
+        )}
       </header>
       <main className={styles.content}>
         {loading && reports.length === 0 ? (
@@ -145,18 +150,28 @@ function CategoryListView({
             <p className={styles.emptyHint}>{emptyConfig.hint}</p>
           </div>
         ) : (
-          <HazardList onSelect={onSelect} />
+          <HazardList onSelect={onSelect} category={category} />
         )}
       </main>
       <Modal open={showForm} onClose={onCloseForm}>
-        <HazardForm
-          category={category}
-          onClose={() => {
-            onCloseForm();
-            fetchReports(sabun, category);
-            onCountsChanged?.();
-          }}
-        />
+        {category === 'inspect' ? (
+          <NoticeForm
+            onClose={() => {
+              onCloseForm();
+              fetchReports(sabun, category);
+              onCountsChanged?.();
+            }}
+          />
+        ) : (
+          <HazardForm
+            category={category}
+            onClose={() => {
+              onCloseForm();
+              fetchReports(sabun, category);
+              onCountsChanged?.();
+            }}
+          />
+        )}
       </Modal>
     </div>
   );

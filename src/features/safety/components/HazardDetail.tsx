@@ -167,7 +167,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           <button type="button" className={styles.detailBackBtn} onClick={onBack} aria-label="뒤로">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.detailTitle}>위험요소</h1>
+          <h1 className={styles.detailTitle}>상세보기</h1>
         </header>
         <div className={styles.emptyState}>
           <p className={styles.emptyText}>게시물을 찾을 수 없어요</p>
@@ -182,7 +182,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
         <button type="button" className={styles.detailBackBtn} onClick={onBack} aria-label="뒤로">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        <h1 className={styles.detailTitle}>위험요소</h1>
+        <h1 className={styles.detailTitle}>상세보기</h1>
         {isMyReport && (
           <div className={styles.menuWrap} ref={menuRef}>
             <button
@@ -209,7 +209,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
       <div className={styles.detailScroll}>
         {/* 사진 */}
-        <img src={report.photoUrl} alt="위험요소 사진" className={styles.detailPhoto} />
+        <img src={report.photoUrl} alt="첨부 사진" className={styles.detailPhoto} />
 
         {/* 내용 */}
         <div className={styles.detailContent}>

@@ -46,8 +46,8 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
     return (
       <div className={styles.emptyState}>
         <span className={styles.emptyIcon}>{isNotice ? '📋' : '📷'}</span>
-        <p className={styles.emptyText}>{isNotice ? '등록된 알림이 없어요' : '등록된 위험요소가 없어요'}</p>
-        <p className={styles.emptyHint}>{isNotice ? '관리자가 등록한 알림이 여기에 표시됩니다' : '발견한 위험요소를 사진으로 공유해주세요'}</p>
+        <p className={styles.emptyText}>{isNotice ? '등록된 알림이 없어요' : '등록된 글이 없어요'}</p>
+        <p className={styles.emptyHint}>{isNotice ? '관리자가 등록한 알림이 여기에 표시됩니다' : '사진과 함께 공유해주세요'}</p>
       </div>
     );
   }
@@ -110,11 +110,11 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
           type="button"
           className={styles.card}
           onClick={() => onSelect(r.id)}
-          aria-label={`위험요소: ${r.description}`}
+          aria-label={r.description}
         >
           <img
             src={r.photoUrl}
-            alt="위험요소 사진"
+            alt="첨부 사진"
             className={styles.cardPhoto}
             loading="lazy"
           />

@@ -87,14 +87,14 @@ type SafetyView =
   | { type: 'detail'; category: SafetyCategory; id: string };
 
 const CATEGORY_LABELS: Record<SafetyCategory, string> = {
-  hazard: '위험요소',
-  action: '조치',
+  hazard: '위험개소',
+  action: '조치내용',
   inspect: '알림마당',
 };
 
 const CATEGORY_EMPTY: Record<SafetyCategory, { icon: string; text: string; hint: string }> = {
-  hazard:  { icon: '📷', text: '등록된 위험요소가 없어요', hint: '발견한 위험요소를 사진으로 공유해주세요' },
-  action:  { icon: '🔧', text: '등록된 조치 내역이 없어요', hint: '조치한 내용을 사진과 함께 기록해주세요' },
+  hazard:  { icon: '📷', text: '등록된 위험개소가 없어요', hint: '발견한 위험개소를 사진으로 공유해주세요' },
+  action:  { icon: '🔧', text: '등록된 조치내용이 없어요', hint: '조치한 내용을 사진과 함께 기록해주세요' },
   inspect: { icon: '📋', text: '등록된 알림이 없어요', hint: '관리자가 등록한 알림이 여기에 표시됩니다' },
 };
 
@@ -242,7 +242,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
           <button type="button" className={styles.backBtn} onClick={goHome} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.headerTitle}>장애 알림</h1>
+          <h1 className={styles.headerTitle}>장애신고</h1>
           <button
             type="button"
             className={styles.addBtn}

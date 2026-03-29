@@ -38,8 +38,8 @@ interface HazardFormProps {
 }
 
 const CATEGORY_TITLES: Record<string, string> = {
-  hazard: '위험요소 등록',
-  action: '조치 등록',
+  hazard: '위험개소 등록',
+  action: '조치내용 등록',
   inspect: '알림마당 등록',
 };
 
@@ -137,7 +137,7 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
         <textarea
           id="hazard-desc"
           className={styles.textArea}
-          placeholder="위험요소에 대해 간단히 설명해주세요"
+          placeholder="내용을 입력해주세요"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}

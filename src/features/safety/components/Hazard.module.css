@@ -704,8 +704,9 @@
 }
 
 .noticeDate {
-  color: var(--dia-text-tertiary);
-  font-weight: 500;
+  color: var(--dia-blue);
+  font-weight: 700;
+  font-size: 12px;
 }
 
 .noticeAuthor {
@@ -734,6 +735,32 @@
   font-size: var(--dia-text-xs);
   color: var(--dia-blue);
   font-weight: 500;
+}
+
+.noticeEditHeader {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-3);
+}
+
+.detailDateBold {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-blue);
+}
+
+.noticeFileLink {
+  display: inline-block;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-blue);
+  font-weight: 500;
+  margin-top: var(--dia-space-2);
+  text-decoration: none;
+}
+
+.noticeFileLink:active {
+  opacity: 0.7;
 }
 
 /* ── Detail Header Menu ── */

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check } from 'lucide-react';
+import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
@@ -10,13 +10,22 @@ import styles from './Hazard.module.css';
 // when comments[reportId] is undefined (React 19 + Zustand 5 strict reference equality check)
 const EMPTY_COMMENTS: HazardComment[] = [];
 
+const DOW = ['일', '월', '화', '수', '목', '금', '토'] as const;
+
 function formatDate(iso: string): string {
   if (!iso) return '';
-  // Supabase timestamps: "2026-03-23 14:26:56.577709+00" — Safari requires ISO 8601 with T separator
   const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
   const d = new Date(normalized);
   if (isNaN(d.getTime())) return '';
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+function formatDateFull(iso: string): string {
+  if (!iso) return '';
+  const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
 }
 
 interface HazardDetailProps {
@@ -53,6 +62,19 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
 
   const isMyReport = report && name && report.createdBy === name;
+  const isNotice = report?.category === 'inspect';
+
+  // 알림마당 수정용: description을 번호별 items로 파싱
+  const [editItems, setEditItems] = useState<string[]>([]);
+
+  const parseDescToItems = (desc: string): string[] => {
+    const lines = desc.split('\n');
+    return lines.map((l) => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+  };
+
+  const itemsToDesc = (items: string[]): string => {
+    return items.filter((s) => s.trim()).map((text, i) => `${i + 1}. ${text.trim()}`).join('\n');
+  };
 
   useEffect(() => {
     fetchComments(reportId);
@@ -105,15 +127,19 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     if (!report) return;
     setEditDesc(report.description);
     setEditLocation(report.location);
+    if (isNotice) {
+      setEditItems(parseDescToItems(report.description));
+    }
     setEditMode(true);
     setShowMenu(false);
   };
 
   const handleEditSave = async () => {
-    if (!editDesc.trim() || !name || !sabun) return;
+    const desc = isNotice ? itemsToDesc(editItems) : editDesc.trim();
+    if (!desc || !name || !sabun) return;
     setError('');
     try {
-      await updateReport(reportId, editDesc.trim(), editLocation.trim(), name, sabun);
+      await updateReport(reportId, desc, editLocation.trim(), name, sabun);
       setEditMode(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : '수정에 실패했습니다');
@@ -208,59 +234,108 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       </header>
 
       <div className={styles.detailScroll}>
-        {/* 사진 */}
-        <img src={report.photoUrl} alt="첨부 사진" className={styles.detailPhoto} />
+        {/* 사진 — 알림마당 placeholder는 숨김 */}
+        {!(isNotice && report.photoUrl.includes('placeholder')) && (
+          <img src={report.photoUrl} alt="첨부 사진" className={styles.detailPhoto} />
+        )}
 
         {/* 내용 */}
         <div className={styles.detailContent}>
           {editMode ? (
-            <>
-              <div className={styles.editField}>
-                <label className={styles.editLabel}>위치</label>
-                <input
-                  type="text"
-                  className={styles.textInput}
-                  value={editLocation}
-                  onChange={(e) => setEditLocation(e.target.value)}
-                  placeholder="위치 (선택)"
-                  maxLength={100}
-                />
-              </div>
-              <div className={styles.editField}>
-                <label className={styles.editLabel}>설명</label>
-                <textarea
-                  className={styles.textArea}
-                  value={editDesc}
-                  onChange={(e) => setEditDesc(e.target.value)}
-                  rows={4}
-                  maxLength={1000}
-                />
-              </div>
-              <div className={styles.editActions}>
-                <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
-                  <X size={16} /> 취소
-                </button>
-                <button
-                  type="button"
-                  className={styles.editSaveBtn}
-                  onClick={handleEditSave}
-                  disabled={!editDesc.trim()}
-                >
-                  <Check size={16} /> 저장
-                </button>
-              </div>
-            </>
+            isNotice ? (
+              /* 알림마당 수정: 번호별 항목 편집 */
+              <>
+                <div className={styles.noticeEditHeader}>알림마당 수정</div>
+                <div className={styles.noticeItemList}>
+                  {editItems.map((text, i) => (
+                    <div key={i} className={`${styles.noticeItem} ${i < 2 ? styles.noticeItemHighlight : ''}`}>
+                      <span className={`${styles.noticeItemNum} ${i < 2 ? styles.noticeItemNumHighlight : ''}`}>{i + 1}</span>
+                      <input
+                        type="text"
+                        className={styles.noticeItemInput}
+                        placeholder={i < 2 ? '강조 항목' : `${i + 1}번 항목`}
+                        value={text}
+                        onChange={(e) => { const next = [...editItems]; next[i] = e.target.value; setEditItems(next); }}
+                        maxLength={200}
+                      />
+                      {editItems.length > 1 && (
+                        <button type="button" className={styles.noticeItemDel} onClick={() => setEditItems(editItems.filter((_, j) => j !== i))}>
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {editItems.length < 10 && (
+                  <button type="button" className={styles.noticeAddBtn} onClick={() => setEditItems([...editItems, ''])}>
+                    <Plus size={14} /> 항목 추가
+                  </button>
+                )}
+                <div className={styles.editActions}>
+                  <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
+                    <X size={16} /> 취소
+                  </button>
+                  <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={editItems.every((s) => !s.trim())}>
+                    <Check size={16} /> 저장
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* 일반 수정 */
+              <>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>위치</label>
+                  <input type="text" className={styles.textInput} value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="위치 (선택)" maxLength={100} />
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>설명</label>
+                  <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
+                </div>
+                <div className={styles.editActions}>
+                  <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
+                    <X size={16} /> 취소
+                  </button>
+                  <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={!editDesc.trim()}>
+                    <Check size={16} /> 저장
+                  </button>
+                </div>
+              </>
+            )
           ) : (
             <>
+              {/* 날짜 + 요일 강조 + 작성자 */}
+              <div className={styles.detailMeta}>
+                <span className={styles.detailDateBold}>{formatDateFull(report.createdAt)}</span>
+                <span className={styles.detailAuthor}>{report.createdBy}</span>
+              </div>
+
               {report.location && (
                 <span className={styles.detailLocation}>📍 {report.location}</span>
               )}
-              <p className={styles.detailDesc}>{report.description}</p>
-              <div className={styles.detailMeta}>
-                <span className={styles.detailAuthor}>{report.createdBy}</span>
-                <span className={styles.detailDot}>·</span>
-                <span className={styles.detailTime}>{formatDate(report.createdAt)}</span>
-              </div>
+
+              {/* 알림마당: 번호 리스트 형태 */}
+              {isNotice ? (
+                <div className={styles.noticeBody}>
+                  {report.description.split('\n').map((line, i) => {
+                    const num = parseInt(line);
+                    const isHighlight = num === 1 || num === 2;
+                    return (
+                      <div key={i} className={`${styles.noticeLine} ${isHighlight ? styles.noticeLineHighlight : ''}`}>
+                        {line}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className={styles.detailDesc}>{report.description}</p>
+              )}
+
+              {/* 첨부파일 표시 */}
+              {isNotice && !report.photoUrl.includes('placeholder') && (
+                <a href={report.photoUrl} target="_blank" rel="noopener noreferrer" className={styles.noticeFileLink}>
+                  📎 첨부파일 보기
+                </a>
+              )}
             </>
           )}
         </div>

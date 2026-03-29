@@ -15,11 +15,13 @@ function timeAgo(iso: string): string {
   return `${d}일 전`;
 }
 
+const DOW = ['일', '월', '화', '수', '목', '금', '토'] as const;
+
 function formatDate(iso: string): string {
   const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
   const d = new Date(normalized);
   if (isNaN(d.getTime())) return '';
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
 }
 
 interface HazardListProps {

@@ -103,6 +103,34 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── Logout Button ── */
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3);
+  margin-top: var(--dia-space-3);
+  background: none;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-red, #ef4444);
+  cursor: pointer;
+  transition: background var(--dia-transition-fast);
+}
+
+.logoutBtn:active {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.logoutUser {
+  color: var(--dia-text-tertiary);
+  font-weight: 400;
+}
+
 /* ── Toggle Switch ── */
 .toggle {
   position: relative;

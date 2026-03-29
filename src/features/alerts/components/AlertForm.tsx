@@ -26,8 +26,8 @@ function getLocalDateStr(d: Date = new Date()): string {
 
 export default function AlertForm({ onClose }: { onClose: () => void }) {
   const addAlert = useAlertStore((s) => s.addAlert);
-  const driverName = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
-  const driverSabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const [stationFrom, setStationFrom] = useState('');
   const [stationTo, setStationTo] = useState('');
   const [direction, setDirection] = useState<Direction>('both');

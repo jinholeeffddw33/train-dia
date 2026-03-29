@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
@@ -22,6 +22,7 @@ export default function MoreTab() {
   const isViewMode = useDriverStore((s) => s.isViewMode);
   const setMyDriver = useDriverStore((s) => s.setMyDriver);
   const backToMe = useDriverStore((s) => s.backToMe);
+  const logout = useDriverStore((s) => s.logout);
   const { theme, toggle: toggleTheme } = useThemeStore();
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
@@ -254,6 +255,21 @@ export default function MoreTab() {
           </div>
           <span className={styles.settingValue}>v2.0.0</span>
         </div>
+
+        {/* 로그아웃 */}
+        <button
+          type="button"
+          className={styles.logoutBtn}
+          onClick={() => {
+            if (window.confirm('로그아웃 하시겠습니까?')) {
+              logout();
+            }
+          }}
+        >
+          <LogOut size={18} />
+          <span>로그아웃</span>
+          {myDriver && <span className={styles.logoutUser}>{myDriver.n}</span>}
+        </button>
       </section>
 
       {/* 내 기관사 변경 확인 팝업 */}

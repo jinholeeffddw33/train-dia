@@ -63,15 +63,15 @@ const ALL_USERS = [...P, ...EXTRA_USERS];
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const current = useDriverStore((s) => s.current);
-  const pick = useDriverStore((s) => s.pick);
-  const setCurrent = useDriverStore((s) => s.setCurrent);
+  const myDriver = useDriverStore((s) => s.myDriver);
+  const setMyDriver = useDriverStore((s) => s.setMyDriver);
   const [name, setName] = useState('');
   const [sabun, setSabun] = useState('');
   const [error, setError] = useState('');
   const [matched, setMatched] = useState<Person | null>(null);
 
-  // 이미 인증됨 → 앱 바로 렌더
-  if (current) return <>{children}</>;
+  // 이미 인증됨 (myDriver 존재) → 앱 바로 렌더
+  if (myDriver) return <>{children}</>;
 
   const clearError = () => setError('');
 
@@ -105,13 +105,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   const handleConfirm = () => {
     if (!matched) return;
-    // P 배열에 있는 기관사 → pick(id), 그 외 → setCurrent 직접 설정
-    const inP = P.find((p) => p.I === matched.I);
-    if (inP) {
-      pick(inP.I);
-    } else {
-      setCurrent(matched);
-    }
+    // 항상 myDriver로 설정 (최초 인증자 = 행위 주체)
+    setMyDriver(matched);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

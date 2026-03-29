@@ -20,6 +20,8 @@ interface DriverState {
   setMyDriverById: (id: string) => void;
   /** 내 보기로 돌아가기 */
   backToMe: () => void;
+  /** 로그아웃 — 인증 초기화 */
+  logout: () => void;
   /** 초기화 (localStorage에서 복원) */
   restore: () => void;
 }
@@ -69,6 +71,10 @@ export const useDriverStore = create<DriverState>()(
         if (myDriver) {
           set({ current: myDriver, isViewMode: false });
         }
+      },
+
+      logout: () => {
+        set({ myDriver: null, current: null, isViewMode: false });
       },
 
       restore: () => {

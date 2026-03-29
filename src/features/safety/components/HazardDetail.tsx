@@ -65,8 +65,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
 
-  const name = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
 
   const isMyReport = report && name && report.createdBy === name;
   const isNotice = report?.category === 'inspect';

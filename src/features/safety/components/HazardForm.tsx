@@ -53,8 +53,8 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
   const fileRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
-  const name = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

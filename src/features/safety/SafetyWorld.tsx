@@ -197,7 +197,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
-  const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const { getUnread, alertUnread, markAsRead, markAlertAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {

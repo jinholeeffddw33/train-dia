@@ -63,7 +63,7 @@ function buildPreviewDays(): Date[] {
 }
 
 export default function ExchangeRequest() {
-  const driver = useDriverStore((s) => s.myDriver ?? s.current);
+  const driver = useDriverStore((s) => s.myDriver);
   const isViewMode = useDriverStore((s) => s.isViewMode);
   const todayStr = toISODate(new Date());
   const previewDays = useMemo(buildPreviewDays, []);

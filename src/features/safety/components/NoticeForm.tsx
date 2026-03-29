@@ -26,8 +26,8 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
-  const name = useDriverStore((s) => (s.myDriver ?? s.current)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver ?? s.current)?.s ?? '');
+  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
 
   const addItem = () => {
     if (items.length >= 10) return;

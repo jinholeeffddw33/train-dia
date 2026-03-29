@@ -117,11 +117,22 @@ function CategoryListView({
   const fetchReports = useHazardStore((s) => s.fetchReports);
   const reports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
-  const canWrite = category !== 'inspect' || isAdmin(sabun);
+  const isInspect = category === 'inspect';
+  const adminUser = isAdmin(sabun);
+  const [showAdminAlert, setShowAdminAlert] = useState(false);
 
   useEffect(() => {
     fetchReports(sabun, category);
   }, [fetchReports, sabun, category]);
+
+  const handleAddClick = () => {
+    if (isInspect && !adminUser) {
+      setShowAdminAlert(true);
+      setTimeout(() => setShowAdminAlert(false), 2500);
+      return;
+    }
+    onShowForm();
+  };
 
   return (
     <div className={styles.wrap}>
@@ -130,12 +141,13 @@ function CategoryListView({
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.headerTitle}>{label}</h1>
-        {canWrite && (
-          <button type="button" className={styles.addBtn} onClick={onShowForm}>
-            + 등록
-          </button>
-        )}
+        <button type="button" className={styles.addBtn} onClick={handleAddClick}>
+          + 등록
+        </button>
       </header>
+      {showAdminAlert && (
+        <div className={styles.adminAlert}>관리자만 등록할 수 있습니다</div>
+      )}
       <main className={styles.content}>
         {loading && reports.length === 0 ? (
           <div className={styles.loadingState}>

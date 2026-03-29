@@ -61,6 +61,24 @@
 
 .addBtn:active { background: var(--dia-amber-dim); }
 
+.adminAlert {
+  text-align: center;
+  padding: 8px;
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-amber);
+  background: rgba(245, 158, 11, 0.1);
+  border-bottom: 1px solid var(--dia-border);
+  animation: fadeInOut 2.5s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 .content {
   flex: 1;
   overflow-y: auto;

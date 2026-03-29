@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
@@ -63,12 +63,11 @@ export default function HomePage() {
     setWorld(null);
   }, []);
 
-  // 월드 진입 시 뒤로가기로 WorldHub 복귀
-  useHistoryBack('world', handleBack, world !== null);
+  // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
+  useHistoryBack(`world-${world}`, handleBack, world !== null);
 
   return (
     <AuthGate>
-      <div id="_dia_dbg" style={{ position:'fixed',top:0,left:0,right:0,background:'#000',color:'#0f0',fontSize:11,padding:'2px 8px',zIndex:99999,opacity:0.9,pointerEvents:'none' }} />
       {world === null ? (
         <WorldHub onEnter={handleEnter} />
       ) : world === 'duty' ? (

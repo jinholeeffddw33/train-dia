@@ -15,7 +15,6 @@ import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
 import { isAdmin } from '@/lib/auth';
-import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
@@ -222,19 +221,6 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   }, [fetchAlerts, fetchHazards, subscribeAlerts, sabun]);
 
   const goHome = useCallback(() => setView('home'), []);
-
-  // 뒤로가기: view에 따라 직전 화면으로 복귀
-  const handleHistoryBack = useCallback(() => {
-    if (typeof view === 'object' && view.type === 'detail') {
-      setView({ type: 'list', category: view.category });
-    } else if (typeof view === 'object' && view.type === 'list') {
-      setView('home');
-    } else if (view === 'alert') {
-      setView('home');
-    }
-  }, [view]);
-
-  useHistoryBack('safety', handleHistoryBack, view !== 'home');
 
   const alerts = useAlertStore((s) => s.alerts);
 

@@ -3,64 +3,34 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * PWA 뒤로가기 인터셉트 훅 v6.
+ * PWA 뒤로가기(하드웨어/제스처) 인터셉트 훅.
  *
- * Android 하드웨어 뒤로가기 + iOS 스와이프 제스처 대응.
- *
- * 원리:
- * - history 스택을 항상 [base, guard] 2개 유지 → 앱 종료 불가
- * - popstate → guard 즉시 복구 → 콜백 Map에서 최상위 활성 핸들러 실행
- * - 콜백은 ref로 매 렌더마다 동기적으로 갱신 (useEffect 의존성 없음)
- * - cleanup에서 history 조작 없음
- * - 300ms lock으로 연쇄 popstate 방지
+ * 글로벌 스택으로 관리: 가장 최근에 등록된 핸들러만 popstate에 반응.
+ * 월드 진입 → 서브 화면 순으로 중첩되어도 올바르게 역순 해제.
  */
 
-// key → ref (항상 최신 콜백을 담는 ref 객체)
-const refMap = new Map<string, { current: (() => void) | null }>();
-const order: string[] = [];
-let initialized = false;
-let locked = false;
+type StackEntry = {
+  key: string;
+  onBack: () => void;
+};
 
-function setup() {
-  if (initialized) return;
-  initialized = true;
+const handlerStack: StackEntry[] = [];
+let suppressPopState = false;
+let listenerAttached = false;
 
-  history.replaceState({ _dia: 'base' }, '');
-  history.pushState({ _dia: 'guard' }, '');
+function ensureGlobalListener() {
+  if (listenerAttached) return;
+  listenerAttached = true;
 
   window.addEventListener('popstate', () => {
-    if (locked) {
-      history.pushState({ _dia: 'guard' }, '');
+    if (suppressPopState) {
+      suppressPopState = false;
       return;
     }
-    locked = true;
-
-    // guard 즉시 복구
-    history.pushState({ _dia: 'guard' }, '');
-
-    // 디버그: 화면 상단에 표시
-    const status = order.map(k => `${k}:${refMap.get(k)?.current ? '●' : '○'}`).join(' ');
-    let exec = 'none';
-    for (let i = order.length - 1; i >= 0; i--) {
-      if (refMap.get(order[i])?.current) { exec = order[i]; break; }
+    const top = handlerStack.pop();
+    if (top) {
+      top.onBack();
     }
-    const dbg = document.getElementById('_dia_dbg');
-    if (dbg) dbg.textContent = `[${exec}] ${status}`;
-    // eslint-disable-next-line no-console
-    console.log(`[BACK] exec=${exec} | ${status}`);
-
-    // 등록 역순으로 활성 핸들러 찾아 실행
-    for (let i = order.length - 1; i >= 0; i--) {
-      const ref = refMap.get(order[i]);
-      if (ref?.current) {
-        // eslint-disable-next-line no-console
-        console.log(`[BACK] exec: ${order[i]}`);
-        ref.current();
-        break;
-      }
-    }
-
-    setTimeout(() => { locked = false; }, 300);
   });
 }
 
@@ -69,26 +39,51 @@ export function useHistoryBack(
   onBack: () => void,
   enabled: boolean = true,
 ) {
-  // ref로 콜백 관리 → 매 렌더마다 동기적으로 갱신
-  const fnRef = useRef<(() => void) | null>(null);
-  fnRef.current = enabled ? onBack : null;
+  const onBackRef = useRef(onBack);
+  onBackRef.current = onBack;
+
+  const registeredRef = useRef(false);
+  const entryRef = useRef<StackEntry | null>(null);
 
   useEffect(() => {
-    setup();
-
-    // ref 객체를 글로벌 Map에 등록 (한 번만)
-    if (!refMap.has(key)) {
-      refMap.set(key, fnRef);
-      order.push(key);
-    } else {
-      // 이미 등록됨 → ref 객체 교체 (React Strict Mode remount 대응)
-      refMap.set(key, fnRef);
+    if (!enabled) {
+      // 비활성화 시 스택에서 제거 + 히스토리 엔트리 정리
+      if (registeredRef.current && entryRef.current) {
+        const idx = handlerStack.indexOf(entryRef.current);
+        if (idx !== -1) {
+          handlerStack.splice(idx, 1);
+          // popstate 연쇄 방지 후 히스토리 정리
+          suppressPopState = true;
+          history.back();
+        }
+        entryRef.current = null;
+        registeredRef.current = false;
+      }
+      return;
     }
 
-    return () => {
-      refMap.delete(key);
-      const idx = order.indexOf(key);
-      if (idx !== -1) order.splice(idx, 1);
+    ensureGlobalListener();
+
+    const entry: StackEntry = {
+      key,
+      get onBack() { return onBackRef.current; },
     };
-  }, [key]); // key만 의존 → mount/unmount 시에만 실행
+    history.pushState({ historyBack: key }, '');
+    handlerStack.push(entry);
+    entryRef.current = entry;
+    registeredRef.current = true;
+
+    return () => {
+      if (entryRef.current) {
+        const idx = handlerStack.indexOf(entryRef.current);
+        if (idx !== -1) {
+          handlerStack.splice(idx, 1);
+          suppressPopState = true;
+          history.back();
+        }
+        entryRef.current = null;
+        registeredRef.current = false;
+      }
+    };
+  }, [key, enabled]);
 }

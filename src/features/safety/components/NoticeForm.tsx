@@ -180,6 +180,11 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         />
       </div>
 
+      {/* 작성자 표시 */}
+      <div className={styles.noticeAuthorInfo}>
+        ✏️ <strong>{name}</strong> 이름으로 등록됩니다
+      </div>
+
       {error && <p className={styles.errorText}>{error}</p>}
 
       <button

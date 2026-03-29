@@ -1,6 +1,6 @@
 'use client';
 
-import { Component, type ReactNode, useState, useEffect, useCallback, useMemo } from 'react';
+import { Component, type ReactNode, useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft, AlertTriangle, ShieldAlert, Wrench, ClipboardCheck,
 } from 'lucide-react';
@@ -223,26 +223,25 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   const goHome = useCallback(() => setView('home'), []);
 
-  // 뒤로가기 히스토리 관리
-  const viewKey = useMemo(() => {
-    if (view === 'home') return 'home';
-    if (view === 'alert') return 'alert';
-    if (typeof view === 'object' && view.type === 'detail') return `detail-${view.id}`;
-    if (typeof view === 'object' && view.type === 'list') return `list-${view.category}`;
-    return 'home';
-  }, [view]);
+  // 뒤로가기 히스토리 관리 — view가 home이 아닐 때만 활성화
+  const isDetail = typeof view === 'object' && view.type === 'detail';
+  const isList = typeof view === 'object' && view.type === 'list';
+  const isAlert = view === 'alert';
+  const notHome = isDetail || isList || isAlert;
 
+  // detail에서는 list로, 나머지는 home으로
   const handleHistoryBack = useCallback(() => {
     if (typeof view === 'object' && view.type === 'detail') {
       setView({ type: 'list', category: view.category });
-    } else if (typeof view === 'object' && view.type === 'list') {
-      setView('home');
-    } else if (view === 'alert') {
+    } else {
       setView('home');
     }
   }, [view]);
 
-  useHistoryBack(`safety-${viewKey}`, handleHistoryBack, view !== 'home');
+  // list/alert 레벨
+  useHistoryBack('safety-list', () => setView('home'), isList || isAlert);
+  // detail 레벨 (list 위에 쌓임)
+  useHistoryBack('safety-detail', handleHistoryBack, isDetail);
 
   const alerts = useAlertStore((s) => s.alerts);
 

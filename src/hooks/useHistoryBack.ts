@@ -1,36 +1,43 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /**
  * PWA 뒤로가기(하드웨어/제스처) 인터셉트 훅.
  *
- * 글로벌 스택으로 관리: 가장 최근에 등록된 핸들러만 popstate에 반응.
- * 월드 진입 → 서브 화면 순으로 중첩되어도 올바르게 역순 해제.
+ * 원리: history.pushState로 더미 엔트리를 쌓고,
+ * popstate 이벤트 발생 시 등록된 콜백을 실행.
+ *
+ * 개선사항 (v2):
+ * - 스택 대신 단일 핸들러 방식으로 단순화
+ * - suppressPopState 타이밍 문제 해결
+ * - cleanup 시 history.back() 연쇄 방지
  */
 
-type StackEntry = {
-  key: string;
-  onBack: () => void;
-};
+// 전역 핸들러 맵 (key → callback)
+const handlers = new Map<string, () => void>();
+// cleanup 중 popstate 무시 카운터
+let suppressCount = 0;
+let listenerReady = false;
 
-const handlerStack: StackEntry[] = [];
-let suppressPopState = false;
-let listenerAttached = false;
-
-function ensureGlobalListener() {
-  if (listenerAttached) return;
-  listenerAttached = true;
+function ensureListener() {
+  if (listenerReady) return;
+  listenerReady = true;
 
   window.addEventListener('popstate', () => {
-    if (suppressPopState) {
-      suppressPopState = false;
+    if (suppressCount > 0) {
+      suppressCount--;
       return;
     }
-    const top = handlerStack.pop();
-    if (top) {
-      top.onBack();
-    }
+
+    // 가장 최근에 등록된 핸들러 실행
+    const keys = [...handlers.keys()];
+    if (keys.length === 0) return;
+
+    const lastKey = keys[keys.length - 1];
+    const handler = handlers.get(lastKey);
+    handlers.delete(lastKey);
+    handler?.();
   });
 }
 
@@ -41,48 +48,38 @@ export function useHistoryBack(
 ) {
   const onBackRef = useRef(onBack);
   onBackRef.current = onBack;
-
-  const registeredRef = useRef(false);
-  const entryRef = useRef<StackEntry | null>(null);
+  const pushedRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) {
-      // 비활성화 시 스택에서 제거 + 히스토리 엔트리 정리
-      if (registeredRef.current && entryRef.current) {
-        const idx = handlerStack.indexOf(entryRef.current);
-        if (idx !== -1) {
-          handlerStack.splice(idx, 1);
-          // popstate 연쇄 방지 후 히스토리 정리
-          suppressPopState = true;
-          history.back();
-        }
-        entryRef.current = null;
-        registeredRef.current = false;
+      // 비활성화 → 정리
+      if (pushedRef.current) {
+        handlers.delete(key);
+        pushedRef.current = false;
+        suppressCount++;
+        history.back();
       }
       return;
     }
 
-    ensureGlobalListener();
+    ensureListener();
 
-    const entry: StackEntry = {
-      key,
-      get onBack() { return onBackRef.current; },
-    };
-    history.pushState({ historyBack: key }, '');
-    handlerStack.push(entry);
-    entryRef.current = entry;
-    registeredRef.current = true;
+    // 이미 등록된 동일 키가 있으면 핸들러만 갱신
+    if (handlers.has(key)) {
+      handlers.set(key, () => onBackRef.current());
+      return;
+    }
+
+    handlers.set(key, () => onBackRef.current());
+    history.pushState({ hb: key }, '');
+    pushedRef.current = true;
 
     return () => {
-      if (entryRef.current) {
-        const idx = handlerStack.indexOf(entryRef.current);
-        if (idx !== -1) {
-          handlerStack.splice(idx, 1);
-          suppressPopState = true;
-          history.back();
-        }
-        entryRef.current = null;
-        registeredRef.current = false;
+      if (pushedRef.current && handlers.has(key)) {
+        handlers.delete(key);
+        pushedRef.current = false;
+        suppressCount++;
+        history.back();
       }
     };
   }, [key, enabled]);

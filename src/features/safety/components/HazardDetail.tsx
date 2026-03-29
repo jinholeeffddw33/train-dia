@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus } from 'lucide-react';
+import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
@@ -73,6 +73,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
+  const [removeFile, setRemoveFile] = useState(false);
 
   const parseDescToItems = (desc: string): string[] => {
     const lines = desc.split('\n');
@@ -134,6 +135,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     if (!report) return;
     setEditDesc(report.description);
     setEditLocation(report.location);
+    setRemoveFile(false);
     if (isNotice) {
       setEditItems(parseDescToItems(report.description));
     }
@@ -146,8 +148,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     if (!desc || !name || !sabun) return;
     setError('');
     try {
-      await updateReport(reportId, desc, editLocation.trim(), name, sabun);
+      await updateReport(reportId, desc, editLocation.trim(), name, sabun, removeFile || undefined);
       setEditMode(false);
+      setRemoveFile(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : '수정에 실패했습니다');
     }
@@ -277,6 +280,20 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <button type="button" className={styles.noticeAddBtn} onClick={() => setEditItems([...editItems, ''])}>
                     <Plus size={14} /> 항목 추가
                   </button>
+                )}
+                {/* 첨부파일 삭제 */}
+                {report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl !== '' && (
+                  <div className={styles.fileDeleteWrap}>
+                    <Paperclip size={14} />
+                    <span className={styles.fileDeleteName}>첨부파일</span>
+                    {removeFile ? (
+                      <span className={styles.fileDeletedLabel}>삭제 예정 (저장 시 적용)</span>
+                    ) : (
+                      <button type="button" className={styles.fileDeleteBtn} onClick={() => setRemoveFile(true)}>
+                        <Trash2 size={14} /> 삭제
+                      </button>
+                    )}
+                  </div>
                 )}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>

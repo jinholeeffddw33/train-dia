@@ -772,6 +772,45 @@
   font-weight: 500;
 }
 
+.fileDeleteWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-2);
+}
+
+.fileDeleteName {
+  flex: 1;
+}
+
+.fileDeleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dia-red, #ef4444);
+  background: rgba(239, 68, 68, 0.08);
+  border: none;
+  cursor: pointer;
+}
+
+.fileDeleteBtn:active { opacity: 0.7; }
+
+.fileDeletedLabel {
+  font-size: 12px;
+  color: var(--dia-red, #ef4444);
+  font-weight: 500;
+}
+
 .noticeEditHeader {
   font-size: var(--dia-text-base);
   font-weight: 700;

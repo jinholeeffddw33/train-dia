@@ -30,6 +30,7 @@ export async function PATCH(
   const location = (body.location as string | undefined)?.trim() ?? '';
   const name = (body.name as string | undefined)?.trim();
   const sabun = (body.sabun as string | undefined)?.trim();
+  const removeFile = body.removeFile === true;
 
   if (!description || !name || !sabun) {
     return NextResponse.json(
@@ -67,9 +68,28 @@ export async function PATCH(
     );
   }
 
+  const updateData: Record<string, string> = { description, location };
+
+  // 첨부파일 삭제 요청
+  if (removeFile) {
+    // 기존 파일 URL 조회 후 스토리지 삭제
+    const { data: fileReport } = await serverSupabase
+      .from('hazard_reports')
+      .select('photo_url')
+      .eq('id', reportId)
+      .single();
+    if (fileReport?.photo_url && !fileReport.photo_url.includes('placeholder')) {
+      const urlPath = fileReport.photo_url.split('/hazard-photos/')[1];
+      if (urlPath) {
+        await serverSupabase.storage.from('hazard-photos').remove([decodeURIComponent(urlPath)]);
+      }
+    }
+    updateData.photo_url = '';
+  }
+
   const { error: updateErr } = await serverSupabase
     .from('hazard_reports')
-    .update({ description, location })
+    .update(updateData)
     .eq('id', reportId);
 
   if (updateErr) {

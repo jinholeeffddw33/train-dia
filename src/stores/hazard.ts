@@ -39,7 +39,7 @@ interface HazardState {
   }) => Promise<void>;
   fetchComments: (reportId: string) => Promise<void>;
   addComment: (reportId: string, comment: string, name: string, sabun: string) => Promise<void>;
-  updateReport: (reportId: string, description: string, location: string, name: string, sabun: string) => Promise<void>;
+  updateReport: (reportId: string, description: string, location: string, name: string, sabun: string, removeFile?: boolean) => Promise<void>;
   deleteReport: (reportId: string, name: string, sabun: string) => Promise<void>;
   updateComment: (reportId: string, commentId: string, comment: string, name: string, sabun: string) => Promise<void>;
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
@@ -131,21 +131,22 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     }));
   },
 
-  updateReport: async (reportId, description, location, name, sabun) => {
+  updateReport: async (reportId, description, location, name, sabun, removeFile) => {
     const res = await fetch(`/api/safety/hazards/${reportId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description, location, name, sabun }),
+      body: JSON.stringify({ description, location, name, sabun, removeFile }),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error((err as { message?: string }).message || '수정에 실패했습니다');
     }
 
-    // 로컬 상태 즉시 업데이트
     set((state) => ({
       reports: state.reports.map((r) =>
-        r.id === reportId ? { ...r, description, location } : r,
+        r.id === reportId
+          ? { ...r, description, location, ...(removeFile ? { photoUrl: '' } : {}) }
+          : r,
       ),
     }));
   },

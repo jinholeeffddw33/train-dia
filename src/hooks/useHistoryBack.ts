@@ -38,10 +38,19 @@ function setup() {
     // guard 즉시 복구
     history.pushState({ _dia: 'guard' }, '');
 
+    // 디버그: 화면에 표시 (폰에서 확인용)
+    const status = order.map(k => `${k}:${refMap.get(k)?.current ? 'ON' : 'off'}`).join(' | ');
+    const dbg = document.getElementById('_dia_dbg');
+    if (dbg) dbg.textContent = status;
+    // eslint-disable-next-line no-console
+    console.log(`[BACK] ${status}`);
+
     // 등록 역순으로 활성 핸들러 찾아 실행
     for (let i = order.length - 1; i >= 0; i--) {
       const ref = refMap.get(order[i]);
       if (ref?.current) {
+        // eslint-disable-next-line no-console
+        console.log(`[BACK] exec: ${order[i]}`);
         ref.current();
         break;
       }

@@ -25,7 +25,7 @@ export default function EduTab({ onBack }: EduTabProps) {
 
   const goHome = useCallback(() => setView({ type: 'home' }), []);
 
-  useHistoryBack(`edu-${view.type}`, goHome, view.type !== 'home');
+  useHistoryBack('edu', goHome, view.type !== 'home');
 
   switch (view.type) {
     case 'study':

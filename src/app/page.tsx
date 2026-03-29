@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import AuthGate from '@/components/common/AuthGate';
 import AppShell from '@/components/layout/AppShell';
@@ -63,16 +63,8 @@ export default function HomePage() {
     setWorld(null);
   }, []);
 
-  // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
-  useHistoryBack(`world-${world}`, handleBack, world !== null);
-
-  // WorldHub에서 뒤로가기 → 히스토리 유지 (앱 종료 방지)
-  useEffect(() => {
-    // 앱 시작 시 기본 히스토리 엔트리 하나 push (빈 스택 방지)
-    if (history.state === null) {
-      history.replaceState({ root: true }, '');
-    }
-  }, []);
+  // 월드 진입 시 뒤로가기로 WorldHub 복귀
+  useHistoryBack('world', handleBack, world !== null);
 
   return (
     <AuthGate>

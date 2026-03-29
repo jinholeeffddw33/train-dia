@@ -44,7 +44,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
   const goHomeTab = useCallback(() => setActiveTab('home'), []);
 
   // home 탭이 아닐 때 뒤로가기 → home 탭 복귀
-  useHistoryBack(`tab-${activeTab}`, goHomeTab, activeTab !== 'home');
+  useHistoryBack('tab', goHomeTab, activeTab !== 'home');
 
   const handleTabChange = useCallback((tab: TabId) => {
     if (tab === 'line') triggerScroll();

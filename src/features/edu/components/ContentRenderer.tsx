@@ -87,15 +87,27 @@ function CompareBlock({ items }: { items: any[] }) {
   );
 }
 
+function isPlainNumber(s: string): boolean {
+  return /^[0-9①②③④⑤⑥⑦⑧⑨⑩]+\.?$/.test(s.trim());
+}
+
 function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
   return (
     <div className={styles.defList}>
-      {items.map((item, i) => (
-        <div key={i} className={styles.defItem}>
-          <div className={styles.defTerm}>{item.term}</div>
-          {item.desc && <div className={styles.defDesc}>{item.desc}</div>}
-        </div>
-      ))}
+      {items.map((item, i) => {
+        const hideNumber = isPlainNumber(item.term) && item.desc;
+        return (
+          <div key={i} className={styles.defItem}>
+            {hideNumber
+              ? <div className={styles.defDesc}>{item.desc}</div>
+              : <>
+                  <div className={styles.defTerm}>{item.term}</div>
+                  {item.desc && <div className={styles.defDesc}>{item.desc}</div>}
+                </>
+            }
+          </div>
+        );
+      })}
     </div>
   );
 }

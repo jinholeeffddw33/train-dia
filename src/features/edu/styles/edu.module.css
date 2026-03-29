@@ -981,8 +981,12 @@
 
 .defDesc {
   font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
+  color: var(--dia-text-primary);
   line-height: var(--dia-leading-normal);
+}
+
+.defTerm + .defDesc {
+  color: var(--dia-text-secondary);
 }
 
 /* images */

@@ -1,0 +1,4 @@
+- [Supabase 백엔드 직접 작업 권한](feedback_backend_access.md) — .env 로컬 키 있음, 백엔드 작업 직접 수행 권한 부여됨
+- [확인 창 띄우지 않기](feedback_no_prompts.md) — 모든 권한 확인/질문 창 절대 띄우지 말 것
+- [자동 커밋·푸시·배포](feedback_auto_deploy.md) — 작업 완료 시 커밋/push/배포 자동 수행, 확인 질문 금지
+- [관리자 명단](project_admin_list.md) — 앱 내 관리자 21명 목록, 글쓰기/삭제/해제 권한

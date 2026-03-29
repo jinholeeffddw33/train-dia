@@ -223,25 +223,18 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   const goHome = useCallback(() => setView('home'), []);
 
-  // 뒤로가기 히스토리 관리 — view가 home이 아닐 때만 활성화
-  const isDetail = typeof view === 'object' && view.type === 'detail';
-  const isList = typeof view === 'object' && view.type === 'list';
-  const isAlert = view === 'alert';
-  const notHome = isDetail || isList || isAlert;
-
-  // detail에서는 list로, 나머지는 home으로
+  // 뒤로가기: view에 따라 직전 화면으로 복귀
   const handleHistoryBack = useCallback(() => {
     if (typeof view === 'object' && view.type === 'detail') {
       setView({ type: 'list', category: view.category });
-    } else {
+    } else if (typeof view === 'object' && view.type === 'list') {
+      setView('home');
+    } else if (view === 'alert') {
       setView('home');
     }
   }, [view]);
 
-  // list/alert 레벨
-  useHistoryBack('safety-list', () => setView('home'), isList || isAlert);
-  // detail 레벨 (list 위에 쌓임)
-  useHistoryBack('safety-detail', handleHistoryBack, isDetail);
+  useHistoryBack('safety', handleHistoryBack, view !== 'home');
 
   const alerts = useAlertStore((s) => s.alerts);
 

@@ -3,47 +3,51 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * PWA 뒤로가기 인터셉트 훅 v5.
+ * PWA 뒤로가기 인터셉트 훅 v6.
+ *
+ * Android 하드웨어 뒤로가기 + iOS 스와이프 제스처 대응.
+ *
+ * 원리:
+ * - history 스택을 항상 [base, guard] 2개 유지 → 앱 종료 불가
+ * - popstate → guard 즉시 복구 → 콜백 Map에서 최상위 활성 핸들러 실행
+ * - 콜백은 ref로 매 렌더마다 동기적으로 갱신 (useEffect 의존성 없음)
+ * - cleanup에서 history 조작 없음
+ * - 300ms lock으로 연쇄 popstate 방지
  */
 
-interface Entry {
-  key: string;
-  backRef: React.RefObject<(() => void) | null>;
-}
+// key → ref (항상 최신 콜백을 담는 ref 객체)
+const refMap = new Map<string, { current: (() => void) | null }>();
+const order: string[] = [];
+let initialized = false;
+let locked = false;
 
-const stack: Entry[] = [];
-let ready = false;
-let processing = false;
+function setup() {
+  if (initialized) return;
+  initialized = true;
 
-function init() {
-  if (ready) return;
-  ready = true;
-
-  history.replaceState({ dia: 0 }, '');
-  history.pushState({ dia: 1 }, '');
+  history.replaceState({ _dia: 'base' }, '');
+  history.pushState({ _dia: 'guard' }, '');
 
   window.addEventListener('popstate', () => {
-    // 처리 중이면 무시 (연쇄 방지)
-    if (processing) {
-      history.pushState({ dia: 1 }, '');
+    if (locked) {
+      history.pushState({ _dia: 'guard' }, '');
       return;
     }
-    processing = true;
+    locked = true;
 
-    // guard 복구
-    history.pushState({ dia: 1 }, '');
+    // guard 즉시 복구
+    history.pushState({ _dia: 'guard' }, '');
 
-    // 최상위 활성 핸들러 실행
-    for (let i = stack.length - 1; i >= 0; i--) {
-      const fn = stack[i].backRef.current;
-      if (fn) {
-        fn();
+    // 등록 역순으로 활성 핸들러 찾아 실행
+    for (let i = order.length - 1; i >= 0; i--) {
+      const ref = refMap.get(order[i]);
+      if (ref?.current) {
+        ref.current();
         break;
       }
     }
 
-    // 200ms 후 처리 해제 (빠른 연속 뒤로가기 허용)
-    setTimeout(() => { processing = false; }, 200);
+    setTimeout(() => { locked = false; }, 300);
   });
 }
 
@@ -52,21 +56,26 @@ export function useHistoryBack(
   onBack: () => void,
   enabled: boolean = true,
 ) {
-  const backRef = useRef<(() => void) | null>(null);
-  backRef.current = enabled ? onBack : null;
+  // ref로 콜백 관리 → 매 렌더마다 동기적으로 갱신
+  const fnRef = useRef<(() => void) | null>(null);
+  fnRef.current = enabled ? onBack : null;
 
   useEffect(() => {
-    init();
+    setup();
 
-    // 이미 등록된 키면 스킵 (같은 ref이므로 current만 갱신되면 됨)
-    if (stack.some((e) => e.key === key)) return;
-
-    const entry: Entry = { key, backRef };
-    stack.push(entry);
+    // ref 객체를 글로벌 Map에 등록 (한 번만)
+    if (!refMap.has(key)) {
+      refMap.set(key, fnRef);
+      order.push(key);
+    } else {
+      // 이미 등록됨 → ref 객체 교체 (React Strict Mode remount 대응)
+      refMap.set(key, fnRef);
+    }
 
     return () => {
-      const idx = stack.findIndex((e) => e.key === key);
-      if (idx !== -1) stack.splice(idx, 1);
+      refMap.delete(key);
+      const idx = order.indexOf(key);
+      if (idx !== -1) order.splice(idx, 1);
     };
-  }, [key]);
+  }, [key]); // key만 의존 → mount/unmount 시에만 실행
 }

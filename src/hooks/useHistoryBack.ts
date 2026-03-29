@@ -28,11 +28,9 @@ function setup() {
   history.replaceState({ _dia: 'base' }, '');
   history.pushState({ _dia: 'guard' }, '');
 
-  window.addEventListener('popstate', (e) => {
-    console.log('[BACK] popstate', { locked, stackSize: order.length, order: [...order], state: e.state });
+  window.addEventListener('popstate', () => {
     if (locked) {
       history.pushState({ _dia: 'guard' }, '');
-      console.log('[BACK] locked — skipped');
       return;
     }
     locked = true;
@@ -41,19 +39,13 @@ function setup() {
     history.pushState({ _dia: 'guard' }, '');
 
     // 등록 역순으로 활성 핸들러 찾아 실행
-    let executed = false;
     for (let i = order.length - 1; i >= 0; i--) {
       const ref = refMap.get(order[i]);
-      const hasHandler = !!ref?.current;
-      console.log('[BACK] check', order[i], 'active:', hasHandler);
-      if (hasHandler) {
-        console.log('[BACK] → executing', order[i]);
-        ref!.current!();
-        executed = true;
+      if (ref?.current) {
+        ref.current();
         break;
       }
     }
-    if (!executed) console.log('[BACK] no active handler found');
 
     setTimeout(() => { locked = false; }, 300);
   });

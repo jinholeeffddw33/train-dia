@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { ArrowLeft, Search, Bookmark, AlertTriangle, Info } from 'lucide-react';
 import ContentRenderer from './ContentRenderer';
 import { useEduStore } from '../hooks/useEduStore';
@@ -148,6 +149,19 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
     window.scrollTo(0, 0);
   }, [markSectionRead, allSections]);
 
+  // 섹션 읽기 중 뒤로가기 → 목차로 복귀
+  const handleDocBack = useCallback(() => {
+    if (mode === 'section') {
+      setMode('toc');
+      setCurrentSection(null);
+      window.scrollTo(0, 0);
+    } else {
+      onBack();
+    }
+  }, [mode, onBack]);
+
+  useHistoryBack('doc-viewer', handleDocBack, mode === 'section');
+
   const toggleChapter = useCallback((chId: string) => {
     setExpandedChapters(prev => {
       const next = new Set(prev);
@@ -247,7 +261,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
     return (
       <div className={styles.screen}>
         <div className={styles.topBar}>
-          <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+          <button type="button" className={styles.backBtn} onClick={handleDocBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <h1 className={styles.topTitle}>교재 학습</h1>
@@ -369,7 +383,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   return (
     <div className={styles.screen}>
       <div className={styles.topBar}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+        <button type="button" className={styles.backBtn} onClick={handleDocBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.topTitle}>{doc.title}</h1>

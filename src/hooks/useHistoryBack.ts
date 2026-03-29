@@ -3,12 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * PWA 뒤로가기 인터셉트 훅 v4.
- *
- * - history 스택을 항상 [root, guard] 2개 유지 → 앱 종료 방지
- * - popstate 시 최상위 핸들러 실행 (스택에서 제거하지 않음)
- * - 핸들러 콜백은 항상 ref로 최신 상태 유지
- * - cleanup에서 history 조작 없음
+ * PWA 뒤로가기 인터셉트 훅 v5.
  */
 
 interface Entry {
@@ -18,6 +13,7 @@ interface Entry {
 
 const stack: Entry[] = [];
 let ready = false;
+let processing = false;
 
 function init() {
   if (ready) return;
@@ -27,17 +23,27 @@ function init() {
   history.pushState({ dia: 1 }, '');
 
   window.addEventListener('popstate', () => {
-    // 즉시 guard 복구
+    // 처리 중이면 무시 (연쇄 방지)
+    if (processing) {
+      history.pushState({ dia: 1 }, '');
+      return;
+    }
+    processing = true;
+
+    // guard 복구
     history.pushState({ dia: 1 }, '');
 
-    // 최상위 핸들러 실행
+    // 최상위 활성 핸들러 실행
     for (let i = stack.length - 1; i >= 0; i--) {
       const fn = stack[i].backRef.current;
       if (fn) {
         fn();
-        return;
+        break;
       }
     }
+
+    // 200ms 후 처리 해제 (빠른 연속 뒤로가기 허용)
+    setTimeout(() => { processing = false; }, 200);
   });
 }
 
@@ -49,25 +55,18 @@ export function useHistoryBack(
   const backRef = useRef<(() => void) | null>(null);
   backRef.current = enabled ? onBack : null;
 
-  const entryRef = useRef<Entry | null>(null);
-
   useEffect(() => {
     init();
 
-    // 이미 등록된 키면 무시 (ref가 항상 최신이므로 갱신 불필요)
-    if (stack.some((e) => e.key === key)) {
-      entryRef.current = stack.find((e) => e.key === key)!;
-      return;
-    }
+    // 이미 등록된 키면 스킵 (같은 ref이므로 current만 갱신되면 됨)
+    if (stack.some((e) => e.key === key)) return;
 
     const entry: Entry = { key, backRef };
     stack.push(entry);
-    entryRef.current = entry;
 
     return () => {
       const idx = stack.findIndex((e) => e.key === key);
       if (idx !== -1) stack.splice(idx, 1);
-      entryRef.current = null;
     };
   }, [key]);
 }

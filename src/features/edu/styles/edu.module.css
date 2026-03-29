@@ -878,27 +878,28 @@
   line-height: var(--dia-leading-normal);
 }
 
-/* flow (step-by-step) */
+/* flow (step-by-step) — 타임라인 스타일 */
 .flowWrap {
   display: flex;
   flex-direction: column;
   gap: 0;
+  padding-left: var(--dia-space-1);
 }
 
 .flowStep {
   position: relative;
-  padding-left: var(--dia-space-8);
+  padding-left: var(--dia-space-6);
   padding-bottom: var(--dia-space-4);
 }
 
 .flowStep::before {
   content: '';
   position: absolute;
-  left: 14px;
-  top: 28px;
+  left: 4px;
+  top: 14px;
   bottom: 0;
   width: 2px;
-  background: var(--dia-border);
+  background: var(--dia-border-light);
 }
 
 .flowStep:last-child::before {
@@ -907,20 +908,23 @@
 
 .flowDot {
   position: absolute;
-  left: 6px;
-  top: 4px;
-  width: 18px;
-  height: 18px;
+  left: 0;
+  top: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-blue);
-  border: 2px solid var(--dia-bg);
+}
+
+.flowStep:first-child .flowDot {
+  width: 12px;
+  height: 12px;
+  left: -1px;
+  top: 5px;
 }
 
 .flowLabel {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
-  margin-bottom: var(--dia-space-2);
+  display: none;
 }
 
 .flowItems {
@@ -931,20 +935,29 @@
 
 .flowItem {
   font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: var(--dia-leading-relaxed);
+}
+
+.flowItem:first-child {
+  font-weight: var(--dia-weight-semibold);
+}
+
+.flowItem + .flowItem {
   color: var(--dia-text-secondary);
-  line-height: var(--dia-leading-normal);
+  font-weight: var(--dia-weight-normal);
   padding-left: var(--dia-space-3);
   position: relative;
 }
 
-.flowItem::before {
-  content: '•';
+.flowItem + .flowItem::before {
+  content: '·';
   position: absolute;
-  left: 0;
+  left: var(--dia-space-1);
   color: var(--dia-text-tertiary);
 }
 
-/* definition list */
+/* definition list — 좌측 바 스타일 */
 .defList {
   display: flex;
   flex-direction: column;
@@ -954,14 +967,15 @@
 .defItem {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
+  border-left: 3px solid var(--dia-blue);
   border-radius: var(--dia-radius-sm);
-  padding: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-3) var(--dia-space-3) var(--dia-space-4);
 }
 
 .defTerm {
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-blue);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
   margin-bottom: var(--dia-space-1);
 }
 

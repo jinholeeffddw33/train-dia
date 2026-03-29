@@ -16,7 +16,6 @@ function FlowBlock({ title, steps }: { title?: string; steps: any[] }) {
         {steps.map((step: any, i: number) => (
           <div key={i} className={styles.flowStep}>
             <div className={styles.flowDot} />
-            <div className={styles.flowLabel}>{step.label}</div>
             <div className={styles.flowItems}>
               {step.items.map((item: string, j: number) => (
                 <div key={j} className={styles.flowItem}>{item}</div>
@@ -94,7 +93,7 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
       {items.map((item, i) => (
         <div key={i} className={styles.defItem}>
           <div className={styles.defTerm}>{item.term}</div>
-          <div className={styles.defDesc}>{item.desc}</div>
+          {item.desc && <div className={styles.defDesc}>{item.desc}</div>}
         </div>
       ))}
     </div>

@@ -6,6 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
+import { usePushSubscription } from '@/hooks/usePushSubscription';
 import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab } from '@/features/compare';
@@ -26,6 +27,7 @@ export default function MoreTab() {
   const { theme, toggle: toggleTheme } = useThemeStore();
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
+  const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushSubscription();
   const [commuteOpen, setCommuteOpen] = useState(false);
   const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
@@ -242,6 +244,35 @@ export default function MoreTab() {
                 onClick={requestPermission}
               >
                 허용할게요
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* 푸시 알림 (앱 꺼져있어도 수신) */}
+        {pushSupported && (
+          <div className={styles.settingRow}>
+            <div className={styles.settingInfo}>
+              <span className={styles.settingIcon}>📲</span>
+              <span className={styles.settingLabel}>푸시 알림</span>
+            </div>
+            {pushSubscribed ? (
+              <button
+                type="button"
+                className={styles.notifBtn}
+                onClick={pushUnsubscribe}
+                disabled={pushLoading}
+              >
+                {pushLoading ? '처리 중...' : '해제'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={styles.notifBtn}
+                onClick={pushSubscribe}
+                disabled={pushLoading}
+              >
+                {pushLoading ? '처리 중...' : '켜기'}
               </button>
             )}
           </div>

@@ -27,6 +27,8 @@ interface CompareState {
   setGroupMemo: (index: number, memo: string) => void;
   setCount: (n: number) => void;
   setPerson: (index: number, p: Person | null) => void;
+  removePerson: (index: number) => void;
+  resetGroup: () => void;
   prevMonth: () => void;
   nextMonth: () => void;
   resetMonth: () => void;
@@ -82,6 +84,24 @@ export const useCompareStore = create<CompareState>()(
           const groups = [...s.groups] as CompareState['groups'];
           groups[s.activeGroup] = { ...groups[s.activeGroup], persons: next };
           return { persons: next, groups };
+        }),
+
+      removePerson: (index) =>
+        set((s) => {
+          const next = [...s.persons];
+          next[index] = null;
+          const groups = [...s.groups] as CompareState['groups'];
+          groups[s.activeGroup] = { ...groups[s.activeGroup], persons: next };
+          return { persons: next, groups };
+        }),
+
+      resetGroup: () =>
+        set((s) => {
+          const fresh = emptyGroup();
+          fresh.memo = s.groups[s.activeGroup].memo;
+          const groups = [...s.groups] as CompareState['groups'];
+          groups[s.activeGroup] = fresh;
+          return { count: fresh.count, persons: fresh.persons, groups };
         }),
 
       prevMonth: () =>

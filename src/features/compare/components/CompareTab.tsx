@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, X, RotateCcw, Pencil } from 'lucide-react';
 import { useCompareStore } from '@/stores/compare';
 import { P as P_RAW } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
@@ -18,39 +18,60 @@ const MAX_COUNT = 20;
 const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
 
 export default function CompareTab() {
-  const { count, persons, year, month, setCount, setPerson, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
+  const { count, persons, year, month, setCount, setPerson, removePerson, resetGroup, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
   const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
 
   const today = useMemo(() => new Date(), []);
-  const todayStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-  const daysInMonth = new Date(year, month, 0).getDate();
   const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
-  // 현재 월이면 오늘부터, 미래 월이면 1일부터
-  const startDay = isCurrentMonth ? today.getDate() : 1;
 
   const rows = useMemo(() => {
     const result = [];
-    for (let d = startDay; d <= daysInMonth; d++) {
-      const date = new Date(year, month - 1, d);
-      const dow = DOW[date.getDay()];
-      const isSun = date.getDay() === 0;
-      const isSat = date.getDay() === 6;
-      const isToday = `${year}-${month}-${d}` === todayStr;
 
-      const dias = persons.map((p) => (p ? getDia(p, date) : null));
-      const types = dias.map((dia) => (dia ? getType(dia) : null));
-      const disps = dias.map((dia) => (dia ? getDiaDisplay(dia) : ''));
+    if (isCurrentMonth) {
+      // 현재월: 오늘부터 30일간
+      for (let i = 0; i < 30; i++) {
+        const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+        const d = date.getDate();
+        const m = date.getMonth() + 1;
+        const dow = DOW[date.getDay()];
+        const isSun = date.getDay() === 0;
+        const isSat = date.getDay() === 6;
 
-      const filledCount = types.filter((t) => t !== null).length;
-      const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
+        const dias = persons.map((p) => (p ? getDia(p, date) : null));
+        const types = dias.map((dia) => (dia ? getType(dia) : null));
+        const disps = dias.map((dia) => (dia ? getDiaDisplay(dia) : ''));
 
-      result.push({ d, dow, isSun, isSat, disps, types, allRest, isToday });
+        const filledCount = types.filter((t) => t !== null).length;
+        const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
+
+        // 월이 바뀌는 날에 월 표시
+        const label = (i === 0 || d === 1) ? `${m}/${d}` : `${d}`;
+        result.push({ d, label, dow, isSun, isSat, disps, types, allRest, isToday: i === 0 });
+      }
+    } else {
+      // 미래/과거 월: 1일~말일
+      const daysInMonth = new Date(year, month, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month - 1, d);
+        const dow = DOW[date.getDay()];
+        const isSun = date.getDay() === 0;
+        const isSat = date.getDay() === 6;
+
+        const dias = persons.map((p) => (p ? getDia(p, date) : null));
+        const types = dias.map((dia) => (dia ? getType(dia) : null));
+        const disps = dias.map((dia) => (dia ? getDiaDisplay(dia) : ''));
+
+        const filledCount = types.filter((t) => t !== null).length;
+        const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
+
+        result.push({ d, label: `${d}`, dow, isSun, isSat, disps, types, allRest, isToday: false });
+      }
     }
     return result;
-  }, [persons, year, month, daysInMonth, startDay, todayStr]);
+  }, [persons, year, month, isCurrentMonth, today]);
 
   const filteredPersons = useMemo(() => {
     if (!searchQuery.trim()) return P_SORTED;
@@ -86,31 +107,37 @@ export default function CompareTab() {
             type="button"
             className={`${styles.groupTab} ${activeGroup === i ? styles.groupTabActive : ''}`}
             onClick={() => setActiveGroup(i)}
-            onDoubleClick={() => setEditingMemo(i)}
             aria-pressed={activeGroup === i}
           >
             {/* STYLE-EXCEPTION: 그룹별 고유 색상 액센트 — 4개 고정 */}
             <span className={styles.groupDot} style={{ background: GROUP_COLORS[i] }} />
-            {editingMemo === i ? (
-              <input
-                type="text"
-                className={styles.groupMemoInput}
-                value={g.memo}
-                maxLength={10}
-                placeholder={`그룹 ${i + 1}`}
-                autoFocus
-                onChange={(e) => setGroupMemo(i, e.target.value)}
-                onBlur={() => setEditingMemo(null)}
-                onKeyDown={(e) => { if (e.key === 'Enter') setEditingMemo(null); }}
-              />
-            ) : (
-              <span className={styles.groupLabel}>{g.memo || `그룹 ${i + 1}`}</span>
-            )}
+            <span className={styles.groupLabel}>{g.memo || `그룹 ${i + 1}`}</span>
             {g.persons.some((p) => p !== null) && (
               <span className={styles.groupBadge}>{g.persons.filter((p) => p !== null).length}</span>
             )}
           </button>
         ))}
+      </div>
+
+      {/* 현재 그룹 메모 편집 + 초기화 */}
+      <div className={styles.groupActions}>
+        <div className={styles.groupMemoWrap}>
+          <Pencil size={14} className={styles.groupMemoIcon} />
+          <input
+            type="text"
+            className={styles.groupMemoInput}
+            value={groups[activeGroup].memo}
+            maxLength={10}
+            placeholder={`그룹 이름 입력 (10자)`}
+            onChange={(e) => setGroupMemo(activeGroup, e.target.value)}
+          />
+        </div>
+        {hasAnyPerson && (
+          <button type="button" className={styles.resetBtn} onClick={resetGroup} aria-label="현재 그룹 초기화">
+            <RotateCcw size={14} />
+            <span>초기화</span>
+          </button>
+        )}
       </div>
 
       {/* 인원 수 선택 — 스텝퍼 */}
@@ -143,21 +170,32 @@ export default function CompareTab() {
       <div className={styles.selectorScroll}>
         <div className={styles.selectorRow}>
           {persons.map((person, idx) => (
-            <button
-              key={idx}
-              type="button"
-              className={`${styles.personCard} ${person ? styles.personCardFilled : ''}`}
-              onClick={() => setSelectorTarget(idx)}
-            >
-              {person ? (
-                <>
-                  <span className={styles.personCardName}>{person.n}</span>
-                  <span className={styles.personCardNum}>{person.I}번</span>
-                </>
-              ) : (
-                <span className={styles.personCardEmpty}>{idx + 1} 선택</span>
+            <div key={idx} className={styles.personCardWrap}>
+              <button
+                type="button"
+                className={`${styles.personCard} ${person ? styles.personCardFilled : ''}`}
+                onClick={() => setSelectorTarget(idx)}
+              >
+                {person ? (
+                  <>
+                    <span className={styles.personCardName}>{person.n}</span>
+                    <span className={styles.personCardNum}>{person.I}번</span>
+                  </>
+                ) : (
+                  <span className={styles.personCardEmpty}>{idx + 1} 선택</span>
+                )}
+              </button>
+              {person && (
+                <button
+                  type="button"
+                  className={styles.personRemoveBtn}
+                  onClick={() => removePerson(idx)}
+                  aria-label={`${person.n} 삭제`}
+                >
+                  <X size={12} />
+                </button>
               )}
-            </button>
+            </div>
           ))}
         </div>
       </div>

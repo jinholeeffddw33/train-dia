@@ -54,18 +54,6 @@
   color: var(--dia-blue);
 }
 
-.groupMemoInput {
-  font-size: 13px;
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
-  background: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-}
-
 .groupBadge {
   font-size: 11px;
   font-weight: var(--dia-weight-bold);
@@ -80,6 +68,91 @@
   padding: 0 4px;
   flex-shrink: 0;
 }
+
+/* ── Group Actions (memo + reset) ── */
+.groupActions {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
+}
+
+.groupMemoWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  min-height: 40px;
+}
+
+.groupMemoIcon {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}
+
+.groupMemoInput {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.groupMemoInput::placeholder {
+  color: var(--dia-text-tertiary);
+}
+
+.resetBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  color: var(--dia-red);
+  font-size: 13px;
+  font-weight: var(--dia-weight-semibold);
+  white-space: nowrap;
+  min-height: 40px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.resetBtn:active { opacity: 0.7; }
+
+/* ── Person Card Wrap (카드 + 삭제버튼) ── */
+.personCardWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.personRemoveBtn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red);
+  color: var(--dia-text-on-color);
+  border: 2px solid var(--dia-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 1;
+}
+
+.personRemoveBtn:active { transform: scale(0.9); }
 
 /* ── Count Selector (Stepper) ── */
 .countSelector {

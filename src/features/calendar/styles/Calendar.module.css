@@ -218,6 +218,17 @@
   line-height: var(--dia-leading-relaxed);
 }
 
+.detailRouteImg {
+  width: 100%;
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  margin-top: var(--dia-space-2);
+}
+
+.hidden {
+  display: none;
+}
+
 /* ── Memo ── */
 .memoSection {
   padding-top: var(--dia-space-3);

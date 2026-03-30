@@ -1,12 +1,37 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useMemoStore } from '@/stores/memo';
 import { useSwapStore } from '@/stores/swap';
-import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime } from '@/lib/schedule';
+import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Calendar.module.css';
+
+/** 교번+날짜 → 행로 이미지 경로 */
+function getRouteImagePath(dia: string, date: Date): string | null {
+  if (dia.startsWith('휴') || dia.startsWith('대')) return null;
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+
+  const h = isHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = isHoliday(tm);
+  const isNight = getType(dia) === 'night';
+
+  let prefix: string;
+  if (!isNight) {
+    prefix = h ? 'p_hol' : 'p_ord';
+  } else {
+    if (h && th) prefix = 'p_hh';
+    else if (h && !th) prefix = 'p_hp';
+    else if (!h && th) prefix = 'p_ph';
+    else prefix = 'p_pp';
+  }
+
+  return `/images/route/${prefix}_${diaNum}.png`;
+}
 
 interface ScheduleDetailProps {
   dateStr: string;
@@ -85,8 +110,26 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
               <span className={styles.detailTimeValue}>{getWorkTime(info.schedule)}</span>
             </div>
           </div>
+          {info.schedule.m && (() => {
+            const imgPath = getRouteImagePath(info.dia, date);
+            return imgPath ? (
+              <img
+                src={imgPath}
+                alt={info.schedule.m}
+                className={styles.detailRouteImg}
+                loading="lazy"
+                onError={(e) => {
+                  // 이미지 없으면 텍스트로 폴백
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove(styles.hidden);
+                }}
+              />
+            ) : null;
+          })()}
           {info.schedule.m && (
-            <p className={styles.detailRoute}>{info.schedule.m}</p>
+            <p className={`${styles.detailRoute} ${getRouteImagePath(info.dia, date) ? styles.hidden : ''}`}>
+              {info.schedule.m}
+            </p>
           )}
         </div>
       )}

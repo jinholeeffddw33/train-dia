@@ -203,7 +203,9 @@ export default function CompareTab() {
       {/* 월 네비게이션 */}
       <div className={styles.nav}>
         <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
-        <button type="button" className={styles.navTitle} onClick={resetMonth}>{year}년 {month}월</button>
+        <button type="button" className={styles.navTitle} onClick={resetMonth}>
+          {isCurrentMonth ? `${year}년 ${month}월 (오늘~30일)` : `${year}년 ${month}월`}
+        </button>
         <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
 
@@ -226,7 +228,7 @@ export default function CompareTab() {
                 style={{ gridTemplateColumns: gridCols }}
               >
                 <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
-                  {row.d} ({row.dow})
+                  {row.label} ({row.dow})
                 </span>
                 {row.disps.map((disp, idx) => (
                   <span key={idx} className={`${styles.tableDia} ${row.types[idx] ? styles[`cmpType_${row.types[idx]}`] : ''}`}>

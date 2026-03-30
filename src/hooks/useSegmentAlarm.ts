@@ -54,7 +54,6 @@ export function useSegmentAlarm(
             body: '출발 준비하세요!',
             tag: key,
             requireInteraction: true,
-            vibrate: [300, 200, 300, 200, 300],
           });
         }
       }

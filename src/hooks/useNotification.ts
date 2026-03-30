@@ -26,12 +26,13 @@ export function useNotification() {
     (title: string, options?: NotificationOptions) => {
       if (!supported || permission !== 'granted') return null;
 
-      // Service Worker가 있으면 SW를 통해 알림 (백그라운드 지원)
+      // Service Worker가 있으면 SW를 통해 알림 (백그라운드 지원 + 기본 알림음 + 진동)
       if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
         navigator.serviceWorker.ready.then((reg) => {
           reg.showNotification(title, {
             icon: '/icon-192.png',
             badge: '/icon-192.png',
+            vibrate: [300, 200, 300, 200, 300],
             ...options,
           });
         });

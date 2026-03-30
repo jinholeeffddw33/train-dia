@@ -192,7 +192,7 @@ export default function CompareTab() {
                   onClick={() => removePerson(idx)}
                   aria-label={`${person.n} 삭제`}
                 >
-                  <X size={12} />
+                  <Minus size={10} strokeWidth={3} />
                 </button>
               )}
             </div>

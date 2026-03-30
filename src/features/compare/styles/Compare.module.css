@@ -136,23 +136,29 @@
 
 .personRemoveBtn {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--dia-radius-full);
-  background: var(--dia-red);
-  color: var(--dia-text-on-color);
-  border: 2px solid var(--dia-bg);
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--dia-red);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   z-index: 1;
+  transition: background var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.personRemoveBtn:active { transform: scale(0.9); }
+.personRemoveBtn:active {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(0.85);
+}
 
 /* ── Count Selector (Stepper) ── */
 .countSelector {

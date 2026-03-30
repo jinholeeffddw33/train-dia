@@ -177,10 +177,7 @@ export default function CompareTab() {
                 onClick={() => setSelectorTarget(idx)}
               >
                 {person ? (
-                  <>
-                    <span className={styles.personCardName}>{person.n}</span>
-                    <span className={styles.personCardNum}>{person.I}번</span>
-                  </>
+                  <span className={styles.personCardName}>{person.n}</span>
                 ) : (
                   <span className={styles.personCardEmpty}>{idx + 1} 선택</span>
                 )}

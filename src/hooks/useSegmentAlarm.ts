@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAlarmStore, DEPOT_OPTIONS, ALARM_LABELS, type AlarmMinute } from '@/stores/alarm';
 import { useNotification } from './useNotification';
 import type { Segment } from '@/lib/types';

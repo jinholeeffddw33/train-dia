@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useRef, useCallback } from 'react';
-import { Minus, Plus, X, RotateCcw, Pencil } from 'lucide-react';
+import { Minus, Plus, X, RotateCcw, Pencil, UserPlus, Check } from 'lucide-react';
 import { useCompareStore } from '@/stores/compare';
 import { P as P_RAW } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
@@ -18,8 +18,9 @@ const MAX_COUNT = 20;
 const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
 
 export default function CompareTab() {
-  const { count, persons, year, month, setCount, setPerson, removePerson, resetGroup, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
-  const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
+  const { count, persons, year, month, setCount, setPerson, removePerson, setPersonsBatch, resetGroup, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
+  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [multiSelected, setMultiSelected] = useState<Person[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
@@ -79,16 +80,30 @@ export default function CompareTab() {
     return P_SORTED.filter((p) => p.n.toLowerCase().includes(q) || p.I.includes(q));
   }, [searchQuery]);
 
-  const handleSelect = (person: Person) => {
-    if (selectorTarget !== null) {
-      setPerson(selectorTarget, person);
-    }
-    setSelectorTarget(null);
+  const openSelector = () => {
+    // 현재 선택된 인원을 초기값으로
+    setMultiSelected(persons.filter((p): p is Person => p !== null));
+    setSearchQuery('');
+    setSelectorOpen(true);
+  };
+
+  const togglePerson = (person: Person) => {
+    setMultiSelected((prev) => {
+      const exists = prev.some((p) => p.I === person.I);
+      if (exists) return prev.filter((p) => p.I !== person.I);
+      if (prev.length >= MAX_COUNT) return prev;
+      return [...prev, person];
+    });
+  };
+
+  const confirmSelection = () => {
+    setPersonsBatch(multiSelected);
+    setSelectorOpen(false);
     setSearchQuery('');
   };
 
   const handleModalClose = useCallback(() => {
-    setSelectorTarget(null);
+    setSelectorOpen(false);
     setSearchQuery('');
   }, []);
 
@@ -140,61 +155,25 @@ export default function CompareTab() {
         )}
       </div>
 
-      {/* 인원 수 선택 — 스텝퍼 */}
-      <div className={styles.countSelector}>
-        <span className={styles.countLabel}>비교 인원</span>
-        <div className={styles.countStepper}>
-          <button
-            type="button"
-            className={styles.countStepBtn}
-            onClick={() => setCount(Math.max(MIN_COUNT, count - 1))}
-            disabled={count <= MIN_COUNT}
-            aria-label="인원 줄이기"
-          >
-            <Minus size={16} />
-          </button>
-          <span className={styles.countValue}>{count}명</span>
-          <button
-            type="button"
-            className={styles.countStepBtn}
-            onClick={() => setCount(Math.min(MAX_COUNT, count + 1))}
-            disabled={count >= MAX_COUNT}
-            aria-label="인원 늘리기"
-          >
-            <Plus size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* 기관사 선택 카드 — 가로 스크롤 */}
-      <div className={styles.selectorScroll}>
-        <div className={styles.selectorRow}>
-          {persons.map((person, idx) => (
-            <div key={idx} className={styles.personCardWrap}>
-              <button
-                type="button"
-                className={`${styles.personCard} ${person ? styles.personCardFilled : ''}`}
-                onClick={() => setSelectorTarget(idx)}
-              >
-                {person ? (
-                  <span className={styles.personCardName}>{person.n}</span>
-                ) : (
-                  <span className={styles.personCardEmpty}>{idx + 1} 선택</span>
-                )}
+      {/* 선택된 기관사 + 추가 버튼 */}
+      <div className={styles.selectedRow}>
+        <div className={styles.selectedChips}>
+          {persons.filter((p): p is Person => p !== null).map((person) => (
+            <span key={person.I} className={styles.selectedChip}>
+              {person.n}
+              <button type="button" className={styles.chipRemove} onClick={() => {
+                const idx = persons.findIndex((p) => p?.I === person.I);
+                if (idx >= 0) removePerson(idx);
+              }}>
+                <X size={12} />
               </button>
-              {person && (
-                <button
-                  type="button"
-                  className={styles.personRemoveBtn}
-                  onClick={() => removePerson(idx)}
-                  aria-label={`${person.n} 삭제`}
-                >
-                  <Minus size={10} strokeWidth={3} />
-                </button>
-              )}
-            </div>
+            </span>
           ))}
         </div>
+        <button type="button" className={styles.addPersonBtn} onClick={openSelector}>
+          <UserPlus size={16} />
+          <span>기관사 선택</span>
+        </button>
       </div>
 
       {/* 월 네비게이션 */}
@@ -244,11 +223,11 @@ export default function CompareTab() {
         </div>
       )}
 
-      {/* 기관사 선택 모달 */}
+      {/* 기관사 복수 선택 모달 */}
       <Modal
-        open={selectorTarget !== null}
+        open={selectorOpen}
         onClose={handleModalClose}
-        title={`기관사 ${selectorTarget !== null ? selectorTarget + 1 : ''} 선택`}
+        title={`기관사 선택 (${multiSelected.length}명)`}
       >
         <div className={styles.searchWrap}>
           <input
@@ -278,18 +257,29 @@ export default function CompareTab() {
           {filteredPersons.length === 0 ? (
             <div className={styles.searchEmpty}>검색 결과가 없습니다</div>
           ) : (
-            filteredPersons.map((p) => (
-              <button
-                key={p.I}
-                type="button"
-                className={styles.modalItem}
-                onClick={() => handleSelect(p)}
-              >
-                <span className={styles.modalName}>{p.n}</span>
-                <span className={styles.modalNum}>{p.I}번</span>
-              </button>
-            ))
+            filteredPersons.map((p) => {
+              const isChecked = multiSelected.some((s) => s.I === p.I);
+              return (
+                <button
+                  key={p.I}
+                  type="button"
+                  className={`${styles.modalItem} ${isChecked ? styles.modalItemChecked : ''}`}
+                  onClick={() => togglePerson(p)}
+                >
+                  <span className={`${styles.checkBox} ${isChecked ? styles.checkBoxOn : ''}`}>
+                    {isChecked && <Check size={14} />}
+                  </span>
+                  <span className={styles.modalName}>{p.n}</span>
+                  <span className={styles.modalNum}>{p.I}번</span>
+                </button>
+              );
+            })
           )}
+        </div>
+        <div className={styles.modalFooter}>
+          <button type="button" className={styles.confirmBtn} onClick={confirmSelection}>
+            {multiSelected.length}명 선택 완료
+          </button>
         </div>
       </Modal>
     </div>

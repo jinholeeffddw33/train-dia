@@ -28,6 +28,7 @@ interface CompareState {
   setCount: (n: number) => void;
   setPerson: (index: number, p: Person | null) => void;
   removePerson: (index: number) => void;
+  setPersonsBatch: (people: Person[]) => void;
   resetGroup: () => void;
   prevMonth: () => void;
   nextMonth: () => void;
@@ -93,6 +94,15 @@ export const useCompareStore = create<CompareState>()(
           const groups = [...s.groups] as CompareState['groups'];
           groups[s.activeGroup] = { ...groups[s.activeGroup], persons: next };
           return { persons: next, groups };
+        }),
+
+      setPersonsBatch: (people) =>
+        set((s) => {
+          const n = Math.max(people.length, 2);
+          const next: (Person | null)[] = Array.from({ length: n }, (_, i) => people[i] ?? null);
+          const groups = [...s.groups] as CompareState['groups'];
+          groups[s.activeGroup] = { ...groups[s.activeGroup], count: n, persons: next };
+          return { count: n, persons: next, groups };
         }),
 
       resetGroup: () =>

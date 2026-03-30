@@ -15,11 +15,14 @@ const P_SORTED = [...P_RAW].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 const MIN_COUNT = 2;
 const MAX_COUNT = 20;
 
+const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
+
 export default function CompareTab() {
-  const { count, persons, setCount, setPerson } = useCompareStore();
+  const { count, persons, setCount, setPerson, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
   const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [editingMemo, setEditingMemo] = useState<number | null>(null);
 
   // 오늘부터 30일간 표시
   const today = useMemo(() => new Date(), []);
@@ -72,6 +75,41 @@ export default function CompareTab() {
 
   return (
     <div className={styles.container}>
+      {/* 그룹 선택 탭 */}
+      <div className={styles.groupTabs}>
+        {groups.map((g, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`${styles.groupTab} ${activeGroup === i ? styles.groupTabActive : ''}`}
+            onClick={() => setActiveGroup(i)}
+            onDoubleClick={() => setEditingMemo(i)}
+            aria-pressed={activeGroup === i}
+          >
+            {/* STYLE-EXCEPTION: 그룹별 고유 색상 액센트 — 4개 고정 */}
+            <span className={styles.groupDot} style={{ background: GROUP_COLORS[i] }} />
+            {editingMemo === i ? (
+              <input
+                type="text"
+                className={styles.groupMemoInput}
+                value={g.memo}
+                maxLength={10}
+                placeholder={`그룹 ${i + 1}`}
+                autoFocus
+                onChange={(e) => setGroupMemo(i, e.target.value)}
+                onBlur={() => setEditingMemo(null)}
+                onKeyDown={(e) => { if (e.key === 'Enter') setEditingMemo(null); }}
+              />
+            ) : (
+              <span className={styles.groupLabel}>{g.memo || `그룹 ${i + 1}`}</span>
+            )}
+            {g.persons.some((p) => p !== null) && (
+              <span className={styles.groupBadge}>{g.persons.filter((p) => p !== null).length}</span>
+            )}
+          </button>
+        ))}
+      </div>
+
       {/* 인원 수 선택 — 스텝퍼 */}
       <div className={styles.countSelector}>
         <span className={styles.countLabel}>비교 인원</span>

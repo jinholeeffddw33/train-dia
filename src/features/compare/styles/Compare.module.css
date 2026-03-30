@@ -2,6 +2,85 @@
 
 .container { padding: var(--dia-space-4); }
 
+/* ── Group Tabs ── */
+.groupTabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-4);
+}
+
+.groupTab {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-2) var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dia-transition-fast), background var(--dia-transition-fast);
+}
+
+.groupTab:active { transform: scale(0.97); }
+
+.groupTabActive {
+  border-color: var(--dia-blue);
+  background: var(--dia-surface-elevated);
+  box-shadow: 0 0 0 1px var(--dia-blue);
+}
+
+.groupDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+}
+
+.groupLabel {
+  font-size: 13px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.groupTabActive .groupLabel {
+  color: var(--dia-blue);
+}
+
+.groupMemoInput {
+  font-size: 13px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.groupBadge {
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-on-color);
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-full);
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
 /* ── Count Selector (Stepper) ── */
 .countSelector {
   display: flex;

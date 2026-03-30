@@ -13,31 +13,6 @@ function isDepotTrain(seg: Segment): boolean {
   return (first >= 1000 && first <= 1499) || (first >= 1500 && first <= 1599) || (first >= 2000 && first <= 2999);
 }
 
-/** 비프음 재생 (Web Audio API) */
-function playBeep() {
-  try {
-    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    osc.type = 'sine';
-    gain.gain.value = 0.3;
-    osc.start();
-    const now = ctx.currentTime;
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.setValueAtTime(0, now + 0.15);
-    gain.gain.setValueAtTime(0.3, now + 0.3);
-    gain.gain.setValueAtTime(0, now + 0.45);
-    gain.gain.setValueAtTime(0.3, now + 0.6);
-    gain.gain.setValueAtTime(0, now + 0.75);
-    osc.stop(now + 0.8);
-  } catch {
-    // 무시
-  }
-}
-
 /**
  * 2·3근무 출발 전 알람 훅
  * - segments: 오늘의 구간 배열 (schedule.g)
@@ -79,8 +54,8 @@ export function useSegmentAlarm(
             body: '출발 준비하세요!',
             tag: key,
             requireInteraction: true,
+            vibrate: [300, 200, 300, 200, 300],
           });
-          playBeep();
         }
       }
 
@@ -127,8 +102,7 @@ export function useSegmentAlarm(
             const title = `${segLabel} 출발 ${label}${nightNote}`;
             const body = `${depTime} 출발 예정 — 준비하세요!`;
 
-            notify(title, { body, tag: key, requireInteraction: true });
-            playBeep();
+            notify(title, { body, tag: key, requireInteraction: true, vibrate: [300, 200, 300, 200, 300] });
           }
         }
       }

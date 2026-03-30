@@ -1248,6 +1248,26 @@
   letter-spacing: 0.5px;
 }
 
+.newBadge {
+  display: inline-block;
+  padding: 1px 6px;
+  margin-left: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #f43f5e, #ec4899);
+  border-radius: 8px;
+  letter-spacing: 0;
+  text-transform: none;
+  animation: newPulse 2s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes newPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 .tipText {
   font-size: var(--dia-text-base);
   color: var(--dia-text-primary);

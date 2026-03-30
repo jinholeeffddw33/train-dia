@@ -18,14 +18,14 @@ export default function HomeTipsQuiz() {
       <div className={styles.tipCard}>
         <span className={styles.tipIcon}>{todayTip.icon}</span>
         <div className={styles.tipContent}>
-          <span className={styles.tipLabel}>오늘의 한마디</span>
+          <span className={styles.tipLabel}>오늘의 한마디 <span className={styles.newBadge}>NEW</span></span>
           <p className={styles.tipText}>{todayTip.text}</p>
         </div>
       </div>
 
       {/* 안전 퀴즈 */}
       <div className={styles.quizCard}>
-        <span className={styles.quizLabel}>안전 퀴즈</span>
+        <span className={styles.quizLabel}>안전 퀴즈 <span className={styles.newBadge}>NEW 30</span></span>
         <p className={styles.quizQuestion}>{currentQuiz.q}</p>
         <div className={styles.quizOptions}>
           {currentQuiz.a.map((opt, i) => {

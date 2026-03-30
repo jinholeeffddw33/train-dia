@@ -18,24 +18,27 @@ const MAX_COUNT = 20;
 const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
 
 export default function CompareTab() {
-  const { count, persons, setCount, setPerson, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
+  const { count, persons, year, month, setCount, setPerson, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
   const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
 
-  // 오늘부터 30일간 표시
   const today = useMemo(() => new Date(), []);
+  const todayStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
+  // 현재 월이면 오늘부터, 미래 월이면 1일부터
+  const startDay = isCurrentMonth ? today.getDate() : 1;
 
   const rows = useMemo(() => {
     const result = [];
-    for (let i = 0; i < 30; i++) {
-      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
-      const d = date.getDate();
-      const m = date.getMonth() + 1;
+    for (let d = startDay; d <= daysInMonth; d++) {
+      const date = new Date(year, month - 1, d);
       const dow = DOW[date.getDay()];
       const isSun = date.getDay() === 0;
       const isSat = date.getDay() === 6;
+      const isToday = `${year}-${month}-${d}` === todayStr;
 
       const dias = persons.map((p) => (p ? getDia(p, date) : null));
       const types = dias.map((dia) => (dia ? getType(dia) : null));
@@ -44,10 +47,10 @@ export default function CompareTab() {
       const filledCount = types.filter((t) => t !== null).length;
       const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
 
-      result.push({ d, m, dow, isSun, isSat, disps, types, allRest, isToday: i === 0 });
+      result.push({ d, dow, isSun, isSat, disps, types, allRest, isToday });
     }
     return result;
-  }, [persons, today]);
+  }, [persons, year, month, daysInMonth, startDay, todayStr]);
 
   const filteredPersons = useMemo(() => {
     if (!searchQuery.trim()) return P_SORTED;
@@ -159,11 +162,11 @@ export default function CompareTab() {
         </div>
       </div>
 
-      {/* 기간 표시 */}
+      {/* 월 네비게이션 */}
       <div className={styles.nav}>
-        <span className={styles.navTitle}>
-          오늘부터 30일
-        </span>
+        <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
+        <button type="button" className={styles.navTitle} onClick={resetMonth}>{year}년 {month}월</button>
+        <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
 
       {/* 비교 테이블 — 가로 스크롤 */}
@@ -185,7 +188,7 @@ export default function CompareTab() {
                 style={{ gridTemplateColumns: gridCols }}
               >
                 <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
-                  {row.d === 1 || row.isToday ? `${row.m}/${row.d}` : row.d} ({row.dow})
+                  {row.d} ({row.dow})
                 </span>
                 {row.disps.map((disp, idx) => (
                   <span key={idx} className={`${styles.tableDia} ${row.types[idx] ? styles[`cmpType_${row.types[idx]}`] : ''}`}>

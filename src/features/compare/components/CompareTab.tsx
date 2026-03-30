@@ -199,7 +199,13 @@ export default function CompareTab() {
 
       {/* 월 네비게이션 */}
       <div className={styles.nav}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
+        <button
+          type="button"
+          className={styles.navBtn}
+          onClick={prevMonth}
+          disabled={isCurrentMonth}
+          aria-label="이전 달"
+        >‹</button>
         <button type="button" className={styles.navTitle} onClick={resetMonth}>
           {isCurrentMonth ? `${year}년 ${month}월 (오늘~30일)` : `${year}년 ${month}월`}
         </button>

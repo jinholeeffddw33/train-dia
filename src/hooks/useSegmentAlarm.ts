@@ -47,9 +47,10 @@ export function useSegmentAlarm(
   segments: Segment[] | undefined,
   scheduleStart: string | undefined,
 ) {
-  const { selected, fixedTimes, fired, markFired, resetFired } = useAlarmStore();
+  const { selected, fixedTimes, fired, markFired, resetFired, clearAll } = useAlarmStore();
   const { notify } = useNotification();
   const lastDateRef = useRef('');
+  const clearedRef = useRef(false);
 
   useEffect(() => {
     if (!segments || segments.length < 2) return;
@@ -131,10 +132,25 @@ export function useSegmentAlarm(
           }
         }
       }
+
+      // ── 마지막 구간 출발시간 경과 시 알람 설정 초기화 ──
+      if (!clearedRef.current) {
+        const lastSeg = segments[segments.length - 1];
+        let lastDep = timeToMins(lastSeg.d);
+        if (lastDep >= 0) {
+          // 야간 보정
+          const prevArr = timeToMins(segments[segments.length - 2]?.a ?? '');
+          if (prevArr >= 0 && lastDep < prevArr - 240) lastDep += 1440;
+          if (nowMins > lastDep) {
+            clearAll();
+            clearedRef.current = true;
+          }
+        }
+      }
     };
 
     check();
     const id = setInterval(check, 30_000);
     return () => clearInterval(id);
-  }, [segments, scheduleStart, selected, fixedTimes, fired, markFired, resetFired, notify]);
+  }, [segments, scheduleStart, selected, fixedTimes, fired, markFired, resetFired, clearAll, notify]);
 }

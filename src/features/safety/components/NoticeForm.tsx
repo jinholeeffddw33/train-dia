@@ -84,6 +84,19 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         sabun,
         category: 'inspect',
       });
+
+      // 알림마당 등록 시 전체 푸시 자동 발송
+      fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          sabun,
+          title: `📋 알림마당 — ${location}`,
+          message: filled[0].trim(),
+        }),
+      }).catch(() => {});
+
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : '등록에 실패했습니다');

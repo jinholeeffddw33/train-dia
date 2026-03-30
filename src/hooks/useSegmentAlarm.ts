@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useAlarmStore, DEPOT_OPTIONS, ALARM_LABELS, type AlarmMinute } from '@/stores/alarm';
 import { useNotification } from './useNotification';
 import type { Segment } from '@/lib/types';
 import { timeToMins } from '@/lib/schedule';
+
+/** 알람음 재생 — 사용자 인터랙션 후에만 동작 (브라우저 정책) */
+function playAlarmSound() {
+  try {
+    const audio = new Audio('/sounds/alarm.mp3');
+    audio.volume = 1.0;
+    audio.play().catch(() => {});
+  } catch { /* ignore */ }
+}
 
 /** 기지 출고 열번 여부 — 첫 번째 열차번호 기준 */
 function isDepotTrain(seg: Segment): boolean {
@@ -50,6 +59,7 @@ export function useSegmentAlarm(
           const key = `${dateKey}_fixed_${ft}`;
           if (fired.includes(key)) continue;
           markFired(key);
+          playAlarmSound();
           notify(`익일 근무 알람 (${ft})`, {
             body: '출발 준비하세요!',
             tag: key,
@@ -93,6 +103,7 @@ export function useSegmentAlarm(
             if (fired.includes(key)) continue;
 
             markFired(key);
+            playAlarmSound();
 
             const label = ALARM_LABELS[alarmMin as AlarmMinute];
             const segLabel = `${i + 1}근무`;

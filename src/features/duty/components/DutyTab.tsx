@@ -3,10 +3,29 @@
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { P } from '@/data/cycle';
-import { getDia, getType, getSchedule, isHoliday } from '@/lib/schedule';
+import { getDia, getType, getSchedule, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import type { Person, Schedule } from '@/lib/types';
 import styles from '../styles/Duty.module.css';
+
+/** 교번+날짜 → 행로 이미지 경로 */
+function getRouteImagePath(dia: string, date: Date): string | null {
+  if (dia.startsWith('휴') || dia.startsWith('대')) return null;
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+  const h = checkHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = checkHoliday(tm);
+  const isNight = getType(dia) === 'night';
+  let prefix: string;
+  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
+  else if (h && th) prefix = 'p_hh';
+  else if (h && !th) prefix = 'p_hp';
+  else if (!h && th) prefix = 'p_ph';
+  else prefix = 'p_pp';
+  return `/images/route/${prefix}_${diaNum}.png`;
+}
 
 /** 주간 다이아 1~44 */
 const DAY_DIAS = Array.from({ length: 44 }, (_, i) => String(i + 1));
@@ -84,7 +103,7 @@ export default function DutyTab() {
     setDate(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
   };
 
-  const isHol = isHoliday(date);
+  const isHol = checkHoliday(date);
   const dow = DOW[date.getDay()];
   const dateStr = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
 
@@ -137,6 +156,7 @@ export default function DutyTab() {
           <DiaCard
             key={entry.dia}
             entry={entry}
+            date={date}
             expanded={expandedDia === entry.dia}
             onToggle={() => setExpandedDia(expandedDia === entry.dia ? null : entry.dia)}
           />
@@ -149,14 +169,17 @@ export default function DutyTab() {
 /** 개별 다이아 카드 */
 function DiaCard({
   entry,
+  date,
   expanded,
   onToggle,
 }: {
   entry: DiaEntry;
+  date: Date;
   expanded: boolean;
   onToggle: () => void;
 }) {
   const { dia, driver, schedule, type } = entry;
+  const routeImgPath = getRouteImagePath(dia, date);
   const typeLabel = TYPE_LABELS[type] || '';
 
   return (
@@ -180,11 +203,17 @@ function DiaCard({
         )}
       </div>
 
-      {/* 확장: 행로 상세 */}
+      {/* 확장: 행로 이미지 또는 상세 */}
       {expanded && schedule && (
         <div className={styles.diaDetail}>
-          {/* 구간별 열차 정보 */}
-          {schedule.g && schedule.g.length > 0 && (
+          {routeImgPath ? (
+            <img
+              src={routeImgPath}
+              alt={schedule.m || '행로표'}
+              className={styles.routeImg}
+              loading="lazy"
+            />
+          ) : schedule.g && schedule.g.length > 0 ? (
             <div className={styles.segments}>
               {schedule.g.map((seg, i) => {
                 const routeParts = schedule.m && !schedule.m.includes('충당여부') && !schedule.m.includes('대휴')
@@ -210,12 +239,9 @@ function DiaCard({
                 );
               })}
             </div>
-          )}
-
-          {/* 대기/스탠바이 메모 */}
-          {!schedule.g && schedule.m && (
+          ) : schedule.m ? (
             <div className={styles.routeDesc}>{schedule.m}</div>
-          )}
+          ) : null}
         </div>
       )}
     </div>

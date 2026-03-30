@@ -16,17 +16,20 @@ const MIN_COUNT = 2;
 const MAX_COUNT = 20;
 
 export default function CompareTab() {
-  const { count, persons, year, month, setCount, setPerson, prevMonth, nextMonth, resetMonth } = useCompareStore();
+  const { count, persons, setCount, setPerson } = useCompareStore();
   const [selectorTarget, setSelectorTarget] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const daysInMonth = new Date(year, month, 0).getDate();
+  // 오늘부터 30일간 표시
+  const today = useMemo(() => new Date(), []);
 
   const rows = useMemo(() => {
     const result = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(year, month - 1, d);
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+      const d = date.getDate();
+      const m = date.getMonth() + 1;
       const dow = DOW[date.getDay()];
       const isSun = date.getDay() === 0;
       const isSat = date.getDay() === 6;
@@ -35,14 +38,13 @@ export default function CompareTab() {
       const types = dias.map((dia) => (dia ? getType(dia) : null));
       const disps = dias.map((dia) => (dia ? getDiaDisplay(dia) : ''));
 
-      // 모든 선택된 인원이 쉬는 날이면 하이라이트
       const filledCount = types.filter((t) => t !== null).length;
       const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
 
-      result.push({ d, dow, isSun, isSat, disps, types, allRest });
+      result.push({ d, m, dow, isSun, isSat, disps, types, allRest, isToday: i === 0 });
     }
     return result;
-  }, [persons, year, month, daysInMonth]);
+  }, [persons, today]);
 
   const filteredPersons = useMemo(() => {
     if (!searchQuery.trim()) return P_SORTED;
@@ -119,11 +121,11 @@ export default function CompareTab() {
         </div>
       </div>
 
-      {/* 월 네비게이션 */}
+      {/* 기간 표시 */}
       <div className={styles.nav}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
-        <button type="button" className={styles.navTitle} onClick={resetMonth}>{year}년 {month}월</button>
-        <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
+        <span className={styles.navTitle}>
+          오늘부터 30일
+        </span>
       </div>
 
       {/* 비교 테이블 — 가로 스크롤 */}
@@ -144,8 +146,8 @@ export default function CompareTab() {
                 /* STYLE-EXCEPTION: 비교 인원 수에 따라 동적 grid columns 필요 */
                 style={{ gridTemplateColumns: gridCols }}
               >
-                <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''}`}>
-                  {row.d} ({row.dow})
+                <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
+                  {row.d === 1 || row.isToday ? `${row.m}/${row.d}` : row.d} ({row.dow})
                 </span>
                 {row.disps.map((disp, idx) => (
                   <span key={idx} className={`${styles.tableDia} ${row.types[idx] ? styles[`cmpType_${row.types[idx]}`] : ''}`}>

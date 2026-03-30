@@ -197,6 +197,11 @@
 
 .tableDateSun { color: var(--dia-red); }
 .tableDateSat { color: var(--dia-blue); }
+.tableDateToday {
+  font-weight: 800;
+  background: var(--dia-blue-dim);
+  border-radius: var(--dia-radius-sm);
+}
 
 .tableDia {
   font-size: var(--dia-text-xs);

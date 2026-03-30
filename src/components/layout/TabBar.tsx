@@ -15,8 +15,8 @@ interface TabItem {
 const TABS: TabItem[] = [
   { id: 'home', label: '홈', Icon: Home },
   { id: 'calendar', label: '근무', Icon: CalendarDays },
-  { id: 'exchange', label: '교체', Icon: RefreshCw },
   { id: 'duty', label: '교번', Icon: Briefcase },
+  { id: 'exchange', label: '교체', Icon: RefreshCw },
   { id: 'line', label: '5호선', Icon: TrainFront },
   { id: 'more', label: '설정', Icon: Settings },
 ];

@@ -32,9 +32,9 @@ export function useNotification() {
           reg.showNotification(title, {
             icon: '/icon-192.png',
             badge: '/icon-192.png',
-            vibrate: [300, 200, 300, 200, 300],
             ...options,
-          });
+            vibrate: [300, 200, 300, 200, 300],
+          } as NotificationOptions);
         });
         return null;
       }

@@ -112,7 +112,7 @@ export function useSegmentAlarm(
             const title = `${segLabel} 출발 ${label}${nightNote}`;
             const body = `${depTime} 출발 예정 — 준비하세요!`;
 
-            notify(title, { body, tag: key, requireInteraction: true, vibrate: [300, 200, 300, 200, 300] });
+            notify(title, { body, tag: key, requireInteraction: true });
           }
         }
       }

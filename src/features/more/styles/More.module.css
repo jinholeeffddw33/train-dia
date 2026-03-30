@@ -399,6 +399,16 @@
   border-color: var(--dia-border-strong);
 }
 
+.toolBtnHighlight {
+  border-color: var(--dia-purple);
+  background: rgba(139, 92, 246, 0.06);
+}
+
+.toolBtnHighlight .settingLabel {
+  color: var(--dia-purple);
+  font-weight: var(--dia-weight-bold);
+}
+
 .toolIconWrap {
   width: 40px;
   height: 40px;

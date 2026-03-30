@@ -79,6 +79,20 @@ export default function MoreTab() {
 
         <button
           type="button"
+          className={`${styles.toolBtn} ${styles.toolBtnHighlight}`}
+          onClick={() => setCompareOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
+              <GitCompareArrows size={20} />
+            </div>
+            <span className={styles.settingLabel}>교번 비교</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
           className={styles.toolBtn}
           onClick={() => setShuttleOpen(true)}
         >
@@ -101,20 +115,6 @@ export default function MoreTab() {
               <Bookmark size={20} />
             </div>
             <span className={styles.settingLabel}>내 바로가기</span>
-          </div>
-          <ChevronRight size={18} className={styles.toolArrow} />
-        </button>
-
-        <button
-          type="button"
-          className={styles.toolBtn}
-          onClick={() => setCompareOpen(true)}
-        >
-          <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
-              <GitCompareArrows size={20} />
-            </div>
-            <span className={styles.settingLabel}>교번 비교</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>

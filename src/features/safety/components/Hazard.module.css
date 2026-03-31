@@ -531,6 +531,24 @@
   color: var(--dia-text-tertiary);
 }
 
+.importantTextArea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  background: var(--dia-bg);
+  resize: vertical;
+  line-height: 1.6;
+  min-height: 160px;
+}
+
+.importantTextArea:focus {
+  outline: none;
+  border-color: var(--dia-blue);
+}
+
 /* ── Notice Form (알림마당) ── */
 .noticeTypeGroup {
   display: flex;
@@ -688,7 +706,8 @@
 .noticeCard:active { background: var(--dia-surface-hover); }
 
 .noticeCardImportant {
-  border-left: 3px solid var(--dia-red, #ef4444);
+  border-left: 3px solid #e11d48;
+  background: linear-gradient(135deg, var(--dia-surface), rgba(225, 29, 72, 0.03));
 }
 
 .noticeHeader {
@@ -706,13 +725,15 @@
 }
 
 .noticeTypeRollcall {
-  background: var(--dia-blue-dim);
-  color: var(--dia-blue);
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
 .noticeTypeImportant {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--dia-red, #ef4444);
+  background: linear-gradient(135deg, #ffe4e6, #fff1f2);
+  color: #be123c;
+  border: 1px solid rgba(225, 29, 72, 0.15);
 }
 
 .noticeDateWrap {
@@ -728,20 +749,25 @@
 }
 
 .noticeDateDay {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
-  color: var(--dia-blue);
+  color: var(--dia-text-primary);
   line-height: 1;
 }
 
 .noticeDateDow {
   font-size: 11px;
   font-weight: 600;
-  color: var(--dia-text-secondary);
+  color: var(--dia-text-tertiary);
 }
 
 .noticeDateHoliday {
-  color: var(--dia-red, #ef4444);
+  color: #e11d48;
+}
+
+.noticeDateHoliday + .noticeDateDay,
+.noticeDateHoliday {
+  color: #e11d48;
 }
 
 .noticeAuthor {
@@ -758,17 +784,33 @@
 .noticeLine {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-primary);
-  line-height: 1.5;
+  line-height: 1.6;
+  padding: 2px 0;
 }
 
 .noticeLineHighlight {
   font-weight: 700;
-  color: var(--dia-amber);
+  color: #0f172a;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border-left: 2px solid #3b82f6;
+}
+
+:root.light .noticeLineHighlight {
+  color: #0f172a;
 }
 
 .noticeFile {
   font-size: var(--dia-text-xs);
-  color: var(--dia-blue);
+  color: var(--dia-text-tertiary);
+  font-weight: 500;
+}
+
+.noticeAuthor {
+  font-size: 11px;
+  color: var(--dia-text-tertiary);
+  margin-left: auto;
   font-weight: 500;
 }
 

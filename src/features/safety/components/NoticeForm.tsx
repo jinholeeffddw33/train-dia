@@ -20,6 +20,7 @@ interface NoticeFormProps {
 export default function NoticeForm({ onClose }: NoticeFormProps) {
   const [noticeType, setNoticeType] = useState<NoticeType>('rollcall');
   const [items, setItems] = useState<string[]>(['']);
+  const [longText, setLongText] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -46,17 +47,21 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   };
 
   const handleSubmit = async () => {
-    const filled = items.filter((s) => s.trim());
-    if (filled.length === 0) { setError('최소 1개 항목을 입력해주세요'); return; }
+    if (noticeType === 'important') {
+      if (!longText.trim()) { setError('내용을 입력해주세요'); return; }
+    } else {
+      const filled = items.filter((s) => s.trim());
+      if (filled.length === 0) { setError('최소 1개 항목을 입력해주세요'); return; }
+    }
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }
 
     setSubmitting(true);
     setError('');
     try {
-      // 번호 붙여서 description 조합
-      const desc = filled
-        .map((text, i) => `${i + 1}. ${text.trim()}`)
-        .join('\n');
+      const desc = noticeType === 'important'
+        ? longText.trim()
+        : items.filter((s) => s.trim()).map((text, i) => `${i + 1}. ${text.trim()}`).join('\n');
+      const filled = noticeType === 'important' ? [longText.trim()] : items.filter((s) => s.trim());
 
       // location 필드에 분류 저장
       const location = NOTICE_TYPE_LABELS[noticeType];
@@ -126,40 +131,57 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         </div>
       </div>
 
-      {/* 번호별 항목 입력 */}
-      <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel}>
-          내용 <span className={styles.required}>*</span>
-          <span className={styles.charCount}>{items.length}/10</span>
-        </label>
-        <div className={styles.noticeItemList}>
-          {items.map((text, i) => (
-            <div key={i} className={`${styles.noticeItem} ${i < 2 ? styles.noticeItemHighlight : ''}`}>
-              <span className={`${styles.noticeItemNum} ${i < 2 ? styles.noticeItemNumHighlight : ''}`}>
-                {i + 1}
-              </span>
-              <input
-                type="text"
-                className={styles.noticeItemInput}
-                placeholder={i < 2 ? '강조 항목' : `${i + 1}번 항목`}
-                value={text}
-                onChange={(e) => updateItem(i, e.target.value)}
-                maxLength={200}
-              />
-              {items.length > 1 && (
-                <button type="button" className={styles.noticeItemDel} onClick={() => removeItem(i)} aria-label="삭제">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          ))}
+      {/* 내용 입력 — 점호: 번호별 / 중요알림: 자유 텍스트 */}
+      {noticeType === 'important' ? (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel}>
+            내용 <span className={styles.required}>*</span>
+            <span className={styles.charCount}>{longText.length}/2000</span>
+          </label>
+          <textarea
+            className={styles.importantTextArea}
+            placeholder="중요 알림 내용을 자유롭게 작성하세요"
+            value={longText}
+            onChange={(e) => setLongText(e.target.value)}
+            rows={8}
+            maxLength={2000}
+          />
         </div>
-        {items.length < 10 && (
-          <button type="button" className={styles.noticeAddBtn} onClick={addItem}>
-            <Plus size={14} /> 항목 추가
-          </button>
-        )}
-      </div>
+      ) : (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel}>
+            내용 <span className={styles.required}>*</span>
+            <span className={styles.charCount}>{items.length}/10</span>
+          </label>
+          <div className={styles.noticeItemList}>
+            {items.map((text, i) => (
+              <div key={i} className={`${styles.noticeItem} ${i < 2 ? styles.noticeItemHighlight : ''}`}>
+                <span className={`${styles.noticeItemNum} ${i < 2 ? styles.noticeItemNumHighlight : ''}`}>
+                  {i + 1}
+                </span>
+                <input
+                  type="text"
+                  className={styles.noticeItemInput}
+                  placeholder={i < 2 ? '강조 항목' : `${i + 1}번 항목`}
+                  value={text}
+                  onChange={(e) => updateItem(i, e.target.value)}
+                  maxLength={200}
+                />
+                {items.length > 1 && (
+                  <button type="button" className={styles.noticeItemDel} onClick={() => removeItem(i)} aria-label="삭제">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          {items.length < 10 && (
+            <button type="button" className={styles.noticeAddBtn} onClick={addItem}>
+              <Plus size={14} /> 항목 추가
+            </button>
+          )}
+        </div>
+      )}
 
       {/* 파일 첨부 */}
       <div className={styles.fieldGroup}>
@@ -204,7 +226,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={submitting || items.every((s) => !s.trim())}
+        disabled={submitting || (noticeType === 'important' ? !longText.trim() : items.every((s) => !s.trim()))}
       >
         {submitting ? '등록 중...' : '등록하기'}
       </button>

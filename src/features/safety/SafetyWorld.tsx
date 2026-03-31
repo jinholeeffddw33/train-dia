@@ -307,38 +307,37 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
         <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
         <p className={styles.heroDesc}>5호선 안전 관리 시스템</p>
 
-        {/* 안전 심볼 + 곡선 */}
+        {/* 레이더 스캔 비주얼 */}
         <div className={styles.heroVisual}>
-          <svg viewBox="0 0 380 100" className={styles.heroLineSvg} fill="none">
-            <path
-              d="M-10 50C60 58 120 65 190 50C260 35 320 55 392 48"
-              stroke="url(#safetyLineGlow)"
-              strokeWidth="16"
-              strokeLinecap="round"
-              opacity="0.12"
-            />
-            <path
-              d="M-10 50C60 58 120 65 190 50C260 35 320 55 392 48"
-              stroke="url(#safetyLineMain)"
-              strokeWidth="5"
-              strokeLinecap="round"
-            />
+          <svg viewBox="0 0 240 240" className={styles.radarSvg} fill="none">
+            {/* 동심원 3개 */}
+            <circle cx="120" cy="120" r="110" stroke="url(#radarRing)" strokeWidth="1" opacity="0.2" />
+            <circle cx="120" cy="120" r="75" stroke="url(#radarRing)" strokeWidth="1" opacity="0.15" />
+            <circle cx="120" cy="120" r="40" stroke="url(#radarRing)" strokeWidth="1" opacity="0.1" />
+            {/* 십자 가이드 */}
+            <line x1="120" y1="10" x2="120" y2="230" stroke="url(#radarRing)" strokeWidth="0.5" opacity="0.1" />
+            <line x1="10" y1="120" x2="230" y2="120" stroke="url(#radarRing)" strokeWidth="0.5" opacity="0.1" />
+            {/* 스캔 라인 (회전 애니메이션은 CSS) */}
+            <line x1="120" y1="120" x2="120" y2="14" stroke="url(#scanLine)" strokeWidth="2" strokeLinecap="round" className={styles.radarScan} />
+            {/* 포인트 핑 */}
+            <circle cx="155" cy="72" r="4" fill="#22c55e" opacity="0.8" className={styles.radarPing1} />
+            <circle cx="85" cy="155" r="3" fill="#f59e0b" opacity="0.7" className={styles.radarPing2} />
+            <circle cx="170" cy="145" r="3" fill="#3b82f6" opacity="0.6" className={styles.radarPing3} />
             <defs>
-              <linearGradient id="safetyLineMain" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
+              <linearGradient id="radarRing" x1="0" y1="0" x2="240" y2="240">
                 <stop stopColor="#f59e0b" />
-                <stop offset="0.5" stopColor="#ef4444" />
-                <stop offset="1" stopColor="#f59e0b" />
+                <stop offset="1" stopColor="#ef4444" />
               </linearGradient>
-              <linearGradient id="safetyLineGlow" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#fbbf24" />
-                <stop offset="1" stopColor="#fca5a5" />
+              <linearGradient id="scanLine" x1="120" y1="120" x2="120" y2="14" gradientUnits="userSpaceOnUse">
+                <stop stopColor="rgba(245, 158, 11, 0)" />
+                <stop offset="1" stopColor="#f59e0b" />
               </linearGradient>
             </defs>
           </svg>
-
+          {/* 중앙 방패 아이콘 */}
           <div className={styles.heroBigBadge}>
             <div className={styles.heroBigIcon}>
-              <ShieldAlert size={36} />
+              <ShieldAlert size={32} />
             </div>
           </div>
         </div>

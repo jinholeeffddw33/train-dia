@@ -170,21 +170,49 @@
   color: var(--dia-text-secondary);
 }
 
-/* ── 히어로 비주얼 ── */
+/* ── 히어로 비주얼 (레이더) ── */
 .heroVisual {
   position: relative;
-  margin-top: 24px;
-  min-height: 120px;
+  margin-top: 16px;
+  min-height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.heroLineSvg {
-  width: 100%;
-  height: auto;
+.radarSvg {
+  width: 200px;
+  height: 200px;
   overflow: visible;
-  display: block;
+}
+
+@keyframes radarRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes radarPulse {
+  0%, 100% { opacity: 0.3; r: 3; }
+  50% { opacity: 1; r: 5; }
+}
+
+@keyframes radarPulse2 {
+  0%, 100% { opacity: 0.2; r: 2; }
+  50% { opacity: 0.8; r: 4; }
+}
+
+.radarScan {
+  transform-origin: 120px 120px;
+  animation: radarRotate 6s linear infinite;
+}
+
+.radarPing1 { animation: radarPulse 3s ease-in-out infinite; }
+.radarPing2 { animation: radarPulse2 4s ease-in-out 1s infinite; }
+.radarPing3 { animation: radarPulse2 3.5s ease-in-out 0.5s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .radarScan { animation: none; }
+  .radarPing1, .radarPing2, .radarPing3 { animation: none; }
 }
 
 .heroBigBadge {
@@ -195,21 +223,15 @@
 }
 
 .heroBigIcon {
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: linear-gradient(180deg, #f59e0b, #ef4444);
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.25);
-  outline: 4px solid rgba(245, 158, 11, 0.15);
-}
-
-:root.light .heroBigIcon {
-  outline-color: #fff;
-  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.18);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.3), 0 0 60px rgba(239, 68, 68, 0.15);
 }
 
 /* ── 메뉴 콘텐츠 ── */

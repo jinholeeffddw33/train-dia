@@ -22,11 +22,29 @@ export async function GET(req: NextRequest) {
   const sabun = req.nextUrl.searchParams.get('sabun') ?? '';
   const category = parseCategory(req.nextUrl.searchParams.get('category'));
 
-  const { data, error } = await serverSupabase
+  // hazard_reads 테이블 존재 여부에 따라 쿼리 분기
+  let data: Record<string, unknown>[] | null = null;
+  let error: { message: string } | null = null;
+
+  const { data: d1, error: e1 } = await serverSupabase
     .from('hazard_reports')
     .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
+
+  if (e1 && e1.message.includes('hazard_reads')) {
+    // hazard_reads 테이블 없으면 reads 없이 재시도
+    const { data: d2, error: e2 } = await serverSupabase
+      .from('hazard_reports')
+      .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
+      .eq('category', category)
+      .order('created_at', { ascending: false });
+    data = d2;
+    error = e2;
+  } else {
+    data = d1;
+    error = e1;
+  }
 
   if (error) {
     return NextResponse.json(

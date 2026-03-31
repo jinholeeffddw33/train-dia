@@ -1,6 +1,8 @@
 'use client';
 
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
+import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
 
 function timeAgo(iso: string): string {
@@ -38,6 +40,9 @@ interface HazardListProps {
 export default function HazardList({ onSelect, category }: HazardListProps) {
   const reports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
+  const toggleLike = useHazardStore((s) => s.toggleLike);
+  const name = useDriverStore((s) => s.myDriver?.n ?? '');
+  const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
   const isNotice = category === 'inspect';
 
   if (loading && reports.length === 0) {
@@ -111,10 +116,21 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
               {hasFile && (
                 <div className={styles.noticeFile}>📎 첨부파일</div>
               )}
-              <div className={styles.cardMeta}>
-                <span className={styles.cardComments}>💬 {r.commentCount}</span>
-                <span className={styles.cardDot}>·</span>
-                <span className={styles.cardReads}>👁 {r.readCount}</span>
+              <div className={styles.noticeFooter}>
+                <div className={styles.noticeReactions}>
+                  <button
+                    type="button"
+                    className={`${styles.reactionBtn} ${r.likedByMe ? styles.reactionBtnActive : ''}`}
+                    onClick={(e) => { e.stopPropagation(); if (name && sabun) toggleLike(r.id, name, sabun); }}
+                  >
+                    <ThumbsUp size={14} /> <span>{r.likeCount}</span>
+                  </button>
+                </div>
+                <div className={styles.cardMeta}>
+                  <span className={styles.cardComments}>💬 {r.commentCount}</span>
+                  <span className={styles.cardDot}>·</span>
+                  <span className={styles.cardReads}>👁 {r.readCount}</span>
+                </div>
               </div>
             </button>
           );

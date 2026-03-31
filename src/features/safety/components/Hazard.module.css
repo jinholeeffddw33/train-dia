@@ -853,6 +853,42 @@
   font-weight: 500;
 }
 
+.noticeFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--dia-space-1);
+}
+
+.noticeReactions {
+  display: flex;
+  gap: 6px;
+}
+
+.reactionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dia-text-tertiary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  cursor: pointer;
+  transition: all var(--dia-transition-fast);
+  min-height: 28px;
+}
+
+.reactionBtn:active { transform: scale(0.95); }
+
+.reactionBtnActive {
+  color: var(--dia-blue);
+  border-color: var(--dia-blue);
+  background: var(--dia-blue-dim);
+}
+
 .cardReads {
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);

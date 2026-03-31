@@ -172,37 +172,47 @@
   justify-content: center;
 }
 
-/* 지하철 + 네트워크 SVG */
-.heroTrainSvg {
+/* 5호선 노선 라인 SVG */
+.heroLineSvg {
   width: 100%;
-  max-width: 320px;
+  max-width: 380px;
   height: auto;
   overflow: visible;
   display: block;
 }
 
-@keyframes nodePulse1 {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.9; }
+/* 5번 심볼 배지 */
+.heroBigBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
-@keyframes nodePulse2 {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.7; }
+.heroBigNum {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: #fff;
+  font-size: 32px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35);
 }
 
-@keyframes speedDash {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -20; }
-}
-
-.nodeP1 { animation: nodePulse1 3s ease-in-out infinite; }
-.nodeP2 { animation: nodePulse2 4s ease-in-out 0.5s infinite; }
-.nodeP3 { animation: nodePulse2 3.5s ease-in-out 1s infinite; }
-.speedLine { stroke-dasharray: 6 4; animation: speedDash 1.5s linear infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .nodeP1, .nodeP2, .nodeP3, .speedLine { animation: none; }
+.heroBigLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #c4b5fd;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 

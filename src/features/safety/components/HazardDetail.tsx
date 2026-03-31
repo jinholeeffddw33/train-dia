@@ -65,6 +65,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const updateComment = useHazardStore((s) => s.updateComment);
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
+  const recordRead = useHazardStore((s) => s.recordRead);
 
   const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
   const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
@@ -89,7 +90,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
   useEffect(() => {
     fetchComments(reportId);
-  }, [reportId, fetchComments]);
+    if (sabun) recordRead(reportId, sabun);
+  }, [reportId, fetchComments, recordRead, sabun]);
 
   // 메뉴 외부 클릭 닫기
   useEffect(() => {
@@ -351,6 +353,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                       </span>
                     )}
                     <span className={styles.detailAuthor}>{report.createdBy}</span>
+                    <span className={styles.detailReadCount}>👁 {report.readCount}</span>
                   </div>
                 );
               })()}

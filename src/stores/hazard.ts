@@ -13,6 +13,7 @@ export interface HazardReport {
   commentCount: number;
   likeCount: number;
   likedByMe: boolean;
+  readCount: number;
 }
 
 export interface HazardComment {
@@ -43,6 +44,7 @@ interface HazardState {
   deleteReport: (reportId: string, name: string, sabun: string) => Promise<void>;
   updateComment: (reportId: string, commentId: string, comment: string, name: string, sabun: string) => Promise<void>;
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
+  recordRead: (reportId: string, sabun: string) => Promise<void>;
   toggleLike: (reportId: string, name: string, sabun: string) => Promise<void>;
 }
 
@@ -214,6 +216,26 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
         r.id === reportId ? { ...r, commentCount: Math.max(0, r.commentCount - 1) } : r,
       ),
     }));
+  },
+
+  recordRead: async (reportId, sabun) => {
+    try {
+      const res = await fetch(`/api/safety/hazards/${reportId}/reads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sabun }),
+      });
+      if (res.ok) {
+        const { readCount } = await res.json() as { readCount: number };
+        set((state) => ({
+          reports: state.reports.map((r) =>
+            r.id === reportId ? { ...r, readCount } : r,
+          ),
+        }));
+      }
+    } catch {
+      // 무시
+    }
   },
 
   toggleLike: async (reportId, name, sabun) => {

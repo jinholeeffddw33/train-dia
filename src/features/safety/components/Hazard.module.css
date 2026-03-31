@@ -853,6 +853,17 @@
   font-weight: 500;
 }
 
+.cardReads {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.detailReadCount {
+  font-size: 12px;
+  color: var(--dia-text-tertiary);
+  margin-left: auto;
+}
+
 .noticeEditHeader {
   font-size: var(--dia-text-base);
   font-weight: 700;

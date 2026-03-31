@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
+    .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
 
@@ -62,6 +62,7 @@ function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
     commentCount: (r.hazard_comments as { count: number }[])?.[0]?.count ?? 0,
     likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
     likedByMe: likedIds.has(r.id as string),
+    readCount: (r.hazard_reads as { count: number }[])?.[0]?.count ?? 0,
   }));
 }
 

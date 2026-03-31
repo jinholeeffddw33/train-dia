@@ -113,6 +113,8 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
               )}
               <div className={styles.cardMeta}>
                 <span className={styles.cardComments}>💬 {r.commentCount}</span>
+                <span className={styles.cardDot}>·</span>
+                <span className={styles.cardReads}>👁 {r.readCount}</span>
               </div>
             </button>
           );
@@ -155,6 +157,8 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                   <span className={styles.cardLikes}>❤️ {r.likeCount}</span>
                 </>
               )}
+              <span className={styles.cardDot}>·</span>
+              <span className={styles.cardReads}>👁 {r.readCount}</span>
             </div>
           </div>
         </button>

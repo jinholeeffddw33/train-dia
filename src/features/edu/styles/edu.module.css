@@ -172,54 +172,37 @@
   justify-content: center;
 }
 
-/* 노선 SVG */
-.heroLineSvg {
+/* 지하철 + 네트워크 SVG */
+.heroTrainSvg {
   width: 100%;
+  max-width: 320px;
   height: auto;
   overflow: visible;
   display: block;
 }
 
-/* 5번 배지 (큰) */
-.heroBigBadge {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@keyframes nodePulse1 {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.9; }
 }
 
-.heroBigNum {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #9d62f7, #7c3aed);
-  color: #fff;
-  font-size: 36px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.3);
-  outline: 4px solid rgba(124, 58, 237, 0.15);
+@keyframes nodePulse2 {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
 }
 
-:root.light .heroBigNum {
-  outline-color: #fff;
-  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.2);
+@keyframes speedDash {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -20; }
 }
 
-.heroBigLabel {
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: var(--dia-weight-semibold);
-  color: #a78bfa;
-}
+.nodeP1 { animation: nodePulse1 3s ease-in-out infinite; }
+.nodeP2 { animation: nodePulse2 4s ease-in-out 0.5s infinite; }
+.nodeP3 { animation: nodePulse2 3.5s ease-in-out 1s infinite; }
+.speedLine { stroke-dasharray: 6 4; animation: speedDash 1.5s linear infinite; }
 
-:root.light .heroBigLabel {
-  color: #7c3aed;
+@media (prefers-reduced-motion: reduce) {
+  .nodeP1, .nodeP2, .nodeP3, .speedLine { animation: none; }
 }
 
 

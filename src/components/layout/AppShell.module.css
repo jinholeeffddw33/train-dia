@@ -13,6 +13,11 @@
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   min-height: 100vh;
+}
+
+/* 뒤로가기 버튼 있을 때 컨텐츠 상단 여백 */
+.shell[data-has-back] .content {
+  padding-top: 52px;
   min-height: 100dvh;
 }
 

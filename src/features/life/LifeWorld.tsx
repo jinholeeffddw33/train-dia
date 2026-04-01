@@ -242,7 +242,11 @@ function DetailView({ postId, name, sabun, onBack }: {
   const [submitting, setSubmitting] = useState(false);
 
   const isSample = postId.startsWith('sample-');
-  useEffect(() => { if (!isSample) fetchComments(postId); }, [fetchComments, postId, isSample]);
+  useEffect(() => {
+    if (!isSample) {
+      try { fetchComments(postId); } catch { /* ignore */ }
+    }
+  }, [fetchComments, postId, isSample]);
 
   if (!post) return (
     <div className={styles.wrap}>
@@ -259,16 +263,19 @@ function DetailView({ postId, name, sabun, onBack }: {
   const handleComment = async () => {
     if (isSample || !commentText.trim() || submitting) return;
     setSubmitting(true);
-    await addComment(postId, commentText.trim(), name, sabun);
-    setCommentText('');
+    try {
+      await addComment(postId, commentText.trim(), name, sabun);
+      setCommentText('');
+    } catch { /* ignore */ }
     setSubmitting(false);
   };
 
   const handleDelete = async () => {
     if (isSample) return;
-    if (!window.confirm('글을 삭제하시겠습니까?')) return;
-    await deletePost(postId, name, sabun);
-    onBack();
+    try {
+      await deletePost(postId, name, sabun);
+      onBack();
+    } catch { /* ignore */ }
   };
 
   return (
@@ -291,7 +298,7 @@ function DetailView({ postId, name, sabun, onBack }: {
             <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
           )}
           <div className={styles.detailContent}>{post.content}</div>
-          <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => { if (!isSample) toggleLike(postId, name, sabun); }}>
+          <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => { if (!isSample) toggleLike(postId, name, sabun).catch(() => {}); }}>
             ❤️ {post.likeCount}
           </button>
         </div>

@@ -51,9 +51,18 @@ export const useLifeStore = create<LifeState>()((set, get) => ({
       const res = await fetch(`/api/life/posts?category=${category}`);
       if (res.ok) {
         const json = await res.json();
-        set({ posts: json.data ?? [] });
+        const realPosts = json.data ?? [];
+        // 새 글 2개당 샘플 1개씩 제거
+        const allSamples = SAMPLE_POSTS[category] ?? [];
+        const removeCount = Math.floor(realPosts.length / 2);
+        const samples = allSamples.slice(removeCount);
+        set({ posts: [...realPosts, ...samples] });
+      } else {
+        set({ posts: SAMPLE_POSTS[category] ?? [] });
       }
-    } catch { /* ignore */ }
+    } catch {
+      set({ posts: SAMPLE_POSTS[category] ?? [] });
+    }
     set({ loading: false });
   },
 

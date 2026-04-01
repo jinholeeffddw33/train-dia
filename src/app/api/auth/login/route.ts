@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createToken, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/jwt';
 import { verifyPin, getProfileBySabun, auditLog, getClientIP } from '@/lib/authServer';
+import { serverSupabase } from '@/lib/serverSupabase';
 
 // ── POST: PIN 로그인 ──
 export async function POST(req: NextRequest) {
@@ -55,6 +56,17 @@ export async function POST(req: NextRequest) {
     role: profile.role,
   });
 
+  // 생체인증 등록 여부 확인
+  let hasBiometric = false;
+  if (serverSupabase) {
+    const { data: creds } = await serverSupabase
+      .from('webauthn_credentials')
+      .select('credential_id')
+      .eq('user_id', profile.id)
+      .limit(1);
+    hasBiometric = (creds?.length ?? 0) > 0;
+  }
+
   // 감사 로그
   await auditLog(profile.id, profile.name, 'login_pin', {
     ip: getClientIP(req),
@@ -70,6 +82,7 @@ export async function POST(req: NextRequest) {
       personId: profile.person_id,
       role: profile.role,
       mustChangePin: profile.must_change_pin,
+      hasBiometric,
     },
   });
 

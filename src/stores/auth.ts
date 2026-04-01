@@ -67,6 +67,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: data.user,
             lastSabun: sabun,
+            hasBiometric: data.user.hasBiometric || get().hasBiometric,
             loading: false,
             error: '',
           });

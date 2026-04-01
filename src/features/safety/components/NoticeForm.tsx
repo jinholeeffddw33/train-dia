@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Plus, X, Paperclip } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import styles from './Hazard.module.css';
 
 type NoticeType = 'rollcall' | 'important';
@@ -27,8 +28,12 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
-  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const authName = useAuthStore((s) => s.user?.name ?? '');
+  const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
+  const name = authName || driverName;
+  const sabun = authSabun || driverSabun;
 
   const addItem = () => {
     if (items.length >= 10) return;

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Heart, Eye, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import { isAdmin } from '@/lib/auth';
 import styles from './Hazard.module.css';
 
@@ -72,8 +73,12 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const fetchReaders = useHazardStore((s) => s.fetchReaders);
   const incrementView = useHazardStore((s) => s.incrementView);
 
-  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const authName = useAuthStore((s) => s.user?.name ?? '');
+  const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
+  const name = authName || driverName;
+  const sabun = authSabun || driverSabun;
 
   const isMyReport = report && name && report.createdBy === name;
   const adminUser = isAdmin(sabun);

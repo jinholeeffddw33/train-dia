@@ -7,6 +7,7 @@ import {
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import Modal from '@/components/common/Modal';
 import AlertList from '@/features/alerts/components/AlertList';
 import AlertForm from '@/features/alerts/components/AlertForm';
@@ -197,7 +198,9 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
-  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
+  const sabun = authSabun || driverSabun;
   const { getUnread, alertUnread, markAsRead, markAlertAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {

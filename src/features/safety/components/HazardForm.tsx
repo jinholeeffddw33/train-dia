@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import styles from './Hazard.module.css';
 
 async function compressImage(file: File): Promise<File> {
@@ -53,8 +54,12 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
   const fileRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
-  const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
-  const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
+  const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const authName = useAuthStore((s) => s.user?.name ?? '');
+  const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
+  const name = authName || driverName;
+  const sabun = authSabun || driverSabun;
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

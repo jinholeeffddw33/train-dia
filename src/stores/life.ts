@@ -13,7 +13,9 @@ export interface LifePost {
   createdAt: string;
   likeCount: number;
   commentCount: number;
+  readCount: number;
   likedByMe: boolean;
+  isSample?: boolean;
 }
 
 export interface LifeComment {
@@ -35,6 +37,7 @@ interface LifeState {
   fetchComments: (postId: string) => Promise<void>;
   addComment: (postId: string, comment: string, name: string, sabun: string) => Promise<void>;
   toggleLike: (postId: string, name: string, sabun: string) => Promise<void>;
+  recordRead: (postId: string, sabun: string) => void;
 }
 
 export const useLifeStore = create<LifeState>()((set, get) => ({
@@ -116,5 +119,22 @@ export const useLifeStore = create<LifeState>()((set, get) => ({
         posts: s.posts.map((p) => p.id === postId ? { ...p, likeCount: json.likeCount, likedByMe: json.liked } : p),
       }));
     }
+  },
+
+  recordRead: (postId, sabun) => {
+    if (!sabun || !postId) return;
+    // localStorage로 unique 조회 추적
+    const key = `life-reads-${postId}`;
+    try {
+      const raw = localStorage.getItem(key);
+      const readers: string[] = raw ? JSON.parse(raw) : [];
+      if (!readers.includes(sabun)) {
+        readers.push(sabun);
+        localStorage.setItem(key, JSON.stringify(readers));
+      }
+      set((s) => ({
+        posts: s.posts.map((p) => p.id === postId ? { ...p, readCount: readers.length } : p),
+      }));
+    } catch { /* ignore */ }
   },
 }));

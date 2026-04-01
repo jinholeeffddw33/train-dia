@@ -560,3 +560,15 @@
 }
 
 .detailLink:active { opacity: 0.7; }
+
+.detailActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--dia-space-3);
+}
+
+.detailReadCount {
+  font-size: 13px;
+  color: var(--dia-text-tertiary);
+}

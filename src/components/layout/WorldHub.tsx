@@ -8,7 +8,7 @@ import styles from './WorldHub.module.css';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
-export type WorldId = 'duty' | 'edu' | 'safety';
+export type WorldId = 'duty' | 'edu' | 'safety' | 'life';
 
 interface WorldHubProps {
   onEnter: (world: WorldId) => void;
@@ -51,6 +51,15 @@ const WORLDS: WorldDef[] = [
     lottie: '/lottie/safety.json',
     iconClass: styles.iconSafety,
     cardClass: styles.cardSafety,
+    lottieW: 44,
+  },
+  {
+    id: 'life',
+    label: '라이프',
+    desc: '건강 · 복지 · 커뮤니티',
+    lottie: '/lottie/safety.json',
+    iconClass: styles.iconLife,
+    cardClass: styles.cardLife,
     lottieW: 44,
   },
 ];
@@ -102,9 +111,6 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
     }, 300);
   }, [onEnter]);
 
-  const topWorlds = WORLDS.slice(0, 2);
-  const bottomWorld = WORLDS[2];
-
   return (
     <div className={styles.hub}>
       <header className={styles.header}>
@@ -114,37 +120,22 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
       </header>
 
       <div className={styles.grid}>
-        <div className={styles.topRow}>
-          {topWorlds.map((w) => (
-            <button
-              key={w.id}
-              type="button"
-              className={`${styles.card} ${w.cardClass}`}
-              onClick={(e) => handleClick(e, w.id)}
-              aria-label={w.label}
-            >
-              <LottieIcon src={w.lottie} className={w.iconClass} width={w.lottieW} height={w.lottieH} />
-              <span className={styles.cardTitle}>{w.label}</span>
-              <span className={styles.cardDesc}>{w.desc}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.bottomRow}>
+        {WORLDS.map((w) => (
           <button
+            key={w.id}
             type="button"
-            className={`${styles.card} ${bottomWorld.cardClass}`}
-            onClick={(e) => handleClick(e, bottomWorld.id)}
-            aria-label={bottomWorld.label}
+            className={`${styles.card} ${w.cardClass}`}
+            onClick={(e) => handleClick(e, w.id)}
+            aria-label={w.label}
           >
-            {safetyTotal > 0 && (
+            {w.id === 'safety' && safetyTotal > 0 && (
               <span className={styles.worldBadge}>{safetyTotal > 99 ? '99+' : safetyTotal}</span>
             )}
-            <LottieIcon src={bottomWorld.lottie} className={bottomWorld.iconClass} width={bottomWorld.lottieW} height={bottomWorld.lottieH} />
-            <span className={styles.cardTitle}>{bottomWorld.label}</span>
-            <span className={styles.cardDesc}>{bottomWorld.desc}</span>
+            <LottieIcon src={w.lottie} className={w.iconClass} width={w.lottieW} height={w.lottieH} />
+            <span className={styles.cardTitle}>{w.label}</span>
+            <span className={styles.cardDesc}>{w.desc}</span>
           </button>
-        </div>
+        ))}
       </div>
 
       <span className={styles.footer}>Train DIA v2</span>

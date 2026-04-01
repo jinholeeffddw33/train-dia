@@ -80,6 +80,8 @@ export default function HomePage() {
         <EduTab onBack={handleBack} />
       ) : world === 'safety' ? (
         <SafetyWorld onBack={handleBack} />
+      ) : world === 'life' ? (
+        <ComingSoon worldId={world} onBack={handleBack} />
       ) : (
         <ComingSoon worldId={world} onBack={handleBack} />
       )}

@@ -98,28 +98,14 @@
   margin-top: var(--dia-space-2);
 }
 
-/* ── Card Grid — 피라미드 ── */
+/* ── Card Grid — 2×2 ── */
 .grid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--dia-space-4);
-  width: 100%;
-  max-width: 300px;
-  z-index: 1;
-}
-
-.topRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--dia-space-4);
   width: 100%;
-}
-
-.bottomRow {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  max-width: 340px;
+  z-index: 1;
 }
 
 /* ── World Card ── */
@@ -143,9 +129,10 @@
 }
 
 /* Staggered entry animation */
-.card:nth-child(1) { animation: cardEntry 0.5s 0.15s var(--dia-ease) both; }
-.card:nth-child(2) { animation: cardEntry 0.5s 0.25s var(--dia-ease) both; }
-.bottomRow .card { animation: cardEntry 0.5s 0.35s var(--dia-ease) both; }
+.card:nth-child(1) { animation: cardEntry 0.5s 0.1s var(--dia-ease) both; }
+.card:nth-child(2) { animation: cardEntry 0.5s 0.2s var(--dia-ease) both; }
+.card:nth-child(3) { animation: cardEntry 0.5s 0.3s var(--dia-ease) both; }
+.card:nth-child(4) { animation: cardEntry 0.5s 0.4s var(--dia-ease) both; }
 
 @keyframes cardEntry {
   from {
@@ -275,11 +262,45 @@
   background: linear-gradient(160deg, rgba(245, 158, 11, 0.04) 0%, rgba(239, 68, 68, 0.02) 100%);
 }
 
-/* ── Bottom card (wider) ── */
-.bottomRow .card {
-  width: 55%;
-  min-width: 160px;
+/* 라이프 — Rose */
+.cardLife {
+  background:
+    linear-gradient(var(--dia-surface), var(--dia-surface)) padding-box,
+    linear-gradient(135deg, rgba(236, 72, 153, 0.5), rgba(168, 85, 247, 0.3)) border-box;
+  box-shadow: var(--dia-card-depth), 0 0 20px rgba(236, 72, 153, 0.08);
 }
+
+.cardLife::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--dia-radius-xl);
+  background: linear-gradient(160deg, rgba(236, 72, 153, 0.06) 0%, rgba(168, 85, 247, 0.04) 100%);
+  pointer-events: none;
+}
+
+.cardLife:hover,
+.cardLife:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: var(--dia-shadow-lg), 0 0 30px rgba(236, 72, 153, 0.15);
+}
+
+.cardLife:active {
+  transform: scale(0.96);
+  box-shadow: var(--dia-shadow-sm);
+}
+
+:global(:root.light) .cardLife {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, rgba(236, 72, 153, 0.4), rgba(168, 85, 247, 0.25)) border-box;
+}
+
+:global(:root.light) .cardLife::before {
+  background: linear-gradient(160deg, rgba(236, 72, 153, 0.04) 0%, rgba(168, 85, 247, 0.02) 100%);
+}
+
+/* (removed: bottomRow) */
 
 /* ── Card Icon ── */
 .iconWrap {
@@ -350,8 +371,24 @@
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(56, 189, 248, 0.1));
 }
 
+.iconLife {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.15));
+  color: #ec4899;
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
+  animation: iconFloat 3s 0.9s ease-in-out infinite, iconGlowRose 3s 0.9s ease-in-out infinite;
+}
+
+@keyframes iconGlowRose {
+  0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.2); }
+  50% { box-shadow: 0 0 32px rgba(236, 72, 153, 0.35); }
+}
+
 :global(:root.light) .iconSafety {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.1));
+}
+
+:global(:root.light) .iconLife {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.1));
 }
 
 /* ── Card Text ── */

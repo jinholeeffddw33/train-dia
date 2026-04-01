@@ -291,49 +291,37 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* PIN 입력 (이미 PIN 설정한 사용자용) */}
-        {hasBiometric && (
-          <div className={styles.inputGroup}>
-            <label htmlFor="auth-pin" className={styles.label}>PIN</label>
-            <div className={styles.pinWrap}>
-              <input
-                id="auth-pin"
-                type={showPin ? 'text' : 'password'}
-                inputMode="numeric"
-                className={styles.input}
-                placeholder="● ● ● ●"
-                value={pin}
-                onChange={(e) => { setPin(e.target.value); clearError(); }}
-                onKeyDown={handleKeyDown}
-                maxLength={10}
-                autoComplete="off"
-                autoFocus={!!lastSabun}
-              />
-              <button
-                type="button"
-                className={styles.pinToggle}
-                onClick={() => setShowPin(!showPin)}
-                aria-label={showPin ? 'PIN 숨기기' : 'PIN 보기'}
-              >
-                {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+        {/* 생체인증 미등록 시에도 PIN 입력 표시 */}
+        <div className={styles.inputGroup}>
+          <label htmlFor="auth-pin" className={styles.label}>PIN</label>
+          <div className={styles.pinWrap}>
+            <input
+              id="auth-pin"
+              type={showPin ? 'text' : 'password'}
+              inputMode="numeric"
+              className={styles.input}
+              placeholder="● ● ● ●"
+              value={pin}
+              onChange={(e) => { setPin(e.target.value); clearError(); }}
+              onKeyDown={handleKeyDown}
+              maxLength={10}
+              autoComplete="off"
+              autoFocus={!!lastSabun}
+            />
+            <button
+              type="button"
+              className={styles.pinToggle}
+              onClick={() => setShowPin(!showPin)}
+              aria-label={showPin ? 'PIN 숨기기' : 'PIN 보기'}
+            >
+              {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-        )}
+        </div>
 
         {error && <p className={styles.error}>{error}</p>}
 
-        {/* 처음 오는 사용자: 사번만 입력 → 시작하기 */}
-        {!hasBiometric ? (
-          <button
-            type="button"
-            className={styles.btn}
-            onClick={handleFirstLogin}
-            disabled={loading || !sabun}
-          >
-            <span>{loading ? '확인 중...' : '시작하기'}</span>
-          </button>
-        ) : (
+        {hasBiometric && (sabun || lastSabun) ? (
           <button
             type="button"
             className={styles.btn}
@@ -342,6 +330,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           >
             <KeyRound size={18} />
             <span>{loading ? '로그인 중...' : 'PIN으로 로그인'}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={pin ? handlePinLogin : handleFirstLogin}
+            disabled={loading || !sabun}
+          >
+            <span>{loading ? '확인 중...' : '시작하기'}</span>
           </button>
         )}
       </div>

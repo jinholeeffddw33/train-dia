@@ -56,8 +56,8 @@ const WORLDS: WorldDef[] = [
   {
     id: 'life',
     label: '라이프',
-    desc: '건강 · 복지 · 커뮤니티',
-    lottie: '/lottie/safety.json',
+    desc: '건강 · 힐링 · 즐거움',
+    lottie: '',
     iconClass: styles.iconLife,
     cardClass: styles.cardLife,
     lottieW: 44,
@@ -131,7 +131,31 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             {w.id === 'safety' && safetyTotal > 0 && (
               <span className={styles.worldBadge}>{safetyTotal > 99 ? '99+' : safetyTotal}</span>
             )}
-            <LottieIcon src={w.lottie} className={w.iconClass} width={w.lottieW} height={w.lottieH} />
+            {w.lottie ? (
+              <LottieIcon src={w.lottie} className={w.iconClass} width={w.lottieW} height={w.lottieH} />
+            ) : (
+              <div className={`${styles.iconWrap} ${w.iconClass}`}>
+                <svg viewBox="0 0 64 64" width={48} height={48} fill="none">
+                  {/* 잎사귀 — 힐링/자연 */}
+                  <path d="M32 12C22 12 14 22 14 32c0 12 8 20 18 20" stroke="#ec4899" strokeWidth="2.5" fill="rgba(236,72,153,0.1)" strokeLinecap="round" />
+                  <path d="M32 12C42 12 50 22 50 32c0 12-8 20-18 20" stroke="#a855f7" strokeWidth="2.5" fill="rgba(168,85,247,0.08)" strokeLinecap="round" />
+                  {/* 줄기 */}
+                  <path d="M32 32V52" stroke="url(#leafStem)" strokeWidth="2" strokeLinecap="round" />
+                  {/* 하트 */}
+                  <path d="M28 26c-2-3-6-3-7 0s1 7 11 12c10-5 12-9 11-12s-5-3-7 0-4 4-4 4-2-1-4-4z" fill="url(#heartGrad)" opacity="0.85" />
+                  <defs>
+                    <linearGradient id="leafStem" x1="32" y1="32" x2="32" y2="52">
+                      <stop stopColor="#a855f7" />
+                      <stop offset="1" stopColor="#ec4899" stopOpacity="0.4" />
+                    </linearGradient>
+                    <linearGradient id="heartGrad" x1="24" y1="24" x2="40" y2="40">
+                      <stop stopColor="#ec4899" />
+                      <stop offset="1" stopColor="#f472b6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            )}
             <span className={styles.cardTitle}>{w.label}</span>
             <span className={styles.cardDesc}>{w.desc}</span>
           </button>

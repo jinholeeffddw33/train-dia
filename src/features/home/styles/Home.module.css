@@ -46,24 +46,30 @@
 }
 
 /* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
-/* 상단: 인사말(좌) + 날짜/시계(우) */
-.headerTopRow {
+/* 상단: 좌(인사말+이름) + 우(날짜+시계) */
+.headerTop {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 6px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .headerGreeting {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.65);
-  padding-top: 4px;
+  margin-bottom: 2px;
 }
 
-.headerClockArea {
+.headerRight {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .headerDate {
@@ -86,13 +92,6 @@
   letter-spacing: 1px;
   margin-top: 2px;
   text-align: center;
-}
-
-/* 이름 행 */
-.headerNameRow {
-  display: flex;
-  align-items: center;
-  gap: var(--dia-space-3);
 }
 
 .headerNameBtn {

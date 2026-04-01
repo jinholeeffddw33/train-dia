@@ -123,7 +123,7 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                     className={`${styles.reactionBtn} ${r.likedByMe ? styles.reactionBtnActive : ''}`}
                     onClick={(e) => { e.stopPropagation(); if (name && sabun) toggleLike(r.id, name, sabun); }}
                   >
-                    <ThumbsUp size={14} /> <span>{r.likeCount}</span>
+                    <ThumbsUp size={14} fill={r.likedByMe ? 'currentColor' : 'none'} /> <span>{r.likeCount}</span>
                   </button>
                 </div>
                 <div className={styles.cardStats}>

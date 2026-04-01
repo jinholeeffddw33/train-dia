@@ -244,7 +244,7 @@ function DetailView({ postId, name, sabun, onBack }: {
   const isSample = postId.startsWith('sample-');
   useEffect(() => {
     if (!isSample) {
-      try { fetchComments(postId); } catch { /* ignore */ }
+      fetchComments(postId).catch(() => {});
     }
   }, [fetchComments, postId, isSample]);
 
@@ -263,19 +263,15 @@ function DetailView({ postId, name, sabun, onBack }: {
   const handleComment = async () => {
     if (isSample || !commentText.trim() || submitting) return;
     setSubmitting(true);
-    try {
-      await addComment(postId, commentText.trim(), name, sabun);
-      setCommentText('');
-    } catch { /* ignore */ }
+    await addComment(postId, commentText.trim(), name, sabun).catch(() => {});
+    setCommentText('');
     setSubmitting(false);
   };
 
   const handleDelete = async () => {
     if (isSample) return;
-    try {
-      await deletePost(postId, name, sabun);
-      onBack();
-    } catch { /* ignore */ }
+    await deletePost(postId, name, sabun).catch(() => {});
+    onBack();
   };
 
   return (

@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
+
+// dynamic import — 일부 브라우저에서 모듈 로드 에러 방지
+async function getWebAuthn() {
+  const mod = await import('@simplewebauthn/browser');
+  return mod;
+}
 
 export interface AuthUser {
   id: string;
@@ -93,6 +98,7 @@ export const useAuthStore = create<AuthState>()(
           const { userId, ...options } = optData;
 
           // 2. 브라우저 생체인증 시작
+          const { startAuthentication } = await getWebAuthn();
           const credential = await startAuthentication({ optionsJSON: options });
 
           // 3. 서버 검증
@@ -137,6 +143,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // 2. 브라우저 생체인증 등록
+          const { startRegistration } = await getWebAuthn();
           const credential = await startRegistration({ optionsJSON: options });
 
           // 3. 서버 검증 + 저장

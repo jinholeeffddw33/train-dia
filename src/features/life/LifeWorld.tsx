@@ -62,37 +62,37 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <div className={styles.heroHaze} />
-          <h1 className={styles.heroTitle}>Life</h1>
-          <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
-          <p className={styles.heroDesc}>기관사를 위한 라이프 공간</p>
 
+          {/* 타이틀 — 자연스러운 힐링 느낌 */}
+          <p className={styles.heroDesc}>기관사를 위한</p>
+          <h1 className={styles.heroTitle}>라이프 공간</h1>
+          <p className={styles.heroSub}>건강 · 힐링 · 즐거움</p>
+
+          {/* 새싹 심볼 */}
           <div className={styles.heroVisual}>
-            <svg viewBox="0 0 200 200" className={styles.lifeSvg} fill="none">
-              <circle cx="100" cy="100" r="90" stroke="url(#lifeRing)" strokeWidth="1" opacity="0.15" />
-              <circle cx="100" cy="100" r="60" stroke="url(#lifeRing)" strokeWidth="1" opacity="0.1" />
-              {/* 4개 카테고리 노드 */}
-              <circle cx="100" cy="20" r="6" fill="#f43f5e" opacity="0.7" className={styles.lifeNode1} />
-              <circle cx="180" cy="100" r="6" fill="#22c55e" opacity="0.7" className={styles.lifeNode2} />
-              <circle cx="100" cy="180" r="6" fill="#3b82f6" opacity="0.7" className={styles.lifeNode3} />
-              <circle cx="20" cy="100" r="6" fill="#8b5cf6" opacity="0.7" className={styles.lifeNode4} />
-              {/* 연결선 */}
-              <line x1="100" y1="26" x2="100" y2="94" stroke="#f43f5e" strokeWidth="0.8" opacity="0.15" />
-              <line x1="174" y1="100" x2="106" y2="100" stroke="#22c55e" strokeWidth="0.8" opacity="0.15" />
-              <line x1="100" y1="174" x2="100" y2="106" stroke="#3b82f6" strokeWidth="0.8" opacity="0.15" />
-              <line x1="26" y1="100" x2="94" y2="100" stroke="#8b5cf6" strokeWidth="0.8" opacity="0.15" />
-              {/* 중앙 */}
-              <circle cx="100" cy="100" r="16" fill="url(#lifeCenter)" />
-              <text x="100" y="105" textAnchor="middle" fontSize="14" fontWeight="800" fill="#fff">L</text>
+            <svg viewBox="0 0 120 100" className={styles.lifeSvg} fill="none">
+              {/* 잎사귀 좌 */}
+              <path d="M60 45C52 32 36 26 30 32c-4 4 2 14 14 16 5 1 12-1 16-3" fill="url(#lfL)" stroke="#22c55e" strokeWidth="1.2" />
+              {/* 잎사귀 우 */}
+              <path d="M60 40C68 27 84 21 90 27c4 4-2 14-14 16-5 1-12-1-16-3" fill="url(#lfR)" stroke="#16a34a" strokeWidth="1.2" />
+              {/* 줄기 */}
+              <path d="M60 42V78" stroke="url(#lfS)" strokeWidth="2.5" strokeLinecap="round" />
+              {/* 흙 */}
+              <ellipse cx="60" cy="82" rx="20" ry="4" fill="#92400e" opacity="0.12" />
+              {/* 반짝임 */}
+              <circle cx="42" cy="28" r="2" fill="#fbbf24" opacity="0.6" />
+              <circle cx="82" cy="22" r="1.5" fill="#fde68a" opacity="0.5" />
+              <circle cx="72" cy="16" r="1.8" fill="#fbbf24" opacity="0.4" />
               <defs>
-                <linearGradient id="lifeRing" x1="0" y1="0" x2="200" y2="200">
-                  <stop stopColor="#f43f5e" />
-                  <stop offset="0.5" stopColor="#8b5cf6" />
-                  <stop offset="1" stopColor="#22c55e" />
+                <linearGradient id="lfL" x1="30" y1="26" x2="60" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#4ade80" /><stop offset="1" stopColor="#22c55e" />
                 </linearGradient>
-                <radialGradient id="lifeCenter" cx="0.5" cy="0.5" r="0.5">
-                  <stop stopColor="#f43f5e" />
-                  <stop offset="1" stopColor="#8b5cf6" />
-                </radialGradient>
+                <linearGradient id="lfR" x1="90" y1="21" x2="60" y2="45" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#86efac" /><stop offset="1" stopColor="#16a34a" />
+                </linearGradient>
+                <linearGradient id="lfS" x1="60" y1="42" x2="60" y2="78" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#22c55e" /><stop offset="1" stopColor="#86efac" stopOpacity="0.4" />
+                </linearGradient>
               </defs>
             </svg>
           </div>

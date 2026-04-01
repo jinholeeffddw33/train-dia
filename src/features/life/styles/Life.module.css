@@ -10,87 +10,76 @@
 .heroBanner {
   position: relative;
   overflow: hidden;
-  padding: 56px 24px 0;
+  padding: 48px 24px 0;
   text-align: center;
   background:
-    radial-gradient(circle at top, rgba(244, 63, 94, 0.08), transparent 40%),
+    radial-gradient(circle at 50% 30%, rgba(34, 197, 94, 0.06), transparent 50%),
     linear-gradient(to bottom, var(--dia-bg), var(--dia-bg));
 }
 
 .heroHaze {
   position: absolute;
-  left: 0; top: 100px;
-  height: 150px; width: 100%;
+  left: 0; top: 60px;
+  height: 100px; width: 100%;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(244, 63, 94, 0.06), rgba(139, 92, 246, 0.03), transparent);
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.04), transparent);
 }
 
 .heroFade {
-  height: 40px;
+  height: 20px;
   background: linear-gradient(to bottom, transparent, var(--dia-bg));
-  margin-top: -8px;
 }
 
 .heroBackBtn {
   position: absolute;
   top: var(--dia-space-3); left: var(--dia-space-3);
-  width: 40px; height: 40px; min-width: 40px;
+  width: 36px; height: 36px; min-width: 36px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   display: flex; align-items: center; justify-content: center;
   color: var(--dia-text-primary);
   cursor: pointer; z-index: 10;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.heroTitle {
-  position: relative;
-  font-size: 32px; font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--dia-text-primary);
-}
-
-.heroSub {
-  position: relative;
-  font-size: 12px; font-weight: 600;
-  letter-spacing: 0.3em;
-  margin-top: 12px;
-  color: #f43f5e;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .heroDesc {
   position: relative;
-  font-size: 15px; font-weight: 500;
-  margin-top: 12px;
+  font-size: 14px; font-weight: 500;
+  color: var(--dia-text-tertiary);
+}
+
+.heroTitle {
+  position: relative;
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--dia-text-primary);
+  margin-top: 2px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroSub {
+  position: relative;
+  font-size: 13px; font-weight: 500;
+  margin-top: 4px;
   color: var(--dia-text-secondary);
+  letter-spacing: 0.5px;
 }
 
 .heroVisual {
   position: relative;
-  margin-top: 16px;
-  min-height: 160px;
+  margin-top: 8px;
+  min-height: 80px;
   display: flex; align-items: center; justify-content: center;
 }
 
-.lifeSvg { width: 160px; height: 160px; overflow: visible; }
-
-@keyframes lifeNodePulse {
-  0%, 100% { opacity: 0.5; r: 5; }
-  50% { opacity: 1; r: 7; }
-}
-
-.lifeNode1 { animation: lifeNodePulse 3s ease-in-out infinite; }
-.lifeNode2 { animation: lifeNodePulse 3s ease-in-out 0.75s infinite; }
-.lifeNode3 { animation: lifeNodePulse 3s ease-in-out 1.5s infinite; }
-.lifeNode4 { animation: lifeNodePulse 3s ease-in-out 2.25s infinite; }
-
-@media (prefers-reduced-motion: reduce) {
-  .lifeNode1, .lifeNode2, .lifeNode3, .lifeNode4 { animation: none; }
-}
+.lifeSvg { width: 100px; height: 80px; overflow: visible; }
 
 /* ── 메뉴 ── */
-.menuContent { padding: var(--dia-space-4); }
+.menuContent { padding: var(--dia-space-3) var(--dia-space-4); }
 
 .menuGrid {
   display: grid;

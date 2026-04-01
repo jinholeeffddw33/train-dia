@@ -45,7 +45,8 @@ interface HazardState {
   deleteReport: (reportId: string, name: string, sabun: string) => Promise<void>;
   updateComment: (reportId: string, commentId: string, comment: string, name: string, sabun: string) => Promise<void>;
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
-  recordRead: (reportId: string, sabun: string) => Promise<void>;
+  recordRead: (reportId: string, sabun: string, name: string) => Promise<void>;
+  fetchReaders: (reportId: string) => Promise<{ name: string; readAt: string }[]>;
   toggleLike: (reportId: string, name: string, sabun: string) => Promise<void>;
   incrementView: (reportId: string) => Promise<void>;
 }
@@ -220,12 +221,12 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     }));
   },
 
-  recordRead: async (reportId, sabun) => {
+  recordRead: async (reportId, sabun, name) => {
     try {
       const res = await fetch(`/api/safety/hazards/${reportId}/reads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sabun }),
+        body: JSON.stringify({ sabun, name }),
       });
       if (res.ok) {
         const { readCount } = await res.json() as { readCount: number };
@@ -237,6 +238,17 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       }
     } catch {
       // 무시
+    }
+  },
+
+  fetchReaders: async (reportId) => {
+    try {
+      const res = await fetch(`/api/safety/hazards/${reportId}/reads`);
+      if (!res.ok) return [];
+      const json = await res.json() as { data: { name: string; readAt: string }[] };
+      return json.data ?? [];
+    } catch {
+      return [];
     }
   },
 

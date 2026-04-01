@@ -1,4 +1,4 @@
-/* AuthGate — 최초 교번 인증 오버레이 */
+/* AuthGate — 인증 오버레이 (생체인증 + PIN) */
 
 .gate {
   position: fixed;
@@ -22,6 +22,16 @@
   margin-bottom: var(--dia-space-4);
 }
 
+.iconWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--dia-space-4);
+}
+
+.iconBlue {
+  color: var(--dia-blue);
+}
+
 .title {
   font-size: var(--dia-text-2xl);
   font-weight: var(--dia-weight-bold);
@@ -33,6 +43,7 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
   margin-bottom: var(--dia-space-8);
+  line-height: 1.5;
 }
 
 .inputGroup {
@@ -59,6 +70,7 @@
   font-weight: var(--dia-weight-semibold);
   text-align: center;
   letter-spacing: 4px;
+  min-height: 48px;
 }
 
 .input::placeholder {
@@ -85,33 +97,92 @@
   -moz-appearance: textfield;
 }
 
+/* PIN 입력 래퍼 (눈 아이콘 포함) */
+.pinWrap {
+  position: relative;
+}
+
+.pinWrap .input {
+  padding-right: 48px;
+}
+
+.pinToggle {
+  position: absolute;
+  right: var(--dia-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-2);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pinToggle:active {
+  color: var(--dia-text-secondary);
+}
+
 .error {
   margin-top: var(--dia-space-2);
+  margin-bottom: var(--dia-space-4);
   font-size: var(--dia-text-sm);
   color: var(--dia-red);
   text-align: center;
 }
 
-.confirm {
+/* ── 생체인증 버튼 ── */
+.biometricBtn {
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4) var(--dia-space-5);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 56px;
+  margin-bottom: var(--dia-space-4);
+  transition: opacity var(--dia-transition-fast);
+}
+
+.biometricBtn:active {
+  opacity: 0.8;
+}
+
+.biometricBtn:disabled {
+  opacity: 0.5;
+}
+
+/* ── 구분선 ── */
+.divider {
+  display: flex;
   align-items: center;
   gap: var(--dia-space-3);
-}
-
-.matchedName {
-  font-size: var(--dia-text-2xl);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-blue);
-}
-
-.matchedHint {
-  font-size: var(--dia-text-sm);
+  margin-bottom: var(--dia-space-5);
   color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-xs);
 }
 
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--dia-border);
+}
+
+/* ── 버튼 ── */
 .btn {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
   padding: var(--dia-space-4);
   background: var(--dia-blue);
   color: white;
@@ -126,6 +197,10 @@
   opacity: 0.8;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+}
+
 .btnSecondary {
   width: 100%;
   padding: var(--dia-space-3);
@@ -133,8 +208,26 @@
   color: var(--dia-text-tertiary);
   font-size: var(--dia-text-sm);
   min-height: 44px;
+  margin-top: var(--dia-space-2);
 }
 
 .btnSecondary:active {
   color: var(--dia-text-secondary);
+}
+
+/* ── 로딩 ── */
+.loadingWrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--dia-space-16) 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--dia-blue);
 }

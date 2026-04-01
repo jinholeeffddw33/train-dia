@@ -52,6 +52,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
+  const [showReaders, setShowReaders] = useState(false);
+  const [readers, setReaders] = useState<{ name: string; readAt: string }[]>([]);
+  const [loadingReaders, setLoadingReaders] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +69,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
   const recordRead = useHazardStore((s) => s.recordRead);
+  const fetchReaders = useHazardStore((s) => s.fetchReaders);
   const incrementView = useHazardStore((s) => s.incrementView);
 
   const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -91,9 +95,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
   useEffect(() => {
     fetchComments(reportId);
-    if (sabun) recordRead(reportId, sabun);
+    if (sabun && name) recordRead(reportId, sabun, name);
     incrementView(reportId);
-  }, [reportId, fetchComments, recordRead, incrementView, sabun]);
+  }, [reportId, fetchComments, recordRead, incrementView, sabun, name]);
 
   // 메뉴 외부 클릭 닫기
   useEffect(() => {
@@ -161,6 +165,15 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     } catch (e) {
       setError(e instanceof Error ? e.message : '수정에 실패했습니다');
     }
+  };
+
+  const handleShowReaders = async () => {
+    if (showReaders) { setShowReaders(false); return; }
+    setLoadingReaders(true);
+    setShowReaders(true);
+    const list = await fetchReaders(reportId);
+    setReaders(list);
+    setLoadingReaders(false);
   };
 
   const handleLike = async () => {
@@ -406,11 +419,34 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             />
             <span className={styles.likeCount}>{report.likeCount}</span>
           </button>
-          <span className={styles.viewCount}>
+          <button
+            type="button"
+            className={`${styles.readersBtn} ${showReaders ? styles.readersBtnActive : ''}`}
+            onClick={handleShowReaders}
+            aria-label="읽은 사람 보기"
+          >
             <Eye size={16} />
-            {report.readCount}
-          </span>
+            <span>{report.readCount}</span>
+          </button>
         </div>
+
+        {/* 읽은 사람 목록 */}
+        {showReaders && (
+          <div className={styles.readersList}>
+            {loadingReaders ? (
+              <div className={styles.readersLoading}>불러오는 중...</div>
+            ) : readers.length === 0 ? (
+              <div className={styles.readersEmpty}>아직 읽은 사람이 없어요</div>
+            ) : (
+              readers.map((r, i) => (
+                <div key={i} className={styles.readerItem}>
+                  <span className={styles.readerName}>{r.name}</span>
+                  <span className={styles.readerTime}>{formatDate(r.readAt)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         <div className={styles.divider} />
 

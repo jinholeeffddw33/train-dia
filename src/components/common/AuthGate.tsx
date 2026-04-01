@@ -1,119 +1,241 @@
 'use client';
 
-import { useState } from 'react';
-import { P } from '@/data/cycle';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
-import type { Person } from '@/lib/types';
+import { Fingerprint, KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import styles from './AuthGate.module.css';
 
-/** 기관사 외 인증 허용 인원 (UI에는 미표시, 인증만 가능) */
-const EXTRA_USERS: Person[] = [
-  { I: '0', d: '', n: '이현구', s: '21711694' },
-  { I: '0', d: '', n: '강병우', s: '21714898' },
-  { I: '0', d: '', n: '박성아', s: '21714940' },
-  { I: '0', d: '', n: '석영훈', s: '21715437' },
-  { I: '0', d: '', n: '김준홍', s: '21715494' },
-  { I: '0', d: '', n: '허금녀', s: '21715538' },
-  { I: '0', d: '', n: '김민정', s: '21715676' },
-  { I: '0', d: '', n: '최창욱', s: '21715684' },
-  { I: '0', d: '', n: '이민우', s: '21716991' },
-  { I: '0', d: '', n: '한태환', s: '21713547' },
-  { I: '0', d: '', n: '반헌준', s: '21713554' },
-  { I: '0', d: '', n: '신승헌', s: '21713568' },
-  { I: '0', d: '', n: '정광구', s: '21714013' },
-  { I: '0', d: '', n: '정용식', s: '21714357' },
-  { I: '0', d: '', n: '이수윤', s: '21714586' },
-  { I: '0', d: '', n: '김다솜', s: '22000103' },
-  { I: '0', d: '', n: '하도현', s: '22000834' },
-  { I: '0', d: '', n: '오현창', s: '22000850' },
-  { I: '0', d: '', n: '김현진', s: '22200209' },
-  { I: '0', d: '', n: '황선호', s: '21717719' },
-  { I: '0', d: '', n: '이지훈', s: '21900305' },
-  { I: '0', d: '', n: '장진수', s: '21707096' },
-  { I: '0', d: '', n: '김봉철', s: '21707406' },
-  { I: '0', d: '', n: '김창환', s: '21707420' },
-  { I: '0', d: '', n: '김성준A', s: '21703825' },
-  { I: '0', d: '', n: '안성숙', s: '21704630' },
-  { I: '0', d: '', n: '신형식', s: '21704784' },
-  { I: '0', d: '', n: '최승곤', s: '21706206' },
-  { I: '0', d: '', n: '이병홍', s: '21706208' },
-  { I: '0', d: '', n: '윤경일', s: '21706306' },
-  { I: '0', d: '', n: '현덕일', s: '21706327' },
-  { I: '0', d: '', n: '김대환', s: '21706363' },
-  { I: '0', d: '', n: '김재범', s: '21707084' },
-  { I: '0', d: '', n: '조재홍', s: '21709373' },
-  { I: '0', d: '', n: '이승훈', s: '21711443' },
-  { I: '0', d: '', n: '박종길', s: '21711719' },
-  { I: '0', d: '', n: '김건래', s: '21711811' },
-  { I: '0', d: '', n: '윤성애', s: '21712601' },
-  { I: '0', d: '', n: '조효진', s: '21709378' },
-  { I: '0', d: '', n: '신제윤', s: '21709575' },
-  { I: '0', d: '', n: '김진완', s: '21709589' },
-  { I: '0', d: '', n: '김윤수', s: '21709608' },
-  { I: '0', d: '', n: '정성한', s: '21709635' },
-  { I: '0', d: '', n: '조옥란', s: '21709649' },
-  { I: '0', d: '', n: '이동복', s: '21710720' },
-  { I: '0', d: '', n: '이선길', s: '21711197' },
-  { I: '0', d: '', n: '전동규', s: '21711304' },
-  { I: '0', d: '', n: '박용덕', s: '21711438' },
-];
-
-/** 사번으로 인증 가능한 전체 목록 */
-const ALL_USERS = [...P, ...EXTRA_USERS];
+type Screen = 'loading' | 'login' | 'biometric-setup' | 'pin-change';
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const current = useDriverStore((s) => s.current);
-  const myDriver = useDriverStore((s) => s.myDriver);
-  const setMyDriver = useDriverStore((s) => s.setMyDriver);
-  const [name, setName] = useState('');
+  const user = useAuthStore((s) => s.user);
+  const hasBiometric = useAuthStore((s) => s.hasBiometric);
+  const lastSabun = useAuthStore((s) => s.lastSabun);
+  const loading = useAuthStore((s) => s.loading);
+  const error = useAuthStore((s) => s.error);
+  const loginWithPin = useAuthStore((s) => s.loginWithPin);
+  const loginWithBiometric = useAuthStore((s) => s.loginWithBiometric);
+  const registerBiometric = useAuthStore((s) => s.registerBiometric);
+  const changePin = useAuthStore((s) => s.changePin);
+  const checkSession = useAuthStore((s) => s.checkSession);
+  const clearError = useAuthStore((s) => s.clearError);
+
+  const [screen, setScreen] = useState<Screen>('loading');
   const [sabun, setSabun] = useState('');
-  const [error, setError] = useState('');
-  const [matched, setMatched] = useState<Person | null>(null);
+  const [pin, setPin] = useState('');
+  const [showPin, setShowPin] = useState(false);
+  const [currentPin, setCurrentPin] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [newPinConfirm, setNewPinConfirm] = useState('');
+  const [pinChangeError, setPinChangeError] = useState('');
+  const [skipBiometric, setSkipBiometric] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
-  // 이미 인증됨 (myDriver 존재) → 앱 바로 렌더
-  if (myDriver) return <>{children}</>;
+  // 앱 시작 시 세션 확인
+  useEffect(() => {
+    checkSession().then(() => setSessionChecked(true));
+  }, [checkSession]);
 
-  const clearError = () => setError('');
-
-  const handleVerify = () => {
-    const trimName = name.trim();
-    const trimSabun = sabun.trim();
-
-    if (!trimName) {
-      setError('이름을 입력해주세요');
-      return;
+  // 로그인 성공 시 driver store 연동
+  useEffect(() => {
+    if (user && user.personId) {
+      const { myDriver, setMyDriverById } = useDriverStore.getState();
+      // myDriver가 없거나 다른 사람이면 인증된 사용자로 설정
+      if (!myDriver || myDriver.I !== user.personId) {
+        setMyDriverById(user.personId);
+      }
     }
-    if (!trimSabun) {
-      setError('사번을 입력해주세요');
-      return;
-    }
+  }, [user]);
 
-    // 이름 + 사번 둘 다 매칭
-    const found = ALL_USERS.find(
-      (p) => p.n === trimName && p.s === trimSabun,
+  // 세션 확인 후 화면 결정
+  useEffect(() => {
+    if (!sessionChecked) return;
+    if (user) {
+      if (user.mustChangePin) {
+        setScreen('pin-change');
+      } else if (!hasBiometric && !skipBiometric) {
+        setScreen('biometric-setup');
+      } else {
+        setScreen('login'); // 인증됨 → children 렌더
+      }
+    } else {
+      setScreen('login');
+      if (lastSabun) setSabun(lastSabun);
+    }
+  }, [sessionChecked, user, hasBiometric, lastSabun, skipBiometric]);
+
+  // 인증 완료 → children
+  if (user && screen !== 'biometric-setup' && screen !== 'pin-change') {
+    return <>{children}</>;
+  }
+
+  // 로딩
+  if (screen === 'loading' || !sessionChecked) {
+    return (
+      <div className={styles.gate}>
+        <div className={styles.card}>
+          <div className={styles.loadingWrap}>
+            <Loader2 size={32} className={styles.spinner} />
+          </div>
+        </div>
+      </div>
     );
+  }
 
-    if (!found) {
-      setError('이름 또는 사번이 일치하지 않습니다');
-      setMatched(null);
+  // PIN 변경 화면 (최초 로그인 시)
+  if (screen === 'pin-change') {
+    const handleChangePin = async () => {
+      setPinChangeError('');
+      if (newPin.length < 6) {
+        setPinChangeError('PIN은 6자리 이상이어야 합니다');
+        return;
+      }
+      if (newPin !== newPinConfirm) {
+        setPinChangeError('새 PIN이 일치하지 않습니다');
+        return;
+      }
+      const ok = await changePin(currentPin, newPin);
+      if (ok) {
+        setScreen('biometric-setup');
+      }
+    };
+
+    return (
+      <div className={styles.gate}>
+        <div className={styles.card}>
+          <div className={styles.iconWrap}>
+            <ShieldCheck size={40} className={styles.iconBlue} />
+          </div>
+          <h1 className={styles.title}>PIN 변경</h1>
+          <p className={styles.subtitle}>보안을 위해 PIN을 변경해주세요</p>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="current-pin" className={styles.label}>현재 PIN (사번 뒤 6자리)</label>
+            <input
+              id="current-pin"
+              type="password"
+              inputMode="numeric"
+              className={styles.input}
+              placeholder="● ● ● ● ● ●"
+              value={currentPin}
+              onChange={(e) => setCurrentPin(e.target.value)}
+              maxLength={10}
+              autoFocus
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="new-pin" className={styles.label}>새 PIN (6자리 이상)</label>
+            <input
+              id="new-pin"
+              type="password"
+              inputMode="numeric"
+              className={styles.input}
+              placeholder="● ● ● ● ● ●"
+              value={newPin}
+              onChange={(e) => setNewPin(e.target.value)}
+              maxLength={10}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label htmlFor="new-pin-confirm" className={styles.label}>새 PIN 확인</label>
+            <input
+              id="new-pin-confirm"
+              type="password"
+              inputMode="numeric"
+              className={styles.input}
+              placeholder="● ● ● ● ● ●"
+              value={newPinConfirm}
+              onChange={(e) => setNewPinConfirm(e.target.value)}
+              maxLength={10}
+            />
+          </div>
+
+          {(pinChangeError || error) && (
+            <p className={styles.error}>{pinChangeError || error}</p>
+          )}
+
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handleChangePin}
+            disabled={loading}
+          >
+            {loading ? '변경 중...' : 'PIN 변경'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 생체인증 등록 유도 화면
+  if (screen === 'biometric-setup' && user) {
+    const handleRegister = async () => {
+      const ok = await registerBiometric();
+      if (ok) {
+        // 등록 완료 → 앱 진입
+        setScreen('login');
+      }
+    };
+
+    return (
+      <div className={styles.gate}>
+        <div className={styles.card}>
+          <div className={styles.iconWrap}>
+            <Fingerprint size={48} className={styles.iconBlue} />
+          </div>
+          <h1 className={styles.title}>생체인증 등록</h1>
+          <p className={styles.subtitle}>
+            다음부터 지문 또는 얼굴인식으로<br />
+            빠르게 로그인할 수 있습니다
+          </p>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handleRegister}
+            disabled={loading}
+          >
+            {loading ? '등록 중...' : '생체인증 등록하기'}
+          </button>
+
+          <button
+            type="button"
+            className={styles.btnSecondary}
+            onClick={() => {
+              setSkipBiometric(true);
+              setScreen('login');
+            }}
+          >
+            나중에 할게요
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 로그인 화면 ──
+  const handleBiometricLogin = async () => {
+    const targetSabun = sabun || lastSabun;
+    if (!targetSabun) {
+      clearError();
       return;
     }
-
-    setError('');
-    setMatched(found);
+    await loginWithBiometric(targetSabun);
   };
 
-  const handleConfirm = () => {
-    if (!matched) return;
-    // 항상 myDriver로 설정 (최초 인증자 = 행위 주체)
-    setMyDriver(matched);
+  const handlePinLogin = async () => {
+    if (!sabun) return;
+    if (!pin) return;
+    await loginWithPin(sabun, pin);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      if (matched) handleConfirm();
-      else handleVerify();
-    }
+    if (e.key === 'Enter') handlePinLogin();
   };
 
   return (
@@ -123,60 +245,82 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         <h1 className={styles.title}>기관사 DIA</h1>
         <p className={styles.subtitle}>답십리 승무사업소 · 5호선</p>
 
-        {matched ? (
-          <div className={styles.confirm}>
-            <p className={styles.matchedName}>{matched.n}</p>
-            <p className={styles.matchedHint}>본인이 맞으면 시작하기를 눌러주세요</p>
-            <button type="button" className={styles.btn} onClick={handleConfirm}>
-              시작하기
-            </button>
+        {/* 사번 입력 */}
+        <div className={styles.inputGroup}>
+          <label htmlFor="auth-sabun" className={styles.label}>사번</label>
+          <input
+            id="auth-sabun"
+            type="number"
+            inputMode="numeric"
+            className={styles.input}
+            placeholder="21700000"
+            value={sabun}
+            onChange={(e) => { setSabun(e.target.value); clearError(); }}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            autoFocus={!lastSabun}
+          />
+        </div>
+
+        {/* 생체인증 버튼 (등록된 경우) */}
+        {hasBiometric && (sabun || lastSabun) && (
+          <button
+            type="button"
+            className={styles.biometricBtn}
+            onClick={handleBiometricLogin}
+            disabled={loading}
+          >
+            <Fingerprint size={24} />
+            <span>{loading ? '인증 중...' : '지문 / 얼굴인식으로 로그인'}</span>
+          </button>
+        )}
+
+        {/* 구분선 */}
+        {hasBiometric && (sabun || lastSabun) && (
+          <div className={styles.divider}>
+            <span>또는 PIN으로 로그인</span>
+          </div>
+        )}
+
+        {/* PIN 입력 */}
+        <div className={styles.inputGroup}>
+          <label htmlFor="auth-pin" className={styles.label}>PIN</label>
+          <div className={styles.pinWrap}>
+            <input
+              id="auth-pin"
+              type={showPin ? 'text' : 'password'}
+              inputMode="numeric"
+              className={styles.input}
+              placeholder="● ● ● ● ● ●"
+              value={pin}
+              onChange={(e) => { setPin(e.target.value); clearError(); }}
+              onKeyDown={handleKeyDown}
+              maxLength={10}
+              autoComplete="off"
+              autoFocus={!!lastSabun}
+            />
             <button
               type="button"
-              className={styles.btnSecondary}
-              onClick={() => { setMatched(null); setName(''); setSabun(''); }}
+              className={styles.pinToggle}
+              onClick={() => setShowPin(!showPin)}
+              aria-label={showPin ? 'PIN 숨기기' : 'PIN 보기'}
             >
-              다시 입력
+              {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-        ) : (
-          <>
-            <div className={styles.inputGroup}>
-              <label htmlFor="auth-name" className={styles.label}>이름</label>
-              <input
-                id="auth-name"
-                type="text"
-                className={styles.input}
-                placeholder="홍길동"
-                value={name}
-                onChange={(e) => { setName(e.target.value); clearError(); }}
-                onKeyDown={handleKeyDown}
-                autoFocus
-                autoComplete="name"
-              />
-            </div>
+        </div>
 
-            <div className={styles.inputGroup}>
-              <label htmlFor="auth-sabun" className={styles.label}>사번</label>
-              <input
-                id="auth-sabun"
-                type="number"
-                inputMode="numeric"
-                className={styles.input}
-                placeholder="21700000"
-                value={sabun}
-                onChange={(e) => { setSabun(e.target.value); clearError(); }}
-                onKeyDown={handleKeyDown}
-                autoComplete="off"
-              />
-            </div>
+        {error && <p className={styles.error}>{error}</p>}
 
-            {error && <p className={styles.error}>{error}</p>}
-
-            <button type="button" className={styles.btn} onClick={handleVerify}>
-              확인
-            </button>
-          </>
-        )}
+        <button
+          type="button"
+          className={styles.btn}
+          onClick={handlePinLogin}
+          disabled={loading || !sabun || !pin}
+        >
+          <KeyRound size={18} />
+          <span>{loading ? '로그인 중...' : 'PIN으로 로그인'}</span>
+        </button>
       </div>
     </div>
   );

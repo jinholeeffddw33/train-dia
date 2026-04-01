@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
@@ -11,7 +12,7 @@ import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
-import { DriverSelector } from '@/features/home';
+// DriverSelector 제거됨 — 기관사 변경은 인증으로 고정
 import HealingCardOverlay from './HealingCardOverlay';
 import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
@@ -21,9 +22,12 @@ export default function MoreTab() {
   const driver = useDriverStore((s) => s.current);
   const myDriver = useDriverStore((s) => s.myDriver);
   const isViewMode = useDriverStore((s) => s.isViewMode);
-  const setMyDriver = useDriverStore((s) => s.setMyDriver);
   const backToMe = useDriverStore((s) => s.backToMe);
-  const logout = useDriverStore((s) => s.logout);
+  const driverLogout = useDriverStore((s) => s.logout);
+  const authUser = useAuthStore((s) => s.user);
+  const authLogout = useAuthStore((s) => s.logout);
+  const hasBiometric = useAuthStore((s) => s.hasBiometric);
+  const registerBiometric = useAuthStore((s) => s.registerBiometric);
   const { theme, toggle: toggleTheme } = useThemeStore();
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
@@ -33,37 +37,24 @@ export default function MoreTab() {
   const [compareOpen, setCompareOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
   const [healingOpen, setHealingOpen] = useState(false);
-  const [driverOpen, setDriverOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [shuttleOpen, setShuttleOpen] = useState(false);
-  const [confirmChangeOpen, setConfirmChangeOpen] = useState(false);
 
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>설정</h2>
 
-      {/* 내 기관사 (행위 주체) */}
-      <button
-        type="button"
-        className={styles.driverCard}
-        onClick={() => {
-          if (myDriver) {
-            setConfirmChangeOpen(true);
-          } else {
-            setDriverOpen(true);
-          }
-        }}
-        aria-label="내 기관사 변경"
-      >
+      {/* 내 기관사 (인증된 사용자 — 변경 불가) */}
+      <div className={styles.driverCard}>
         <div className={styles.driverAvatar}>
-          {myDriver ? myDriver.n[0] : driver ? driver.n[0] : <UserRoundPen size={20} />}
+          {authUser ? authUser.name[0] : myDriver ? myDriver.n[0] : <UserRoundPen size={20} />}
         </div>
         <div className={styles.driverInfo}>
-          <span className={styles.driverNameText}>{myDriver ? myDriver.n : driver ? driver.n : '기관사 선택'}</span>
-          <span className={styles.driverNumText}>답십리 승무사업소 · 내 계정</span>
+          <span className={styles.driverNameText}>{authUser?.name ?? myDriver?.n ?? '기관사'}</span>
+          <span className={styles.driverNumText}>답십리 승무사업소 · 인증됨</span>
         </div>
-        <ChevronRight size={18} className={styles.toolArrow} />
-      </button>
+        <ShieldCheck size={18} className={styles.toolArrow} />
+      </div>
 
       {/* 조회 모드 안내 */}
       {isViewMode && (
@@ -291,59 +282,44 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.logoutBtn}
-          onClick={() => {
+          onClick={async () => {
             if (window.confirm('로그아웃 하시겠습니까?')) {
-              logout();
+              await authLogout();
+              driverLogout();
             }
           }}
         >
           <LogOut size={18} />
           <span>로그아웃</span>
-          {myDriver && <span className={styles.logoutUser}>{myDriver.n}</span>}
+          {authUser && <span className={styles.logoutUser}>{authUser.name}</span>}
         </button>
       </section>
 
-      {/* 내 기관사 변경 확인 팝업 */}
-      {confirmChangeOpen && (
-        <div className={styles.confirmOverlay} onClick={() => setConfirmChangeOpen(false)}>
-          <div className={styles.confirmDialog} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.confirmTitle}>내 기관사를 변경하시겠어요?</h3>
-            <p className={styles.confirmDesc}>
-              변경하면 게시글 작성, 교대 요청 등이<br />
-              새 기관사 이름으로 동작합니다.
-            </p>
-            <div className={styles.confirmActions}>
-              <button
-                type="button"
-                className={styles.confirmCancel}
-                onClick={() => setConfirmChangeOpen(false)}
-              >
-                취소
-              </button>
-              <button
-                type="button"
-                className={styles.confirmOk}
-                onClick={() => {
-                  setConfirmChangeOpen(false);
-                  setDriverOpen(true);
-                }}
-              >
-                변경하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* 보안 섹션 */}
+      <section className={styles.section}>
+        <h3 className={styles.sectionTitle}>보안</h3>
 
-      {/* 기관사 선택 모달 (설정에서 열면 myDriver로 설정) */}
-      <DriverSelector
-        open={driverOpen}
-        onClose={() => setDriverOpen(false)}
-        onSelectOverride={(person) => {
-          setMyDriver(person);
-          setDriverOpen(false);
-        }}
-      />
+        {/* 생체인증 등록/상태 */}
+        <div className={styles.settingRow}>
+          <div className={styles.settingInfo}>
+            <span className={styles.settingIcon}><Fingerprint size={16} /></span>
+            <span className={styles.settingLabel}>생체인증</span>
+          </div>
+          {hasBiometric ? (
+            <span className={styles.settingValue}>등록됨 ✓</span>
+          ) : (
+            <button
+              type="button"
+              className={styles.notifBtn}
+              onClick={() => registerBiometric()}
+            >
+              등록하기
+            </button>
+          )}
+        </div>
+      </section>
+
+      {/* 기관사 변경 팝업 제거됨 — 인증된 사용자로 고정 */}
 
       {/* 모달 오버레이 */}
       <CommuteOverlay

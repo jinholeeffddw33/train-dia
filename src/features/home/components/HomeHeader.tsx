@@ -7,6 +7,17 @@ import { ChevronDown } from 'lucide-react';
 import HeaderClock from './HeaderClock';
 import styles from '../styles/Home.module.css';
 
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 6) return '늦은 밤이에요 🌙';
+  if (h < 9) return '좋은 아침이에요 ☀️';
+  if (h < 12) return '오전도 힘내세요 💪';
+  if (h < 14) return '점심 맛있게 드세요 🍚';
+  if (h < 18) return '오후도 화이팅 🚇';
+  if (h < 21) return '오늘도 수고했어요 🌆';
+  return '야간 안전운행 하세요 🌙';
+}
+
 interface HomeHeaderProps {
   onDriverClick?: () => void;
 }
@@ -23,6 +34,7 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
     <header className={styles.headerSection}>
       <div className={styles.headerTop}>
         <div className={styles.headerLeft}>
+          {driver && <span className={styles.headerGreeting}>{getGreeting()}</span>}
           <button
             type="button"
             className={styles.headerNameBtn}

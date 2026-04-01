@@ -148,7 +148,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
         segInfo.status === 'after' ? (
           <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
             <div className={styles.dirBannerDir}>근무 완료</div>
-            <div className={styles.dirBannerSub}>오늘도 수고하셨습니다</div>
+            <div className={styles.dirBannerSub}>안전하게 마무리했어요</div>
           </div>
         ) : currentDirection && (
           <div className={`${styles.dirBanner} ${styles[`dirBanner_${currentDirection.dir}`]}`}>
@@ -168,7 +168,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
       {isToday && banner && banner.state === 'done' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
           <div className={styles.dirBannerDir}>근무 완료</div>
-          <div className={styles.dirBannerSub}>오늘 하루도 수고 많으셨어요</div>
+          <div className={styles.dirBannerSub}>편안한 퇴근길 되세요</div>
           {banner.next && banner.next.schedule && (
             <div className={styles.dirBannerNext}>
               다음근무 {banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} {banner.next.schedule.s} {nextDirection ? dirShort(nextDirection.dir) : ''}
@@ -191,7 +191,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
             <div className={styles.dirBannerSub}>푹 쉬고 내일 힘내요</div>
           )}
           {banner.next?.daysAhead === 0 && diaType !== 'rest' && (
-            <div className={styles.dirBannerSub}>오늘도 안전 운행 하세요</div>
+            <div className={styles.dirBannerSub}>좋은 하루 시작하세요</div>
           )}
           {banner.next && banner.next.schedule && (
             <div className={styles.dirBannerNext}>

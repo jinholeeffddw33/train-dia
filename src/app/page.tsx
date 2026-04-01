@@ -14,6 +14,7 @@ import { MoreTab } from '@/features/more';
 import { Line5Tab } from '@/features/line5';
 import { EduTab } from '@/features/edu';
 import SafetyWorld from '@/features/safety/SafetyWorld';
+import { LifeWorld } from '@/features/life';
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -81,7 +82,7 @@ export default function HomePage() {
       ) : world === 'safety' ? (
         <SafetyWorld onBack={handleBack} />
       ) : world === 'life' ? (
-        <ComingSoon worldId={world} onBack={handleBack} />
+        <LifeWorld onBack={handleBack} />
       ) : (
         <ComingSoon worldId={world} onBack={handleBack} />
       )}

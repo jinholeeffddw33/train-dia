@@ -42,7 +42,7 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
           </button>
           {isViewMode && (
             <button type="button" className={styles.viewModeBadge} onClick={backToMe}>
-              조회 중 · 내 보기로 돌아가기
+              내 계정 보기
             </button>
           )}
           <span className={styles.headerDate}>{dateStr}</span>

@@ -64,12 +64,15 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-1);
-  margin-top: auto;
 }
 
-.cardAuthor,
-.cardTime,
-.cardComments {
+.cardAuthor {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.cardTime {
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
@@ -78,6 +81,30 @@
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   opacity: 0.5;
+}
+
+.cardStats {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  margin-top: auto;
+}
+
+.cardStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  padding: 2px 8px;
+  border-radius: var(--dia-radius-full);
+  font-weight: var(--dia-weight-medium);
+  line-height: 1;
+}
+
+.cardStatLiked {
+  color: var(--dia-red);
 }
 
 /* ── Empty / Loading ── */
@@ -525,11 +552,7 @@
 
 .submitBtn:active:not(:disabled) { opacity: 0.8; }
 
-/* ── Card Likes ── */
-.cardLikes {
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
-}
+/* ── Card Likes (legacy, replaced by .cardStat) ── */
 
 .importantTextArea {
   width: 100%;
@@ -1029,7 +1052,19 @@
 
 /* ── Like Section ── */
 .likeSection {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-4);
   padding: var(--dia-space-2) var(--dia-space-4);
+}
+
+.viewCount {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-medium);
 }
 
 .likeBtn {

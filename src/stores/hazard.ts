@@ -10,6 +10,7 @@ export interface HazardReport {
   createdBy: string;
   createdAt: string;
   category?: SafetyCategory;
+  viewCount: number;
   commentCount: number;
   likeCount: number;
   likedByMe: boolean;
@@ -46,6 +47,7 @@ interface HazardState {
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
   recordRead: (reportId: string, sabun: string) => Promise<void>;
   toggleLike: (reportId: string, name: string, sabun: string) => Promise<void>;
+  incrementView: (reportId: string) => Promise<void>;
 }
 
 export const useHazardStore = create<HazardState>()((set, get) => ({
@@ -235,6 +237,21 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       }
     } catch {
       // 무시
+    }
+  },
+
+  incrementView: async (reportId) => {
+    try {
+      const res = await fetch(`/api/safety/hazards/${reportId}/views`, { method: 'POST' });
+      if (!res.ok) return;
+      const result = (await res.json()) as { viewCount: number };
+      set((state) => ({
+        reports: state.reports.map((r) =>
+          r.id === reportId ? { ...r, viewCount: result.viewCount } : r,
+        ),
+      }));
+    } catch {
+      // 조회수 증가 실패는 무시 (핵심 기능 아님)
     }
   },
 

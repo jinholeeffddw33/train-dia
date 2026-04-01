@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
+import { ArrowLeft, Heart, Eye, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { isAdmin } from '@/lib/auth';
@@ -66,6 +66,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
   const recordRead = useHazardStore((s) => s.recordRead);
+  const incrementView = useHazardStore((s) => s.incrementView);
 
   const name = useDriverStore((s) => (s.myDriver)?.n ?? '');
   const sabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
@@ -91,7 +92,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   useEffect(() => {
     fetchComments(reportId);
     if (sabun) recordRead(reportId, sabun);
-  }, [reportId, fetchComments, recordRead, sabun]);
+    incrementView(reportId);
+  }, [reportId, fetchComments, recordRead, incrementView, sabun]);
 
   // 메뉴 외부 클릭 닫기
   useEffect(() => {
@@ -353,7 +355,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                       </span>
                     )}
                     <span className={styles.detailAuthor}>{report.createdBy}</span>
-                    <span className={styles.detailReadCount}>👁 {report.readCount}</span>
+                    <span className={styles.detailReadCount}><Eye size={14} /> {report.readCount}</span>
                   </div>
                 );
               })()}
@@ -389,7 +391,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           )}
         </div>
 
-        {/* 좋아요 */}
+        {/* 좋아요 + 조회수 */}
         <div className={styles.likeSection}>
           <button
             type="button"
@@ -404,6 +406,10 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             />
             <span className={styles.likeCount}>{report.likeCount}</span>
           </button>
+          <span className={styles.viewCount}>
+            <Eye size={16} />
+            {report.readCount}
+          </span>
         </div>
 
         <div className={styles.divider} />

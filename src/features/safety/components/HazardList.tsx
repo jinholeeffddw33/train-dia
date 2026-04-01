@@ -1,6 +1,6 @@
 'use client';
 
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Heart, MessageCircle, Eye, ThumbsUp } from 'lucide-react';
 import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
@@ -126,10 +126,15 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                     <ThumbsUp size={14} /> <span>{r.likeCount}</span>
                   </button>
                 </div>
-                <div className={styles.cardMeta}>
-                  <span className={styles.cardComments}>💬 {r.commentCount}</span>
-                  <span className={styles.cardDot}>·</span>
-                  <span className={styles.cardReads}>👁 {r.readCount}</span>
+                <div className={styles.cardStats}>
+                  <span className={styles.cardStat}>
+                    <MessageCircle size={13} />
+                    {r.commentCount}
+                  </span>
+                  <span className={styles.cardStat}>
+                    <Eye size={13} />
+                    {r.readCount}
+                  </span>
                 </div>
               </div>
             </button>
@@ -165,16 +170,20 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
               <span className={styles.cardAuthor}>{r.createdBy}</span>
               <span className={styles.cardDot}>·</span>
               <span className={styles.cardTime}>{timeAgo(r.createdAt)}</span>
-              <span className={styles.cardDot}>·</span>
-              <span className={styles.cardComments}>💬 {r.commentCount}</span>
-              {r.likeCount > 0 && (
-                <>
-                  <span className={styles.cardDot}>·</span>
-                  <span className={styles.cardLikes}>❤️ {r.likeCount}</span>
-                </>
-              )}
-              <span className={styles.cardDot}>·</span>
-              <span className={styles.cardReads}>👁 {r.readCount}</span>
+            </div>
+            <div className={styles.cardStats}>
+              <span className={`${styles.cardStat} ${r.likedByMe ? styles.cardStatLiked : ''}`}>
+                <Heart size={13} fill={r.likedByMe ? 'currentColor' : 'none'} />
+                {r.likeCount}
+              </span>
+              <span className={styles.cardStat}>
+                <MessageCircle size={13} />
+                {r.commentCount}
+              </span>
+              <span className={styles.cardStat}>
+                <Eye size={13} />
+                {r.readCount}
+              </span>
             </div>
           </div>
         </button>

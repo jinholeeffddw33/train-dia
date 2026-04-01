@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -46,9 +46,32 @@ export default function MoreTab() {
   const [pinError, setPinError] = useState('');
   const [pinLoading, setPinLoading] = useState(false);
 
+  // 오늘 통계
+  const [stats, setStats] = useState({ todayVisitors: 0, todayPosts: 0 });
+  useEffect(() => {
+    fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => {});
+    // 접속 기록
+    const s = authUser?.sabun || myDriver?.s || '';
+    const n = authUser?.name || myDriver?.n || '';
+    if (s) fetch('/api/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sabun: s, name: n }) }).catch(() => {});
+  }, []);
+
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>설정</h2>
+
+      {/* 오늘의 현황 */}
+      <div className={styles.statsBar}>
+        <div className={styles.statItem}>
+          <span className={styles.statNum}>{stats.todayVisitors}</span>
+          <span className={styles.statLabel}>오늘 접속</span>
+        </div>
+        <div className={styles.statDivider} />
+        <div className={styles.statItem}>
+          <span className={styles.statNum}>{stats.todayPosts}</span>
+          <span className={styles.statLabel}>새 소식</span>
+        </div>
+      </div>
 
       {/* 내 기관사 (인증된 사용자 — 변경 불가) */}
       <div className={styles.driverCard}>

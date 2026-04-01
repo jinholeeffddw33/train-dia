@@ -4,7 +4,7 @@
 .headerSection {
   background: var(--dia-hero-gradient);
   color: #fff;
-  padding: calc(20px + env(safe-area-inset-top, 0px)) 20px 16px;
+  padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
   position: relative;
   overflow: hidden;
   -webkit-user-select: none;
@@ -75,7 +75,7 @@
 }
 
 .headerName {
-  font-size: var(--dia-text-2xl);
+  font-size: clamp(18px, 5vw, 24px);
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
@@ -108,17 +108,17 @@
 }
 
 .headerDate {
-  font-size: var(--dia-text-base);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
-  margin-top: 4px;
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
   letter-spacing: 0.3px;
 }
 
 .headerRight {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   flex-shrink: 1;
   min-width: 0;
 }
@@ -131,9 +131,16 @@
 .headerOrg {
   font-size: var(--dia-text-xs);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.35);
   letter-spacing: 1px;
-  margin-top: 6px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.headerGreeting {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
 }
 
 .clockAmPm {
@@ -146,7 +153,7 @@
 }
 
 .clockBig {
-  font-size: clamp(36px, 10vw, 56px);
+  font-size: clamp(32px, 8vw, 48px);
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;

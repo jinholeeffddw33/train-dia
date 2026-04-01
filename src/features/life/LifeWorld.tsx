@@ -232,6 +232,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
                   <div className={styles.postMeta}>
                     <span>❤️ {post.likeCount}</span>
                     <span>💬 {post.commentCount}</span>
+                    <span>👁 {post.readCount ?? 0}</span>
                   </div>
                 </div>
               </button>
@@ -260,6 +261,20 @@ function DetailView({ postId, name, sabun, onBack }: {
   useEffect(() => {
     fetchComments(postId).catch(() => {});
   }, [fetchComments, postId]);
+
+  // 조회 기록 — 1회만
+  useEffect(() => {
+    if (sabun && postId) {
+      try {
+        const key = `life-read-${postId}`;
+        const readers: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!readers.includes(sabun)) {
+          readers.push(sabun);
+          localStorage.setItem(key, JSON.stringify(readers));
+        }
+      } catch { /* ignore */ }
+    }
+  }, [postId, sabun]);
 
   if (!post) return (
     <div className={styles.wrap}>
@@ -313,9 +328,12 @@ function DetailView({ postId, name, sabun, onBack }: {
               🔗 {post.linkUrl}
             </a>
           )}
-          <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun).catch(() => {})}>
-            ❤️ {post.likeCount}
-          </button>
+          <div className={styles.detailActions}>
+            <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun).catch(() => {})}>
+              ❤️ {post.likeCount}
+            </button>
+            <span className={styles.detailReadCount}>👁 {post.readCount ?? 0}명이 봤어요</span>
+          </div>
         </div>
 
         {/* 댓글 */}

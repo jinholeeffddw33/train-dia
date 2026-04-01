@@ -7,7 +7,7 @@ import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice } from '@/features/home';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
@@ -36,18 +36,20 @@ function TabContent({ tab }: { tab: TabId }) {
 
 function HomeTab() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [driverOpen, setDriverOpen] = useState(false);
 
   return (
     <>
-      <HomeHeader />
+      <HomeHeader onDriverClick={() => setDriverOpen(true)} />
       <HomeNotice />
       <WeekStrip
         selectedDate={selectedDate}
         onSelectDate={(date) => setSelectedDate(date || undefined)}
       />
-      <TodayCard selectedDate={selectedDate} />
+      <TodayCard selectedDate={selectedDate} onEmptyClick={() => setDriverOpen(true)} />
       <StatusCards baseDate={selectedDate} />
       <HomeTipsQuiz />
+      <DriverSelector open={driverOpen} onClose={() => setDriverOpen(false)} />
     </>
   );
 }

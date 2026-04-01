@@ -19,9 +19,10 @@ import styles from '../styles/Home.module.css';
 
 interface TodayCardProps {
   selectedDate?: Date;
+  onEmptyClick?: () => void;
 }
 
-export default function TodayCard({ selectedDate }: TodayCardProps) {
+export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps) {
   const driver = useDriverStore((s) => s.current);
   const getSwappedDia = useGetSwappedDia();
   const clock = useClock();
@@ -79,7 +80,7 @@ export default function TodayCard({ selectedDate }: TodayCardProps) {
 
   if (!driver || !dia) {
     return (
-      <section className={styles.emptyCard}>
+      <section className={styles.emptyCard} onClick={onEmptyClick} role={onEmptyClick ? 'button' : undefined} tabIndex={onEmptyClick ? 0 : undefined}>
         <TrainFront size={48} className={styles.emptyIcon} />
         <p className={styles.emptyText}>기관사를 선택하면{'\n'}오늘의 교번을 볼 수 있어요</p>
       </section>

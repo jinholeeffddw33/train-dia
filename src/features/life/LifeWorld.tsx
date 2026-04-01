@@ -7,11 +7,11 @@ import { useAuthStore } from '@/stores/auth';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
 import styles from './styles/Life.module.css';
 
-const CATEGORIES: { id: LifeCategory; label: string; icon: typeof Heart; color: string; desc: string }[] = [
-  { id: 'healing', label: '힐링', icon: Heart, color: 'rose', desc: '마음과 몸의 쉼표' },
-  { id: 'hobby', label: '취미', icon: Target, color: 'green', desc: '오늘 뭐 하지?' },
-  { id: 'growth', label: '성장', icon: BookOpen, color: 'blue', desc: '내일의 나를 위한 투자' },
-  { id: 'lounge', label: '라운지', icon: MessageCircle, color: 'purple', desc: '우리끼리 편하게' },
+const CATEGORIES: { id: LifeCategory; label: string; icon: typeof Heart; color: string; desc: string; longDesc: string }[] = [
+  { id: 'healing', label: '힐링', icon: Heart, color: 'rose', desc: '마음과 몸의 쉼표', longDesc: '산책, 명상, 좋은 음악 — 하루의 긴장을 풀어주는 공간' },
+  { id: 'hobby', label: '취미', icon: Target, color: 'green', desc: '오늘 뭐 하지?', longDesc: '라이딩, 사진, 운동, 여행 — 취미를 공유하고 동호회를 만들어보세요' },
+  { id: 'growth', label: '성장', icon: BookOpen, color: 'blue', desc: '내일의 나를 위한 투자', longDesc: '자격증, 공부법, 업무 노하우 — 함께 성장하는 기관사 커뮤니티' },
+  { id: 'lounge', label: '라운지', icon: MessageCircle, color: 'purple', desc: '우리끼리 편하게', longDesc: '잡담, 맛집, 웃긴 이야기 — 편하게 소통하는 우리만의 공간' },
 ];
 
 const ICON_BG: Record<string, string> = {
@@ -161,6 +161,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
   const posts = useLifeStore((s) => s.posts);
   const loading = useLifeStore((s) => s.loading);
   const fetchPosts = useLifeStore((s) => s.fetchPosts);
+  const cat = CATEGORIES.find((c) => c.id === category);
 
   useEffect(() => { fetchPosts(category); }, [fetchPosts, category]);
 
@@ -175,6 +176,12 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
           + 글쓰기
         </button>
       </header>
+      {/* 카테고리 설명 */}
+      {cat && (
+        <div className={styles.catDesc}>
+          <span>{cat.longDesc}</span>
+        </div>
+      )}
       <main className={styles.content}>
         {loading ? (
           <div className={styles.emptyWrap}>
@@ -192,18 +199,24 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
               <button
                 key={post.id}
                 type="button"
-                className={styles.postCard}
+                className={`${styles.postCard} ${post.isSample ? styles.postCardSample : ''}`}
                 onClick={() => onSelect(post.id)}
               >
-                <div className={styles.postTop}>
-                  <span className={styles.postAuthor}>{post.createdBy}</span>
-                  <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
-                </div>
-                <div className={styles.postTitle}>{post.title}</div>
-                <div className={styles.postBody}>{post.content.substring(0, 80)}{post.content.length > 80 ? '...' : ''}</div>
-                <div className={styles.postMeta}>
-                  <span>❤️ {post.likeCount}</span>
-                  <span>💬 {post.commentCount}</span>
+                {post.imageUrl && (
+                  <img src={post.imageUrl} alt="" className={styles.postImage} loading="lazy" />
+                )}
+                <div className={styles.postContent}>
+                  <div className={styles.postTop}>
+                    <span className={styles.postAuthor}>{post.createdBy}</span>
+                    {post.isSample && <span className={styles.sampleBadge}>샘플</span>}
+                    <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
+                  </div>
+                  <div className={styles.postTitle}>{post.title}</div>
+                  <div className={styles.postBody}>{post.content.substring(0, 80)}{post.content.length > 80 ? '...' : ''}</div>
+                  <div className={styles.postMeta}>
+                    <span>❤️ {post.likeCount}</span>
+                    <span>💬 {post.commentCount}</span>
+                  </div>
                 </div>
               </button>
             ))}
@@ -272,6 +285,9 @@ function DetailView({ postId, name, sabun, onBack }: {
             <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
           </div>
           <h2 className={styles.detailTitle}>{post.title}</h2>
+          {post.imageUrl && (
+            <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
+          )}
           <div className={styles.detailContent}>{post.content}</div>
           <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun)}>
             ❤️ {post.likeCount}

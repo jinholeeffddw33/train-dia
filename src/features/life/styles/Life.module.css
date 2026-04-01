@@ -209,11 +209,22 @@
   gap: var(--dia-space-3);
 }
 
+/* 카테고리 설명 */
+.catDesc {
+  padding: var(--dia-space-3) var(--dia-space-4);
+  font-size: 13px;
+  color: var(--dia-text-tertiary);
+  line-height: 1.5;
+  text-align: center;
+  background: var(--dia-bg);
+  border-bottom: 1px solid var(--dia-border);
+}
+
 .postCard {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl);
-  padding: var(--dia-space-4);
+  overflow: hidden;
   text-align: left; width: 100%;
   cursor: pointer;
   transition: background var(--dia-transition-fast);
@@ -221,8 +232,24 @@
 
 .postCard:active { background: var(--dia-surface-hover); }
 
+.postCardSample {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.postImage {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.postContent {
+  padding: var(--dia-space-3) var(--dia-space-4) var(--dia-space-4);
+}
+
 .postTop {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; align-items: center;
+  gap: var(--dia-space-2);
   margin-bottom: var(--dia-space-2);
 }
 
@@ -231,9 +258,19 @@
   color: var(--dia-text-primary);
 }
 
+.sampleBadge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-amber);
+  color: #fff;
+}
+
 .postDate {
   font-size: 13px;
   color: var(--dia-text-tertiary);
+  margin-left: auto;
 }
 
 .postTitle {
@@ -273,8 +310,14 @@
 .detailTitle {
   font-size: 20px; font-weight: 700;
   color: var(--dia-text-primary);
-  margin-bottom: var(--dia-space-4);
+  margin-bottom: var(--dia-space-3);
   line-height: var(--dia-leading-normal);
+}
+
+.detailImage {
+  width: 100%;
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-4);
 }
 
 .detailContent {

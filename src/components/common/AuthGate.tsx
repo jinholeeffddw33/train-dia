@@ -245,6 +245,22 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         <h1 className={styles.title}>기관사 DIA</h1>
         <p className={styles.subtitle}>답십리 승무사업소 · 5호선</p>
 
+        {/* 최초 안내 (생체인증 미등록 = 처음 오는 사용자) */}
+        {!hasBiometric && (
+          <div className={styles.notice}>
+            <p className={styles.noticeTitle}>보안 업데이트 안내</p>
+            <p className={styles.noticeText}>
+              보안 강화를 위해 로그인이 필요합니다.
+            </p>
+            <p className={styles.noticePin}>
+              초기 PIN = <strong>사번 뒤 6자리</strong>
+            </p>
+            <p className={styles.noticeExample}>
+              예: 사번 21714375 → PIN <strong>714375</strong>
+            </p>
+          </div>
+        )}
+
         {/* 사번 입력 */}
         <div className={styles.inputGroup}>
           <label htmlFor="auth-sabun" className={styles.label}>사번</label>

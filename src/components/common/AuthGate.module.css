@@ -59,6 +59,41 @@
   margin-bottom: var(--dia-space-2);
 }
 
+/* ── 업데이트 안내 박스 ── */
+.notice {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-blue-dim, rgba(59, 130, 246, 0.2));
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4);
+  margin-bottom: var(--dia-space-6);
+  text-align: left;
+}
+
+.noticeTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-blue);
+  margin-bottom: var(--dia-space-2);
+}
+
+.noticeText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-2);
+  line-height: 1.4;
+}
+
+.noticePin {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+  margin-bottom: var(--dia-space-1);
+}
+
+.noticeExample {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}
+
 .input {
   width: 100%;
   padding: var(--dia-space-4);

@@ -136,22 +136,38 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             ) : (
               <div className={`${styles.iconWrap} ${w.iconClass}`}>
                 <svg viewBox="0 0 64 64" width={48} height={48} fill="none">
-                  {/* 잎사귀 — 힐링/자연 */}
-                  <path d="M32 12C22 12 14 22 14 32c0 12 8 20 18 20" stroke="#ec4899" strokeWidth="2.5" fill="rgba(236,72,153,0.1)" strokeLinecap="round" />
-                  <path d="M32 12C42 12 50 22 50 32c0 12-8 20-18 20" stroke="#a855f7" strokeWidth="2.5" fill="rgba(168,85,247,0.08)" strokeLinecap="round" />
+                  {/* 땅/흙 */}
+                  <ellipse cx="32" cy="52" rx="16" ry="4" fill="url(#soilGrad)" opacity="0.3" />
                   {/* 줄기 */}
-                  <path d="M32 32V52" stroke="url(#leafStem)" strokeWidth="2" strokeLinecap="round" />
-                  {/* 하트 */}
-                  <path d="M28 26c-2-3-6-3-7 0s1 7 11 12c10-5 12-9 11-12s-5-3-7 0-4 4-4 4-2-1-4-4z" fill="url(#heartGrad)" opacity="0.85" />
+                  <path d="M32 28V52" stroke="url(#stemGrad)" strokeWidth="2.5" strokeLinecap="round" />
+                  {/* 왼쪽 새싹 잎 */}
+                  <path d="M32 30C28 24 18 20 14 24c-3 3 0 10 8 12 4 1 8 0 10-2" fill="url(#leafL)" stroke="#22c55e" strokeWidth="1.2" />
+                  {/* 오른쪽 새싹 잎 */}
+                  <path d="M32 26C36 20 46 16 50 20c3 3 0 10-8 12-4 1-8 0-10-2" fill="url(#leafR)" stroke="#16a34a" strokeWidth="1.2" />
+                  {/* 잎맥 */}
+                  <path d="M32 30C28 27 22 25 18 26" stroke="#16a34a" strokeWidth="0.6" opacity="0.4" strokeLinecap="round" />
+                  <path d="M32 26C36 23 42 21 46 22" stroke="#15803d" strokeWidth="0.6" opacity="0.4" strokeLinecap="round" />
+                  {/* 반짝임 */}
+                  <circle cx="22" cy="22" r="1.5" fill="#fbbf24" opacity="0.7" />
+                  <circle cx="44" cy="18" r="1" fill="#fbbf24" opacity="0.5" />
+                  <circle cx="38" cy="14" r="1.2" fill="#fde68a" opacity="0.6" />
                   <defs>
-                    <linearGradient id="leafStem" x1="32" y1="32" x2="32" y2="52">
-                      <stop stopColor="#a855f7" />
-                      <stop offset="1" stopColor="#ec4899" stopOpacity="0.4" />
+                    <linearGradient id="stemGrad" x1="32" y1="28" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#22c55e" />
+                      <stop offset="1" stopColor="#86efac" stopOpacity="0.5" />
                     </linearGradient>
-                    <linearGradient id="heartGrad" x1="24" y1="24" x2="40" y2="40">
-                      <stop stopColor="#ec4899" />
-                      <stop offset="1" stopColor="#f472b6" />
+                    <linearGradient id="leafL" x1="14" y1="20" x2="32" y2="36" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#4ade80" />
+                      <stop offset="1" stopColor="#22c55e" />
                     </linearGradient>
+                    <linearGradient id="leafR" x1="50" y1="16" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#86efac" />
+                      <stop offset="1" stopColor="#16a34a" />
+                    </linearGradient>
+                    <radialGradient id="soilGrad" cx="0.5" cy="0.5" r="0.5">
+                      <stop stopColor="#92400e" />
+                      <stop offset="1" stopColor="#92400e" stopOpacity="0" />
+                    </radialGradient>
                   </defs>
                 </svg>
               </div>

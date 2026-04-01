@@ -1,11 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component, type ReactNode } from 'react';
 import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
 import styles from './styles/Life.module.css';
+
+class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => void }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode; onBack: () => void }) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className={styles.wrap}>
+          <div className={styles.emptyWrap}>
+            <span className={styles.emptyIcon}>⚠️</span>
+            <span className={styles.emptyText}>화면을 불러올 수 없어요</span>
+            <button type="button" className={styles.addBtn} onClick={this.props.onBack}>돌아가기</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const CATEGORIES: { id: LifeCategory; label: string; icon: typeof Heart; color: string; desc: string; longDesc: string }[] = [
   { id: 'healing', label: '힐링', icon: Heart, color: 'rose', desc: '마음과 몸의 쉼표', longDesc: '산책, 명상, 좋은 음악 — 하루의 긴장을 풀어주는 공간' },
@@ -125,12 +144,14 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   // ── 상세 화면 ──
   if (typeof view === 'object' && view.type === 'detail') {
     return (
-      <DetailView
-        postId={view.postId}
-        name={name}
-        sabun={sabun}
-        onBack={() => setView({ type: 'list', category: view.category })}
-      />
+      <LifeErrorBoundary onBack={() => setView({ type: 'list', category: view.category })}>
+        <DetailView
+          postId={view.postId}
+          name={name}
+          sabun={sabun}
+          onBack={() => setView({ type: 'list', category: view.category })}
+        />
+      </LifeErrorBoundary>
     );
   }
 

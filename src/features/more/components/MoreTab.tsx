@@ -39,6 +39,12 @@ export default function MoreTab() {
   const [healingOpen, setHealingOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [shuttleOpen, setShuttleOpen] = useState(false);
+  const [pinChangeOpen, setPinChangeOpen] = useState(false);
+  const [curPin, setCurPin] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [newPinConfirm, setNewPinConfirm] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [pinLoading, setPinLoading] = useState(false);
 
   return (
     <div className={styles.container}>
@@ -317,7 +323,107 @@ export default function MoreTab() {
             </button>
           )}
         </div>
+
+        {/* PIN 변경 */}
+        <div className={styles.settingRow}>
+          <div className={styles.settingInfo}>
+            <span className={styles.settingIcon}><KeyRound size={16} /></span>
+            <span className={styles.settingLabel}>PIN 변경</span>
+          </div>
+          <button
+            type="button"
+            className={styles.notifBtn}
+            onClick={() => {
+              setCurPin(''); setNewPin(''); setNewPinConfirm(''); setPinError('');
+              setPinChangeOpen(true);
+            }}
+          >
+            변경하기
+          </button>
+        </div>
       </section>
+
+      {/* PIN 변경 모달 */}
+      {pinChangeOpen && (
+        <div className={styles.fullOverlay}>
+          <div className={styles.overlayHeader}>
+            <button
+              type="button"
+              className={styles.overlayClose}
+              onClick={() => setPinChangeOpen(false)}
+              aria-label="닫기"
+            >
+              <X size={22} />
+            </button>
+            <h2 className={styles.overlayTitle}>PIN 변경</h2>
+          </div>
+          <div className={styles.overlayBody}>
+            <div className={styles.pinChangeForm}>
+              <div className={styles.pinField}>
+                <label className={styles.pinLabel}>현재 PIN</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  className={styles.pinInput}
+                  placeholder="현재 PIN"
+                  value={curPin}
+                  onChange={(e) => { setCurPin(e.target.value); setPinError(''); }}
+                  maxLength={10}
+                  autoFocus
+                />
+              </div>
+              <div className={styles.pinField}>
+                <label className={styles.pinLabel}>새 PIN (4자리 이상)</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  className={styles.pinInput}
+                  placeholder="새 PIN"
+                  value={newPin}
+                  onChange={(e) => { setNewPin(e.target.value); setPinError(''); }}
+                  maxLength={10}
+                />
+              </div>
+              <div className={styles.pinField}>
+                <label className={styles.pinLabel}>새 PIN 확인</label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  className={styles.pinInput}
+                  placeholder="새 PIN 확인"
+                  value={newPinConfirm}
+                  onChange={(e) => { setNewPinConfirm(e.target.value); setPinError(''); }}
+                  maxLength={10}
+                />
+              </div>
+              {pinError && <p className={styles.pinError}>{pinError}</p>}
+              <button
+                type="button"
+                className={styles.pinSubmit}
+                disabled={pinLoading}
+                onClick={async () => {
+                  if (!curPin) { setPinError('현재 PIN을 입력해주세요'); return; }
+                  if (newPin.length < 4) { setPinError('새 PIN은 4자리 이상이어야 합니다'); return; }
+                  if (newPin !== newPinConfirm) { setPinError('새 PIN이 일치하지 않습니다'); return; }
+                  setPinLoading(true);
+                  const res = await fetch('/api/auth/pin/change', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPin: curPin, newPin }),
+                  });
+                  const data = await res.json();
+                  setPinLoading(false);
+                  if (!res.ok) { setPinError(data.message || 'PIN 변경에 실패했습니다'); return; }
+                  setPinChangeOpen(false);
+                  alert('PIN이 변경되었습니다');
+                }}
+              >
+                {pinLoading ? '변경 중...' : 'PIN 변경'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 기관사 변경 팝업 제거됨 — 인증된 사용자로 고정 */}
 

@@ -613,3 +613,67 @@
   color: white;
   min-height: 48px;
 }
+
+/* ── PIN 변경 모달 ── */
+.pinChangeForm {
+  padding: var(--dia-space-4);
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.pinField {
+  margin-bottom: var(--dia-space-5);
+}
+
+.pinLabel {
+  display: block;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.pinInput {
+  width: 100%;
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-lg);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-xl);
+  text-align: center;
+  letter-spacing: 4px;
+  min-height: 48px;
+}
+
+.pinInput:focus {
+  outline: none;
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 3px var(--dia-blue-dim, rgba(59, 130, 246, 0.2));
+}
+
+.pinInput::placeholder {
+  font-size: var(--dia-text-base);
+  letter-spacing: 0;
+}
+
+.pinError {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-red);
+  text-align: center;
+  margin-bottom: var(--dia-space-4);
+}
+
+.pinSubmit {
+  width: 100%;
+  padding: var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 48px;
+}
+
+.pinSubmit:active { opacity: 0.8; }
+.pinSubmit:disabled { opacity: 0.5; }

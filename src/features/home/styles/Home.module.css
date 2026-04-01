@@ -45,12 +45,13 @@
   pointer-events: none;
 }
 
-/* ── Header Top (좌우 분할) ── */
+/* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
 .headerTop {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 
@@ -58,7 +59,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0;
+  min-width: 120px;
   white-space: nowrap;
 }
 
@@ -88,7 +89,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .clockRow {
@@ -114,7 +116,7 @@
 }
 
 .clockBig {
-  font-size: clamp(40px, 11vw, 56px);
+  font-size: clamp(36px, 10vw, 56px);
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;

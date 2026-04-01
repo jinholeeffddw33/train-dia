@@ -15,9 +15,9 @@
   min-height: 100vh;
 }
 
-/* 뒤로가기 버튼 있을 때 컨텐츠 상단 여백 (버튼 높이만큼만) */
+/* 뒤로가기 버튼 있을 때 컨텐츠 상단 여백 */
 .shell[data-has-back] .content {
-  padding-top: 44px;
+  padding-top: 36px;
   min-height: 100dvh;
 }
 
@@ -115,11 +115,11 @@
 /* ── Back to Hub button ── */
 .backBtn {
   position: fixed;
-  top: 6px;
-  left: var(--dia-space-3);
+  top: 4px;
+  left: 8px;
   z-index: var(--dia-layer-fixed);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);

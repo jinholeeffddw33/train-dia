@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { requireAuth, verifyPin, hashPin, auditLog, getClientIP } from '@/lib/authServer';
 
-// ── POST: PIN 변경 ──
+// ── POST: PIN 설정/변경 ──
+// firstSetup=true: 최초 PIN 설정 (currentPin 불필요)
+// firstSetup=false: 기존 PIN 변경 (currentPin 필수)
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
@@ -15,7 +17,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { currentPin?: string; newPin?: string };
+  let body: { currentPin?: string; newPin?: string; firstSetup?: boolean };
   try {
     body = await req.json();
   } catch {
@@ -25,10 +27,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { currentPin, newPin } = body;
-  if (!currentPin || !newPin) {
+  const { currentPin, newPin, firstSetup } = body;
+
+  if (!newPin) {
     return NextResponse.json(
-      { code: 'MISSING_FIELDS', message: '현재 PIN과 새 PIN을 입력해주세요' },
+      { code: 'MISSING_FIELDS', message: '새 PIN을 입력해주세요' },
       { status: 400 },
     );
   }
@@ -40,10 +43,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 현재 PIN 검증
   const { data: profile } = await serverSupabase
     .from('driver_profiles')
-    .select('pin_hash')
+    .select('pin_hash, must_change_pin')
     .eq('id', user.sub)
     .single();
 
@@ -54,22 +56,31 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const valid = await verifyPin(currentPin, profile.pin_hash);
-  if (!valid) {
-    return NextResponse.json(
-      { code: 'WRONG_PIN', message: '현재 PIN이 일치하지 않습니다' },
-      { status: 401 },
-    );
+  // 최초 PIN 설정이 아닌 경우 → 현재 PIN 검증 필수
+  if (!firstSetup || !profile.must_change_pin) {
+    if (!currentPin) {
+      return NextResponse.json(
+        { code: 'MISSING_FIELDS', message: '현재 PIN을 입력해주세요' },
+        { status: 400 },
+      );
+    }
+    const valid = await verifyPin(currentPin, profile.pin_hash);
+    if (!valid) {
+      return NextResponse.json(
+        { code: 'WRONG_PIN', message: '현재 PIN이 일치하지 않습니다' },
+        { status: 401 },
+      );
+    }
   }
 
-  // 새 PIN 해시 저장
+  // 새 PIN 저장
   const newHash = await hashPin(newPin);
   await serverSupabase
     .from('driver_profiles')
     .update({ pin_hash: newHash, must_change_pin: false })
     .eq('id', user.sub);
 
-  await auditLog(user.sub, user.name, 'pin_change', {
+  await auditLog(user.sub, user.name, firstSetup ? 'pin_first_setup' : 'pin_change', {
     ip: getClientIP(req),
   });
 

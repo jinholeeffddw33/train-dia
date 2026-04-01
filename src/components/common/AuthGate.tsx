@@ -83,22 +83,34 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // PIN 변경 화면 (최초 로그인 시)
+  // PIN 최초 설정 화면 (사번만으로 로그인한 후)
   if (screen === 'pin-change') {
-    const handleChangePin = async () => {
+    const handleSetPin = async () => {
       setPinChangeError('');
       if (newPin.length < 4) {
         setPinChangeError('PIN은 4자리 이상이어야 합니다');
         return;
       }
       if (newPin !== newPinConfirm) {
-        setPinChangeError('새 PIN이 일치하지 않습니다');
+        setPinChangeError('PIN이 일치하지 않습니다');
         return;
       }
-      const ok = await changePin(currentPin, newPin);
-      if (ok) {
-        setScreen('biometric-setup');
+      // 최초 설정: currentPin 없이 firstSetup 플래그
+      const res = await fetch('/api/auth/pin/change', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPin, firstSetup: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPinChangeError(data.message || 'PIN 설정에 실패했습니다');
+        return;
       }
+      // mustChangePin 해제
+      if (user) {
+        useAuthStore.setState({ user: { ...user, mustChangePin: false } });
+      }
+      setScreen('biometric-setup');
     };
 
     return (
@@ -107,48 +119,36 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <div className={styles.iconWrap}>
             <ShieldCheck size={40} className={styles.iconBlue} />
           </div>
-          <h1 className={styles.title}>PIN 변경</h1>
-          <p className={styles.subtitle}>보안을 위해 PIN을 변경해주세요</p>
+          <h1 className={styles.title}>PIN 설정</h1>
+          <p className={styles.subtitle}>
+            앱 잠금에 사용할 PIN을 설정해주세요
+          </p>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="current-pin" className={styles.label}>현재 PIN (사번 뒤 6자리)</label>
+            <label htmlFor="new-pin" className={styles.label}>PIN (4자리 이상)</label>
             <input
-              id="current-pin"
+              id="new-pin"
               type="password"
               inputMode="numeric"
               className={styles.input}
-              placeholder="● ● ● ● ● ●"
-              value={currentPin}
-              onChange={(e) => setCurrentPin(e.target.value)}
+              placeholder="● ● ● ●"
+              value={newPin}
+              onChange={(e) => { setNewPin(e.target.value); setPinChangeError(''); }}
               maxLength={10}
               autoFocus
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="new-pin" className={styles.label}>새 PIN (4자리 이상)</label>
-            <input
-              id="new-pin"
-              type="password"
-              inputMode="numeric"
-              className={styles.input}
-              placeholder="● ● ● ● ● ●"
-              value={newPin}
-              onChange={(e) => setNewPin(e.target.value)}
-              maxLength={10}
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="new-pin-confirm" className={styles.label}>새 PIN 확인</label>
+            <label htmlFor="new-pin-confirm" className={styles.label}>PIN 확인</label>
             <input
               id="new-pin-confirm"
               type="password"
               inputMode="numeric"
               className={styles.input}
-              placeholder="● ● ● ● ● ●"
+              placeholder="● ● ● ●"
               value={newPinConfirm}
-              onChange={(e) => setNewPinConfirm(e.target.value)}
+              onChange={(e) => { setNewPinConfirm(e.target.value); setPinChangeError(''); }}
               maxLength={10}
             />
           </div>
@@ -160,10 +160,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             className={styles.btn}
-            onClick={handleChangePin}
+            onClick={handleSetPin}
             disabled={loading}
           >
-            {loading ? '변경 중...' : 'PIN 변경'}
+            {loading ? '설정 중...' : 'PIN 설정'}
           </button>
         </div>
       </div>
@@ -228,14 +228,23 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     await loginWithBiometric(targetSabun);
   };
 
-  const handlePinLogin = async () => {
+  // 사번만으로 최초 로그인 (PIN 미설정자)
+  const handleFirstLogin = async () => {
     if (!sabun) return;
-    if (!pin) return;
+    await loginWithPin(sabun, ''); // 빈 PIN → 서버에서 must_change_pin이면 허용
+  };
+
+  const handlePinLogin = async () => {
+    if (!sabun || !pin) return;
     await loginWithPin(sabun, pin);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handlePinLogin();
+    if (e.key === 'Enter') {
+      if (hasBiometric) handlePinLogin();
+      else if (pin) handlePinLogin();
+      else handleFirstLogin();
+    }
   };
 
   return (
@@ -244,22 +253,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         <div className={styles.icon}>🚇</div>
         <h1 className={styles.title}>기관사 DIA</h1>
         <p className={styles.subtitle}>답십리 승무사업소 · 5호선</p>
-
-        {/* 최초 안내 (생체인증 미등록 = 처음 오는 사용자) */}
-        {!hasBiometric && (
-          <div className={styles.notice}>
-            <p className={styles.noticeTitle}>보안 업데이트 안내</p>
-            <p className={styles.noticeText}>
-              보안 강화를 위해 로그인이 필요합니다.
-            </p>
-            <p className={styles.noticePin}>
-              초기 PIN = <strong>사번 뒤 6자리</strong>
-            </p>
-            <p className={styles.noticeExample}>
-              예: 사번 21714375 → PIN <strong>714375</strong>
-            </p>
-          </div>
-        )}
 
         {/* 사번 입력 */}
         <div className={styles.inputGroup}>
@@ -298,45 +291,59 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* PIN 입력 */}
-        <div className={styles.inputGroup}>
-          <label htmlFor="auth-pin" className={styles.label}>PIN</label>
-          <div className={styles.pinWrap}>
-            <input
-              id="auth-pin"
-              type={showPin ? 'text' : 'password'}
-              inputMode="numeric"
-              className={styles.input}
-              placeholder="● ● ● ● ● ●"
-              value={pin}
-              onChange={(e) => { setPin(e.target.value); clearError(); }}
-              onKeyDown={handleKeyDown}
-              maxLength={10}
-              autoComplete="off"
-              autoFocus={!!lastSabun}
-            />
-            <button
-              type="button"
-              className={styles.pinToggle}
-              onClick={() => setShowPin(!showPin)}
-              aria-label={showPin ? 'PIN 숨기기' : 'PIN 보기'}
-            >
-              {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+        {/* PIN 입력 (이미 PIN 설정한 사용자용) */}
+        {hasBiometric && (
+          <div className={styles.inputGroup}>
+            <label htmlFor="auth-pin" className={styles.label}>PIN</label>
+            <div className={styles.pinWrap}>
+              <input
+                id="auth-pin"
+                type={showPin ? 'text' : 'password'}
+                inputMode="numeric"
+                className={styles.input}
+                placeholder="● ● ● ●"
+                value={pin}
+                onChange={(e) => { setPin(e.target.value); clearError(); }}
+                onKeyDown={handleKeyDown}
+                maxLength={10}
+                autoComplete="off"
+                autoFocus={!!lastSabun}
+              />
+              <button
+                type="button"
+                className={styles.pinToggle}
+                onClick={() => setShowPin(!showPin)}
+                aria-label={showPin ? 'PIN 숨기기' : 'PIN 보기'}
+              >
+                {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <button
-          type="button"
-          className={styles.btn}
-          onClick={handlePinLogin}
-          disabled={loading || !sabun || !pin}
-        >
-          <KeyRound size={18} />
-          <span>{loading ? '로그인 중...' : 'PIN으로 로그인'}</span>
-        </button>
+        {/* 처음 오는 사용자: 사번만 입력 → 시작하기 */}
+        {!hasBiometric ? (
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handleFirstLogin}
+            disabled={loading || !sabun}
+          >
+            <span>{loading ? '확인 중...' : '시작하기'}</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={handlePinLogin}
+            disabled={loading || !sabun || !pin}
+          >
+            <KeyRound size={18} />
+            <span>{loading ? '로그인 중...' : 'PIN으로 로그인'}</span>
+          </button>
+        )}
       </div>
     </div>
   );

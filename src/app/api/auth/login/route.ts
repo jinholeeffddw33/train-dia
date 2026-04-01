@@ -3,7 +3,7 @@ import { createToken, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/jwt';
 import { verifyPin, getProfileBySabun, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 
-// ── POST: PIN 로그인 ──
+// ── POST: 로그인 (PIN 또는 최초 사번만) ──
 export async function POST(req: NextRequest) {
   let body: { sabun?: string; pin?: string };
   try {
@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
   const sabun = body.sabun?.trim();
   const pin = body.pin?.trim();
 
-  if (!sabun || !pin) {
+  if (!sabun) {
     return NextResponse.json(
-      { code: 'MISSING_FIELDS', message: '사번과 PIN을 입력해주세요' },
+      { code: 'MISSING_FIELDS', message: '사번을 입력해주세요' },
       { status: 400 },
     );
   }
@@ -29,22 +29,31 @@ export async function POST(req: NextRequest) {
   const profile = await getProfileBySabun(sabun);
   if (!profile) {
     return NextResponse.json(
-      { code: 'AUTH_FAILED', message: '사번 또는 PIN이 일치하지 않습니다' },
+      { code: 'AUTH_FAILED', message: '등록되지 않은 사번입니다' },
       { status: 401 },
     );
   }
 
-  // PIN 검증
-  const pinValid = await verifyPin(pin, profile.pin_hash);
-  if (!pinValid) {
-    await auditLog(profile.id, profile.name, 'login_failed', {
-      metadata: { reason: 'invalid_pin' },
-      ip: getClientIP(req),
-    });
-    return NextResponse.json(
-      { code: 'AUTH_FAILED', message: '사번 또는 PIN이 일치하지 않습니다' },
-      { status: 401 },
-    );
+  // 최초 로그인 (must_change_pin = true): 사번만으로 로그인 허용
+  // 이후 로그인: PIN 필수
+  if (!profile.must_change_pin) {
+    if (!pin) {
+      return NextResponse.json(
+        { code: 'MISSING_PIN', message: 'PIN을 입력해주세요' },
+        { status: 400 },
+      );
+    }
+    const pinValid = await verifyPin(pin, profile.pin_hash);
+    if (!pinValid) {
+      await auditLog(profile.id, profile.name, 'login_failed', {
+        metadata: { reason: 'invalid_pin' },
+        ip: getClientIP(req),
+      });
+      return NextResponse.json(
+        { code: 'AUTH_FAILED', message: 'PIN이 일치하지 않습니다' },
+        { status: 401 },
+      );
+    }
   }
 
   // JWT 발급
@@ -68,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 감사 로그
-  await auditLog(profile.id, profile.name, 'login_pin', {
+  await auditLog(profile.id, profile.name, profile.must_change_pin ? 'first_login' : 'login_pin', {
     ip: getClientIP(req),
   });
 

@@ -46,21 +46,53 @@
 }
 
 /* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
-.headerTop {
+/* 상단: 인사말(좌) + 날짜/시계(우) */
+.headerTopRow {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: 8px 12px;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  margin-bottom: 6px;
 }
 
-.headerLeft {
+.headerGreeting {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  padding-top: 4px;
+}
+
+.headerClockArea {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 120px;
-  white-space: nowrap;
+  align-items: center;
+}
+
+.headerDate {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.clockRow {
+  display: flex;
+  align-items: flex-end;
+}
+
+.headerOrg {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 1px;
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* 이름 행 */
+.headerNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
 }
 
 .headerNameBtn {
@@ -75,7 +107,7 @@
 }
 
 .headerName {
-  font-size: clamp(18px, 5vw, 24px);
+  font-size: clamp(22px, 6vw, 28px);
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.3px;
@@ -90,10 +122,10 @@
 }
 
 .headerRole {
-  font-size: var(--dia-text-sm);
+  font-size: 15px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
-  margin-left: 2px;
+  margin-left: 4px;
 }
 
 .viewModeBadge {
@@ -104,43 +136,6 @@
   border-radius: var(--dia-radius-full);
   padding: 2px 10px;
   min-height: 28px;
-  margin-top: 2px;
-}
-
-.headerDate {
-  font-size: var(--dia-text-sm);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 2px;
-  letter-spacing: 0.3px;
-}
-
-.headerRight {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-.clockRow {
-  display: flex;
-  align-items: flex-end;
-}
-
-.headerOrg {
-  font-size: var(--dia-text-xs);
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 1px;
-  margin-top: 4px;
-  text-align: center;
-}
-
-.headerGreeting {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 2px;
 }
 
 .clockAmPm {

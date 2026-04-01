@@ -32,39 +32,41 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
 
   return (
     <header className={styles.headerSection}>
-      <div className={styles.headerTop}>
-        <div className={styles.headerLeft}>
-          {driver && <span className={styles.headerGreeting}>{getGreeting()}</span>}
-          <button
-            type="button"
-            className={styles.headerNameBtn}
-            onClick={onDriverClick}
-            aria-label="기관사 선택"
-          >
-            {driver ? (
-              <span className={styles.headerName}>
-                {driver.n} <span className={styles.headerRole}>기관사님</span>
-                <ChevronDown size={14} className={styles.headerChevron} />
-              </span>
-            ) : (
-              <span className={styles.headerName}>
-                기관사 선택 <ChevronDown size={14} className={styles.headerChevron} />
-              </span>
-            )}
-          </button>
-          {isViewMode && (
-            <button type="button" className={styles.viewModeBadge} onClick={backToMe}>
-              내 계정 보기
-            </button>
-          )}
+      {/* 인사말 + 날짜/시간 */}
+      <div className={styles.headerTopRow}>
+        {driver && <span className={styles.headerGreeting}>{getGreeting()}</span>}
+        <div className={styles.headerClockArea}>
           <span className={styles.headerDate}>{dateStr}</span>
-        </div>
-        <div className={styles.headerRight}>
           <div className={styles.clockRow}>
             <HeaderClock />
           </div>
           <span className={styles.headerOrg}>답십리승무사업소</span>
         </div>
+      </div>
+      {/* 이름 */}
+      <div className={styles.headerNameRow}>
+        <button
+          type="button"
+          className={styles.headerNameBtn}
+          onClick={onDriverClick}
+          aria-label="기관사 선택"
+        >
+          {driver ? (
+            <span className={styles.headerName}>
+              {driver.n} <span className={styles.headerRole}>기관사님</span>
+              <ChevronDown size={16} className={styles.headerChevron} />
+            </span>
+          ) : (
+            <span className={styles.headerName}>
+              기관사 선택 <ChevronDown size={16} className={styles.headerChevron} />
+            </span>
+          )}
+        </button>
+        {isViewMode && (
+          <button type="button" className={styles.viewModeBadge} onClick={backToMe}>
+            내 계정 보기
+          </button>
+        )}
       </div>
     </header>
   );

@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
 import { P } from '@/data/cycle';
+import { EXTRA_USERS } from '@/lib/auth';
+
+const ALL_PEOPLE = [...P, ...EXTRA_USERS];
 
 interface DriverState {
   /** 본인 기관사 (최초 설정 후 잠금 — 행위 주체) */
@@ -18,6 +21,8 @@ interface DriverState {
   setMyDriver: (person: Person) => void;
   /** 내 기관사 ID로 설정 */
   setMyDriverById: (id: string) => void;
+  /** 사번으로 내 기관사 설정 */
+  setMyDriverBySabun: (sabun: string) => void;
   /** 내 보기로 돌아가기 */
   backToMe: () => void;
   /** 로그아웃 — 인증 초기화 */
@@ -60,7 +65,15 @@ export const useDriverStore = create<DriverState>()(
       },
 
       setMyDriverById: (id: string) => {
-        const person = P.find((p) => p.I === id) ?? null;
+        // P + EXTRA_USERS 모두에서 검색
+        const person = ALL_PEOPLE.find((p) => p.I === id) ?? null;
+        if (person) {
+          set({ myDriver: person, current: person, isViewMode: false });
+        }
+      },
+
+      setMyDriverBySabun: (sabun: string) => {
+        const person = ALL_PEOPLE.find((p) => p.s === sabun) ?? null;
         if (person) {
           set({ myDriver: person, current: person, isViewMode: false });
         }

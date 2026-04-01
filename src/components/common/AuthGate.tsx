@@ -39,11 +39,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   // 로그인 성공 시 driver store 연동
   useEffect(() => {
-    if (user && user.personId) {
-      const { myDriver, setMyDriverById } = useDriverStore.getState();
-      // myDriver가 없거나 다른 사람이면 인증된 사용자로 설정
-      if (!myDriver || myDriver.I !== user.personId) {
-        setMyDriverById(user.personId);
+    if (user && user.sabun) {
+      const { myDriver, setMyDriverById, setMyDriverBySabun } = useDriverStore.getState();
+      if (!myDriver || myDriver.s !== user.sabun) {
+        // 사번으로 먼저 시도 (EXTRA_USERS 포함)
+        if (user.personId && user.personId !== '0') {
+          setMyDriverById(user.personId);
+        } else {
+          setMyDriverBySabun(user.sabun);
+        }
       }
     }
   }, [user]);

@@ -24,8 +24,6 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
   const driver = useDriverStore((s) => s.current);
-  const isViewMode = useDriverStore((s) => s.isViewMode);
-  const backToMe = useDriverStore((s) => s.backToMe);
   const td = today();
   const dow = DOW[td.getDay()];
   const dateStr = `${td.getMonth() + 1}월 ${td.getDate()}일 (${dow})`;
@@ -53,11 +51,6 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
               </span>
             )}
           </button>
-          {isViewMode && (
-            <button type="button" className={styles.viewModeBadge} onClick={backToMe}>
-              내 계정 보기
-            </button>
-          )}
         </div>
         {/* 오른쪽: 날짜 + 시계 + 사업소 */}
         <div className={styles.headerRight}>

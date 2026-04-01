@@ -370,16 +370,14 @@ function WriteView({ category, name, sabun, onBack }: {
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // 미리보기용 로컬 URL
+    setImageFile(file);
     const url = URL.createObjectURL(file);
     setImagePreview(url);
-    // 실제 업로드 대신 base64로 변환 (간단 구현)
-    const reader = new FileReader();
-    reader.onload = () => setImageUrl(reader.result as string);
-    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async () => {
@@ -388,9 +386,24 @@ function WriteView({ category, name, sabun, onBack }: {
     setSubmitting(true);
     setError('');
     try {
+      let uploadedImageUrl = '';
+
+      // 사진 있으면 먼저 업로드
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('name', name);
+        formData.append('sabun', sabun);
+        const uploadRes = await fetch('/api/life/upload', { method: 'POST', body: formData });
+        if (uploadRes.ok) {
+          const uploadJson = await uploadRes.json();
+          uploadedImageUrl = uploadJson.url;
+        }
+      }
+
       await createPost({
         category, title: title.trim(), content: content.trim(), name, sabun,
-        imageUrl: imageUrl || undefined,
+        imageUrl: uploadedImageUrl || undefined,
         linkUrl: linkUrl.trim() || undefined,
       });
       if (imagePreview) URL.revokeObjectURL(imagePreview);

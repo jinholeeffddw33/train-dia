@@ -154,9 +154,16 @@ export const useAuthStore = create<AuthState>()(
           set({ hasBiometric: true, loading: false, error: '' });
           return true;
         } catch (err) {
-          const message = err instanceof Error && err.name === 'NotAllowedError'
-            ? '생체인증 등록이 취소되었습니다'
-            : '생체인증 등록에 실패했습니다';
+          let message: string;
+          if (err instanceof Error) {
+            if (err.name === 'NotAllowedError') {
+              message = '생체인증 등록이 취소되었습니다';
+            } else {
+              message = `생체인증 오류: ${err.name} — ${err.message}`;
+            }
+          } else {
+            message = `생체인증 등록 실패: ${String(err)}`;
+          }
           set({ loading: false, error: message });
           return false;
         }

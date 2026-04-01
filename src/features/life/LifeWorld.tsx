@@ -220,7 +220,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
               <button
                 key={post.id}
                 type="button"
-                className={`${styles.postCard} ${post.isSample ? styles.postCardSample : ''}`}
+                className={`${styles.postCard} ${''}`}
                 onClick={() => onSelect(post.id)}
               >
                 {post.imageUrl && (
@@ -229,7 +229,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
                 <div className={styles.postContent}>
                   <div className={styles.postTop}>
                     <span className={styles.postAuthor}>{post.createdBy}</span>
-                    {post.isSample && <span className={styles.sampleBadge}>샘플</span>}
+
                     <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
                   </div>
                   <div className={styles.postTitle}>{post.title}</div>
@@ -262,12 +262,9 @@ function DetailView({ postId, name, sabun, onBack }: {
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const isSample = postId.startsWith('sample-');
   useEffect(() => {
-    if (!isSample) {
-      fetchComments(postId).catch(() => {});
-    }
-  }, [fetchComments, postId, isSample]);
+    fetchComments(postId).catch(() => {});
+  }, [fetchComments, postId]);
 
   if (!post) return (
     <div className={styles.wrap}>
@@ -279,10 +276,10 @@ function DetailView({ postId, name, sabun, onBack }: {
     </div>
   );
 
-  const isMyPost = !isSample && post.createdBy === name;
+  const isMyPost = post.createdBy === name;
 
   const handleComment = async () => {
-    if (isSample || !commentText.trim() || submitting) return;
+    if (!commentText.trim() || submitting) return;
     setSubmitting(true);
     await addComment(postId, commentText.trim(), name, sabun).catch(() => {});
     setCommentText('');
@@ -290,7 +287,6 @@ function DetailView({ postId, name, sabun, onBack }: {
   };
 
   const handleDelete = async () => {
-    if (isSample) return;
     await deletePost(postId, name, sabun).catch(() => {});
     onBack();
   };
@@ -320,7 +316,7 @@ function DetailView({ postId, name, sabun, onBack }: {
               <Link2 size={14} /> {post.linkUrl}
             </a>
           )}
-          <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => { if (!isSample) toggleLike(postId, name, sabun).catch(() => {}); }}>
+          <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun).catch(() => {})}>
             ❤️ {post.likeCount}
           </button>
         </div>

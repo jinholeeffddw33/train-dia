@@ -14,7 +14,6 @@ export interface LifePost {
   likeCount: number;
   commentCount: number;
   likedByMe: boolean;
-  isSample?: boolean;
 }
 
 export interface LifeComment {

@@ -232,6 +232,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
                   <div className={styles.postMeta}>
                     <span>❤️ {post.likeCount}</span>
                     <span>💬 {post.commentCount}</span>
+                    <span>📖 {post.readCount ?? 0}</span>
                   </div>
                 </div>
               </button>
@@ -345,6 +346,7 @@ function DetailView({ postId, name, sabun, onBack }: {
               {liked ? '❤️' : '🤍'} {likeCount}
             </button>
             <span className={styles.detailMeta}>💬 {cmts.length}</span>
+            <span className={styles.detailMeta}>📖 {post.readCount ?? 0}명 읽음</span>
           </div>
         </div>
 

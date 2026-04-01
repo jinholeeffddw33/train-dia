@@ -244,63 +244,65 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
   );
 }
 
-// ── 상세 뷰 ──
+// ── 상세 뷰 (최소화 — 안정성 우선) ──
 function DetailView({ postId, name, sabun, onBack }: {
   postId: string; name: string; sabun: string; onBack: () => void;
 }) {
-  const posts = useLifeStore((s) => s.posts);
-  const post = posts.find((p) => p.id === postId);
-  const comments = useLifeStore((s) => s.comments[postId] ?? []);
-  const fetchComments = useLifeStore((s) => s.fetchComments);
-  const addComment = useLifeStore((s) => s.addComment);
-  const toggleLike = useLifeStore((s) => s.toggleLike);
-  const deletePost = useLifeStore((s) => s.deletePost);
+  const post = useLifeStore((s) => s.posts.find((p) => p.id === postId) || null);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [cmts, setCmts] = useState<Array<{ id: string; comment: string; createdBy: string; createdAt: string }>>([]);
 
+  // 댓글 로드
   useEffect(() => {
-    fetchComments(postId).catch(() => {});
-  }, [fetchComments, postId]);
+    let cancelled = false;
+    fetch(`/api/life/posts/${postId}/comments`)
+      .then((r) => r.ok ? r.json() : { data: [] })
+      .then((json) => { if (!cancelled) setCmts(json.data || []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [postId]);
 
-  // 조회 기록 — 1회만
-  useEffect(() => {
-    if (sabun && postId) {
-      try {
-        const key = `life-read-${postId}`;
-        const readers: string[] = JSON.parse(localStorage.getItem(key) || '[]');
-        if (!readers.includes(sabun)) {
-          readers.push(sabun);
-          localStorage.setItem(key, JSON.stringify(readers));
-        }
-      } catch { /* ignore */ }
-    }
-  }, [postId, sabun]);
+  if (!post) {
+    return (
+      <div className={styles.wrap}>
+        <header className={styles.header}>
+          <button type="button" className={styles.backBtn} onClick={onBack}><ArrowLeft size={20} /></button>
+          <h1 className={styles.headerTitle}>상세보기</h1>
+        </header>
+        <div className={styles.emptyWrap}><span className={styles.emptyText}>글을 찾을 수 없어요</span></div>
+      </div>
+    );
+  }
 
-  if (!post) return (
-    <div className={styles.wrap}>
-      <header className={styles.header}>
-        <button type="button" className={styles.backBtn} onClick={onBack}><ArrowLeft size={20} /></button>
-        <h1 className={styles.headerTitle}>상세보기</h1>
-      </header>
-      <div className={styles.emptyWrap}><span className={styles.emptyText}>글을 찾을 수 없어요</span></div>
-    </div>
-  );
-
-  const isMyPost = post.createdBy === name;
-  const hasImage = typeof post.imageUrl === 'string' && post.imageUrl.length > 0;
-  const hasLink = typeof post.linkUrl === 'string' && post.linkUrl.length > 0;
-
-  const handleComment = async () => {
-    if (!commentText.trim() || submitting) return;
-    setSubmitting(true);
-    await addComment(postId, commentText.trim(), name, sabun).catch(() => {});
-    setCommentText('');
-    setSubmitting(false);
+  const handleLike = () => {
+    fetch(`/api/life/posts/${postId}/likes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, sabun }),
+    }).catch(() => {});
   };
 
-  const handleDelete = async () => {
-    await deletePost(postId, name, sabun).catch(() => {});
-    onBack();
+  const handleComment = () => {
+    if (!commentText.trim() || submitting) return;
+    setSubmitting(true);
+    fetch(`/api/life/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment: commentText.trim(), name, sabun }),
+    })
+      .then((r) => r.ok ? fetch(`/api/life/posts/${postId}/comments`).then((r2) => r2.json()) : null)
+      .then((json) => { if (json) setCmts(json.data || []); setCommentText(''); })
+      .catch(() => {})
+      .finally(() => setSubmitting(false));
+  };
+
+  const handleDelete = () => {
+    fetch(`/api/life/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, sabun }),
+    }).then(() => onBack()).catch(() => onBack());
   };
 
   return (
@@ -308,7 +310,7 @@ function DetailView({ postId, name, sabun, onBack }: {
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onBack}><ArrowLeft size={20} strokeWidth={2} /></button>
         <h1 className={styles.headerTitle}>상세보기</h1>
-        {isMyPost && (
+        {post.createdBy === name && (
           <button type="button" className={styles.deleteBtn} onClick={handleDelete}>삭제</button>
         )}
       </header>
@@ -319,27 +321,15 @@ function DetailView({ postId, name, sabun, onBack }: {
             <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
           </div>
           <h2 className={styles.detailTitle}>{post.title}</h2>
-          {hasImage && (
-            <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
-          )}
           <div className={styles.detailContent}>{post.content}</div>
-          {hasLink && (
-            <a href={post.linkUrl} target="_blank" rel="noopener noreferrer" className={styles.detailLink}>
-              🔗 {post.linkUrl}
-            </a>
-          )}
-          <div className={styles.detailActions}>
-            <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun).catch(() => {})}>
-              ❤️ {post.likeCount}
-            </button>
-            <span className={styles.detailReadCount}>👁 {post.readCount ?? 0}명이 봤어요</span>
-          </div>
+          <button type="button" className={styles.likeBtn} onClick={handleLike}>
+            ❤️ 좋아요
+          </button>
         </div>
 
-        {/* 댓글 */}
         <div className={styles.commentSection}>
-          <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
-          {comments.map((c) => (
+          <h3 className={styles.commentTitle}>댓글 {cmts.length}</h3>
+          {cmts.map((c) => (
             <div key={c.id} className={styles.commentItem}>
               <div className={styles.commentTop}>
                 <span className={styles.commentAuthor}>{c.createdBy}</span>
@@ -350,7 +340,6 @@ function DetailView({ postId, name, sabun, onBack }: {
           ))}
         </div>
 
-        {/* 댓글 입력 */}
         <div className={styles.commentInput}>
           <input
             type="text"

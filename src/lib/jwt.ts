@@ -11,7 +11,7 @@ export interface TokenPayload extends JWTPayload {
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-const TOKEN_MAX_AGE = 7 * 24 * 60 * 60; // 7일 (초)
+const TOKEN_MAX_AGE = 24 * 60 * 60; // 24시간 (초)
 
 export async function createToken(payload: Omit<TokenPayload, 'iat' | 'exp'>): Promise<string> {
   return new SignJWT(payload as unknown as Record<string, unknown>)

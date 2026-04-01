@@ -456,3 +456,107 @@
   color: var(--dia-text-tertiary);
   text-align: center;
 }
+
+.hiddenInput { display: none; }
+
+/* 사진 미리보기 */
+.imagePreviewWrap {
+  position: relative;
+  margin-bottom: var(--dia-space-3);
+}
+
+.imagePreview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+}
+
+.imageRemoveBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+/* 링크 입력 */
+.linkInputWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  margin-bottom: var(--dia-space-3);
+}
+
+.linkIcon { color: var(--dia-blue); flex-shrink: 0; }
+
+.linkInput {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: var(--dia-text-primary);
+  outline: none;
+  min-width: 0;
+}
+
+.linkInput::placeholder { color: var(--dia-text-tertiary); }
+
+.linkRemoveBtn {
+  background: none;
+  border: none;
+  color: var(--dia-text-tertiary);
+  cursor: pointer;
+  display: flex;
+}
+
+/* 글쓰기 도구 */
+.writeToolbar {
+  display: flex;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
+  padding-top: var(--dia-space-2);
+  border-top: 1px solid var(--dia-border);
+}
+
+.toolbarBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: var(--dia-radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  cursor: pointer;
+}
+
+.toolbarBtn:active { background: var(--dia-surface-hover); }
+
+/* 상세 링크 */
+.detailLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--dia-blue);
+  margin-top: var(--dia-space-2);
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.detailLink:active { opacity: 0.7; }

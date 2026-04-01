@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, Component, type ReactNode } from 'react';
-import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp } from 'lucide-react';
+import { useState, useEffect, useRef, Component, type ReactNode } from 'react';
+import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
@@ -315,6 +315,11 @@ function DetailView({ postId, name, sabun, onBack }: {
             <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
           )}
           <div className={styles.detailContent}>{post.content}</div>
+          {post.linkUrl && (
+            <a href={post.linkUrl} target="_blank" rel="noopener noreferrer" className={styles.detailLink}>
+              <Link2 size={14} /> {post.linkUrl}
+            </a>
+          )}
           <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => { if (!isSample) toggleLike(postId, name, sabun).catch(() => {}); }}>
             ❤️ {post.likeCount}
           </button>
@@ -361,8 +366,25 @@ function WriteView({ category, name, sabun, onBack }: {
   const createPost = useLifeStore((s) => s.createPost);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [showLinkInput, setShowLinkInput] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // 미리보기용 로컬 URL
+    const url = URL.createObjectURL(file);
+    setImagePreview(url);
+    // 실제 업로드 대신 base64로 변환 (간단 구현)
+    const reader = new FileReader();
+    reader.onload = () => setImageUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async () => {
     if (!title.trim()) { setError('제목을 입력해주세요'); return; }
@@ -370,7 +392,12 @@ function WriteView({ category, name, sabun, onBack }: {
     setSubmitting(true);
     setError('');
     try {
-      await createPost({ category, title: title.trim(), content: content.trim(), name, sabun });
+      await createPost({
+        category, title: title.trim(), content: content.trim(), name, sabun,
+        imageUrl: imageUrl || undefined,
+        linkUrl: linkUrl.trim() || undefined,
+      });
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
       onBack();
     } catch (e) {
       setError(e instanceof Error ? e.message : '등록에 실패했습니다');
@@ -404,9 +431,48 @@ function WriteView({ category, name, sabun, onBack }: {
             placeholder="내용을 작성하세요"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={12}
+            rows={10}
             maxLength={5000}
           />
+
+          {/* 사진 미리보기 */}
+          {imagePreview && (
+            <div className={styles.imagePreviewWrap}>
+              <img src={imagePreview} alt="미리보기" className={styles.imagePreview} />
+              <button type="button" className={styles.imageRemoveBtn} onClick={() => { setImageUrl(''); setImagePreview(''); }}>
+                <X size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* 링크 입력 */}
+          {showLinkInput && (
+            <div className={styles.linkInputWrap}>
+              <Link2 size={16} className={styles.linkIcon} />
+              <input
+                type="url"
+                className={styles.linkInput}
+                placeholder="https://..."
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+              />
+              <button type="button" className={styles.linkRemoveBtn} onClick={() => { setLinkUrl(''); setShowLinkInput(false); }}>
+                <X size={14} />
+              </button>
+            </div>
+          )}
+
+          {/* 하단 도구 */}
+          <div className={styles.writeToolbar}>
+            <button type="button" className={styles.toolbarBtn} onClick={() => fileRef.current?.click()}>
+              <ImagePlus size={20} /> <span>사진</span>
+            </button>
+            <button type="button" className={styles.toolbarBtn} onClick={() => setShowLinkInput(true)}>
+              <Link2 size={20} /> <span>링크</span>
+            </button>
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" className={styles.hiddenInput} onChange={handleImageSelect} />
+
           {error && <p className={styles.errorText}>{error}</p>}
           <p className={styles.writeInfo}>✏️ <strong>{name}</strong> 이름으로 등록됩니다</p>
         </div>

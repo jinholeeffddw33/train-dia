@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (newPin.length < 6) {
+  if (newPin.length < 4) {
     return NextResponse.json(
-      { code: 'PIN_TOO_SHORT', message: 'PIN은 6자리 이상이어야 합니다' },
+      { code: 'PIN_TOO_SHORT', message: 'PIN은 4자리 이상이어야 합니다' },
       { status: 400 },
     );
   }

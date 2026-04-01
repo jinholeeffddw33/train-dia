@@ -7,9 +7,7 @@ import {
 import { serverSupabase } from '@/lib/serverSupabase';
 import { createToken, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/jwt';
 import { getProfileBySabun, getProfileById, auditLog, getClientIP } from '@/lib/authServer';
-
-const RP_ID = process.env.WEBAUTHN_RP_ID || 'localhost';
-const ORIGIN = process.env.WEBAUTHN_ORIGIN || 'http://localhost:3000';
+import { getRpConfig } from '@/lib/webauthnConfig';
 
 // ── GET: 인증 옵션 생성 ──
 export async function GET(req: NextRequest) {
@@ -49,8 +47,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const { rpId } = getRpConfig(req);
+
   const options = await generateAuthenticationOptions({
-    rpID: RP_ID,
+    rpID: rpId,
     allowCredentials: credentials.map((c) => ({
       id: c.credential_id,
       type: 'public-key',
@@ -134,8 +134,8 @@ export async function POST(req: NextRequest) {
     verification = await verifyAuthenticationResponse({
       response: credential as unknown as Parameters<typeof verifyAuthenticationResponse>[0]['response'],
       expectedChallenge: challengeRow.challenge,
-      expectedOrigin: ORIGIN,
-      expectedRPID: RP_ID,
+      expectedOrigin: getRpConfig(req).origin,
+      expectedRPID: getRpConfig(req).rpId,
       credential: {
         id: storedCred.credential_id,
         publicKey: new Uint8Array(Buffer.from(storedCred.public_key, 'base64')),

@@ -6,10 +6,7 @@ import {
 } from '@simplewebauthn/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
-
-const RP_NAME = '기관사 DIA';
-const RP_ID = process.env.WEBAUTHN_RP_ID || 'localhost';
-const ORIGIN = process.env.WEBAUTHN_ORIGIN || 'http://localhost:3000';
+import { RP_NAME, getRpConfig } from '@/lib/webauthnConfig';
 
 // ── GET: 등록 옵션 생성 ──
 export async function GET(req: NextRequest) {
@@ -24,6 +21,8 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const { rpId, origin } = getRpConfig(req);
+
   // 기존 credential 조회 (중복 등록 방지)
   const { data: existingCreds } = await serverSupabase
     .from('webauthn_credentials')
@@ -32,7 +31,7 @@ export async function GET(req: NextRequest) {
 
   const options = await generateRegistrationOptions({
     rpName: RP_NAME,
-    rpID: RP_ID,
+    rpID: rpId,
     userName: user.sabun,
     userDisplayName: user.name,
     userID: new TextEncoder().encode(user.sub),
@@ -42,13 +41,13 @@ export async function GET(req: NextRequest) {
       type: 'public-key',
     })),
     authenticatorSelection: {
-      authenticatorAttachment: 'platform', // 내장 생체인증만
+      authenticatorAttachment: 'platform',
       userVerification: 'required',
       residentKey: 'preferred',
     },
   });
 
-  // 챌린지 저장
+  // 챌린지 저장 (rpId, origin도 함께 — 검증 시 동일한 값 사용)
   await serverSupabase.from('webauthn_challenges').insert({
     user_id: user.sub,
     challenge: options.challenge,
@@ -70,6 +69,8 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+
+  const { rpId, origin } = getRpConfig(req);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let body: any;
@@ -104,12 +105,12 @@ export async function POST(req: NextRequest) {
     verification = await verifyRegistrationResponse({
       response: body,
       expectedChallenge: challengeRow.challenge,
-      expectedOrigin: ORIGIN,
-      expectedRPID: RP_ID,
+      expectedOrigin: origin,
+      expectedRPID: rpId,
     });
   } catch (err) {
     return NextResponse.json(
-      { code: 'VERIFICATION_FAILED', message: '생체인증 등록에 실패했습니다', detail: String(err) },
+      { code: 'VERIFICATION_FAILED', message: `생체인증 등록 실패: ${String(err)}` },
       { status: 400 },
     );
   }

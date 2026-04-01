@@ -87,8 +87,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   if (screen === 'pin-change') {
     const handleChangePin = async () => {
       setPinChangeError('');
-      if (newPin.length < 6) {
-        setPinChangeError('PIN은 6자리 이상이어야 합니다');
+      if (newPin.length < 4) {
+        setPinChangeError('PIN은 4자리 이상이어야 합니다');
         return;
       }
       if (newPin !== newPinConfirm) {
@@ -126,7 +126,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="new-pin" className={styles.label}>새 PIN (6자리 이상)</label>
+            <label htmlFor="new-pin" className={styles.label}>새 PIN (4자리 이상)</label>
             <input
               id="new-pin"
               type="password"

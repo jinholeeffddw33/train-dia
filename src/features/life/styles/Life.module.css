@@ -557,7 +557,7 @@
   margin-top: var(--dia-space-3);
 }
 
-.detailReadCount {
-  font-size: 13px;
+.detailMeta {
+  font-size: 14px;
   color: var(--dia-text-tertiary);
 }

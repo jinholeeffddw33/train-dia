@@ -232,7 +232,6 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
                   <div className={styles.postMeta}>
                     <span>❤️ {post.likeCount}</span>
                     <span>💬 {post.commentCount}</span>
-                    <span>👁 {post.readCount ?? 0}</span>
                   </div>
                 </div>
               </button>
@@ -244,7 +243,7 @@ function ListView({ category, label, name, sabun, onBack, onSelect, onWrite }: {
   );
 }
 
-// ── 상세 뷰 (최소화 — 안정성 우선) ──
+// ── 상세 뷰 (fetch 직접 호출 — 스토어 의존 최소) ──
 function DetailView({ postId, name, sabun, onBack }: {
   postId: string; name: string; sabun: string; onBack: () => void;
 }) {
@@ -252,6 +251,8 @@ function DetailView({ postId, name, sabun, onBack }: {
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [cmts, setCmts] = useState<Array<{ id: string; comment: string; createdBy: string; createdAt: string }>>([]);
+  const [likeCount, setLikeCount] = useState(post?.likeCount ?? 0);
+  const [liked, setLiked] = useState(post?.likedByMe ?? false);
 
   // 댓글 로드
   useEffect(() => {
@@ -275,12 +276,21 @@ function DetailView({ postId, name, sabun, onBack }: {
     );
   }
 
+  const hasImage = post.imageUrl && post.imageUrl.length > 1;
+  const hasLink = post.linkUrl && post.linkUrl.length > 1;
+
   const handleLike = () => {
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setLikeCount((c) => nextLiked ? c + 1 : Math.max(0, c - 1));
     fetch(`/api/life/posts/${postId}/likes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, sabun }),
-    }).catch(() => {});
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((json) => { if (json) { setLikeCount(json.likeCount); setLiked(json.liked); } })
+      .catch(() => {});
   };
 
   const handleComment = () => {
@@ -321,10 +331,21 @@ function DetailView({ postId, name, sabun, onBack }: {
             <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
           </div>
           <h2 className={styles.detailTitle}>{post.title}</h2>
+          {hasImage && (
+            <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
+          )}
           <div className={styles.detailContent}>{post.content}</div>
-          <button type="button" className={styles.likeBtn} onClick={handleLike}>
-            ❤️ 좋아요
-          </button>
+          {hasLink && (
+            <a href={post.linkUrl} target="_blank" rel="noopener noreferrer" className={styles.detailLink}>
+              🔗 {post.linkUrl}
+            </a>
+          )}
+          <div className={styles.detailActions}>
+            <button type="button" className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ''}`} onClick={handleLike}>
+              {liked ? '❤️' : '🤍'} {likeCount}
+            </button>
+            <span className={styles.detailMeta}>💬 {cmts.length}</span>
+          </div>
         </div>
 
         <div className={styles.commentSection}>

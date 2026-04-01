@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, Component, type ReactNode } from 'react';
 import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
-import { useAuthStore } from '@/stores/auth';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
 import styles from './styles/Life.module.css';
 
@@ -51,12 +50,8 @@ type View = 'home' | { type: 'list'; category: LifeCategory } | { type: 'detail'
 
 export default function LifeWorld({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>('home');
-  const driverName = useDriverStore((s) => s.myDriver?.n ?? '');
-  const authName = useAuthStore((s) => s.user?.name ?? '');
-  const driverSabun = useDriverStore((s) => s.myDriver?.s ?? '');
-  const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
-  const name = authName || driverName;
-  const sabun = authSabun || driverSabun;
+  const name = useDriverStore((s) => s.myDriver?.n ?? '');
+  const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
 
   // ── 홈 화면 ──
   if (view === 'home') {
@@ -277,6 +272,8 @@ function DetailView({ postId, name, sabun, onBack }: {
   );
 
   const isMyPost = post.createdBy === name;
+  const hasImage = typeof post.imageUrl === 'string' && post.imageUrl.length > 0;
+  const hasLink = typeof post.linkUrl === 'string' && post.linkUrl.length > 0;
 
   const handleComment = async () => {
     if (!commentText.trim() || submitting) return;
@@ -307,13 +304,13 @@ function DetailView({ postId, name, sabun, onBack }: {
             <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
           </div>
           <h2 className={styles.detailTitle}>{post.title}</h2>
-          {post.imageUrl && (
+          {hasImage && (
             <img src={post.imageUrl} alt="" className={styles.detailImage} loading="lazy" />
           )}
           <div className={styles.detailContent}>{post.content}</div>
-          {post.linkUrl && (
+          {hasLink && (
             <a href={post.linkUrl} target="_blank" rel="noopener noreferrer" className={styles.detailLink}>
-              <Link2 size={14} /> {post.linkUrl}
+              🔗 {post.linkUrl}
             </a>
           )}
           <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={() => toggleLike(postId, name, sabun).catch(() => {})}>

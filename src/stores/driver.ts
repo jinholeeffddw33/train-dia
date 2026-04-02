@@ -39,25 +39,19 @@ export const useDriverStore = create<DriverState>()(
       isViewMode: false,
 
       pick: (id: string) => {
-        const person = P.find((p) => p.I === id) ?? null;
+        const person = ALL_PEOPLE.find((p) => p.I === id) ?? null;
+        if (!person) return;
         const { myDriver } = get();
-        // 최초 선택 시 myDriver도 함께 설정
-        if (!myDriver && person) {
-          set({ current: person, myDriver: person, isViewMode: false });
-        } else {
-          const viewing = person && myDriver ? person.I !== myDriver.I : false;
-          set({ current: person, isViewMode: viewing });
-        }
+        // myDriver는 절대 변경하지 않음 — 로그인 시에만 설정됨
+        const isViewMode = myDriver ? person.I !== myDriver.I : false;
+        set({ current: person, isViewMode });
       },
 
       setCurrent: (person: Person) => {
         const { myDriver } = get();
-        if (!myDriver) {
-          set({ current: person, myDriver: person, isViewMode: false });
-        } else {
-          const viewing = person.I !== myDriver.I;
-          set({ current: person, isViewMode: viewing });
-        }
+        // myDriver는 절대 변경하지 않음 — 로그인 시에만 설정됨
+        const isViewMode = myDriver ? person.I !== myDriver.I : false;
+        set({ current: person, isViewMode });
       },
 
       setMyDriver: (person: Person) => {

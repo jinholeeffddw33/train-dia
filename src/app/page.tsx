@@ -39,6 +39,11 @@ function HomeTab() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [driverOpen, setDriverOpen] = useState(false);
 
+  // 홈 진입 시 오늘 접속 기록 (오늘 1회만 서버에서 처리)
+  useEffect(() => {
+    fetch('/api/stats', { method: 'POST' }).catch(() => {});
+  }, []);
+
   return (
     <>
       <HomeHeader onDriverClick={() => setDriverOpen(true)} />

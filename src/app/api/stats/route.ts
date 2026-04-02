@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
+import { requireAuth } from '@/lib/authServer';
 
-// ── GET: 오늘의 통계 (접속자, 새 글) ──
+// ── GET: 오늘의 통계 ──
 export async function GET() {
   if (!serverSupabase) {
     return NextResponse.json({ todayVisitors: 0, todayPosts: 0 });
@@ -11,19 +12,20 @@ export async function GET() {
   todayStart.setHours(0, 0, 0, 0);
   const todayISO = todayStart.toISOString();
 
-  // 오늘 접속자 수 (hazard_reads 테이블의 unique user_sabun)
+  // 오늘 앱 접속자 수 (audit_log의 app_visit 이벤트 unique user_id)
   let todayVisitors = 0;
   try {
     const { data } = await serverSupabase
-      .from('hazard_reads')
-      .select('user_sabun')
+      .from('audit_log')
+      .select('user_id')
+      .eq('action', 'app_visit')
       .gte('created_at', todayISO);
     if (data) {
-      todayVisitors = new Set(data.map((r: { user_sabun: string }) => r.user_sabun)).size;
+      todayVisitors = new Set(data.map((r: { user_id: string }) => r.user_id)).size;
     }
   } catch { /* ignore */ }
 
-  // 오늘 새 글 수 (hazard_reports)
+  // 오늘 새 소식 수 (hazard_reports 신규 등록)
   let todayPosts = 0;
   try {
     const { count } = await serverSupabase
@@ -36,26 +38,37 @@ export async function GET() {
   return NextResponse.json({ todayVisitors, todayPosts });
 }
 
-// ── POST: 접속 기록 ──
+// ── POST: 홈화면 진입 기록 (오늘 1회만) ──
 export async function POST(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json({ ok: true });
   }
 
-  let body: Record<string, unknown>;
-  try { body = await req.json(); } catch { return NextResponse.json({ ok: true }); }
+  const authResult = await requireAuth(req);
+  if (authResult instanceof NextResponse) {
+    return NextResponse.json({ ok: true }); // 미인증이면 기록 안 함
+  }
+  const user = authResult;
 
-  const sabun = (body.sabun as string | undefined)?.trim();
-  if (!sabun) return NextResponse.json({ ok: true });
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
-  // 접속 기록 — hazard_reads에 특별 report_id 'visit'로 기록
+  // 오늘 이미 app_visit 기록이 있으면 skip
   try {
-    await serverSupabase
-      .from('hazard_reads')
-      .upsert(
-        { report_id: '00000000-0000-0000-0000-000000000000', user_sabun: sabun, user_name: body.name ?? '', created_at: new Date().toISOString() },
-        { onConflict: 'report_id,user_sabun' },
-      );
+    const { count } = await serverSupabase
+      .from('audit_log')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.sub)
+      .eq('action', 'app_visit')
+      .gte('created_at', todayStart.toISOString());
+
+    if ((count ?? 0) === 0) {
+      await serverSupabase.from('audit_log').insert({
+        user_id: user.sub,
+        user_name: user.name,
+        action: 'app_visit',
+      });
+    }
   } catch { /* ignore */ }
 
   return NextResponse.json({ ok: true });

@@ -50,10 +50,6 @@ export default function MoreTab() {
   const [stats, setStats] = useState({ todayVisitors: 0, todayPosts: 0 });
   useEffect(() => {
     fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => {});
-    // 접속 기록
-    const s = authUser?.sabun || myDriver?.s || '';
-    const n = authUser?.name || myDriver?.n || '';
-    if (s) fetch('/api/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sabun: s, name: n }) }).catch(() => {});
   }, []);
 
   return (

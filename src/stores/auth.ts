@@ -16,10 +16,16 @@ export interface AuthUser {
   mustChangePin?: boolean;
 }
 
+export interface SabunStatus {
+  exists: boolean;
+  mustChangePin: boolean;
+  hasBiometric: boolean;
+}
+
 interface AuthState {
   /** 로그인된 사용자 (null이면 미인증) */
   user: AuthUser | null;
-  /** 이 기기에 생체인증 등록 여부 */
+  /** 이 기기에 생체인증 등록 여부 (서버 기준) */
   hasBiometric: boolean;
   /** 마지막 로그인한 사번 (자동 입력용) */
   lastSabun: string;
@@ -29,6 +35,8 @@ interface AuthState {
   error: string;
 
   // ── 액션 ──
+  /** 사번으로 계정 상태 조회 (로그인 전) */
+  checkSabun: (sabun: string) => Promise<SabunStatus | null>;
   /** PIN 로그인 */
   loginWithPin: (sabun: string, pin: string) => Promise<boolean>;
   /** 생체인증 로그인 */
@@ -53,6 +61,24 @@ export const useAuthStore = create<AuthState>()(
       lastSabun: '',
       loading: false,
       error: '',
+
+      checkSabun: async (sabun) => {
+        set({ loading: true, error: '' });
+        try {
+          const res = await fetch(`/api/auth/check-sabun?sabun=${encodeURIComponent(sabun)}`);
+          const data = await res.json();
+          if (!res.ok) {
+            set({ loading: false, error: data.message || '사번을 확인할 수 없습니다' });
+            return null;
+          }
+          // 서버에서 받은 hasBiometric으로 로컬 상태 동기화
+          set({ hasBiometric: data.hasBiometric, loading: false, error: '' });
+          return data as SabunStatus;
+        } catch {
+          set({ loading: false, error: '네트워크 오류. 인터넷 연결을 확인해주세요' });
+          return null;
+        }
+      },
 
       loginWithPin: async (sabun, pin) => {
         set({ loading: true, error: '' });

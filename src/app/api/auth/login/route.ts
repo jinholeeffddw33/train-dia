@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createToken, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/jwt';
+import { createToken, COOKIE_NAME, TOKEN_MAX_AGE_PIN } from '@/lib/jwt';
 import { verifyPin, getProfileBySabun, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 
@@ -56,14 +56,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // JWT 발급
+  // JWT 발급 (PIN 로그인: 7일 세션)
   const token = await createToken({
     sub: profile.id,
     sabun: profile.sabun,
     name: profile.name,
     personId: profile.person_id,
     role: profile.role,
-  });
+  }, TOKEN_MAX_AGE_PIN);
 
   // 생체인증 등록 여부 확인
   let hasBiometric = false;
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: TOKEN_MAX_AGE_PIN,
   });
 
   return res;

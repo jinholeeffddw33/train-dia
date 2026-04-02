@@ -59,6 +59,76 @@
   margin-bottom: var(--dia-space-2);
 }
 
+/* ── 안내 단계 목록 ── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-5);
+  text-align: left;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+
+.stepNum {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--dia-blue);
+  color: white;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.4;
+}
+
+/* ── 초기 PIN 강조 박스 ── */
+.pinHint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-blue-dim, rgba(59, 130, 246, 0.25));
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  margin-bottom: var(--dia-space-5);
+}
+
+.pinHintLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.pinHintCode {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  letter-spacing: 6px;
+}
+
+/* ── subtitle 힌트 (작은 보조 텍스트) ── */
+.subtitleHint {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── 인라인 스피너 (버튼 안) ── */
+.spinnerInline {
+  animation: spin 1s linear infinite;
+}
+
 /* ── 업데이트 안내 박스 ── */
 .notice {
   background: var(--dia-surface);

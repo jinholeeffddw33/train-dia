@@ -5,7 +5,7 @@ import {
   type VerifiedAuthenticationResponse,
 } from '@simplewebauthn/server';
 import { serverSupabase } from '@/lib/serverSupabase';
-import { createToken, COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/jwt';
+import { createToken, COOKIE_NAME, TOKEN_MAX_AGE_BIOMETRIC } from '@/lib/jwt';
 import { getProfileBySabun, getProfileById, auditLog, getClientIP } from '@/lib/authServer';
 import { getRpConfig } from '@/lib/webauthnConfig';
 
@@ -182,13 +182,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // JWT 발급 (생체인증 로그인: 24시간 세션)
   const token = await createToken({
     sub: profile.id,
     sabun: profile.sabun,
     name: profile.name,
     personId: profile.person_id,
     role: profile.role,
-  });
+  }, TOKEN_MAX_AGE_BIOMETRIC);
 
   await auditLog(profile.id, profile.name, 'login_webauthn', {
     ip: getClientIP(req),
@@ -211,7 +212,7 @@ export async function POST(req: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: COOKIE_MAX_AGE,
+    maxAge: TOKEN_MAX_AGE_BIOMETRIC,
   });
 
   return res;

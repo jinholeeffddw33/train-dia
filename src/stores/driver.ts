@@ -94,6 +94,11 @@ export const useDriverStore = create<DriverState>()(
         current: state.current,
         myDriver: state.myDriver,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.myDriver && state.current) {
+          state.isViewMode = state.current.I !== state.myDriver.I;
+        }
+      },
     },
   ),
 );

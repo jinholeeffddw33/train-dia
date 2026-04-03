@@ -24,6 +24,9 @@ interface HomeHeaderProps {
 
 export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
   const driver = useDriverStore((s) => s.current);
+  const isViewMode = useDriverStore((s) => s.isViewMode);
+  const backToMe = useDriverStore((s) => s.backToMe);
+  const myDriver = useDriverStore((s) => s.myDriver);
   const td = today();
   const dow = DOW[td.getDay()];
   const dateStr = `${td.getMonth() + 1}월 ${td.getDate()}일 (${dow})`;
@@ -33,7 +36,11 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
       <div className={styles.headerTop}>
         {/* 왼쪽: 인사말 + 이름 */}
         <div className={styles.headerLeft}>
-          {driver && <span className={styles.headerGreeting}>{getGreeting()}</span>}
+          {driver && (
+            <span className={styles.headerGreeting}>
+              {isViewMode ? `${myDriver?.n ?? '내'} 계정으로 보는 중` : getGreeting()}
+            </span>
+          )}
           <button
             type="button"
             className={styles.headerNameBtn}
@@ -51,6 +58,16 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
               </span>
             )}
           </button>
+          {isViewMode && myDriver && (
+            <button
+              type="button"
+              className={styles.viewModeBadge}
+              onClick={backToMe}
+              aria-label="내 스케줄로 돌아가기"
+            >
+              ← 내 보기 ({myDriver.n})
+            </button>
+          )}
         </div>
         {/* 오른쪽: 날짜 + 시계 + 사업소 */}
         <div className={styles.headerRight}>

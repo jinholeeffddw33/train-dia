@@ -128,13 +128,21 @@
 }
 
 .viewModeBadge {
+  display: inline-flex;
+  align-items: center;
   font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
   color: var(--dia-blue);
   background: rgba(59, 130, 246, 0.15);
   border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: var(--dia-radius-full);
-  padding: 2px 10px;
-  min-height: 28px;
+  padding: 0 var(--dia-space-3);
+  min-height: 44px;
+  transition: background var(--dia-transition-fast);
+}
+
+.viewModeBadge:active {
+  background: rgba(59, 130, 246, 0.28);
 }
 
 .clockAmPm {

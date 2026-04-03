@@ -249,11 +249,17 @@ function DetailView({ postId, name, sabun, onBack }: {
   postId: string; name: string; sabun: string; onBack: () => void;
 }) {
   const post = useLifeStore((s) => s.posts.find((p) => p.id === postId) || null);
+  const recordRead = useLifeStore((s) => s.recordRead);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [cmts, setCmts] = useState<Array<{ id: string; comment: string; createdBy: string; createdAt: string }>>([]);
   const [likeCount, setLikeCount] = useState(post?.likeCount ?? 0);
   const [liked, setLiked] = useState(post?.likedByMe ?? false);
+
+  // 조회수 증가
+  useEffect(() => {
+    recordRead(postId, sabun);
+  }, [postId, sabun, recordRead]);
 
   // 댓글 로드
   useEffect(() => {

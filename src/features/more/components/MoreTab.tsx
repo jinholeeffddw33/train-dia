@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone } from 'lucide-react';
+import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useThemeStore } from '@/stores/theme';
@@ -40,6 +41,8 @@ export default function MoreTab() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [shuttleOpen, setShuttleOpen] = useState(false);
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
+  const [installGuideOpen, setInstallGuideOpen] = useState(false);
+  const { canInstall, isInstalled, isIOS, install } = useInstallPrompt();
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [newPinConfirm, setNewPinConfirm] = useState('');
@@ -192,6 +195,26 @@ export default function MoreTab() {
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
+
+        {/* 홈 화면 추가 — 미설치 상태에서만 노출 */}
+        {!isInstalled && (canInstall || isIOS) && (
+          <button
+            type="button"
+            className={styles.toolBtn}
+            onClick={() => {
+              if (canInstall) install();
+              else setInstallGuideOpen(true);
+            }}
+          >
+            <div className={styles.settingInfo}>
+              <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+                <Smartphone size={20} />
+              </div>
+              <span className={styles.settingLabel}>홈 화면에 추가</span>
+            </div>
+            <ChevronRight size={18} className={styles.toolArrow} />
+          </button>
+        )}
       </section>
 
       {/* 설정 섹션 */}
@@ -439,6 +462,56 @@ export default function MoreTab() {
               >
                 {pinLoading ? '변경 중...' : 'PIN 변경'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* iOS 홈 화면 추가 안내 모달 */}
+      {installGuideOpen && (
+        <div className={styles.fullOverlay}>
+          <div className={styles.overlayHeader}>
+            <button
+              type="button"
+              className={styles.overlayClose}
+              onClick={() => setInstallGuideOpen(false)}
+              aria-label="닫기"
+            >
+              <X size={22} />
+            </button>
+            <h2 className={styles.overlayTitle}>홈 화면에 추가</h2>
+          </div>
+          <div className={styles.overlayBody}>
+            <div className={styles.installGuide}>
+              <p className={styles.installGuideDesc}>
+                Safari에서 홈 화면에 추가하면 앱처럼 바로 열 수 있어요.
+              </p>
+              <ol className={styles.installSteps}>
+                <li className={styles.installStep}>
+                  <span className={styles.installStepNum}>1</span>
+                  <div className={styles.installStepText}>
+                    <strong>Safari 하단 공유 버튼</strong> 탭<br />
+                    <span className={styles.installStepSub}>화면 아래 가운데 □↑ 아이콘</span>
+                  </div>
+                </li>
+                <li className={styles.installStep}>
+                  <span className={styles.installStepNum}>2</span>
+                  <div className={styles.installStepText}>
+                    <strong>홈 화면에 추가</strong> 선택<br />
+                    <span className={styles.installStepSub}>목록을 아래로 스크롤하면 보여요</span>
+                  </div>
+                </li>
+                <li className={styles.installStep}>
+                  <span className={styles.installStepNum}>3</span>
+                  <div className={styles.installStepText}>
+                    <strong>오른쪽 상단 추가</strong> 탭<br />
+                    <span className={styles.installStepSub}>이름은 그대로 두면 돼요</span>
+                  </div>
+                </li>
+              </ol>
+              <p className={styles.installGuideTip}>
+                💡 설치 후에는 주소창 없이 앱처럼 실행돼요
+              </p>
             </div>
           </div>
         </div>

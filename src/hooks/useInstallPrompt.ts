@@ -10,10 +10,18 @@ interface BeforeInstallPromptEvent extends Event {
 export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // 이미 설치됐는지 확인 (standalone)
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // iOS Safari 감지 (beforeinstallprompt 없음 — 수동 안내 필요)
+    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    setIsIOS(ios);
+
+    // 이미 설치됐는지 확인 (standalone — Android + iOS 공통)
+    const standalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as { standalone?: boolean }).standalone === true;
+    if (standalone) {
       setIsInstalled(true);
       return;
     }
@@ -45,6 +53,7 @@ export function useInstallPrompt() {
   return {
     canInstall: !!deferredPrompt && !isInstalled,
     isInstalled,
+    isIOS,
     install,
   };
 }

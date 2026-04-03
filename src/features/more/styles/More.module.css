@@ -716,3 +716,68 @@
 
 .pinSubmit:active { opacity: 0.8; }
 .pinSubmit:disabled { opacity: 0.5; }
+
+/* ── iOS 홈 화면 추가 안내 ── */
+.installGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+}
+
+.installGuideDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+}
+
+.installSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  list-style: none;
+}
+
+.installStep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.installStepNum {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--dia-blue);
+  color: white;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.installStepText {
+  flex: 1;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: 1.5;
+}
+
+.installStepSub {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.installGuideTip {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-md);
+}

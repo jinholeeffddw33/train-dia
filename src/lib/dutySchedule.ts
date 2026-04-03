@@ -96,6 +96,11 @@ export function getDutyInfo(date: Date): DutyInfo {
   const assignments: ShiftAssignment[] = [];
   const gwanje: GwanjeAssignment[] = [];
 
+  // 월별 본소↔기지 교대: 홀수월(3,5,7...)=기본, 짝수월(4,6,8...)=뒤집힘
+  // 기준: 2026-03 (홀수월) = gijiFirst→기지, bonsoFirst→본소
+  const month = date.getMonth() + 1; // 1-indexed
+  const isSwappedMonth = month % 2 === 0;
+
   for (const group of GROUPS) {
     const pos = ((daysSince + group.offset) % 8 + 8) % 8;
 
@@ -106,36 +111,40 @@ export function getDutyInfo(date: Date): DutyInfo {
     const isFirstHalf = pos < 4;
     const shift = isDay ? '주간' as const : '야간' as const;
 
+    // 짝수월이면 gijiFirst↔bonsoFirst 역할 교대
+    const giji = isSwappedMonth ? group.bonsoFirst : group.gijiFirst;
+    const bonso = isSwappedMonth ? group.gijiFirst : group.bonsoFirst;
+
     if (isFirstHalf) {
-      // 기지first → 기지, 본소first → 본소
+      // giji → 기지, bonso → 본소
       assignments.push({
         location: '본소',
         shift,
-        manager: group.bonsoFirst.manager,
-        crew: group.bonsoFirst.crew,
+        manager: bonso.manager,
+        crew: bonso.crew,
         group: group.name,
       });
       assignments.push({
         location: '기지',
         shift,
-        manager: group.gijiFirst.manager,
-        crew: group.gijiFirst.crew,
+        manager: giji.manager,
+        crew: giji.crew,
         group: group.name,
       });
     } else {
-      // second-half: 기지first → 본소, 본소first → 기지
+      // second-half: giji → 본소, bonso → 기지
       assignments.push({
         location: '본소',
         shift,
-        manager: group.gijiFirst.manager,
-        crew: group.gijiFirst.crew,
+        manager: giji.manager,
+        crew: giji.crew,
         group: group.name,
       });
       assignments.push({
         location: '기지',
         shift,
-        manager: group.bonsoFirst.manager,
-        crew: group.bonsoFirst.crew,
+        manager: bonso.manager,
+        crew: bonso.crew,
         group: group.name,
       });
     }

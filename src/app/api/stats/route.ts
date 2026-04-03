@@ -2,15 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { requireAuth } from '@/lib/authServer';
 
+/** KST(UTC+9) 기준 오늘 자정 ISO 문자열 */
+function getTodayStartKST(): string {
+  const now = new Date();
+  // KST = UTC + 9시간
+  const kstOffset = 9 * 60 * 60 * 1000;
+  const kstNow = new Date(now.getTime() + kstOffset);
+  // KST 기준 날짜의 00:00:00을 UTC로 변환
+  const kstMidnight = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()));
+  // KST 00:00 = UTC 전날 15:00
+  return new Date(kstMidnight.getTime() - kstOffset).toISOString();
+}
+
 // ── GET: 오늘의 통계 ──
 export async function GET() {
   if (!serverSupabase) {
     return NextResponse.json({ todayVisitors: 0, todayPosts: 0 });
   }
 
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const todayISO = todayStart.toISOString();
+  const todayISO = getTodayStartKST();
 
   // 오늘 앱 접속자 수 (audit_log의 app_visit 이벤트 unique user_id)
   let todayVisitors = 0;
@@ -50,8 +60,7 @@ export async function POST(req: NextRequest) {
   }
   const user = authResult;
 
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  const todayISO = getTodayStartKST();
 
   // 오늘 이미 app_visit 기록이 있으면 skip
   try {
@@ -60,7 +69,7 @@ export async function POST(req: NextRequest) {
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.sub)
       .eq('action', 'app_visit')
-      .gte('created_at', todayStart.toISOString());
+      .gte('created_at', todayISO);
 
     if ((count ?? 0) === 0) {
       await serverSupabase.from('audit_log').insert({

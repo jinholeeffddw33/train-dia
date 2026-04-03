@@ -65,7 +65,7 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
               onClick={backToMe}
               aria-label="내 스케줄로 돌아가기"
             >
-              ← 내 보기 ({myDriver.n})
+              ← 돌아가기 ({myDriver.n})
             </button>
           )}
         </div>

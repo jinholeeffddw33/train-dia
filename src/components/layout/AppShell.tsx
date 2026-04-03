@@ -80,17 +80,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
         </div>
       )}
 
-      {/* 조회 모드 배너 */}
-      {isViewMode && viewDriver && myDriver && (
-        <div className={styles.viewModeBanner}>
-          <span className={styles.viewModeText}>
-            <strong>{viewDriver.n}</strong> 조회 중 (내 계정: {myDriver.n})
-          </span>
-          <button type="button" className={styles.viewModeBtn} onClick={backToMe}>
-            내 보기
-          </button>
-        </div>
-      )}
+      {/* 조회 모드 배너 — 삭제: HomeHeader 내 돌아가기 버튼으로 통합 */}
 
       {onBack && (
         <button

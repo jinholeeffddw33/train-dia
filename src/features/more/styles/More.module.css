@@ -897,12 +897,6 @@
 .feedbackSubmitBtn:active { opacity: 0.8; }
 .feedbackSubmitBtn:disabled { opacity: 0.4; }
 
-.feedbackNote {
-  margin-top: var(--dia-space-3);
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
-  text-align: center;
-}
 
 /* 완료 화면 */
 .feedbackDone {

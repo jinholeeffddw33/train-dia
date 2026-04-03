@@ -103,9 +103,6 @@ export default function FeedbackOverlay({ onClose }: Props) {
               {loading ? '전송 중...' : '익명으로 제보하기'}
             </button>
 
-            <p className={styles.feedbackNote}>
-              * 답장은 불가하며, 관리자만 확인합니다
-            </p>
           </div>
         )}
       </div>

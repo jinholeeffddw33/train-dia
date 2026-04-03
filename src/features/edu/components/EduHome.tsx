@@ -5,7 +5,7 @@ import {
   ArrowLeft, ChevronRight, X,
   Mic, TrainFront, DoorOpen, Wrench,
   GraduationCap, Award, User, ClipboardList,
-  RotateCcw, Clock, GitCompareArrows,
+  RotateCcw, Clock, GitCompareArrows, Play,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -29,7 +29,7 @@ const MENU_ITEMS = [
   { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch6'] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
-  { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'coming'   as const, targets: [] },
+  { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapters' as const, targets: ['newcomer1', 'newcomer2', 'newcomer3'] },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'coming'   as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
@@ -113,6 +113,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
     { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: [],             coming: true },
     { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
+    { id: 'rescue',  label: '입환전호\n요령',  color: 'amber'  as const, targets: [],            coming: false, link: 'https://youtu.be/C6piuhrnxpA?si=zIY7NMsgcfvfyvgR' },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
@@ -315,13 +316,14 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
             </div>
             <div className={styles.subMenuGrid}>
               {REPAIR_SUB.map((sub) => {
-                const iconMap = {
+                const iconMap: Record<string, typeof Wrench> = {
                   abb: Wrench,
                   woojin: Wrench,
                   rotem: Wrench,
                   compare: GitCompareArrows,
-                } as const;
-                const SubIcon = iconMap[sub.id as keyof typeof iconMap];
+                  rescue: Play,
+                };
+                const SubIcon = iconMap[sub.id] ?? Wrench;
                 return (
                   <button
                     key={sub.id}
@@ -329,7 +331,10 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                     className={`${styles.subMenuItem} ${sub.coming ? styles.menuGridItemDisabled : ''}`}
                     disabled={sub.coming}
                     onClick={() => {
-                      if (!sub.coming) {
+                      if (sub.coming) return;
+                      if ('link' in sub && sub.link) {
+                        window.open(sub.link, '_blank', 'noopener,noreferrer');
+                      } else {
                         setRepairOpen(false);
                         onChapters([...sub.targets]);
                       }

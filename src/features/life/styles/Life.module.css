@@ -104,9 +104,25 @@
 .menuItem:active { background: var(--dia-surface-hover); transform: scale(0.98); }
 
 .menuIcon {
+  position: relative;
   width: 52px; height: 52px;
   border-radius: var(--dia-radius-xl);
   display: flex; align-items: center; justify-content: center;
+}
+
+.menuBadge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 20px; height: 20px;
+  padding: 0 6px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red, #ef4444);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .menuLabel {

@@ -16,23 +16,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ code: 'MISSING_FIELDS', message: '파일, 이름, 사번이 필요합니다' }, { status: 400 });
   }
 
-  const verified = verifyUser(name, sabun);
-  if (!verified) {
-    return NextResponse.json({ code: 'AUTH_FAILED' }, { status: 403 });
+  // 파일 크기 검증 (5MB 제한)
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ code: 'FILE_TOO_LARGE', message: '사진 크기는 5MB 이하만 가능합니다' }, { status: 400 });
   }
 
-  // 파일명 생성
-  const ext = file.name.split('.').pop() || 'jpg';
+  const verified = verifyUser(name, sabun);
+  if (!verified) {
+    return NextResponse.json({ code: 'AUTH_FAILED', message: '이름과 사번이 일치하지 않습니다' }, { status: 403 });
+  }
+
+  // 파일명 생성 (확장자 안전 처리)
+  const rawExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const ext = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic'].includes(rawExt) ? rawExt : 'jpg';
   const fileName = `life/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   const buf = Buffer.from(await file.arrayBuffer());
 
   const { error } = await serverSupabase.storage
     .from('hazard-photos')
-    .upload(fileName, buf, { contentType: file.type, upsert: false });
+    .upload(fileName, buf, { contentType: file.type || 'image/jpeg', upsert: false });
 
   if (error) {
-    return NextResponse.json({ code: 'UPLOAD_FAILED', message: error.message }, { status: 500 });
+    return NextResponse.json({ code: 'UPLOAD_FAILED', message: `사진 저장 실패: ${error.message}` }, { status: 500 });
   }
 
   const { data: urlData } = serverSupabase.storage

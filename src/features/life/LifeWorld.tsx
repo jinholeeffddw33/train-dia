@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Component, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback, Component, type ReactNode } from 'react';
 import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
@@ -48,10 +48,45 @@ const ICON_COLOR: Record<string, string> = {
 
 type View = 'home' | { type: 'list'; category: LifeCategory } | { type: 'detail'; category: LifeCategory; postId: string } | { type: 'write'; category: LifeCategory };
 
+/** localStorage에서 카테고리별 마지막 방문 시간 가져오기 */
+function getLastVisit(cat: LifeCategory): string {
+  try { return localStorage.getItem(`life-last-visit-${cat}`) ?? ''; } catch { return ''; }
+}
+/** 카테고리 방문 시 현재 시간 저장 */
+function markVisited(cat: LifeCategory) {
+  try { localStorage.setItem(`life-last-visit-${cat}`, new Date().toISOString()); } catch { /* ignore */ }
+}
+
 export default function LifeWorld({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>('home');
   const name = useDriverStore((s) => s.myDriver?.n ?? '');
   const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
+  const [newCounts, setNewCounts] = useState<Record<string, number>>({});
+
+  // 카테고리별 새 글 수 가져오기
+  const fetchNewCounts = useCallback(() => {
+    const params = new URLSearchParams();
+    for (const cat of CATEGORIES) {
+      const lv = getLastVisit(cat.id);
+      if (lv) params.set(cat.id, lv);
+    }
+    const qs = params.toString();
+    fetch(`/api/life/posts/counts${qs ? `?${qs}` : ''}`)
+      .then((r) => r.ok ? r.json() : { data: {} })
+      .then((json) => setNewCounts(json.data || {}))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (view === 'home') fetchNewCounts();
+  }, [view, fetchNewCounts]);
+
+  // 카테고리 진입 시 방문 기록 + 배지 초기화
+  const handleCategoryClick = useCallback((catId: LifeCategory) => {
+    markVisited(catId);
+    setNewCounts((prev) => ({ ...prev, [catId]: 0 }));
+    setView({ type: 'list', category: catId });
+  }, []);
 
   // ── 홈 화면 ──
   if (view === 'home') {
@@ -103,15 +138,21 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           <div className={styles.menuGrid}>
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
+              const badgeCount = newCounts[cat.id] ?? 0;
               return (
                 <button
                   key={cat.id}
                   type="button"
                   className={styles.menuItem}
-                  onClick={() => setView({ type: 'list', category: cat.id })}
+                  onClick={() => handleCategoryClick(cat.id)}
                 >
                   <div className={`${styles.menuIcon} ${ICON_BG[cat.color]}`}>
                     <Icon size={26} className={ICON_COLOR[cat.color]} />
+                    {badgeCount > 0 && (
+                      <span className={styles.menuBadge}>
+                        {badgeCount > 99 ? '99+' : badgeCount}
+                      </span>
+                    )}
                   </div>
                   <span className={styles.menuLabel}>{cat.label}</span>
                   <span className={styles.menuDesc}>{cat.desc}</span>
@@ -408,7 +449,13 @@ function WriteView({ category, name, sabun, onBack }: {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError('사진 크기는 5MB 이하만 가능합니다');
+      return;
+    }
+    setError('');
     setImageFile(file);
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
     const url = URL.createObjectURL(file);
     setImagePreview(url);
   };
@@ -431,6 +478,9 @@ function WriteView({ category, name, sabun, onBack }: {
         if (uploadRes.ok) {
           const uploadJson = await uploadRes.json();
           uploadedImageUrl = uploadJson.url;
+        } else {
+          const errJson = await uploadRes.json().catch(() => ({}));
+          throw new Error((errJson as { message?: string }).message || '사진 업로드에 실패했습니다');
         }
       }
 
@@ -481,7 +531,7 @@ function WriteView({ category, name, sabun, onBack }: {
           {imagePreview && (
             <div className={styles.imagePreviewWrap}>
               <img src={imagePreview} alt="미리보기" className={styles.imagePreview} />
-              <button type="button" className={styles.imageRemoveBtn} onClick={() => { setImageUrl(''); setImagePreview(''); }}>
+              <button type="button" className={styles.imageRemoveBtn} onClick={() => { setImageFile(null); setImageUrl(''); if (imagePreview) URL.revokeObjectURL(imagePreview); setImagePreview(''); }}>
                 <X size={16} />
               </button>
             </div>

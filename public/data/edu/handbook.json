@@ -6693,13 +6693,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "주공기 압력이 8~9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
+                    "주공기 압력이 8~9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
                   ]
                 }
               ]
@@ -6755,6 +6755,10 @@
               ]
             },
             {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n3"
+            },
+            {
               "type": "heading",
               "text": "기능시험"
             },
@@ -6765,7 +6769,7 @@
                   "label": "1",
                   "items": [
                     "제동장치 상태 및 기능시험",
-                    "1)   전·후   운전실   상용제동,   EBS(비상제동스위치),   보안제동,   EBCOS(비상제동   차단스위치) 기능상태 점검",
+                    "1) 전·후 운전실 상용제동, EBS(비상제동스위치), 보안제동, EBCOS(비상제동 차단스위치) 기능상태 점검",
                     "2) 운전실 데스크 주차제동 체결, 완해 스위치 취급"
                   ]
                 },
@@ -6860,6 +6864,10 @@
               ]
             },
             {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n4"
+            },
+            {
               "type": "heading",
               "text": "역행시험"
             },
@@ -6898,31 +6906,31 @@
               ]
             },
             {
-              "type": "heading",
-              "text": "열차무선(LTE)"
+              "type": "text",
+              "value": "열차무선(LTE)"
             },
             {
               "type": "heading",
               "text": "열차무선"
             },
             {
-              "type": "heading",
-              "text": "각종 등 및 표시기"
+              "type": "text",
+              "value": "각종 등 및 표시기"
             },
             {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_021.jpg",
-                  "caption": "기적"
+                  "caption": "기적\n▶"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_022.jpg",
-                  "caption": "데스크 표시등"
+                  "caption": "데스크 표시등\n▶"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_023.jpg",
-                  "caption": "계기등"
+                  "caption": "계기등\n▶"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_024.jpg",
@@ -6948,8 +6956,12 @@
               ]
             },
             {
-              "type": "heading",
-              "text": "각종 NFB 확인"
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n5"
+            },
+            {
+              "type": "text",
+              "value": "각종 NFB 확인"
             },
             {
               "type": "images",
@@ -6991,11 +7003,15 @@
             },
             {
               "type": "text",
-              "value": "전·후 운전실\nADU\n출고 준비 완료통보"
+              "value": "전·후 운전실\nADU 출고 준비 완료통보"
             },
             {
               "type": "heading",
               "text": "PDT 시험"
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n6"
             }
           ]
         },
@@ -7124,7 +7140,7 @@
             },
             {
               "type": "text",
-              "value": "모니터(DU)\n데스크 표시등 확인\n고장 리셋 스위치\n고장기록 확인\n차량 재기동"
+              "value": "모니터(DU)\n데스크 표시등 확인 고장 리셋 스위치\n고장기록 확인\n차량 재기동"
             },
             {
               "type": "images",
@@ -7146,6 +7162,10 @@
                   "caption": "KEY OFF"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n7"
             },
             {
               "type": "images",
@@ -7172,6 +7192,10 @@
                   "caption": "전차선 전압계"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n8"
             }
           ]
         },
@@ -7269,6 +7293,10 @@
                   "caption": "BATK 1, 2"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n9"
             }
           ]
         },
@@ -7338,7 +7366,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터   경고   메시지[IVS(SIV접지스위치), IES(인버터접지스위치), EPanDS(비상전원차단스위치) 취급 등], 운전실배전반 내 ESR(접지 스위치 릴레이), 판토그라프 상태 확인"
+                    "모니터 경고 메시지[IVS(SIV접지스위치), IES(인버터접지스위치), EPanDS(비상전원차단스위치) 취급 등], 운전실배전반 내 ESR(접지 스위치 릴레이), 판토그라프 상태 확인"
                   ]
                 },
                 {
@@ -7350,13 +7378,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "운전실 데스크 주공기 압력 확인(MR 압력 게이지)"
+                    "운전실 데스크 주공기 압력 확인(MR 압력 게이지) 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "ACM 구동상태 확인(MR 6.5kg/cm 2   에서 Pan 상승 스위치 취급 시 구동)",
+                    "ACM 구동상태 확인(MR 6.5kg/cm에서 Pan 상승 스위치 취급 시 구동)",
                     "2호, 6호 객실 내에서 ACM 구동음 확인"
                   ]
                 },
@@ -7374,23 +7402,28 @@
             },
             {
               "type": "text",
-              "value": "모니터 경고,\n가선 정전 표시등   축전지 전압 75V 이상   MR 압력 게이지\nPan 상태 확인"
-            },
-            {
-              "type": "text",
-              "value": "ACM 구동음 확인\n전·후 운전실\n(2호, 6호)\nEPanDS 확인"
+              "value": "모니터 경고,\n가선 정전 표시등 축전지 전압 75V 이상 MR 압력 게이지\nPan 상태 확인"
             },
             {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_043.jpg",
-                  "caption": ""
+                  "caption": "ACM 구동음 확인\n(2호, 6호)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_044.jpg",
-                  "caption": ""
-                },
+                  "caption": "전·후 운전실\nEPanDS 확인"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n10"
+            },
+            {
+              "type": "images",
+              "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_045.jpg",
                   "caption": ""
@@ -7430,14 +7463,10 @@
                 {
                   "label": "5",
                   "items": [
-                    "1량 판토그라프 상승 불능"
+                    "1량 판토그라프 상승 불능 불량현상 Ÿ 모니터에 2호 또는 6호차 판토그라프 상승불가"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "불량현상   Ÿ   모니터에 2호 또는 6호차 판토그라프 상승불가"
             },
             {
               "type": "heading",
@@ -7477,29 +7506,29 @@
               "text": "확인사항"
             },
             {
-              "type": "text",
-              "value": "해당 유니트\n해당 차호 Pan\n운전실 개별 Pan\n일반배전반\nVVVF, SIV OFF\n하강 표시\n하강 스위치\nPanVN 확인\nPan 개방 코크 확인"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_049.jpg",
-                  "caption": ""
+                  "caption": "해당 유니트\nVVVF, SIV OFF"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_050.jpg",
-                  "caption": ""
+                  "caption": "해당 차호 Pan\n하강 표시"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_051.jpg",
-                  "caption": ""
+                  "caption": "운전실 개별 Pan\n하강 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_052.jpg",
-                  "caption": ""
+                  "caption": "일반배전반\nPanVN 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "Pan 개방 코크 확인\n제1장 출고준비 및 기본 조치사항\n11"
             }
           ]
         },
@@ -7507,7 +7536,7 @@
           "id": "newcomer1-6",
           "title": "SIV 기동 불능",
           "summary": [
-            "모니터에 해당 차호 SIV   ‘ NG ’   현시"
+            "모니터에 해당 차호 SIV ‘NG’ 현시"
           ],
           "keywords": [
             "SIV",
@@ -7532,7 +7561,7 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "모니터에 해당 차호 SIV   ‘ NG ’   현시"
+                  "desc": "모니터에 해당 차호 SIV ‘NG’ 현시"
                 }
               ]
             },
@@ -7545,7 +7574,7 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "해당 차호 운전실 가선 전압계   ‘ 0 ’   V 현시"
+                  "desc": "해당 차호 운전실 가선 전압계 ‘0’ V 현시"
                 }
               ]
             },
@@ -7574,7 +7603,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "중고장 이외의 고장 시(경고장) 고장 리셋스위치 취급( 반드시 주간제어기 B7에 위치 )"
+                    "중고장 이외의 고장 시(경고장) 고장 리셋스위치 취급(반드시 주간제어기 B7에 위치)"
                   ]
                 },
                 {
@@ -7601,6 +7630,10 @@
                   "caption": "SIVCN 1, 2 상태 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n12"
             }
           ]
         },
@@ -7623,14 +7656,10 @@
                 {
                   "label": "7",
                   "items": [
-                    "CM(주공기압축기) 기동 불능"
+                    "CM(주공기압축기) 기동 불능 불량현상 Ÿ 모니터에 해당 차호 CM ‘NG’ 현시"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "불량현상   Ÿ   모니터에 해당 차호 CM   ‘ NG ’   현시"
             },
             {
               "type": "heading",
@@ -7689,6 +7718,10 @@
                   "caption": "SIV 상태 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n13"
             }
           ]
         },
@@ -7773,10 +7806,15 @@
                 {
                   "label": "5",
                   "items": [
-                    "ATCN 1, 2 취급 시 출입문 닫힘상태 확인 후 취급 ※ 재부팅 소요시간 45~50초 소요됨"
+                    "ATCN 1, 2 취급 시 출입문 닫힘상태 확인 후 취급"
                   ]
                 }
               ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 재부팅 소요시간 45~50초 소요됨"
             },
             {
               "type": "heading",
@@ -7790,6 +7828,10 @@
                   "caption": "ADU 상태 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n14"
             }
           ]
         },
@@ -7813,14 +7855,10 @@
                 {
                   "label": "9",
                   "items": [
-                    "DU(TCMS 모니터) 현시 불량"
+                    "DU(TCMS 모니터) 현시 불량 불량현상 Ÿ DU(이하 모니터) 현시 불량"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "불량현상   Ÿ   DU(이하 모니터) 현시 불량"
             },
             {
               "type": "heading",
@@ -7872,6 +7910,10 @@
                   "caption": "TCMSDON OFF → ON"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n15"
             }
           ]
         },
@@ -7964,29 +8006,29 @@
               "text": "확인사항"
             },
             {
-              "type": "text",
-              "value": "주차제동\n주차제동\n주차제동\nPABBPS\n표시등 확인\n전자변 완해 취급\n당김고리 당김\n바이패스 취급"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_060.jpg",
-                  "caption": ""
+                  "caption": "주차제동\n표시등 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_061.jpg",
-                  "caption": ""
+                  "caption": "주차제동\n전자변 완해 취급"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_062.jpg",
-                  "caption": ""
+                  "caption": "주차제동\n당김고리 당김"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_063.jpg",
-                  "caption": ""
+                  "caption": "PABBPS\n바이패스 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n16"
             }
           ]
         },
@@ -8051,13 +8093,13 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터에   ‘ F/N1032 보안제동 동작 중(ScBR) ’   경고 현시"
+                    "모니터에 ‘F/N1032 보안제동 동작 중(ScBR)’ 경고 현시"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "보안제동 표시등 점등, 모니터   ‘ 상태확인 → 제동장치 ’ 에서 제동압력 확인 (TC, T 1, 2 → 2kg/cm 2 , M → 4kg/cm 2 )"
+                    "보안제동 표시등 점등, 모니터 ‘상태확인 → 제동장치’에서 제동압력 확인 22 (TC, T 1, 2 → 2kg/cm, M → 4kg/cm)"
                   ]
                 },
                 {
@@ -8087,7 +8129,7 @@
             },
             {
               "type": "text",
-              "value": "보안제동 스위치\n보안제동 표시등   제동장치 압력 확인\nCPRS 취급\n반복취급"
+              "value": "보안제동 스위치\n보안제동 표시등 제동장치 압력 확인 CPRS 취급\n반복취급"
             },
             {
               "type": "images",
@@ -8101,6 +8143,10 @@
                   "caption": "제동풀림코크 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n17"
             },
             {
               "type": "images",
@@ -8126,7 +8172,7 @@
           "title": "비상제동 완해 불량",
           "summary": [
             "비상제동 표시등 점등",
-            "모니터   ‘ F/N1006 비상제동 동작 중(EBR) ’   경고 현시"
+            "모니터 ‘F/N1006 비상제동 동작 중(EBR)’ 경고 현시"
           ],
           "keywords": [
             "비상제동",
@@ -8155,7 +8201,7 @@
                 },
                 {
                   "term": "",
-                  "desc": "모니터   ‘ F/N1006 비상제동 동작 중(EBR) ’   경고 현시"
+                  "desc": "모니터 ‘F/N1006 비상제동 동작 중(EBR)’ 경고 현시"
                 }
               ]
             },
@@ -8182,19 +8228,19 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터에   ‘ F/N1006 비상제동 동작 중(EBR) ’   경고 현시"
+                    "모니터에 ‘F/N1006 비상제동 동작 중(EBR)’ 경고 현시"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "비상제동 표시등 점등, 모니터   ‘ 상태확인 → 제동장치 ’ 에서 제동압력 확인"
+                    "비상제동 표시등 점등, 모니터 ‘상태확인 → 제동장치’에서 제동압력 확인"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "운전실   좌측/우측   EBS(비상제동스위치)   점등   상태   확인(스위치   PUSH   ON   상태시에만   램프 점등)"
+                    "운전실 좌측/우측 EBS(비상제동스위치) 점등 상태 확인(스위치 PUSH ON 상태시에만 램프 점등)"
                   ]
                 },
                 {
@@ -8206,7 +8252,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "완해 불능 시 주간제어기   ‘ EB → 중립 ’   2~3회 반복 취급 후 제동 상태 확인"
+                    "완해 불능 시 주간제어기 ‘EB → 중립’ 2~3회 반복 취급 후 제동 상태 확인"
                   ]
                 },
                 {
@@ -8223,25 +8269,25 @@
               "text": "확인사항"
             },
             {
-              "type": "text",
-              "value": "모니터 및\nEBS 점등 여부확인\n제동장치 압력 확인\nEBCOS 취급\n표시등 확인\n(좌/우)"
-            },
-            {
-              "type": "text",
-              "value": "주간제어기 EB\n제동풀림코크 취급\n반복 취급"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_069.jpg",
-                  "caption": ""
+                  "caption": "모니터 및\n제동장치 압력 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_070.jpg",
-                  "caption": ""
+                  "caption": "EBS 점등 여부확인\nEBCOS 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "표시등 확인 (좌/우)"
+            },
+            {
+              "type": "text",
+              "value": "주간제어기 EB\n제동풀림코크 취급\n반복 취급\n서울시 5호선 200칸 전동차 응급처치요령\n18"
             }
           ]
         },
@@ -8264,22 +8310,9 @@
                 {
                   "label": "13",
                   "items": [
-                    "판토그라프 완전부동 취급"
+                    "판토그라프 완전부동 취급 불량현상 Ÿ 집전장치 고장 완전부동 취급을 하여야 할 경우"
                   ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "불량현상   Ÿ   집전장치 고장"
-            },
-            {
-              "type": "text",
-              "value": "완전부동 취급을 하여야 할\n경우"
-            },
-            {
-              "type": "flow",
-              "steps": [
+                },
                 {
                   "label": "1",
                   "items": [
@@ -8342,6 +8375,10 @@
                   "caption": "단부 커버"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제1장 출고준비 및 기본 조치사항\n19"
             }
           ]
         },
@@ -8362,14 +8399,10 @@
                 {
                   "label": "14",
                   "items": [
-                    "비상역행"
+                    "비상역행 불량현상 Ÿ 역행불능"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "불량현상   Ÿ   역행불능"
             },
             {
               "type": "heading",
@@ -8405,25 +8438,25 @@
               "text": "조치방법"
             },
             {
-              "type": "text",
-              "value": "운전실 배전반\nEROS EO\nZVBPS 취급\n운전모드 수동\nENCN OFF\n모드 선택\n(ATC OFF)\n또는 비상"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_074.jpg",
-                  "caption": ""
+                  "caption": "운전실 배전반"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_075.jpg",
-                  "caption": ""
+                  "caption": "EROS EO"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_076.jpg",
-                  "caption": ""
+                  "caption": "ZVBPS 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "ENCN OFF모드 선택(ATC OFF)또는 비상\n서울시 5호선 200칸 전동차 응급처치요령\n20"
             }
           ]
         }
@@ -8473,7 +8506,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "Pan 상승 안내방송   “ OO편성 판토 상승합니다. ” 를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
+                    "Pan 상승 안내방송 “OO편성 판토 상승합니다.”를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
                   ]
                 },
                 {
@@ -8486,13 +8519,13 @@
                 {
                   "label": "4",
                   "items": [
-                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
                   ]
                 }
               ]
@@ -8510,25 +8543,25 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_002.jpg",
-                  "caption": "MC ON"
+                  "caption": "MC ON\nPAN 상승 안내방송"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_003.jpg",
-                  "caption": "TCMS 초기화"
+                  "caption": "TCMS 초기화\nPAN 상승 S/W 취급"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_004.jpg",
-                  "caption": "ATC 초기화"
+                  "caption": "ATC 초기화\nPAN 상승"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_005.jpg",
-                  "caption": "축전지 전압계"
+                  "caption": "축전지 전압계\n전차선 전압계"
                 }
               ]
             },
             {
               "type": "text",
-              "value": "PAN 상승 안내방송   PAN 상승 S/W 취급   PAN 상승   전차선 전압계"
+              "value": "제2장 상황별 조치사할\n23"
             },
             {
               "type": "heading",
@@ -8541,7 +8574,7 @@
                   "label": "1",
                   "items": [
                     "제동장치 상태 및 기능시험",
-                    "1)   전·후   운전실   상용제동,   EBS(비상제동스위치),   보안제동,   EBCOS(비상제동   차단스위치) 기능상태 점검",
+                    "1) 전·후 운전실 상용제동, EBS(비상제동스위치), 보안제동, EBCOS(비상제동 차단스위치) 기능상태 점검",
                     "2) 운전실 데스크 주차제동 체결, 완해 스위치 취급"
                   ]
                 },
@@ -8585,9 +8618,19 @@
                 {
                   "label": "7",
                   "items": [
-                    "전·후 운전실 PDT 시험(ATC) ※ 주의사항 :   PDT시험 시행 도중 시험을 중단하지 말 것."
+                    "전·후 운전실 PDT 시험(ATC)"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 주의사항 : PDT시험 시행 도중 시험을 중단하지 말 것."
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "8",
                   "items": [
@@ -8632,61 +8675,67 @@
               ]
             },
             {
-              "type": "heading",
-              "text": "역행시험"
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n24"
             },
             {
-              "type": "text",
-              "value": "DU 상태확인 →\n주간제어기 역행\n역전기 전진   보안제동 취급\n인버터\n1단(P1) 위치"
+              "type": "heading",
+              "text": "역행시험"
             },
             {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_011.jpg",
-                  "caption": "주간제어기 중립"
+                  "caption": "DU 상태확인 →\n역전기 전진"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_012.jpg",
-                  "caption": "보안제동 복귀"
+                  "caption": "주간제어기 역행\n보안제동 취급"
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "열차무선(LTE)"
-            },
-            {
-              "type": "heading",
-              "text": "열차무선"
-            },
-            {
-              "type": "heading",
-              "text": "각종 등 및 표시기"
-            },
-            {
-              "type": "text",
-              "value": "기적   데스크 표시등   계기등   전조등\n후미등   객실등   객실안내 표시기   행선 및 열번표시기"
             },
             {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_013.jpg",
-                  "caption": ""
+                  "caption": "인버터"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_014.jpg",
-                  "caption": ""
-                },
+                  "caption": "1단(P1) 위치"
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_015.jpg",
-                  "caption": ""
+                  "caption": "주간제어기 중립"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_016.jpg",
-                  "caption": ""
-                },
+                  "caption": "보안제동 복귀"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "열차무선(LTE)"
+            },
+            {
+              "type": "heading",
+              "text": "열차무선"
+            },
+            {
+              "type": "text",
+              "value": "각종 등 및 표시기\n기적 데스크 표시등 계기등 전조등\n후미등 객실등 객실안내 표시기 행선 및 열번표시기\n제2장 상황별 조치사할\n25"
+            },
+            {
+              "type": "images",
+              "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_017.jpg",
                   "caption": ""
@@ -8710,12 +8759,8 @@
               ]
             },
             {
-              "type": "heading",
-              "text": "각종 NFB 확인"
-            },
-            {
               "type": "text",
-              "value": "데스크 좌측   운전실 배전반 NFB"
+              "value": "각종 NFB 확인\n데스크 좌측 운전실 배전반 NFB"
             },
             {
               "type": "heading",
@@ -8723,7 +8768,7 @@
             },
             {
               "type": "text",
-              "value": "데스크 중앙   운전실 우측   운전실 좌측"
+              "value": "데스크 중앙 운전실 우측 운전실 좌측"
             },
             {
               "type": "heading",
@@ -8731,11 +8776,15 @@
             },
             {
               "type": "text",
-              "value": "전·후 운전실\nADU\n출고 준비 완료통보"
+              "value": "전·후 운전실\nADU 출고 준비 완료통보"
             },
             {
               "type": "heading",
               "text": "PDT 시험"
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n26"
             },
             {
               "type": "images",
@@ -8816,7 +8865,7 @@
                 {
                   "label": "6",
                   "items": [
-                    "Pan 상승 안내방송   “ OO편성 판토 상승합니다 .” 를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
+                    "Pan 상승 안내방송 “OO편성 판토 상승합니다.”를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
                   ]
                 },
                 {
@@ -8829,13 +8878,13 @@
                 {
                   "label": "8",
                   "items": [
-                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "9",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -8862,6 +8911,10 @@
                   "caption": "BATK1, 2"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n27"
             }
           ]
         },
@@ -8870,7 +8923,7 @@
           "title": "축전지전압 0V인 경우",
           "summary": [
             "최초 기동 시 또는 운전실 교환 시",
-            "Key ON 위치로 취급했을 때 축전지전압   “ 0 ”   V 현시",
+            "Key ON 위치로 취급했을 때 축전지전압 “0” V 현시",
             "TCMS 축전지 75V 이하 시 모니터에 축전지 저전압 경고"
           ],
           "keywords": [
@@ -8900,7 +8953,7 @@
                 },
                 {
                   "term": "",
-                  "desc": "Key ON 위치로 취급했을 때 축전지전압   “ 0 ”   V 현시"
+                  "desc": "Key ON 위치로 취급했을 때 축전지전압 “0” V 현시"
                 },
                 {
                   "term": "",
@@ -8912,9 +8965,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "운행중 EPANDS 취급 시 전동차 전원이 OFF 되는 경우 원인 및 조치"
+                  "desc": "운행중 EPANDS 취급 시 전동차 전원이 OFF 되는 경우"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "원인 및 조치"
             },
             {
               "type": "flow",
@@ -8928,25 +8985,25 @@
                 {
                   "label": "2",
                   "items": [
-                    "주간제어기 전후진 핸들을   F 또는 R 위치로 투입해 본다."
+                    "주간제어기 전후진 핸들을 F 또는 R 위치로 투입해 본다."
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "축전지 제어박스의 BIS   “ ON ”   확인(검수원)"
+                    "축전지 제어박스의 BIS “ON” 확인(검수원)"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "운전실 배전반 BATKN2 차단 시 축전지 전압계만   “ 0 ” V 현시"
+                    "운전실 배전반 BATKN2 차단 시 축전지 전압계만 “0”V 현시"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "전부 운전실 조치불능 시 후부 운전실에서 시도(후부 이동하여 BATKN3차단기 ON ⇒ 다시 선두로 이동하여 EBON차단기 ON → BLVR동작으로 인하여   ‘ a ’   접점으로 OPEN 되었을 경우 BATKBS를 함께 취급)"
+                    "전부 운전실 조치불능 시 후부 운전실에서 시도(후부 이동하여 BATKN3차단기 ON ⇒ 다시 선두로 이동하여 EBON차단기 ON → BLVR동작으로 인하여 ‘a’ 접점으로 OPEN 되었을 경우 BATKBS를 함께 취급)"
                   ]
                 },
                 {
@@ -8958,7 +9015,7 @@
                 {
                   "label": "7",
                   "items": [
-                    "Pan 상승 안내방송   “ OO편성 판토 상승합니다. ” 를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
+                    "Pan 상승 안내방송 “OO편성 판토 상승합니다.”를 차외, 차내 모두 2 ~ 3회 반복 방송 실시"
                   ]
                 },
                 {
@@ -8971,13 +9028,13 @@
                 {
                   "label": "9",
                   "items": [
-                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "10",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -8994,7 +9051,7 @@
             },
             {
               "type": "text",
-              "value": "축전지 제어박스\nKey ON, 역전기 F/R\nBIS ON 확인"
+              "value": "축전지 제어박스\nKey ON, 역전기 F/R\nBIS ON 확인\n서울시 5호선 200칸 전동차 응급처치요령\n28"
             }
           ]
         },
@@ -9002,9 +9059,7 @@
           "id": "newcomer2-4",
           "title": "보조공기압축기(ACM) 구동 불능 시",
           "summary": [
-            "PANUS를 누르면 자동 기동되며 운전실 TCMS 화면에 PAN 그림 확인 공기충만 : 7.5kgf/cm 2 (정상)",
-            "PANUS 누르고 1분이 경과해도 운전실 TCMS 화면에 PAN 그림이 변하지 않는다.",
-            "TCMS 프로토콜 상 (ACMK) 확인 조치요령"
+            "PANUS를 누르면 자동 기동되며 운전실 TCMS 화면에 PAN 그림 확인"
           ],
           "keywords": [
             "ACM",
@@ -9030,17 +9085,30 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "PANUS를 누르면 자동 기동되며 운전실 TCMS 화면에 PAN 그림 확인 공기충만 : 7.5kgf/cm 2 (정상)"
-                },
+                  "desc": "PANUS를 누르면 자동 기동되며 운전실 TCMS 화면에 PAN 그림 확인"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "2\n공기충만 : 7.5kgf/cm(정상)"
+            },
+            {
+              "type": "list",
+              "items": [
                 {
                   "term": "",
                   "desc": "PANUS 누르고 1분이 경과해도 운전실 TCMS 화면에 PAN 그림이 변하지 않는다."
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 프로토콜 상 (ACMK) 확인 조치요령"
+                  "desc": "TCMS 프로토콜 상 (ACMK) 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -9078,13 +9146,13 @@
                 {
                   "label": "6",
                   "items": [
-                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "7",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -9101,7 +9169,7 @@
             },
             {
               "type": "text",
-              "value": "일반배전반 PaVN\nKey 검수 또는 ON   축전지 전압계 확인   운전실 배전반\n확인"
+              "value": "일반배전반 PaVN\nKey 검수 또는 ON 축전지 전압계 확인 운전실 배전반\n확인\n제2장 상황별 조치사할\n29"
             }
           ]
         },
@@ -9149,9 +9217,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "전차선 단전의 경우에는 모니터에 Pan 상승으로 표시됨 조치사항"
+                  "desc": "전차선 단전의 경우에는 모니터에 Pan 상승으로 표시됨"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치사항"
             },
             {
               "type": "flow",
@@ -9159,7 +9231,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터 경고   메시지[IVS(SIV접지스위치),   IES(인버터접지스위치),   EPanDS(비상전원차단스위치) 취급 등], 운전실배전반 내 ESR(접지 스위치 릴레이), 판토그라프 상태 확인"
+                    "모니터 경고 메시지[IVS(SIV접지스위치), IES(인버터접지스위치), EPanDS(비상전원차단스위치) 취급 등], 운전실배전반 내 ESR(접지 스위치 릴레이), 판토그라프 상태 확인"
                   ]
                 },
                 {
@@ -9171,13 +9243,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "운전실 데스크 주공기 압력 확인(MR 압력 게이지)"
+                    "운전실 데스크 주공기 압력 확인(MR 압력 게이지) 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "ACM 구동상태 확인(MR 6.5kg/cm 2   에서 Pan 상승 스위치 취급 시 구동)",
+                    "ACM 구동상태 확인(MR 6.5kg/cm에서 Pan 상승 스위치 취급 시 구동)",
                     "2호, 6호 객실 내에서 ACM 구동음 확인"
                   ]
                 },
@@ -9196,13 +9268,13 @@
                 {
                   "label": "7",
                   "items": [
-                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "8",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -9219,7 +9291,7 @@
             },
             {
               "type": "text",
-              "value": "모니터 경고, Pan\n가선 정전 표시등   축전지 전압 75V이상   MR 압력 게이지\n상태 확인\nACM 구동음 확인\n전·후 운전실\n(2호, 6호)\nEPanDS 확인"
+              "value": "모니터 경고, Pan\n가선 정전 표시등 축전지 전압 75V이상 MR 압력 게이지\n상태 확인\nACM 구동음 확인전·후 운전실\n(2호, 6호)EPanDS 확인\n서울시 5호선 200칸 전동차 응급처치요령\n30"
             },
             {
               "type": "images",
@@ -9240,7 +9312,7 @@
           "id": "newcomer2-6",
           "title": "1량 판토 상승 불능 시",
           "summary": [
-            "모니터에 2호차 또는 6호차 판토그라프 상승 불가 조치사항"
+            "모니터에 2호차 또는 6호차 판토그라프 상승 불가"
           ],
           "keywords": [
             "판토",
@@ -9265,9 +9337,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "모니터에 2호차 또는 6호차 판토그라프 상승 불가 조치사항"
+                  "desc": "모니터에 2호차 또는 6호차 판토그라프 상승 불가"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치사항"
             },
             {
               "type": "flow",
@@ -9299,13 +9375,13 @@
                 {
                   "label": "5",
                   "items": [
-                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "6",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -9321,24 +9397,29 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "해당 유니트\n해당 차호 Pan\n운전실 개별 Pan\n일반배전반 PaVN 확인\nVVVF, SIV OFF\n하강 표시\n하강 스위치\nPan 개방 코크 확인"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_027.jpg",
-                  "caption": ""
+                  "caption": "해당 유니트"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_028.jpg",
-                  "caption": ""
+                  "caption": "해당 차호 Pan"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_029.jpg",
-                  "caption": ""
-                },
+                  "caption": "운전실 개별 Pan"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "일반배전반 PaVN 확인\nVVVF, SIV OFF하강 표시하강 스위치\nPan 개방 코크 확인\n제2장 상황별 조치사할\n31"
+            },
+            {
+              "type": "images",
+              "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_030.jpg",
                   "caption": ""
@@ -9352,7 +9433,7 @@
           "title": "전 차량 판토 하강 불능 시",
           "summary": [
             "PanDS, EPanDS 눌렀으나 전체 유니트 판토 하강 불능",
-            "TCMS 화면 PAN상태 ◆◆ 표시 유지 조치사항"
+            "TCMS 화면 PAN상태 ◆◆ 표시 유지"
           ],
           "keywords": [
             "차량",
@@ -9382,9 +9463,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 화면 PAN상태 ◆◆ 표시 유지 조치사항"
+                  "desc": "TCMS 화면 PAN상태 ◆◆ 표시 유지"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치사항"
             },
             {
               "type": "flow",
@@ -9416,13 +9501,13 @@
                 {
                   "label": "5",
                   "items": [
-                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "조치 완료 후 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "6",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -9449,6 +9534,10 @@
                   "caption": "EPANDS 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n32"
             }
           ]
         },
@@ -9456,7 +9545,7 @@
           "id": "newcomer2-8",
           "title": "피뢰기 동작 시",
           "summary": [
-            "전차선 단전 원인 및 조치"
+            "전차선 단전"
           ],
           "keywords": [
             "피뢰기",
@@ -9480,9 +9569,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "전차선 단전 원인 및 조치"
+                  "desc": "전차선 단전"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "원인 및 조치"
             },
             {
               "type": "flow",
@@ -9537,6 +9630,10 @@
                   "caption": "DCArr 동작"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n33"
             }
           ]
         },
@@ -9545,7 +9642,7 @@
           "title": "개별 판토 하강 취급요령",
           "summary": [
             "일부 차량 Pan 상승 불가",
-            "접지사고(고장) 발생 등으로 완전부동 취급 필요시 원인 및 조치"
+            "접지사고(고장) 발생 등으로 완전부동 취급 필요시"
           ],
           "keywords": [
             "개별",
@@ -9575,9 +9672,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "접지사고(고장) 발생 등으로 완전부동 취급 필요시 원인 및 조치"
+                  "desc": "접지사고(고장) 발생 등으로 완전부동 취급 필요시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "원인 및 조치"
             },
             {
               "type": "flow",
@@ -9620,7 +9721,7 @@
             },
             {
               "type": "text",
-              "value": "해당 SIVCN1, 2\n개별판토하강 스위치\nOFF"
+              "value": "해당 SIVCN1, 2\n개별판토하강 스위치\nOFF\n서울시 5호선 200칸 전동차 응급처치요령\n34"
             }
           ]
         },
@@ -9628,8 +9729,8 @@
           "id": "newcomer2-10",
           "title": "SIV 고장 및 연장급전",
           "summary": [
-            "모니터에 해당 호차 SIV   ‘ NG ’   현시",
-            "해당 차호 운전실 가선 전압계   ‘ 0 ’   V 현시 원인 및 조치"
+            "모니터에 해당 호차 SIV ‘NG’ 현시",
+            "해당 차호 운전실 가선 전압계 ‘0’ V 현시"
           ],
           "keywords": [
             "SIV",
@@ -9654,13 +9755,17 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "모니터에 해당 호차 SIV   ‘ NG ’   현시"
+                  "desc": "모니터에 해당 호차 SIV ‘NG’ 현시"
                 },
                 {
                   "term": "",
-                  "desc": "해당 차호 운전실 가선 전압계   ‘ 0 ’   V 현시 원인 및 조치"
+                  "desc": "해당 차호 운전실 가선 전압계 ‘0’ V 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "원인 및 조치"
             },
             {
               "type": "flow",
@@ -9694,13 +9799,13 @@
                 {
                   "label": "5",
                   "items": [
-                    "고장리셋버튼 취급 후 정상 시 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
+                    "고장리셋버튼 취급 후 정상 시 운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
                   ]
                 },
                 {
                   "label": "6",
                   "items": [
-                    "주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -9716,21 +9821,21 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "모니터 Pan 상태\nSIVCN 1, 2 상태\n고장 리셋 스위치\n주간제어기 B7\n확인\n확인\n취급"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_034.jpg",
-                  "caption": ""
+                  "caption": "모니터 Pan 상태"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_035.jpg",
-                  "caption": ""
+                  "caption": "SIVCN 1, 2 상태"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "주간제어기 B7\n확인확인 취급\n제2장 상황별 조치사할\n35"
             },
             {
               "type": "flow",
@@ -9756,9 +9861,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "출입문 동작 불능 조치요령"
+                  "desc": "출입문 동작 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -9766,9 +9875,19 @@
                 {
                   "label": "1",
                   "items": [
-                    "DOOR등(발차지시등) 점등 불능 시 ① 불량 차호 모니터 확인{해당차DCUL(R)N OFF, 장애물 검지, 비상핸들취급 등} ② DROS 수회 개폐 취급 ③ 해당 출입문 비상핸들(EH) 취급 모니터 확인하여 복귀 ④ 비상핸들(EH) 취급   후 출입문 수동 개폐하여 이물질 개입여부 등 확인 ⑤ 도어 엔진 내 DCU(출입문 제어장치) 상태 확인 및 고장 시 MCB1 차단하여 2계로 절환 후 상태확인 ⑥ 전/후 운전실 배전반 DILN 차단(NFB 트립) 확인 ※ 전부차 DILN OFF 시 : DOOR등 소등, DU에 출입문 닫힘 표시, 역행가능 ※ 후부차 DILN OFF 시 : DOOR등 소등, DU에 출입문 열림 표시, 역행가능 ⑦ DOOR 등 소손 여부 확인 ⑧ DOOR등 점등 불능 원인을 알 수 없는 경우에는 관제사 승인 후 DBS (BY PASS) 취급 회송조치{※출입문이 열린 상태에서도 DBS를 취급하면 DOOR등이 점등됨에 주의.} ※ 운행 중 DOOR등 소등 시 : 즉시 비상정차, 원인 제거 후 잔 여 운행"
+                    "DOOR등(발차지시등) 점등 불능 시 ① 불량 차호 모니터 확인{해당차DCUL(R)N OFF, 장애물 검지, 비상핸들취급 등} ② DROS 수회 개폐 취급 ③ 해당 출입문 비상핸들(EH) 취급 모니터 확인하여 복귀 ④ 비상핸들(EH) 취급 후 출입문 수동 개폐하여 이물질 개입여부 등 확인 ⑤ 도어 엔진 내 DCU(출입문 제어장치) 상태 확인 및 고장 시 MCB1 차단하여 2계로 절환 후 상태확인 ⑥ 전/후 운전실 배전반 DILN 차단(NFB 트립) 확인"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 전부차 DILN OFF 시 : DOOR등 소등, DU에 출입문 닫힘 표시, 역행가능\n※ 후부차 DILN OFF 시 : DOOR등 소등, DU에 출입문 열림 표시, 역행가능 ⑦ DOOR 등 소손 여부 확인 ⑧ DOOR등 점등 불능 원인을 알 수 없는 경우에는 관제사 승인 후 DBS (BY PASS) 취급 회송조치{※출입문이 열린 상태에서도 DBS를 취급하면 DOOR등이 점등됨에 주의.}\n※ 운행 중 DOOR등 소등 시 : 즉시 비상정차, 원인 제거 후 잔 여 운행"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "2",
                   "items": [
@@ -9783,7 +9902,7 @@
             },
             {
               "type": "text",
-              "value": "전/후 DILN 차단\nDOOR등 상태 확인\n확인"
+              "value": "전/후 DILN 차단\nDOOR등 상태 확인\n확인\n서울시 5호선 200칸 전동차 응급처치요령\n36"
             }
           ]
         },
@@ -9791,7 +9910,7 @@
           "id": "newcomer2-11",
           "title": "DOOR등 점등 불능 시",
           "summary": [
-            "출입문 개방 불능 조치요령"
+            "출입문 개방 불능"
           ],
           "keywords": [
             "DOOR",
@@ -9809,9 +9928,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "출입문 개방 불능 조치요령"
+                  "desc": "출입문 개방 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -9819,9 +9942,19 @@
                 {
                   "label": "1",
                   "items": [
-                    "1개 출입문이 열리지 않을 때 ① 모니터로 불량 출입문 및 비상핸들 취급 여부 확인 ② 해당 출입문 비상핸들을 아래로 내려   ‘ 비상 ’   위치로 절환 후 이물질 확인 ③ 출입문 상부 점검 커버 개방 ④ 출입문 차단 장치의 봉을 밀어 넣어   ‘ 차단(쇄정) ’   위치로 절환(출입문 By-pass) ⑤ 비상 핸들을 위로 올려   ‘ 정상 ’   위치로 복귀 ⑥ 고장 안내문 부착 및 여객 안내방송 ⑦ 차량 교체 할 수 있는 역까지 운행 ⑧ DCU 상태확인 및 고장번호 현시 시 MCB1 차단하여, 2계로 절환 후 상태확인 ※출입문 잠금조치를 할 수 없는 경우 관제사 승인 회송 조치, 막차의 경우에는 출입문 보호막 설치 및 역무원 등 출입문 감시자를 승차시킬 것 ※출입문 고장 확인 시 휴대품 : 휴대용 열차무선전화기, 출입문 Key, 고장   안내문, 출입문 보 호 막(마지막 열차限)"
+                    "1개 출입문이 열리지 않을 때 ① 모니터로 불량 출입문 및 비상핸들 취급 여부 확인 ② 해당 출입문 비상핸들을 아래로 내려 ‘비상’ 위치로 절환 후 이물질 확인 ③ 출입문 상부 점검 커버 개방 ④ 출입문 차단 장치의 봉을 밀어 넣어 ‘차단(쇄정)’ 위치로 절환(출입문 By-pass) ⑤ 비상 핸들을 위로 올려 ‘정상’ 위치로 복귀 ⑥ 고장 안내문 부착 및 여객 안내방송 ⑦ 차량 교체 할 수 있는 역까지 운행 ⑧ DCU 상태확인 및 고장번호 현시 시 MCB1 차단하여, 2계로 절환 후 상태확인"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※출입문 잠금조치를 할 수 없는 경우 관제사 승인 회송 조치, 막차의 경우에는 출입문 보호막 설치 및 역무원 등 출입문 감시자를 승차시킬 것\n※출입문 고장 확인 시 휴대품 : 휴대용 열차무선전화기, 출입문 Key, 고장 안내문, 출입문 보 호 막(마지막 열차限)"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "2",
                   "items": [
@@ -9831,7 +9964,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "조치 완료 후 정상운행"
+                    "조치 완료 후 정상운행 제2장 상황별 조치사할 37"
                   ]
                 }
               ]
@@ -9842,7 +9975,7 @@
           "id": "newcomer2-12",
           "title": "출입문 열림 불능(1개 또는 1량)",
           "summary": [
-            "전체 출입문 개방 불능 조치요령"
+            "전체 출입문 개방 불능"
           ],
           "keywords": [
             "출입문",
@@ -9861,13 +9994,13 @@
                 {
                   "label": "1",
                   "items": [
-                    "1개 출입문 열림 불량 비상핸들 취급 후 출입문차단장치 비상핸들 복귀 후 출입문 주변 이물질 여객안내방송 후 운행 ‘ 차단(쇄저) ’   취급 폐문 확인"
+                    "1개 출입문 열림 불량 비상핸들 취급 후 출입문차단장치비상핸들 복귀 후 출입문 주변 이물질여객안내방송 후 운행 ‘차단(쇄저)’ 취급폐문 확인"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "1량 출입문 열림 불량 해당차   LDCUN, DOC 3회 연속 취급 RDCUN 확인"
+                    "1량 출입문 열림 불량 해당차 LDCUN, DOC 3회 연속 취급 RDCUN 확인 서울시 5호선 200칸 전동차 응급처치요령 38"
                   ]
                 }
               ]
@@ -9914,9 +10047,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "전체 출입문 개방 불능 조치요령"
+                  "desc": "전체 출입문 개방 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -9924,9 +10061,19 @@
                 {
                   "label": "1",
                   "items": [
-                    "전부 운전실에서 출입문 취급 시도 ① DOS 연속 3회 열림 취급 ⇒ 불능 시 DBS 취급 후 열기 시도 ② 전부 운전실 ATCN1, 2 확인복귀 ⇒ 복귀 불능 시 또는 ZVR 계전기 불량 시 ③ 전, 후부차의 DCLN 또는 DCRN 동시 차단 시 확인 복귀 ④ 열 림   불 능   운 전실 의   TCM S   PN1, 2확인   복귀   ⇒   복귀   불능   시   DBS   취급 ⑤ 위   조치   후에 도   불능   시:   관제   지시 에   따 라   차량 재기동 후   열기 시도 ⑥ 각 차량 출입문 1개씩 수동 개방 취급하여 여객 안내유도 하차 후 회송 조치( 관제 승인 ) ◆ [ 핵심 ]   전, 후부차   DBS 취급 후 열기 시도 ⇒ 불능 시 : P/B핸들 N위치≫전후진 제어기 N 위치 → MC KEY OFF 후 열기 시도 ⇒ 불능 시 : 전, 후부 DRN, DCLN, DCRN 확인 복귀 후 열기 시도 ※ MC KEY OFF 후 출입문 개방 시 : 반드시 출입문 폐문 후 ON 위치로 취급할 것 ⇒ 먼저 취급하면 출입문이 닫혀 민원 발생 우려"
+                    "전부 운전실에서 출입문 취급 시도 ① DOS 연속 3회 열림 취급 ⇒ 불능 시 DBS 취급 후 열기 시도 ② 전부 운전실 ATCN1, 2 확인복귀 ⇒ 복귀 불능 시 또는 ZVR 계전기 불량 시 ③ 전, 후부차의 DCLN 또는 DCRN 동시 차단 시 확인 복귀 ④ 열 림 불 능 운 전실 의 TCM S PN1, 2확인 복귀 ⇒ 복귀 불능 시 DBS 취급 ⑤ 위 조치 후에 도 불능 시: 관제 지시 에 따 라 차량 재기동 후 열기 시도 ⑥ 각 차량 출입문 1개씩 수동 개방 취급하여 여객 안내유도 하차 후 회송 조치(관제 승인) ◆ [핵심] 전, 후부차 DBS 취급 후 열기 시도 ⇒ 불능 시 : P/B핸들 N위치≫전후진 제어기 N 위치 → MC KEY OFF 후 열기 시도 ⇒ 불능 시 : 전, 후부 DRN, DCLN, DCRN 확인 복귀 후 열기 시도"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ MC KEY OFF 후 출입문 개방 시 : 반드시 출입문 폐문 후 ON 위치로 취급할 것 ⇒ 먼저 취급하면 출입문이 닫혀 민원 발생 우려"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "2",
                   "items": [
@@ -9951,6 +10098,10 @@
                   "caption": "운전실 DRN"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n39"
             }
           ]
         },
@@ -9959,7 +10110,7 @@
           "title": "전 차량 출입문 열림 불능",
           "summary": [
             "DOOR등 소등",
-            "역행 불능 조치요령"
+            "역행 불능"
           ],
           "keywords": [
             "차량",
@@ -9989,9 +10140,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "역행 불능 조치요령"
+                  "desc": "역행 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -9999,9 +10154,19 @@
                 {
                   "label": "1",
                   "items": [
-                    "1개 출입문이 닫히지 않을 때 ① 모니터로 불량차 출입문 및 비상핸들 취급 확인 ② DCS 수회 개·폐 취급 ③ 해당 출입문 비상핸들을 아래로 내려‘비상’위치로 절환 이물질 확인 ④ 출입문 상부 점검 커버 개방 ⑤ 출입문 차단장치의 봉을 밀어 넣어‘차단(쇄정)’위치로 절환(출입문 By-pass) ⑥ 비상핸들을 위로 올려‘정상’위치로 복귀 ⑦ 출입문 고장 안내문 부착, 역무원 감시자 승차 및 여객 안내 방송시행 ⑧ 차량 교체할 수 있는 역까지 운행 ※ 출입문 잠금조치를 할 수 없는 경우 관제사 승인 회송하고 마지막 열차의 경우는 출입문 보호막 설치 및 역무원 등 출입문 감시자를 승차시킬 것 ※ 출입문 고장 확인 시 휴대품 : 휴대용 열차무선전화기, 출입문Key, 고장안내문, 출입문 보호막(마지막열차限)"
+                    "1개 출입문이 닫히지 않을 때 ① 모니터로 불량차 출입문 및 비상핸들 취급 확인 ② DCS 수회 개·폐 취급 ③ 해당 출입문 비상핸들을 아래로 내려‘비상’위치로 절환 이물질 확인 ④ 출입문 상부 점검 커버 개방 ⑤ 출입문 차단장치의 봉을 밀어 넣어‘차단(쇄정)’위치로 절환(출입문 By-pass) ⑥ 비상핸들을 위로 올려‘정상’위치로 복귀 ⑦ 출입문 고장 안내문 부착, 역무원 감시자 승차 및 여객 안내 방송시행 ⑧ 차량 교체할 수 있는 역까지 운행"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 출입문 잠금조치를 할 수 없는 경우 관제사 승인 회송하고 마지막 열차의 경우는 출입문 보호막 설치 및 역무원 등 출입문 감시자를 승차시킬 것\n※ 출입문 고장 확인 시 휴대품 : 휴대용 열차무선전화기, 출입문Key, 고장안내문, 출입문 보호막(마지막열차限)"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "2",
                   "items": [
@@ -10011,13 +10176,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "전동차 전체 출입문이 닫히지 않을 때 ① DCS 연속 3회 취급 후 불능 시 반대편 운전실의 DCS S/W를 취급해본다. ② DOS 고착 확인(전부 운전실 주분전함내 DRN OFF 후 ON 시 출입문 닫혔다 개방되면 DOS 고착, 출입문 개방 안되면 DROS 고착임) ③   DOS 고착 경우 :   반드시   관제사 승인 후   회송조치(DOS 고착된 방향의 출입문은 전부차의 DRN ON 취급 즉시 개방되므로 정상 운행이 불가능 하므로 승객 하차 후 즉시 회송조치) ④ DROS 고착 경우 : DOS 개문 취급 → DCS 폐문취급 → DICLN, DICRN   OFF 후 ON 반복으로 출입문 취급하거나,   후부차 DICL(R)N OFF 후 전부 운전실에서 출입문 취급"
+                    "전동차 전체 출입문이 닫히지 않을 때 ① DCS 연속 3회 취급 후 불능 시 반대편 운전실의 DCS S/W를 취급해본다. ② DOS 고착 확인(전부 운전실 주분전함내 DRN OFF 후 ON 시 출입문 닫혔다 개방되면 DOS 고착, 출입문 개방 안되면 DROS 고착임) ③ DOS 고착 경우 : 반드시 관제사 승인 후 회송조치(DOS 고착된 방향의 출입문은 전부차의 DRN ON 취급 즉시 개방되므로 정상 운행이 불가능 하므로 승객 하차 후 즉시 회송조치) ④ DROS 고착 경우 : DOS 개문 취급 → DCS 폐문취급 → DICLN, DICRN OFF 후 ON 반복으로 출입문 취급하거나, 후부차 DICL(R)N OFF 후 전부 운전실에서 출입문 취급"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "조치 완료 후 정상운행"
+                    "조치 완료 후 정상운행 서울시 5호선 200칸 전동차 응급처치요령 40"
                   ]
                 }
               ]
@@ -10030,7 +10195,7 @@
           "summary": [
             "전부차 ZVR 여자 불능",
             "DSD(데드맨) 미취급 시 3초 후 경보음 발생. 13초 경과 후 비상제동체결",
-            "정차 시 전, 후부차 모두 전체 출입문 개방 불능 조치요령"
+            "정차 시 전, 후부차 모두 전체 출입문 개방 불능"
           ],
           "keywords": [
             "출입문",
@@ -10044,36 +10209,38 @@
               "text": "관련사진"
             },
             {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/newcomer/ch2_045.jpg",
-                  "caption": "1. 1개 출입문"
-                },
-                {
-                  "src": "/images/edu/newcomer/ch2_046.jpg",
-                  "caption": "닫힘 불량"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "value": "비상핸들 취급 후\n출입문 차단장치\n비상핸들 복귀 후\n관제사 통화 차량\n출입문 이물질 확인\n‘ 차단(쇄정) ’   취급\n폐문\n교체 역까지 운행"
-            },
-            {
               "type": "flow",
               "steps": [
                 {
+                  "label": "1",
+                  "items": [
+                    "1개 출입문 닫힘 불량 비상핸들 취급 후출입문 차단장치비상핸들 복귀 후관제사 통화 차량 출입문 이물질 확인‘차단(쇄정)’ 취급폐문교체 역까지 운행"
+                  ]
+                },
+                {
                   "label": "2",
                   "items": [
-                    "1량 출 입문 닫힘 불량 해당차   LDCUN, DCS 수회 개폐 취급 RDCUN 확인"
+                    "1량 출입문 닫힘 불량 해당차 LDCUN, DCS 수회 개폐 취급 RDCUN 확인"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "전체   출입문   닫힘 불량 DCS 3회 연속 취급   관제사 통화 회송   출입문 비상핸들 확인"
+                    "전체 출입문 닫힘 불량 DCS 3회 연속 취급 관제사 통화 회송 출입문 비상핸들 확인 제2장 상황별 조치사할 41"
                   ]
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/newcomer/ch2_045.jpg",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/newcomer/ch2_046.jpg",
+                  "caption": ""
                 }
               ]
             },
@@ -10101,9 +10268,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "정차 시 전, 후부차 모두 전체 출입문 개방 불능 조치요령"
+                  "desc": "정차 시 전, 후부차 모두 전체 출입문 개방 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10132,9 +10303,19 @@
                   "label": "4",
                   "items": [
                     "주/보조 ATC 동작상태 확인",
-                    "고장 시 ATC1,2 NFB OFF/ON 시행, 안전모드 수동 또는 자동으로 변경 시 ZVR, AZVR 여자상태 확인 ※ AZVR : ATC에 의한 0속도계전기 TZVR : 비상모드에 의한 0속도계전기"
+                    "고장 시 ATC1,2 NFB OFF/ON 시행, 안전모드 수동 또는 자동으로 변경 시 ZVR, AZVR 여자상태 확인"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ AZVR : ATC에 의한 0속도계전기 TZVR : 비상모드에 의한 0속도계전기"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "5",
                   "items": [
@@ -10165,6 +10346,10 @@
                   "caption": "필요시 EBCOS 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n42"
             }
           ]
         },
@@ -10172,7 +10357,7 @@
           "id": "newcomer2-15",
           "title": "전부차 VZR 동작 불량 시",
           "summary": [
-            "냉난방 제어스위치를 취급하였으나 전차량 객실 냉방 불능 조치요령"
+            "냉난방 제어스위치를 취급하였으나 전차량 객실 냉방 불능"
           ],
           "keywords": [
             "VZR",
@@ -10198,9 +10383,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "냉난방 제어스위치를 취급하였으나 전차량 객실 냉방 불능 조치요령"
+                  "desc": "냉난방 제어스위치를 취급하였으나 전차량 객실 냉방 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10208,7 +10397,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "전차량 객실냉방 불능 ① TCMS 화면에서 냉난방 상태 확인 ② 보조전원장치(SIV) 동작상태 확인 ③ 냉난방 제어스위치 확인 · 반복 취급"
+                    "전차량 객실냉방 불능 ① TCMS 화면에서 냉난방 상태 확인 ② 보조전원장치(SIV) 동작상태 확인 ③ 냉난방 제어스위치 확인·반복 취급"
                   ]
                 },
                 {
@@ -10241,6 +10430,10 @@
                   "caption": "HVACN 차단 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n43"
             }
           ]
         },
@@ -10248,7 +10441,7 @@
           "id": "newcomer2-16",
           "title": "객실 냉방 불능 시",
           "summary": [
-            "냉난방 제어스위치를 취급하였으나 객실 난방 불능 조치요령"
+            "냉난방 제어스위치를 취급하였으나 객실 난방 불능"
           ],
           "keywords": [
             "객실",
@@ -10273,9 +10466,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "냉난방 제어스위치를 취급하였으나 객실 난방 불능 조치요령"
+                  "desc": "냉난방 제어스위치를 취급하였으나 객실 난방 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10283,13 +10480,13 @@
                 {
                   "label": "1",
                   "items": [
-                    "전차량 난방 불능 ① TCMS 화면에서 냉난방 상태 확인   ⇒   냉난방 제어스위치 확인 반복 취급"
+                    "전차량 난방 불능 ① TCMS 화면에서 냉난방 상태 확인 ⇒ 냉난방 제어스위치 확인 반복 취급"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "일부차량 난방 불능 ① 해당차량 RHeN1, RHeN2, HVACN 확인   ⇒   차단 시 복귀 ② 객실 냉난방 배전반 LOCAL MODE S/W 수동, 자동 상태 확인 ③ 객실 온도센서 확인 ④ 냉난방 제어기(MICOM) 상태 확인 및 고장발생 시 냉난방 제어기(MICOM) NFB OFF/ON 취급 후 동작상태 확인"
+                    "일부차량 난방 불능 ① 해당차량 RHeN1, RHeN2, HVACN 확인 ⇒ 차단 시 복귀 ② 객실 냉난방 배전반 LOCAL MODE S/W 수동, 자동 상태 확인 ③ 객실 온도센서 확인 ④ 냉난방 제어기(MICOM) 상태 확인 및 고장발생 시 냉난방 제어기(MICOM) NFB OFF/ON 취급 후 동작상태 확인"
                   ]
                 },
                 {
@@ -10306,7 +10503,7 @@
             },
             {
               "type": "text",
-              "value": "RHeN1, RHeN2\n난방 제어스위치 확인\n차단 확인"
+              "value": "RHeN1, RHeN2\n난방 제어스위치 확인\n차단 확인\n서울시 5호선 200칸 전동차 응급처치요령\n44"
             },
             {
               "type": "images",
@@ -10327,7 +10524,7 @@
           "id": "newcomer2-17",
           "title": "객실 난방 불능 시",
           "summary": [
-            "객실등 소등 조치요령"
+            "객실등 소등"
           ],
           "keywords": [
             "객실",
@@ -10352,9 +10549,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "객실등 소등 조치요령"
+                  "desc": "객실등 소등"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10391,7 +10592,7 @@
             },
             {
               "type": "text",
-              "value": "배전반 RALpN,\nRALpN, RDLpN 확인\nRDLpN 확인"
+              "value": "배전반 RALpN,\nRALpN, RDLpN 확인\nRDLpN 확인\n제2장 상황별 조치사할\n45"
             },
             {
               "type": "images",
@@ -10408,7 +10609,7 @@
           "id": "newcomer2-18",
           "title": "객실등 점등 불능 시",
           "summary": [
-            "주간제어기 핸들 동력위치로 했으나 운행 불능 조치요령"
+            "주간제어기 핸들 동력위치로 했으나 운행 불능"
           ],
           "keywords": [
             "객실등",
@@ -10433,9 +10634,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "주간제어기 핸들 동력위치로 했으나 운행 불능 조치요령"
+                  "desc": "주간제어기 핸들 동력위치로 했으나 운행 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10449,33 +10654,53 @@
                 {
                   "label": "2",
                   "items": [
-                    "TCMS에   “ 주차 ”   현시 시 ⇒ 전, 후부차 PBN 확인 복귀 후   주차제동 완해 S/W 취급 ※ 전부차 PBN 복귀 불능 시 : 동력 취급 시만 PBBS 누른상태에서 회송 조치하거나, 후부운전실 추진 운전으로 회송 조치(관제 승인)"
+                    "TCMS에 “주차” 현시 시 ⇒ 전, 후부차 PBN 확인 복귀 후 주차제동 완해 S/W 취급"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 전부차 PBN 복귀 불능 시 : 동력 취급 시만 PBBS 누른상태에서 회송 조치하거나, 후부운전실 추진 운전으로 회송 조치(관제 승인)"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "3",
                   "items": [
-                    "15km/h 설정 불능 등으로 정차제동 풀림 불능 시 : 관제승인 후   “ 비상 ”   취급 및 HBCOS도 함께 취급하여야 주행 시 정차제동 걸림 방지"
+                    "15km/h 설정 불능 등으로 정차제동 풀림 불능 시 : 관제승인 후 “비상” 취급 및 HBCOS도 함께 취급하여야 주행 시 정차제동 걸림 방지"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "축전지 전압 75V 이하인지 확인(제어대   “ 축전지 저전압 ”   적색 램프 점등)"
+                    "축전지 전압 75V 이하인지 확인(제어대 “축전지 저전압” 적색 램프 점등)"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "전차선 단전 또는 900V 이하인지 확인( “ 전차선 정전 ”   적색 램프 점등)"
+                    "전차선 단전 또는 900V 이하인지 확인(“전차선 정전” 적색 램프 점등)"
                   ]
                 },
                 {
                   "label": "6",
                   "items": [
-                    "TCMS에 엔코더 고장 현시 시: 전부차 ENCN 확인   복귀   및   OFF 후 ON 취급 시도 ※ ENCN 복귀 불능 또는 엔코더 고장 시 ⇒ EROS   “ EO ” 모드, 취급 운전(관제와 협의)"
+                    "TCMS에 엔코더 고장 현시 시: 전부차 ENCN 확인 복귀 및 OFF 후 ON 취급 시도"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ ENCN 복귀 불능 또는 엔코더 고장 시 ⇒ EROS “EO”모드, 취급 운전(관제와 협의)"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "7",
                   "items": [
@@ -10485,7 +10710,7 @@
                 {
                   "label": "8",
                   "items": [
-                    "VVVF 고장 시 ⇒ 1차 리셋 취급(VVVF 재부팅) ① 승강장에 정위치 정차 후 ② 주간제어기 N위치 취급 ⇒ 전후진 핸들을 N위치로 전환 ③ 약 6초 경과 후 VVVF   “ 정상 ”   현시되면 ④ 전후진 핸들을 F 위치로 전환"
+                    "VVVF 고장 시 ⇒ 1차 리셋 취급(VVVF 재부팅) ① 승강장에 정위치 정차 후 ② 주간제어기 N위치 취급 ⇒ 전후진 핸들을 N위치로 전환 ③ 약 6초 경과 후 VVVF “정상” 현시되면 ④ 전후진 핸들을 F 위치로 전환"
                   ]
                 },
                 {
@@ -10509,7 +10734,7 @@
                 {
                   "label": "12",
                   "items": [
-                    "위 조치로 불능 시 : EROS   “ EO ” 취급 회송조치"
+                    "위 조치로 불능 시 : EROS “EO”취급 회송조치"
                   ]
                 },
                 {
@@ -10531,21 +10756,21 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "PBN 차단 확인 및\nENCDN1, ENCDN2\nEROS   “ EO ”   취급   주간제어기 취급\n복귀\n차단 확인 및 복귀"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_054.jpg",
-                  "caption": ""
+                  "caption": "PBN 차단 확인 및\nEROS“EO”취급"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_055.jpg",
-                  "caption": ""
+                  "caption": "ENCDN1, ENCDN2\n주간제어기 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "복귀차단 확인 및 복귀\n서울시 5호선 200칸 전동차 응급처치요령\n46"
             }
           ]
         },
@@ -10553,7 +10778,7 @@
           "id": "newcomer2-19",
           "title": "동력운전 불능 시",
           "summary": [
-            "해당 차량 동력운전 및 회생제동 불능 - TCMS 화면 모터전류 막대 상승 불능 또는 막대 소멸(해당 M차) 조치요령"
+            "해당 차량 동력운전 및 회생제동 불능"
           ],
           "keywords": [
             "동력운전",
@@ -10577,9 +10802,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "해당 차량 동력운전 및 회생제동 불능 - TCMS 화면 모터전류 막대 상승 불능 또는 막대 소멸(해당 M차) 조치요령"
+                  "desc": "해당 차량 동력운전 및 회생제동 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "- TCMS 화면 모터전류 막대 상승 불능 또는 막대 소멸(해당 M차)\n조치요령"
             },
             {
               "type": "flow",
@@ -10593,9 +10822,19 @@
                 {
                   "label": "2",
                   "items": [
-                    "VVVF 3개 이상 고장 시 관제 지시에 의거 차량 재개동 시도 ※ 안내방송 및 출입문 폐문 후 PANDS, MC키 OFF ⇒ 약 10초 후   MC키 ON 위치, 전후진제어기 전진 위치 및 주간제어기 B7 스텝 ⇒ TCMS 활성화 후 PANUS ⇒ MCBCS 취급"
+                    "VVVF 3개 이상 고장 시 관제 지시에 의거 차량 재개동 시도"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 안내방송 및 출입문 폐문 후 PANDS, MC키 OFF ⇒ 약 10초 후 MC키 ON 위치, 전후진제어기 전진 위치 및 주간제어기 B7 스텝 ⇒ TCMS 활성화 후 PANUS ⇒ MCBCS 취급"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "3",
                   "items": [
@@ -10628,7 +10867,7 @@
             },
             {
               "type": "text",
-              "value": "PECN 취급   전후진핸들 취급"
+              "value": "PECN 취급 전후진핸들 취급\n제2장 상황별 조치사할\n47"
             }
           ]
         },
@@ -10636,7 +10875,7 @@
           "id": "newcomer2-20",
           "title": "추진제어장치(VVVF) 고장 시",
           "summary": [
-            "역행 불능 조치요령"
+            "역행 불능"
           ],
           "keywords": [
             "VVVF",
@@ -10661,9 +10900,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "역행 불능 조치요령"
+                  "desc": "역행 불능"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -10683,7 +10926,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "정지위치 초과 정차 시 : 주간제어기 N위치 ⇒ 운전모드 비상모드 ⇒ 역전기 후진 위치 ⇒ 주간 제어기 제동위치 후   약 3초 후 동력 취급하여 하구배에서 밀리지 않고 후진 가능"
+                    "정지위치 초과 정차 시 : 주간제어기 N위치 ⇒ 운전모드 비상모드 ⇒ 역전기 후진 위치 ⇒ 주간 제어기 제동위치 후 약 3초 후 동력 취급하여 하구배에서 밀리지 않고 후진 가능"
                   ]
                 },
                 {
@@ -10713,15 +10956,25 @@
                 {
                   "label": "8",
                   "items": [
-                    "전후부 운전실 배전반 PBN 확인(트립 시 모니터에   ‘ 주차 제동 동작 ’   현시)"
+                    "전후부 운전실 배전반 PBN 확인(트립 시 모니터에 ‘주차 제동 동작’ 현시)"
                   ]
                 },
                 {
                   "label": "9",
                   "items": [
-                    "정차제동(HB) 체결 여부 확인(완해불능 시 BC압력 확인) ⇒ 제어대내 정차제동 개방스위치(HBCOS) 개방 취급(BC압력   ‘ 0 ’   확인) ※   주의사항 ① HBCOS 개방 취급 후 역정차 시 정차제동 체결 불가 ② 기본 고장조치(Reset) 시 보안제동 취급 후 시행"
+                    "정차제동(HB) 체결 여부 확인(완해불능 시 BC압력 확인) ⇒ 제어대내 정차제동 개방스위치(HBCOS) 개방 취급(BC압력 ‘0’ 확인)"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 주의사항 ① HBCOS 개방 취급 후 역정차 시 정차제동 체결 불가 ② 기본 고장조치(Reset) 시 보안제동 취급 후 시행"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "10",
                   "items": [
@@ -10760,7 +11013,7 @@
             },
             {
               "type": "text",
-              "value": "강제제동완해 스위치\n전후진 핸들 취급\n취급"
+              "value": "강제제동완해 스위치\n전후진 핸들 취급\n취급\n서울시 5호선 200칸 전동차 응급처치요령\n48"
             },
             {
               "type": "images",
@@ -10777,8 +11030,8 @@
           "id": "newcomer2-21",
           "title": "역행 불능 시",
           "summary": [
-            "TCMS 화면 상단 중앙에   “ EB ”   표시 현시",
-            "TCMS 화면 하단 상태 표시줄에   “ 비상제동 동작 ”   메시지 현시",
+            "TCMS 화면 상단 중앙에 “EB” 표시 현시",
+            "TCMS 화면 하단 상태 표시줄에 “비상제동 동작” 메시지 현시",
             "제어대 고장표시등의“비상제동(EBLp)”적색 램프 점등"
           ],
           "keywords": [
@@ -10803,25 +11056,38 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "TCMS 화면 상단 중앙에   “ EB ”   표시 현시"
+                  "desc": "TCMS 화면 상단 중앙에 “EB” 표시 현시"
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 화면 하단 상태 표시줄에   “ 비상제동 동작 ”   메시지 현시"
+                  "desc": "TCMS 화면 하단 상태 표시줄에 “비상제동 동작” 메시지 현시"
                 },
                 {
                   "term": "",
                   "desc": "제어대 고장표시등의“비상제동(EBLp)”적색 램프 점등"
-                },
-                {
-                  "term": "",
-                  "desc": "제어대 BC압력계 2.0 ~ 2.2kgf/cm 2   이상 현시"
-                },
-                {
-                  "term": "",
-                  "desc": "운행중 DSD 고장 시 열차속도 약 5km/h 이상에서 3초 후 경보음 발생 및 10초 후 비상제동 걸림 으로 정차, B7스텝 취급하면 비상제동 풀림, 열차 출발 후 5km/h 이상에서 13초 후 비생제동 걸림 으로 정차를 반복 조치요령"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "2"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "제어대 BC압력계 2.0 ~ 2.2kgf/cm이상 현시"
+                },
+                {
+                  "term": "",
+                  "desc": "운행중 DSD 고장 시 열차속도 약 5km/h 이상에서 3초 후 경보음 발생 및 10초 후 비상제동 걸림"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "으로 정차, B7스텝 취급하면 비상제동 풀림, 열차 출발 후 5km/h 이상에서 13초 후 비생제동 걸림\n으로 정차를 반복\n조치요령"
             },
             {
               "type": "flow",
@@ -10829,7 +11095,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "주간제어기 비상위치 ⇒ B7스텝 위치 취급,   역전기 N위치 시 ⇒ F 또는 R 위치로 취급"
+                    "주간제어기 비상위치 ⇒ B7스텝 위치 취급, 역전기 N위치 시 ⇒ F 또는 R 위치로 취급"
                   ]
                 },
                 {
@@ -10841,31 +11107,41 @@
                 {
                   "label": "3",
                   "items": [
-                    "전부 및 후부 EBS(좌, 제어대, 우) 취급 시 ⇒ 복귀 불능 시 EBCOS 취급"
+                    "전부 및 후부 EBS(좌, 제어대, 우) 취급 시 ⇒ 복귀 불능 시 EBCOS 취급 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "전부 및 후부 MRPS(6~7kgf/cm 2 ) 동작 시⇒ 복귀 불능 시 EBCOS 취급"
+                    "전부 및 후부 MRPS(6~7kgf/cm) 동작 시⇒ 복귀 불능 시 EBCOS 취급"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "전부 및 후부 운전실 EROS(EO, R1, R2)위치 시⇒ N위치로 복귀 ※후부차 EROS 복귀 불능 시 ⇒ EBCOS 취급하고 주의운전"
+                    "전부 및 후부 운전실 EROS(EO, R1, R2)위치 시⇒ N위치로 복귀"
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※후부차 EROS 복귀 불능 시 ⇒ EBCOS 취급하고 주의운전"
+            },
+            {
+              "type": "flow",
+              "steps": [
                 {
                   "label": "7",
                   "items": [
-                    "전부차   ADUN 또는 ATCN1, 2 차단 후 복귀 불능 시 : 관제승인 후 운전모드선택(OMS) 비상 취급"
+                    "전부차 ADUN 또는 ATCN1, 2 차단 후 복귀 불능 시 : 관제승인 후 운전모드선택(OMS) 비상 취급"
                   ]
                 },
                 {
                   "label": "8",
                   "items": [
-                    "전부 운전실 복귀 불능 시 ⇒EROS   “ EO ”   취급, EBCOS 취급, 응급운전"
+                    "전부 운전실 복귀 불능 시 ⇒EROS “EO” 취급, EBCOS 취급, 응급운전"
                   ]
                 },
                 {
@@ -10877,7 +11153,7 @@
                 {
                   "label": "10",
                   "items": [
-                    "위 조치로   불능 시 : MC KEY 취거 후 재 투입 시도"
+                    "위 조치로 불능 시 : MC KEY 취거 후 재 투입 시도"
                   ]
                 },
                 {
@@ -10906,7 +11182,7 @@
             },
             {
               "type": "text",
-              "value": "운전모드선택(OMS)\nEROS   “ EO ”   취급 확인   EBCOS 취급\n비상 취급"
+              "value": "운전모드선택(OMS)\nEROS “EO” 취급 확인 EBCOS 취급\n비상 취급\n제2장 상황별 조치사할\n49"
             },
             {
               "type": "images",
@@ -10928,7 +11204,7 @@
           "title": "전 차량 비상제동 체결 시",
           "summary": [
             "ADU 통신 실패 또는 M-ATC, A-ATC ADU하단 중앙에 적색으로 표시됨",
-            "모니터에 ATC1 또는 ATC2 통신고장 경고 현시 조치요령"
+            "모니터에 ATC1 또는 ATC2 통신고장 경고 현시"
           ],
           "keywords": [
             "차량",
@@ -10957,9 +11233,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "모니터에 ATC1 또는 ATC2 통신고장 경고 현시 조치요령"
+                  "desc": "모니터에 ATC1 또는 ATC2 통신고장 경고 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11027,7 +11307,7 @@
             },
             {
               "type": "text",
-              "value": "ATCN1, 2\nADU 상태 확인   모니터 상태 확인\nOFF   → ON"
+              "value": "ATCN1, 2\nADU 상태 확인 모니터 상태 확인\nOFF → ON\n서울시 5호선 200칸 전동차 응급처치요령\n50"
             },
             {
               "type": "images",
@@ -11082,9 +11362,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "고장코드 : 4019 제동력 부족(ISBD) 조치요령"
+                  "desc": "고장코드 : 4019 제동력 부족(ISBD)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11092,7 +11376,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "TCMS   화면을   「제동상태정보」로   전환,   단계별(1   ~   7   스텝)   상용제동   걸림   상태를   확인 (정차제동스위치 개방 취급 후 제동값 확인)"
+                    "TCMS 화면을 「제동상태정보」로 전환, 단계별(1 ~ 7 스텝) 상용제동 걸림 상태를 확인 (정차제동스위치 개방 취급 후 제동값 확인)"
                   ]
                 },
                 {
@@ -11104,13 +11388,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "제동력 부족 검지 조건 : 제동 7단 취급 시 해당 차량의 제동압력이 생성되지 않음 조치 : 고장 차호 일반 배전반의 제동작용장치 차단기(BOUN) OFF/ON 하여 리셋 실시 MCS 모드로 전환 후, 마스콘을 N(중립) → 제동 7단까지 수회 취급하여 소거여부 확인"
+                    "제동력 부족 검지 조건 : 제동 7단 취급 시 해당 차량의 제동압력이 생성되지 않음 조치 : 고장 차호 일반 배전반의 제동작용장치 차단기(BOUN) OFF/ON 하여 리셋 실시 MCS 모드로 전환 후, 마스콘을 N(중립) → 제동 7단까지 수회 취급하여 소거여부 확인 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -11137,6 +11421,10 @@
                   "caption": "마스콘 N-B7 취급"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n51"
             }
           ]
         },
@@ -11146,7 +11434,7 @@
           "summary": [
             "주차제동 체결된 상태에서 풀림 불가에 따른 동력운전 불능",
             "TCMS 화면 상단 우측에 PB 적색표시 현시",
-            "TCMS 화면 하단 상태표시줄에 「주차제동 동작 중」메세지 현시 조치요령"
+            "TCMS 화면 하단 상태표시줄에 「주차제동 동작 중」메세지 현시"
           ],
           "keywords": [
             "상용제동",
@@ -11180,9 +11468,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 화면 하단 상태표시줄에 「주차제동 동작 중」메세지 현시 조치요령"
+                  "desc": "TCMS 화면 하단 상태표시줄에 「주차제동 동작 중」메세지 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11190,13 +11482,13 @@
                 {
                   "label": "1",
                   "items": [
-                    "해당 운전실에서 주차제동동작 램프(PABAIL) 점등 확인"
+                    "해당 운전실에서 주차제동동작 램프(PABAIL) 점등 확인 2"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "주공기압력 6.0kgf/cm 2   이하 확인"
+                    "주공기압력 6.0kgf/cm이하 확인"
                   ]
                 },
                 {
@@ -11214,13 +11506,13 @@
                 {
                   "label": "5",
                   "items": [
-                    "동력운전 불가 시 Tc차 운전실 백월부 주차제동 바이패스(PABBPS) 취급(관제와 협의)"
+                    "동력운전 불가 시 Tc차 운전실 백월부 주차제동 바이패스(PABBPS) 취급(관제와 협의) 2"
                   ]
                 },
                 {
                   "label": "6",
                   "items": [
-                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -11237,7 +11529,7 @@
             },
             {
               "type": "text",
-              "value": "주차제동\n주차제동 완해\n수동완해 케이블 조작   주차제동 바이패스 취급\n수동조작(완해)"
+              "value": "주차제동\n주차제동 완해 수동완해 케이블 조작 주차제동 바이패스 취급\n수동조작(완해)\n서울시 5호선 200칸 전동차 응급처치요령\n52"
             },
             {
               "type": "images",
@@ -11268,7 +11560,7 @@
           "summary": [
             "정차 후 추진 시",
             "TCMS 화면 상단 고장차량 현시",
-            "TCMS 화면 하단 상태표시줄에 제동불완해 검지 메시지 현시 또는 프로토콜 데이터 상 NRBD 「1」값 확인"
+            "TCMS 화면 하단 상태표시줄에 제동불완해 검지 메시지 현시 또는 프로토콜 데이터 상 NRBD"
           ],
           "keywords": [
             "주차제동",
@@ -11301,17 +11593,39 @@
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 화면 하단 상태표시줄에 제동불완해 검지 메시지 현시 또는 프로토콜 데이터 상 NRBD 「1」값 확인"
-                },
-                {
-                  "term": "",
-                  "desc": "TCMS 화면 하단 메뉴창에서「상태정보」⇒ 「제동장치 상태」로 전환하고 5초 이상 BC압력 설정치 확인"
-                },
-                {
-                  "term": "",
-                  "desc": "고장코드 : 4026 제동 불완해 검지(NRBD) 조치요령"
+                  "desc": "TCMS 화면 하단 상태표시줄에 제동불완해 검지 메시지 현시 또는 프로토콜 데이터 상 NRBD"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "「1」값 확인"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "TCMS 화면 하단 메뉴창에서「상태정보」⇒ 「제동장치 상태」로 전환하고 5초 이상 BC압력"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "설정치 확인"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "고장코드 : 4026 제동 불완해 검지(NRBD)"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11331,13 +11645,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "강제제동완해 스위치 취급 후 해소되지 않을 경우 관제보고 후 조치 ⇒ 고장 차호 일반 배전반의 제동작용장치 차단기(BOUN) OFF/ON 하여 리셋 실시 ⇒ 고장 차호 출입문 도어포스트 라인(차량외부)에 설치된 제동풀림콕크 90°취급"
+                    "강제제동완해 스위치 취급 후 해소되지 않을 경우 관제보고 후 조치 ⇒ 고장 차호 일반 배전반의 제동작용장치 차단기(BOUN) OFF/ON 하여 리셋 실시 ⇒ 고장 차호 출입문 도어포스트 라인(차량외부)에 설치된 제동풀림콕크 90°취급 2"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm 2   이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
+                    "조치 완료 후 주공기 압력이 8 ~ 9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 TCMS 화면에서 각 장치의 이상 유무 확인"
                   ]
                 },
                 {
@@ -11354,7 +11668,7 @@
             },
             {
               "type": "text",
-              "value": "해당차량 제동풀림콕크\n마스콘 N-B7 취급   강제완해 버튼 취급   일반배전반 BOUN 리셋\n취급"
+              "value": "해당차량 제동풀림콕크\n마스콘 N-B7 취급 강제완해 버튼 취급 일반배전반 BOUN 리셋\n취급\n제2장 상황별 조치사할\n53"
             },
             {
               "type": "images",
@@ -11384,7 +11698,7 @@
           "title": "운행 중 제동 불완해 발생 시",
           "summary": [
             "TCMS 고장경보음 발생(삐~)",
-            "TCMS 프로토콜 통신불량 현시 - 해당차량 통신불량 현시 : 전두차 TC 고장 또는 Tc차 이더넷 스위치 고장 - 해당차량 통신불량 현시 : 해당 CC 또는 통신라인고장, 해당차량 이더넷 스위치 고장 - 주요장치(C/I, SIV, 제동) 통신불량 현시 - TCMS 화면 정상동작 불능(출입문, CM 등 동작상태 현시 불량) 조치요령"
+            "TCMS 프로토콜 통신불량 현시"
           ],
           "keywords": [
             "운행",
@@ -11414,9 +11728,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "TCMS 프로토콜 통신불량 현시 - 해당차량 통신불량 현시 : 전두차 TC 고장 또는 Tc차 이더넷 스위치 고장 - 해당차량 통신불량 현시 : 해당 CC 또는 통신라인고장, 해당차량 이더넷 스위치 고장 - 주요장치(C/I, SIV, 제동) 통신불량 현시 - TCMS 화면 정상동작 불능(출입문, CM 등 동작상태 현시 불량) 조치요령"
+                  "desc": "TCMS 프로토콜 통신불량 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "- 해당차량 통신불량 현시 : 전두차 TC 고장 또는 Tc차 이더넷 스위치 고장\n- 해당차량 통신불량 현시 : 해당 CC 또는 통신라인고장, 해당차량 이더넷 스위치 고장\n- 주요장치(C/I, SIV, 제동) 통신불량 현시\n- TCMS 화면 정상동작 불능(출입문, CM 등 동작상태 현시 불량)\n조치요령"
             },
             {
               "type": "flow",
@@ -11442,7 +11760,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "조치불능 시 ⇒ 수동운전(ATC 정상인 경우) 및 EROS   “ EO ” 위치로 운행"
+                    "조치불능 시 ⇒ 수동운전(ATC 정상인 경우) 및 EROS “EO”위치로 운행"
                   ]
                 },
                 {
@@ -11484,7 +11802,7 @@
             },
             {
               "type": "text",
-              "value": "TCMSDON 차단 후\nTCUN 확인 및 복귀\nEROS   “ EO ”   취급\n재투입"
+              "value": "TCMSDON 차단 후\nTCUN 확인 및 복귀 EROS “EO” 취급\n재투입\n서울시 5호선 200칸 전동차 응급처치요령\n54"
             },
             {
               "type": "images",
@@ -11509,7 +11827,7 @@
           "id": "newcomer2-27",
           "title": "TCMS 통신고장 발생 시",
           "summary": [
-            "TCMS 화면 하단부 고장 메시지 현시 조치요령"
+            "TCMS 화면 하단부 고장 메시지 현시"
           ],
           "keywords": [
             "TCMS",
@@ -11534,9 +11852,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "TCMS 화면 하단부 고장 메시지 현시 조치요령"
+                  "desc": "TCMS 화면 하단부 고장 메시지 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11599,6 +11921,10 @@
                   "caption": "PIDN 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n55"
             }
           ]
         },
@@ -11607,7 +11933,7 @@
           "title": "표시기(PIS) 통신고장 시",
           "summary": [
             "고장장치 통신 불량으로 해당 운전실 방송/통화 불능",
-            "[PA]통신고장 현시 조치요령"
+            "[PA]통신고장 현시"
           ],
           "keywords": [
             "PIS",
@@ -11636,9 +11962,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "[PA]통신고장 현시 조치요령"
+                  "desc": "[PA]통신고장 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11689,21 +12019,21 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "자동방송장치(PAC)\n방송장치 통신 동작\nPACN 확인\nCPU LCD 확인\n확인"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_076.jpg",
-                  "caption": ""
+                  "caption": "자동방송장치(PAC)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_077.jpg",
-                  "caption": ""
+                  "caption": "방송장치 통신 동작"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "PACN 확인\nCPU LCD 확인확인\n서울시 5호선 200칸 전동차 응급처치요령\n56"
             }
           ]
         },
@@ -11750,8 +12080,17 @@
                 },
                 {
                   "term": "",
-                  "desc": "ATC 주/보조 DOWN, TCMS 동시에 고장 발생 시 취급시기"
-                },
+                  "desc": "ATC 주/보조 DOWN, TCMS 동시에 고장 발생 시"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "취급시기"
+            },
+            {
+              "type": "list",
+              "items": [
                 {
                   "term": "",
                   "desc": "ENCDN1, 2 차단되어 복귀불능 또는 엔코더 고장 시"
@@ -11762,13 +12101,26 @@
                 },
                 {
                   "term": "",
-                  "desc": "ATCN1, 2 고장 시 조치요령"
-                },
-                {
-                  "term": "",
-                  "desc": "EROS   “ EO ” , EBCOS 취급 후 동력 운전 시행(관제 승인) ① EO모드 운전 시 속도 45km/h 이하(속도 제한됨) ② 상용제동은 스텝(B1 ~ B7)과 관계없이 B7스텝 현시 ③ 동력운전 시 : P4노치 ④ EO모드 운전 시 후진 불가 절차"
+                  "desc": "ATCN1, 2 고장 시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "EROS “EO”, EBCOS 취급 후 동력 운전 시행(관제 승인)"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "① EO모드 운전 시 속도 45km/h 이하(속도 제한됨)\n② 상용제동은 스텝(B1 ~ B7)과 관계없이 B7스텝 현시\n③ 동력운전 시 : P4노치\n④ EO모드 운전 시 후진 불가\n절차"
             },
             {
               "type": "flow",
@@ -11783,7 +12135,7 @@
                   "label": "2",
                   "items": [
                     "운전실 배전반 내 EROS에서 EO 모드 선택",
-                    "EO   모드에서   주/보조   ATC   DOWN   시   비상제동   체결,   ZVBPS(0속도   바이패스   스위치)를 BYPASS 취급[EBR(비상제동 계전기) 여자]"
+                    "EO 모드에서 주/보조 ATC DOWN 시 비상제동 체결, ZVBPS(0속도 바이패스 스위치)를 BYPASS 취급[EBR(비상제동 계전기) 여자]"
                   ]
                 },
                 {
@@ -11807,6 +12159,10 @@
                   "caption": "ENCDN1, 2 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n57"
             }
           ]
         },
@@ -11814,9 +12170,7 @@
           "id": "newcomer2-30",
           "title": "EO모드 운전(EROS \"EO\" 취급)",
           "summary": [
-            "TCMS 화면 상단 중앙에   “ EB ”   표시 현시",
-            "공기공급 중단으로 인해, 주공기압력이 최소 설정압력(6.0kgf/cm 2 ) 이하로 낮아지는 고장이 발생",
-            "비상안전루프가 차단되어 비상제동 체결 조치요령"
+            "TCMS 화면 상단 중앙에 “EB” 표시 현시"
           ],
           "keywords": [
             "EO",
@@ -11842,17 +12196,30 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "TCMS 화면 상단 중앙에   “ EB ”   표시 현시"
-                },
-                {
-                  "term": "",
-                  "desc": "공기공급 중단으로 인해, 주공기압력이 최소 설정압력(6.0kgf/cm 2 ) 이하로 낮아지는 고장이 발생"
-                },
-                {
-                  "term": "",
-                  "desc": "비상안전루프가 차단되어 비상제동 체결 조치요령"
+                  "desc": "TCMS 화면 상단 중앙에 “EB” 표시 현시"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "2"
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "공기공급 중단으로 인해, 주공기압력이 최소 설정압력(6.0kgf/cm) 이하로 낮아지는 고장이 발생"
+                },
+                {
+                  "term": "",
+                  "desc": "비상안전루프가 차단되어 비상제동 체결"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11882,29 +12249,34 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "PABRS\n주차제동\nMR 압력 게이지   EBCOS(비상제동개방)\n(주차제동 완해)\n수동조작(완해)\n주차제동 바이패스\n취급"
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/newcomer/ch2_079.jpg",
+                  "caption": "PABRS\nMR 압력 게이지"
+                },
+                {
+                  "src": "/images/edu/newcomer/ch2_080.jpg",
+                  "caption": "주차제동\nEBCOS(비상제동개방)"
+                }
+              ]
             },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/newcomer/ch2_079.jpg",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/newcomer/ch2_080.jpg",
-                  "caption": ""
-                },
-                {
                   "src": "/images/edu/newcomer/ch2_081.jpg",
-                  "caption": ""
+                  "caption": "(주차제동 완해)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_082.jpg",
-                  "caption": ""
+                  "caption": "수동조작(완해)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "주차제동 바이패스\n취급\n서울시 5호선 200칸 전동차 응급처치요령\n58"
             }
           ]
         },
@@ -11912,7 +12284,7 @@
           "id": "newcomer2-31",
           "title": "구원운전 요령",
           "summary": [
-            "MR압력 최대압력 초과 시 안전밸브(설정압력 + 10%)에 의한 압축공기 배기(소음 발생) 조치요령"
+            "MR압력 최대압력 초과 시 안전밸브(설정압력 + 10%)에 의한 압축공기 배기(소음 발생)"
           ],
           "keywords": [
             "구원운전",
@@ -11930,7 +12302,7 @@
                 {
                   "label": "31",
                   "items": [
-                    "MR 압력 9kg/cm 이상 상승 시 현상"
+                    "MR 압력 9kg/cm이상 상승 시 현상"
                   ]
                 }
               ]
@@ -11940,9 +12312,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "MR압력 최대압력 초과 시 안전밸브(설정압력 + 10%)에 의한 압축공기 배기(소음 발생) 조치요령"
+                  "desc": "MR압력 최대압력 초과 시 안전밸브(설정압력 + 10%)에 의한 압축공기 배기(소음 발생)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -11950,13 +12326,13 @@
                 {
                   "label": "1",
                   "items": [
-                    "주공급 배관(역지변과 MR 공기통 사이)에 설치된 안전밸브에 의해 최대 압력제한을 초과하는 최대 압력에서 압축공기를 대기로 방출(기준 값 : 9.4 ∼ 11.0kgf/cm 2 )"
+                    "주공급 배관(역지변과 MR 공기통 사이)에 설치된 안전밸브에 의해 최대 압력제한을 초과하는 2 최대 압력에서 압축공기를 대기로 방출(기준 값 : 9.4 ∼ 11.0kgf/cm)"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "영업운행 종료 후 기지 입고하여 차량상태 점검 ⇒ 조압기(CMG) 설정압력 확인 (ON : 8.0 ± 0.1 kgf/cm 2 , OFF : 9.0 ± 0.1 kgf/cm 2 ) ⇒ 안전밸브 교체진행"
+                    "영업운행 종료 후 기지 입고하여 차량상태 점검 22 ⇒ 조압기(CMG) 설정압력 확인 (ON : 8.0 ± 0.1 kgf/cm, OFF : 9.0 ± 0.1 kgf/cm) ⇒ 안전밸브 교체진행"
                   ]
                 }
               ]
@@ -11967,7 +12343,7 @@
             },
             {
               "type": "text",
-              "value": "주공기 배관 안전밸브"
+              "value": "주공기 배관 안전밸브\n제2장 상황별 조치사할\n59"
             },
             {
               "type": "flow",
@@ -11993,9 +12369,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "SLAVE 고장 시 고장 표시(MASTER로 정상 동작) 조치요령"
+                  "desc": "SLAVE 고장 시 고장 표시(MASTER로 정상 동작)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12016,7 +12396,7 @@
                   "label": "3",
                   "items": [
                     "MASTER, SLAVE 동시 고장시",
-                    "EROS   “ EO ” , EBCOS 취급 후 동력 운전 시행(관제 승인) ① EO모드 운전 시 속도 45km/h 이하(속도 제한됨) ② 상용제동은 스텝(B1 ~ B7)과 관계없이 B7스텝 현시 ③ 동력운전 시 : P4노치 ④ EO모드 운전 시 후진 불가 절차"
+                    "EROS “EO”, EBCOS 취급 후 동력 운전 시행(관제 승인) ① EO모드 운전 시 속도 45km/h 이하(속도 제한됨) ② 상용제동은 스텝(B1 ~ B7)과 관계없이 B7스텝 현시 ③ 동력운전 시 : P4노치 ④ EO모드 운전 시 후진 불가 절차"
                   ]
                 },
                 {
@@ -12029,7 +12409,7 @@
                   "label": "2",
                   "items": [
                     "운전실 배전반 내 EROS에서 EO 모드 선택",
-                    "EO   모드에서   주/보조   ATC   DOWN   시   비상제동   체결,   ZVBPS(0속도   바이패스   스위치)를 BYPASS 취급[EBR(비상제동 계전기) 여자]"
+                    "EO 모드에서 주/보조 ATC DOWN 시 비상제동 체결, ZVBPS(0속도 바이패스 스위치)를 BYPASS 취급[EBR(비상제동 계전기) 여자]"
                   ]
                 },
                 {
@@ -12046,17 +12426,17 @@
               "text": "관련사진"
             },
             {
-              "type": "text",
-              "value": "엔코더 PS보드 전원\nENCDN1, 2 차단기\nEROS   “ EO ”   취급\n스위치 확인\n확인"
-            },
-            {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_083.jpg",
-                  "caption": ""
+                  "caption": "엔코더 PS보드 전원"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "EROS “EO” 취급\n스위치 확인확인\n서울시 5호선 200칸 전동차 응급처치요령\n60"
             }
           ]
         },
@@ -12064,7 +12444,7 @@
           "id": "newcomer2-32",
           "title": "MR 압력 9kg/cm² 이상 상승 시",
           "summary": [
-            "CMSB 인버터가 기동한 상태에서 출력전류(28A)의 150% 이상에서 1분간 지속시 고장발생 조치요령"
+            "CMSB 인버터가 기동한 상태에서 출력전류(28A)의 150% 이상에서 1분간 지속시 고장발생"
           ],
           "keywords": [
             "MR",
@@ -12090,9 +12470,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "CMSB 인버터가 기동한 상태에서 출력전류(28A)의 150% 이상에서 1분간 지속시 고장발생 조치요령"
+                  "desc": "CMSB 인버터가 기동한 상태에서 출력전류(28A)의 150% 이상에서 1분간 지속시 고장발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12137,6 +12521,10 @@
                   "caption": "제어기 점검"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n61"
             }
           ]
         },
@@ -12144,7 +12532,7 @@
           "id": "newcomer2-33",
           "title": "엔코더 고장 시",
           "summary": [
-            "TCMS DU 화면 SOTS1 or SOTS2 발생 조치요령"
+            "TCMS DU 화면 SOTS1 or SOTS2 발생"
           ],
           "keywords": [
             "엔코더",
@@ -12168,9 +12556,13 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "TCMS DU 화면 SOTS1 or SOTS2 발생 조치요령"
+                  "desc": "TCMS DU 화면 SOTS1 or SOTS2 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12189,7 +12581,7 @@
             },
             {
               "type": "text",
-              "value": "ELN 차단기 재취급"
+              "value": "ELN 차단기 재취급\n서울시 5호선 200칸 전동차 응급처치요령\n62"
             },
             {
               "type": "images",
@@ -12245,9 +12637,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "출입문 시스템을 부정확하게 설치됨 조치요령"
+                  "desc": "출입문 시스템을 부정확하게 설치됨"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12267,7 +12663,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "필요시 승인도면 또는 작업 절차서에 따라 출입문 설치를 조정한다."
+                    "필요시 승인도면 또는 작업 절차서에 따라 출입문 설치를 조정한다. 제2장 상황별 조치사할 63"
                   ]
                 }
               ]
@@ -12322,9 +12718,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "초기 전원 공급 시 하기 원인으로 인해 Calibration(초기화) 실패함. 1) DCS 및 DLS가 비정상적으로 동작함. 2) 도어 어셈블리 동작 이상 발생 3) 도퍼 판넬 사이에 기계적 간섭, 먼지, 이물질이 있는 경우 DCU가 장애물 감지를 반복 수행함. 조치요령"
+                  "desc": "초기 전원 공급 시 하기 원인으로 인해 Calibration(초기화) 실패함."
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "1) DCS 및 DLS가 비정상적으로 동작함.\n2) 도어 어셈블리 동작 이상 발생\n3) 도퍼 판넬 사이에 기계적 간섭, 먼지, 이물질이 있는 경우 DCU가 장애물 감지를 반복 수행함.\n조치요령"
             },
             {
               "type": "flow",
@@ -12332,25 +12732,25 @@
                 {
                   "label": "1",
                   "items": [
-                    "“ 저전압 ”   에러와 같이 발생했다면, 전압이 낮은지 확인한다. (≤70V)"
+                    "“저전압” 에러와 같이 발생했다면, 전압이 낮은지 확인한다. (≤70V)"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "“ 장애물 감지 ”   에러와 동시에 발생했다면, 기계적 간섭 또는/및 외부 요인이 존재하는지 확인 한다. 필요시 도어 설치를 조절하거나 이물질을 제거한다."
+                    "“장애물 감지” 에러와 동시에 발생했다면, 기계적 간섭 또는/및 외부 요인이 존재하는지 확인 한다. 필요시 도어 설치를 조절하거나 이물질을 제거한다."
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "“ DLS 에러 ”   또는/및   “ DCS 에러 ” 와 함께 발생했다면, 닫힘 및 잠김 동작 중 Bracket이 스위치의 레버를 정상적으로 작동하는지 확인한다. 비정상 동작한다면 승인도면에 따라 조정한다. 필요시 스위치를 교체한다."
+                    "“DLS 에러” 또는/및 “DCS 에러”와 함께 발생했다면, 닫힘 및 잠김 동작 중 Bracket이 스위치의 레버를 정상적으로 작동하는지 확인한다. 비정상 동작한다면 승인도면에 따라 조정한다. 필요시 스위치를 교체한다."
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "“ 모터 회로 에러 ” 와 같이 발생한다면, 모터 커넥터 체결을 확인한다. 정상이라면 모터 어셈블리를 교체한다."
+                    "“모터 회로 에러”와 같이 발생한다면, 모터 커넥터 체결을 확인한다. 정상이라면 모터 어셈블리를 교체한다."
                   ]
                 },
                 {
@@ -12377,6 +12777,10 @@
                   "caption": "DCU 교체"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n64"
             }
           ]
         },
@@ -12425,9 +12829,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "공급 전압이 매우 낮음. (열림 동작시간이 저전압으로 인해 6초를 초과함) 조치요령"
+                  "desc": "공급 전압이 매우 낮음. (열림 동작시간이 저전압으로 인해 6초를 초과함)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12447,7 +12855,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "“ 모터 회로 에러 ” 와 같이 발생한다면, 모터 커넥터 체결을 확인한다. 정상이라면, 모터 어셈 블리를 교체한다."
+                    "“모터 회로 에러”와 같이 발생한다면, 모터 커넥터 체결을 확인한다. 정상이라면, 모터 어셈 블리를 교체한다."
                   ]
                 },
                 {
@@ -12474,6 +12882,10 @@
                   "caption": "DCU 교체"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n65"
             }
           ]
         },
@@ -12521,9 +12933,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "DLS 고장 발생 조치요령"
+                  "desc": "DLS 고장 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12548,7 +12964,7 @@
             },
             {
               "type": "text",
-              "value": "리미트 스위치 확인"
+              "value": "리미트 스위치 확인\n서울시 5호선 200칸 전동차 응급처치요령\n66"
             },
             {
               "type": "images",
@@ -12613,9 +13029,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "DCS 1,2 고장 발생 조치요령"
+                  "desc": "DCS 1,2 고장 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12662,6 +13082,10 @@
                   "caption": "DSC2 스위치 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n67"
             }
           ]
         },
@@ -12721,9 +13145,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "엔코더 에러 발생 조치요령"
+                  "desc": "엔코더 에러 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12770,6 +13198,10 @@
                   "caption": "DLS2 스위치 확인"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "서울시 5호선 200칸 전동차 응급처치요령\n68"
             }
           ]
         },
@@ -12824,9 +13256,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "비상스위치 고장 발생 조치요령"
+                  "desc": "비상스위치 고장 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12863,6 +13299,10 @@
                   "caption": "ESW1/ESW2"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n69"
             }
           ]
         },
@@ -12872,7 +13312,7 @@
           "summary": [
             "압축기 기동 중 정격전류 값 허용치 이상의 높은 전류치로 나타난다.",
             "압축기 정상기동 중 갑자기 정지한다.",
-            "압축기 기동하지 않는다. 조치요령"
+            "압축기 기동하지 않는다."
           ],
           "keywords": [
             "DLS1",
@@ -12905,9 +13345,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "압축기 기동하지 않는다. 조치요령"
+                  "desc": "압축기 기동하지 않는다."
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -12944,7 +13388,7 @@
             },
             {
               "type": "text",
-              "value": "압축기"
+              "value": "압축기\n서울시 5호선 200칸 전동차 응급처치요령\n70"
             },
             {
               "type": "images",
@@ -13005,9 +13449,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "증발기 모터 기동 하지 않는다. 조치요령"
+                  "desc": "증발기 모터 기동 하지 않는다."
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -13054,6 +13502,10 @@
                   "caption": "증발기 팬 모터"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n71"
             }
           ]
         },
@@ -13063,7 +13515,7 @@
           "summary": [
             "AC FAN Motor 내부코일뭉치의 절연 파괴로 인한 발열",
             "기동축 휨으로 인한 발열",
-            "기동축 베어링 고착에 따른 발열 및 소음 발생 조치요령"
+            "기동축 베어링 고착에 따른 발열 및 소음 발생"
           ],
           "keywords": [
             "운전실",
@@ -13096,9 +13548,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "기동축 베어링 고착에 따른 발열 및 소음 발생 조치요령"
+                  "desc": "기동축 베어링 고착에 따른 발열 및 소음 발생"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -13112,7 +13568,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "공기정화기 정면 오른쪽에 위치한 로커 스위치를   “ I ”   에서   “ O ” 으로 전환하여 AC 전원을 차단한다."
+                    "공기정화기 정면 오른쪽에 위치한 로커 스위치를 “I” 에서 “O”으로 전환하여 AC 전원을 차단한다."
                   ]
                 }
               ]
@@ -13136,7 +13592,7 @@
             },
             {
               "type": "text",
-              "value": "◆ 육안 검사\nIC의 Body 손상 유무 확인\n(터짐, 깨짐)\n→ IC가 손상되었을 경우 제어보드 교체\n로커 스위치 ON( “ I ” ) 상태   로커 스위치 OFF( “ O ” ) 상태"
+              "value": "◆ 육안 검사\nIC의 Body 손상 유무 확인\n(터짐, 깨짐)\n→ IC가 손상되었을 경우 제어보드 교체\n로커 스위치 ON(“I”) 상태 로커 스위치 OFF(“O”) 상태\n서울시 5호선 200칸 전동차 응급처치요령\n72"
             },
             {
               "type": "images",
@@ -13167,9 +13623,13 @@
                 },
                 {
                   "term": "",
-                  "desc": "주공기압력 저하에 따른 비상제동, 주차제동 체결 조치요령"
+                  "desc": "주공기압력 저하에 따른 비상제동, 주차제동 체결"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "조치요령"
             },
             {
               "type": "flow",
@@ -13195,7 +13655,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "주차제동 완해스위치(PABRS) 버튼 취급 → 스위치로 완해 안될 시 강제완해 취급 ⇒ 주차제동전자밸브   수동조작기구   「완해」(우측)측 봉을 손으로 밀어서 완해여부   확인(주차 제동 전자밸브 불량 시)당김고리 취급 ⇒ Tc차 선두 및 후부의 1, 2축 차륜쪽 수동완해 고리를 손으로 당겨서 완해여부 확인(주차제동 실린더 기계적 고장 시) ⇒ 동력운전 불가 시 Tc차 운전실 백월부 주차제동 바이패스(PABBPS) 취급(관제와 협의)"
+                    "주차제동 완해스위치(PABRS) 버튼 취급 → 스위치로 완해 안될 시 강제완해 취급 ⇒ 주차제동전자밸브 수동조작기구 「완해」(우측)측 봉을 손으로 밀어서 완해여부 확인(주차 제동 전자밸브 불량 시)당김고리 취급 ⇒ Tc차 선두 및 후부의 1, 2축 차륜쪽 수동완해 고리를 손으로 당겨서 완해여부 확인(주차제동 실린더 기계적 고장 시) ⇒ 동력운전 불가 시 Tc차 운전실 백월부 주차제동 바이패스(PABBPS) 취급(관제와 협의)"
                   ]
                 },
                 {
@@ -13215,42 +13675,42 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_104.jpg",
-                  "caption": "MR 압력 게이지"
+                  "caption": "MR 압력 게이지\nPABRS"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_105.jpg",
-                  "caption": "EBCOS(비상제동개방)"
+                  "caption": "EBCOS(비상제동개방)\n주차제동"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_106.jpg",
-                  "caption": "CMN 개방"
+                  "caption": "CMN 개방\n주차제동"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_107.jpg",
-                  "caption": "CMSBN 개방"
+                  "caption": "CMSBN 개방\n주차제동 바이패스"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "PABRS\n주차제동\n주차제동\n주차제동 바이패스\n(주차제동 완해)\n수동조작(완해)\n수동조작(완해)\n취급"
             },
             {
               "type": "images",
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_108.jpg",
-                  "caption": ""
+                  "caption": "(주차제동 완해)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_109.jpg",
-                  "caption": ""
+                  "caption": "수동조작(완해)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_110.jpg",
-                  "caption": ""
+                  "caption": "수동조작(완해)"
                 }
               ]
+            },
+            {
+              "type": "text",
+              "value": "제2장 상황별 조치사할\n73"
             },
             {
               "type": "flow",
@@ -13286,12 +13746,15 @@
                   "label": "1",
                   "items": [
                     "기존차[608칸] 구원 운전",
-                    "1) 구원 및 피구원차를 연결한다. 전두연결기(Tc 차량)간 연결을 실시한 후, 좌/우 12P 점퍼 2개를 연결한다.(기존차 608칸만 해당) 구원 및 피구원차의 주 공기 압력 코크(MR 코크)를 흐름 위치로 한다. 12P 점퍼의 연결 신호는 아래와 같다. (단, 신조차-신조차 간은 연결 불필요) 12P(L)   12P(R) 번호   기능   설명   번호   기능   설명 1   DC100V   DC100V 출력   1   DC100V   DC100V 입력 2   Ground   Ground 출력   2   Ground   Ground 입력 3   TOW   12P 연결기 연결 확인 출력   3   TOW   12P 연결기 연결 확인 입력 4   BR1   구원 제동 비트 출력 1   4   BR1   구원 제동 비트 입력 1 5   BR2   구원 제동 비트 출력 2   5   BR2   구원 제동 비트 입력 2 6   BR3   구원 제동 비트 출력 3   6   BR3   구원 제동 비트 입력 3 7   BR4   구원 제동 비트 출력 4   7   BR4   구원 제동 비트 입력 4 8   예비   -   8   예비   - 9   예비   -   9   예비   - 10   예비   -   10   예비   - 11   PA +   운전실 통화   11   PA +   운전실 통화 12   PA -   운전실 통화   12   PA -   운전실 통화 ※ 용어 설명 TOW : 구원 BR(Brake for rescue) : 구원제동 PA(Public Address) : 방송",
-                    "2) 구원차는 판토 상승, 피구원차는 판토 하강을 확인한다.(로직상 피구원차는 판토 하강 필수)",
-                    "3) 구원 운전 조작 및 절차는   “ 시험 유형별 상세 항목 ” 을 따른다."
+                    "1) 구원 및 피구원차를 연결한다. 전두연결기(Tc 차량)간 연결을 실시한 후, 좌/우 12P 점퍼 2개를 연결한다.(기존차 608칸만 해당) 구원 및 피구원차의 주 공기 압력 코크(MR 코크)를 흐름 위치로 한다. 12P 점퍼의 연결 신호는 아래와 같다. (단, 신조차-신조차 간은 연결 불필요) 12P(L) 12P(R) 번호 기능 설명 번호 기능 설명 1 DC100V DC100V 출력 1 DC100V DC100V 입력 2 Ground Ground 출력 2 Ground Ground 입력 3 TOW 12P 연결기 연결 확인 출력 3 TOW 12P 연결기 연결 확인 입력 4 BR1 구원 제동 비트 출력 1 4 BR1 구원 제동 비트 입력 1 5 BR2 구원 제동 비트 출력 2 5 BR2 구원 제동 비트 입력 2 6 BR3 구원 제동 비트 출력 3 6 BR3 구원 제동 비트 입력 3 7 BR4 구원 제동 비트 출력 4 7 BR4 구원 제동 비트 입력 4 8 예비 - 8 예비 - 9 예비 - 9 예비 - 10 예비 - 10 예비 - 11 PA + 운전실 통화 11 PA + 운전실 통화 12 PA - 운전실 통화 12 PA - 운전실 통화"
                   ]
                 }
               ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 용어 설명 TOW : 구원 BR(Brake for rescue) : 구원제동 PA(Public Address) : 방송 2) 구원차는 판토 상승, 피구원차는 판토 하강을 확인한다.(로직상 피구원차는 판토 하강 필수) 3) 구원 운전 조작 및 절차는 “시험 유형별 상세 항목”을 따른다."
             }
           ]
         },
@@ -13317,12 +13780,15 @@
                   "label": "2",
                   "items": [
                     "하남선[32칸] 구원 운전(신조차-신조차도 동일)",
-                    "1) 구원 및 피구원차를 연결한다. 전두연결기(Tc 차량)간 연결을 실시한다(자동 연결기를 통해 42P 점퍼 연결체결됨.) 구원 및 피구원차의 주 공기 압력 코크(MR 코크)를 흐름 위치로 한다. 42P 자동 연결기의 연결 신호는 아래와 같다. (단, 하남선(32칸) 및 신조차에서 사용) 42P 번호   기능   설명   번호   기능   설명 1   DC100V   비상 루프 전원   1   DC100V   DC100V 입력 2   EROR 1   EROR 제어 1   2   EROR 1   EROR 제어 1 3   EROR 2   EROR 제어 2   3   EROR 1   EROR 제어 2 4   EB1   EB Loop 1   4   EB1   EB Loop 1 5   EB2   EB Loop 2   5   EB2   EB Loop 2 6   PA +   운전실 통화 +   6   PA+   운전실 통화 + 7   7 8   8 9   PA -   운전실 통화 -   9   PA-   운전실 통화 - 10   SB   보안제동 체결   10   SB   보안제동 체결 11   연결1   연결 신호 전원 출력   11   연결1   연결 신호 전원 출력 12   연결2   자동 연결 확인 입력   12   연결2   자동 연결 확인 출력 13   예비   -   13   예비   - 14   예비   -   14   예비   - 15   예비   -   15   예비   - 16   예비   -   16   예비   - 17   BR1   구원 제동 비트 출력 1   17   BR1   구원 제동 비트 입력 1 18   BR2   구원 제동 비트 출력 2   18   BR2   구원 제동 비트 입력 2 19   BR3   구원 제동 비트 출력 3   19   BR3   구원 제동 비트 입력 3 20   BR4   구원 제동 비트 출력 4   20   BR4   구원 제동 비트 입력 4 21   Ground   Ground 연결   21   Ground   Ground 연결 ※ 용어 설명 EROR(Rescue operation relay) : 구원운전 계전기 EB(Emergency Brake) : 비상제동 PA(Public Address) : 방송 BR(Brake for rescue) : 구원제동",
-                    "2) 구원차는 판토 상승, 피구원차는 판토 하강을 확인한다.(로직상 피구원차는 판토 하강 필수)",
-                    "3) 구원 운전 조작 및 절차는   “ 시험 유형별 상세 항목 ” 을 따른다."
+                    "1) 구원 및 피구원차를 연결한다. 전두연결기(Tc 차량)간 연결을 실시한다(자동 연결기를 통해 42P 점퍼 연결체결됨.) 구원 및 피구원차의 주 공기 압력 코크(MR 코크)를 흐름 위치로 한다. 42P 자동 연결기의 연결 신호는 아래와 같다. (단, 하남선(32칸) 및 신조차에서 사용) 42P 번호 기능 설명 번호 기능 설명 1 DC100V 비상 루프 전원 1 DC100V DC100V 입력 2 EROR 1 EROR 제어 1 2 EROR 1 EROR 제어 1 3 EROR 2 EROR 제어 2 3 EROR 1 EROR 제어 2 4 EB1 EB Loop 1 4 EB1 EB Loop 1 5 EB2 EB Loop 2 5 EB2 EB Loop 2 6 PA + 운전실 통화 + 6 PA+ 운전실 통화 + 7 7 8 8 9 PA - 운전실 통화 - 9 PA- 운전실 통화 - 10 SB 보안제동 체결 10 SB 보안제동 체결 11 연결1 연결 신호 전원 출력 11 연결1 연결 신호 전원 출력 12 연결2 자동 연결 확인 입력 12 연결2 자동 연결 확인 출력 13 예비 - 13 예비 - 14 예비 - 14 예비 - 15 예비 - 15 예비 - 16 예비 - 16 예비 - 17 BR1 구원 제동 비트 출력 1 17 BR1 구원 제동 비트 입력 1 18 BR2 구원 제동 비트 출력 2 18 BR2 구원 제동 비트 입력 2 19 BR3 구원 제동 비트 출력 3 19 BR3 구원 제동 비트 입력 3 20 BR4 구원 제동 비트 출력 4 20 BR4 구원 제동 비트 입력 4 21 Ground Ground 연결 21 Ground Ground 연결"
                   ]
                 }
               ]
+            },
+            {
+              "type": "callout",
+              "variant": "warning",
+              "text": "※ 용어 설명 EROR(Rescue operation relay) : 구원운전 계전기 EB(Emergency Brake) : 비상제동 PA(Public Address) : 방송 BR(Brake for rescue) : 구원제동 2) 구원차는 판토 상승, 피구원차는 판토 하강을 확인한다.(로직상 피구원차는 판토 하강 필수) 3) 구원 운전 조작 및 절차는 “시험 유형별 상세 항목”을 따른다. 제2장 상황별 조치사할 75"
             }
           ]
         },
@@ -13348,7 +13814,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "기존차[608칸] - 신조차 구원운전 시험(좌/우 12P 점퍼 2개 연결 필요) 신조차[336칸]_밀기 피구원차_기존차(608칸) 구원차_신조차[336칸] 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   하강   상승 F/N/R   F   N   F   N EROS   없음   없음   N   N 마스콘   N   -   P ~ B   - 기존차(608칸)_밀기 피구원차_신조차[336칸] 구원차_기존차(608칸) 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   하강   상승 F/N/R   F   N   F   N EROS   N   N   없음   없음 마스콘   N   -   P ~ B   - 신조차[336칸]_끌기 구원차_신조차[336칸] 피구원차_기존차(608칸) 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   상승   하강 F/N/R   F   N   F   N EROS   N   N   없음   없음 마스콘   P ~ B   -   N   - 기존차(608칸)_끌기 구원차_기존차(608칸) 피구원차_신조차[336칸] 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   상승   하강 F/N/R   F   N   F   N EROS   없음   없음   N   N 마스콘   P ~ B   -   N   - 구원 연결 사진"
+                    "기존차[608칸] - 신조차 구원운전 시험(좌/우 12P 점퍼 2개 연결 필요) 신조차[336칸]_밀기 피구원차_기존차(608칸)구원차_신조차[336칸] 선두 후부 선두 후부 KEY On Off On Off Panto 하강 ⇦상승 F/N/R F N F N EROS 없음 없음 N N 마스콘 N - P ~ B - 기존차(608칸)_밀기 피구원차_신조차[336칸]구원차_기존차(608칸) 선두 후부 선두 후부 KEY On Off On Off Panto 하강 ⇦상승 F/N/R F N F N EROS N N 없음 없음 마스콘 N - P ~ B - 신조차[336칸]_끌기 구원차_신조차[336칸]피구원차_기존차(608칸) 선두 후부 선두 후부 KEY On Off On Off Panto 상승 ⇦하강 F/N/R F N F N EROS N N 없음 없음 마스콘 P ~ B - N - 기존차(608칸)_끌기 구원차_기존차(608칸)피구원차_신조차[336칸] 선두 후부 선두 후부 KEY On Off On Off Panto 상승 ⇦하강 F/N/R F N F N EROS 없음 없음 N N 마스콘 P ~ B - N - 구원 연결 사진 서울시 5호선 200칸 전동차 응급처치요령 76"
                   ]
                 }
               ]
@@ -13372,7 +13838,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "하남선[32칸] - 신조차 구원운전 시험(자동 연결기를 통해 42P 점퍼 연결체결) 신조차[336칸]_밀기 피구원차_하남선[32칸) 구원차_신조차(336칸) 선두   후부   선두   후부 KEY   On   Off   On   Off Panto   하강   상승 ⇦ F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   N   -   P ~ B   - 하남선[32칸]_밀기 피구원차_신조차(336칸) 구원차_하남선[32칸) 선두   후부   선두   후부 KEY   On   Off   On   Off Panto   하강   상승 ⇦ F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   N   -   P ~ B   - 신조차[336칸]_끌기 구원차_신조차(336칸) 피구원차(하남선 32칸) 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   상승   하강 F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   P ~ B   -   N   - 하남선[32칸]_끌기 피구원차_(하남선 32칸) 구원차_신조차(336칸) 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   상승   하강 F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   P ~ B   -   N   - 구원 연결 사진"
+                    "하남선[32칸] - 신조차 구원운전 시험(자동 연결기를 통해 42P 점퍼 연결체결) 신조차[336칸]_밀기 피구원차_하남선[32칸)구원차_신조차(336칸) 선두 후부 선두 후부 KEY On Off On Off Panto 하강 상승 ⇦ F/N/R F N F N EROS N N R1(전동차) N 마스콘 N - P ~ B - 하남선[32칸]_밀기 피구원차_신조차(336칸)구원차_하남선[32칸) 선두 후부 선두 후부 KEY On Off On Off Panto 하강 상승 ⇦ F/N/R F N F N EROS N N R1(전동차) N 마스콘 N - P ~ B - 신조차[336칸]_끌기 구원차_신조차(336칸)피구원차(하남선 32칸) 선두 후부 선두 후부 KEY On Off On Off Panto 상승 ⇦하강 F/N/R F N F N EROS N N R1(전동차) N 마스콘 P ~ B - N - 하남선[32칸]_끌기 피구원차_(하남선 32칸)구원차_신조차(336칸) 선두 후부 선두 후부 KEY On Off On Off Panto 상승 ⇦하강 F/N/R F N F N EROS N N R1(전동차) N 마스콘 P ~ B - N - 구원 연결 사진 제2장 상황별 조치사할 77"
                   ]
                 }
               ]
@@ -13396,7 +13862,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "신조차 - 신조차 구원운전 시험(자동 연결기를 통해 42P 점퍼 연결체결) 신조차[336칸]_밀기 피구원차_신조차(336칸) 구원차_신조차(336칸) 선두   후부   선두   후부 KEY   On   Off   On   Off Panto   하강   상승 ⇦ F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   N   -   P ~ B   - 신조차[336칸]_끌기 구원차_신조차(336칸) 피구원차_신조차(336칸) 선두   후부   선두   후부 KEY   On   Off   On   Off ⇦ Panto   상승   하강 F/N/R   F   N   F   N EROS   N   N   R1(전동차)   N 마스콘   P ~ B   -   N   - 구원 연결 사진"
+                    "신조차 - 신조차 구원운전 시험(자동 연결기를 통해 42P 점퍼 연결체결) 신조차[336칸]_밀기 피구원차_신조차(336칸)구원차_신조차(336칸) 선두 후부 선두 후부 KEY On Off On Off Panto 하강 상승 ⇦ F/N/R F N F N EROS N N R1(전동차) N 마스콘 N - P ~ B - 신조차[336칸]_끌기 구원차_신조차(336칸)피구원차_신조차(336칸) 선두 후부 선두 후부 KEY On Off On Off Panto 상승 ⇦하강 F/N/R F N F N EROS N N R1(전동차) N 마스콘 P ~ B - N - 구원 연결 사진 서울시 5호선 200칸 전동차 응급처치요령 78"
                   ]
                 }
               ]
@@ -13440,7 +13906,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.1 추진제어장치 고장 (VVVFF)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n1025   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.1 추진제어장치 고장 (VVVFF)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n1025 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13481,18 +13947,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "TCMS 추진제어장치 보호동작기능(중고장, 경고장 고장코드 30XX번에 해당하는 고장 조치방법)에 따른 조치"
+                    "TCMS 추진제어장치 보호동작기능(중고장, 경고장 고장코드 30XX번에 해당하는 고장 조치방법)에 따른 조치 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 87"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             },
             {
               "type": "images",
@@ -13528,7 +13986,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.2 BCH 중고장(BCH_ERR)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3001   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.2 BCH 중고장(BCH_ERR)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3001 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13569,18 +14027,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 88"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13600,7 +14050,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.3 인버터 ARM단락(CFD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3007   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.3 인버터 ARM단락(CFD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3007 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13641,18 +14091,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 89"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13673,7 +14115,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.4 제어 전원 전압 저하(통합제어장치, CLVD_S)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3008   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.4 제어 전원 전압 저하(통합제어장치, CLVD_S)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3008 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13714,18 +14156,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 90"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13746,7 +14180,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.5 제어 전원 전압 저하(PWM 기판, CLVD_P1)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3009   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.5 제어 전원 전압 저하(PWM 기판, CLVD_P1)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3009 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13787,18 +14221,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 91"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13818,7 +14244,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.6 HSCB 개방 불능(고착)(HBNO)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3026   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.6 HSCB 개방 불능(고착)(HBNO)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3026 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13859,18 +14285,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 92"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13891,7 +14309,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.7 제어 전원 전압 저하(PWM 기판, CLVD_P2)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3027   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.7 제어 전원 전압 저하(PWM 기판, CLVD_P2)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3027 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -13932,18 +14350,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 93"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -13964,7 +14374,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.8 게이트 전원 전압 저하(GPLVD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3028   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.8 게이트 전원 전압 저하(GPLVD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3028 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14005,18 +14415,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 94"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14035,7 +14437,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.9 마이컴 이상(CPUWDTD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3029   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.9 마이컴 이상(CPUWDTD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3029 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14076,18 +14478,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 판토 하강상태에서 인버터 재기동 후 해당 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 판토 하강상태에서 인버터 재기동 후 해당 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 95"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14106,7 +14500,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.10 마이컴 이상(WDTD_P)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3030   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.10 마이컴 이상(WDTD_P)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3030 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14147,18 +14541,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 판토 하강상태에서 인버터 재기동 후 해당 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 판토 하강상태에서 인버터 재기동 후 해당 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 96"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14178,7 +14564,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.11 보호 세트치 이상(SETERR)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3037   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.11 보호 세트치 이상(SETERR)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3037 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14219,18 +14605,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 97"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14249,7 +14627,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.12 접지 검지(GRD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3039   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.12 접지 검지(GRD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3039 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14290,18 +14668,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 98"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14321,7 +14691,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.13 CT 이상 검지(CTERR)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3040   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.13 CT 이상 검지(CTERR)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3040 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14362,18 +14732,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 99"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14392,7 +14754,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.14 PWM – 통합제어장치간 DI 이상(ERRDIO)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3041   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.14 PWM – 통합제어장치간 DI 이상(ERRDIO)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3041 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14433,18 +14795,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 100"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14464,7 +14818,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.15 LB 개방 불능(고착)(LBNO)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3001   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.15 LB 개방 불능(고착)(LBNO)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3001 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14505,18 +14859,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 101"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14536,7 +14882,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.16 CCK 개방 불능(고착)(CCKNO)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3045   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.16 CCK 개방 불능(고착)(CCKNO)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3045 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14577,18 +14923,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 102"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14608,7 +14946,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.17 MCOK 개방 불능(고착)(MCOKNO)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3047   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.17 MCOK 개방 불능(고착)(MCOKNO)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3047 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14649,18 +14987,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 103"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14680,7 +15010,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.18 BCH IGBT 고장(BCHCFD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3049   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.18 BCH IGBT 고장(BCHCFD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3049 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14721,18 +15051,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 104"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14752,7 +15074,7 @@
           "content": [
             {
               "type": "text",
-              "value": "1.19 BCH CPU 고장(BCHWDTD)\n고장코드   고장등급   고장분류   차량위치\nM1, M2, 하부기기,\n3053   중고장   VVVF\nVVVF. INVERTER BOX"
+              "value": "1.19 BCH CPU 고장(BCHWDTD)\n고장코드 고장등급 고장분류 차량위치\nM1, M2, 하부기기,\n3053 중고장 VVVF\nVVVF. INVERTER BOX"
             },
             {
               "type": "heading",
@@ -14793,18 +15115,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인"
+                    "종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON하고 고장 재발 여부 확인 중고장 CUT OUT 시 M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반 배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 추진제어장치 차단기 (PECN) 추진제어장치 차단기 (PECN) OFF ➜ ON 제3장 중고장 105"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "M차 1량 고장 시(3/4출력) 종착역까지 운행하고, 회차선 진입 후 관제에 보고 및 차량의 일반\n배전반에 위치한 추진제어장치 차단기(PECN)를 OFF/ON\n2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름\n추진제어장치 차단기 (PECN)   추진제어장치 차단기 (PECN) OFF ➜ ON"
             }
           ]
         },
@@ -14825,7 +15139,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.1 제동력 부족(ISBD)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4019   중고장   ECU\nBOU 내 ECU"
+              "value": "2.1 제동력 부족(ISBD)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4019 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -14882,7 +15196,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN)   ECU IF-1 보드   BC 압력센서"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN) ECU IF-1 보드 BC 압력센서 제3장 중고장 109"
                   ]
                 }
               ]
@@ -14922,7 +15236,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.2 제동 불완해 검지(NRBD)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4026   중고장   ECU\nBOU 내 ECU"
+              "value": "2.2 제동 불완해 검지(NRBD)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4026 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -14984,7 +15298,7 @@
                     "강제완해스위치 취급 후 복귀하지 않을 경우 관제보고 후 조치",
                     "해당차량 출입문 도어포스트 라인(차량외부)에 설치된 제동풀림콕크 취급",
                     "ECU의 IF-1 보드 상태 확인",
-                    "ECU의 CPU 보드 상태 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동풀림콕크   ECU IF-1 보드   ECU CPU 보드"
+                    "ECU의 CPU 보드 상태 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동풀림콕크 ECU IF-1 보드 ECU CPU 보드 서울시 5호선 200칸 전동차 응급처치요령 110"
                   ]
                 }
               ]
@@ -15019,7 +15333,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.3 제동장치 고장(ECUF)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n1018   중고장   ECU\nBOU 내 ECU"
+              "value": "2.3 제동장치 고장(ECUF)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n1018 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -15075,7 +15389,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 AC압력센서, 상용제동 제동작용장치 차단기(BOUN)   ECU 전원보드 CPU 보드 전자밸브"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 AC압력센서, 상용제동 제동작용장치 차단기(BOUN) ECU 전원보드 CPU 보드 전자밸브 제3장 중고장 111"
                   ]
                 }
               ]
@@ -15110,7 +15424,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.4 공기제동장치 고장(AIRF)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4001   중고장   ECU\nBOU 내 ECU"
+              "value": "2.4 공기제동장치 고장(AIRF)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4001 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -15172,7 +15486,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 AC압력센서, 상용제동 제동작용장치 차단기(BOUN)   ECU 전원보드 CPU 보드 전자밸브"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 AC압력센서, 상용제동 제동작용장치 차단기(BOUN) ECU 전원보드 CPU 보드 전자밸브 서울시 5호선 200칸 전동차 응급처치요령 112"
                   ]
                 }
               ]
@@ -15195,7 +15509,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.5 RAM 점검 고장(RAMF)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4003   중고장   ECU\nBOU 내 ECU"
+              "value": "2.5 RAM 점검 고장(RAMF)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4003 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -15256,7 +15570,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN)   ECU CPU 보드"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN) ECU CPU 보드 제3장 중고장 113"
                   ]
                 }
               ]
@@ -15278,7 +15592,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.6 전자제어밸브 고장(ECVF)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4006   중고장   ECU\nBOU 내 ECU"
+              "value": "2.6 전자제어밸브 고장(ECVF)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4006 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -15340,7 +15654,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN)   ECU IF-1 보드   상용제동 전자제어밸브"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN) ECU IF-1 보드 상용제동 전자제어밸브 서울시 5호선 200칸 전동차 응급처치요령 114"
                   ]
                 }
               ]
@@ -15373,7 +15687,7 @@
           "content": [
             {
               "type": "text",
-              "value": "2.7 AC압력 센서 고장(ACSF)\n고장코드   고장등급   고장분류   차량위치\n전차량 하부,\n4012   중고장   ECU\nBOU 내 ECU"
+              "value": "2.7 AC압력 센서 고장(ACSF)\n고장코드 고장등급 고장분류 차량위치\n전차량 하부,\n4012 중고장 ECU\nBOU 내 ECU"
             },
             {
               "type": "heading",
@@ -15429,7 +15743,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN)   ECU 전원보드 CPU 보드   BOU 내 AC압력센서"
+                    "고장복귀 여부를 확인 자동 복귀 시 ECU의 일시적인 통신 에러로 정상 운행 중고장으로 연장급전 시 2칸 이상 동시 고장인 경우 수동운전 및 관제의 지시에 따름 제동작용장치 차단기(BOUN) ECU 전원보드 CPU 보드 BOU 내 AC압력센서 제3장 중고장 115"
                   ]
                 }
               ]
@@ -15462,7 +15776,7 @@
           "content": [
             {
               "type": "text",
-              "value": "3.1 출입문 안전 인터록 회로 이상\n고장코드   고장등급   고장분류   차량위치\n출입문 안전\n7009   B\n측 출입문\n인터록 회로 이상"
+              "value": "3.1 출입문 안전 인터록 회로 이상\n고장코드 고장등급 고장분류 차량위치\n출입문 안전\n7009 B 측 출입문\n인터록 회로 이상"
             },
             {
               "type": "heading",
@@ -15503,7 +15817,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "DCU를 교체한다."
+                    "DCU를 교체한다. 제3장 중고장 119"
                   ]
                 }
               ]
@@ -15525,7 +15839,7 @@
           "content": [
             {
               "type": "text",
-              "value": "3.2 모터/인코더 회로 오류\n고장코드   고장등급   고장분류   차량위치\n7011   B   모터/인코더 회로 오류   측 출입문"
+              "value": "3.2 모터/인코더 회로 오류\n고장코드 고장등급 고장분류 차량위치\n7011 B 모터/인코더 회로 오류 측 출입문"
             },
             {
               "type": "heading",
@@ -15598,7 +15912,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "위의 항목이 모두 정상이면, DCU를 교체한다."
+                    "위의 항목이 모두 정상이면, DCU를 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 120"
                   ]
                 }
               ]
@@ -15621,7 +15935,7 @@
           "content": [
             {
               "type": "text",
-              "value": "4.1 ATC 비상제동 체결(ATCEB)\n고장코드   고장등급   고장분류   차량위치\n1009   중고장   신호장치   TC"
+              "value": "4.1 ATC 비상제동 체결(ATCEB)\n고장코드 고장등급 고장분류 차량위치\n1009 중고장 신호장치 TC"
             },
             {
               "type": "heading",
@@ -15656,18 +15970,10 @@
                 {
                   "label": "1",
                   "items": [
-                    "Master Controller를 B7에 위치 후 운행"
+                    "Master Controller를 B7에 위치 후 운행 중고장 CUT OUT 시 Master Controller를 B7에 위치 후 운행 제3장 중고장 123"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "Master Controller를 B7에 위치 후 운행"
             }
           ]
         },
@@ -15686,7 +15992,7 @@
           "content": [
             {
               "type": "text",
-              "value": "4.2 [M-ATC] 주 ATC 고장(MATCF)\n고장코드   고장등급   고장분류   차량위치\n9008   중고장   신호장치   TC"
+              "value": "4.2 [M-ATC] 주 ATC 고장(MATCF)\n고장코드 고장등급 고장분류 차량위치\n9008 중고장 신호장치 TC"
             },
             {
               "type": "heading",
@@ -15727,7 +16033,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "보조 ATC로 운행 중 문제시에 ATC의 전원(ATCN1, ATCN2, ADUN)을 껐다 켠다. 자동 복귀 시 일시적인 장애로 정상운행 ATCN1, ATCN2, ADUN   보조 ATC 절체"
+                    "보조 ATC로 운행 중 문제시에 ATC의 전원(ATCN1, ATCN2, ADUN)을 껐다 켠다. 자동 복귀 시 일시적인 장애로 정상운행 ATCN1, ATCN2, ADUN 보조 ATC 절체 서울시 5호선 200칸 전동차 응급처치요령 124"
                   ]
                 }
               ]
@@ -15762,7 +16068,7 @@
           "content": [
             {
               "type": "text",
-              "value": "5.1 SIV 고장(SIVF)\n고장코드   고장등급   고장분류   차량위치\n1001   중고장   SIV   TC, 하부기기, SIV BOX"
+              "value": "5.1 SIV 고장(SIVF)\n고장코드 고장등급 고장분류 차량위치\n1001 중고장 SIV TC, 하부기기, SIV BOX"
             },
             {
               "type": "heading",
@@ -15815,18 +16121,10 @@
                 {
                   "label": "3",
                   "items": [
-                    "제어전원 OFF → ON 취급(IVCN)에 의한 고장 복귀"
+                    "제어전원 OFF → ON 취급(IVCN)에 의한 고장 복귀 중고장 CUT OUT 시 종착역까지 정상 운행 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기 (SIVCN1, SIVCN2) OFF/ON(리셋) 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 해제됨 SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작 계속 고장 시 관제보고 후 협의 조치 일반 배전반 SIVCN1, SIVCN2 OFF ➜ ON 제3장 중고장 127"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "종착역까지 정상 운행\n회차선   진입 후   관제에   보고 및   해당   차량의   일반   배전전반에   있는   보조전원제어장치   차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n보조전원제어장치   차단기(SIVCN1,   SIVCN2)   리셋   시   중고장   신호가   리셋되므로   연장급전은\n해제됨\nSIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n계속 고장 시 관제보고 후 협의 조치\n일반 배전반   SIVCN1, SIVCN2 OFF ➜ ON"
             },
             {
               "type": "images",
@@ -15858,7 +16156,7 @@
           "content": [
             {
               "type": "text",
-              "value": "5.2 FC1 충전불량(STF)\n고장코드   고장등급   고장분류   차량위치\n5002   중고장   SIV   TC, 하부기기, SIV BOX"
+              "value": "5.2 FC1 충전불량(STF)\n고장코드 고장등급 고장분류 차량위치\n5002 중고장 SIV TC, 하부기기, SIV BOX"
             },
             {
               "type": "heading",
@@ -15911,18 +16209,10 @@
                 {
                   "label": "3",
                   "items": [
-                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다."
+                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다. 중고장 CUT OUT 시 종착역까지 정상 운행 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기 (SIVCN1, SIVCN2) OFF/ON(리셋) 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 해제됨. SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작 계속 고장 시 관제보고 후 협의 조치 일반 배전반 SIVCN1, SIVCN2 OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 128"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "종착역까지 정상 운행\n회차선   진입 후   관제에   보고 및   해당   차량의   일반   배전전반에   있는   보조전원제어장치   차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n보조전원제어장치   차단기(SIVCN1,   SIVCN2)   리셋   시   중고장   신호가   리셋되므로   연장급전은\n해제됨.\nSIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n계속 고장 시 관제보고 후 협의 조치\n일반 배전반   SIVCN1, SIVCN2 OFF ➜ ON"
             }
           ]
         },
@@ -15943,7 +16233,7 @@
           "content": [
             {
               "type": "text",
-              "value": "5.3 인버터 출력 전압 이상(LOVD)\n고장코드   고장등급   고장분류   차량위치\n5019   중고장   SIV   TC, 하부기기, SIV BOX"
+              "value": "5.3 인버터 출력 전압 이상(LOVD)\n고장코드 고장등급 고장분류 차량위치\n5019 중고장 SIV TC, 하부기기, SIV BOX"
             },
             {
               "type": "heading",
@@ -15996,18 +16286,10 @@
                 {
                   "label": "3",
                   "items": [
-                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다."
+                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다. 중고장 CUT OUT 시 종착역까지 정상 운행 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기 (SIVCN1, SIVCN2) OFF/ON(리셋) 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 해제됨. SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작 계속 고장 시 관제보고 후 협의 조치 일반 배전반 SIVCN1, SIVCN2 OFF ➜ ON 제3장 중고장 129"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "종착역까지 정상 운행\n회차선   진입 후   관제에   보고 및   해당   차량의   일반   배전전반에   있는   보조전원제어장치   차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n보조전원제어장치   차단기(SIVCN1,   SIVCN2)   리셋   시   중고장   신호가   리셋되므로   연장급전은\n해제됨.\nSIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n계속 고장 시 관제보고 후 협의 조치\n일반 배전반   SIVCN1, SIVCN2 OFF ➜ ON"
             }
           ]
         },
@@ -16027,7 +16309,7 @@
           "content": [
             {
               "type": "text",
-              "value": "5.4 인버터 출력 과전류(IAOC)\n고장코드   고장등급   고장분류   차량위치\n5020   중고장   SIV   TC, 하부기기, SIV BOX"
+              "value": "5.4 인버터 출력 과전류(IAOC)\n고장코드 고장등급 고장분류 차량위치\n5020 중고장 SIV TC, 하부기기, SIV BOX"
             },
             {
               "type": "heading",
@@ -16074,18 +16356,10 @@
                 {
                   "label": "2",
                   "items": [
-                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다."
+                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다. 중고장 CUT OUT 시 종착역까지 정상 운행 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기 (SIVCN1, SIVCN2) OFF/ON(리셋) 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 해제됨. SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작 계속 고장 시 관제보고 후 협의 조치 일반 배전반 SIVCN1, SIVCN2 OFF ➜ ON 서울시 5호선 200칸 전동차 응급처치요령 130"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "종착역까지 정상 운행\n회차선   진입 후   관제에   보고 및   해당   차량의   일반   배전전반에   있는   보조전원제어장치   차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n보조전원제어장치   차단기(SIVCN1,   SIVCN2)   리셋   시   중고장   신호가   리셋되므로   연장급전은\n해제됨.\nSIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n계속 고장 시 관제보고 후 협의 조치\n일반 배전반   SIVCN1, SIVCN2 OFF ➜ ON"
             }
           ]
         },
@@ -16105,7 +16379,7 @@
           "content": [
             {
               "type": "text",
-              "value": "5.5 인버터 출력 과부하(OOL)\n고장코드   고장등급   고장분류   차량위치\n5021   중고장   SIV   TC, 하부기기, SIV BOX"
+              "value": "5.5 인버터 출력 과부하(OOL)\n고장코드 고장등급 고장분류 차량위치\n5021 중고장 SIV TC, 하부기기, SIV BOX"
             },
             {
               "type": "heading",
@@ -16164,18 +16438,10 @@
                 {
                   "label": "4",
                   "items": [
-                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다."
+                    "고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다. 중고장 CUT OUT 시 종착역까지 정상 운행 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기 (SIVCN1, SIVCN2) OFF/ON(리셋) 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 해제됨. SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작 계속 고장 시 관제보고 후 협의 조치 일반 배전반 SIVCN1, SIVCN2 OFF ➜ ON 제3장 중고장 131"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "중고장 CUT OUT 시"
-            },
-            {
-              "type": "text",
-              "value": "종착역까지 정상 운행\n회차선   진입 후   관제에   보고 및   해당   차량의   일반   배전전반에   있는   보조전원제어장치   차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n보조전원제어장치   차단기(SIVCN1,   SIVCN2)   리셋   시   중고장   신호가   리셋되므로   연장급전은\n해제됨.\nSIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n계속 고장 시 관제보고 후 협의 조치\n일반 배전반   SIVCN1, SIVCN2 OFF ➜ ON"
             }
           ]
         },
@@ -16196,7 +16462,7 @@
           "content": [
             {
               "type": "text",
-              "value": "6.1 후진 제한속도 초과에 의한 FSB 출력\n고장코드   고장등급   고장분류   차량위치\n2015   중고장   TCMS   TC, 운전실, 하부"
+              "value": "6.1 후진 제한속도 초과에 의한 FSB 출력\n고장코드 고장등급 고장분류 차량위치\n2015 중고장 TCMS TC, 운전실, 하부"
             },
             {
               "type": "heading",
@@ -16231,7 +16497,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "후진 시 제한속도 준수 자동 복귀 시 일시적인 것으로 정상 운행"
+                    "후진 시 제한속도 준수 자동 복귀 시 일시적인 것으로 정상 운행 제3장 중고장 135"
                   ]
                 }
               ]
@@ -16255,7 +16521,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.1 UC1 인버터1 고장(U1INV1F)\n고장코드   고장등급   고장분류   차량위치\n6001   중고장   HVAC   TC, T, M"
+              "value": "7.1 UC1 인버터1 고장(U1INV1F)\n고장코드 고장등급 고장분류 차량위치\n6001 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16302,7 +16568,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
+                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 139"
                   ]
                 }
               ]
@@ -16333,7 +16599,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.2 UC1 인버터2 고장(U1INV2F)\n고장코드   고장등급   고장분류   차량위치\n6002   중고장   HVAC   TC, T, M"
+              "value": "7.2 UC1 인버터2 고장(U1INV2F)\n고장코드 고장등급 고장분류 차량위치\n6002 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16380,7 +16646,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
+                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 140"
                   ]
                 }
               ]
@@ -16402,7 +16668,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.3 UC2 인버터3 고장(U2INV3F)\n고장코드   고장등급   고장분류   차량위치\n6003   중고장   HVAC   TC, T, M"
+              "value": "7.3 UC2 인버터3 고장(U2INV3F)\n고장코드 고장등급 고장분류 차량위치\n6003 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16449,7 +16715,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
+                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 141"
                   ]
                 }
               ]
@@ -16471,7 +16737,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.4 UC2 인버터4 고장(U2INV4F)\n고장코드   고장등급   고장분류   차량위치\n6004   중고장   HVAC   TC, T, M"
+              "value": "7.4 UC2 인버터4 고장(U2INV4F)\n고장코드 고장등급 고장분류 차량위치\n6004 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16518,7 +16784,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
+                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 142"
                   ]
                 }
               ]
@@ -16541,7 +16807,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.5 UC1 EF EOCR 과전류(U1EFOF)\n고장코드   고장등급   고장분류   차량위치\n6005   중고장   HVAC   TC, T, M"
+              "value": "7.5 UC1 EF EOCR 과전류(U1EFOF)\n고장코드 고장등급 고장분류 차량위치\n6005 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16582,7 +16848,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 143"
                   ]
                 }
               ]
@@ -16605,7 +16871,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.6 UC2 EF EOCR 과전류(U2EFOF)\n고장코드   고장등급   고장분류   차량위치\n6006   중고장   HVAC   TC, T, M"
+              "value": "7.6 UC2 EF EOCR 과전류(U2EFOF)\n고장코드 고장등급 고장분류 차량위치\n6006 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16646,7 +16912,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 144"
                   ]
                 }
               ]
@@ -16669,7 +16935,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.7 배기팬 과부하 검지(VFOC)\n고장코드   고장등급   고장분류   차량위치\n6017   중고장   HVAC   TC, T, M"
+              "value": "7.7 배기팬 과부하 검지(VFOC)\n고장코드 고장등급 고장분류 차량위치\n6017 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16710,7 +16976,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 145"
                   ]
                 }
               ]
@@ -16732,7 +16998,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.8 라인플로워팬 과부하(LFFOC)\n고장코드   고장등급   고장분류   차량위치\n6018   중고장   HVAC   TC, T, M"
+              "value": "7.8 라인플로워팬 과부하(LFFOC)\n고장코드 고장등급 고장분류 차량위치\n6018 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16773,7 +17039,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 146"
                   ]
                 }
               ]
@@ -16795,7 +17061,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.9 교통약자석 라인플로워팬 과부하(WLLFOC)\n고장코드   고장등급   고장분류   차량위치\n6019   중고장   HVAC   TC, T, M"
+              "value": "7.9 교통약자석 라인플로워팬 과부하(WLLFOC)\n고장코드 고장등급 고장분류 차량위치\n6019 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16836,7 +17102,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 147"
                   ]
                 }
               ]
@@ -16858,7 +17124,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.10 공기정화기 과부하(APDOC)\n고장코드   고장등급   고장분류   차량위치\n6020   중고장   HVAC   TC, T, M"
+              "value": "7.10 공기정화기 과부하(APDOC)\n고장코드 고장등급 고장분류 차량위치\n6020 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16899,7 +17165,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 148"
                   ]
                 }
               ]
@@ -16921,7 +17187,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.11 AC380V 위상 이상(A380PF)\n고장코드   고장등급   고장분류   차량위치\n6025   중고장   HVAC   TC, T, M"
+              "value": "7.11 AC380V 위상 이상(A380PF)\n고장코드 고장등급 고장분류 차량위치\n6025 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -16962,7 +17228,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴 교체"
+                    "위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴 교체 제3장 중고장 149"
                   ]
                 }
               ]
@@ -16985,7 +17251,7 @@
           "content": [
             {
               "type": "text",
-              "value": "7.12 냉난방 배전반 CF1 과부하(U1CF10C)\n고장코드   고장등급   고장분류   차량위치\n6026   중고장   HVAC   TC, T, M"
+              "value": "7.12 냉난방 배전반 CF1 과부하(U1CF10C)\n고장코드 고장등급 고장분류 차량위치\n6026 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17026,14 +17292,14 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이   트립 되었다면   RESET후 마이컴 재기동.   재기동   후에도   계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 서울시 5호선 200칸 전동차 응급처치요령 150"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.13 냉난방 배전반 CF2 과부하(U2CF20C)\n고장코드   고장등급   고장분류   차량위치\n6027   중고장   HVAC   TC, T, M"
+              "value": "7.13 냉난방 배전반 CF2 과부하(U2CF20C)\n고장코드 고장등급 고장분류 차량위치\n6027 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17074,14 +17340,14 @@
                 {
                   "label": "2",
                   "items": [
-                    "EOCR이 트립   되었다면   RESET후   마이컴   재기동.   재기동   후에도 계속해서   고장이   발생하면 마이컴을 교체한다."
+                    "EOCR이 트립 되었다면 RESET후 마이컴 재기동. 재기동 후에도 계속해서 고장이 발생하면 마이컴을 교체한다. 제3장 중고장 151"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.14 냉난방 배전반 U1CFK1 접촉기 고장(U1CFK1F)\n고장코드   고장등급   고장분류   차량위치\n6028   중고장   HVAC   TC, T, M"
+              "value": "7.14 냉난방 배전반 U1CFK1 접촉기 고장(U1CFK1F)\n고장코드 고장등급 고장분류 차량위치\n6028 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17128,14 +17394,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 서울시 5호선 200칸 전동차 응급처치요령 152"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.15 냉난방 배전반 U2CFK2 접촉기 고장(U2CFK2F)\n고장코드   고장등급   고장분류   차량위치\n6029   중고장   HVAC   TC, T, M"
+              "value": "7.15 냉난방 배전반 U2CFK2 접촉기 고장(U2CFK2F)\n고장코드 고장등급 고장분류 차량위치\n6029 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17182,14 +17448,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 제3장 중고장 153"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.16 냉난방 배전반 EFK1 접촉기 고장(EFK1F)\n고장코드   고장등급   고장분류   차량위치\n6030   중고장   HVAC   TC, T, M"
+              "value": "7.16 냉난방 배전반 EFK1 접촉기 고장(EFK1F)\n고장코드 고장등급 고장분류 차량위치\n6030 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17236,14 +17502,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 서울시 5호선 200칸 전동차 응급처치요령 154"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.17 냉난방 배전반 EFK2 접촉기 고장(EFK2F)\n고장코드   고장등급   고장분류   차량위치\n6031   중고장   HVAC   TC, T, M"
+              "value": "7.17 냉난방 배전반 EFK2 접촉기 고장(EFK2F)\n고장코드 고장등급 고장분류 차량위치\n6031 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17290,14 +17556,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 제3장 중고장 155"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.18 냉난방 배전반 RHeK1 접촉기 고장(RHEK1F)\n고장코드   고장등급   고장분류   차량위치\n6032   중고장   HVAC   TC, T, M"
+              "value": "7.18 냉난방 배전반 RHeK1 접촉기 고장(RHEK1F)\n고장코드 고장등급 고장분류 차량위치\n6032 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17344,14 +17610,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 서울시 5호선 200칸 전동차 응급처치요령 156"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.19 냉난방 배전반 RHeK2 접촉기 고장(RHEK2F)\n고장코드   고장등급   고장분류   차량위치\n6033   중고장   HVAC   TC, T, M"
+              "value": "7.19 냉난방 배전반 RHeK2 접촉기 고장(RHEK2F)\n고장코드 고장등급 고장분류 차량위치\n6033 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17398,14 +17664,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 제3장 중고장 157"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.20 냉난방 배전반 VFK 접촉기 고장(VFKF)\n고장코드   고장등급   고장분류   차량위치\n6034   중고장   HVAC   TC, T, M"
+              "value": "7.20 냉난방 배전반 VFK 접촉기 고장(VFKF)\n고장코드 고장등급 고장분류 차량위치\n6034 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17452,14 +17718,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 서울시 5호선 200칸 전동차 응급처치요령 158"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.21 냉난방 배전반 LFFK1 접촉기 고장(LFFK1F)\n고장코드   고장등급   고장분류   차량위치\n6035   중고장   HVAC   TC, T, M"
+              "value": "7.21 냉난방 배전반 LFFK1 접촉기 고장(LFFK1F)\n고장코드 고장등급 고장분류 차량위치\n6035 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17506,14 +17772,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 제3장 중고장 159"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.22 냉난방 배전반 LFFK2 접촉기 고장(LFFK2F)\n고장코드   고장등급   고장분류   차량위치\n6036   중고장   HVAC   TC, T, M"
+              "value": "7.22 냉난방 배전반 LFFK2 접촉기 고장(LFFK2F)\n고장코드 고장등급 고장분류 차량위치\n6036 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17560,14 +17826,14 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 서울시 5호선 200칸 전동차 응급처치요령 160"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "7.23 냉난방 배전반 APDK 접촉기 고장(APDKF)\n고장코드   고장등급   고장분류   차량위치\n6037   중고장   HVAC   TC, T, M"
+              "value": "7.23 냉난방 배전반 APDK 접촉기 고장(APDKF)\n고장코드 고장등급 고장분류 차량위치\n6037 중고장 HVAC TC, T, M"
             },
             {
               "type": "heading",
@@ -17614,7 +17880,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체"
+                    "위와 같은 조치 후에도 계속 고장 발생 시 마이컴 교체 제3장 중고장 161"
                   ]
                 }
               ]
@@ -17635,7 +17901,7 @@
           "content": [
             {
               "type": "text",
-              "value": "8.1 CMSB 통신고장\n고장코드   고장등급   고장분류   차량위치\n8001   중고장   CMSB   TC, 하부, CMSB BOX"
+              "value": "8.1 CMSB 통신고장\n고장코드 고장등급 고장분류 차량위치\n8001 중고장 CMSB TC, 하부, CMSB BOX"
             },
             {
               "type": "heading",
@@ -17676,7 +17942,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON   CMSB 제어기"
+                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON CMSB 제어기 제3장 중고장 165"
                   ]
                 }
               ]
@@ -17711,7 +17977,7 @@
           "content": [
             {
               "type": "text",
-              "value": "8.2 CM 과온(OVERTEMP)\n고장코드   고장등급   고장분류   차량위치\n8002   중고장   CMSB   TC, 하부, CMSB BOX"
+              "value": "8.2 CM 과온(OVERTEMP)\n고장코드 고장등급 고장분류 차량위치\n8002 중고장 CMSB TC, 하부, CMSB BOX"
             },
             {
               "type": "heading",
@@ -17758,7 +18024,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON   온도스위치"
+                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON 온도스위치 서울시 5호선 200칸 전동차 응급처치요령 166"
                   ]
                 }
               ]
@@ -17780,7 +18046,7 @@
           "content": [
             {
               "type": "text",
-              "value": "8.3 CM 단락(SHORT)\n고장코드   고장등급   고장분류   차량위치\n8003   중고장   CMSB   TC, 하부, CMSB BOX"
+              "value": "8.3 CM 단락(SHORT)\n고장코드 고장등급 고장분류 차량위치\n8003 중고장 CMSB TC, 하부, CMSB BOX"
             },
             {
               "type": "heading",
@@ -17821,7 +18087,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON   게이트 보드"
+                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON 게이트 보드 제3장 중고장 167"
                   ]
                 }
               ]
@@ -17843,7 +18109,7 @@
           "content": [
             {
               "type": "text",
-              "value": "8.4 출력 과전류(OCC)\n고장코드   고장등급   고장분류   차량위치\n8004   중고장   CMSB   TC, 하부, CMSB BOX"
+              "value": "8.4 출력 과전류(OCC)\n고장코드 고장등급 고장분류 차량위치\n8004 중고장 CMSB TC, 하부, CMSB BOX"
             },
             {
               "type": "heading",
@@ -17890,7 +18156,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON   게이트 보드   온도스위치"
+                    "공기압축기 점검 재기동 후 복귀 불능 시 종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전반에 위치한 CMSBN을 OFF/ON 자동 복귀 시 재기동 후 복귀하면 정상 운행 CMSB 차단기 OFF ➜ ON 게이트 보드 온도스위치 서울시 5호선 200칸 전동차 응급처치요령 168"
                   ]
                 }
               ]
@@ -17913,7 +18179,7 @@
           "content": [
             {
               "type": "text",
-              "value": "9.1 (BMS) 축전지 고전압 고장(HVF)\n고장코드   고장등급   고장분류   차량위치\n12009   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.1 (BMS) 축전지 고전압 고장(HVF)\n고장코드 고장등급 고장분류 차량위치\n12009 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -17936,7 +18202,7 @@
             },
             {
               "type": "text",
-              "value": "배터리 팩 105V 초과 또는 셀 4.2V 초과   – 5초 이상 유지됨"
+              "value": "배터리 팩 105V 초과 또는 셀 4.2V 초과 –5초 이상 유지됨"
             },
             {
               "type": "heading",
@@ -17972,7 +18238,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 제3장 중고장 171"
                   ]
                 }
               ]
@@ -18008,7 +18274,7 @@
           "content": [
             {
               "type": "text",
-              "value": "9.2 (BMS) 축전지 저전압 고장(LVF)\n고장코드   고장등급   고장분류   차량위치\n12010   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.2 (BMS) 축전지 저전압 고장(LVF)\n고장코드 고장등급 고장분류 차량위치\n12010 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18031,7 +18297,7 @@
             },
             {
               "type": "text",
-              "value": "배터리 팩 75V 초과 또는 셀 2.75V 미만   – 5초 이상 유지됨"
+              "value": "배터리 팩 75V 초과 또는 셀 2.75V 미만 –5초 이상 유지됨"
             },
             {
               "type": "heading",
@@ -18067,7 +18333,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 서울시 5호선 200칸 전동차 응급처치요령 172"
                   ]
                 }
               ]
@@ -18089,7 +18355,7 @@
           "content": [
             {
               "type": "text",
-              "value": "9.3 (BMS) 축전지 고온 고장(HTF)\n고장코드   고장등급   고장분류   차량위치\n12011   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.3 (BMS) 축전지 고온 고장(HTF)\n고장코드 고장등급 고장분류 차량위치\n12011 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18148,14 +18414,14 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 제3장 중고장 173"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "9.4 (BMS) 축전지 저온 고장(LTF)\n고장코드   고장등급   고장분류   차량위치\n12012   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.4 (BMS) 축전지 저온 고장(LTF)\n고장코드 고장등급 고장분류 차량위치\n12012 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18214,7 +18480,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 서울시 5호선 200칸 전동차 응급처치요령 174"
                   ]
                 }
               ]
@@ -18237,7 +18503,7 @@
           "content": [
             {
               "type": "text",
-              "value": "9.5 (BMS) 축전지 충전 과전류 고장(CHOCF)\n고장코드   고장등급   고장분류   차량위치\n12013   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.5 (BMS) 축전지 충전 과전류 고장(CHOCF)\n고장코드 고장등급 고장분류 차량위치\n12013 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18296,14 +18562,14 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 제3장 중고장 175"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "9.6 (BMS) 축전지 방전 과전류 고장(DCHOCF)\n고장코드   고장등급   고장분류   차량위치\n12014   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.6 (BMS) 축전지 방전 과전류 고장(DCHOCF)\n고장코드 고장등급 고장분류 차량위치\n12014 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18362,7 +18628,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 서울시 5호선 200칸 전동차 응급처치요령 176"
                   ]
                 }
               ]
@@ -18387,7 +18653,7 @@
           "content": [
             {
               "type": "text",
-              "value": "9.7 (BMS) 축전지 셀전압 불균형 고장(IMBALF)\n고장코드   고장등급   고장분류   차량위치\n12015   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.7 (BMS) 축전지 셀전압 불균형 고장(IMBALF)\n고장코드 고장등급 고장분류 차량위치\n12015 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18452,14 +18718,14 @@
                 {
                   "label": "6",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 제3장 중고장 177"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "9.8 (BMS) 축전지 CAN 통신 이상(CANF)\n고장코드   고장등급   고장분류   차량위치\n12016   중고장   BMS   TC, 하부, BMS BOX"
+              "value": "9.8 (BMS) 축전지 CAN 통신 이상(CANF)\n고장코드 고장등급 고장분류 차량위치\n12016 중고장 BMS TC, 하부, BMS BOX"
             },
             {
               "type": "heading",
@@ -18524,7 +18790,7 @@
                 {
                   "label": "6",
                   "items": [
-                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON   BCB 스위치 OFF/ON"
+                    "정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰 자동 복귀 시 일시적인 오류로 정상 운행 축전지 스위치 OFF/ON BCB 스위치 OFF/ON 서울시 5호선 200칸 전동차 응급처치요령 178"
                   ]
                 }
               ]
@@ -18546,7 +18812,7 @@
           "content": [
             {
               "type": "text",
-              "value": "10.1 편성 내 화재발생(FD)\n고장코드   고장등급   고장분류   차량위치\n1035   중고장   FDU   TC, T, M"
+              "value": "10.1 편성 내 화재발생(FD)\n고장코드 고장등급 고장분류 차량위치\n1035 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18587,14 +18853,14 @@
                 {
                   "label": "2",
                   "items": [
-                    "화재 감지기 점검 및 청소 실시 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "화재 감지기 점검 및 청소 실시 자동 복귀 시 일시적인 오류로 정상 운행 제3장 중고장 181"
                   ]
                 }
               ]
             },
             {
               "type": "text",
-              "value": "10.2 화재발생\n고장코드   고장등급   고장분류   차량위치\n13001   중고장   FDU   TC, T, M"
+              "value": "10.2 화재발생\n고장코드 고장등급 고장분류 차량위치\n13001 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18635,7 +18901,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "실제가 화재가 발생하였다면, 응급대피요령에 따라 행동한다."
+                    "실제가 화재가 발생하였다면, 응급대피요령에 따라 행동한다. 서울시 5호선 200칸 전동차 응급처치요령 182"
                   ]
                 }
               ]
@@ -18656,7 +18922,7 @@
           "content": [
             {
               "type": "text",
-              "value": "10.3 온도 범위 오류감지(ITEPF)\n고장코드   고장등급   고장분류   차량위치\n13046   중고장   FDU   TC, T, M"
+              "value": "10.3 온도 범위 오류감지(ITEPF)\n고장코드 고장등급 고장분류 차량위치\n13046 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18691,7 +18957,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 제3장 중고장 183"
                   ]
                 }
               ]
@@ -18715,7 +18981,7 @@
             },
             {
               "type": "text",
-              "value": "10.4 센서 전체 고장 감지(ADTTF)\n고장코드   고장등급   고장분류   차량위치\n13047   중고장   FDU   TC, T, M"
+              "value": "10.4 센서 전체 고장 감지(ADTTF)\n고장코드 고장등급 고장분류 차량위치\n13047 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18756,7 +19022,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "통신 라인 점검 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "통신 라인 점검 자동 복귀 시 일시적인 오류로 정상 운행 서울시 5호선 200칸 전동차 응급처치요령 184"
                   ]
                 }
               ]
@@ -18780,7 +19046,7 @@
             },
             {
               "type": "text",
-              "value": "10.5 수신기 메모리 고장(MEMF)\n고장코드   고장등급   고장분류   차량위치\n13048   중고장   FDU   TC, T, M"
+              "value": "10.5 수신기 메모리 고장(MEMF)\n고장코드 고장등급 고장분류 차량위치\n13048 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18815,7 +19081,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 제3장 중고장 185"
                   ]
                 }
               ]
@@ -18839,7 +19105,7 @@
             },
             {
               "type": "text",
-              "value": "10.6 수신기 체크섬 오류(CSF)\n고장코드   고장등급   고장분류   차량위치\n13049   중고장   FDU   TC, T, M"
+              "value": "10.6 수신기 체크섬 오류(CSF)\n고장코드 고장등급 고장분류 차량위치\n13049 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18874,7 +19140,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 서울시 5호선 200칸 전동차 응급처치요령 186"
                   ]
                 }
               ]
@@ -18916,7 +19182,7 @@
           "content": [
             {
               "type": "text",
-              "value": "10.7 INFM 모듈 고장(INFMF)\n고장코드   고장등급   고장분류   차량위치\n13050   중고장   FDU   TC, T, M"
+              "value": "10.7 INFM 모듈 고장(INFMF)\n고장코드 고장등급 고장분류 차량위치\n13050 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -18951,7 +19217,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 INFM(ETHM) 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 INFM(ETHM) 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 제3장 중고장 187"
                   ]
                 }
               ]
@@ -18975,7 +19241,7 @@
             },
             {
               "type": "text",
-              "value": "10.8 DIOM 모듈 고장(DIOMF)\n고장코드   고장등급   고장분류   차량위치\n13051   중고장   FDU   TC, T, M"
+              "value": "10.8 DIOM 모듈 고장(DIOMF)\n고장코드 고장등급 고장분류 차량위치\n13051 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -19010,7 +19276,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 DIOM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 DIOM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 서울시 5호선 200칸 전동차 응급처치요령 188"
                   ]
                 }
               ]
@@ -19034,7 +19300,7 @@
             },
             {
               "type": "text",
-              "value": "10.9 ADM 모듈 고장(ADMF)\n고장코드   고장등급   고장분류   차량위치\n13052   중고장   FDU   TC, T, M"
+              "value": "10.9 ADM 모듈 고장(ADMF)\n고장코드 고장등급 고장분류 차량위치\n13052 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -19069,7 +19335,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 ADM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 ADM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 제3장 중고장 189"
                   ]
                 }
               ]
@@ -19093,7 +19359,7 @@
             },
             {
               "type": "text",
-              "value": "10.10 CPUM 모듈 고장(CPUMF)\n고장코드   고장등급   고장분류   차량위치\n13053   중고장   FDU   TC, T, M"
+              "value": "10.10 CPUM 모듈 고장(CPUMF)\n고장코드 고장등급 고장분류 차량위치\n13053 중고장 FDU TC, T, M"
             },
             {
               "type": "heading",
@@ -19128,7 +19394,7 @@
                 {
                   "label": "1",
                   "items": [
-                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행"
+                    "정비지침서를 참조하여 CPUM 모듈을 교체 후 정상 동작하는지 확인한다. 자동 복귀 시 일시적인 오류로 정상 운행 서울시 5호선 200칸 전동차 응급처치요령 190"
                   ]
                 }
               ]
@@ -19167,7 +19433,7 @@
           "content": [
             {
               "type": "text",
-              "value": "10.11 역행제동 입력신호 고장(PBF)\n고장코드   고장등급   고장분류   차량위치\n19005, 19105   중고장   ENCD   TC, 운전실, 엔코더 장치"
+              "value": "10.11 역행제동 입력신호 고장(PBF)\n고장코드 고장등급 고장분류 차량위치\n19005, 19105 중고장 ENCD TC, 운전실, 엔코더 장치"
             },
             {
               "type": "heading",
@@ -19226,7 +19492,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "주간제어기 점검 후 정상 확인 자동 복귀 시 일시적인 오류로 정상 운행 엔코더"
+                    "주간제어기 점검 후 정상 확인 자동 복귀 시 일시적인 오류로 정상 운행 엔코더 제3장 중고장 191"
                   ]
                 }
               ]
@@ -19242,7 +19508,7 @@
             },
             {
               "type": "text",
-              "value": "10.12 입력 범위 고장(IRF)\n고장코드   고장등급   고장분류   차량위치\n19006, 19106   중고장   ENCD   TC, 운전실, 엔코더 장치"
+              "value": "10.12 입력 범위 고장(IRF)\n고장코드 고장등급 고장분류 차량위치\n19006, 19106 중고장 ENCD TC, 운전실, 엔코더 장치"
             },
             {
               "type": "heading",
@@ -19307,7 +19573,7 @@
                 {
                   "label": "6",
                   "items": [
-                    "자동 운전 시 IRF 고장 발생 시 ATO 장치 점검 후 정상 확인 엔코더"
+                    "자동 운전 시 IRF 고장 발생 시 ATO 장치 점검 후 정상 확인 엔코더 서울시 5호선 200칸 전동차 응급처치요령 192"
                   ]
                 }
               ]
@@ -19323,7 +19589,7 @@
             },
             {
               "type": "text",
-              "value": "10.13 ATO 입력고장(AIF)\n고장코드   고장등급   고장분류   차량위치\n19007, 19107   중고장   ENCD   TC, 운전실, 엔코더 장치"
+              "value": "10.13 ATO 입력고장(AIF)\n고장코드 고장등급 고장분류 차량위치\n19007, 19107 중고장 ENCD TC, 운전실, 엔코더 장치"
             },
             {
               "type": "heading",
@@ -19382,7 +19648,7 @@
                 {
                   "label": "5",
                   "items": [
-                    "ATO SLAVE 지령 전압 확인 자동 복귀 시 일시적인 오류로 정상 운행 엔코더"
+                    "ATO SLAVE 지령 전압 확인 자동 복귀 시 일시적인 오류로 정상 운행 엔코더 제3장 중고장 193"
                   ]
                 }
               ]

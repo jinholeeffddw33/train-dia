@@ -6731,28 +6731,16 @@
                 {
                   "label": "3",
                   "items": [
-                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인 2"
+                    "운전실 전차선 전압계(1,500V) 및 축전지 전압계(100V) 확인"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "주공기 압력이 8~9kg/cm이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
+                    "주공기 압력이 8~9kg/cm 이상이 될 때까지 대기 후 압력이 형성되면 역전기 제동 취급 후"
                   ]
                 }
               ]
-            },
-            {
-              "type": "heading",
-              "text": "기능시험"
-            },
-            {
-              "type": "heading",
-              "text": "기동요령"
-            },
-            {
-              "type": "text",
-              "value": "Pan 상승"
             },
             {
               "type": "heading",
@@ -6880,6 +6868,10 @@
               ]
             },
             {
+              "type": "heading",
+              "text": "열차무선"
+            },
+            {
               "type": "images",
               "items": [
                 {
@@ -6887,6 +6879,10 @@
                   "caption": "열차무선(LTE)"
                 }
               ]
+            },
+            {
+              "type": "heading",
+              "text": "각종 등 및 표시기"
             },
             {
               "type": "images",
@@ -6931,20 +6927,21 @@
               ]
             },
             {
-              "type": "text",
-              "value": "열차무선(LTE)"
-            },
-            {
               "type": "heading",
-              "text": "열차무선"
+              "text": "각종 NFB 확인"
             },
             {
-              "type": "text",
-              "value": "각종 등 및 표시기"
-            },
-            {
-              "type": "text",
-              "value": "각종 NFB 확인"
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/newcomer/ch1_028.jpg",
+                  "caption": "데스크 좌측"
+                },
+                {
+                  "src": "/images/edu/newcomer/ch1_029.jpg",
+                  "caption": "운전실 배전반 NFB"
+                }
+              ]
             },
             {
               "type": "heading",
@@ -6973,31 +6970,6 @@
                 {
                   "src": "/images/edu/newcomer/ch1_032.jpg",
                   "caption": "ADU\n전·후 운전실\nPDT 시험"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "value": "전·후 운전실\nADU 출고 준비 완료통보"
-            },
-            {
-              "type": "heading",
-              "text": "PDT 시험"
-            },
-            {
-              "type": "heading",
-              "text": "각종 NFB 확인"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/newcomer/ch1_028.jpg",
-                  "caption": "데스크 좌측"
-                },
-                {
-                  "src": "/images/edu/newcomer/ch1_029.jpg",
-                  "caption": "운전실 배전반 NFB"
                 }
               ]
             }
@@ -7072,7 +7044,7 @@
                 {
                   "label": "3",
                   "items": [
-                    "차량 재기동 : 안내방송 → 출입문 페문 → 판토그라프 하강 → KEY OFF → 10초 후 → KEY ON → 판토그라프 상승"
+                    "차량 재기동 : 안내방송 → 출입문 폐문 → 판토그라프 하강 → KEY OFF → 10초 후 KEY ON → 판토그라프 상승 → 전차선 전압계 확인 → 모니터 확인"
                   ]
                 }
               ]
@@ -7105,19 +7077,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "회로차단기는 필요에 따라 OFF → ON 취급할 것"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "제동관련 조치를 하였을 때는 반드시 제동상태를 확인할 것"
-                  ]
-                },
-                {
-                  "label": "6",
-                  "items": [
-                    "차체 하부의 고압기기에 접촉하지 않도록 주의할 것"
+                    "고장조치 중 관제 보고 후 조치할 것"
                   ]
                 }
               ]
@@ -7142,10 +7102,6 @@
                   "caption": "고장 리셋 스위치"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "모니터(DU)\n데스크 표시등 확인 고장 리셋 스위치\n고장기록 확인\n차량 재기동"
             },
             {
               "type": "heading",
@@ -7268,7 +7224,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "위 조치사항으로 계속 기동 불능 시 후부 운전실 이동하여 기동"
+                    "후부 운전실 Key ON 시도"
                   ]
                 }
               ]
@@ -7378,20 +7334,19 @@
                 {
                   "label": "3",
                   "items": [
-                    "운전실 데스크 주공기 압력 확인(MR 압력 게이지) 2"
+                    "MR 압력 게이지 확인(5kg/cm² 이상)"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "ACM 구동상태 확인(MR 6.5kg/cm에서 Pan 상승 스위치 취급 시 구동)",
-                    "2호, 6호 객실 내에서 ACM 구동음 확인"
+                    "ACM(2호, 6호) 구동음 확인"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "전·후 운전실 EPanDS 취급 상태 확인"
+                    "전·후 운전실 EPanDS(비상전원차단) 확인"
                   ]
                 }
               ]
@@ -7412,7 +7367,7 @@
                   "caption": "가선 정전 표시등"
                 },
                 {
-                  "src": "/images/edu/newcomer/ch1_004.jpg",
+                  "src": "/images/edu/newcomer/ch1_045.jpg",
                   "caption": "축전지 전압 75V 이상"
                 },
                 {
@@ -7433,10 +7388,6 @@
                   "caption": "전·후 운전실\nEPanDS 확인"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "모니터 경고,\n가선 정전 표시등 축전지 전압 75V 이상 MR 압력 게이지\nPan 상태 확인"
             }
           ]
         },
@@ -7459,10 +7410,23 @@
                 {
                   "label": "5",
                   "items": [
-                    "1량 판토그라프 상승 불능 불량현상 Ÿ 모니터에 2호 또는 6호차 판토그라프 상승불가"
+                    "1량 판토그라프 상승 불능"
                   ]
                 }
               ]
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "모니터에 2호 또는 6호차 판토그라프 상승불가"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "불량현상"
             },
             {
               "type": "heading",
@@ -7492,7 +7456,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "해당 차호(2호 또는 6호) 객실 비상인터폰 배전반 내 Pan 개방 코크(2개) 확인"
+                    "Pan 개방 코크 확인"
                   ]
                 }
               ]
@@ -7521,10 +7485,6 @@
                   "caption": "일반배전반\nPanVN 확인"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "Pan 개방 코크 확인\n제1장 출고준비 및 기본 조치사항\n11"
             }
           ]
         },
@@ -7557,7 +7517,7 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "모니터에 해당 차호 SIV ‘NG’ 현시"
+                  "desc": "모니터에 해당 차호 SIV 'NG' 현시"
                 }
               ]
             },
@@ -7570,7 +7530,7 @@
               "items": [
                 {
                   "term": "",
-                  "desc": "해당 차호 운전실 가선 전압계 ‘0’ V 현시"
+                  "desc": "해당 차호 운전실 가선 전압계 '0' V 현시"
                 }
               ]
             },
@@ -7592,20 +7552,13 @@
                   "items": [
                     "운전실 배전반 내 SIVCN 1, 2 차단 상태 확인",
                     "SIV 중고장 동반 시 연장급전 상태로 운행(고장코드 1001, 5002, 5019, 5020, 5021)",
-                    "연장급전 불능 시 SICN1(전부) 또는 SIVCN2(후부) OFF하여 강제 연장급전",
-                    "운전실 배전반 내 ESKN(연장급전 제어 NFB) 상태 확인"
+                    "연장급전 불능 시 차량 교환"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "중고장 이외의 고장 시(경고장) 고장 리셋스위치 취급(반드시 주간제어기 B7에 위치)"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "복귀 불능 시 차량 재기동"
+                    "주간제어기 B7 위치 후 고장 리셋 취급"
                   ]
                 }
               ]
@@ -7627,10 +7580,6 @@
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_054.jpg",
-                  "caption": "주간제어기 B7"
-                },
-                {
-                  "src": "/images/edu/newcomer/ch1_034.jpg",
                   "caption": "고장 리셋 스위치 취급"
                 }
               ]
@@ -7656,10 +7605,23 @@
                 {
                   "label": "7",
                   "items": [
-                    "CM(주공기압축기) 기동 불능 불량현상 Ÿ 모니터에 해당 차호 CM ‘NG’ 현시"
+                    "CM(주공기압축기) 기동 불능"
                   ]
                 }
               ]
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "모니터에 해당 차호 CM 'NG' 현시"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "불량현상"
             },
             {
               "type": "heading",
@@ -7679,25 +7641,7 @@
                 {
                   "label": "2",
                   "items": [
-                    "해당 차호 SIV 동작상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "운전실 배전반 내 CMN, CMSBN(CM기동장치 NFB) 상태 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "CMSBN OFF → ON 하여 정상 복귀 여부 확인"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "F/N1014 공기압축기 인버터 고장(CMSBF) 유지 시 직입기동 상태로 운행"
+                    "운전실 배전반 내 CMSBN OFF → ON 확인"
                   ]
                 }
               ]
@@ -7711,11 +7655,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch1_055.jpg",
-                  "caption": "모니터 CM 상태 확인"
+                  "caption": "모니터 SIV 상태 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_055.jpg",
-                  "caption": "SIV 상태 확인"
+                  "caption": "CM 기동상태 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch1_056.jpg",
@@ -7799,14 +7743,7 @@
                 {
                   "label": "4",
                   "items": [
-                    "ATCN 1, 2 동시에 OFF → ON 하여 정상 복귀 여부 확인",
-                    "복귀 불능 시 ATC 고장"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "ATCN 1, 2 취급 시 출입문 닫힘상태 확인 후 취급"
+                    "ATCN 1, 2 OFF → ON 후 재부팅"
                   ]
                 }
               ]
@@ -7855,10 +7792,23 @@
                 {
                   "label": "9",
                   "items": [
-                    "DU(TCMS 모니터) 현시 불량 불량현상 Ÿ DU(이하 모니터) 현시 불량"
+                    "DU(TCMS 모니터) 현시 불량"
                   ]
                 }
               ]
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "DU(이하 모니터) 현시 불량"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "불량현상"
             },
             {
               "type": "heading",
@@ -7888,8 +7838,13 @@
                 {
                   "label": "4",
                   "items": [
-                    "운전실 TCMS함 내 LIU 1, 2 LED 점등상태 확인",
-                    "LIU 1, 2 고장 시 TCUN OFF → ON 하여 정상 복귀 여부 확인"
+                    "운전실 배전반 내 TCUN(열차 컴퓨터 NFB) 상태 확인"
+                  ]
+                },
+                {
+                  "label": "5",
+                  "items": [
+                    "TCUN OFF → ON 하여 정상 복귀 여부 확인"
                   ]
                 }
               ]
@@ -7986,13 +7941,13 @@
                 {
                   "label": "3",
                   "items": [
-                    "완해 불능 시 1대차 좌측 또는 우측 주차제동 완해 당김고리 당김"
+                    "완해 불능 시 1대차 좌측 주차제동 완해 당김고리 취급"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "역행 불능 시 운전실 배전반 내 PABBPS(주차제동 바이패스 스위치) BYPASS 위치로 취급"
+                    "PABBPS 바이패스 취급"
                   ]
                 }
               ]
@@ -8085,32 +8040,31 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터에 ‘F/N1032 보안제동 동작 중(ScBR)’ 경고 현시"
+                    "모니터에 'F/N1032 보안제동 동작 중(ScBR)' 경고 현시"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "보안제동 표시등 점등, 모니터 ‘상태확인 → 제동장치’에서 제동압력 확인 22 (TC, T 1, 2 → 2kg/cm, M → 4kg/cm)"
+                    "보안제동 표시등 점등, 모니터 '상태확인 → 제동장치'에서 제동압력 확인 (TC, T 1, 2 → 2kg/cm², M → 4kg/cm²)"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "보안제동 스위치 2~3회 반복 취급"
+                    "보안제동 체결/완해 반복 취급"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "CPRS(강제 완해 스위치) 취급하여 제동 완해 상태 확인"
+                    "강제제동완해(CPRS) 취급"
                   ]
                 },
                 {
                   "label": "5",
                   "items": [
-                    "완해 불능 시 전량 제동풀림코크 취급 후 구원",
-                    "제동풀림코크 : L2 위 출입문 개방 후 대차 측 하단에 위치"
+                    "제동풀림코크 취급"
                   ]
                 }
               ]
@@ -8148,10 +8102,6 @@
                   "caption": "제동풀림코크 취급"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "보안제동 스위치\n보안제동 표시등 제동장치 압력 확인 CPRS 취급\n반복취급"
             }
           ]
         },
@@ -8189,7 +8139,7 @@
                 },
                 {
                   "term": "",
-                  "desc": "모니터 ‘F/N1006 비상제동 동작 중(EBR)’ 경고 현시"
+                  "desc": "모니터 'F/N1006 비상제동 동작 중(EBR)' 경고 현시"
                 }
               ]
             },
@@ -8216,38 +8166,25 @@
                 {
                   "label": "1",
                   "items": [
-                    "모니터에 ‘F/N1006 비상제동 동작 중(EBR)’ 경고 현시"
+                    "모니터에 'F/N1006 비상제동 동작 중(EBR)' 경고 현시"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "비상제동 표시등 점등, 모니터 ‘상태확인 → 제동장치’에서 제동압력 확인"
+                    "비상제동 표시등 점등, 모니터 '상태확인 → 제동장치'에서 제동압력 확인"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "운전실 좌측/우측 EBS(비상제동스위치) 점등 상태 확인(스위치 PUSH ON 상태시에만 램프 점등)"
+                    "운전실 좌측/우측 EBS(비상제동스위치) 점등 여부 확인"
                   ]
                 },
                 {
                   "label": "4",
                   "items": [
-                    "EBCOS(비상제동완해스위치) 및 운전모드 비상으로 전환 취급하여 제동 완해 상태 확인"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "완해 불능 시 주간제어기 ‘EB → 중립’ 2~3회 반복 취급 후 제동 상태 확인"
-                  ]
-                },
-                {
-                  "label": "6",
-                  "items": [
-                    "완해 불능 시 전량 제동풀림코크 취급 후 구원",
-                    "1량 완해 불능 시 해당 차호 제동풀림코크 취급"
+                    "EBCOS 취급"
                   ]
                 }
               ]
@@ -8276,14 +8213,6 @@
                   "caption": "EBCOS 취급"
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "표시등 확인 (좌/우)"
-            },
-            {
-              "type": "text",
-              "value": "주간제어기 EB\n제동풀림코크 취급\n반복 취급\n서울시 5호선 200칸 전동차 응급처치요령\n18"
             }
           ]
         },
@@ -8306,28 +8235,35 @@
                 {
                   "label": "13",
                   "items": [
-                    "판토그라프 완전부동 취급 불량현상 Ÿ 집전장치 고장 완전부동 취급을 하여야 할 경우"
-                  ]
-                },
-                {
-                  "label": "1",
-                  "items": [
-                    "판타그라프 파손 및 집전장치 고장 시"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "DCArr 동작 시"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "기타 필요 시"
+                    "판토그라프 완전부동 취급"
                   ]
                 }
               ]
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "집전장치 고장 완전부동 취급을 하여야 할 경우"
+                },
+                {
+                  "term": "",
+                  "desc": "1) 판타그라프 파손 및 집전장치 고장 시"
+                },
+                {
+                  "term": "",
+                  "desc": "2) DCArr 동작 시"
+                },
+                {
+                  "term": "",
+                  "desc": "3) 해당 호차 Pan 상승 불능 시"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "불량현상"
             },
             {
               "type": "heading",
@@ -8346,14 +8282,10 @@
                   "label": "2",
                   "items": [
                     "운전실 우측 상단에 위치한 판토그라프 하강스위치 취급",
-                    "필요 시 2호, 6호 객실 비상 인터폰함 내 판토그라프 제어공기 코크 차단 조치시기"
+                    "필요 시 2호, 6호 객실 비상 인터폰함 내 판토그라프 제어공기 코크 차단"
                   ]
                 }
               ]
-            },
-            {
-              "type": "text",
-              "value": "Pan 파손 및\nDCArr 동작\n집전장치 고장\n부동취급"
             },
             {
               "type": "heading",
@@ -8371,12 +8303,12 @@
                   "caption": "Pan 하강 스위치 취급"
                 },
                 {
-                  "src": "/images/edu/newcomer/ch1_073.jpg",
-                  "caption": "단부 커버"
+                  "src": "/images/edu/newcomer/ch1_071.jpg",
+                  "caption": "Pan 완전부동"
                 },
                 {
-                  "src": "/images/edu/newcomer/ch1_071.jpg",
-                  "caption": "Pan 제어공기 차단"
+                  "src": "/images/edu/newcomer/ch1_073.jpg",
+                  "caption": "단부 커버"
                 }
               ]
             }
@@ -8399,10 +8331,23 @@
                 {
                   "label": "14",
                   "items": [
-                    "비상역행 불량현상 Ÿ 역행불능"
+                    "비상역행"
                   ]
                 }
               ]
+            },
+            {
+              "type": "list",
+              "items": [
+                {
+                  "term": "",
+                  "desc": "역행불능"
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "text": "불량현상"
             },
             {
               "type": "heading",
@@ -8414,21 +8359,26 @@
                 {
                   "label": "1",
                   "items": [
-                    "전동차의 추진제어장치가 정상이나 엔코더 고장으로 견인력 및 제동력 값이 추진장치 및 제동장 치에 전달될 수 없을 경우 EO 모드를 사용하여 차량 대피(TCMS 고장발생 시에도 사용 가능) * 후진 운행은 불가하며 필요시 운전실을 변경하여 조작 필요."
+                    "전동차의 추진제어장치가 정상이나 엔코더 고장으로 견인력 및 제동력 값이 추진장치 및 제동장치에 전달될 수 없을 경우 EO 모드를 사용하여 차량 대피(TCMS 고장발생 시에도 사용 가능)",
+                    "* 후진 운행은 불가하며 필요시 운전실을 변경하여 조작 필요"
                   ]
                 },
                 {
                   "label": "2",
                   "items": [
-                    "운전실 배전반 내 EROS에서 EO 모드 선택",
-                    "EO 모드에서 주/보조 ATC DOWN에 의한 수동운전이 불가능하여 비상제동 체결 시 운전모 드를 비상운전으로 변경하여 운행."
+                    "운전실 배전반 EROS를 EO 모드로 선택"
                   ]
                 },
                 {
                   "label": "3",
                   "items": [
-                    "운전모드 수동 또는 비상(ATC OFF 시) 선택",
-                    "EO모드 역행 시 역행력 P4, 제동력 B7 적용(45km/h 이하)"
+                    "ZVBPS 바이패스 취급(ATC OFF)"
+                  ]
+                },
+                {
+                  "label": "4",
+                  "items": [
+                    "운전모드 선택을 수동 또는 비상으로 선택"
                   ]
                 }
               ]
@@ -8436,10 +8386,6 @@
             {
               "type": "heading",
               "text": "조치방법"
-            },
-            {
-              "type": "text",
-              "value": "ENCN OFF모드 선택(ATC OFF)또는 비상\n서울시 5호선 200칸 전동차 응급처치요령\n20"
             },
             {
               "type": "heading",
@@ -8547,19 +8493,19 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_002.jpg",
-                  "caption": "MC ON\nPAN 상승 안내방송"
+                  "caption": "MC Key ON 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_003.jpg",
-                  "caption": "TCMS 초기화\nPAN 상승 S/W 취급"
+                  "caption": "TCMS 초기화 화면"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_004.jpg",
-                  "caption": "ATC 초기화\nPAN 상승"
+                  "caption": "ATC 장치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_005.jpg",
-                  "caption": "축전지 전압계\n전차선 전압계"
+                  "caption": "TCMS PAN 상태 화면"
                 }
               ]
             },
@@ -8649,11 +8595,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_006.jpg",
-                  "caption": "상용제동"
+                  "caption": "상용제동 핸들"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_007.jpg",
-                  "caption": "EBS(비상제동)"
+                  "caption": "EBS(비상제동스위치)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_008.jpg",
@@ -8661,7 +8607,7 @@
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_009.jpg",
-                  "caption": "EBCOS(비상제동차단)"
+                  "caption": "EBCOS(비상제동차단스위치)"
                 }
               ]
             },
@@ -8670,7 +8616,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_010.jpg",
-                  "caption": "주차제동 체결"
+                  "caption": "주차제동 스위치"
                 }
               ]
             },
@@ -8683,11 +8629,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_011.jpg",
-                  "caption": "DU 상태확인 →\n역전기 전진"
+                  "caption": "DU 상태확인 화면"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_012.jpg",
-                  "caption": "주간제어기 역행\n보안제동 취급"
+                  "caption": "주간제어기 역행 취급"
                 }
               ]
             },
@@ -8696,11 +8642,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_013.jpg",
-                  "caption": "인버터"
+                  "caption": "TCMS 인버터 화면"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_014.jpg",
-                  "caption": "1단(P1) 위치"
+                  "caption": "주간제어기 1단(P1) 위치"
                 }
               ]
             },
@@ -8709,7 +8655,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_015.jpg",
-                  "caption": "주간제어기 중립"
+                  "caption": "주간제어기 중립 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_016.jpg",
@@ -8734,23 +8680,23 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_017.jpg",
-                  "caption": ""
+                  "caption": "계기판(압력계/전압계/전류계)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_018.jpg",
-                  "caption": ""
+                  "caption": "전조등/후미등 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_019.jpg",
-                  "caption": ""
+                  "caption": "행선표시기 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_020.jpg",
-                  "caption": ""
+                  "caption": "객실등 점등 상태"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_021.jpg",
-                  "caption": ""
+                  "caption": "객실안내 표시기 확인"
                 }
               ]
             },
@@ -8783,7 +8729,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_022.jpg",
-                  "caption": ""
+                  "caption": "ADU 화면 (속도계)"
                 }
               ]
             }
@@ -8896,11 +8842,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_023.jpg",
-                  "caption": "Key ON"
+                  "caption": "MC Key ON 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_024.jpg",
-                  "caption": "BATK1, 2"
+                  "caption": "BATK1, 2 확인"
                 }
               ]
             }
@@ -9286,11 +9232,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_025.jpg",
-                  "caption": ""
+                  "caption": "데스크 가선정전(LBOLp) 표시등"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_026.jpg",
-                  "caption": ""
+                  "caption": "비상전원차단(EPANDS) 및 출입문 스위치"
                 }
               ]
             }
@@ -9389,15 +9335,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_027.jpg",
-                  "caption": "해당 유니트"
+                  "caption": "TCMS 일반화면 (전체 장치 상태)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_028.jpg",
-                  "caption": "해당 차호 Pan"
+                  "caption": "TCMS 일반화면 (PAN 상태 확인)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_029.jpg",
-                  "caption": "운전실 개별 Pan"
+                  "caption": "개별판토하강(IPANDS) 스위치"
                 }
               ]
             },
@@ -9410,7 +9356,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_030.jpg",
-                  "caption": ""
+                  "caption": "판토그라프 제어공기 코크"
                 }
               ]
             }
@@ -9515,11 +9461,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_031.jpg",
-                  "caption": "판토하강 취급"
+                  "caption": "판토하강(PANDS) 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_032.jpg",
-                  "caption": "EPANDS 취급"
+                  "caption": "운전실 배전반 내부"
                 }
               ]
             }
@@ -9611,7 +9557,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_033.jpg",
-                  "caption": "DCArr 동작"
+                  "caption": "SIVCN1, SIVCN2 차단기"
                 }
               ]
             }
@@ -9805,11 +9751,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_034.jpg",
-                  "caption": "모니터 Pan 상태"
+                  "caption": "운전실 데스크 전체"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_035.jpg",
-                  "caption": "SIVCN 1, 2 상태"
+                  "caption": "고장리셋(TFRS) 스위치"
                 }
               ]
             },
@@ -9990,31 +9936,31 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_036.jpg",
-                  "caption": ""
+                  "caption": "출입문 닫힘 상태"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_037.jpg",
-                  "caption": ""
+                  "caption": "출입문 차단장치 내부"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_038.jpg",
-                  "caption": ""
+                  "caption": "도어엔진 내부 (DCU)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_039.jpg",
-                  "caption": ""
+                  "caption": "출입문 비상밸브 안내문"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_040.jpg",
-                  "caption": ""
+                  "caption": "출입문 닫힘 상태"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_041.jpg",
-                  "caption": ""
+                  "caption": "출입문 선택/비상전원차단 패널"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_042.jpg",
-                  "caption": ""
+                  "caption": "일반 배전반"
                 }
               ]
             },
@@ -10071,11 +10017,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_043.jpg",
-                  "caption": "DOS 3회 연속 취급"
+                  "caption": "운전실 배전반 NFB"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_044.jpg",
-                  "caption": "운전실 DRN"
+                  "caption": "운전실 배전반 NFB"
                 }
               ]
             }
@@ -10212,11 +10158,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_045.jpg",
-                  "caption": ""
+                  "caption": "LTE 열차무선장치 (전면/측면)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_046.jpg",
-                  "caption": ""
+                  "caption": "LTE 열차무선장치 (전면/측면)"
                 }
               ]
             },
@@ -10315,11 +10261,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_047.jpg",
-                  "caption": "DSD 누름 취급"
+                  "caption": "주간제어기/역전기 취급"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_048.jpg",
-                  "caption": "필요시 EBCOS 취급"
+                  "caption": "데스크 스위치 패널 (EBCOS 등)"
                 }
               ]
             }
@@ -10395,11 +10341,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_049.jpg",
-                  "caption": "냉방 제어스위치 확인"
+                  "caption": "냉난방 제어스위치 패널"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_050.jpg",
-                  "caption": "HVACN 차단 확인"
+                  "caption": "일반배전반 (HVACN 포함)"
                 }
               ]
             }
@@ -10478,11 +10424,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_051.jpg",
-                  "caption": ""
+                  "caption": "냉난방 제어스위치 패널"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_052.jpg",
-                  "caption": ""
+                  "caption": "일반배전반 (RHeN 포함)"
                 }
               ]
             }
@@ -10567,7 +10513,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_053.jpg",
-                  "caption": ""
+                  "caption": "배전반 NFB (객실/운전실 구간)"
                 }
               ]
             }
@@ -10728,11 +10674,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_054.jpg",
-                  "caption": "PBN 차단 확인 및\nEROS“EO”취급"
+                  "caption": "EROS 스위치 (E0 위치 표시)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_055.jpg",
-                  "caption": "ENCDN1, ENCDN2\n주간제어기 취급"
+                  "caption": "주간제어기/역전기 취급"
                 }
               ]
             },
@@ -10988,7 +10934,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_056.jpg",
-                  "caption": ""
+                  "caption": "데스크 스위치 패널 (EBCOS 등)"
                 }
               ]
             }
@@ -11153,11 +11099,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_057.jpg",
-                  "caption": ""
+                  "caption": "EROS 스위치 (E0 위치 표시)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_058.jpg",
-                  "caption": ""
+                  "caption": "데스크 스위치 패널 (EBCOS 등)"
                 }
               ]
             }
@@ -11278,7 +11224,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_059.jpg",
-                  "caption": ""
+                  "caption": "ADU 화면 (속도계)"
                 }
               ]
             }
@@ -11378,11 +11324,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_060.jpg",
-                  "caption": "일반배전반 BOUN 리셋"
+                  "caption": "일반배전반 BOUN 차단기"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_061.jpg",
-                  "caption": "마스콘 N-B7 취급"
+                  "caption": "주간제어기/역전기 취급"
                 }
               ]
             }
@@ -11496,19 +11442,19 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_062.jpg",
-                  "caption": ""
+                  "caption": "주차제동완해(PABRS) 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_063.jpg",
-                  "caption": ""
+                  "caption": "주차제동 전자밸브 수동조작(완해)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_064.jpg",
-                  "caption": ""
+                  "caption": "주차제동 강제완해장치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_065.jpg",
-                  "caption": ""
+                  "caption": "PBN(주차제동 제어) 차단기"
                 }
               ]
             }
@@ -11635,19 +11581,19 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_066.jpg",
-                  "caption": ""
+                  "caption": "주간제어기/역전기 취급"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_067.jpg",
-                  "caption": ""
+                  "caption": "강제제동완해(CPRS) 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_068.jpg",
-                  "caption": ""
+                  "caption": "일반배전반 BOUN 차단기"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_069.jpg",
-                  "caption": ""
+                  "caption": "제동풀림콕크"
                 }
               ]
             }
@@ -11769,15 +11715,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_070.jpg",
-                  "caption": ""
+                  "caption": "운전실 배전반 NFB (TCUN 등)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_071.jpg",
-                  "caption": ""
+                  "caption": "운전실 배전반 NFB (TCMSDON 등)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_072.jpg",
-                  "caption": ""
+                  "caption": "EROS 스위치 (E0 위치 표시)"
                 }
               ]
             }
@@ -11870,15 +11816,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_073.jpg",
-                  "caption": "PISCN 확인"
+                  "caption": "운전실 배전반 NFB (PISCN)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_074.jpg",
-                  "caption": "FTNDDN 확인"
+                  "caption": "운전실 배전반 NFB (FTNDDN)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_075.jpg",
-                  "caption": "PIDN 확인"
+                  "caption": "운전실 배전반 NFB (PIDN)"
                 }
               ]
             }
@@ -11979,11 +11925,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_076.jpg",
-                  "caption": "자동방송장치(PAC)"
+                  "caption": "자동방송장치(PAC) 본체"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_077.jpg",
-                  "caption": "방송장치 통신 동작"
+                  "caption": "자동방송장치(PAC) 동작 상태"
                 }
               ]
             },
@@ -12112,7 +12058,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_078.jpg",
-                  "caption": "ENCDN1, 2 확인"
+                  "caption": "주간제어기/역전기 취급"
                 }
               ]
             }
@@ -12201,11 +12147,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_079.jpg",
-                  "caption": "PABRS\nMR 압력 게이지"
+                  "caption": "EBCOS(비상제동개방) 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_080.jpg",
-                  "caption": "주차제동\nEBCOS(비상제동개방)"
+                  "caption": "주차제동완해(PABRS) 스위치"
                 }
               ]
             },
@@ -12214,11 +12160,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_081.jpg",
-                  "caption": "(주차제동 완해)"
+                  "caption": "주차제동 강제완해장치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_082.jpg",
-                  "caption": "수동조작(완해)"
+                  "caption": "PBN(주차제동 제어) 차단기"
                 }
               ]
             },
@@ -12374,7 +12320,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_083.jpg",
-                  "caption": "엔코더 PS보드 전원"
+                  "caption": "ATC 차상장치 (엔코더 PS보드)"
                 }
               ]
             },
@@ -12454,15 +12400,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_084.jpg",
-                  "caption": "모터상태 점검"
+                  "caption": "COMP 장치 (모터 상태 점검)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_085.jpg",
-                  "caption": "GDU 점검"
+                  "caption": "INVERTER GDU 기판"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_086.jpg",
-                  "caption": "제어기 점검"
+                  "caption": "SIV 제어기판 (제어기 점검)"
                 }
               ]
             }
@@ -12528,7 +12474,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_087.jpg",
-                  "caption": ""
+                  "caption": "ELN(열차분리검지) 차단기"
                 }
               ]
             }
@@ -12710,11 +12656,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_088.jpg",
-                  "caption": "모터 확인"
+                  "caption": "출입문 구동장치 (모터 어셈블리)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_089.jpg",
-                  "caption": "DCU 교체"
+                  "caption": "출입문 구동장치 (DCU)"
                 }
               ]
             }
@@ -12811,11 +12757,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_090.jpg",
-                  "caption": "모터 확인"
+                  "caption": "출입문 구동장치 (모터 어셈블리)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_091.jpg",
-                  "caption": "DCU 교체"
+                  "caption": "출입문 구동장치 (DCU)"
                 }
               ]
             }
@@ -12903,7 +12849,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_092.jpg",
-                  "caption": ""
+                  "caption": "출입문 내부 스위치 구조도"
                 }
               ]
             }
@@ -13011,7 +12957,7 @@
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_094.jpg",
-                  "caption": "DSC2 스위치 확인"
+                  "caption": "DCS2 스위치 확인"
                 }
               ]
             }
@@ -13119,7 +13065,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_095.jpg",
-                  "caption": "DLS1 스위치 확인"
+                  "caption": "DLS1 스위치 확인 (ISO 영역)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_096.jpg",
@@ -13220,7 +13166,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_097.jpg",
-                  "caption": "ESW1/ESW2"
+                  "caption": "ESW1/ESW2 비상스위치"
                 }
               ]
             }
@@ -13315,7 +13261,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_098.jpg",
-                  "caption": ""
+                  "caption": "증발기 모터 (냉방 팬)"
                 }
               ]
             }
@@ -13415,7 +13361,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_099.jpg",
-                  "caption": "증발기"
+                  "caption": "증발기 (FAR 장치)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_100.jpg",
@@ -13498,11 +13444,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_101.jpg",
-                  "caption": "과전류 검출부(U9)"
+                  "caption": "과전류 검출부 IC(U9) 확인"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_102.jpg",
-                  "caption": "과전류 시 IC(U9) 손상 확인 방법"
+                  "caption": "로커 스위치 OFF(\"O\") 상태"
                 }
               ]
             },
@@ -13515,7 +13461,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_103.jpg",
-                  "caption": ""
+                  "caption": "로커 스위치 OFF(\"O\") 상태"
                 }
               ]
             },
@@ -13591,19 +13537,19 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_104.jpg",
-                  "caption": "MR 압력 게이지\nPABRS"
+                  "caption": "EBCOS(비상제동개방) 스위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_105.jpg",
-                  "caption": "EBCOS(비상제동개방)\n주차제동"
+                  "caption": "CMN(주공기압축기) 차단기"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_106.jpg",
-                  "caption": "CMN 개방\n주차제동"
+                  "caption": "CMSBN(공기압축기 기동장치) 차단기"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_107.jpg",
-                  "caption": "CMSBN 개방\n주차제동 바이패스"
+                  "caption": "주차제동완해(PABRS) 스위치"
                 }
               ]
             },
@@ -13612,15 +13558,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_108.jpg",
-                  "caption": "(주차제동 완해)"
+                  "caption": "주차제동 전자밸브 수동조작(완해)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_109.jpg",
-                  "caption": "수동조작(완해)"
+                  "caption": "주차제동 강제완해장치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_110.jpg",
-                  "caption": "수동조작(완해)"
+                  "caption": "PBN(주차제동 제어) 차단기"
                 }
               ]
             },
@@ -13736,11 +13682,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_111.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (열차 접근)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_112.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (연결기 체결)"
                 }
               ]
             },
@@ -13760,11 +13706,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_113.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (연결 완료)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_114.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (작업자 확인)"
                 }
               ]
             },
@@ -13784,11 +13730,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch2_115.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (연결기 분리 상태)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch2_116.jpg",
-                  "caption": ""
+                  "caption": "구원연결 작업 (연결기 연결 완료)"
                 }
               ]
             }
@@ -13869,15 +13815,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_003.jpg",
-                  "caption": ""
+                  "caption": "일반 배전반 차단기 패널"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_004.jpg",
-                  "caption": ""
+                  "caption": "일반 배전반 전체 (PECN 위치)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_005.jpg",
-                  "caption": ""
+                  "caption": "PECN (추진제어장치 차단기) 확대"
                 }
               ]
             }
@@ -15118,15 +15064,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_006.jpg",
-                  "caption": ""
+                  "caption": "BOUN (제동작용장치 차단기) 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_007.jpg",
-                  "caption": ""
+                  "caption": "ECU 제어기 (IF-1 보드 위치)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_008.jpg",
-                  "caption": ""
+                  "caption": "BC센서, 압력점검구"
                 }
               ]
             }
@@ -15220,11 +15166,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_009.jpg",
-                  "caption": ""
+                  "caption": "제동풀림콕크"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_010.jpg",
-                  "caption": ""
+                  "caption": "ECU 제어기"
                 }
               ]
             }
@@ -15311,11 +15257,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_011.jpg",
-                  "caption": ""
+                  "caption": "ECU 2대 교체 대상"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_012.jpg",
-                  "caption": ""
+                  "caption": "ASR 릴레이 확인"
                 }
               ]
             }
@@ -15576,7 +15522,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_013.jpg",
-                  "caption": ""
+                  "caption": "ECVR (전자제어밸브 릴레이) 확인"
                 }
               ]
             }
@@ -15665,7 +15611,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_014.jpg",
-                  "caption": ""
+                  "caption": "AC압력 센서 릴레이 확인"
                 }
               ]
             }
@@ -15955,11 +15901,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_015.jpg",
-                  "caption": ""
+                  "caption": "ATCN1, ATCN2, ADUN\n차단기 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_016.jpg",
-                  "caption": ""
+                  "caption": "DU 화면 — 보조 ATC 절체 확인"
                 }
               ]
             }
@@ -16043,11 +15989,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_017.jpg",
-                  "caption": ""
+                  "caption": "SIV 관련 배전반 전체"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_018.jpg",
-                  "caption": ""
+                  "caption": "SIVCN1, SIVCN2\n(보조전원제어장치 차단기) 확대"
                 }
               ]
             }
@@ -16490,7 +16436,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_019.jpg",
-                  "caption": ""
+                  "caption": "냉난방 배전반 및 마이컴"
                 }
               ]
             }
@@ -17864,11 +17810,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_020.jpg",
-                  "caption": ""
+                  "caption": "CMSBN (공기압축기 기동장치)\n차단기 위치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_021.jpg",
-                  "caption": ""
+                  "caption": "CMSB 인버터 GDU 제어기"
                 }
               ]
             }
@@ -18160,11 +18106,11 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_022.jpg",
-                  "caption": ""
+                  "caption": "축전지 메인스위치 및 현시장치"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_023.jpg",
-                  "caption": ""
+                  "caption": "BCB 박스 내부 전원스위치"
                 }
               ]
             }
@@ -18879,15 +18825,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_024.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_025.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_026.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -18944,15 +18890,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_027.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_028.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_029.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -19003,15 +18949,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_030.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_031.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_032.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -19062,15 +19008,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_033.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_034.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_035.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             }
@@ -19139,15 +19085,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_036.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_037.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_038.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -19198,15 +19144,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_039.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_040.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_041.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -19257,15 +19203,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_042.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_043.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_044.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             },
@@ -19316,15 +19262,15 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_045.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 조립도\n(①커넥터 영역 ②PSM 고정부)"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_046.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 후면 — PSM 슬롯"
                 },
                 {
                   "src": "/images/edu/newcomer/ch3_047.jpg",
-                  "caption": ""
+                  "caption": "화재수신기 분해도\n(ETHM/DIOM/ADM/CPUM/PSM)"
                 }
               ]
             }
@@ -19414,7 +19360,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_048.jpg",
-                  "caption": ""
+                  "caption": "엔코더 장치 (PS/ENC 모듈)"
                 }
               ]
             },
@@ -19495,7 +19441,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_049.jpg",
-                  "caption": ""
+                  "caption": "엔코더 장치 (PS/ENC 모듈)"
                 }
               ]
             },
@@ -19570,7 +19516,7 @@
               "items": [
                 {
                   "src": "/images/edu/newcomer/ch3_050.jpg",
-                  "caption": ""
+                  "caption": "엔코더 장치 (PS/ENC 모듈)"
                 }
               ]
             }

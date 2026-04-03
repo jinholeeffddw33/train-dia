@@ -11,11 +11,13 @@ export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
 
   useEffect(() => {
-    // iOS Safari 감지 (beforeinstallprompt 없음 — 수동 안내 필요)
     const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const android = /Android/.test(navigator.userAgent);
     setIsIOS(ios);
+    setIsAndroid(android);
 
     // 이미 설치됐는지 확인 (standalone — Android + iOS 공통)
     const standalone =
@@ -54,6 +56,7 @@ export function useInstallPrompt() {
     canInstall: !!deferredPrompt && !isInstalled,
     isInstalled,
     isIOS,
+    isAndroid,
     install,
   };
 }

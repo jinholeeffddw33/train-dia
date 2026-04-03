@@ -781,3 +781,20 @@
   background: var(--dia-surface);
   border-radius: var(--dia-radius-md);
 }
+
+.openInChromeBtn {
+  width: 100%;
+  padding: var(--dia-space-4);
+  background: var(--dia-blue);
+  color: white;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--dia-transition-fast);
+}
+
+.openInChromeBtn:active { opacity: 0.8; }

@@ -42,7 +42,7 @@ export default function MoreTab() {
   const [shuttleOpen, setShuttleOpen] = useState(false);
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
-  const { canInstall, isInstalled, isIOS, install } = useInstallPrompt();
+  const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [newPinConfirm, setNewPinConfirm] = useState('');
@@ -197,7 +197,7 @@ export default function MoreTab() {
         </button>
 
         {/* 홈 화면 추가 — 미설치 상태에서만 노출 */}
-        {!isInstalled && (canInstall || isIOS) && (
+        {!isInstalled && (canInstall || isIOS || isAndroid) && (
           <button
             type="button"
             className={styles.toolBtn}
@@ -482,37 +482,77 @@ export default function MoreTab() {
             <h2 className={styles.overlayTitle}>홈 화면에 추가</h2>
           </div>
           <div className={styles.overlayBody}>
-            <div className={styles.installGuide}>
-              <p className={styles.installGuideDesc}>
-                Safari에서 홈 화면에 추가하면 앱처럼 바로 열 수 있어요.
-              </p>
-              <ol className={styles.installSteps}>
-                <li className={styles.installStep}>
-                  <span className={styles.installStepNum}>1</span>
-                  <div className={styles.installStepText}>
-                    <strong>Safari 하단 공유 버튼</strong> 탭<br />
-                    <span className={styles.installStepSub}>화면 아래 가운데 □↑ 아이콘</span>
-                  </div>
-                </li>
-                <li className={styles.installStep}>
-                  <span className={styles.installStepNum}>2</span>
-                  <div className={styles.installStepText}>
-                    <strong>홈 화면에 추가</strong> 선택<br />
-                    <span className={styles.installStepSub}>목록을 아래로 스크롤하면 보여요</span>
-                  </div>
-                </li>
-                <li className={styles.installStep}>
-                  <span className={styles.installStepNum}>3</span>
-                  <div className={styles.installStepText}>
-                    <strong>오른쪽 상단 추가</strong> 탭<br />
-                    <span className={styles.installStepSub}>이름은 그대로 두면 돼요</span>
-                  </div>
-                </li>
-              </ol>
-              <p className={styles.installGuideTip}>
-                💡 설치 후에는 주소창 없이 앱처럼 실행돼요
-              </p>
-            </div>
+            {isIOS ? (
+              /* ── iOS Safari 안내 ── */
+              <div className={styles.installGuide}>
+                <p className={styles.installGuideDesc}>
+                  Safari에서 홈 화면에 추가하면 앱처럼 바로 열 수 있어요.
+                </p>
+                <ol className={styles.installSteps}>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>1</span>
+                    <div className={styles.installStepText}>
+                      <strong>Safari 하단 공유 버튼</strong> 탭<br />
+                      <span className={styles.installStepSub}>화면 아래 가운데 □↑ 아이콘</span>
+                    </div>
+                  </li>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>2</span>
+                    <div className={styles.installStepText}>
+                      <strong>홈 화면에 추가</strong> 선택<br />
+                      <span className={styles.installStepSub}>목록을 아래로 스크롤하면 보여요</span>
+                    </div>
+                  </li>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>3</span>
+                    <div className={styles.installStepText}>
+                      <strong>오른쪽 상단 추가</strong> 탭<br />
+                      <span className={styles.installStepSub}>이름은 그대로 두면 돼요</span>
+                    </div>
+                  </li>
+                </ol>
+                <p className={styles.installGuideTip}>
+                  💡 설치 후에는 주소창 없이 앱처럼 실행돼요
+                </p>
+              </div>
+            ) : (
+              /* ── Android 비크롬 브라우저 안내 ── */
+              <div className={styles.installGuide}>
+                <p className={styles.installGuideDesc}>
+                  네이버 앱 등에서는 설치가 안 돼요.<br />
+                  크롬(Chrome) 앱에서 열면 원클릭으로 설치할 수 있어요.
+                </p>
+                <ol className={styles.installSteps}>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>1</span>
+                    <div className={styles.installStepText}>
+                      <strong>아래 버튼</strong>으로 크롬에서 열기<br />
+                      <span className={styles.installStepSub}>크롬이 없으면 Play 스토어에서 설치</span>
+                    </div>
+                  </li>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>2</span>
+                    <div className={styles.installStepText}>
+                      <strong>하단 설치 배너</strong> 탭<br />
+                      <span className={styles.installStepSub}>"홈 화면에 추가" 또는 "앱 설치" 버튼</span>
+                    </div>
+                  </li>
+                </ol>
+                <button
+                  type="button"
+                  className={styles.openInChromeBtn}
+                  onClick={() => {
+                    const { host, pathname, search } = window.location;
+                    window.location.href = `intent://${host}${pathname}${search}#Intent;scheme=https;package=com.android.chrome;end`;
+                  }}
+                >
+                  크롬으로 열기
+                </button>
+                <p className={styles.installGuideTip}>
+                  💡 크롬에서 설치하면 앱처럼 바로 실행돼요
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

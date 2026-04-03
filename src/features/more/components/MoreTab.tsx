@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock } from 'lucide-react';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -17,6 +17,8 @@ import { ContactsTab } from '@/features/contacts';
 import HealingCardOverlay from './HealingCardOverlay';
 import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
+import FeedbackOverlay from './FeedbackOverlay';
+import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import styles from '../styles/More.module.css';
 
 export default function MoreTab() {
@@ -42,6 +44,8 @@ export default function MoreTab() {
   const [shuttleOpen, setShuttleOpen] = useState(false);
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
   const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -58,6 +62,25 @@ export default function MoreTab() {
   return (
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>설정</h2>
+
+      {/* 의견 / 버그 제보 버튼 */}
+      <button
+        type="button"
+        className={styles.feedbackBanner}
+        onClick={() => setFeedbackOpen(true)}
+      >
+        <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+          <MessageSquarePlus size={20} />
+        </div>
+        <div className={styles.feedbackBannerText}>
+          <span className={styles.feedbackBannerTitle}>의견 / 버그 제보</span>
+          <span className={styles.feedbackBannerSub}>
+            <Lock size={10} className={styles.feedbackLockIcon} />
+            완전 익명 · 이름·사번 수집 없음
+          </span>
+        </div>
+        <ChevronRight size={16} className={styles.toolArrow} />
+      </button>
 
       {/* 오늘의 현황 */}
       <div className={styles.statsBar}>
@@ -385,6 +408,26 @@ export default function MoreTab() {
         </div>
       </section>
 
+      {/* 관리자 섹션 — admin role만 표시 */}
+      {authUser?.role === 'admin' && (
+        <section className={styles.section}>
+          <h3 className={styles.sectionTitle}>관리자</h3>
+          <button
+            type="button"
+            className={styles.toolBtn}
+            onClick={() => setAdminFeedbackOpen(true)}
+          >
+            <div className={styles.settingInfo}>
+              <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
+                <ClipboardList size={20} />
+              </div>
+              <span className={styles.settingLabel}>제보 목록 보기</span>
+            </div>
+            <ChevronRight size={16} className={styles.toolArrow} />
+          </button>
+        </section>
+      )}
+
       {/* PIN 변경 모달 */}
       {pinChangeOpen && (
         <div className={styles.fullOverlay}>
@@ -606,6 +649,16 @@ export default function MoreTab() {
         open={shortcutsOpen}
         onClose={() => setShortcutsOpen(false)}
       />
+
+      {/* 익명 제보 오버레이 */}
+      {feedbackOpen && (
+        <FeedbackOverlay onClose={() => setFeedbackOpen(false)} />
+      )}
+
+      {/* 관리자 제보 목록 오버레이 */}
+      {adminFeedbackOpen && (
+        <AdminFeedbackOverlay onClose={() => setAdminFeedbackOpen(false)} />
+      )}
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (

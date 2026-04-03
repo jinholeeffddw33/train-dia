@@ -9,7 +9,7 @@
   height: 56px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-amber);
-  color: white;
+  color: var(--dia-on-amber);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +244,7 @@
   padding: var(--dia-space-3);
   margin: var(--dia-space-4) var(--dia-space-4) var(--dia-space-5);
   background: var(--dia-amber);
-  color: white;
+  color: var(--dia-on-amber);
   border-radius: var(--dia-radius-lg);
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-semibold);
@@ -465,7 +465,7 @@
   width: 100%;
   padding: var(--dia-space-3);
   background: var(--dia-amber);
-  color: white;
+  color: var(--dia-on-amber);
   border-radius: var(--dia-radius-lg);
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-semibold);

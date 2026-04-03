@@ -13,6 +13,9 @@
   --dia-blue-glow: rgba(59, 130, 246, 0.3);
   --dia-green: #22C55E;
   --dia-green-dim: rgba(34, 197, 94, 0.15);
+  /* 텍스트 전용 — 다크/라이트 양쪽에서 충분한 대비 보장 */
+  --dia-green-text: #34D399;    /* dark bg 위 텍스트 (9.6:1) */
+  --dia-on-amber: #451a03;      /* amber bg 위 텍스트 — 모드 무관 항상 dark (9.8:1) */
   --dia-purple: #8B5CF6;
   --dia-purple-dim: rgba(139, 92, 246, 0.15);
   --dia-amber: #F59E0B;
@@ -209,6 +212,7 @@
    LIGHT MODE (옵션 — 기본은 다크)
    ========================================== */
 :root.light {
+  --dia-green-text: #16a34a;    /* light bg 위 텍스트 (4.6:1 on white) */
   --dia-bg: #F0F4F8;
   --dia-bg-elevated: #F8FAFC;
   --dia-surface: #FFFFFF;

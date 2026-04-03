@@ -51,7 +51,7 @@
 .noticeText em {
   font-style: normal;
   font-weight: var(--dia-weight-bold);
-  color: #34D399;
+  color: var(--dia-green-text);
 }
 
 .noticeClose {

@@ -80,7 +80,7 @@ input, textarea, select {
 /* ===== 모바일 선택 색상 ===== */
 ::selection {
   background: var(--dia-blue);
-  color: white;
+  color: var(--dia-text-inverse);
 }
 
 /* ===== Safe area ===== */

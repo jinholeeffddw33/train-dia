@@ -375,6 +375,8 @@
 .type_night.diaBadge { background: var(--dia-type-night); box-shadow: var(--dia-shadow-glow-purple); }
 .type_standby .diaBadge,
 .type_standby.diaBadge { background: var(--dia-type-standby); }
+/* amber 배지는 bright color → 어두운 텍스트 필수 (white 2.1:1 → on-amber 9.8:1) */
+.type_standby .diaBadgeText { color: var(--dia-on-amber); }
 .type_rest .diaBadge,
 .type_rest.diaBadge { background: var(--dia-type-rest); }
 
@@ -1166,7 +1168,7 @@
   padding: 1px 5px;
   border-radius: var(--dia-radius-sm);
   background: var(--dia-amber);
-  color: #fff;
+  color: var(--dia-on-amber);
   font-weight: 600;
 }
 
@@ -1398,13 +1400,13 @@
 }
 
 .weekDiaSwapped {
-  color: #34D399 !important;
+  color: var(--dia-green-text) !important;
 }
 
 .weekSwapLabel {
   font-size: 13px;
   font-weight: var(--dia-weight-bold);
-  color: #34D399;
+  color: var(--dia-green-text);
   margin-top: 1px;
   line-height: 1;
 }
@@ -1416,7 +1418,7 @@
 .statusSwapTag {
   font-size: 13px;
   font-weight: var(--dia-weight-bold);
-  color: #34D399;
+  color: var(--dia-green-text);
   margin-left: auto;
 }
 
@@ -1575,7 +1577,7 @@
 .homeNoticeDesc em {
   font-style: normal;
   font-weight: var(--dia-weight-bold);
-  color: #34D399;
+  color: var(--dia-green-text);
 }
 
 .homeNoticeClose {

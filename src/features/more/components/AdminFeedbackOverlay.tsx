@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, MessageSquare, Inbox } from 'lucide-react';
+import { X, MessageSquare, Inbox, Trash2 } from 'lucide-react';
 import styles from '../styles/More.module.css';
 
 interface FeedbackItem {
@@ -23,6 +23,21 @@ export default function AdminFeedbackOverlay({ onClose }: Props) {
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  async function handleDelete(id: number) {
+    setDeletingId(id);
+    const prev = items;
+    setItems((cur) => cur.filter((i) => i.id !== id));
+    try {
+      const res = await fetch(`/api/feedback?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+    } catch {
+      setItems(prev); // 실패 시 복원
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   useEffect(() => {
     fetch('/api/feedback')
@@ -76,6 +91,15 @@ export default function AdminFeedbackOverlay({ onClose }: Props) {
                   <MessageSquare size={12} />
                   <span>{formatDate(item.created_at)}</span>
                   <span className={styles.adminFeedbackAnon}>익명</span>
+                  <button
+                    type="button"
+                    className={styles.adminFeedbackDeleteBtn}
+                    onClick={() => handleDelete(item.id)}
+                    disabled={deletingId === item.id}
+                    aria-label="제보 삭제"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
                 <p className={styles.adminFeedbackContent}>{item.content}</p>
               </li>

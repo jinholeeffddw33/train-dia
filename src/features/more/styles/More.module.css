@@ -1077,3 +1077,21 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.adminFeedbackDeleteBtn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  transition: color var(--dia-transition-fast), background var(--dia-transition-fast);
+}
+
+.adminFeedbackDeleteBtn:active {
+  color: var(--dia-red, #f87171);
+  background: rgba(248, 113, 113, 0.12);
+}

@@ -60,3 +60,30 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ data: data ?? [] });
 }
+
+// ── DELETE: 관리자 전용 제보 삭제 ──
+export async function DELETE(req: NextRequest) {
+  if (!serverSupabase) {
+    return NextResponse.json({ code: 'UNAVAILABLE', message: '서비스를 일시적으로 사용할 수 없습니다' }, { status: 503 });
+  }
+
+  const user = await getSessionUser(req);
+  if (!user) {
+    return NextResponse.json({ code: 'UNAUTHORIZED', message: '로그인이 필요합니다' }, { status: 401 });
+  }
+  if (user.role !== 'admin') {
+    return NextResponse.json({ code: 'FORBIDDEN', message: '접근 권한이 없습니다' }, { status: 403 });
+  }
+
+  const id = req.nextUrl.searchParams.get('id');
+  if (!id || isNaN(Number(id))) {
+    return NextResponse.json({ code: 'INVALID_ID', message: '잘못된 요청입니다' }, { status: 400 });
+  }
+
+  const { error } = await serverSupabase.from('feedback').delete().eq('id', Number(id));
+  if (error) {
+    return NextResponse.json({ code: 'DB_ERROR', message: '삭제에 실패했습니다' }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}

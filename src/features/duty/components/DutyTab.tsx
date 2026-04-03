@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Megaphone } from 'lucide-react';
 import { P } from '@/data/cycle';
 import { getDia, getType, getSchedule, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
@@ -53,6 +53,21 @@ const TYPE_LABELS: Record<string, string> = {
   standby: '대기',
 };
 
+const ANNOUNCE_TS_KEY = 'feedbackAnnounce_ts';
+const ANNOUNCE_DISMISSED_KEY = 'feedbackAnnounce_dismissed';
+const ANNOUNCE_DURATION = 48 * 60 * 60 * 1000;
+
+function initAnnounce(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (localStorage.getItem(ANNOUNCE_DISMISSED_KEY)) return false;
+  const ts = localStorage.getItem(ANNOUNCE_TS_KEY);
+  if (!ts) {
+    localStorage.setItem(ANNOUNCE_TS_KEY, String(Date.now()));
+    return true;
+  }
+  return Date.now() - Number(ts) < ANNOUNCE_DURATION;
+}
+
 export default function DutyTab() {
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -60,6 +75,12 @@ export default function DutyTab() {
   });
   const [filter, setFilter] = useState<FilterType>('all');
   const [expandedDia, setExpandedDia] = useState<string | null>(null);
+  const [showAnnounce, setShowAnnounce] = useState(initAnnounce);
+
+  function dismissAnnounce() {
+    localStorage.setItem(ANNOUNCE_DISMISSED_KEY, '1');
+    setShowAnnounce(false);
+  }
 
   // 역방향 조회: 다이아 → 기관사
   const entries = useMemo(() => {
@@ -114,6 +135,22 @@ export default function DutyTab() {
 
   return (
     <div className={styles.container}>
+      {/* 제보 기능 안내 배너 (48h + X 닫기) */}
+      {showAnnounce && (
+        <div className={styles.noticeBanner}>
+          <div className={styles.noticeContent}>
+            <Megaphone size={18} className={styles.noticeIcon} />
+            <div className={styles.noticeText}>
+              <strong>새 기능 — 익명 제보</strong>
+              <span>버그·오류·아이디어를 익명으로 제보할 수 있어요.<br />설정 탭 상단에서 바로 작성할 수 있습니다.</span>
+            </div>
+          </div>
+          <button type="button" className={styles.noticeClose} onClick={dismissAnnounce} aria-label="닫기">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* 날짜 선택 */}
       <div className={styles.dateSelector}>
         <button type="button" onClick={prevDay} className={styles.dateArrow} aria-label="이전 날짜">

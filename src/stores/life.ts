@@ -37,7 +37,7 @@ interface LifeState {
   fetchComments: (postId: string) => Promise<void>;
   addComment: (postId: string, comment: string, name: string, sabun: string) => Promise<void>;
   toggleLike: (postId: string, name: string, sabun: string) => Promise<void>;
-  recordRead: (postId: string, sabun: string) => void;
+  recordRead: (postId: string, sabun: string, name?: string) => void;
 }
 
 const SAMPLE_POSTS: Record<LifeCategory, LifePost[]> = {
@@ -149,20 +149,22 @@ export const useLifeStore = create<LifeState>()((set, get) => ({
     }
   },
 
-  recordRead: (postId, sabun) => {
+  recordRead: (postId, sabun, name = '') => {
     if (!sabun || !postId) return;
-    // localStorage로 unique 조회 추적
-    const key = `life-reads-${postId}`;
-    try {
-      const raw = localStorage.getItem(key);
-      const readers: string[] = raw ? JSON.parse(raw) : [];
-      if (!readers.includes(sabun)) {
-        readers.push(sabun);
-        localStorage.setItem(key, JSON.stringify(readers));
-      }
-      set((s) => ({
-        posts: s.posts.map((p) => p.id === postId ? { ...p, readCount: readers.length } : p),
-      }));
-    } catch { /* ignore */ }
+    // API 호출 (fire-and-forget) — DB에 unique 조회 기록
+    fetch(`/api/life/posts/${postId}/reads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sabun, name }),
+    })
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        if (json?.readCount != null) {
+          set((s) => ({
+            posts: s.posts.map((p) => p.id === postId ? { ...p, readCount: json.readCount } : p),
+          }));
+        }
+      })
+      .catch(() => { /* ignore */ });
   },
 }));

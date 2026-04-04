@@ -299,8 +299,8 @@ function DetailView({ postId, name, sabun, onBack }: {
 
   // 조회수 증가
   useEffect(() => {
-    recordRead(postId, sabun);
-  }, [postId, sabun, recordRead]);
+    recordRead(postId, sabun, name);
+  }, [postId, sabun, name, recordRead]);
 
   // 댓글 로드
   useEffect(() => {

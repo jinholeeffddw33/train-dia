@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await serverSupabase
     .from('life_posts')
-    .select('id, category, title, content, image_url, link_url, created_by, created_at, life_comments(count), life_likes(count)')
+    .select('id, category, title, content, image_url, link_url, created_by, created_at, life_comments(count), life_likes(count), life_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     createdAt: r.created_at,
     commentCount: (r.life_comments as { count: number }[])?.[0]?.count ?? 0,
     likeCount: (r.life_likes as { count: number }[])?.[0]?.count ?? 0,
+    readCount: (r.life_reads as { count: number }[])?.[0]?.count ?? 0,
     likedByMe: likedIds.has(r.id as string),
   }));
 

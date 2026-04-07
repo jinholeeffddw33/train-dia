@@ -11,9 +11,9 @@
   user-select: none;
 }
 
-/* 뒤로가기 버튼(40px @ left:12px) 공간 확보 */
+/* 뒤로가기 버튼(32px @ left:8px) 공간 확보 */
 :global([data-has-back]) .headerSection {
-  padding-left: 60px;
+  padding-left: 44px;
 }
 
 :global(:root.light) .headerSection {

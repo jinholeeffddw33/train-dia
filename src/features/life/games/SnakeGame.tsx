@@ -33,7 +33,7 @@ const DIR_DELTA: Record<Direction, Pos> = {
 };
 
 const OBSTACLE_INTERVAL = 3; // 사과 3개마다 장애물 1개 추가
-const MAX_OBSTACLES = 10;
+const MAX_OBSTACLES = 8;
 
 /* ── Helpers ── */
 function randomPos(occupied: Set<string>): Pos {

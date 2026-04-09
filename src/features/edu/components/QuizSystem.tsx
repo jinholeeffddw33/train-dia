@@ -289,6 +289,23 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   /* ── Result ── */
   if (phase === 'result') {
     const isWrongMode = quizMode === 'wrong-only';
+    const isPerfect = score100 === 100;
+    const RADIUS = 60;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    const ringColorClass = isPerfect
+      ? styles.resultRingGold
+      : score100 >= 80 ? styles.resultRingGreen
+      : score100 >= 60 ? styles.resultRingAmber
+      : styles.resultRingRed;
+
+    const gradeLabel = isPerfect ? 'PERFECT' : score100 >= 80 ? '우수' : score100 >= 60 ? '보통' : '분발';
+    const gradeLabelClass = isPerfect
+      ? styles.resultGradePerfect
+      : score100 >= 80 ? styles.resultGradeGood
+      : score100 >= 60 ? styles.resultGradeOk
+      : styles.resultGradeFail;
+
     return (
       <div className={styles.screen}>
         <div className={styles.topBar}>
@@ -299,17 +316,46 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
         </div>
 
         <div className={styles.resultWrap}>
-          <div className={`${styles.resultScore} ${scoreGradeClass(score100)}`}>
-            {score100}점
-          </div>
-          <div className={styles.resultLabel}>
-            {questions.length}문제 중 {score}문제 정답
-            {isWrongMode && resolvedInSession > 0 && ` · ${resolvedInSession}문제 해결됨`}
-            {!isWrongMode && wrongInSession > 0 && ` · ${wrongInSession}문제 오답노트 저장`}
+          {/* 원형 프로그레스 */}
+          <ScoreRing
+            score100={score100}
+            radius={RADIUS}
+            circumference={CIRCUMFERENCE}
+            ringColorClass={ringColorClass}
+            isPerfect={isPerfect}
+          />
+
+          {/* 등급 라벨 */}
+          <span className={`${styles.resultGradeLabel} ${gradeLabelClass}`}>
+            {gradeLabel}
+          </span>
+
+          {/* 통계 카드 */}
+          <div className={styles.resultStats}>
+            <div className={styles.resultStatCard}>
+              <span className={`${styles.resultStatValue} ${styles.resultStatValueGreen}`}>{score}</span>
+              <span className={styles.resultStatLabel}>정답</span>
+            </div>
+            <div className={styles.resultStatCard}>
+              <span className={`${styles.resultStatValue} ${styles.resultStatValueRed}`}>{questions.length - score}</span>
+              <span className={styles.resultStatLabel}>오답</span>
+            </div>
+            <div className={styles.resultStatCard}>
+              <span className={styles.resultStatValue}>{questions.length}</span>
+              <span className={styles.resultStatLabel}>총 문제</span>
+            </div>
           </div>
 
+          {/* 부가 정보 */}
+          <div className={styles.resultLabel}>
+            {isWrongMode && resolvedInSession > 0 && `${resolvedInSession}문제 해결됨`}
+            {!isWrongMode && wrongInSession > 0 && `${wrongInSession}문제 오답노트 저장`}
+          </div>
+
+          {/* 성장 지표 */}
           {!isWrongMode && growth !== null && growth !== 0 && (
             <div className={`${styles.resultGrowth} ${growth < 0 ? styles.resultDown : ''}`}>
+              <span className={styles.resultGrowthArrow}>{growth > 0 ? '\u25B2' : '\u25B2'}</span>
               {growth > 0 ? `이전 대비 +${growth}점` : `이전 대비 ${growth}점`}
             </div>
           )}
@@ -325,7 +371,6 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
                 type="button"
                 className={`${styles.resultBtn} ${styles.resultBtnPrimary}`}
                 onClick={() => {
-                  // 미해결 오답으로 재시작
                   startWrongOnlyQuiz();
                 }}
               >
@@ -408,6 +453,53 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
             </button>
           </>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** SVG 원형 프로그레스 (0 → score100 애니메이션) */
+function ScoreRing({
+  score100,
+  radius,
+  circumference,
+  ringColorClass,
+  isPerfect,
+}: {
+  score100: number;
+  radius: number;
+  circumference: number;
+  ringColorClass: string;
+  isPerfect: boolean;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    // 마운트 직후 0 → 실제값 트랜지션
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const offset = mounted
+    ? circumference * (1 - score100 / 100)
+    : circumference;
+
+  return (
+    <div className={`${styles.resultRing} ${isPerfect ? styles.resultRingPerfect : ''}`}>
+      <svg className={styles.resultRingSvg} viewBox="0 0 140 140">
+        <circle className={styles.resultRingBg} cx="70" cy="70" r={radius} />
+        <circle
+          className={`${styles.resultRingFg} ${ringColorClass}`}
+          cx="70"
+          cy="70"
+          r={radius}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          /* STYLE-EXCEPTION: 동적 strokeDashoffset 값 — CSS transition으로 애니메이션 */
+        />
+      </svg>
+      <div className={styles.resultRingCenter}>
+        <span className={styles.resultRingScore}>{score100}</span>
+        <span className={styles.resultRingUnit}>점</span>
       </div>
     </div>
   );

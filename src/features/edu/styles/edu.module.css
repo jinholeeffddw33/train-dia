@@ -1800,6 +1800,9 @@
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
   outline: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchResults {

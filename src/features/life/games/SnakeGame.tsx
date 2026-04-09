@@ -40,6 +40,22 @@ function randomApple(snake: Pos[]): Pos {
   return pos;
 }
 
+/** roundRect 폴백 — 구형 브라우저 호환 */
+function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
 function loadBest(): number {
   try { return parseInt(localStorage.getItem(LS_KEY) ?? '0', 10) || 0; } catch { return 0; }
 }
@@ -77,6 +93,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasSizeRef = useRef(300); // CSS pixel size
 
   // Game state refs (mutable, no re-render)
   const snakeRef = useRef<Pos[]>([{ x: 7, y: 7 }]);
@@ -99,7 +116,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const size = canvas.width;
+    const size = canvasSizeRef.current;
     const cellSize = size / GRID;
     const colors = getColors();
     const snake = snakeRef.current;
@@ -139,34 +156,31 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     ctx.fill();
 
     // Snake body (tail → head, 투명도 그라데이션)
+    const gap = 1;
+    const r = Math.max(2, cellSize * 0.15); // corner radius
     for (let i = snake.length - 1; i >= 1; i--) {
       const alpha = 0.3 + 0.7 * (1 - i / snake.length);
       ctx.fillStyle = colors.snakeBody(alpha);
-      const gap = 1;
-      ctx.beginPath();
-      ctx.roundRect(
+      roundedRect(ctx,
         snake[i].x * cellSize + gap,
         snake[i].y * cellSize + gap,
         cellSize - gap * 2,
         cellSize - gap * 2,
-        3,
+        r,
       );
-      ctx.fill();
     }
 
     // Snake head
     ctx.fillStyle = colors.snakeHead;
     ctx.shadowColor = colors.snakeHead;
     ctx.shadowBlur = 6;
-    ctx.beginPath();
-    ctx.roundRect(
-      snake[0].x * cellSize + 1,
-      snake[0].y * cellSize + 1,
-      cellSize - 2,
-      cellSize - 2,
-      4,
+    roundedRect(ctx,
+      snake[0].x * cellSize + gap,
+      snake[0].y * cellSize + gap,
+      cellSize - gap * 2,
+      cellSize - gap * 2,
+      r + 1,
     );
-    ctx.fill();
     ctx.shadowBlur = 0;
   }, []);
 
@@ -311,14 +325,15 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const resize = () => {
-      const maxSize = Math.min(window.innerWidth - 32, 380);
-      const px = maxSize * (window.devicePixelRatio || 1);
-      canvas.width = px;
-      canvas.height = px;
-      canvas.style.width = `${maxSize}px`;
-      canvas.style.height = `${maxSize}px`;
+      const dpr = window.devicePixelRatio || 1;
+      const cssSize = Math.min(window.innerWidth - 32, 380);
+      canvasSizeRef.current = cssSize;
+      canvas.width = cssSize * dpr;
+      canvas.height = cssSize * dpr;
+      canvas.style.width = `${cssSize}px`;
+      canvas.style.height = `${cssSize}px`;
       const ctx = canvas.getContext('2d');
-      if (ctx) ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+      if (ctx) ctx.scale(dpr, dpr);
       draw();
     };
     resize();

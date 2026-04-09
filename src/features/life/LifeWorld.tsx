@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Component, type ReactNode } from 'react';
-import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
+import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X, Gamepad2, Zap, Bug } from 'lucide-react';
+
+const ReactionTest = lazy(() => import('./games/ReactionTest'));
+const SnakeGame = lazy(() => import('./games/SnakeGame'));
 import { useDriverStore } from '@/stores/driver';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
 import styles from './styles/Life.module.css';
@@ -46,7 +49,13 @@ const ICON_COLOR: Record<string, string> = {
   purple: styles.iconPurple,
 };
 
-type View = 'home' | { type: 'list'; category: LifeCategory } | { type: 'detail'; category: LifeCategory; postId: string } | { type: 'write'; category: LifeCategory };
+type GameId = 'reaction' | 'snake';
+type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | { type: 'list'; category: LifeCategory } | { type: 'detail'; category: LifeCategory; postId: string } | { type: 'write'; category: LifeCategory };
+
+const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
+  { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
+  { id: 'snake', label: '스네이크', icon: Bug, color: 'green', desc: '먹이를 먹고 길어지는 클래식 게임' },
+];
 
 /** localStorage에서 카테고리별 마지막 방문 시간 가져오기 */
 function getLastVisit(cat: LifeCategory): string {
@@ -160,8 +169,71 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
               );
             })}
           </div>
+
+          {/* 게임 진입 버튼 */}
+          <button
+            type="button"
+            className={styles.gameEntryBtn}
+            onClick={() => setView('games')}
+          >
+            <div className={styles.gameEntryIcon}>
+              <Gamepad2 size={22} />
+            </div>
+            <div className={styles.gameEntryText}>
+              <span className={styles.gameEntryLabel}>미니 게임</span>
+              <span className={styles.gameEntryDesc}>쉬는 시간에 가볍게 한 판</span>
+            </div>
+            <ChevronRight size={18} className={styles.gameEntryArrow} />
+          </button>
         </div>
       </div>
+    );
+  }
+
+  // ── 게임 목록 ──
+  if (view === 'games') {
+    return (
+      <div className={styles.wrap}>
+        <div className={styles.lifeHeader}>
+          <button type="button" className={styles.backBtn} onClick={() => setView('home')} aria-label="뒤로가기">
+            <ArrowLeft size={20} strokeWidth={2} />
+          </button>
+          <h2 className={styles.headerTitle}>미니 게임</h2>
+        </div>
+        <div className={styles.menuContent}>
+          {GAMES.map((g) => {
+            const Icon = g.icon;
+            return (
+              <button
+                key={g.id}
+                type="button"
+                className={styles.gameCard}
+                onClick={() => setView({ type: 'game', gameId: g.id })}
+              >
+                <div className={`${styles.gameCardIcon} ${g.color === 'amber' ? styles.iconBgAmber : styles.iconBgGreen}`}>
+                  <Icon size={24} />
+                </div>
+                <div className={styles.gameCardText}>
+                  <span className={styles.gameCardLabel}>{g.label}</span>
+                  <span className={styles.gameCardDesc}>{g.desc}</span>
+                </div>
+                <ChevronRight size={18} className={styles.gameEntryArrow} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── 게임 플레이 ──
+  if (typeof view === 'object' && view.type === 'game') {
+    const goBack = () => setView('games');
+    return (
+      <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        {view.gameId === 'reaction' && <ReactionTest onBack={goBack} />}
+        {view.gameId === 'snake' && <SnakeGame onBack={goBack} />}
+      </Suspense>
     );
   }
 

@@ -1,0 +1,418 @@
+/* ===== Reaction Test Game ===== */
+
+/* ── 전체 래퍼 ── */
+.wrap {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+}
+
+/* ── 상단 헤더 ── */
+.header {
+  position: relative;
+  z-index: var(--dia-layer-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-bg);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  transition: background var(--dia-transition-fast);
+}
+
+.backBtn:hover {
+  background: var(--dia-surface-hover);
+}
+
+.backBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.headerTitle {
+  flex: 1;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.roundBadge {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+}
+
+/* ── 게임 영역 (터치 전체) ── */
+.gameArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-6);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  gap: var(--dia-space-4);
+  min-height: 0;
+}
+
+/* 상태별 배경 */
+.stateIdle {
+  background: var(--dia-bg);
+}
+
+.stateWaiting {
+  background: #991B1B;
+}
+
+.stateReady {
+  background: #166534;
+}
+
+.stateTooEarly {
+  background: #92400E;
+}
+
+.stateResult {
+  background: var(--dia-bg);
+}
+
+/* 라이트 모드 배경 보정 */
+:root.light .stateWaiting {
+  background: #DC2626;
+}
+
+:root.light .stateReady {
+  background: #16A34A;
+}
+
+:root.light .stateTooEarly {
+  background: #D97706;
+}
+
+/* ── 텍스트 요소 ── */
+.emoji {
+  font-size: clamp(48px, 10vw, 72px);
+  line-height: 1;
+}
+
+.mainText {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  text-align: center;
+  line-height: var(--dia-leading-tight);
+}
+
+/* 게임 진행 중 텍스트는 항상 흰색 */
+.stateWaiting .mainText,
+.stateReady .mainText,
+.stateTooEarly .mainText {
+  color: #FFFFFF;
+}
+
+.stateWaiting .subText,
+.stateReady .subText,
+.stateTooEarly .subText {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.subText {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-normal);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  line-height: var(--dia-leading-normal);
+}
+
+.reactionTime {
+  font-size: var(--dia-text-4xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  text-align: center;
+  line-height: 1;
+}
+
+.reactionUnit {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  margin-left: var(--dia-space-1);
+}
+
+/* ── 시작 화면 설명 카드 ── */
+.introCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  padding: var(--dia-space-6);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-card-depth);
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+}
+
+.introTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.introDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-relaxed);
+}
+
+.introSteps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  text-align: left;
+}
+
+.introStep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: var(--dia-leading-normal);
+}
+
+.stepNum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.startBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  min-height: 44px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #FFFFFF;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--dia-transition-fast);
+  box-shadow: var(--dia-shadow-glow-blue);
+}
+
+.startBtn:hover {
+  opacity: 0.9;
+}
+
+.startBtn:active {
+  transform: scale(0.98);
+}
+
+.startBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+/* ── 최고 기록 표시 ── */
+.bestRecord {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-amber);
+}
+
+/* ── 결과 화면 ── */
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+  padding: var(--dia-space-6);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-card-depth);
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+}
+
+.resultTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.resultAvg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.resultAvgLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.resultAvgValue {
+  font-size: var(--dia-text-3xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+}
+
+.resultGrade {
+  font-size: var(--dia-text-2xl);
+  padding: var(--dia-space-3) 0;
+}
+
+.resultGradeLabel {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+/* ── 라운드별 기록 ── */
+.roundList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.roundItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+}
+
+.roundLabel {
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.roundValue {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-semibold);
+}
+
+/* ── 새 기록! ── */
+.newRecord {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-amber);
+}
+
+/* ── 다시하기 버튼 ── */
+.retryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  min-height: 44px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #FFFFFF;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--dia-transition-fast);
+  box-shadow: var(--dia-shadow-glow-blue);
+}
+
+.retryBtn:hover {
+  opacity: 0.9;
+}
+
+.retryBtn:active {
+  transform: scale(0.98);
+}
+
+.retryBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+/* ── 진행 바 ── */
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--dia-border);
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--dia-blue);
+  transition: width 0.3s ease;
+}
+
+/* ── 터치 힌트 ── */
+.tapHint {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 게임 중 힌트는 밝게 */
+.stateWaiting .tapHint,
+.stateReady .tapHint,
+.stateTooEarly .tapHint {
+  color: rgba(255, 255, 255, 0.5);
+}

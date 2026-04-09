@@ -373,7 +373,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     resize();
     window.addEventListener('resize', resize);
     return () => window.removeEventListener('resize', resize);
-  }, [draw]);
+  }, [draw, gameState]);
 
   /* ── Render: 시작 화면 (풀스크린) ── */
   if (gameState === 'idle') {

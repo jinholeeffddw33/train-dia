@@ -6,6 +6,7 @@ import {
   Mic, TrainFront, DoorOpen, Wrench,
   GraduationCap, Award, User, ClipboardList,
   RotateCcw, Clock, GitCompareArrows, Play,
+  ShieldCheck,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -30,7 +31,7 @@ const MENU_ITEMS = [
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch6'] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
   { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapters' as const, targets: ['newcomer1', 'newcomer2', 'newcomer3'] },
-  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'coming'   as const, targets: [] },
+  { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'submenu'  as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
 ];
@@ -107,6 +108,11 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   }, []);
 
   const [repairOpen, setRepairOpen] = useState(false);
+  const [eduOpen, setEduOpen] = useState(false);
+
+  const EDU_SUB = [
+    { id: 'safety_edu', label: '철도안전\n교육', color: 'blue' as const, targets: ['safety_edu1'], coming: false },
+  ];
 
   const REPAIR_SUB = [
     { id: 'abb',     label: 'ABB\n전동차',   color: 'blue'   as const, targets: ['ch5a'],       coming: false },
@@ -123,10 +129,10 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
         break;
       case 'submenu':
         if (item.id === 'repair') setRepairOpen(true);
+        if (item.id === 'edu') setEduOpen(true);
         break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
-      case 'coming':  break;
     }
   };
 
@@ -192,14 +198,12 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
         <div className={styles.menuGrid8}>
           {MENU_ITEMS.map(item => {
             const Icon = item.icon;
-            const isComing = item.action === 'coming';
             return (
               <button
                 key={item.id}
                 type="button"
-                className={`${styles.menuGridItem} ${isComing ? styles.menuGridItemDisabled : ''}`}
+                className={styles.menuGridItem}
                 onClick={() => handleMenuClick(item)}
-                disabled={isComing}
               >
                 <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[item.color]}`}>
                   <Icon size={26} className={ICON_COLOR_MAP[item.color]} />
@@ -348,6 +352,42 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 교육훈련 서브메뉴 */}
+      {eduOpen && (
+        <div className={styles.subMenuOverlay} onClick={() => setEduOpen(false)}>
+          <div className={styles.subMenuPanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.subMenuHeader}>
+              <GraduationCap size={20} className={styles.quickIconBlue} />
+              <h3 className={styles.subMenuTitle}>교육훈련</h3>
+              <button type="button" className={styles.subMenuClose} onClick={() => setEduOpen(false)} aria-label="닫기">
+                <X size={20} />
+              </button>
+            </div>
+            <div className={styles.subMenuGrid}>
+              {EDU_SUB.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  className={`${styles.subMenuItem} ${sub.coming ? styles.menuGridItemDisabled : ''}`}
+                  disabled={sub.coming}
+                  onClick={() => {
+                    if (sub.coming) return;
+                    setEduOpen(false);
+                    onChapters([...sub.targets]);
+                  }}
+                >
+                  <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[sub.color]}`}>
+                    <ShieldCheck size={26} className={ICON_COLOR_MAP[sub.color]} />
+                  </div>
+                  <span className={styles.subMenuLabel}>{sub.label}</span>
+                  {sub.coming && <span className={styles.subMenuComing}>준비중</span>}
+                </button>
+              ))}
             </div>
           </div>
         </div>

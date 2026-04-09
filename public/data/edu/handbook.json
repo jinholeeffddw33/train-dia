@@ -20004,6 +20004,143 @@
           ]
         }
       ]
+    },
+    {
+      "id": "safety_edu1",
+      "title": "철도안전교육",
+      "description": "철도안전교육 슬라이드 자료",
+      "sections": [
+        {
+          "id": "safety_edu1-1",
+          "title": "철도안전교육",
+          "summary": "철도안전교육 슬라이드 전체",
+          "keywords": [
+            "철도안전",
+            "안전교육",
+            "구원운전"
+          ],
+          "updatedAt": "2026-04-09",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_01.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_02.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_03.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_04.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_05.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_06.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_07.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_08.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_09.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_10.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_11.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_12.jpg",
+                  "caption": ""
+                }
+              ]
+            },
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/safety/slide_13.jpg",
+                  "caption": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

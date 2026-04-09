@@ -1,4 +1,4 @@
-/* ===== Snake Game ===== */
+/* ===== Snake Game (Canvas) ===== */
 
 .wrap {
   min-height: 100vh;
@@ -52,16 +52,15 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-2);
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-secondary);
 }
 
 .scoreLabel {
+  font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
 }
 
 .scoreValue {
+  font-size: var(--dia-text-lg);
   color: var(--dia-green);
   font-weight: var(--dia-weight-bold);
   font-variant-numeric: tabular-nums;
@@ -74,235 +73,126 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--dia-space-4);
+  padding: var(--dia-space-3) var(--dia-space-4);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+  gap: var(--dia-space-2);
 }
 
-/* ── Grid ── */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(20, 1fr);
+/* ── Canvas Container ── */
+.canvasWrap {
+  position: relative;
   width: min(calc(100vw - 32px), 380px);
-  height: min(calc(100vw - 32px), 380px);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-strong);
+  aspect-ratio: 1;
   border-radius: var(--dia-radius-md);
   overflow: hidden;
+  border: 1px solid var(--dia-border-strong);
   box-shadow: var(--dia-card-depth);
-  position: relative;
 }
 
-.cell {
-  border: 1px solid var(--dia-border-light);
-  box-sizing: border-box;
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.cellSnakeHead {
-  background: var(--dia-3d-green-start);
-  border-color: var(--dia-3d-green-end);
-  border-radius: 3px;
-  box-shadow:
-    var(--dia-3d-inset),
-    0 0 8px rgba(34, 197, 94, 0.4);
-}
-
-.cellSnakeBody {
-  border-radius: 2px;
-  border-color: transparent;
-}
-
-/* opacity 단계별 — 머리 가까울수록 진하고, 꼬리로 갈수록 연함 */
-.bodyOpacity100 {
-  background: var(--dia-green);
-  opacity: 0.9;
-}
-.bodyOpacity90 {
-  background: var(--dia-green);
-  opacity: 0.8;
-}
-.bodyOpacity80 {
-  background: var(--dia-green);
-  opacity: 0.7;
-}
-.bodyOpacity70 {
-  background: var(--dia-green);
-  opacity: 0.6;
-}
-.bodyOpacity60 {
-  background: var(--dia-green);
-  opacity: 0.5;
-}
-.bodyOpacity50 {
-  background: var(--dia-green);
-  opacity: 0.4;
-}
-.bodyOpacity40 {
-  background: var(--dia-green);
-  opacity: 0.35;
-}
-
-.cellApple {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(12px, calc(min(calc(100vw - 32px), 380px) / 25), 16px);
-  line-height: 1;
-  border-color: transparent;
-}
-
-/* ── Start Screen ── */
-.startOverlay {
+/* ── Overlay (Start / Game Over) ── */
+.overlay {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--dia-space-4);
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(4px);
-  border-radius: var(--dia-radius-md);
-  z-index: 5;
-  padding: var(--dia-space-4);
-}
-
-.startTitle {
-  font-size: var(--dia-text-2xl);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-green);
-  text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-  margin: 0;
-}
-
-.startEmoji {
-  font-size: var(--dia-text-4xl);
-  line-height: 1;
-}
-
-.startHint {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
-  text-align: center;
-  line-height: var(--dia-leading-relaxed);
-}
-
-.startBest {
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
-}
-
-.startBestValue {
-  color: var(--dia-amber);
-  font-weight: var(--dia-weight-semibold);
-}
-
-.tapHint {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-primary);
-  padding: var(--dia-space-3) var(--dia-space-6);
-  background: var(--dia-green);
-  color: var(--dia-text-inverse);
-  border-radius: var(--dia-radius-full);
-  border: none;
-  cursor: pointer;
-  box-shadow: var(--dia-3d-green-glow);
-  min-height: 44px;
-  min-width: 44px;
-}
-
-.tapHint:focus-visible {
-  outline: 2px solid var(--dia-blue);
-  outline-offset: 2px;
-}
-
-.tapHint:active {
-  transform: scale(0.98);
-}
-
-/* ── Game Over ── */
-.gameOverOverlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
   background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(4px);
-  border-radius: var(--dia-radius-md);
-  z-index: 5;
   padding: var(--dia-space-4);
+  text-align: center;
 }
 
-.gameOverTitle {
+:root.light .overlay {
+  background: rgba(240, 244, 248, 0.9);
+}
+
+.overlayEmoji {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.overlayTitle {
   font-size: var(--dia-text-xl);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-red);
   margin: 0;
 }
 
-.gameOverScore {
-  font-size: var(--dia-text-lg);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
+.overlayHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+  margin: 0;
 }
 
-.gameOverScoreNum {
+.overlayScore {
+  font-size: var(--dia-text-3xl);
+  font-weight: var(--dia-weight-bold);
   color: var(--dia-green);
+  margin: var(--dia-space-1) 0;
 }
 
-.gameOverBest {
+.overlayScoreUnit {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-medium);
+  margin-left: 2px;
+}
+
+.overlayBest {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
+  margin: 0;
 }
 
-.gameOverBestValue {
+.overlayBest strong {
   color: var(--dia-amber);
-  font-weight: var(--dia-weight-semibold);
 }
 
 .newRecord {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-amber);
-  font-weight: var(--dia-weight-semibold);
-}
-
-.retryBtn {
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-medium);
-  padding: var(--dia-space-3) var(--dia-space-6);
-  background: var(--dia-green);
-  color: var(--dia-text-inverse);
-  border-radius: var(--dia-radius-full);
-  border: none;
-  cursor: pointer;
-  box-shadow: var(--dia-3d-green-glow);
-  margin-top: var(--dia-space-2);
-  min-height: 44px;
-  min-width: 44px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-amber);
+  margin: 0;
 }
 
-.retryBtn:focus-visible {
+.startBtn {
+  margin-top: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-8);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  background: var(--dia-green);
+  color: #fff;
+  border: none;
+  border-radius: var(--dia-radius-full);
+  cursor: pointer;
+  min-height: 44px;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+.startBtn:active {
+  transform: scale(0.97);
+}
+
+.startBtn:focus-visible {
   outline: 2px solid var(--dia-blue);
   outline-offset: 2px;
 }
 
-.retryBtn:active {
-  transform: scale(0.98);
-}
-
-/* ── D-Pad (모바일 방향 버튼) ── */
+/* ── D-Pad ── */
 .dpad {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--dia-space-1);
-  margin-top: var(--dia-space-4);
+  margin-top: var(--dia-space-3);
 }
 
 .dpadRow {
@@ -312,13 +202,13 @@
 }
 
 .dpadBtn {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--dia-radius-md);
+  width: 60px;
+  height: 60px;
+  border-radius: var(--dia-radius-lg);
   border: 1px solid var(--dia-border-strong);
   background: var(--dia-surface-elevated);
   color: var(--dia-text-primary);
-  font-size: 20px;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -326,32 +216,15 @@
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   box-shadow: var(--dia-card-depth);
-  transition: transform 0.08s ease, background 0.08s ease;
+  transition: transform 0.06s ease, background 0.06s ease;
 }
 
 .dpadBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   background: var(--dia-surface-active);
 }
 
 .dpadCenter {
-  width: 56px;
-  height: 56px;
-}
-
-/* ── Light Mode ── */
-:root.light .startOverlay {
-  background: rgba(240, 244, 248, 0.9);
-}
-
-:root.light .gameOverOverlay {
-  background: rgba(240, 244, 248, 0.92);
-}
-
-:root.light .tapHint {
-  color: #fff;
-}
-
-:root.light .retryBtn {
-  color: #fff;
+  width: 60px;
+  height: 60px;
 }

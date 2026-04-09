@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import styles from './SnakeGame.module.css';
 
@@ -13,37 +13,24 @@ interface SnakeGameProps {
 }
 
 type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+interface Pos { x: number; y: number }
 
-interface Pos {
-  x: number;
-  y: number;
-}
-
-const GRID = 20;
-const INITIAL_SPEED = 200;
-const MIN_SPEED = 100;
-const SPEED_STEP = 10; // 10점마다 SPEED_STEP만큼 빨라짐
+const GRID = 15;
+const INITIAL_SPEED = 350;
+const MIN_SPEED = 150;
+const SPEED_DECREASE = 8; // 사과 하나당 8ms 빨라짐
 const SWIPE_THRESHOLD = 30;
 const LS_KEY = 'traindia-snake-best';
 
 const OPPOSITE: Record<Direction, Direction> = {
-  UP: 'DOWN',
-  DOWN: 'UP',
-  LEFT: 'RIGHT',
-  RIGHT: 'LEFT',
+  UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT',
 };
-
 const DIR_DELTA: Record<Direction, Pos> = {
-  UP: { x: 0, y: -1 },
-  DOWN: { x: 0, y: 1 },
-  LEFT: { x: -1, y: 0 },
-  RIGHT: { x: 1, y: 0 },
+  UP: { x: 0, y: -1 }, DOWN: { x: 0, y: 1 },
+  LEFT: { x: -1, y: 0 }, RIGHT: { x: 1, y: 0 },
 };
 
-/* ──────────────────────────────────────────────
-   Helpers
-   ────────────────────────────────────────────── */
-
+/* ── Helpers ── */
 function randomApple(snake: Pos[]): Pos {
   const occupied = new Set(snake.map((p) => `${p.x},${p.y}`));
   let pos: Pos;
@@ -54,33 +41,26 @@ function randomApple(snake: Pos[]): Pos {
 }
 
 function loadBest(): number {
-  try {
-    const v = localStorage.getItem(LS_KEY);
-    return v ? parseInt(v, 10) || 0 : 0;
-  } catch {
-    return 0;
-  }
+  try { return parseInt(localStorage.getItem(LS_KEY) ?? '0', 10) || 0; } catch { return 0; }
 }
-
 function saveBest(score: number): void {
-  try {
-    localStorage.setItem(LS_KEY, String(score));
-  } catch {
-    /* ignore */
-  }
+  try { localStorage.setItem(LS_KEY, String(score)); } catch { /* */ }
 }
 
-/** 뱀 몸통 opacity class — 머리 가까울수록 진하게 */
-function bodyOpacityClass(index: number, total: number): string {
-  if (total <= 1) return styles.bodyOpacity100;
-  const ratio = index / (total - 1);
-  if (ratio < 0.15) return styles.bodyOpacity100;
-  if (ratio < 0.3) return styles.bodyOpacity90;
-  if (ratio < 0.45) return styles.bodyOpacity80;
-  if (ratio < 0.6) return styles.bodyOpacity70;
-  if (ratio < 0.75) return styles.bodyOpacity60;
-  if (ratio < 0.9) return styles.bodyOpacity50;
-  return styles.bodyOpacity40;
+/* ──────────────────────────────────────────────
+   Canvas 색상 (다크/라이트 대응)
+   ────────────────────────────────────────────── */
+function getColors() {
+  const root = document.documentElement;
+  const isLight = root.classList.contains('light');
+  return {
+    bg: isLight ? '#FFFFFF' : '#1E293B',
+    gridLine: isLight ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.04)',
+    snakeHead: '#22C55E',
+    snakeBody: (alpha: number) => `rgba(34, 197, 94, ${alpha})`,
+    apple: '#EF4444',
+    appleGlow: isLight ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.3)',
+  };
 }
 
 /* ──────────────────────────────────────────────
@@ -90,250 +70,265 @@ function bodyOpacityClass(index: number, total: number): string {
 type GameState = 'idle' | 'playing' | 'over';
 
 export default function SnakeGame({ onBack }: SnakeGameProps) {
-  /* ── State ── */
   const [gameState, setGameState] = useState<GameState>('idle');
-  const [snake, setSnake] = useState<Pos[]>([{ x: 10, y: 10 }]);
-  const [apple, setApple] = useState<Pos>({ x: 15, y: 10 });
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
 
-  /* ── Refs (mutable game state for interval) ── */
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  // Game state refs (mutable, no re-render)
+  const snakeRef = useRef<Pos[]>([{ x: 7, y: 7 }]);
+  const appleRef = useRef<Pos>({ x: 11, y: 7 });
   const dirRef = useRef<Direction>('RIGHT');
-  const nextDirRef = useRef<Direction>('RIGHT');
-  const snakeRef = useRef<Pos[]>(snake);
-  const appleRef = useRef<Pos>(apple);
+  const dirQueueRef = useRef<Direction[]>([]);
   const scoreRef = useRef(0);
+  const speedRef = useRef(INITIAL_SPEED);
   const gameStateRef = useRef<GameState>('idle');
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastTickRef = useRef(0);
+  const rafRef = useRef<number>(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const gameAreaRef = useRef<HTMLDivElement>(null);
 
-  // Keep refs in sync
-  snakeRef.current = snake;
-  appleRef.current = apple;
-  scoreRef.current = score;
-  gameStateRef.current = gameState;
+  useEffect(() => { setBest(loadBest()); }, []);
 
-  // Load best score once
-  useEffect(() => {
-    setBest(loadBest());
+  /* ── Canvas draw ── */
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const size = canvas.width;
+    const cellSize = size / GRID;
+    const colors = getColors();
+    const snake = snakeRef.current;
+    const apple = appleRef.current;
+
+    // Background
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, size, size);
+
+    // Grid lines
+    ctx.strokeStyle = colors.gridLine;
+    ctx.lineWidth = 1;
+    for (let i = 1; i < GRID; i++) {
+      const p = i * cellSize;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
+    }
+
+    // Apple glow
+    ctx.fillStyle = colors.appleGlow;
+    ctx.beginPath();
+    ctx.arc(
+      (apple.x + 0.5) * cellSize,
+      (apple.y + 0.5) * cellSize,
+      cellSize * 0.8, 0, Math.PI * 2,
+    );
+    ctx.fill();
+
+    // Apple
+    ctx.fillStyle = colors.apple;
+    ctx.beginPath();
+    ctx.arc(
+      (apple.x + 0.5) * cellSize,
+      (apple.y + 0.5) * cellSize,
+      cellSize * 0.4, 0, Math.PI * 2,
+    );
+    ctx.fill();
+
+    // Snake body (tail → head, 투명도 그라데이션)
+    for (let i = snake.length - 1; i >= 1; i--) {
+      const alpha = 0.3 + 0.7 * (1 - i / snake.length);
+      ctx.fillStyle = colors.snakeBody(alpha);
+      const gap = 1;
+      ctx.beginPath();
+      ctx.roundRect(
+        snake[i].x * cellSize + gap,
+        snake[i].y * cellSize + gap,
+        cellSize - gap * 2,
+        cellSize - gap * 2,
+        3,
+      );
+      ctx.fill();
+    }
+
+    // Snake head
+    ctx.fillStyle = colors.snakeHead;
+    ctx.shadowColor = colors.snakeHead;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.roundRect(
+      snake[0].x * cellSize + 1,
+      snake[0].y * cellSize + 1,
+      cellSize - 2,
+      cellSize - 2,
+      4,
+    );
+    ctx.fill();
+    ctx.shadowBlur = 0;
   }, []);
 
-  /* ── Game Tick ── */
-  const tick = useCallback(() => {
-    const currentSnake = snakeRef.current;
-    const currentApple = appleRef.current;
+  /* ── Game loop (requestAnimationFrame) ── */
+  const gameLoop = useCallback((timestamp: number) => {
+    if (gameStateRef.current !== 'playing') return;
 
-    // Apply queued direction
-    dirRef.current = nextDirRef.current;
+    const elapsed = timestamp - lastTickRef.current;
+    if (elapsed >= speedRef.current) {
+      lastTickRef.current = timestamp;
 
-    const head = currentSnake[0];
-    const delta = DIR_DELTA[dirRef.current];
-    const newHead: Pos = {
-      x: head.x + delta.x,
-      y: head.y + delta.y,
-    };
-
-    // Wall collision
-    if (newHead.x < 0 || newHead.x >= GRID || newHead.y < 0 || newHead.y >= GRID) {
-      endGame();
-      return;
-    }
-
-    // Self collision (skip tail since it will move)
-    const ateApple = newHead.x === currentApple.x && newHead.y === currentApple.y;
-    const bodyToCheck = ateApple ? currentSnake : currentSnake.slice(0, -1);
-    if (bodyToCheck.some((p) => p.x === newHead.x && p.y === newHead.y)) {
-      endGame();
-      return;
-    }
-
-    // Move
-    const newSnake = [newHead, ...currentSnake];
-    if (ateApple) {
-      const newScore = scoreRef.current + 10;
-      const newApple = randomApple(newSnake);
-      setScore(newScore);
-      setApple(newApple);
-      appleRef.current = newApple;
-      scoreRef.current = newScore;
-
-      // Speed up every 10 points
-      const newSpeed = Math.max(MIN_SPEED, INITIAL_SPEED - Math.floor(newScore / 10) * SPEED_STEP);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      // Process direction queue
+      if (dirQueueRef.current.length > 0) {
+        const next = dirQueueRef.current.shift()!;
+        if (OPPOSITE[next] !== dirRef.current) {
+          dirRef.current = next;
+        }
       }
-      intervalRef.current = setInterval(tick, newSpeed);
-    } else {
-      newSnake.pop();
+
+      const snake = snakeRef.current;
+      const apple = appleRef.current;
+      const delta = DIR_DELTA[dirRef.current];
+      const newHead: Pos = { x: snake[0].x + delta.x, y: snake[0].y + delta.y };
+
+      // Wall collision
+      if (newHead.x < 0 || newHead.x >= GRID || newHead.y < 0 || newHead.y >= GRID) {
+        endGame(); return;
+      }
+
+      // Self collision
+      const ateApple = newHead.x === apple.x && newHead.y === apple.y;
+      const body = ateApple ? snake : snake.slice(0, -1);
+      if (body.some((p) => p.x === newHead.x && p.y === newHead.y)) {
+        endGame(); return;
+      }
+
+      // Move
+      const newSnake = [newHead, ...snake];
+      if (ateApple) {
+        const newScore = scoreRef.current + 10;
+        scoreRef.current = newScore;
+        setScore(newScore);
+        appleRef.current = randomApple(newSnake);
+        speedRef.current = Math.max(MIN_SPEED, INITIAL_SPEED - Math.floor(newScore / 10) * SPEED_DECREASE);
+      } else {
+        newSnake.pop();
+      }
+      snakeRef.current = newSnake;
     }
-    setSnake(newSnake);
-    snakeRef.current = newSnake;
-  }, []);
+
+    draw();
+    rafRef.current = requestAnimationFrame(gameLoop);
+  }, [draw]);
 
   const endGame = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    setGameState('over');
     gameStateRef.current = 'over';
+    setGameState('over');
+    cancelAnimationFrame(rafRef.current);
 
-    const currentScore = scoreRef.current;
-    const currentBest = loadBest();
-    if (currentScore > currentBest) {
-      saveBest(currentScore);
-      setBest(currentScore);
-      setIsNewRecord(true);
-    } else {
-      setIsNewRecord(false);
-    }
+    const s = scoreRef.current;
+    const b = loadBest();
+    if (s > b) { saveBest(s); setBest(s); setIsNewRecord(true); }
+    else { setIsNewRecord(false); }
   }, []);
 
   const startGame = useCallback(() => {
-    const initialSnake = [{ x: 10, y: 10 }];
-    const initialApple = randomApple(initialSnake);
+    const init = [{ x: 7, y: 7 }];
+    snakeRef.current = init;
+    appleRef.current = randomApple(init);
+    dirRef.current = 'RIGHT';
+    dirQueueRef.current = [];
+    scoreRef.current = 0;
+    speedRef.current = INITIAL_SPEED;
+    lastTickRef.current = 0;
+    gameStateRef.current = 'playing';
 
-    setSnake(initialSnake);
-    setApple(initialApple);
     setScore(0);
     setIsNewRecord(false);
     setGameState('playing');
 
-    snakeRef.current = initialSnake;
-    appleRef.current = initialApple;
-    scoreRef.current = 0;
-    dirRef.current = 'RIGHT';
-    nextDirRef.current = 'RIGHT';
-    gameStateRef.current = 'playing';
+    rafRef.current = requestAnimationFrame(gameLoop);
+  }, [gameLoop]);
 
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    intervalRef.current = setInterval(tick, INITIAL_SPEED);
-  }, [tick]);
+  // Cleanup
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
-  // Cleanup interval on unmount
+  // Draw idle/over state
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+    if (gameState !== 'playing') draw();
+  }, [gameState, draw]);
 
-  /* ── Direction change with opposite guard ── */
+  /* ── Direction change (queue-based) ── */
   const changeDirection = useCallback((newDir: Direction) => {
-    if (OPPOSITE[newDir] === dirRef.current) return;
-    nextDirRef.current = newDir;
+    // 큐에 최대 2개만 쌓기 (빠른 L자 회전 지원)
+    const queue = dirQueueRef.current;
+    const lastDir = queue.length > 0 ? queue[queue.length - 1] : dirRef.current;
+    if (OPPOSITE[newDir] === lastDir) return;
+    if (queue.length < 2) {
+      queue.push(newDir);
+    }
   }, []);
 
-  /* ── Touch handlers ── */
+  /* ── Touch swipe ── */
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (gameStateRef.current !== 'playing') return;
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (gameStateRef.current !== 'playing' || !touchStartRef.current) return;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartRef.current.x;
-    const dy = touch.clientY - touchStartRef.current.y;
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
     touchStartRef.current = null;
-
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (absDx < SWIPE_THRESHOLD && absDy < SWIPE_THRESHOLD) return;
-
-    if (absDx > absDy) {
-      changeDirection(dx > 0 ? 'RIGHT' : 'LEFT');
-    } else {
-      changeDirection(dy > 0 ? 'DOWN' : 'UP');
-    }
+    if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
+    changeDirection(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'RIGHT' : 'LEFT') : (dy > 0 ? 'DOWN' : 'UP'));
   }, [changeDirection]);
 
-  /* ── Keyboard support ── */
+  /* ── Keyboard ── */
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const h = (e: KeyboardEvent) => {
       if (gameStateRef.current !== 'playing') {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          if (gameStateRef.current === 'idle' || gameStateRef.current === 'over') {
-            startGame();
-          }
+          e.preventDefault(); startGame();
         }
         return;
       }
-
-      switch (e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-          e.preventDefault();
-          changeDirection('UP');
-          break;
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-          e.preventDefault();
-          changeDirection('DOWN');
-          break;
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          e.preventDefault();
-          changeDirection('LEFT');
-          break;
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          e.preventDefault();
-          changeDirection('RIGHT');
-          break;
-      }
+      const map: Record<string, Direction> = {
+        ArrowUp: 'UP', w: 'UP', W: 'UP',
+        ArrowDown: 'DOWN', s: 'DOWN', S: 'DOWN',
+        ArrowLeft: 'LEFT', a: 'LEFT', A: 'LEFT',
+        ArrowRight: 'RIGHT', d: 'RIGHT', D: 'RIGHT',
+      };
+      const dir = map[e.key];
+      if (dir) { e.preventDefault(); changeDirection(dir); }
     };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
   }, [changeDirection, startGame]);
 
-  /* ── Build cell map for O(1) lookup ── */
-  const snakeSet = new Map<string, number>();
-  snake.forEach((p, i) => {
-    snakeSet.set(`${p.x},${p.y}`, i);
-  });
-  const appleKey = `${apple.x},${apple.y}`;
+  /* ── Canvas sizing ── */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const resize = () => {
+      const maxSize = Math.min(window.innerWidth - 32, 380);
+      const px = maxSize * (window.devicePixelRatio || 1);
+      canvas.width = px;
+      canvas.height = px;
+      canvas.style.width = `${maxSize}px`;
+      canvas.style.height = `${maxSize}px`;
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+      draw();
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [draw]);
 
   /* ── Render ── */
-  const cells: ReactNode[] = [];
-  for (let y = 0; y < GRID; y++) {
-    for (let x = 0; x < GRID; x++) {
-      const key = `${x},${y}`;
-      const snakeIdx = snakeSet.get(key);
-      const isApple = key === appleKey;
-
-      let className = styles.cell;
-      if (snakeIdx === 0) {
-        className = `${styles.cell} ${styles.cellSnakeHead}`;
-      } else if (snakeIdx !== undefined) {
-        className = `${styles.cell} ${styles.cellSnakeBody} ${bodyOpacityClass(snakeIdx, snake.length)}`;
-      } else if (isApple) {
-        className = `${styles.cell} ${styles.cellApple}`;
-      }
-
-      cells.push(
-        <div key={key} className={className}>
-          {isApple ? '🍎' : null}
-        </div>
-      );
-    }
-  }
-
   return (
-    <div className={styles.wrap}>
+    <div className={styles.wrap} ref={wrapRef}>
       {/* Header */}
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
@@ -349,68 +344,46 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
       </header>
 
       {/* Game Area */}
-      <div
-        ref={gameAreaRef}
-        className={styles.gameArea}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div className={styles.grid}>
-          {cells}
+      <div className={styles.gameArea} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className={styles.canvasWrap}>
+          <canvas ref={canvasRef} className={styles.canvas} />
 
-          {/* Start Screen Overlay */}
+          {/* Start Overlay */}
           {gameState === 'idle' && (
-            <div className={styles.startOverlay}>
-              <span className={styles.startEmoji}>🐍</span>
-              <h2 className={styles.startTitle}>스네이크</h2>
-              <p className={styles.startHint}>
-                스와이프로 방향 전환<br />
-                사과를 먹어 점수를 올리세요
-              </p>
-              {best > 0 && (
-                <p className={styles.startBest}>
-                  최고 기록: <span className={styles.startBestValue}>{best}점</span>
-                </p>
-              )}
-              <button type="button" className={styles.tapHint} onClick={startGame}>
-                탭하여 시작
-              </button>
+            <div className={styles.overlay}>
+              <span className={styles.overlayEmoji}>🐍</span>
+              <h2 className={styles.overlayTitle}>스네이크</h2>
+              <p className={styles.overlayHint}>방향 버튼으로 조종<br />사과를 먹어 점수를 올리세요</p>
+              {best > 0 && <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>}
+              <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
             </div>
           )}
 
           {/* Game Over Overlay */}
           {gameState === 'over' && (
-            <div className={styles.gameOverOverlay}>
-              <h2 className={styles.gameOverTitle}>게임 오버</h2>
-              <p className={styles.gameOverScore}>
-                점수: <span className={styles.gameOverScoreNum}>{score}</span>
-              </p>
-              {isNewRecord && (
-                <p className={styles.newRecord}>🏆 새로운 기록!</p>
-              )}
-              <p className={styles.gameOverBest}>
-                최고 기록: <span className={styles.gameOverBestValue}>{best}점</span>
-              </p>
-              <button type="button" className={styles.retryBtn} onClick={startGame}>
-                다시 하기
-              </button>
+            <div className={styles.overlay}>
+              <h2 className={styles.overlayTitle}>게임 오버</h2>
+              <p className={styles.overlayScore}>{score}<span className={styles.overlayScoreUnit}>점</span></p>
+              {isNewRecord && <p className={styles.newRecord}>🏆 새로운 기록!</p>}
+              <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>
+              <button type="button" className={styles.startBtn} onClick={startGame}>다시 하기</button>
             </div>
           )}
         </div>
 
-        {/* D-Pad — 모바일 방향 버튼 */}
+        {/* D-Pad */}
         {gameState === 'playing' && (
           <div className={styles.dpad}>
             <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('UP')} aria-label="위">▲</button>
+              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('UP')} aria-label="위">▲</button>
             </div>
             <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('LEFT')} aria-label="왼쪽">◀</button>
+              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('LEFT')} aria-label="왼쪽">◀</button>
               <div className={styles.dpadCenter} />
-              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('RIGHT')} aria-label="오른쪽">▶</button>
+              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('RIGHT')} aria-label="오른쪽">▶</button>
             </div>
             <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('DOWN')} aria-label="아래">▼</button>
+              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('DOWN')} aria-label="아래">▼</button>
             </div>
           </div>
         )}

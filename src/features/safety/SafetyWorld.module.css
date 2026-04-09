@@ -243,6 +243,11 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--dia-space-3) var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-4) var(--dia-space-2);
+  box-shadow: var(--dia-card-inset), var(--dia-card-depth);
 }
 
 .menuItem {
@@ -281,7 +286,6 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  overflow: hidden;
   transform: translateY(0);
   transition:
     transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94),

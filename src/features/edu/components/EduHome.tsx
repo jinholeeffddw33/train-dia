@@ -37,12 +37,13 @@ const MENU_ITEMS = [
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
 ];
 
+// 3D 배경 위 흰색 아이콘 — 개별 색상 클래스 불필요
 const ICON_COLOR_MAP = {
-  blue:   styles.quickIconBlue,
-  purple: styles.quickIconViolet,
-  green:  styles.quickIconGreen,
-  amber:  styles.quickIconWarn,
-  red:    styles.quickIconRed,
+  blue:   '',
+  purple: '',
+  green:  '',
+  amber:  '',
+  red:    '',
 } as const;
 
 const ICON_BG_MAP = {

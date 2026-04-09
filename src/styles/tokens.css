@@ -95,6 +95,32 @@
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.03) 100%);
   --dia-border-glow: rgba(255, 255, 255, 0.06);
 
+  /* ========================================
+     3D Icon Tokens (ZINOSB-grade squircle)
+     ======================================== */
+  /* bloom: 아이콘 좌상단 빛 반사 강도 */
+  --dia-3d-bloom: 0.2;
+  /* 공통 inset/depth/pressed — 다크 */
+  --dia-3d-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --dia-3d-depth: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.2);
+  --dia-3d-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  /* 각 색상 그라데이션 start/end + glow */
+  --dia-3d-blue-start: #3B82F6;
+  --dia-3d-blue-end: #1D4ED8;
+  --dia-3d-blue-glow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  --dia-3d-purple-start: #8B5CF6;
+  --dia-3d-purple-end: #6D28D9;
+  --dia-3d-purple-glow: 0 4px 14px rgba(139, 92, 246, 0.35);
+  --dia-3d-green-start: #22C55E;
+  --dia-3d-green-end: #15803D;
+  --dia-3d-green-glow: 0 4px 14px rgba(34, 197, 94, 0.3);
+  --dia-3d-amber-start: #F59E0B;
+  --dia-3d-amber-end: #B45309;
+  --dia-3d-amber-glow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  --dia-3d-red-start: #EF4444;
+  --dia-3d-red-end: #B91C1C;
+  --dia-3d-red-glow: 0 4px 14px rgba(239, 68, 68, 0.3);
+
   /* Hero Gradient */
   --dia-hero-gradient: linear-gradient(160deg, #0A2260 0%, #1247C2 40%, #2563EB 80%, #3B82F6 100%);
 
@@ -244,6 +270,27 @@
   --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.02) 100%);
   --dia-border-glow: rgba(0, 0, 0, 0.06);
+
+  /* 3D Icon Tokens — Light mode (채도 유지, 글로우 약화) */
+  --dia-3d-bloom: 0.28;
+  --dia-3d-inset: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --dia-3d-depth: 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.06);
+  --dia-3d-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.18);
+  --dia-3d-blue-start: #3B82F6;
+  --dia-3d-blue-end: #2563EB;
+  --dia-3d-blue-glow: none;
+  --dia-3d-purple-start: #8B5CF6;
+  --dia-3d-purple-end: #7C3AED;
+  --dia-3d-purple-glow: none;
+  --dia-3d-green-start: #22C55E;
+  --dia-3d-green-end: #16A34A;
+  --dia-3d-green-glow: none;
+  --dia-3d-amber-start: #F59E0B;
+  --dia-3d-amber-end: #D97706;
+  --dia-3d-amber-glow: none;
+  --dia-3d-red-start: #EF4444;
+  --dia-3d-red-end: #DC2626;
+  --dia-3d-red-glow: none;
 
   /* Hero Gradient */
   --dia-hero-gradient: linear-gradient(160deg, #1E40AF 0%, #2563EB 40%, #3B82F6 80%, #60A5FA 100%);

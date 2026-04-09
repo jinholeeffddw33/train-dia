@@ -1,0 +1,139 @@
+/* ===== Game Ranking ===== */
+
+.wrap {
+  margin-top: var(--dia-space-4);
+  width: 100%;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: var(--dia-space-1);
+  margin-bottom: var(--dia-space-3);
+}
+
+.tab {
+  flex: 1;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  cursor: pointer;
+  min-height: 40px;
+  transition: all var(--dia-transition-fast);
+}
+
+.tab:active {
+  transform: scale(0.98);
+}
+
+.tabActive {
+  color: #fff;
+  background: var(--dia-blue);
+  border-color: var(--dia-blue);
+}
+
+/* ── List ── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  min-height: 44px;
+}
+
+.rowTop3 {
+  border-color: var(--dia-amber-dim);
+}
+
+.rowMe {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+}
+
+.rank {
+  width: 28px;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+}
+
+.meTag {
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  background: rgba(59, 130, 246, 0.15);
+  padding: 1px 6px;
+  border-radius: var(--dia-radius-full);
+}
+
+.score {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-green);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ── My Rank ── */
+.myRank {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-top: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface-elevated);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+}
+
+.myRankLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.myRankValue {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  flex: 1;
+}
+
+.myRankScore {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-green);
+}
+
+/* ── States ── */
+.loading, .empty {
+  text-align: center;
+  padding: var(--dia-space-4);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}

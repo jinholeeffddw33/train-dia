@@ -104,11 +104,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: var(--dia-space-2);
   background: rgba(15, 23, 42, 0.88);
   padding: var(--dia-space-4);
   text-align: center;
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding-top: var(--dia-space-6);
 }
 
 :root.light .overlay {
@@ -128,9 +130,18 @@
 
 .overlayHint {
   font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
   margin: 0;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.08);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-md);
+}
+
+:root.light .overlayHint {
+  color: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .overlayScore {

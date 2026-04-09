@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import GameRanking from './GameRanking';
 import styles from './ReactionTest.module.css';
 
 /* ── 타입 ── */
@@ -295,6 +296,16 @@ function FinalResult({
   const grade = getGrade(avg);
   const isNewRecord = best !== null && avg <= best;
 
+  // 서버에 점수 저장 (반응속도는 낮을수록 좋지만, 랭킹은 점수가 높을수록 상위이므로 역수 변환)
+  // → 간단히 avg 값을 그대로 저장하고 랭킹에서 오름차순으로 표시
+  useEffect(() => {
+    fetch('/api/games/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game: 'reaction', score: avg }),
+    }).catch(() => {});
+  }, [avg]);
+
   return (
     <div className={styles.resultCard} onClick={(e) => e.stopPropagation()}>
       <h2 className={styles.resultTitle}>측정 완료!</h2>
@@ -332,6 +343,8 @@ function FinalResult({
       <button type="button" className={styles.retryBtn} onClick={onRetry}>
         다시 하기
       </button>
+
+      <GameRanking game="reaction" scoreLabel="평균" scoreUnit="ms" />
     </div>
   );
 }

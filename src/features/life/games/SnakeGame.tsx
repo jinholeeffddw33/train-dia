@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import GameRanking from './GameRanking';
 import styles from './SnakeGame.module.css';
 
 /* ──────────────────────────────────────────────
@@ -17,8 +18,10 @@ interface Pos { x: number; y: number }
 
 const GRID = 15;
 const INITIAL_SPEED = 220;
-const MIN_SPEED = 90;
-const SPEED_DECREASE = 10; // 사과 하나당 10ms 빨라짐
+const MIN_SPEED = 160;
+const SPEED_DECREASE = 6; // 사과 하나당 6ms 빨라짐
+const SPEED_CAP_SCORE = 50; // 이 점수 이후 속도 증가 멈춤
+const MAX_SNAKE_LENGTH = 15; // 뱀 최대 길이
 const SWIPE_THRESHOLD = 30;
 const LS_KEY = 'traindia-snake-best';
 
@@ -256,7 +259,9 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         appleCountRef.current += 1;
         setScore(newScore);
         appleRef.current = randomApple(newSnake, obstaclesRef.current);
-        speedRef.current = Math.max(MIN_SPEED, INITIAL_SPEED - Math.floor(newScore / 10) * SPEED_DECREASE);
+        // 50점까지만 속도 증가, 이후 고정
+        const speedScore = Math.min(newScore, SPEED_CAP_SCORE);
+        speedRef.current = Math.max(MIN_SPEED, INITIAL_SPEED - Math.floor(speedScore / 10) * SPEED_DECREASE);
 
         // 사과 3개마다 장애물 추가
         if (appleCountRef.current % OBSTACLE_INTERVAL === 0 && obstaclesRef.current.length < MAX_OBSTACLES) {
@@ -264,6 +269,10 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           obstaclesRef.current = [...obstaclesRef.current, newOb];
         }
       } else {
+        newSnake.pop();
+      }
+      // 뱀 최대 길이 제한 — 넘으면 꼬리 자르기 (점수는 유지)
+      while (newSnake.length > MAX_SNAKE_LENGTH) {
         newSnake.pop();
       }
       snakeRef.current = newSnake;
@@ -282,6 +291,15 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     const b = loadBest();
     if (s > b) { saveBest(s); setBest(s); setIsNewRecord(true); }
     else { setIsNewRecord(false); }
+
+    // 서버에 점수 저장
+    if (s > 0) {
+      fetch('/api/games/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ game: 'snake', score: s }),
+      }).catch(() => {});
+    }
   }, []);
 
   const startGame = useCallback(() => {
@@ -426,6 +444,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
               {isNewRecord && <p className={styles.newRecord}>🏆 새로운 기록!</p>}
               <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>
               <button type="button" className={styles.startBtn} onClick={startGame}>다시 하기</button>
+              <GameRanking game="snake" />
             </div>
           )}
         </div>

@@ -30,15 +30,26 @@ const DIR_DELTA: Record<Direction, Pos> = {
   LEFT: { x: -1, y: 0 }, RIGHT: { x: 1, y: 0 },
 };
 
+const OBSTACLE_INTERVAL = 3; // 사과 3개마다 장애물 1개 추가
+const MAX_OBSTACLES = 10;
+
 /* ── Helpers ── */
-function randomApple(snake: Pos[]): Pos {
-  const occupied = new Set(snake.map((p) => `${p.x},${p.y}`));
+function randomPos(occupied: Set<string>): Pos {
   let pos: Pos;
   do {
-    // 가장자리 1칸 안쪽에서만 생성 — 벽붙이 사과 방지
     pos = { x: 1 + Math.floor(Math.random() * (GRID - 2)), y: 1 + Math.floor(Math.random() * (GRID - 2)) };
   } while (occupied.has(`${pos.x},${pos.y}`));
   return pos;
+}
+
+function randomApple(snake: Pos[], obstacles: Pos[] = []): Pos {
+  const occupied = new Set([...snake, ...obstacles].map((p) => `${p.x},${p.y}`));
+  return randomPos(occupied);
+}
+
+function addObstacle(snake: Pos[], apple: Pos, obstacles: Pos[]): Pos {
+  const occupied = new Set([...snake, ...obstacles, apple].map((p) => `${p.x},${p.y}`));
+  return randomPos(occupied);
 }
 
 /** roundRect 폴백 — 구형 브라우저 호환 */
@@ -77,6 +88,8 @@ function getColors() {
     snakeBody: (alpha: number) => `rgba(34, 197, 94, ${alpha})`,
     apple: '#EF4444',
     appleGlow: isLight ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.3)',
+    obstacle: isLight ? '#94A3B8' : '#475569',
+    obstacleBorder: isLight ? '#64748B' : '#64748B',
   };
 }
 
@@ -102,6 +115,8 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
   const dirRef = useRef<Direction>('RIGHT');
   const dirQueueRef = useRef<Direction[]>([]);
   const scoreRef = useRef(0);
+  const appleCountRef = useRef(0); // 먹은 사과 개수
+  const obstaclesRef = useRef<Pos[]>([]);
   const speedRef = useRef(INITIAL_SPEED);
   const gameStateRef = useRef<GameState>('idle');
   const lastTickRef = useRef(0);
@@ -134,6 +149,16 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
       const p = i * cellSize;
       ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, size); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(size, p); ctx.stroke();
+    }
+
+    // Obstacles
+    const obstacles = obstaclesRef.current;
+    for (const ob of obstacles) {
+      ctx.fillStyle = colors.obstacle;
+      ctx.strokeStyle = colors.obstacleBorder;
+      ctx.lineWidth = 1;
+      roundedRect(ctx, ob.x * cellSize + 1, ob.y * cellSize + 1, cellSize - 2, cellSize - 2, 3);
+      ctx.strokeRect(ob.x * cellSize + 1, ob.y * cellSize + 1, cellSize - 2, cellSize - 2);
     }
 
     // Apple glow
@@ -211,6 +236,11 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         endGame(); return;
       }
 
+      // Obstacle collision
+      if (obstaclesRef.current.some((p) => p.x === newHead.x && p.y === newHead.y)) {
+        endGame(); return;
+      }
+
       // Self collision
       const ateApple = newHead.x === apple.x && newHead.y === apple.y;
       const body = ateApple ? snake : snake.slice(0, -1);
@@ -223,9 +253,16 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
       if (ateApple) {
         const newScore = scoreRef.current + 10;
         scoreRef.current = newScore;
+        appleCountRef.current += 1;
         setScore(newScore);
-        appleRef.current = randomApple(newSnake);
+        appleRef.current = randomApple(newSnake, obstaclesRef.current);
         speedRef.current = Math.max(MIN_SPEED, INITIAL_SPEED - Math.floor(newScore / 10) * SPEED_DECREASE);
+
+        // 사과 3개마다 장애물 추가
+        if (appleCountRef.current % OBSTACLE_INTERVAL === 0 && obstaclesRef.current.length < MAX_OBSTACLES) {
+          const newOb = addObstacle(newSnake, appleRef.current, obstaclesRef.current);
+          obstaclesRef.current = [...obstaclesRef.current, newOb];
+        }
       } else {
         newSnake.pop();
       }
@@ -250,6 +287,8 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
   const startGame = useCallback(() => {
     const init = [{ x: 7, y: 7 }];
     snakeRef.current = init;
+    obstaclesRef.current = [];
+    appleCountRef.current = 0;
     appleRef.current = randomApple(init);
     dirRef.current = 'RIGHT';
     dirQueueRef.current = [];
@@ -369,7 +408,11 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
             <div className={styles.overlay}>
               <span className={styles.overlayEmoji}>🐍</span>
               <h2 className={styles.overlayTitle}>스네이크</h2>
-              <p className={styles.overlayHint}>방향 버튼으로 조종<br />사과를 먹어 점수를 올리세요</p>
+              <p className={styles.overlayHint}>
+                🍎 사과를 먹으면 점수 +10<br />
+                💀 벽 · 자기 몸 · 장애물 = 게임오버<br />
+                🧱 사과 3개마다 장애물 등장!
+              </p>
               {best > 0 && <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>}
               <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
             </div>

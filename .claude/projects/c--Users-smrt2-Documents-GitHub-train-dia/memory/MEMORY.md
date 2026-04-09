@@ -2,3 +2,4 @@
 - [확인 창 띄우지 않기](feedback_no_prompts.md) — 모든 권한 확인/질문 창 절대 띄우지 말 것
 - [자동 커밋·푸시·배포](feedback_auto_deploy.md) — 작업 완료 시 커밋/push/배포 자동 수행, 확인 질문 금지
 - [관리자 명단](project_admin_list.md) — 앱 내 관리자 21명 목록, 글쓰기/삭제/해제 권한
+- [Supabase 직접 관리](feedback_supabase_direct.md) — 테이블 생성/수정도 직접 수행, 사용자에게 묻지 말 것

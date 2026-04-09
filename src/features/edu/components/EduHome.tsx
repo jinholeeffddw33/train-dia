@@ -111,7 +111,8 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   const [eduOpen, setEduOpen] = useState(false);
 
   const EDU_SUB = [
-    { id: 'safety_edu', label: '철도안전\n교육', color: 'blue' as const, targets: ['safety_edu1'], coming: false },
+    { id: 'safety_edu', label: '슬라이드\n학습', color: 'blue' as const, targets: ['safety_edu1'], coming: false },
+    { id: 'video_edu', label: '동영상\n교육', color: 'green' as const, targets: [], coming: true },
   ];
 
   const REPAIR_SUB = [

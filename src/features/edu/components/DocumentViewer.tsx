@@ -372,7 +372,9 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
             )}
             {hasCaution && (
               <div className={styles.summaryCaution}>
-                <AlertTriangle size={14} />
+                <span className={styles.metaIconBadgeAmber}>
+                  <AlertTriangle size={16} />
+                </span>
                 <span>{currentSectionData.caution}</span>
               </div>
             )}
@@ -404,7 +406,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
               className={styles.navBtn}
               onClick={() => openSection(allSections[currentIdx - 1].sectionId)}
             >
-              이전
+              ← 이전
             </button>
           )}
           {currentIdx < allSections.length - 1 && (
@@ -413,7 +415,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
               className={`${styles.navBtn} ${styles.navBtnPrimary}`}
               onClick={() => openSection(allSections[currentIdx + 1].sectionId)}
             >
-              다음
+              다음 →
             </button>
           )}
         </div>

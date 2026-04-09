@@ -399,72 +399,86 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     return () => window.removeEventListener('resize', resize);
   }, [draw]);
 
-  /* ── Render ── */
+  /* ── Render: 시작 화면 (풀스크린) ── */
+  if (gameState === 'idle') {
+    return (
+      <div className={styles.wrap} ref={wrapRef}>
+        <header className={styles.header}>
+          <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+            <ArrowLeft size={20} strokeWidth={2} />
+          </button>
+          <h1 className={styles.headerTitle}>스네이크</h1>
+        </header>
+        <div className={styles.fullPage}>
+          <span className={styles.bigEmoji}>🐍</span>
+          <h2 className={styles.pageTitle}>스네이크</h2>
+          <div className={styles.rules}>
+            <p>🍎 사과를 먹으면 점수 +10</p>
+            <p>💀 벽 · 자기 몸 · 장애물에 부딪히면 게임오버</p>
+            <p>🧱 사과 3개마다 장애물이 하나씩 등장!</p>
+            <p>🎮 방향 버튼이나 스와이프로 조종</p>
+          </div>
+          {best > 0 && <p className={styles.bestText}>최고 기록: <strong>{best}점</strong></p>}
+          <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Render: 게임 오버 (풀스크린) ── */
+  if (gameState === 'over') {
+    return (
+      <div className={styles.wrap} ref={wrapRef}>
+        <header className={styles.header}>
+          <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
+            <ArrowLeft size={20} strokeWidth={2} />
+          </button>
+          <h1 className={styles.headerTitle}>스네이크</h1>
+        </header>
+        <div className={styles.fullPage}>
+          <h2 className={styles.pageTitle}>게임 오버</h2>
+          <p className={styles.bigScore}>{score}<span className={styles.bigScoreUnit}>점</span></p>
+          {isNewRecord && <p className={styles.newRecord}>🏆 새로운 기록!</p>}
+          <p className={styles.bestText}>최고 기록: <strong>{best}점</strong></p>
+          <button type="button" className={styles.startBtn} onClick={startGame}>다시 하기</button>
+          <GameRanking game="snake" />
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Render: 플레이 중 ── */
   return (
     <div className={styles.wrap} ref={wrapRef}>
-      {/* Header */}
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.headerTitle}>스네이크</h1>
-        {gameState === 'playing' && (
-          <div className={styles.scoreDisplay}>
-            <span className={styles.scoreLabel}>점수</span>
-            <span className={styles.scoreValue}>{score}</span>
-          </div>
-        )}
+        <div className={styles.scoreDisplay}>
+          <span className={styles.scoreLabel}>점수</span>
+          <span className={styles.scoreValue}>{score}</span>
+        </div>
       </header>
 
-      {/* Game Area */}
       <div className={styles.gameArea} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <div className={styles.canvasWrap}>
           <canvas ref={canvasRef} className={styles.canvas} />
-
-          {/* Start Overlay */}
-          {gameState === 'idle' && (
-            <div className={styles.overlay}>
-              <span className={styles.overlayEmoji}>🐍</span>
-              <h2 className={styles.overlayTitle}>스네이크</h2>
-              <p className={styles.overlayHint}>
-                🍎 사과를 먹으면 점수 +10<br />
-                💀 벽 · 자기 몸 · 장애물 = 게임오버<br />
-                🧱 사과 3개마다 장애물 등장!
-              </p>
-              {best > 0 && <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>}
-              <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
-            </div>
-          )}
-
-          {/* Game Over Overlay */}
-          {gameState === 'over' && (
-            <div className={styles.overlay}>
-              <h2 className={styles.overlayTitle}>게임 오버</h2>
-              <p className={styles.overlayScore}>{score}<span className={styles.overlayScoreUnit}>점</span></p>
-              {isNewRecord && <p className={styles.newRecord}>🏆 새로운 기록!</p>}
-              <p className={styles.overlayBest}>최고 기록: <strong>{best}점</strong></p>
-              <button type="button" className={styles.startBtn} onClick={startGame}>다시 하기</button>
-              <GameRanking game="snake" />
-            </div>
-          )}
         </div>
 
-        {/* D-Pad */}
-        {gameState === 'playing' && (
-          <div className={styles.dpad}>
-            <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('UP')} aria-label="위">▲</button>
-            </div>
-            <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('LEFT')} aria-label="왼쪽">◀</button>
-              <div className={styles.dpadCenter} />
-              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('RIGHT')} aria-label="오른쪽">▶</button>
-            </div>
-            <div className={styles.dpadRow}>
-              <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('DOWN')} aria-label="아래">▼</button>
-            </div>
+        <div className={styles.dpad}>
+          <div className={styles.dpadRow}>
+            <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('UP')} aria-label="위">▲</button>
           </div>
-        )}
+          <div className={styles.dpadRow}>
+            <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('LEFT')} aria-label="왼쪽">◀</button>
+            <div className={styles.dpadCenter} />
+            <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('RIGHT')} aria-label="오른쪽">▶</button>
+          </div>
+          <div className={styles.dpadRow}>
+            <button type="button" className={styles.dpadBtn} onPointerDown={() => changeDirection('DOWN')} aria-label="아래">▼</button>
+          </div>
+        </div>
       </div>
     </div>
   );

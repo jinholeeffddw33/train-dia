@@ -398,11 +398,22 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           )}
         </div>
 
-        <p className={styles.controlsHint}>
-          {gameState === 'playing'
-            ? '스와이프로 방향 전환 · 키보드: ←↑↓→'
-            : 'PC: 방향키 / 모바일: 스와이프'}
-        </p>
+        {/* D-Pad — 모바일 방향 버튼 */}
+        {gameState === 'playing' && (
+          <div className={styles.dpad}>
+            <div className={styles.dpadRow}>
+              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('UP')} aria-label="위">▲</button>
+            </div>
+            <div className={styles.dpadRow}>
+              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('LEFT')} aria-label="왼쪽">◀</button>
+              <div className={styles.dpadCenter} />
+              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('RIGHT')} aria-label="오른쪽">▶</button>
+            </div>
+            <div className={styles.dpadRow}>
+              <button type="button" className={styles.dpadBtn} onClick={() => changeDirection('DOWN')} aria-label="아래">▼</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

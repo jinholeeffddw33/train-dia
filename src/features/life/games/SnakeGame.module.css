@@ -296,12 +296,47 @@
   transform: scale(0.98);
 }
 
-/* ── Controls Hint ── */
-.controlsHint {
-  margin-top: var(--dia-space-3);
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
-  text-align: center;
+/* ── D-Pad (모바일 방향 버튼) ── */
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-1);
+  margin-top: var(--dia-space-4);
+}
+
+.dpadRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+}
+
+.dpadBtn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border-strong);
+  background: var(--dia-surface-elevated);
+  color: var(--dia-text-primary);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  box-shadow: var(--dia-card-depth);
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+
+.dpadBtn:active {
+  transform: scale(0.92);
+  background: var(--dia-surface-active);
+}
+
+.dpadCenter {
+  width: 56px;
+  height: 56px;
 }
 
 /* ── Light Mode ── */

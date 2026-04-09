@@ -6,5 +6,13 @@
     "duration": "",
     "date": "2026-04-09",
     "category": "신입교육"
+  },
+  {
+    "id": "video_002",
+    "title": "입환전호",
+    "youtubeId": "C6piuhrnxpA",
+    "duration": "",
+    "date": "2026-04-09",
+    "category": "실무교육"
   }
 ]

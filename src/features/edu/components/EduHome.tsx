@@ -112,7 +112,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   const [eduOpen, setEduOpen] = useState(false);
 
   const EDU_SUB = [
-    { id: 'slide',  label: '슬라이드\n학습', color: 'blue'  as const, targets: ['safety_edu1'], coming: false },
+    { id: 'slide',  label: '슬라이드\n교육', color: 'blue'  as const, targets: ['safety_edu1'], coming: false },
     { id: 'video',  label: '동영상\n교육',   color: 'green' as const, targets: [],              coming: false },
   ];
 
@@ -121,7 +121,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
     { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: [],             coming: true },
     { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
-    { id: 'rescue',  label: '입환전호\n요령',  color: 'amber'  as const, targets: [],            coming: false, link: 'https://youtu.be/C6piuhrnxpA?si=zIY7NMsgcfvfyvgR' },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
@@ -327,7 +326,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                   woojin: Wrench,
                   rotem: Wrench,
                   compare: GitCompareArrows,
-                  rescue: Play,
                 };
                 const SubIcon = iconMap[sub.id] ?? Wrench;
                 return (
@@ -338,12 +336,8 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                     disabled={sub.coming}
                     onClick={() => {
                       if (sub.coming) return;
-                      if ('link' in sub && sub.link) {
-                        window.open(sub.link, '_blank', 'noopener,noreferrer');
-                      } else {
-                        setRepairOpen(false);
-                        onChapters([...sub.targets]);
-                      }
+                      setRepairOpen(false);
+                      onChapters([...sub.targets]);
                     }}
                   >
                     <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[sub.color]}`}>

@@ -54,12 +54,22 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // ── 로그인 성공 시 driver store 연동 ──
   useEffect(() => {
     if (user?.sabun) {
-      const { myDriver, setMyDriverById, setMyDriverBySabun } = useDriverStore.getState();
-      if (!myDriver || myDriver.I !== user.personId) {
+      const { myDriver, setMyDriverById, setMyDriverBySabun, setMyDriver } = useDriverStore.getState();
+      // sabun(유일값)으로 비교 — I는 EXTRA_USERS 전원 '0'이라 신뢰 불가
+      if (!myDriver || myDriver.s !== user.sabun) {
         if (user.personId && user.personId !== '0') {
           setMyDriverById(user.personId);
         } else {
           setMyDriverBySabun(user.sabun);
+        }
+
+        // P/EXTRA에 없는 사용자 fallback (관리자 등)
+        const updated = useDriverStore.getState().myDriver;
+        if (!updated || updated.s !== user.sabun) {
+          setMyDriver({ I: user.personId || '0', d: '', n: user.name, s: user.sabun });
+        } else if (updated.n !== user.name) {
+          // DB 이름이 P 배열 이름과 다르면 DB(인증) 이름 우선
+          setMyDriver({ ...updated, n: user.name });
         }
       }
     }

@@ -260,7 +260,10 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   /* ── 섹션 뷰어 ── */
   if (mode === 'section' && currentSectionData) {
     const bookmarked = isBookmarked(currentSection!);
-    const hasSummary = currentSectionData.summary && currentSectionData.summary.length > 0;
+    const summaryArr = Array.isArray(currentSectionData.summary)
+      ? currentSectionData.summary
+      : currentSectionData.summary ? [currentSectionData.summary] : [];
+    const hasSummary = summaryArr.length > 0;
     const hasCaution = !!currentSectionData.caution;
     const hasKeywords = currentSectionData.keywords && currentSectionData.keywords.length > 0;
     const showMeta = hasSummary || hasCaution || hasKeywords;
@@ -297,7 +300,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
                   핵심 요약
                 </div>
                 <ul className={styles.summaryList}>
-                  {currentSectionData.summary.map((s: string, i: number) => (
+                  {summaryArr.map((s: string, i: number) => (
                     <li key={i}>{s}</li>
                   ))}
                 </ul>

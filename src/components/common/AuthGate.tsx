@@ -55,8 +55,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user?.sabun) {
       const { myDriver, setMyDriverById, setMyDriverBySabun, setMyDriver } = useDriverStore.getState();
-      // sabun(유일값)으로 비교 — I는 EXTRA_USERS 전원 '0'이라 신뢰 불가
-      if (!myDriver || myDriver.s !== user.sabun) {
+      // sabun + 이름으로 비교 — 이름 변경도 감지
+      if (!myDriver || myDriver.s !== user.sabun || myDriver.n !== user.name) {
         if (user.personId && user.personId !== '0') {
           setMyDriverById(user.personId);
         } else {

@@ -271,9 +271,14 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       </header>
 
       <div className={styles.detailScroll}>
-        {/* 사진 — 알림마당 placeholder는 숨김 */}
-        {!(isNotice && report.photoUrl.includes('placeholder')) && (
-          <img src={report.photoUrl} alt="첨부 사진" className={styles.detailPhoto} />
+        {/* 사진 — 빈 URL/placeholder 숨김 + 로드 실패 시 숨김 */}
+        {report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
+          <img
+            src={report.photoUrl}
+            alt="첨부 사진"
+            className={styles.detailPhoto}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
         )}
 
         {/* 내용 */}
@@ -400,7 +405,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
               )}
 
               {/* 첨부파일 표시 */}
-              {isNotice && !report.photoUrl.includes('placeholder') && (
+              {isNotice && report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
                 <a href={report.photoUrl} target="_blank" rel="noopener noreferrer" className={styles.noticeFileLink}>
                   📎 첨부파일 보기
                 </a>

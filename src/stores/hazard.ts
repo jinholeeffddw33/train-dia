@@ -80,7 +80,7 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
 
   createReport: async ({ photo, description, location, name, sabun, category }) => {
     const formData = new FormData();
-    formData.append('photo', photo);
+    if (photo) formData.append('photo', photo);
     formData.append('description', description);
     formData.append('location', location);
     formData.append('name', name);

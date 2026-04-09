@@ -7,6 +7,30 @@ import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import styles from './Hazard.module.css';
 
+/** 이미지 리사이즈 (최대 1280px, 품질 0.82) */
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1280;
+      const scale = Math.max(img.width, img.height) > MAX ? MAX / Math.max(img.width, img.height) : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => resolve(new File([blob!], file.name, { type: 'image/jpeg' })),
+        'image/jpeg',
+        0.82,
+      );
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => resolve(file); // 압축 실패 시 원본
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 type NoticeType = 'rollcall' | 'important';
 
 const NOTICE_TYPE_LABELS: Record<NoticeType, string> = {
@@ -71,23 +95,19 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
       // location 필드에 분류 저장
       const location = NOTICE_TYPE_LABELS[noticeType];
 
-      // 파일 첨부: 사진 대신 파일을 전송 (없으면 1x1 투명 placeholder)
-      let photoFile: File;
+      // 파일 첨부: 이미지면 압축, 없으면 photo 없이 전송
+      let photoFile: File | undefined;
       if (file) {
-        photoFile = file;
-      } else {
-        // API에서 photo 필수이므로 1x1 투명 PNG placeholder
-        const canvas = document.createElement('canvas');
-        canvas.width = 1;
-        canvas.height = 1;
-        const blob = await new Promise<Blob>((resolve) =>
-          canvas.toBlob((b) => resolve(b!), 'image/png'),
-        );
-        photoFile = new File([blob], 'placeholder.png', { type: 'image/png' });
+        // 이미지 파일이면 압축
+        if (file.type.startsWith('image/')) {
+          photoFile = await compressImage(file);
+        } else {
+          photoFile = file;
+        }
       }
 
       await createReport({
-        photo: photoFile,
+        photo: photoFile as File,
         description: desc,
         location,
         name,

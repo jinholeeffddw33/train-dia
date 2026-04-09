@@ -116,14 +116,16 @@ export async function POST(req: NextRequest) {
   const sabun = (formData.get('sabun') as string | null)?.trim();
   const category = parseCategory(formData.get('category') as string | null);
 
-  if (!photo || !description || !name || !sabun) {
+  // inspect(알림마당)는 photo 없어도 OK
+  const photoRequired = category !== 'inspect';
+  if ((!photo && photoRequired) || !description || !name || !sabun) {
     return NextResponse.json(
-      { code: 'MISSING_FIELDS', message: '사진, 설명, 이름, 사번은 필수입니다' },
+      { code: 'MISSING_FIELDS', message: photoRequired ? '사진, 설명, 이름, 사번은 필수입니다' : '설명, 이름, 사번은 필수입니다' },
       { status: 400 },
     );
   }
 
-  if (photo.size > 5 * 1024 * 1024) {
+  if (photo && photo.size > 5 * 1024 * 1024) {
     return NextResponse.json(
       { code: 'FILE_TOO_LARGE', message: '사진은 5MB 이하로 올려주세요' },
       { status: 400 },
@@ -138,25 +140,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Storage 업로드
-  const ext = photo.type.includes('png') ? 'png' : 'jpg';
-  const fileName = `${category}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-  const buffer = Buffer.from(await photo.arrayBuffer());
+  // Storage 업로드 (photo가 있을 때만)
+  let publicUrl = '';
+  if (photo && photo.size > 100) { // 100 bytes 이하는 placeholder로 간주
+    const ext = photo.type.includes('png') ? 'png' : 'jpg';
+    const fileName = `${category}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const buffer = Buffer.from(await photo.arrayBuffer());
 
-  const { error: uploadError } = await serverSupabase.storage
-    .from('hazard-photos')
-    .upload(fileName, buffer, { contentType: photo.type, upsert: false });
+    const { error: uploadError } = await serverSupabase.storage
+      .from('hazard-photos')
+      .upload(fileName, buffer, { contentType: photo.type, upsert: false });
 
-  if (uploadError) {
-    return NextResponse.json(
-      { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: uploadError.message },
-      { status: 500 },
-    );
+    if (uploadError) {
+      return NextResponse.json(
+        { code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했습니다', detail: uploadError.message },
+        { status: 500 },
+      );
+    }
+
+    publicUrl = serverSupabase.storage
+      .from('hazard-photos')
+      .getPublicUrl(fileName).data.publicUrl;
   }
-
-  const { data: { publicUrl } } = serverSupabase.storage
-    .from('hazard-photos')
-    .getPublicUrl(fileName);
 
   // DB 삽입 (category 포함)
   const insertData: Record<string, string> = {

@@ -1,11 +1,114 @@
 'use client';
 
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from '../styles/edu.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface ContentRendererProps {
   blocks: any[];
+}
+
+/* ── 풀스크린 슬라이드 뷰어 ── */
+interface SlideViewerProps {
+  images: { src: string; caption?: string }[];
+  initialIndex: number;
+  onClose: () => void;
+}
+
+function SlideViewer({ images, initialIndex, onClose }: SlideViewerProps) {
+  const [idx, setIdx] = useState(initialIndex);
+  const touchRef = useRef<{ startX: number; startY: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const goPrev = useCallback(() => setIdx(i => Math.max(0, i - 1)), []);
+  const goNext = useCallback(() => setIdx(i => Math.min(images.length - 1, i + 1)), [images.length]);
+
+  // 키보드 네비게이션
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose, goPrev, goNext]);
+
+  // 스와이프 처리
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchRef.current) return;
+    const dx = e.changedTouches[0].clientX - touchRef.current.startX;
+    const dy = e.changedTouches[0].clientY - touchRef.current.startY;
+    // 수평 스와이프가 수직보다 크고 50px 이상일 때만
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) goNext();
+      else goPrev();
+    }
+    touchRef.current = null;
+  };
+
+  return (
+    <div
+      className={styles.slideViewerOverlay}
+      role="dialog"
+      aria-modal="true"
+      aria-label="슬라이드 뷰어"
+      ref={containerRef}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* 상단 바 */}
+      <div className={styles.slideViewerHeader}>
+        <span className={styles.slideViewerCounter}>{idx + 1} / {images.length}</span>
+        <button type="button" className={styles.slideViewerClose} onClick={onClose} aria-label="닫기">
+          <X size={24} />
+        </button>
+      </div>
+
+      {/* 슬라이드 이미지 */}
+      <div className={styles.slideViewerBody}>
+        {idx > 0 && (
+          <button type="button" className={`${styles.slideViewerNav} ${styles.slideViewerNavLeft}`} onClick={goPrev} aria-label="이전">
+            <ChevronLeft size={28} />
+          </button>
+        )}
+        <img
+          src={images[idx].src}
+          alt={images[idx].caption || `슬라이드 ${idx + 1}`}
+          className={styles.slideViewerImg}
+          draggable={false}
+        />
+        {idx < images.length - 1 && (
+          <button type="button" className={`${styles.slideViewerNav} ${styles.slideViewerNavRight}`} onClick={goNext} aria-label="다음">
+            <ChevronRight size={28} />
+          </button>
+        )}
+      </div>
+
+      {/* 캡션 */}
+      {images[idx].caption && (
+        <div className={styles.slideViewerCaption}>{images[idx].caption}</div>
+      )}
+
+      {/* 하단 인디케이터 */}
+      <div className={styles.slideViewerDots}>
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`${styles.slideViewerDot} ${i === idx ? styles.slideViewerDotActive : ''}`}
+            onClick={() => setIdx(i)}
+            aria-label={`슬라이드 ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function FlowBlock({ title, steps }: { title?: string; steps: any[] }) {
@@ -113,6 +216,20 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
 }
 
 export default function ContentRenderer({ blocks }: ContentRendererProps) {
+  const [viewer, setViewer] = useState<{ images: { src: string; caption?: string }[]; index: number } | null>(null);
+
+  // 모든 이미지 블록에서 이미지를 합산 (풀스크린에서 전체 스와이프용)
+  const allImages = blocks
+    .filter((b: any) => b.type === 'images')
+    .flatMap((b: any) => b.items as { src: string; caption?: string }[]);
+
+  const openViewer = useCallback((blockImages: { src: string; caption?: string }[], localIdx: number) => {
+    // 전체 이미지 목록에서의 인덱스 계산
+    const targetSrc = blockImages[localIdx].src;
+    const globalIdx = allImages.findIndex(img => img.src === targetSrc);
+    setViewer({ images: allImages, index: globalIdx >= 0 ? globalIdx : 0 });
+  }, [allImages]);
+
   return (
     <>
       {blocks.map((block: any, i: number) => {
@@ -144,11 +261,19 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
             return <ListBlock key={i} items={block.items} />;
           case 'images':
             return (
-              <div key={i} className={styles.imageGrid}>
+              <div key={i} className={styles.slideList}>
                 {block.items.map((img: { src: string; caption?: string }, j: number) => (
-                  <figure key={j} className={styles.imageFigure}>
-                    <img src={img.src} alt={img.caption || ''} className={styles.imageBlock} loading="lazy" />
-                    {img.caption && <figcaption className={styles.imageCaption}>{img.caption}</figcaption>}
+                  <figure key={j} className={styles.slideFigure}>
+                    <button
+                      type="button"
+                      className={styles.slideBtn}
+                      onClick={() => openViewer(block.items, j)}
+                      aria-label={img.caption || `슬라이드 ${j + 1} 확대`}
+                    >
+                      <img src={img.src} alt={img.caption || ''} className={styles.slideImg} loading="lazy" />
+                      <span className={styles.slideTapHint}>탭하여 확대</span>
+                    </button>
+                    {img.caption && <figcaption className={styles.slideCaption}>{img.caption}</figcaption>}
                   </figure>
                 ))}
               </div>
@@ -157,6 +282,15 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
             return null;
         }
       })}
+
+      {/* 풀스크린 슬라이드 뷰어 */}
+      {viewer && (
+        <SlideViewer
+          images={viewer.images}
+          initialIndex={viewer.index}
+          onClose={() => setViewer(null)}
+        />
+      )}
     </>
   );
 }

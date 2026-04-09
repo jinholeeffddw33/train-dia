@@ -118,7 +118,17 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
             }
           }
         } else if (initChapters && initChapters.length > 0) {
-          setExpandedChapters(new Set(initChapters));
+          // 단일 챕터 + 단일 섹션이면 TOC 스킵 → 바로 섹션 뷰
+          const filtered = data.chapters.filter((ch: any) => initChapters.includes(ch.id));
+          const totalSections = filtered.reduce((sum: number, ch: any) => sum + ch.sections.length, 0);
+          if (totalSections === 1 && filtered.length === 1) {
+            const sec = filtered[0].sections[0];
+            setCurrentSection(sec.id);
+            setMode('section');
+            markSectionRead(sec.id, filtered[0].id);
+          } else {
+            setExpandedChapters(new Set(initChapters));
+          }
         } else if (initChapter) {
           setExpandedChapters(new Set([initChapter]));
         }

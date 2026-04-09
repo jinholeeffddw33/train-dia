@@ -976,7 +976,199 @@
   color: var(--dia-text-secondary);
 }
 
-/* images */
+/* ── 슬라이드 리스트 (1열 풀와이드) ── */
+.slideList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  margin: var(--dia-space-3) 0;
+}
+
+.slideFigure {
+  margin: 0;
+}
+
+.slideBtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.slideBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.slideBtn:active {
+  transform: scale(0.98);
+}
+
+.slideImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--dia-radius-md);
+}
+
+.slideTapHint {
+  position: absolute;
+  bottom: var(--dia-space-2);
+  right: var(--dia-space-2);
+  font-size: var(--dia-text-xs);
+  color: rgba(255, 255, 255, 0.9);  /* 항상 어두운 오버레이 위 → 테마 무관 */
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-sm);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.slideCaption {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-1);
+  line-height: var(--dia-leading-normal);
+}
+
+/* ── 풀스크린 슬라이드 뷰어 ── */
+.slideViewerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  flex-direction: column;
+  touch-action: pan-y;
+}
+
+.slideViewerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: max(var(--dia-space-3), env(safe-area-inset-top));
+  flex-shrink: 0;
+}
+
+.slideViewerCounter {
+  font-size: var(--dia-text-sm);
+  color: rgba(255, 255, 255, 0.8);
+  font-variant-numeric: tabular-nums;
+}
+
+.slideViewerClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.slideViewerClose:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.slideViewerBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 0;
+  padding: 0 var(--dia-space-2);
+}
+
+.slideViewerImg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--dia-radius-md);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.slideViewerNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  z-index: 1;
+  transition: background 0.15s ease;
+}
+
+.slideViewerNav:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.slideViewerNavLeft { left: var(--dia-space-2); }
+.slideViewerNavRight { right: var(--dia-space-2); }
+
+.slideViewerCaption {
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: rgba(255, 255, 255, 0.7);
+  padding: var(--dia-space-2) var(--dia-space-4);
+  flex-shrink: 0;
+}
+
+.slideViewerDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--dia-space-2) var(--dia-space-4);
+  padding-bottom: max(var(--dia-space-3), env(safe-area-inset-bottom));
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.slideViewerDot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.slideViewerDot:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.slideViewerDotActive {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.3);
+}
+
+/* 기존 imageGrid/imageFigure/imageBlock/imageCaption 유지 (다른 곳 사용 가능) */
 .imageGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -1817,4 +2009,216 @@
   text-align: center;
   color: var(--dia-text-tertiary);
   font-size: var(--dia-text-sm);
+}
+
+/* ===== 동영상 교육 ===== */
+
+.videoListWrap {
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.videoEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-10) var(--dia-space-4);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-base);
+  text-align: center;
+}
+
+.videoRetryBtn {
+  padding: var(--dia-space-2) var(--dia-space-5);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  border: none;
+  cursor: pointer;
+}
+
+.videoRetryBtn:active {
+  transform: scale(0.97);
+}
+
+/* 영상 카드 */
+.videoCard {
+  display: flex;
+  flex-direction: column;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  padding: 0;
+}
+
+.videoCard:active {
+  transform: scale(0.98);
+}
+
+/* 썸네일 */
+.videoThumbWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--dia-bg);
+  overflow: hidden;
+}
+
+.videoThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.videoPlayOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.videoCard:hover .videoPlayOverlay,
+.videoCard:focus-visible .videoPlayOverlay {
+  opacity: 1;
+}
+
+.videoDuration {
+  position: absolute;
+  right: var(--dia-space-2);
+  bottom: var(--dia-space-2);
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  padding: 2px 6px;
+  border-radius: var(--dia-radius-sm);
+  line-height: 1.4;
+}
+
+/* 카드 정보 영역 */
+.videoInfo {
+  padding: var(--dia-space-3) var(--dia-space-4);
+}
+
+.videoTitle {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0 0 var(--dia-space-2);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.videoMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+.videoCategoryBadge {
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  padding: 1px 8px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+}
+
+/* ── 풀스크린 플레이어 오버레이 ── */
+.videoPlayerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+
+.videoPlayerHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+  min-height: 52px;
+}
+
+.videoPlayerTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.videoPlayerClose {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  border-radius: var(--dia-radius-full);
+}
+
+.videoPlayerClose:active {
+  transform: scale(0.92);
+}
+
+.videoPlayerBody {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 16:9 반응형 iframe 래퍼 */
+.videoIframeWrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #000;
+}
+
+.videoIframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.videoPlayerInfo {
+  padding: var(--dia-space-4);
 }

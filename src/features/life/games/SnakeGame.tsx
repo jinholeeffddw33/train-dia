@@ -396,6 +396,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           </div>
           {best > 0 && <p className={styles.bestText}>최고 기록: <strong>{best}점</strong></p>}
           <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
+          <GameRanking game="snake" />
         </div>
       </div>
     );

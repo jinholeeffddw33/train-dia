@@ -214,6 +214,7 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
             <button type="button" className={styles.startBtn} onClick={handleStart}>
               시작하기
             </button>
+            <GameRanking game="reaction" scoreLabel="평균" scoreUnit="ms" />
           </div>
         )}
 

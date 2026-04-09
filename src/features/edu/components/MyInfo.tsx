@@ -64,22 +64,22 @@ export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
       <div className={styles.homeContent}>
         {/* ── 요약 카드 ── */}
         <div className={styles.myInfoSummary}>
-          <div className={styles.myInfoStat}>
-            <Trophy size={20} className={styles.quickIconWarn} />
+          <div className={`${styles.myInfoStat} ${styles.myInfoStatAmber}`}>
+            <Trophy size={20} className={styles.myInfoStatIcon} />
             <div className={styles.myInfoStatValue}>
               {totalQuizzes > 0 ? `${bestScore}점` : '-'}
             </div>
             <div className={styles.myInfoStatLabel}>최고 점수</div>
           </div>
-          <div className={styles.myInfoStat}>
-            <Target size={20} className={styles.quickIconBlue} />
+          <div className={`${styles.myInfoStat} ${styles.myInfoStatBlue}`}>
+            <Target size={20} className={styles.myInfoStatIcon} />
             <div className={styles.myInfoStatValue}>
               {totalQuizzes > 0 ? `${avgScore}점` : '-'}
             </div>
             <div className={styles.myInfoStatLabel}>평균 점수</div>
           </div>
-          <div className={styles.myInfoStat}>
-            <BookOpen size={20} className={styles.quickIconGreen} />
+          <div className={`${styles.myInfoStat} ${styles.myInfoStatGreen}`}>
+            <BookOpen size={20} className={styles.myInfoStatIcon} />
             <div className={styles.myInfoStatValue}>{readCount}</div>
             <div className={styles.myInfoStatLabel}>학습 섹션</div>
           </div>
@@ -89,7 +89,11 @@ export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
         {(growth !== null || streak >= 2) && (
           <div className={styles.myInfoGrowthRow}>
             {growth !== null && (
-              <div className={styles.myInfoGrowthChip}>
+              <div className={`${styles.myInfoGrowthChip} ${
+                growth > 0 ? styles.myInfoGrowthUp
+                  : growth < 0 ? styles.myInfoGrowthDown
+                  : styles.myInfoGrowthFlat
+              }`}>
                 <GrowthIcon value={growth} />
                 <span>
                   {growth > 0 ? `+${growth}점` : growth === 0 ? '동일' : `${growth}점`}
@@ -97,7 +101,7 @@ export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
               </div>
             )}
             {streak >= 2 && (
-              <div className={styles.streakBadge}>{streak}일 연속 학습</div>
+              <div className={styles.streakBadge}>🔥 {streak}일 연속 학습</div>
             )}
           </div>
         )}
@@ -130,8 +134,17 @@ export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
             {quizHistory.map((rec: QuizRecord, i: number) => {
               const prev = i < quizHistory.length - 1 ? quizHistory[i + 1] : null;
               const diff = prev ? rec.percent - prev.percent : null;
+              const isBest = rec.percent === bestScore && bestScore > 0;
+              const gradeClass = rec.percent >= 80
+                ? styles.myInfoHistoryItemGreen
+                : rec.percent >= 60
+                  ? styles.myInfoHistoryItemOrange
+                  : styles.myInfoHistoryItemRed;
               return (
-                <div key={`${rec.solvedAt}-${i}`} className={styles.myInfoHistoryItem}>
+                <div
+                  key={`${rec.solvedAt}-${i}`}
+                  className={`${styles.myInfoHistoryItem} ${gradeClass} ${isBest ? styles.myInfoHistoryItemBest : ''}`}
+                >
                   <div className={styles.myInfoHistoryLeft}>
                     <span className={styles.myInfoHistoryDate}>{formatDate(rec.solvedAt)}</span>
                     <span className={styles.myInfoHistoryMode}>{modeLabel(rec.mode)}</span>

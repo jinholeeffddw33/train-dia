@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ArrowLeft, Search, Bookmark, AlertTriangle, Info } from 'lucide-react';
+import {
+  ArrowLeft, Search, Bookmark, AlertTriangle, Info, Check,
+  TrainFront, Wrench, Building2, AlertCircle, FileText, Mic,
+  Radio, Satellite, Rocket, Shield,
+  type LucideIcon,
+} from 'lucide-react';
 import ContentRenderer from './ContentRenderer';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -79,6 +84,53 @@ function expandSearchTerms(query: string): string[] {
   }
 
   return [...terms];
+}
+
+/* ── 챕터 3D 배지 색상 순환 ── */
+const CHAPTER_COLORS = ['blue', 'purple', 'green', 'amber', 'red'] as const;
+type ChapterColor = typeof CHAPTER_COLORS[number];
+
+const ICON_BG_MAP: Record<ChapterColor, string> = {
+  blue:   styles.iconBgBlue,
+  purple: styles.iconBgPurple,
+  green:  styles.iconBgGreen,
+  amber:  styles.iconBgAmber,
+  red:    styles.iconBgRed,
+};
+
+const ACCENT_BAR_MAP: Record<ChapterColor, string> = {
+  blue:   styles.tocAccentBlue,
+  purple: styles.tocAccentPurple,
+  green:  styles.tocAccentGreen,
+  amber:  styles.tocAccentAmber,
+  red:    styles.tocAccentRed,
+};
+
+const PROGRESS_BAR_MAP: Record<ChapterColor, string> = {
+  blue:   styles.tocProgressBlue,
+  purple: styles.tocProgressPurple,
+  green:  styles.tocProgressGreen,
+  amber:  styles.tocProgressAmber,
+  red:    styles.tocProgressRed,
+};
+
+/** 이모지 → lucide 아이콘 매핑 */
+const EMOJI_ICON_MAP: Record<string, LucideIcon> = {
+  '🚆': TrainFront,
+  '🔧': Wrench,
+  '🏗️': Building2,
+  '🔴': AlertCircle,
+  '📝': FileText,
+  '⚠️': AlertTriangle,
+  '🎙️': Mic,
+  '📻': Radio,
+  '📡': Satellite,
+  '🚀': Rocket,
+  '🛡️': Shield,
+};
+
+function getChapterIcon(emoji: string): LucideIcon {
+  return EMOJI_ICON_MAP[emoji] || FileText;
 }
 
 type SearchMatchType = 'title' | 'alias' | 'content';
@@ -306,7 +358,9 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
             {hasSummary && (
               <div className={styles.summarySection}>
                 <div className={styles.summaryLabel}>
-                  <Info size={14} />
+                  <span className={styles.metaIconBadgeBlue}>
+                    <Info size={16} />
+                  </span>
                   핵심 요약
                 </div>
                 <ul className={styles.summaryList}>
@@ -461,40 +515,68 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
             {(initChapters && initChapters.length > 0
               ? doc.chapters.filter((ch: any) => initChapters.includes(ch.id))
               : doc.chapters
-            ).map((ch: any) => {
+            ).map((ch: any, chIdx: number) => {
               const isExpanded = expandedChapters.has(ch.id);
               const readCountInCh = ch.sections.filter((s: any) => readMap[s.id]).length;
+              const color = CHAPTER_COLORS[chIdx % CHAPTER_COLORS.length];
+              const ChIcon = getChapterIcon(ch.icon);
+              const progressPct = ch.sections.length > 0
+                ? Math.round((readCountInCh / ch.sections.length) * 100)
+                : 0;
 
               return (
-                <div key={ch.id} className={styles.tocChapter}>
+                <div key={ch.id} className={`${styles.tocChapter} ${ACCENT_BAR_MAP[color]}`}>
                   <button type="button" className={styles.tocChapterBtn} onClick={() => toggleChapter(ch.id)}>
-                    <span className={styles.tocChIcon}>{ch.icon}</span>
-                    <span className={styles.tocChTitle}>{ch.title}</span>
-                    {readCountInCh > 0 && (
-                      <span className={styles.tocBadge}>
-                        {readCountInCh}/{ch.sections.length}
-                      </span>
-                    )}
+                    <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
+                      <ChIcon size={18} />
+                    </span>
+                    <span className={styles.tocChBody}>
+                      <span className={styles.tocChTitle}>{ch.title}</span>
+                      {ch.sections.length > 0 && (
+                        <span className={styles.tocProgressRow}>
+                          <span className={styles.tocProgressTrack}>
+                            {/* STYLE-EXCEPTION: 동적 진도 퍼센트 — CSS만으로 표현 불가 */}
+                            <span
+                              className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
+                              style={{ width: `${progressPct}%` }}
+                              role="progressbar"
+                              aria-valuenow={progressPct}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                            />
+                          </span>
+                          <span className={styles.tocProgressLabel}>
+                            {readCountInCh}/{ch.sections.length}
+                          </span>
+                        </span>
+                      )}
+                    </span>
                   </button>
 
                   {isExpanded && (
                     <div className={styles.tocSections}>
-                      {ch.sections.map((sec: any) => (
-                        <button
-                          key={sec.id}
-                          type="button"
-                          className={styles.tocSectionBtn}
-                          onClick={() => openSection(sec.id)}
-                        >
-                          {bookmarkSet.has(sec.id) && (
-                            <Bookmark size={12} className={styles.bookmarkIcon} fill="currentColor" />
-                          )}
-                          <span className={styles.tocSecTitle}>{sec.title}</span>
-                          {formatReadLabel(sec.id) && (
-                            <span className={styles.tocRead}>{formatReadLabel(sec.id)}</span>
-                          )}
-                        </button>
-                      ))}
+                      {ch.sections.map((sec: any, secIdx: number) => {
+                        const isRead = !!readMap[sec.id];
+                        return (
+                          <button
+                            key={sec.id}
+                            type="button"
+                            className={styles.tocSectionBtn}
+                            onClick={() => openSection(sec.id)}
+                          >
+                            <span className={isRead ? styles.tocSecCheck : styles.tocSecNum}>
+                              {isRead ? <Check size={12} /> : secIdx + 1}
+                            </span>
+                            {bookmarkSet.has(sec.id) && (
+                              <Bookmark size={12} className={styles.bookmarkIcon} fill="currentColor" />
+                            )}
+                            <span className={styles.tocSecTitle}>{sec.title}</span>
+                            {formatReadLabel(sec.id) && (
+                              <span className={styles.tocRead}>{formatReadLabel(sec.id)}</span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

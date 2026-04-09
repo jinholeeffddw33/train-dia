@@ -21,9 +21,8 @@ const INITIAL_SPEED = 220;
 const MIN_SPEED = 160;
 const SPEED_DECREASE = 6; // 사과 하나당 6ms 빨라짐
 const SPEED_CAP_SCORE = 50; // 이 점수 이후 속도 증가 멈춤
-const MAX_SNAKE_LENGTH = 15; // 뱀 최대 길이
 const SWIPE_THRESHOLD = 30;
-const LS_KEY = 'traindia-snake-best';
+const LS_KEY = 'traindia-apple-best';
 
 const OPPOSITE: Record<Direction, Direction> = {
   UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT',
@@ -184,22 +183,9 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
     );
     ctx.fill();
 
-    // Snake body (tail → head, 투명도 그라데이션)
+    // 플레이어 블록 (1칸)
     const gap = 1;
-    const r = Math.max(2, cellSize * 0.15); // corner radius
-    for (let i = snake.length - 1; i >= 1; i--) {
-      const alpha = 0.3 + 0.7 * (1 - i / snake.length);
-      ctx.fillStyle = colors.snakeBody(alpha);
-      roundedRect(ctx,
-        snake[i].x * cellSize + gap,
-        snake[i].y * cellSize + gap,
-        cellSize - gap * 2,
-        cellSize - gap * 2,
-        r,
-      );
-    }
-
-    // Snake head
+    const r = Math.max(2, cellSize * 0.15);
     ctx.fillStyle = colors.snakeHead;
     ctx.shadowColor = colors.snakeHead;
     ctx.shadowBlur = 6;
@@ -244,15 +230,11 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         endGame(); return;
       }
 
-      // Self collision
+      // 사과 체크
       const ateApple = newHead.x === apple.x && newHead.y === apple.y;
-      const body = ateApple ? snake : snake.slice(0, -1);
-      if (body.some((p) => p.x === newHead.x && p.y === newHead.y)) {
-        endGame(); return;
-      }
 
-      // Move
-      const newSnake = [newHead, ...snake];
+      // 블록 1개 고정 — 항상 위치만 이동
+      const newSnake = [newHead];
       if (ateApple) {
         const newScore = scoreRef.current + 10;
         scoreRef.current = newScore;
@@ -268,12 +250,6 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           const newOb = addObstacle(newSnake, appleRef.current, obstaclesRef.current);
           obstaclesRef.current = [...obstaclesRef.current, newOb];
         }
-      } else {
-        newSnake.pop();
-      }
-      // 뱀 최대 길이 제한 — 넘으면 꼬리 자르기 (점수는 유지)
-      while (newSnake.length > MAX_SNAKE_LENGTH) {
-        newSnake.pop();
       }
       snakeRef.current = newSnake;
       draw(); // tick 때만 그리기 (매 프레임 X → 렉 방지)
@@ -407,14 +383,14 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.headerTitle}>스네이크</h1>
+          <h1 className={styles.headerTitle}>사과 먹기</h1>
         </header>
         <div className={styles.fullPage}>
-          <span className={styles.bigEmoji}>🐍</span>
-          <h2 className={styles.pageTitle}>스네이크</h2>
+          <span className={styles.bigEmoji}>🍎</span>
+          <h2 className={styles.pageTitle}>사과 먹기</h2>
           <div className={styles.rules}>
             <p>🍎 사과를 먹으면 점수 +10</p>
-            <p>💀 벽 · 자기 몸 · 장애물에 부딪히면 게임오버</p>
+            <p>💀 벽이나 장애물에 부딪히면 게임오버</p>
             <p>🧱 사과 3개마다 장애물이 하나씩 등장!</p>
             <p>🎮 방향 버튼이나 스와이프로 조종</p>
           </div>
@@ -433,7 +409,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.headerTitle}>스네이크</h1>
+          <h1 className={styles.headerTitle}>사과 먹기</h1>
         </header>
         <div className={styles.fullPage}>
           <h2 className={styles.pageTitle}>게임 오버</h2>
@@ -454,7 +430,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        <h1 className={styles.headerTitle}>스네이크</h1>
+        <h1 className={styles.headerTitle}>사과 먹기</h1>
         <div className={styles.scoreDisplay}>
           <span className={styles.scoreLabel}>점수</span>
           <span className={styles.scoreValue}>{score}</span>

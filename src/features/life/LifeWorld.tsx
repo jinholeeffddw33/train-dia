@@ -54,7 +54,7 @@ type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | { type: 'list'
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
-  { id: 'snake', label: '스네이크', icon: Bug, color: 'green', desc: '먹이를 먹고 길어지는 클래식 게임' },
+  { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
 ];
 
 /** localStorage에서 카테고리별 마지막 방문 시간 가져오기 */

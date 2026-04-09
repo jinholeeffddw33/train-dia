@@ -7,6 +7,7 @@ import DocumentViewer from './DocumentViewer';
 import QuizSystem from './QuizSystem';
 import WrongReview from './WrongReview';
 import MyInfo from './MyInfo';
+import VideoEducation from './VideoEducation';
 
 type EduView =
   | { type: 'home' }
@@ -14,7 +15,8 @@ type EduView =
   | { type: 'quiz'; chapter?: string }
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
-  | { type: 'myinfo' };
+  | { type: 'myinfo' }
+  | { type: 'video' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -55,6 +57,8 @@ export default function EduTab({ onBack }: EduTabProps) {
           onWrongReview={() => setView({ type: 'wrong-review' })}
         />
       );
+    case 'video':
+      return <VideoEducation onBack={goHome} />;
     default:
       return (
         <EduHome
@@ -67,6 +71,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onWrongReview={() => setView({ type: 'wrong-review' })}
           onWrongQuiz={() => setView({ type: 'wrong-quiz' })}
           onMyInfo={() => setView({ type: 'myinfo' })}
+          onVideo={() => setView({ type: 'video' })}
         />
       );
   }

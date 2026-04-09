@@ -16,9 +16,9 @@ type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 interface Pos { x: number; y: number }
 
 const GRID = 15;
-const INITIAL_SPEED = 350;
-const MIN_SPEED = 150;
-const SPEED_DECREASE = 8; // 사과 하나당 8ms 빨라짐
+const INITIAL_SPEED = 220;
+const MIN_SPEED = 90;
+const SPEED_DECREASE = 10; // 사과 하나당 10ms 빨라짐
 const SWIPE_THRESHOLD = 30;
 const LS_KEY = 'traindia-snake-best';
 
@@ -35,7 +35,8 @@ function randomApple(snake: Pos[]): Pos {
   const occupied = new Set(snake.map((p) => `${p.x},${p.y}`));
   let pos: Pos;
   do {
-    pos = { x: Math.floor(Math.random() * GRID), y: Math.floor(Math.random() * GRID) };
+    // 가장자리 1칸 안쪽에서만 생성 — 벽붙이 사과 방지
+    pos = { x: 1 + Math.floor(Math.random() * (GRID - 2)), y: 1 + Math.floor(Math.random() * (GRID - 2)) };
   } while (occupied.has(`${pos.x},${pos.y}`));
   return pos;
 }
@@ -229,9 +230,9 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         newSnake.pop();
       }
       snakeRef.current = newSnake;
+      draw(); // tick 때만 그리기 (매 프레임 X → 렉 방지)
     }
 
-    draw();
     rafRef.current = requestAnimationFrame(gameLoop);
   }, [draw]);
 

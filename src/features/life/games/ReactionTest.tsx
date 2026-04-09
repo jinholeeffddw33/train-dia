@@ -185,23 +185,24 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
         {/* 시작 대기 화면 */}
         {state.phase === 'idle' && (
           <div className={styles.introCard}>
-            <p className={styles.emoji}>⚡</p>
+            <p className={styles.emoji}>🎯</p>
             <h2 className={styles.introTitle}>반응속도 테스트</h2>
             <p className={styles.introDesc}>
-              내 반응속도는 몇 ms일까?
+              초록색으로 바뀌는 순간 최대한 빨리 터치하세요!<br />
+              총 {TOTAL_ROUNDS}회 측정 후 평균 기록을 보여줍니다.
             </p>
             <div className={styles.introSteps}>
               <div className={styles.introStep}>
                 <span className={styles.stepNum}>1</span>
-                <span>🔴 빨간 화면에서 기다리세요</span>
+                <span>시작하면 빨간 화면이 나타납니다</span>
               </div>
               <div className={styles.introStep}>
                 <span className={styles.stepNum}>2</span>
-                <span>🟢 초록색으로 바뀌면 바로 터치!</span>
+                <span>초록색으로 바뀌면 즉시 터치!</span>
               </div>
               <div className={styles.introStep}>
                 <span className={styles.stepNum}>3</span>
-                <span>⏱️ {TOTAL_ROUNDS}번 측정 후 평균 기록 확인</span>
+                <span>너무 빨리 누르면 다시 시도합니다</span>
               </div>
             </div>
             {best !== null && (

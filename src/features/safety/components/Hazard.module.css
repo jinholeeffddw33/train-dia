@@ -256,13 +256,13 @@
 }
 
 .detailHeaderCardRollcall {
-  background: linear-gradient(135deg, var(--dia-surface), rgba(59, 130, 246, 0.06));
-  border-color: rgba(59, 130, 246, 0.15);
+  background: linear-gradient(135deg, var(--dia-surface-elevated), rgba(59, 130, 246, 0.1));
+  border-color: rgba(59, 130, 246, 0.25);
 }
 
 .detailHeaderCardImportant {
-  background: linear-gradient(135deg, var(--dia-surface), rgba(239, 68, 68, 0.06));
-  border-color: rgba(239, 68, 68, 0.15);
+  background: linear-gradient(135deg, var(--dia-surface-elevated), rgba(239, 68, 68, 0.1));
+  border-color: rgba(239, 68, 68, 0.25);
 }
 
 .detailHeaderRow {
@@ -778,7 +778,7 @@
 
 .noticeCardImportant {
   border-left: 3px solid var(--dia-3d-red-start);
-  background: linear-gradient(135deg, var(--dia-surface), rgba(239, 68, 68, 0.04));
+  background: linear-gradient(135deg, var(--dia-surface), rgba(239, 68, 68, 0.08));
 }
 
 .noticeHeader {
@@ -881,7 +881,7 @@
 /* 목록에서 본문 미리보기: 최대 2줄 + fade */
 .noticeBodyPreview {
   position: relative;
-  max-height: 3.2em;
+  max-height: 5em;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -894,13 +894,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 1.4em;
+  height: 1.6em;
   background: linear-gradient(transparent, var(--dia-surface));
   pointer-events: none;
 }
 
 .noticeCardImportant .noticeBodyPreview::after {
-  background: linear-gradient(transparent, rgba(239, 68, 68, 0.04));
   background: linear-gradient(transparent, var(--dia-surface));
 }
 
@@ -1019,9 +1018,9 @@
 .reactionBtn:active { transform: scale(0.95); }
 
 .reactionBtnActive {
-  color: var(--dia-blue);
-  border-color: var(--dia-blue);
-  background: var(--dia-blue-dim);
+  color: var(--dia-red);
+  border-color: var(--dia-red);
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .cardReads {
@@ -1044,10 +1043,11 @@
 
 /* ── Detail Body Card ── */
 .detailBodyCard {
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: var(--dia-surface-elevated);
+  border: 1px solid var(--dia-border-strong);
   border-radius: var(--dia-radius-lg);
   padding: var(--dia-space-4);
+  box-shadow: var(--dia-card-depth);
 }
 
 .noticeEditHeader {
@@ -1287,8 +1287,9 @@
 
 .likeBtnActive {
   border-color: var(--dia-red);
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.2);
   color: var(--dia-red);
+  box-shadow: var(--dia-3d-inset), 0 0 8px rgba(239, 68, 68, 0.2);
 }
 
 .likeCount {

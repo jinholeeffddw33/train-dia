@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import type { QuizMode } from '../hooks/useEduStore';
@@ -185,6 +185,18 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
       setPhase('result');
     }
   }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizChapterId]);
+
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // 답변 후 "다음 문제" 버튼으로 자동 스크롤
+  useEffect(() => {
+    if (answered && nextBtnRef.current) {
+      const timer = setTimeout(() => {
+        nextBtnRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [answered]);
 
   const score100 = toScore100(score, questions.length);
 
@@ -424,9 +436,9 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           {q.choices.map((choice: string, i: number) => {
             let cls = styles.choiceBtn;
             if (answered) {
-              cls += ` ${styles.choiceDisabled}`;
               if (i === q.answer) cls += ` ${styles.choiceCorrect}`;
               else if (i === selected) cls += ` ${styles.choiceWrong}`;
+              else cls += ` ${styles.choiceDisabled}`;
             }
             return (
               <button
@@ -448,7 +460,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
               {selected === q.answer ? '정답. ' : '오답. '}
               {q.explanation}
             </div>
-            <button type="button" className={styles.nextBtn} onClick={handleNext}>
+            <button ref={nextBtnRef} type="button" className={styles.nextBtn} onClick={handleNext}>
               {currentIdx < questions.length - 1 ? '다음 문제' : '결과 보기'}
             </button>
           </>

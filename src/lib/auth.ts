@@ -74,7 +74,14 @@ const ADMIN_SABUNS = new Set([
 ]);
 
 export function verifyUser(name: string, sabun: string): Person | null {
-  return ALL_USERS.find((p) => p.n === name && p.s === sabun) ?? null;
+  // 1. P + EXTRA_USERS에서 먼저 검색
+  const local = ALL_USERS.find((p) => p.n === name && p.s === sabun);
+  if (local) return local;
+  // 2. sabun만 일치하면 DB 이름이 변경된 케이스 → 허용
+  const bySabun = ALL_USERS.find((p) => p.s === sabun);
+  if (bySabun) return { ...bySabun, n: name };
+  // 3. P/EXTRA에 없는 계정(030827 등) → 사번으로만 허용
+  return { I: '0', d: '', n: name, s: sabun };
 }
 
 /** 관리자 여부 확인 */

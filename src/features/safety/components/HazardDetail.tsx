@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, Eye, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip } from 'lucide-react';
+import { ArrowLeft, Heart, Eye, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -359,55 +359,63 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             )
           ) : (
             <>
-              {/* 날짜 + 요일 강조 + 작성자 */}
+              {/* 날짜 + 요일 강조 + 작성자 — 그라데이션 헤더 카드 */}
               {(() => {
                 const di = parseDateInfo(report.createdAt);
                 const isImportant = report.location === '중요알림';
+                const headerCardClass = `${styles.detailHeaderCard} ${isImportant ? styles.detailHeaderCardImportant : styles.detailHeaderCardRollcall}`;
                 return (
-                  <div className={styles.detailMeta}>
-                    {report.location && (
-                      <span className={`${styles.noticeType} ${isImportant ? styles.noticeTypeImportant : styles.noticeTypeRollcall}`}>
-                        {report.location}
-                      </span>
-                    )}
-                    {di && (
-                      <span className={styles.noticeDateWrap}>
-                        <span className={styles.noticeDateMonth}>{di.month}</span>
-                        <span className={styles.noticeDateDay}>{di.date}</span>
-                        <span className={`${styles.noticeDateDow} ${di.isHoliday ? styles.noticeDateHoliday : ''}`}>{di.dow}</span>
-                      </span>
-                    )}
-                    <span className={styles.detailAuthor}>{report.createdBy}</span>
-                    <span className={styles.detailReadCount}><Eye size={14} /> {report.readCount}</span>
+                  <div className={headerCardClass}>
+                    <div className={styles.detailHeaderRow}>
+                      {report.location && (
+                        <span className={`${styles.noticeType} ${isImportant ? styles.noticeTypeImportant : styles.noticeTypeRollcall}`}>
+                          {report.location}
+                        </span>
+                      )}
+                      {di && (
+                        <span className={styles.noticeDateWrap}>
+                          <span className={styles.noticeDateMonth}>{di.month}</span>
+                          <span className={styles.noticeDateDay}>{di.date}</span>
+                          <span className={`${styles.noticeDateDow} ${di.isHoliday ? styles.noticeDateHoliday : ''}`}>{di.dow}</span>
+                        </span>
+                      )}
+                      <span className={styles.detailReadCount}><Eye size={14} /> {report.readCount}</span>
+                    </div>
+                    <div className={styles.detailAuthorWrap}>
+                      <span className={`${styles.authorAvatar} ${styles.authorAvatarLg}`}>{report.createdBy.charAt(0)}</span>
+                      <span className={styles.detailAuthor}>{report.createdBy}</span>
+                    </div>
                   </div>
                 );
               })()}
 
-              {report.location && (
+              {!isNotice && report.location && (
                 <span className={styles.detailLocation}>📍 {report.location}</span>
               )}
 
-              {/* 알림마당: 번호 리스트 형태 */}
+              {/* 알림마당: 번호 리스트 형태 — 본문 카드 */}
               {isNotice ? (
-                <div className={styles.noticeBody}>
-                  {report.description.split('\n').map((line, i) => {
-                    const num = parseInt(line);
-                    const isHighlight = num === 1 || num === 2;
-                    return (
-                      <div key={i} className={`${styles.noticeLine} ${isHighlight ? styles.noticeLineHighlight : ''}`}>
-                        {line}
-                      </div>
-                    );
-                  })}
+                <div className={styles.detailBodyCard}>
+                  <div className={styles.noticeBody}>
+                    {report.description.split('\n').map((line, i) => {
+                      const num = parseInt(line);
+                      const isHighlight = num === 1 || num === 2;
+                      return (
+                        <div key={i} className={`${styles.noticeLine} ${isHighlight ? styles.noticeLineHighlight : ''}`}>
+                          {line}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <p className={styles.detailDesc}>{report.description}</p>
               )}
 
-              {/* 첨부파일 표시 */}
+              {/* 첨부파일 표시 — pill 카드 스타일 */}
               {isNotice && report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
                 <a href={report.photoUrl} target="_blank" rel="noopener noreferrer" className={styles.noticeFileLink}>
-                  📎 첨부파일 보기
+                  <Paperclip size={14} /> 첨부파일 보기
                 </a>
               )}
             </>
@@ -484,64 +492,67 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
                 return (
                   <div key={c.id} className={styles.commentCard}>
-                    <div className={styles.commentHeader}>
-                      <span className={styles.commentAuthor}>{c.createdBy}</span>
-                      <div className={styles.commentHeaderRight}>
-                        <span className={styles.commentTime}>{formatDate(c.createdAt)}</span>
-                        {isMyComment && !isEditing && (
-                          <div className={styles.commentMenuWrap}>
-                            <button
-                              type="button"
-                              className={styles.commentMenuBtn}
-                              onClick={() => setCommentMenuId(commentMenuId === c.id ? null : c.id)}
-                              aria-label="댓글 더보기"
-                            >
-                              <MoreVertical size={14} />
-                            </button>
-                            {commentMenuId === c.id && (
-                              <div className={styles.commentMenuDropdown} ref={menuRef}>
-                                <button type="button" className={styles.menuItem} onClick={() => handleCommentEditStart(c)}>
-                                  <Pencil size={14} /> 수정
-                                </button>
-                                <button type="button" className={`${styles.menuItem} ${styles.menuItemDanger}`} onClick={() => handleCommentDelete(c.id)}>
-                                  <Trash2 size={14} /> 삭제
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {isEditing ? (
-                      <div className={styles.commentEditWrap}>
-                        <textarea
-                          className={styles.commentEditInput}
-                          value={editCommentText}
-                          onChange={(e) => setEditCommentText(e.target.value)}
-                          rows={2}
-                          maxLength={500}
-                        />
-                        <div className={styles.commentEditActions}>
-                          <button
-                            type="button"
-                            className={styles.commentEditCancel}
-                            onClick={() => { setEditingCommentId(null); setEditCommentText(''); }}
-                          >
-                            취소
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.commentEditSave}
-                            onClick={handleCommentEditSave}
-                            disabled={!editCommentText.trim()}
-                          >
-                            저장
-                          </button>
+                    <span className={styles.authorAvatar}>{c.createdBy.charAt(0)}</span>
+                    <div className={styles.commentBody}>
+                      <div className={styles.commentHeader}>
+                        <span className={styles.commentAuthor}>{c.createdBy}</span>
+                        <div className={styles.commentHeaderRight}>
+                          <span className={styles.commentTime}>{formatDate(c.createdAt)}</span>
+                          {isMyComment && !isEditing && (
+                            <div className={styles.commentMenuWrap}>
+                              <button
+                                type="button"
+                                className={styles.commentMenuBtn}
+                                onClick={() => setCommentMenuId(commentMenuId === c.id ? null : c.id)}
+                                aria-label="댓글 더보기"
+                              >
+                                <MoreVertical size={14} />
+                              </button>
+                              {commentMenuId === c.id && (
+                                <div className={styles.commentMenuDropdown} ref={menuRef}>
+                                  <button type="button" className={styles.menuItem} onClick={() => handleCommentEditStart(c)}>
+                                    <Pencil size={14} /> 수정
+                                  </button>
+                                  <button type="button" className={`${styles.menuItem} ${styles.menuItemDanger}`} onClick={() => handleCommentDelete(c.id)}>
+                                    <Trash2 size={14} /> 삭제
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <p className={styles.commentText}>{c.comment}</p>
-                    )}
+                      {isEditing ? (
+                        <div className={styles.commentEditWrap}>
+                          <textarea
+                            className={styles.commentEditInput}
+                            value={editCommentText}
+                            onChange={(e) => setEditCommentText(e.target.value)}
+                            rows={2}
+                            maxLength={500}
+                          />
+                          <div className={styles.commentEditActions}>
+                            <button
+                              type="button"
+                              className={styles.commentEditCancel}
+                              onClick={() => { setEditingCommentId(null); setEditCommentText(''); }}
+                            >
+                              취소
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.commentEditSave}
+                              onClick={handleCommentEditSave}
+                              disabled={!editCommentText.trim()}
+                            >
+                              저장
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className={styles.commentText}>{c.comment}</p>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -578,7 +589,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             disabled={submitting || !commentText.trim()}
             aria-label="댓글 등록"
           >
-            {submitting ? '...' : '↑'}
+            {submitting ? '...' : <Send size={18} />}
           </button>
         </div>
       </div>

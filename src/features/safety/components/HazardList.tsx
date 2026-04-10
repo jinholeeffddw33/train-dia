@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, MessageCircle, Eye, ThumbsUp } from 'lucide-react';
+import { Heart, MessageCircle, Eye, ThumbsUp, Paperclip } from 'lucide-react';
 import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
@@ -97,9 +97,12 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                     </span>
                   </span>
                 )}
-                <span className={styles.noticeAuthor}>{r.createdBy}</span>
+                <span className={styles.authorWrap}>
+                  <span className={styles.authorAvatar}>{r.createdBy.charAt(0)}</span>
+                  <span className={styles.noticeAuthor}>{r.createdBy}</span>
+                </span>
               </div>
-              <div className={styles.noticeBody}>
+              <div className={styles.noticeBodyPreview}>
                 {lines.map((line, i) => {
                   const num = parseInt(line);
                   const isHighlight = num === 1 || num === 2;
@@ -114,7 +117,7 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                 })}
               </div>
               {hasFile && (
-                <div className={styles.noticeFile}>📎 첨부파일</div>
+                <div className={styles.noticeFile}><Paperclip size={12} /> 첨부파일</div>
               )}
               <div className={styles.noticeFooter}>
                 <div className={styles.noticeReactions}>

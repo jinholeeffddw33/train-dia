@@ -247,12 +247,9 @@
 
 /* ── Detail Header Card (분류별 그라데이션) ── */
 .detailHeaderCard {
-  padding: var(--dia-space-4);
+  padding: var(--dia-space-3) var(--dia-space-4);
   border-radius: var(--dia-radius-lg);
   border: 1px solid var(--dia-border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--dia-space-2);
 }
 
 .detailHeaderCardRollcall {

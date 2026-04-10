@@ -379,11 +379,10 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                           <span className={`${styles.noticeDateDow} ${di.isHoliday ? styles.noticeDateHoliday : ''}`}>{di.dow}</span>
                         </span>
                       )}
-                      <span className={styles.detailReadCount}><Eye size={14} /> {report.readCount}</span>
-                    </div>
-                    <div className={styles.detailAuthorWrap}>
-                      <span className={`${styles.authorAvatar} ${styles.authorAvatarLg}`}>{report.createdBy.charAt(0)}</span>
-                      <span className={styles.detailAuthor}>{report.createdBy}</span>
+                      <span className={styles.detailAuthorWrap}>
+                        <span className={styles.authorAvatar}>{report.createdBy.charAt(0)}</span>
+                        <span className={styles.detailAuthor}>{report.createdBy}</span>
+                      </span>
                     </div>
                   </div>
                 );

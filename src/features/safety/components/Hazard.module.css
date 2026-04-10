@@ -1188,7 +1188,9 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-2);
-  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: var(--dia-space-3);
+  margin-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border);
 }
 
 .viewCount {

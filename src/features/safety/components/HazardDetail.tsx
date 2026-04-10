@@ -392,9 +392,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                 <span className={styles.detailLocation}>📍 {report.location}</span>
               )}
 
-              {/* 알림마당: 번호 리스트 형태 — 본문 카드 */}
-              {isNotice ? (
-                <div className={styles.detailBodyCard}>
+              {/* 본문 + 첨부 + 좋아요/조회 통합 카드 */}
+              <div className={styles.detailBodyCard}>
+                {isNotice ? (
                   <div className={styles.noticeBody}>
                     {report.description.split('\n').map((line, i) => {
                       const num = parseInt(line);
@@ -406,45 +406,45 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                       );
                     })}
                   </div>
-                </div>
-              ) : (
-                <p className={styles.detailDesc}>{report.description}</p>
-              )}
+                ) : (
+                  <p className={styles.detailDesc}>{report.description}</p>
+                )}
 
-              {/* 첨부파일 표시 — pill 카드 스타일 */}
-              {isNotice && report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
-                <a href={report.photoUrl} target="_blank" rel="noopener noreferrer" className={styles.noticeFileLink}>
-                  <Paperclip size={14} /> 첨부파일 보기
-                </a>
-              )}
+                {/* 첨부파일 */}
+                {isNotice && report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
+                  <a href={report.photoUrl} target="_blank" rel="noopener noreferrer" className={styles.noticeFileLink}>
+                    <Paperclip size={14} /> 첨부파일 보기
+                  </a>
+                )}
+
+                {/* 좋아요 + 조회수 */}
+                <div className={styles.likeSection}>
+                  <button
+                    type="button"
+                    className={`${styles.likeBtn} ${report.likedByMe ? styles.likeBtnActive : ''}`}
+                    onClick={handleLike}
+                    aria-label={report.likedByMe ? '좋아요 취소' : '좋아요'}
+                  >
+                    <Heart
+                      size={20}
+                      fill={report.likedByMe ? 'var(--dia-red)' : 'none'}
+                      stroke={report.likedByMe ? 'var(--dia-red)' : 'currentColor'}
+                    />
+                    <span className={styles.likeCount}>{report.likeCount}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.readersBtn} ${showReaders ? styles.readersBtnActive : ''}`}
+                    onClick={handleShowReaders}
+                    aria-label="읽은 사람 보기"
+                  >
+                    <Eye size={16} />
+                    <span>{report.readCount}</span>
+                  </button>
+                </div>
+              </div>
             </>
           )}
-        </div>
-
-        {/* 좋아요 + 조회수 */}
-        <div className={styles.likeSection}>
-          <button
-            type="button"
-            className={`${styles.likeBtn} ${report.likedByMe ? styles.likeBtnActive : ''}`}
-            onClick={handleLike}
-            aria-label={report.likedByMe ? '좋아요 취소' : '좋아요'}
-          >
-            <Heart
-              size={20}
-              fill={report.likedByMe ? 'var(--dia-red)' : 'none'}
-              stroke={report.likedByMe ? 'var(--dia-red)' : 'currentColor'}
-            />
-            <span className={styles.likeCount}>{report.likeCount}</span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.readersBtn} ${showReaders ? styles.readersBtnActive : ''}`}
-            onClick={handleShowReaders}
-            aria-label="읽은 사람 보기"
-          >
-            <Eye size={16} />
-            <span>{report.readCount}</span>
-          </button>
         </div>
 
         {/* 읽은 사람 목록 */}

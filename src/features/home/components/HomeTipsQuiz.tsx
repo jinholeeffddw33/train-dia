@@ -1,12 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DAILY_TIPS, QUIZ } from '@/data/tips';
 import styles from '../styles/Home.module.css';
 
 export default function HomeTipsQuiz() {
   const [quizIdx, setQuizIdx] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
+
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // 답변 후 "다음 문제" 버튼으로 자동 스크롤
+  useEffect(() => {
+    if (quizAnswer !== null && nextBtnRef.current) {
+      const timer = setTimeout(() => {
+        nextBtnRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [quizAnswer]);
 
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 864e5);
   const todayTip = DAILY_TIPS[dayOfYear % DAILY_TIPS.length];
@@ -49,6 +61,7 @@ export default function HomeTipsQuiz() {
           <div className={styles.quizExplanation}>
             <p>{quizAnswer === currentQuiz.correct ? '맞았어요!' : '아쉬워요!'} {currentQuiz.exp}</p>
             <button
+              ref={nextBtnRef}
               type="button"
               className={styles.quizNext}
               onClick={() => { setQuizIdx((i) => i + 1); setQuizAnswer(null); }}

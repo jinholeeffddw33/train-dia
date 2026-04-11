@@ -5,7 +5,7 @@ import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand, Info }
 import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
 import { showToast } from '@/components/common/Toast';
-import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
+import { getDia, getType, getDiaDisplay, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import { P } from '@/data/cycle';
 import type { Person } from '@/lib/types';
@@ -49,6 +49,25 @@ function matchesWish(dia: string, wish: WishType): boolean {
     case '비번': return dia.endsWith('~');
     case '휴무': return dia.startsWith('휴');
   }
+}
+
+/** 교번+날짜 → 행로 이미지 경로 */
+function getRouteImagePath(dia: string, date: Date): string | null {
+  if (dia.startsWith('휴') || dia.startsWith('대') || dia.endsWith('~')) return null;
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+  const h = checkHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = checkHoliday(tm);
+  const isNight = getType(dia) === 'night';
+  let prefix: string;
+  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
+  else if (h && th) prefix = 'p_hh';
+  else if (h && !th) prefix = 'p_hp';
+  else if (!h && th) prefix = 'p_ph';
+  else prefix = 'p_pp';
+  return `/images/route/${prefix}_${diaNum}.png`;
 }
 
 /** 오늘 기준 14일 미리보기 배열 */
@@ -505,6 +524,7 @@ function MatchCard({
   const addPost = useExchangeStore((s) => s.addPost);
   const posts = useExchangeStore((s) => s.posts);
   const [sent, setSent] = useState(false);
+  const [routePreview, setRoutePreview] = useState<{ dia: string; date: Date; imgPath: string } | null>(null);
 
   const alreadySent = useMemo(() => {
     if (!driver) return false;
@@ -580,14 +600,54 @@ function MatchCard({
           const dia = getDia(person, date);
           const type = getType(dia);
           const display = getDiaDisplay(dia);
+          const imgPath = getRouteImagePath(dia, date);
           return (
             <div key={key} className={styles.matchDay}>
               <span className={styles.matchDayLabel}>{formatShort(date)}</span>
-              <span className={`${styles.matchDayDia} ${styles[`dia_${type}`]}`}>{display}</span>
+              {imgPath ? (
+                <button
+                  type="button"
+                  className={`${styles.matchDayDia} ${styles[`dia_${type}`]} ${styles.matchDiaBtn}`}
+                  onClick={() => setRoutePreview({ dia, date, imgPath })}
+                  aria-label={`${display}번 근무 행로 보기`}
+                >
+                  {display}
+                </button>
+              ) : (
+                <span className={`${styles.matchDayDia} ${styles[`dia_${type}`]}`}>{display}</span>
+              )}
             </div>
           );
         })}
       </div>
+
+      {/* 행로 이미지 미리보기 */}
+      {routePreview && (
+        <div className={styles.routeOverlay} onClick={() => setRoutePreview(null)}>
+          <div className={styles.routePanel} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.routeHeader}>
+              <h3 className={styles.routeTitle}>
+                {person.n} · {getDiaDisplay(routePreview.dia)}번 근무
+              </h3>
+              <button
+                type="button"
+                className={styles.routeClose}
+                onClick={() => setRoutePreview(null)}
+                aria-label="닫기"
+              >
+                <X size={22} />
+              </button>
+            </div>
+            <div className={styles.routeBody}>
+              <img
+                src={routePreview.imgPath}
+                alt={`${getDiaDisplay(routePreview.dia)}번 행로표`}
+                className={styles.routeImg}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

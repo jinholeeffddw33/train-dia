@@ -371,6 +371,103 @@
   font-weight: var(--dia-weight-bold);
 }
 
+.matchDiaBtn {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: var(--dia-radius-sm);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matchDiaBtn:active {
+  transform: scale(0.92);
+  background: var(--dia-bg);
+}
+
+/* ── 행로 이미지 미리보기 오버레이 ── */
+.routeOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-4);
+  animation: routeFadeIn 0.15s ease;
+}
+
+@keyframes routeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.routePanel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.routeHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.routeTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.routeClose {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  border-radius: var(--dia-radius-full);
+}
+
+.routeClose:active {
+  transform: scale(0.92);
+}
+
+.routeBody {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--dia-space-3);
+}
+
+.routeImg {
+  width: 100%;
+  height: auto;
+  border-radius: var(--dia-radius-md);
+}
+
 /* ── Memo Section ── */
 .memoSection {
   padding-top: var(--dia-space-4);

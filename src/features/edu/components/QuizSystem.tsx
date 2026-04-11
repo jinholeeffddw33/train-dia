@@ -243,9 +243,22 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     } else {
       const percent = toScore100(score, questions.length);
       addQuizRecord({ score, total: questions.length, percent, mode: quizMode });
-      // 등급 도전 모드일 때 점수 기록
+      // 등급 도전 모드일 때 점수 기록 + 서버 전송
       if (quizMode === 'level' && quizLevelId) {
         updateLevelScore(quizLevelId, percent);
+        const level = levels.find(l => l.id === quizLevelId);
+        if (level) {
+          fetch('/api/edu/level-records', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              levelId: quizLevelId,
+              levelName: level.name,
+              score: percent,
+              passed: percent >= level.passScore,
+            }),
+          }).catch(() => {});
+        }
       }
       setPhase('result');
     }

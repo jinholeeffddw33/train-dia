@@ -1095,3 +1095,112 @@
   color: var(--dia-red, #f87171);
   background: rgba(248, 113, 113, 0.12);
 }
+
+/* ===== 등급도전 현황 ===== */
+
+.levelEmpty {
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  padding: var(--dia-space-10) var(--dia-space-4);
+}
+
+.levelSection {
+  padding: var(--dia-space-4);
+}
+
+.levelSectionTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-tertiary);
+  margin: 0 0 var(--dia-space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* 기관사별 요약 */
+.levelSummaryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.levelSummaryCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+
+.levelSummaryName {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  flex: 1;
+  min-width: 0;
+}
+
+.levelSummaryBadge {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+}
+
+.levelSummaryAttempts {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+}
+
+/* 전체 기록 */
+.levelRecordList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.levelRecordItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+}
+
+.levelRecordLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.levelRecordName {
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+}
+
+.levelRecordLevel {
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+  font-size: var(--dia-text-xs);
+}
+
+.levelRecordScore {
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+  font-size: var(--dia-text-xs);
+}
+
+.levelRecordDate {
+  color: var(--dia-text-tertiary);
+  white-space: nowrap;
+  font-size: var(--dia-text-xs);
+}

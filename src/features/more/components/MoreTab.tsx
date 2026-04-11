@@ -19,7 +19,10 @@ import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import FeedbackOverlay from './FeedbackOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
+import LevelRecordsOverlay from './LevelRecordsOverlay';
 import styles from '../styles/More.module.css';
+
+const LEVEL_ADMIN_SABUN = '21711694'; // 이현구
 
 export default function MoreTab() {
   const driver = useDriverStore((s) => s.current);
@@ -46,6 +49,7 @@ export default function MoreTab() {
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
+  const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
   const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -428,6 +432,26 @@ export default function MoreTab() {
         </section>
       )}
 
+      {/* 등급도전 현황 — 이현구만 */}
+      {authUser?.sabun === LEVEL_ADMIN_SABUN && (
+        <section className={styles.section}>
+          <h3 className={styles.sectionTitle}>교육 관리</h3>
+          <button
+            type="button"
+            className={styles.toolBtn}
+            onClick={() => setLevelRecordsOpen(true)}
+          >
+            <div className={styles.settingInfo}>
+              <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+                <ShieldCheck size={20} />
+              </div>
+              <span className={styles.settingLabel}>등급도전 현황</span>
+            </div>
+            <ChevronRight size={16} className={styles.toolArrow} />
+          </button>
+        </section>
+      )}
+
       {/* PIN 변경 모달 */}
       {pinChangeOpen && (
         <div className={styles.fullOverlay}>
@@ -659,6 +683,9 @@ export default function MoreTab() {
       {adminFeedbackOpen && (
         <AdminFeedbackOverlay onClose={() => setAdminFeedbackOpen(false)} />
       )}
+
+      {/* 등급도전 현황 오버레이 */}
+      <LevelRecordsOverlay open={levelRecordsOpen} onClose={() => setLevelRecordsOpen(false)} />
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (

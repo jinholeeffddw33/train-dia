@@ -1623,23 +1623,25 @@
   background: rgba(219, 234, 254, 0.5);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  border-left: 3px solid rgba(59, 130, 246, 0.25);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-left: 3px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.08);
 }
 
-:root.light .levelCard.levelGreen { border-left-color: #16a34a; }
-:root.light .levelCard.levelBlue { border-left-color: #2563eb; }
-:root.light .levelCard.levelAmber { border-left-color: #d97706; }
-:root.light .levelCard.levelRed { border-left-color: #dc2626; }
+:root.light .levelCard.levelGreen { border-left-color: #16a34a; border-color: rgba(22, 163, 74, 0.25); border-left-color: #16a34a; }
+:root.light .levelCard.levelBlue { border-color: rgba(37, 99, 235, 0.25); border-left-color: #2563eb; }
+:root.light .levelCard.levelAmber { border-color: rgba(217, 119, 6, 0.25); border-left-color: #d97706; }
+:root.light .levelCard.levelRed { border-color: rgba(220, 38, 38, 0.25); border-left-color: #dc2626; }
 
 :root.light .levelPassBadge { color: #16a34a; text-shadow: none; }
 :root.light .levelGoLabel { color: #2563eb; text-shadow: none; }
 
 :root.light .areaChip {
-  background: rgba(219, 234, 254, 0.4);
+  background: rgba(219, 234, 254, 0.5);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  border: 1px solid rgba(59, 130, 246, 0.12);
+  border: 1.5px solid rgba(59, 130, 246, 0.25);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.06);
 }
 
 :root.light .areaChipCount { color: #2563eb; }
@@ -2083,8 +2085,8 @@
 }
 
 :root.light .historyItem {
-  background: rgba(219, 234, 254, 0.3);
-  border: 1px solid rgba(59, 130, 246, 0.08);
+  background: rgba(219, 234, 254, 0.4);
+  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .historyDate {

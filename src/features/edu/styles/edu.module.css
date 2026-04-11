@@ -2420,6 +2420,76 @@
   font-size: var(--dia-text-sm);
 }
 
+/* ===== 통합 교육훈련 리스트 ===== */
+
+.trainingListWrap {
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.trainingCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.trainingCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+
+.trainingCardTitle {
+  font-size: var(--dia-text-base);
+  font-weight: 600;
+  color: var(--dia-text-primary);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.trainingBtnRow {
+  display: flex;
+  gap: var(--dia-space-3);
+}
+
+.trainingBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  min-height: 48px;
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface-elevated);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.trainingBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.trainingBtn:active {
+  transform: scale(0.97);
+}
+
+.trainingBtnVideo {
+  background: var(--dia-surface-elevated);
+}
+
 /* ===== 동영상 교육 ===== */
 
 .videoListWrap {

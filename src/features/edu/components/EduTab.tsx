@@ -8,6 +8,7 @@ import QuizSystem from './QuizSystem';
 import WrongReview from './WrongReview';
 import MyInfo from './MyInfo';
 import VideoEducation from './VideoEducation';
+import TrainingList from './TrainingList';
 
 type EduView =
   | { type: 'home' }
@@ -16,7 +17,8 @@ type EduView =
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
   | { type: 'myinfo' }
-  | { type: 'video' };
+  | { type: 'video' }
+  | { type: 'training' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -59,6 +61,13 @@ export default function EduTab({ onBack }: EduTabProps) {
       );
     case 'video':
       return <VideoEducation onBack={goHome} />;
+    case 'training':
+      return (
+        <TrainingList
+          onBack={goHome}
+          onSlide={(ids) => setView({ type: 'study', initChapters: ids })}
+        />
+      );
     default:
       return (
         <EduHome
@@ -72,6 +81,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onWrongQuiz={() => setView({ type: 'wrong-quiz' })}
           onMyInfo={() => setView({ type: 'myinfo' })}
           onVideo={() => setView({ type: 'video' })}
+          onTraining={() => setView({ type: 'training' })}
         />
       );
   }

@@ -1360,85 +1360,118 @@
   filter: brightness(0.9);
 }
 
-/* ── 퀴즈 ── */
+/* ── 퀴즈 — Mission Control 블루 테마 ── */
 .quizSetup {
-  padding: var(--dia-space-4);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-3);
+  gap: 0;
 }
 
-/* 현재 등급 카드 */
+/* ── 히어로 등급 배너 ── */
 .currentLevelCard {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-strong);
-  border-radius: var(--dia-radius-lg);
-  padding: var(--dia-space-4);
+  gap: var(--dia-space-4);
+  padding: var(--dia-space-6) var(--dia-space-4) var(--dia-space-5);
+  background: linear-gradient(160deg, #0c1929 0%, #132040 40%, #1a2d55 100%);
+  overflow: hidden;
 }
 
-.currentLevelInfo { flex: 1; min-width: 0; }
+.currentLevelCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(96, 165, 250, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.currentLevelInfo { flex: 1; min-width: 0; position: relative; z-index: 1; }
 
 .currentLevelName {
-  font-size: var(--dia-text-lg);
+  font-size: var(--dia-text-xl);
   font-weight: 700;
-  color: var(--dia-text-primary);
+  color: #F1F5F9;
+  text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
 }
 
 .currentLevelDesc {
   font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
-  margin-top: 2px;
+  color: rgba(148, 163, 184, 0.9);
+  margin-top: 4px;
 }
 
-/* 뱃지 */
+/* ── 뱃지 — 글로우 효과 ── */
 .levelBadge {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   gap: 1px;
   color: var(--dia-text-secondary);
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 6px currentColor);
 }
 
-.levelGreen { color: var(--dia-green); }
-.levelBlue { color: var(--dia-blue); }
-.levelAmber { color: var(--dia-amber); }
-.levelRed { color: var(--dia-red); }
+.levelGreen { color: #4ade80; }
+.levelBlue { color: #60a5fa; }
+.levelAmber { color: #fbbf24; }
+.levelRed { color: #f87171; }
 
 .levelStars {
   font-size: 10px;
   line-height: 1;
   letter-spacing: -1px;
+  color: inherit;
 }
 
-/* 등급 카드 */
+/* ── 등급/영역 공통 내부 패딩 영역 ── */
+.quizSetup > .sectionDivider {
+  padding-left: var(--dia-space-4);
+  padding-right: var(--dia-space-4);
+}
+
+/* ── 등급 카드 — 글래스모피즘 + 좌측 액센트바 ── */
 .levelCard {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  margin: 0 var(--dia-space-4);
+  background: rgba(30, 58, 100, 0.25);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  border-left: 3px solid rgba(96, 165, 250, 0.3);
   border-radius: var(--dia-radius-md);
   padding: var(--dia-space-3) var(--dia-space-4);
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
-  min-height: 56px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  min-height: 60px;
 }
 
 .levelCard:focus-visible {
-  outline: 2px solid var(--dia-blue);
+  outline: 2px solid #60a5fa;
   outline-offset: 2px;
 }
 
 .levelCard:active:not(.levelLocked) {
   transform: scale(0.98);
+  background: rgba(30, 58, 100, 0.4);
 }
 
+/* 등급 색상별 좌측 액센트바 */
+.levelCard.levelGreen { border-left-color: #4ade80; }
+.levelCard.levelBlue { border-left-color: #60a5fa; }
+.levelCard.levelAmber { border-left-color: #fbbf24; }
+.levelCard.levelRed { border-left-color: #f87171; }
+
 .levelLocked {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  border-left-color: rgba(148, 163, 184, 0.2);
 }
 
 .levelCardLeft {
@@ -1460,7 +1493,7 @@
 .levelCardDesc {
   font-size: var(--dia-text-xs);
   color: var(--dia-text-secondary);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .levelCardRight {
@@ -1477,7 +1510,8 @@
   gap: 4px;
   font-size: var(--dia-text-sm);
   font-weight: 600;
-  color: var(--dia-green);
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
 }
 
 .levelScoreLabel {
@@ -1487,15 +1521,17 @@
 
 .levelGoLabel {
   font-size: var(--dia-text-sm);
-  font-weight: 500;
-  color: var(--dia-blue);
+  font-weight: 600;
+  color: #60a5fa;
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
 }
 
-/* 영역별 그리드 */
+/* ── 영역별 그리드 — 글래스 타일 ── */
 .areaGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-4);
 }
 
 .areaChip {
@@ -1503,50 +1539,111 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  min-height: 52px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  gap: 4px;
+  min-height: 56px;
+  background: rgba(30, 58, 100, 0.2);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(96, 165, 250, 0.1);
   border-radius: var(--dia-radius-md);
-  padding: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-1);
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.1s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
 .areaChip:focus-visible {
-  outline: 2px solid var(--dia-blue);
+  outline: 2px solid #60a5fa;
   outline-offset: 2px;
 }
 
 .areaChip:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  background: rgba(30, 58, 100, 0.35);
+  border-color: rgba(96, 165, 250, 0.25);
 }
 
 .areaChipName {
   font-size: var(--dia-text-sm);
   font-weight: 500;
   color: var(--dia-text-primary);
+  text-align: center;
+  line-height: 1.2;
 }
 
 .areaChipCount {
   font-size: var(--dia-text-xs);
-  color: var(--dia-text-secondary);
+  color: #60a5fa;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-/* 결과 — 등급 뱃지 */
+/* ── 결과 — 등급 뱃지 ── */
 .resultLevelBadge {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--dia-space-2);
+  gap: var(--dia-space-3);
   margin-bottom: var(--dia-space-2);
 }
 
 .resultLevelPass {
-  font-size: var(--dia-text-lg);
+  font-size: var(--dia-text-xl);
   font-weight: 700;
-  color: var(--dia-green);
+  color: #4ade80;
+  text-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
 }
+
+/* ── 라이트 모드 오버라이드 — 쿨블루 소프트 ── */
+:root.light .currentLevelCard {
+  background: linear-gradient(160deg, #e8f0fe 0%, #dbeafe 40%, #c7d9f5 100%);
+}
+
+:root.light .currentLevelCard::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+}
+
+:root.light .currentLevelName {
+  color: #1e3a5f;
+  text-shadow: none;
+}
+
+:root.light .currentLevelDesc {
+  color: #475569;
+}
+
+:root.light .levelBadge { filter: none; }
+:root.light .levelGreen { color: #16a34a; }
+:root.light .levelBlue { color: #2563eb; }
+:root.light .levelAmber { color: #d97706; }
+:root.light .levelRed { color: #dc2626; }
+
+:root.light .levelCard {
+  background: rgba(219, 234, 254, 0.5);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-left: 3px solid rgba(59, 130, 246, 0.25);
+}
+
+:root.light .levelCard.levelGreen { border-left-color: #16a34a; }
+:root.light .levelCard.levelBlue { border-left-color: #2563eb; }
+:root.light .levelCard.levelAmber { border-left-color: #d97706; }
+:root.light .levelCard.levelRed { border-left-color: #dc2626; }
+
+:root.light .levelPassBadge { color: #16a34a; text-shadow: none; }
+:root.light .levelGoLabel { color: #2563eb; text-shadow: none; }
+
+:root.light .areaChip {
+  background: rgba(219, 234, 254, 0.4);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid rgba(59, 130, 246, 0.12);
+}
+
+:root.light .areaChipCount { color: #2563eb; }
+:root.light .resultLevelPass { color: #16a34a; text-shadow: none; }
 
 .quizOption {
   background: var(--dia-surface);
@@ -1596,16 +1693,25 @@
 .progressBar {
   flex: 1;
   height: 6px;
-  background: var(--dia-surface);
+  background: rgba(30, 58, 100, 0.3);
   border-radius: var(--dia-radius-full);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--dia-blue);
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
   border-radius: var(--dia-radius-full);
   transition: width 300ms var(--dia-ease);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
+}
+
+:root.light .progressBar {
+  background: rgba(219, 234, 254, 0.6);
+}
+
+:root.light .progressFill {
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
 .progressText {
@@ -1683,18 +1789,24 @@
 .explanation {
   margin-top: var(--dia-space-3);
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(30, 58, 100, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.1);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
   line-height: var(--dia-leading-normal);
 }
 
+:root.light .explanation {
+  background: rgba(219, 234, 254, 0.4);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
 .nextBtn {
   margin-top: var(--dia-space-4);
   width: 100%;
   padding: var(--dia-space-3);
-  background: var(--dia-blue);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   border: none;
   border-radius: var(--dia-radius-md);
   color: #fff;
@@ -1703,10 +1815,13 @@
   cursor: pointer;
   min-height: 48px;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 .nextBtn:active {
-  opacity: 0.9;
+  transform: scale(0.98);
+  box-shadow: 0 1px 6px rgba(59, 130, 246, 0.2);
 }
 
 /* quiz result */
@@ -1717,6 +1832,11 @@
   flex-direction: column;
   align-items: center;
   gap: var(--dia-space-5);
+  background: linear-gradient(180deg, rgba(12, 25, 41, 0.5) 0%, transparent 60%);
+}
+
+:root.light .resultWrap {
+  background: linear-gradient(180deg, rgba(219, 234, 254, 0.4) 0%, transparent 60%);
 }
 
 .resultEmoji {
@@ -1739,7 +1859,7 @@
 
 .resultRingBg {
   fill: none;
-  stroke: var(--dia-border);
+  stroke: rgba(30, 58, 100, 0.3);
   stroke-width: 10;
 }
 
@@ -1748,12 +1868,16 @@
   stroke-width: 10;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s ease-out;
+  filter: drop-shadow(0 0 6px currentColor);
 }
 
-.resultRingGreen { stroke: var(--dia-green); }
-.resultRingAmber { stroke: var(--dia-amber); }
-.resultRingRed { stroke: var(--dia-red); }
+.resultRingGreen { stroke: #4ade80; }
+.resultRingAmber { stroke: #fbbf24; }
+.resultRingRed { stroke: #f87171; }
 .resultRingGold { stroke: var(--dia-3d-amber-start); }
+
+:root.light .resultRingBg { stroke: rgba(219, 234, 254, 0.6); }
+:root.light .resultRingFg { filter: none; }
 
 .resultRingCenter {
   position: absolute;
@@ -1833,10 +1957,18 @@
   align-items: center;
   gap: var(--dia-space-1);
   padding: var(--dia-space-3) var(--dia-space-2);
-  background: var(--dia-surface-elevated);
-  border: 1px solid var(--dia-border);
+  background: rgba(30, 58, 100, 0.2);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(96, 165, 250, 0.1);
   border-radius: var(--dia-radius-md);
-  box-shadow: var(--dia-card-depth);
+}
+
+:root.light .resultStatCard {
+  background: rgba(219, 234, 254, 0.4);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid rgba(59, 130, 246, 0.12);
 }
 
 .resultStatValue {
@@ -1911,20 +2043,30 @@
 }
 
 .resultBtnOutline {
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: rgba(30, 58, 100, 0.2);
+  border: 1px solid rgba(96, 165, 250, 0.2);
   color: var(--dia-text-primary);
 }
 
 .resultBtnPrimary {
-  background: var(--dia-blue);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   border: none;
   color: #fff;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+}
+
+:root.light .resultBtnOutline {
+  background: rgba(219, 234, 254, 0.5);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+:root.light .resultBtnPrimary {
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
 }
 
 /* history */
 .historyList {
-  padding: var(--dia-space-4);
+  padding: 0 var(--dia-space-4) var(--dia-space-4);
   display: flex;
   flex-direction: column;
   gap: var(--dia-space-2);
@@ -1935,9 +2077,14 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: rgba(30, 58, 100, 0.15);
+  border: 1px solid rgba(96, 165, 250, 0.08);
   border-radius: var(--dia-radius-sm);
+}
+
+:root.light .historyItem {
+  background: rgba(219, 234, 254, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.08);
 }
 
 .historyDate {

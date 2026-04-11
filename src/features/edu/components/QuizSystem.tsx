@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Shield, Crown, Lock, Check } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import type { QuizMode } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -15,6 +15,22 @@ interface QuizSystemProps {
 }
 
 type Phase = 'setup' | 'quiz' | 'result';
+
+/* ── 등급 정의 ── */
+interface LevelDef {
+  id: number;
+  name: string;
+  color: string;
+  passScore: number;
+  description: string;
+}
+
+interface AreaDef {
+  id: string;
+  name: string;
+  chapters: string[];
+  level: number;
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -35,24 +51,76 @@ function scoreGradeClass(score100: number): string {
   return styles.gradeRed;
 }
 
-/** 챕터 ID → 짧은 이름 */
-const CHAPTER_LABELS: Record<string, string> = {
-  ch1: '근무작업절차',
-  ch2: '전동차 일반',
-  ch4: '기지/주박',
-  ch5: '전동차 비교',
-  ch6: '한줄노트',
-  ch7: '사고사례',
-  ch8: '방송문안',
-  ch9: '통화요령',
-  ch10: 'All-Call',
-};
+/** 등급 색상 CSS 클래스 */
+function levelColorClass(color: string): string {
+  switch (color) {
+    case 'green': return styles.levelGreen;
+    case 'blue': return styles.levelBlue;
+    case 'amber': return styles.levelAmber;
+    case 'red': return styles.levelRed;
+    default: return '';
+  }
+}
+
+/** 뱃지 아이콘 — 방패+별 */
+function LevelBadge({ level, size = 24 }: { level: LevelDef; size?: number }) {
+  const isMaster = level.id === 4;
+  const Icon = isMaster ? Crown : Shield;
+  const stars = Math.min(level.id - 1, 3);
+  return (
+    <span className={`${styles.levelBadge} ${levelColorClass(level.color)}`}>
+      <Icon size={size} />
+      {stars > 0 && (
+        <span className={styles.levelStars}>{'★'.repeat(stars)}</span>
+      )}
+    </span>
+  );
+}
+
+/** 현재 등급 계산 */
+function getCurrentLevel(levelScores: Record<number, number>, levels: LevelDef[]): LevelDef {
+  let current = levels[0];
+  for (let i = 0; i < levels.length - 1; i++) {
+    const bestScore = levelScores[levels[i].id] ?? 0;
+    if (bestScore >= levels[i].passScore) {
+      current = levels[i + 1];
+    } else break;
+  }
+  return current;
+}
+
+/** 해당 레벨이 해금되었는지 */
+function isLevelUnlocked(levelId: number, levelScores: Record<number, number>, levels: LevelDef[]): boolean {
+  if (levelId === 1) return true;
+  for (let i = 0; i < levels.length; i++) {
+    if (levels[i].id === levelId) {
+      // 이전 레벨이 통과되었는지 확인
+      const prevLevel = levels[i - 1];
+      if (!prevLevel) return true;
+      return (levelScores[prevLevel.id] ?? 0) >= prevLevel.passScore;
+    }
+  }
+  return false;
+}
+
+/** 해당 레벨이 통과되었는지 */
+function isLevelPassed(levelId: number, levelScores: Record<number, number>, levels: LevelDef[]): boolean {
+  const level = levels.find(l => l.id === levelId);
+  if (!level) return false;
+  return (levelScores[levelId] ?? 0) >= level.passScore;
+}
+
+/** 영역 이름 맵 */
+const AREA_LABELS: Record<string, string> = {};
 
 export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
+  const [levels, setLevels] = useState<LevelDef[]>([]);
+  const [areas, setAreas] = useState<AreaDef[]>([]);
   const [phase, setPhase] = useState<Phase>(wrongOnly ? 'quiz' : 'setup');
   const [quizMode, setQuizMode] = useState<QuizMode>(wrongOnly ? 'wrong-only' : 'standard');
-  const [quizChapterId, setQuizChapterId] = useState<string | undefined>(initChapter);
+  const [quizLevelId, setQuizLevelId] = useState<number | undefined>();
+  const [quizAreaId, setQuizAreaId] = useState<string | undefined>();
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -62,20 +130,17 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   const [resolvedInSession, setResolvedInSession] = useState(0);
 
   const {
-    addQuizRecord, addWrongAnswer, resolveWrongAnswer,
-    previousScore, totalQuizzes, unresolvedWrongs,
+    addQuizRecord, addWrongAnswer, resolveWrongAnswer, updateLevelScore,
+    previousScore, totalQuizzes, unresolvedWrongs, levelScores,
   } = useEduStore();
 
-  // 오답 전용 모드: store에서 오답 문제를 퀴즈 형식으로 변환
+  // 오답 전용 모드
   const startWrongOnlyQuiz = useCallback(() => {
     if (unresolvedWrongs.length === 0) return;
     const pool = unresolvedWrongs.map(w => ({
-      id: w.questionId,
-      chapter: w.chapterId,
-      question: w.question,
-      choices: w.choices,
-      answer: w.answer,
-      explanation: w.explanation,
+      id: w.questionId, chapter: w.chapterId,
+      question: w.question, choices: w.choices,
+      answer: w.answer, explanation: w.explanation,
       _isFromWrongNote: true,
     }));
     startQuizWith(pool, pool.length, 'wrong-only');
@@ -84,30 +149,29 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
 
   useEffect(() => {
     if (wrongOnly) {
-      // 오답 전용 모드: quiz JSON 불필요, store 데이터로 직접 시작
-      if (unresolvedWrongs.length > 0) {
-        startWrongOnlyQuiz();
-      }
+      if (unresolvedWrongs.length > 0) startWrongOnlyQuiz();
       return;
     }
-
     fetch('/data/edu/handbook-quiz.json')
       .then(r => r.json())
       .then(data => {
         setAllQuestions(data.questions);
-        // 챕터 직진입 시 자동 시작
+        setLevels(data.levels ?? []);
+        setAreas(data.areas ?? []);
+        // 영역 이름 맵 구성
+        for (const a of (data.areas ?? [])) {
+          AREA_LABELS[a.id] = a.name;
+        }
         if (initChapter && data.questions.length > 0) {
           const pool = data.questions.filter((q: any) => q.chapter === initChapter);
-          if (pool.length > 0) {
-            startQuizWith(pool, Math.min(pool.length, 20), 'chapter', initChapter);
-          }
+          if (pool.length > 0) startQuizWith(pool, Math.min(pool.length, 20), 'chapter');
         }
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const startQuizWith = useCallback((pool: any[], count: number, mode: QuizMode = 'standard', chapterId?: string) => {
+  const startQuizWith = useCallback((pool: any[], count: number, mode: QuizMode = 'standard') => {
     const shuffled = shuffle(pool).slice(0, count);
     const withShuffledChoices = shuffled.map(q => {
       const indices: number[] = q.choices.map((_: any, i: number) => i);
@@ -128,16 +192,21 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     setSelected(null);
     setAnswered(false);
     setQuizMode(mode);
-    setQuizChapterId(chapterId);
     setPhase('quiz');
   }, []);
 
-  const startQuiz = useCallback((count: number, mode: QuizMode = 'standard', chapter?: string) => {
-    let pool = allQuestions;
-    if (chapter) {
-      pool = allQuestions.filter(q => q.chapter === chapter);
-    }
-    startQuizWith(pool, count, mode, chapter);
+  const startLevelQuiz = useCallback((levelId: number) => {
+    const pool = allQuestions.filter(q => q.level === levelId);
+    setQuizLevelId(levelId);
+    setQuizAreaId(undefined);
+    startQuizWith(pool, Math.min(pool.length, 30), 'level');
+  }, [allQuestions, startQuizWith]);
+
+  const startAreaQuiz = useCallback((areaId: string) => {
+    const pool = allQuestions.filter(q => q.area === areaId);
+    setQuizAreaId(areaId);
+    setQuizLevelId(undefined);
+    startQuizWith(pool, pool.length, 'area');
   }, [allQuestions, startQuizWith]);
 
   const handleSelect = useCallback((choiceIdx: number) => {
@@ -147,23 +216,19 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     const q = questions[currentIdx];
     if (choiceIdx === q.answer) {
       setScore(prev => prev + 1);
-      // 오답 재시험 모드에서 맞힌 문제는 resolved 처리
       if (q._isFromWrongNote) {
         resolveWrongAnswer(q.id);
         setResolvedInSession(prev => prev + 1);
       }
     } else {
       setWrongInSession(prev => prev + 1);
-      // 오답 재시험 모드가 아닌 경우에만 오답노트에 추가
       if (!q._isFromWrongNote) {
         addWrongAnswer({
-          questionId: q.id,
-          question: q.question,
-          choices: q.originalChoices,
-          answer: q.originalAnswer,
+          questionId: q.id, question: q.question,
+          choices: q.originalChoices, answer: q.originalAnswer,
           selected: q.originalChoices.indexOf(q.choices[choiceIdx]),
           explanation: q.explanation,
-          chapter: CHAPTER_LABELS[q.chapter] ?? q.chapter,
+          chapter: AREA_LABELS[q.area] ?? q.chapter,
           chapterId: q.chapter,
         });
       }
@@ -177,18 +242,16 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
       setAnswered(false);
     } else {
       const percent = toScore100(score, questions.length);
-      addQuizRecord({
-        score, total: questions.length, percent,
-        mode: quizMode,
-        chapterId: quizChapterId,
-      });
+      addQuizRecord({ score, total: questions.length, percent, mode: quizMode });
+      // 등급 도전 모드일 때 점수 기록
+      if (quizMode === 'level' && quizLevelId) {
+        updateLevelScore(quizLevelId, percent);
+      }
       setPhase('result');
     }
-  }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizChapterId]);
+  }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizLevelId, updateLevelScore]);
 
   const nextBtnRef = useRef<HTMLButtonElement>(null);
-
-  // 답변 후 "다음 문제" 버튼으로 자동 스크롤
   useEffect(() => {
     if (answered && nextBtnRef.current) {
       const timer = setTimeout(() => {
@@ -203,24 +266,29 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   const resultMessage = useMemo(() => {
     if (quizMode === 'wrong-only') {
       if (score100 === 100) return '오답을 모두 정복했습니다.';
-      if (score100 >= 80) return '대부분 보완되었습니다. 남은 문제를 한번 더 확인하세요.';
+      if (score100 >= 80) return '대부분 보완되었습니다.';
       return '오답 교재를 다시 확인하고 재도전하세요.';
+    }
+    if (quizMode === 'level' && quizLevelId) {
+      const level = levels.find(l => l.id === quizLevelId);
+      if (level && score100 >= level.passScore) {
+        if (quizLevelId < 4) return `${level.name} 등급 통과! 다음 등급이 해금되었습니다.`;
+        return '마스터기관사 등급 달성! 축하합니다.';
+      }
+      if (level) return `${level.passScore}점 이상이 필요합니다. 다시 도전하세요.`;
     }
     if (score100 >= 90) return '충분히 숙달되었습니다.';
     if (score100 >= 80) return '양호합니다. 취약 부분만 보완하세요.';
-    if (score100 >= 70) return '복습이 필요합니다. 오답 교재를 확인하세요.';
-    if (score100 >= 50) return '관련 교재를 다시 학습하세요.';
-    return '기본 내용부터 재학습이 필요합니다.';
-  }, [score100, quizMode]);
+    if (score100 >= 70) return '복습이 필요합니다.';
+    return '관련 교재를 다시 학습하세요.';
+  }, [score100, quizMode, quizLevelId, levels]);
 
   const growth = previousScore !== null ? score100 - previousScore : null;
 
-  // 챕터별 문제 수
-  const chapterCounts = useMemo(() => {
+  // 영역별 문제 수
+  const areaCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const q of allQuestions) {
-      counts[q.chapter] = (counts[q.chapter] || 0) + 1;
-    }
+    for (const q of allQuestions) counts[q.area] = (counts[q.area] || 0) + 1;
     return counts;
   }, [allQuestions]);
 
@@ -234,15 +302,15 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           </button>
           <h1 className={styles.topTitle}>오답 재시험</h1>
         </div>
-        <div className={styles.emptyState}>
-          미해결 오답이 없습니다. 시험을 먼저 풀어보세요.
-        </div>
+        <div className={styles.emptyState}>미해결 오답이 없습니다.</div>
       </div>
     );
   }
 
   /* ── Setup ── */
   if (phase === 'setup') {
+    const currentLevel = getCurrentLevel(levelScores, levels);
+
     return (
       <div className={styles.screen}>
         <div className={styles.topBar}>
@@ -253,45 +321,86 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
         </div>
 
         <div className={styles.quizSetup}>
-          <div className={styles.sectionDivider}>전체 시험</div>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(10, 'quick')}>
-            <div className={styles.quizOptionTitle}>빠른 테스트 (10문제)</div>
-            <div className={styles.quizOptionDesc}>가볍게 실력 점검</div>
-          </button>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(20, 'standard')}>
-            <div className={styles.quizOptionTitle}>표준 시험 (20문제)</div>
-            <div className={styles.quizOptionDesc}>실력 평가</div>
-          </button>
-          <button type="button" className={styles.quizOption} onClick={() => startQuiz(allQuestions.length, 'full')}>
-            <div className={styles.quizOptionTitle}>전체 ({allQuestions.length}문제)</div>
-            <div className={styles.quizOptionDesc}>전 범위 점검</div>
-          </button>
+          {/* 현재 등급 표시 */}
+          {levels.length > 0 && (
+            <div className={styles.currentLevelCard}>
+              <LevelBadge level={currentLevel} size={28} />
+              <div className={styles.currentLevelInfo}>
+                <div className={styles.currentLevelName}>{currentLevel.name}</div>
+                <div className={styles.currentLevelDesc}>{currentLevel.description}</div>
+              </div>
+            </div>
+          )}
 
-          {/* 챕터별 퀴즈 */}
-          <div className={styles.sectionDivider}>챕터별 시험</div>
-          {Object.entries(CHAPTER_LABELS).map(([chId, label]) => {
-            const cnt = chapterCounts[chId] || 0;
-            if (cnt === 0) return null;
+          {/* 등급 도전 */}
+          <div className={styles.sectionDivider}>등급 도전</div>
+          {levels.map(level => {
+            const unlocked = isLevelUnlocked(level.id, levelScores, levels);
+            const passed = isLevelPassed(level.id, levelScores, levels);
+            const bestScore = levelScores[level.id] ?? 0;
+            const qCount = allQuestions.filter(q => q.level === level.id).length;
+
             return (
               <button
-                key={chId}
+                key={level.id}
                 type="button"
-                className={styles.quizOption}
-                onClick={() => startQuiz(cnt, 'chapter', chId)}
+                className={`${styles.levelCard} ${levelColorClass(level.color)} ${!unlocked ? styles.levelLocked : ''}`}
+                disabled={!unlocked}
+                onClick={() => unlocked && startLevelQuiz(level.id)}
               >
-                <div className={styles.quizOptionTitle}>{label}</div>
-                <div className={styles.quizOptionDesc}>{cnt}문제</div>
+                <div className={styles.levelCardLeft}>
+                  <LevelBadge level={level} size={22} />
+                  <div className={styles.levelCardBody}>
+                    <div className={styles.levelCardName}>{level.name}</div>
+                    <div className={styles.levelCardDesc}>
+                      {level.description} · {qCount}문제
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.levelCardRight}>
+                  {!unlocked && <Lock size={18} />}
+                  {unlocked && passed && (
+                    <span className={styles.levelPassBadge}>
+                      <Check size={14} /> {bestScore}점
+                    </span>
+                  )}
+                  {unlocked && !passed && bestScore > 0 && (
+                    <span className={styles.levelScoreLabel}>{bestScore}점</span>
+                  )}
+                  {unlocked && !passed && bestScore === 0 && (
+                    <span className={styles.levelGoLabel}>도전</span>
+                  )}
+                </div>
               </button>
             );
           })}
 
+          {/* 영역별 연습 */}
+          <div className={styles.sectionDivider}>영역별 연습</div>
+          <div className={styles.areaGrid}>
+            {areas.map(area => {
+              const cnt = areaCounts[area.id] || 0;
+              if (cnt === 0) return null;
+              return (
+                <button
+                  key={area.id}
+                  type="button"
+                  className={styles.areaChip}
+                  onClick={() => startAreaQuiz(area.id)}
+                >
+                  <span className={styles.areaChipName}>{area.name}</span>
+                  <span className={styles.areaChipCount}>{cnt}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 시험 기록 */}
           <div className={styles.sectionDivider}>시험 기록</div>
           {totalQuizzes > 0 ? (
             <QuizHistory />
           ) : (
-            <div className={styles.emptyHistory}>
-              아직 시험 기록이 없습니다.
-            </div>
+            <div className={styles.emptyHistory}>아직 시험 기록이 없습니다.</div>
           )}
         </div>
       </div>
@@ -301,6 +410,9 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   /* ── Result ── */
   if (phase === 'result') {
     const isWrongMode = quizMode === 'wrong-only';
+    const isLevelMode = quizMode === 'level';
+    const levelDef = isLevelMode && quizLevelId ? levels.find(l => l.id === quizLevelId) : null;
+    const levelPassed = levelDef ? score100 >= levelDef.passScore : false;
     const isPerfect = score100 === 100;
     const RADIUS = 60;
     const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -324,25 +436,27 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
-          <h1 className={styles.topTitle}>{isWrongMode ? '오답 재시험 결과' : '결과'}</h1>
+          <h1 className={styles.topTitle}>
+            {isWrongMode ? '오답 재시험 결과' : isLevelMode && levelDef ? `${levelDef.name} 결과` : '결과'}
+          </h1>
         </div>
 
         <div className={styles.resultWrap}>
-          {/* 원형 프로그레스 */}
+          {/* 등급 뱃지 (등급 도전 모드) */}
+          {isLevelMode && levelDef && (
+            <div className={styles.resultLevelBadge}>
+              <LevelBadge level={levelDef} size={36} />
+              {levelPassed && <span className={styles.resultLevelPass}>통과!</span>}
+            </div>
+          )}
+
           <ScoreRing
-            score100={score100}
-            radius={RADIUS}
-            circumference={CIRCUMFERENCE}
-            ringColorClass={ringColorClass}
-            isPerfect={isPerfect}
+            score100={score100} radius={RADIUS} circumference={CIRCUMFERENCE}
+            ringColorClass={ringColorClass} isPerfect={isPerfect}
           />
 
-          {/* 등급 라벨 */}
-          <span className={`${styles.resultGradeLabel} ${gradeLabelClass}`}>
-            {gradeLabel}
-          </span>
+          <span className={`${styles.resultGradeLabel} ${gradeLabelClass}`}>{gradeLabel}</span>
 
-          {/* 통계 카드 */}
           <div className={styles.resultStats}>
             <div className={styles.resultStatCard}>
               <span className={`${styles.resultStatValue} ${styles.resultStatValueGreen}`}>{score}</span>
@@ -358,16 +472,13 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
             </div>
           </div>
 
-          {/* 부가 정보 */}
           <div className={styles.resultLabel}>
             {isWrongMode && resolvedInSession > 0 && `${resolvedInSession}문제 해결됨`}
             {!isWrongMode && wrongInSession > 0 && `${wrongInSession}문제 오답노트 저장`}
           </div>
 
-          {/* 성장 지표 */}
           {!isWrongMode && growth !== null && growth !== 0 && (
             <div className={`${styles.resultGrowth} ${growth < 0 ? styles.resultDown : ''}`}>
-              <span className={styles.resultGrowthArrow}>{growth > 0 ? '\u25B2' : '\u25B2'}</span>
               {growth > 0 ? `이전 대비 +${growth}점` : `이전 대비 ${growth}점`}
             </div>
           )}
@@ -375,18 +486,16 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           <div className={styles.resultMessage}>{resultMessage}</div>
 
           <div className={styles.resultActions}>
-            <button type="button" className={`${styles.resultBtn} ${styles.resultBtnOutline}`} onClick={onBack}>
+            <button type="button" className={`${styles.resultBtn} ${styles.resultBtnOutline}`} onClick={() => setPhase('setup')}>
               돌아가기
             </button>
             {isWrongMode ? (
-              <button
-                type="button"
-                className={`${styles.resultBtn} ${styles.resultBtnPrimary}`}
-                onClick={() => {
-                  startWrongOnlyQuiz();
-                }}
-              >
+              <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={startWrongOnlyQuiz}>
                 다시 풀기
+              </button>
+            ) : isLevelMode && quizLevelId ? (
+              <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => startLevelQuiz(quizLevelId)}>
+                다시 도전
               </button>
             ) : (
               <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => setPhase('setup')}>
@@ -441,13 +550,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
               else cls += ` ${styles.choiceDisabled}`;
             }
             return (
-              <button
-                key={i}
-                type="button"
-                className={cls}
-                onClick={() => handleSelect(i)}
-                disabled={answered}
-              >
+              <button key={i} type="button" className={cls} onClick={() => handleSelect(i)} disabled={answered}>
                 {i + 1}. {choice}
               </button>
             );
@@ -457,8 +560,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
         {answered && (
           <>
             <div className={styles.explanation}>
-              {selected === q.answer ? '정답. ' : '오답. '}
-              {q.explanation}
+              {selected === q.answer ? '정답. ' : '오답. '}{q.explanation}
             </div>
             <button ref={nextBtnRef} type="button" className={styles.nextBtn} onClick={handleNext}>
               {currentIdx < questions.length - 1 ? '다음 문제' : '결과 보기'}
@@ -470,43 +572,20 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   );
 }
 
-/** SVG 원형 프로그레스 (0 → score100 애니메이션) */
-function ScoreRing({
-  score100,
-  radius,
-  circumference,
-  ringColorClass,
-  isPerfect,
-}: {
-  score100: number;
-  radius: number;
-  circumference: number;
-  ringColorClass: string;
-  isPerfect: boolean;
+/** SVG 원형 프로그레스 */
+function ScoreRing({ score100, radius, circumference, ringColorClass, isPerfect }: {
+  score100: number; radius: number; circumference: number; ringColorClass: string; isPerfect: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    // 마운트 직후 0 → 실제값 트랜지션
-    const raf = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  const offset = mounted
-    ? circumference * (1 - score100 / 100)
-    : circumference;
-
+  useEffect(() => { const raf = requestAnimationFrame(() => setMounted(true)); return () => cancelAnimationFrame(raf); }, []);
+  const offset = mounted ? circumference * (1 - score100 / 100) : circumference;
   return (
     <div className={`${styles.resultRing} ${isPerfect ? styles.resultRingPerfect : ''}`}>
       <svg className={styles.resultRingSvg} viewBox="0 0 140 140">
         <circle className={styles.resultRingBg} cx="70" cy="70" r={radius} />
-        <circle
-          className={`${styles.resultRingFg} ${ringColorClass}`}
-          cx="70"
-          cy="70"
-          r={radius}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          /* STYLE-EXCEPTION: 동적 strokeDashoffset 값 — CSS transition으로 애니메이션 */
+        <circle className={`${styles.resultRingFg} ${ringColorClass}`} cx="70" cy="70" r={radius}
+          strokeDasharray={circumference} strokeDashoffset={offset}
+          /* STYLE-EXCEPTION: 동적 strokeDashoffset */
         />
       </svg>
       <div className={styles.resultRingCenter}>
@@ -520,17 +599,13 @@ function ScoreRing({
 function QuizHistory() {
   const { progress } = useEduStore();
   const recent = [...progress.quizHistory].reverse().slice(0, 10);
-  const best = progress.quizHistory.length > 0
-    ? Math.max(...progress.quizHistory.map(r => r.percent))
-    : 0;
 
   const modeLabel = (mode?: QuizMode) => {
     switch (mode) {
-      case 'quick': return '빠른';
-      case 'full': return '전체';
-      case 'chapter': return '챕터';
+      case 'level': return '등급';
+      case 'area': return '영역';
       case 'wrong-only': return '오답';
-      default: return '표준';
+      default: return '시험';
     }
   };
 
@@ -547,9 +622,7 @@ function QuizHistory() {
             <span className={styles.historyMeta}>
               {modeLabel(record.mode)} · {record.score}/{record.total}
             </span>
-            <span className={`${styles.historyScore} ${gradeClass} ${record.percent === best ? styles.historyHigh : ''}`}>
-              {record.percent}점
-            </span>
+            <span className={`${styles.historyScore} ${gradeClass}`}>{record.percent}점</span>
           </div>
         );
       })}

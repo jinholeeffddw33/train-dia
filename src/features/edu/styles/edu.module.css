@@ -1365,7 +1365,187 @@
   padding: var(--dia-space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-4);
+  gap: var(--dia-space-3);
+}
+
+/* 현재 등급 카드 */
+.currentLevelCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-4);
+}
+
+.currentLevelInfo { flex: 1; min-width: 0; }
+
+.currentLevelName {
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.currentLevelDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+
+/* 뱃지 */
+.levelBadge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  color: var(--dia-text-secondary);
+}
+
+.levelGreen { color: var(--dia-green); }
+.levelBlue { color: var(--dia-blue); }
+.levelAmber { color: var(--dia-amber); }
+.levelRed { color: var(--dia-red); }
+
+.levelStars {
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+/* 등급 카드 */
+.levelCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  min-height: 56px;
+}
+
+.levelCard:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.levelCard:active:not(.levelLocked) {
+  transform: scale(0.98);
+}
+
+.levelLocked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.levelCardLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.levelCardBody { flex: 1; min-width: 0; }
+
+.levelCardName {
+  font-size: var(--dia-text-base);
+  font-weight: 600;
+  color: var(--dia-text-primary);
+}
+
+.levelCardDesc {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  margin-top: 1px;
+}
+
+.levelCardRight {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-shrink: 0;
+  color: var(--dia-text-tertiary);
+}
+
+.levelPassBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-green);
+}
+
+.levelScoreLabel {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.levelGoLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  color: var(--dia-blue);
+}
+
+/* 영역별 그리드 */
+.areaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--dia-space-2);
+}
+
+.areaChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  padding: var(--dia-space-2);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.areaChip:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.areaChip:active {
+  transform: scale(0.97);
+}
+
+.areaChipName {
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  color: var(--dia-text-primary);
+}
+
+.areaChipCount {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+}
+
+/* 결과 — 등급 뱃지 */
+.resultLevelBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-2);
+}
+
+.resultLevelPass {
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-green);
 }
 
 .quizOption {

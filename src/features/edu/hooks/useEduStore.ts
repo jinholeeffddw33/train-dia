@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 
 /* ── 타입 ── */
 
-export type QuizMode = 'quick' | 'standard' | 'full' | 'chapter' | 'wrong-only';
+export type QuizMode = 'quick' | 'standard' | 'full' | 'chapter' | 'wrong-only' | 'level' | 'area';
 
 export interface QuizRecord {
   date: string;       // ISO
@@ -44,6 +44,8 @@ export interface EduProgress {
   recentSections: string[];                     // 최근 본 섹션 ID (최대 10개, 최신이 앞)
   streak: number;
   lastStudyDate?: string;                       // YYYY-MM-DD
+  /** 등급 해금 상태: levelScores[level] = 최고점수 (70+ or 80+ 이면 다음 레벨 해금) */
+  levelScores: Record<number, number>;
 }
 
 const STORAGE_KEY = 'train-dia-edu-progress';
@@ -58,6 +60,7 @@ const EMPTY_PROGRESS: EduProgress = {
   wrongAnswers: [],
   recentSections: [],
   streak: 0,
+  levelScores: {},
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -111,6 +114,11 @@ function migrateProgress(data: any): EduProgress {
 
     // 이전 필드 정리
     delete data.lastReadSection;
+  }
+
+  // v4+: levelScores 기본값
+  if (!data.levelScores) {
+    data.levelScores = {};
   }
 
   return data as EduProgress;
@@ -243,6 +251,18 @@ export function useEduStore() {
     }));
   }, []);
 
+  /* ── 등급 점수 기록 ── */
+  const updateLevelScore = useCallback((level: number, percent: number) => {
+    setProgress(prev => {
+      const prevBest = prev.levelScores[level] ?? 0;
+      if (percent <= prevBest) return prev;
+      return {
+        ...prev,
+        levelScores: { ...prev.levelScores, [level]: percent },
+      };
+    });
+  }, []);
+
   /* ── 파생값 ── */
   const bestScore = progress.quizHistory.length > 0
     ? Math.max(...progress.quizHistory.map(r => r.percent))
@@ -281,5 +301,7 @@ export function useEduStore() {
     wrongCount: progress.wrongAnswers.length,
     unresolvedWrongCount: unresolvedWrongs.length,
     unresolvedWrongs,
+    updateLevelScore,
+    levelScores: progress.levelScores,
   };
 }

@@ -516,7 +516,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
           <div className={styles.tocList}>
             {(initChapters && initChapters.length > 0
               ? doc.chapters.filter((ch: any) => initChapters.includes(ch.id))
-              : doc.chapters
+              : doc.chapters.filter((ch: any) => !ch.hidden)
             ).map((ch: any, chIdx: number) => {
               const isExpanded = expandedChapters.has(ch.id);
               const readCountInCh = ch.sections.filter((s: any) => readMap[s.id]).length;

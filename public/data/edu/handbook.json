@@ -5785,6 +5785,388 @@
       ]
     },
     {
+      "id": "ch5c",
+      "title": "로템 전동차 응급조치",
+      "icon": "🔧",
+      "sections": [
+        {
+          "id": "ch5c-01",
+          "title": "목차",
+          "summary": [
+            "5호선 로템 전동차 32량 응급처치요령 목차"
+          ],
+          "keywords": [
+            "목차",
+            "로템"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_01.jpg",
+                  "caption": "목차 (1/2)"
+                },
+                {
+                  "src": "/images/edu/rotem/page_02.jpg",
+                  "caption": "목차 (2/2)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-02",
+          "title": "일반사항 — 안전수칙·객실환경",
+          "summary": [
+            "기관사 업무 안전수칙",
+            "쾌적한 객실환경 제공"
+          ],
+          "keywords": [
+            "안전수칙",
+            "객실환경",
+            "냉난방"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_03.jpg",
+                  "caption": "기관사 업무 안전수칙"
+                },
+                {
+                  "src": "/images/edu/rotem/page_04.jpg",
+                  "caption": "쾌적한 객실환경 제공"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-03",
+          "title": "일반사항 — 관제보고·지적확인·안내방송",
+          "summary": [
+            "열차관제사 보고방법",
+            "지적확인환호 요령",
+            "안내방송 시행요령"
+          ],
+          "keywords": [
+            "관제보고",
+            "지적확인",
+            "환호",
+            "안내방송",
+            "PSD"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_05.jpg",
+                  "caption": "열차관제 보고방법"
+                },
+                {
+                  "src": "/images/edu/rotem/page_06.jpg",
+                  "caption": "지적확인환호 요령 (PSD, 출입문)"
+                },
+                {
+                  "src": "/images/edu/rotem/page_07.jpg",
+                  "caption": "안내방송 시행요령"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-04",
+          "title": "PSD 닫힘 불능",
+          "summary": [
+            "PSD 닫힘 불능 시 조치 절차"
+          ],
+          "keywords": [
+            "PSD",
+            "닫힘불능",
+            "스크린도어"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_08.jpg",
+                  "caption": "PSD 닫힘 불능 — 조치 절차"
+                },
+                {
+                  "src": "/images/edu/rotem/page_09.jpg",
+                  "caption": "PSD 닫힘 불능 — 플로차트"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-05",
+          "title": "전차선 정전·화재 발생",
+          "summary": [
+            "전차선 정전 시 무동력 운행",
+            "열차 화재 발생 시 조치"
+          ],
+          "keywords": [
+            "정전",
+            "전차선",
+            "화재",
+            "대피",
+            "무동력"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_10.jpg",
+                  "caption": "전차선 정전 시 조치"
+                },
+                {
+                  "src": "/images/edu/rotem/page_11.jpg",
+                  "caption": "화재 발생 시 조치 (역 구간)"
+                },
+                {
+                  "src": "/images/edu/rotem/page_12.jpg",
+                  "caption": "화재 발생 시 조치 (터널 구간)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-06",
+          "title": "구원운전",
+          "summary": [
+            "구원운전(고장차) 절차",
+            "구원연결 전 확인사항"
+          ],
+          "keywords": [
+            "구원운전",
+            "구원연결",
+            "고장차",
+            "재기동"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_13.jpg",
+                  "caption": "구원운전 — 조치 절차"
+                },
+                {
+                  "src": "/images/edu/rotem/page_14.jpg",
+                  "caption": "구원운전 — 플로차트 (1)"
+                },
+                {
+                  "src": "/images/edu/rotem/page_15.jpg",
+                  "caption": "구원운전 — 플로차트 (2)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-07",
+          "title": "제동 불완해·비상제동",
+          "summary": [
+            "제동 불완해 시 조치",
+            "비상제동등 점등 시 조치"
+          ],
+          "keywords": [
+            "제동",
+            "불완해",
+            "비상제동",
+            "제동압력",
+            "MR"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_16.jpg",
+                  "caption": "제동 불완해 — 제동압력 파악"
+                },
+                {
+                  "src": "/images/edu/rotem/page_17.jpg",
+                  "caption": "비상제동등 점등 시 조치"
+                },
+                {
+                  "src": "/images/edu/rotem/page_18.jpg",
+                  "caption": "공기압 관련 조치"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-08",
+          "title": "출입문 고장",
+          "summary": [
+            "출입문 열림등 점등/소등 시 조치",
+            "출입문 위치 확인"
+          ],
+          "keywords": [
+            "출입문",
+            "도어",
+            "열림등",
+            "닫힘불능"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_19.jpg",
+                  "caption": "출입문 열림등 점등 시 조치"
+                },
+                {
+                  "src": "/images/edu/rotem/page_20.jpg",
+                  "caption": "출입문 위치 확인 및 기록"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-09",
+          "title": "기타 고장 — 현상파악·ATC·MR관",
+          "summary": [
+            "현상파악 요령",
+            "ATC Reset 절차",
+            "MR관 파열 조치"
+          ],
+          "keywords": [
+            "ATC",
+            "Reset",
+            "MR관",
+            "파열",
+            "현상파악"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_21.jpg",
+                  "caption": "현상파악 요령"
+                },
+                {
+                  "src": "/images/edu/rotem/page_22.jpg",
+                  "caption": "ATC Reset 절차"
+                },
+                {
+                  "src": "/images/edu/rotem/page_23.jpg",
+                  "caption": "MR관 파열 조치"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-10",
+          "title": "무동력 운전·역행 차단",
+          "summary": [
+            "무동력(타력) 운전 절차"
+          ],
+          "keywords": [
+            "무동력",
+            "타력운전",
+            "역행차단"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_24.jpg",
+                  "caption": "무동력(타력) 운전 절차"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-11",
+          "title": "부록 — 기지 노선도",
+          "summary": [
+            "고덕기지 노선도"
+          ],
+          "keywords": [
+            "기지",
+            "노선도",
+            "고덕기지"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_25.jpg",
+                  "caption": "부록 목차"
+                },
+                {
+                  "src": "/images/edu/rotem/page_27.jpg",
+                  "caption": "기지 노선도 (1)"
+                },
+                {
+                  "src": "/images/edu/rotem/page_28.jpg",
+                  "caption": "기지 노선도 (2)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ch5c-12",
+          "title": "부록 — 용어표·정지거리",
+          "summary": [
+            "용어 변경(순화) 표",
+            "정지 거리 표"
+          ],
+          "keywords": [
+            "용어",
+            "순화",
+            "정지거리"
+          ],
+          "updatedAt": "2026-04",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/rotem/page_29.jpg",
+                  "caption": "용어 변경(순화) 표"
+                },
+                {
+                  "src": "/images/edu/rotem/page_30.jpg",
+                  "caption": "정지 거리 표"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "ch6",
       "title": "한줄노트 & 퀵가이드",
       "icon": "📝",

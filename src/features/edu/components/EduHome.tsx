@@ -114,7 +114,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   const REPAIR_SUB = [
     { id: 'abb',     label: 'ABB\n전동차',   color: 'blue'   as const, targets: ['ch5a'],       coming: false },
     { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
-    { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: [],             coming: true },
+    { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: ['ch5c'],       coming: false },
     { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
   ];
 

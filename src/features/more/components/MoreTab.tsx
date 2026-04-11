@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3 } from 'lucide-react';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -19,6 +19,7 @@ import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import FeedbackOverlay from './FeedbackOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
+import AdminDashboard from './AdminDashboard';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
 import styles from '../styles/More.module.css';
 
@@ -49,6 +50,7 @@ export default function MoreTab() {
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
+  const [adminDashOpen, setAdminDashOpen] = useState(false);
   const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
   const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
   const [curPin, setCurPin] = useState('');
@@ -419,6 +421,19 @@ export default function MoreTab() {
           <button
             type="button"
             className={styles.toolBtn}
+            onClick={() => setAdminDashOpen(true)}
+          >
+            <div className={styles.settingInfo}>
+              <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+                <BarChart3 size={20} />
+              </div>
+              <span className={styles.settingLabel}>접속 현황판</span>
+            </div>
+            <ChevronRight size={16} className={styles.toolArrow} />
+          </button>
+          <button
+            type="button"
+            className={styles.toolBtn}
             onClick={() => setAdminFeedbackOpen(true)}
           >
             <div className={styles.settingInfo}>
@@ -677,6 +692,11 @@ export default function MoreTab() {
       {/* 익명 제보 오버레이 */}
       {feedbackOpen && (
         <FeedbackOverlay onClose={() => setFeedbackOpen(false)} />
+      )}
+
+      {/* 관리자 현황판 */}
+      {adminDashOpen && (
+        <AdminDashboard onClose={() => setAdminDashOpen(false)} />
       )}
 
       {/* 관리자 제보 목록 오버레이 */}

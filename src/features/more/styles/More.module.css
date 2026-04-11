@@ -1204,3 +1204,230 @@
   white-space: nowrap;
   font-size: var(--dia-text-xs);
 }
+
+/* ══════════════════════════════════════
+   관리자 현황판 (AdminDashboard)
+══════════════════════════════════════ */
+
+.adminPinGate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-8) var(--dia-space-4);
+  gap: var(--dia-space-4);
+}
+
+.adminPinIcon {
+  color: var(--dia-blue);
+  opacity: 0.7;
+}
+
+.adminPinLabel {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+
+.adminPinInput {
+  width: 160px;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 2px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-xl);
+  text-align: center;
+  letter-spacing: 8px;
+  outline: none;
+}
+
+.adminPinInput:focus {
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 3px var(--dia-blue-dim);
+}
+
+.adminPinError {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-red);
+}
+
+.adminPinSubmit {
+  padding: var(--dia-space-3) var(--dia-space-6);
+  background: var(--dia-blue);
+  border: none;
+  border-radius: var(--dia-radius-md);
+  color: #fff;
+  font-size: var(--dia-text-base);
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  min-width: 160px;
+}
+
+.adminPinSubmit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.adminContent {
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.adminEmpty {
+  padding: var(--dia-space-8) var(--dia-space-4);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+}
+
+.adminEmptyText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  padding: var(--dia-space-3);
+}
+
+/* 요약 카드 3열 */
+.adminSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dia-space-3);
+}
+
+.adminSummaryCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-4) var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.adminSummaryIcon {
+  color: var(--dia-blue);
+}
+
+.adminSummaryValue {
+  font-size: var(--dia-text-2xl);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  line-height: 1;
+}
+
+.adminSummaryLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+/* 섹션 */
+.adminSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.adminSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  margin: 0;
+}
+
+/* 리스트 */
+.adminList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.adminListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+}
+
+.adminListName {
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  color: var(--dia-text-primary);
+}
+
+.adminListTime {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.adminListSabun {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 차트 */
+.adminChart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.adminChartRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.adminChartDate {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  min-width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adminChartBarWrap {
+  flex: 1;
+  height: 20px;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-sm);
+  overflow: hidden;
+}
+
+.adminChartBar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--dia-blue), #60a5fa);
+  border-radius: var(--dia-radius-sm);
+  min-width: 4px;
+  transition: width 0.3s ease;
+}
+
+.adminChartCount {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  min-width: 32px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.adminFooter {
+  text-align: center;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-4) 0;
+}

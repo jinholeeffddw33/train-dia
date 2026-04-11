@@ -9,3 +9,4 @@ export { default as QuickActions } from './components/QuickActions';
 export { default as HomeTipsQuiz } from './components/HomeTipsQuiz';
 export { default as DutyInfoCard } from './components/DutyInfoCard';
 export { default as HomeNotice } from './components/HomeNotice';
+export { default as InstallCard } from './components/InstallCard';

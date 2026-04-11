@@ -3,7 +3,6 @@
     "id": "rescue_guide",
     "title": "구원연결 가이드",
     "category": "신입교육",
-    "slide": { "chapterIds": ["safety_edu1"] },
     "video": { "youtubeId": "zzBidwDgTnE" }
   },
   {

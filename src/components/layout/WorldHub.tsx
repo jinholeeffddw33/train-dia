@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
+import { InstallCard } from '@/features/home';
 import styles from './WorldHub.module.css';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
@@ -177,6 +178,8 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           </button>
         ))}
       </div>
+
+      <InstallCard />
 
       <span className={styles.footer}>Train DIA v2</span>
     </div>

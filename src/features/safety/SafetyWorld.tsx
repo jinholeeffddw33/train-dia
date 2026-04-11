@@ -4,6 +4,7 @@ import { Component, type ReactNode, useState, useEffect, useCallback } from 'rea
 import {
   ArrowLeft, AlertTriangle, ShieldAlert, Wrench, ClipboardCheck,
 } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
@@ -224,6 +225,18 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   }, [fetchAlerts, fetchHazards, subscribeAlerts, sabun]);
 
   const goHome = useCallback(() => setView('home'), []);
+
+  // 뒤로가기: Level 1 — 비-홈 뷰에서 홈으로
+  useHistoryBack('safety-l1', goHome, view !== 'home');
+
+  // 뒤로가기: Level 2 — detail에서 list로
+  const isDetail = typeof view === 'object' && view.type === 'detail';
+  const goToList = useCallback(() => {
+    if (typeof view === 'object' && view.type === 'detail') {
+      setView({ type: 'list', category: view.category });
+    }
+  }, [view]);
+  useHistoryBack('safety-l2', goToList, isDetail);
 
   const alerts = useAlertStore((s) => s.alerts);
 

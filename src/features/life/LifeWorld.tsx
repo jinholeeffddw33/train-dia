@@ -5,6 +5,7 @@ import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, 
 
 const ReactionTest = lazy(() => import('./games/ReactionTest'));
 const SnakeGame = lazy(() => import('./games/SnakeGame'));
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useDriverStore } from '@/stores/driver';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
 import styles from './styles/Life.module.css';
@@ -89,6 +90,20 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     if (view === 'home') fetchNewCounts();
   }, [view, fetchNewCounts]);
+
+  // 뒤로가기: Level 1 — 비-홈 뷰에서 홈으로
+  const goLifeHome = useCallback(() => setView('home'), []);
+  useHistoryBack('life-l1', goLifeHome, view !== 'home');
+
+  // 뒤로가기: Level 2 — game→games, detail/write→list
+  const isDepth2 = typeof view === 'object' && (view.type === 'game' || view.type === 'detail' || view.type === 'write');
+  const goToParent2 = useCallback(() => {
+    if (typeof view === 'object' && view.type === 'game') setView('games');
+    else if (typeof view === 'object' && (view.type === 'detail' || view.type === 'write')) {
+      setView({ type: 'list', category: view.category });
+    }
+  }, [view]);
+  useHistoryBack('life-l2', goToParent2, isDepth2);
 
   // 카테고리 진입 시 방문 기록 + 배지 초기화
   const handleCategoryClick = useCallback((catId: LifeCategory) => {

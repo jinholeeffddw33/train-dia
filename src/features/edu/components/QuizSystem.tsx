@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ArrowLeft, Shield, Crown, Lock, Check } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEduStore } from '../hooks/useEduStore';
 import type { QuizMode } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -133,6 +134,10 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     addQuizRecord, addWrongAnswer, resolveWrongAnswer, updateLevelScore,
     previousScore, totalQuizzes, unresolvedWrongs, levelScores,
   } = useEduStore();
+
+  // 퀴즈/결과 화면에서 뒤로가기 → setup 화면으로 복귀
+  const goSetup = useCallback(() => setPhase('setup'), []);
+  useHistoryBack('quiz-phase', goSetup, phase !== 'setup');
 
   // 오답 전용 모드
   const startWrongOnlyQuiz = useCallback(() => {

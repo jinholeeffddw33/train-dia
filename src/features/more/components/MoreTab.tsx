@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3 } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -58,6 +59,29 @@ export default function MoreTab() {
   const [newPinConfirm, setNewPinConfirm] = useState('');
   const [pinError, setPinError] = useState('');
   const [pinLoading, setPinLoading] = useState(false);
+
+  // 오버레이 뒤로가기 지원
+  const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen
+    || healingOpen || shortcutsOpen || shuttleOpen || feedbackOpen
+    || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen;
+  const closeActiveOverlay = useCallback(() => {
+    if (commuteOpen) setCommuteOpen(false);
+    else if (subwayOpen) setSubwayOpen(false);
+    else if (compareOpen) setCompareOpen(false);
+    else if (contactsOpen) setContactsOpen(false);
+    else if (healingOpen) setHealingOpen(false);
+    else if (shortcutsOpen) setShortcutsOpen(false);
+    else if (shuttleOpen) setShuttleOpen(false);
+    else if (feedbackOpen) setFeedbackOpen(false);
+    else if (adminFeedbackOpen) setAdminFeedbackOpen(false);
+    else if (adminDashOpen) setAdminDashOpen(false);
+    else if (levelRecordsOpen) setLevelRecordsOpen(false);
+    else if (pinChangeOpen) setPinChangeOpen(false);
+    else if (installGuideOpen) setInstallGuideOpen(false);
+  }, [commuteOpen, subwayOpen, compareOpen, contactsOpen, healingOpen,
+      shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
+      adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen]);
+  useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
 
   // 오늘 통계
   const [stats, setStats] = useState({ todayVisitors: 0, todayPosts: 0 });

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from '../styles/edu.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -217,6 +218,8 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
 
 export default function ContentRenderer({ blocks }: ContentRendererProps) {
   const [viewer, setViewer] = useState<{ images: { src: string; caption?: string }[]; index: number } | null>(null);
+  const closeViewer = useCallback(() => setViewer(null), []);
+  useHistoryBack('slide-viewer', closeViewer, !!viewer);
 
   // 모든 이미지 블록에서 이미지를 합산 (풀스크린에서 전체 스와이프용)
   const allImages = blocks

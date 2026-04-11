@@ -7,6 +7,7 @@ import {
   Radio, Satellite, Rocket, Shield,
   type LucideIcon,
 } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import ContentRenderer from './ContentRenderer';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -150,7 +151,12 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   const [currentSection, setCurrentSection] = useState<string | null>(null);
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
+  const [tocSkipped, setTocSkipped] = useState(false);
   const { progress, markSectionRead, toggleBookmark, isBookmarked } = useEduStore();
+
+  // 섹션 보기에서 뒤로가기 → TOC로 복귀 (TOC 자동 스킵된 경우 제외)
+  const goToc = useCallback(() => { setMode('toc'); setCurrentSection(null); }, []);
+  useHistoryBack('doc-section', goToc, mode === 'section' && !tocSkipped);
 
   useEffect(() => {
     fetch('/data/edu/handbook.json')
@@ -161,6 +167,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
         if (initSection) {
           setCurrentSection(initSection);
           setMode('section');
+          setTocSkipped(true);
           for (const ch of data.chapters) {
             for (const sec of ch.sections) {
               if (sec.id === initSection) {
@@ -177,6 +184,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
             const sec = filtered[0].sections[0];
             setCurrentSection(sec.id);
             setMode('section');
+            setTocSkipped(true);
             markSectionRead(sec.id, filtered[0].id);
           } else {
             setExpandedChapters(new Set(initChapters));

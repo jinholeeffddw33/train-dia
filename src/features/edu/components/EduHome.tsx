@@ -31,7 +31,7 @@ const MENU_ITEMS = [
   { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch6'] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
-  { id: 'roadmap',  label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'roadmap'  as const, targets: [] },
+  { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapters' as const, targets: ['newcomer1', 'newcomer2', 'newcomer3'] },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'training' as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
@@ -110,25 +110,12 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   }, []);
 
   const [repairOpen, setRepairOpen] = useState(false);
-  const [roadmapOpen, setRoadmapOpen] = useState(false);
 
   const REPAIR_SUB = [
-    { id: 'abb',      label: 'ABB\n전동차',     color: 'blue'   as const, targets: ['ch5a'],       coming: false },
-    { id: 'woojin',   label: '우진\n전동차',     color: 'green'  as const, targets: ['ch5b'],       coming: false },
-    { id: 'rotem',    label: '로템\n전동차',     color: 'amber'  as const, targets: ['ch5c'],       coming: false },
-    { id: 'startup',  label: '출고 시\n고장',    color: 'red'    as const, targets: ['ch5e'],       coming: false },
-    { id: 'critical', label: '우진\n중고장',     color: 'purple' as const, targets: ['ch5d'],       coming: false },
-    { id: 'compare',  label: '전동차\n비교',     color: 'blue'   as const, targets: ['ch5'],        coming: false },
-  ];
-
-  const ROADMAP_STEPS = [
-    { step: 1, label: '기본업무 익히기',      desc: '출근 후 해야 할 기본 절차', targets: ['ch1', 'ch4'], color: 'blue' as const },
-    { step: 2, label: '전동차 기초 이해',     desc: '5호선 전동차 구조와 운전', targets: ['ch2'], color: 'green' as const },
-    { step: 3, label: '안내방송·관제 통화',   desc: '방송 문안과 관제 보고 요령', targets: ['ch8', 'ch9', 'ch10'], color: 'purple' as const },
-    { step: 4, label: '출고 시 고장조치',     desc: '출고 전 발생하는 고장 대처', targets: ['ch5e'], color: 'amber' as const },
-    { step: 5, label: '우진 고장조치',        desc: '운행 중 주요 고장 처리', targets: ['ch5b'], color: 'red' as const },
-    { step: 6, label: '중고장 코드',          desc: 'TCMS 중고장 경보 이해', targets: ['ch5d'], color: 'red' as const },
-    { step: 7, label: '사고사례·퀵가이드',    desc: '실제 사례와 빠른 참조', targets: ['ch7', 'ch6'], color: 'amber' as const },
+    { id: 'abb',     label: 'ABB\n전동차',   color: 'blue'   as const, targets: ['ch5a'],       coming: false },
+    { id: 'woojin',  label: '우진\n전동차',   color: 'green'  as const, targets: ['ch5b'],       coming: false },
+    { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: ['ch5c'],       coming: false },
+    { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
@@ -139,7 +126,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
       case 'submenu':
         if (item.id === 'repair') setRepairOpen(true);
         break;
-      case 'roadmap':  setRoadmapOpen(true); break;
       case 'training': onTraining(); break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
@@ -334,8 +320,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                   abb: Wrench,
                   woojin: Wrench,
                   rotem: Wrench,
-                  startup: Wrench,
-                  critical: Wrench,
                   compare: GitCompareArrows,
                 };
                 const SubIcon = iconMap[sub.id] ?? Wrench;
@@ -359,44 +343,6 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                   </button>
                 );
               })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 새내기 학습 로드맵 */}
-      {roadmapOpen && (
-        <div className={styles.subMenuOverlay} onClick={() => setRoadmapOpen(false)}>
-          <div className={styles.roadmapPanel} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.subMenuHeader}>
-              <DoorOpen size={20} className={styles.quickIconAmber} />
-              <h3 className={styles.subMenuTitle}>신규 기관사 학습 순서</h3>
-              <button type="button" className={styles.subMenuClose} onClick={() => setRoadmapOpen(false)} aria-label="닫기">
-                <X size={20} />
-              </button>
-            </div>
-            <p className={styles.roadmapDesc}>처음이라면 이 순서대로 학습하세요</p>
-            <div className={styles.roadmapList}>
-              {ROADMAP_STEPS.map((step) => (
-                <button
-                  key={step.step}
-                  type="button"
-                  className={styles.roadmapItem}
-                  onClick={() => {
-                    setRoadmapOpen(false);
-                    onChapters([...step.targets]);
-                  }}
-                >
-                  <div className={`${styles.roadmapStep} ${ICON_BG_MAP[step.color]}`}>
-                    {step.step}
-                  </div>
-                  <div className={styles.roadmapItemBody}>
-                    <div className={styles.roadmapItemLabel}>{step.label}</div>
-                    <div className={styles.roadmapItemDesc}>{step.desc}</div>
-                  </div>
-                  <ChevronRight size={16} className={styles.resumeArrow} />
-                </button>
-              ))}
             </div>
           </div>
         </div>

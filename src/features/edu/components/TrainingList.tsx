@@ -15,7 +15,7 @@ interface TrainingItem {
 
 interface TrainingListProps {
   onBack: () => void;
-  onSlide: (chapterIds: string[]) => void;
+  onSlide: (chapterIds: string[], title?: string) => void;
 }
 
 export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
@@ -87,7 +87,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
                 <button
                   type="button"
                   className={styles.trainingBtn}
-                  onClick={() => onSlide(item.slide!.chapterIds)}
+                  onClick={() => onSlide(item.slide!.chapterIds, item.title)}
                 >
                   <BookOpen size={18} />
                   <span>슬라이드</span>

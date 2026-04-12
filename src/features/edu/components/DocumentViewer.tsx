@@ -20,6 +20,8 @@ interface DocumentViewerProps {
   initChapter?: string;
   /** 여러 챕터를 펼쳐서 보여줄 때 (아이콘 메뉴 진입) */
   initChapters?: string[];
+  /** 아이콘 메뉴 진입 시 해당 메뉴 라벨을 제목으로 표시 */
+  initTitle?: string;
 }
 
 type ViewMode = 'toc' | 'section';
@@ -145,7 +147,7 @@ interface SearchResult {
   matchType: SearchMatchType;
 }
 
-export default function DocumentViewer({ onBack, initSection, initChapter, initChapters }: DocumentViewerProps) {
+export default function DocumentViewer({ onBack, initSection, initChapter, initChapters, initTitle }: DocumentViewerProps) {
   const [doc, setDoc] = useState<any>(null);
   const [mode, setMode] = useState<ViewMode>('toc');
   const [currentSection, setCurrentSection] = useState<string | null>(null);
@@ -450,7 +452,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
-        <h1 className={styles.topTitle}>{doc.title}</h1>
+        <h1 className={styles.topTitle}>{initTitle || doc.title}</h1>
       </div>
 
       <div className={styles.searchWrap}>

@@ -12,7 +12,7 @@ import TrainingList from './TrainingList';
 
 type EduView =
   | { type: 'home' }
-  | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[] }
+  | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[]; initTitle?: string }
   | { type: 'quiz'; chapter?: string }
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
@@ -39,6 +39,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           initSection={view.initSection}
           initChapter={view.initChapter}
           initChapters={view.initChapters}
+          initTitle={view.initTitle}
         />
       );
     case 'quiz':
@@ -65,7 +66,7 @@ export default function EduTab({ onBack }: EduTabProps) {
       return (
         <TrainingList
           onBack={goHome}
-          onSlide={(ids) => setView({ type: 'study', initChapters: ids })}
+          onSlide={(ids, title) => setView({ type: 'study', initChapters: ids, initTitle: title })}
         />
       );
     default:
@@ -76,7 +77,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onQuiz={() => setView({ type: 'quiz' })}
           onSection={(id) => setView({ type: 'study', initSection: id })}
           onChapter={(id) => setView({ type: 'study', initChapter: id })}
-          onChapters={(ids) => setView({ type: 'study', initChapters: ids })}
+          onChapters={(ids, title) => setView({ type: 'study', initChapters: ids, initTitle: title })}
           onWrongReview={() => setView({ type: 'wrong-review' })}
           onWrongQuiz={() => setView({ type: 'wrong-quiz' })}
           onMyInfo={() => setView({ type: 'myinfo' })}

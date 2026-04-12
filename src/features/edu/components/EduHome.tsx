@@ -20,7 +20,7 @@ interface EduHomeProps {
   onWrongReview: () => void;
   onWrongQuiz: () => void;
   onChapter: (chapterId: string) => void;
-  onChapters: (chapterIds: string[]) => void;
+  onChapters: (chapterIds: string[], title?: string) => void;
   onMyInfo: () => void;
   onVideo: () => void;
   onTraining: () => void;
@@ -121,7 +121,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
     switch (item.action) {
       case 'chapters':
-        onChapters([...item.targets]);
+        onChapters([...item.targets], item.label);
         break;
       case 'submenu':
         if (item.id === 'repair') setRepairOpen(true);
@@ -332,7 +332,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                     onClick={() => {
                       if (sub.coming) return;
                       setRepairOpen(false);
-                      onChapters([...sub.targets]);
+                      onChapters([...sub.targets], sub.label);
                     }}
                   >
                     <div className={`${styles.menuGridIcon} ${ICON_BG_MAP[sub.color]}`}>

@@ -18,7 +18,7 @@
     { "id": "abb", "name": "ABB 고장조치", "chapters": ["ch5a"], "level": 3 },
     { "id": "woojin", "name": "우진 고장조치", "chapters": ["ch5b"], "level": 4 },
     { "id": "rotem", "name": "로템 응급조치", "chapters": ["ch5c"], "level": 4 },
-    { "id": "critical", "name": "중고장", "chapters": ["newcomer3"], "level": 4 }
+    { "id": "critical", "name": "중고장", "chapters": ["newcomer1"], "level": 4 }
   ],
   "questions": [
     {"id":"q001","area":"duty","level":1,"chapter":"ch1","question":"기관사의 주요업무 중 '안전수송'이란 무엇인가?","choices":["열차 정시운전과 고객 안전수송","전동차 정비 및 수리","역 시설물 관리","승강장 청소"],"answer":0,"explanation":"안전수송은 열차 정시운전과 고객 안전수송을 의미합니다."},
@@ -151,20 +151,20 @@
     {"id":"q128","area":"rotem","level":4,"chapter":"ch5c","question":"로템 구원운전 전 반드시 해야 할 것은?","choices":["재기동 시도","즉시 구원차 연결","승객 하차","관제 보고만"],"answer":0,"explanation":"구원 전 재기동을 먼저 시도합니다."},
     {"id":"q129","area":"rotem","level":4,"chapter":"ch5c","question":"로템-우진 간 구원연결 시 역전기 위치는?","choices":["전진(F)","중립(N)","후진(R)","R1(전동차)"],"answer":3,"explanation":"로템-우진 구원연결 시 역전기 R1(전동차)입니다."},
     {"id":"q130","area":"rotem","level":4,"chapter":"ch5c","question":"로템 LIU2 강제절체 방법은?","choices":["AP.CBSUTC OFF","TCUCB1 OFF","ATCCB1 OFF","SIVCN OFF"],"answer":1,"explanation":"로템 LIU2 강제절체: TCUCB1 OFF입니다."},
-    {"id":"q131","area":"critical","level":4,"chapter":"newcomer3","question":"VVVF 인버터 중고장(VVVFF) 시 해당 차량의 상태는?","choices":["정상 운행","견인력 상실","출입문 열림","판토 하강"],"answer":1,"explanation":"VVVF 중고장 시 해당 차량은 견인력을 상실합니다."},
-    {"id":"q132","area":"critical","level":4,"chapter":"newcomer3","question":"BCH 중고장(BCH_ERR) 시 영향 받는 시스템은?","choices":["출입문","제동 충전 장치","냉난방","조명"],"answer":1,"explanation":"BCH(Brake Charger)는 제동 충전 장치입니다."},
-    {"id":"q133","area":"critical","level":4,"chapter":"newcomer3","question":"인버터 ARM단락(CFD) 발생 시 조치는?","choices":["해당 인버터 차단","전 차량 재기동","관제 보고만","ATC 리셋"],"answer":0,"explanation":"ARM단락 시 해당 인버터를 차단합니다."},
-    {"id":"q134","area":"critical","level":4,"chapter":"newcomer3","question":"HSCB 개방 불능(HBNO) 시 영향 받는 장치는?","choices":["출입문","고속도차단기","ATC","SIV"],"answer":1,"explanation":"HSCB = High Speed Circuit Breaker(고속도차단기)입니다."},
-    {"id":"q135","area":"critical","level":4,"chapter":"newcomer3","question":"마이컴 이상(CPUWDTD)은 어떤 장치의 고장인가?","choices":["출입문 제어기","추진제어장치 CPU","ATC 컴퓨터","SIV 제어기"],"answer":1,"explanation":"추진제어장치의 CPU(마이컴) 이상입니다."},
-    {"id":"q136","area":"critical","level":4,"chapter":"newcomer3","question":"제동 불완해 검지(NRBD)는 어떤 시스템의 고장인가?","choices":["ATC","ECU(제동제어장치)","VVVF","SIV"],"answer":1,"explanation":"ECU 중고장으로 제동 불완해를 검지합니다."},
-    {"id":"q137","area":"critical","level":4,"chapter":"newcomer3","question":"SIV 고장(SIVF) 시 연장급전 불능이면?","choices":["정상 운행","해당 차량 조명 소등","차량 재기동 후 불가 시 차량 교환","비상제동 체결"],"answer":2,"explanation":"재기동 후 불가 시 차량 교환합니다."},
-    {"id":"q138","area":"critical","level":4,"chapter":"newcomer3","question":"ATC 비상제동 체결(ATCEB) 시 가장 먼저 할 것은?","choices":["판토 하강","ATC 리셋","속도코드 확인","출입문 개방"],"answer":2,"explanation":"속도코드를 확인하여 원인을 파악합니다."},
-    {"id":"q139","area":"critical","level":4,"chapter":"newcomer3","question":"편성 내 화재발생(FD) 시 모니터에 표시되는 것은?","choices":["화재 경보 및 해당 차호","비상제동만 표시","정상 표시","화면 꺼짐"],"answer":0,"explanation":"화재 경보 및 해당 차호가 표시됩니다."},
-    {"id":"q140","area":"critical","level":4,"chapter":"newcomer3","question":"CM 과부하(OVERLOAD) 시 해당 CM은?","choices":["자동 정지","자동 재기동","속도 감소","정상 가동"],"answer":0,"explanation":"CM 과부하 시 해당 CM은 자동 정지됩니다."},
-    {"id":"q141","area":"critical","level":4,"chapter":"newcomer3","question":"축전지 저전압 고장(LVF)의 기준 전압은?","choices":["60V 미만","70V 미만","75V 미만","80V 미만"],"answer":2,"explanation":"축전지 저전압 고장(LVF)은 75V 미만입니다."},
-    {"id":"q142","area":"critical","level":4,"chapter":"newcomer3","question":"출입문 안전 인터록 회로 이상 시 현상은?","choices":["출입문 열림 불능","닫힘 후에도 역행 불가","비상제동 해제 불가","ATC 고장"],"answer":1,"explanation":"안전 인터록 이상 시 닫혀도 역행 불가합니다."},
-    {"id":"q143","area":"critical","level":4,"chapter":"newcomer3","question":"FC1 충전불량(STF) 시 영향 받는 장치는?","choices":["SIV의 필터 콘덴서","ATC","출입문","냉난방"],"answer":0,"explanation":"FC1은 SIV의 필터 콘덴서 관련 고장입니다."},
-    {"id":"q144","area":"critical","level":4,"chapter":"newcomer3","question":"후진 제한속도 초과 시 발생하는 것은?","choices":["ATC 고장","FSB 출력","비상제동","판토 하강"],"answer":1,"explanation":"후진 제한속도 초과 시 FSB(풀서비스브레이크)가 출력됩니다."},
-    {"id":"q145","area":"critical","level":4,"chapter":"newcomer3","question":"공조기 UC1 인버터 고장 시 영향 받는 것은?","choices":["견인력","객실 냉난방","출입문","조명"],"answer":1,"explanation":"공조기 인버터 고장 시 객실 냉난방에 영향을 줍니다."}
+    {"id":"q131","area":"critical","level":4,"chapter":"newcomer1","question":"VVVF 인버터 중고장(VVVFF) 시 해당 차량의 상태는?","choices":["정상 운행","견인력 상실","출입문 열림","판토 하강"],"answer":1,"explanation":"VVVF 중고장 시 해당 차량은 견인력을 상실합니다."},
+    {"id":"q132","area":"critical","level":4,"chapter":"newcomer1","question":"BCH 중고장(BCH_ERR) 시 영향 받는 시스템은?","choices":["출입문","제동 충전 장치","냉난방","조명"],"answer":1,"explanation":"BCH(Brake Charger)는 제동 충전 장치입니다."},
+    {"id":"q133","area":"critical","level":4,"chapter":"newcomer1","question":"인버터 ARM단락(CFD) 발생 시 조치는?","choices":["해당 인버터 차단","전 차량 재기동","관제 보고만","ATC 리셋"],"answer":0,"explanation":"ARM단락 시 해당 인버터를 차단합니다."},
+    {"id":"q134","area":"critical","level":4,"chapter":"newcomer1","question":"HSCB 개방 불능(HBNO) 시 영향 받는 장치는?","choices":["출입문","고속도차단기","ATC","SIV"],"answer":1,"explanation":"HSCB = High Speed Circuit Breaker(고속도차단기)입니다."},
+    {"id":"q135","area":"critical","level":4,"chapter":"newcomer1","question":"마이컴 이상(CPUWDTD)은 어떤 장치의 고장인가?","choices":["출입문 제어기","추진제어장치 CPU","ATC 컴퓨터","SIV 제어기"],"answer":1,"explanation":"추진제어장치의 CPU(마이컴) 이상입니다."},
+    {"id":"q136","area":"critical","level":4,"chapter":"newcomer1","question":"제동 불완해 검지(NRBD)는 어떤 시스템의 고장인가?","choices":["ATC","ECU(제동제어장치)","VVVF","SIV"],"answer":1,"explanation":"ECU 중고장으로 제동 불완해를 검지합니다."},
+    {"id":"q137","area":"critical","level":4,"chapter":"newcomer1","question":"SIV 고장(SIVF) 시 연장급전 불능이면?","choices":["정상 운행","해당 차량 조명 소등","차량 재기동 후 불가 시 차량 교환","비상제동 체결"],"answer":2,"explanation":"재기동 후 불가 시 차량 교환합니다."},
+    {"id":"q138","area":"critical","level":4,"chapter":"newcomer1","question":"ATC 비상제동 체결(ATCEB) 시 가장 먼저 할 것은?","choices":["판토 하강","ATC 리셋","속도코드 확인","출입문 개방"],"answer":2,"explanation":"속도코드를 확인하여 원인을 파악합니다."},
+    {"id":"q139","area":"critical","level":4,"chapter":"newcomer1","question":"편성 내 화재발생(FD) 시 모니터에 표시되는 것은?","choices":["화재 경보 및 해당 차호","비상제동만 표시","정상 표시","화면 꺼짐"],"answer":0,"explanation":"화재 경보 및 해당 차호가 표시됩니다."},
+    {"id":"q140","area":"critical","level":4,"chapter":"newcomer1","question":"CM 과부하(OVERLOAD) 시 해당 CM은?","choices":["자동 정지","자동 재기동","속도 감소","정상 가동"],"answer":0,"explanation":"CM 과부하 시 해당 CM은 자동 정지됩니다."},
+    {"id":"q141","area":"critical","level":4,"chapter":"newcomer1","question":"축전지 저전압 고장(LVF)의 기준 전압은?","choices":["60V 미만","70V 미만","75V 미만","80V 미만"],"answer":2,"explanation":"축전지 저전압 고장(LVF)은 75V 미만입니다."},
+    {"id":"q142","area":"critical","level":4,"chapter":"newcomer1","question":"출입문 안전 인터록 회로 이상 시 현상은?","choices":["출입문 열림 불능","닫힘 후에도 역행 불가","비상제동 해제 불가","ATC 고장"],"answer":1,"explanation":"안전 인터록 이상 시 닫혀도 역행 불가합니다."},
+    {"id":"q143","area":"critical","level":4,"chapter":"newcomer1","question":"FC1 충전불량(STF) 시 영향 받는 장치는?","choices":["SIV의 필터 콘덴서","ATC","출입문","냉난방"],"answer":0,"explanation":"FC1은 SIV의 필터 콘덴서 관련 고장입니다."},
+    {"id":"q144","area":"critical","level":4,"chapter":"newcomer1","question":"후진 제한속도 초과 시 발생하는 것은?","choices":["ATC 고장","FSB 출력","비상제동","판토 하강"],"answer":1,"explanation":"후진 제한속도 초과 시 FSB(풀서비스브레이크)가 출력됩니다."},
+    {"id":"q145","area":"critical","level":4,"chapter":"newcomer1","question":"공조기 UC1 인버터 고장 시 영향 받는 것은?","choices":["견인력","객실 냉난방","출입문","조명"],"answer":1,"explanation":"공조기 인버터 고장 시 객실 냉난방에 영향을 줍니다."}
   ]
 }

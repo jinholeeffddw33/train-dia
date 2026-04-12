@@ -1289,1253 +1289,162 @@
       "icon": "🔧",
       "sections": [
         {
-          "id": "ch5a-1",
-          "title": "판타그라프 상승불량",
-          "summary": [
-            "전량/1량 판타그라프 상승불량 시 응급조치"
-          ],
+          "id": "abb-00",
+          "title": "목차",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "전량 판타그라프 상승불량"
-                },
-                {
-                  "term": "2",
-                  "desc": "1량 판타그라프 상승불량"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "축전지 전압(70V), ACM 기동상태, 주공기압력 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "운전실 회로차단기(PanUN) 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "운전실 비상판타하강스위치 취급상태 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "판타그라프 상승 스위치(PanUS) 2~3초 누름"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "객실 내 회로차단기(PanVN), Pan 전자변·Cock 상태 확인"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_002.jpg",
-                  "caption": "축전지 전압계, 주공기압력계 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_003.jpg",
-                  "caption": "판타그라프 상승, 하강 S/W"
-                },
-                {
-                  "src": "/images/edu/abb/img_004.jpg",
-                  "caption": "해당차량 객실 회로차단기 확인"
+                  "src": "/images/edu/abb/abb_01.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 1 -\n전동차 응급조치 매뉴얼\n【5호선ABB】\n목    차\n1. 판타그라프 상승불량········································································  3\n2. 주공기압력 상승 불량·······································································  4\n3. 비상제동 풀기 불량··········································································  5\n4. 제동 풀기 불량·························································································  6\n5. 주차제동 풀기 불량··········································································  7\n6. 운전실 출입문표시등 점등불량·······················································  8\n7. 전 차량 출입문 열림 불량·······························································  9\n8. 전 차량 출입문 닫힘불량·······························································  10\n9. 출입문(1개) 닫힘불량··········································································  12\n10. 역행불량································································································  13\n11. ATO/ATC 동작불량·······································································  14\n12. 전부 TC, LIU 불량·········································································  15\n13. 인버터(MIM, AIM) 불량································································  17"
             }
           ]
         },
         {
-          "id": "ch5a-2",
-          "title": "주공기압력 상승 불량",
-          "summary": [
-            "운전실 주공기압력계 상승불량 시 응급조치"
-          ],
+          "id": "abb-01",
+          "title": "판타그라프·주공기압력 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "text",
-              "text": "운전실 주공기압력계 상승불량"
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "판타그라프 상승상태 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "TCMS(FIS) 모니터 CM 기동상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "객실내 CMCN, CMGN 상태 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "객실 하부, 연결기 부위 공기누기 소음 확인"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "MRPS 동작시 EBCOS 취급"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_005.jpg",
-                  "caption": "주공기압력계"
-                },
-                {
-                  "src": "/images/edu/abb/img_006.jpg",
-                  "caption": "CMCN, CMGN"
-                },
-                {
-                  "src": "/images/edu/abb/img_007.jpg",
-                  "caption": "EBCOS"
-                },
-                {
-                  "src": "/images/edu/abb/img_008.jpg",
-                  "caption": "해당량 객실하부 공기누기"
-                },
-                {
-                  "src": "/images/edu/abb/img_009.jpg",
-                  "caption": "EBCOS"
+                  "src": "/images/edu/abb/abb_02.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 3 -\n1\n판타그라프 상승불량\n불량현상\n1. 전량판타그라프상승불량\n2. 1량판타그라프상승불량\n【단계별조치요령】\n1. 축전지전압(70 V), ACM 기동상태, 주공기압력확인\n2. 운전실회로차단기(PanUN) 확인\n3. 운전실비상판타하강스위치취급상태확인\n4. 판타그라프상승스위치(PanUS) 2~3초누름\n5. 객실내회로차단기(PanVN), Pan 전자변․Cock 상태확인\n【조치방법】\n축전지 전압계, \n주공기압력계 확인\n판타그라프 상승,하강 S/W\n해당차량 객실 회로차단기 확인\n- 4 -\n2\n주공기압력 상승 불량\n불량현상\n1. 운전실주공기압력계상승불량\n【단계별조치요령】\n1. 판타그라프상승상태확인\n2. TCMS(FIS)모니터CM 기동상태확인\n3. 객실내CMCN, CMGN 상태확인\n4. 객실하부, 연결기부위공기누기소음확인\n5. MRPS 동작시EBCOS 취급\n【조치방법】\n주공기압력계\nCMCN, CMGN\nEBCOS\n해당량 객실하부 공기누기\nEBCOS"
             }
           ]
         },
         {
-          "id": "ch5a-3",
-          "title": "비상제동 풀기 불량",
-          "summary": [
-            "비상제동표시등 점등, BC 4.1㎏/㎠ 현시, 7 step시 해방 불능"
-          ],
+          "id": "abb-02",
+          "title": "비상제동·제동 풀기 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "비상제동표시등 점등"
-                },
-                {
-                  "term": "2",
-                  "desc": "제동압력(BC) 4.1㎏/㎠ 현시"
-                },
-                {
-                  "term": "3",
-                  "desc": "제동 7 step시 비상제동 해방 불능"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "주공기압력 확인, 운전모드 확인, 주간제어기 제동취급 위치 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "비상·보안제동스위치 취급상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "운전실 회로차단기·계전기(비상제동 NFB, ATC NFB 등) 상태 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "복귀 불가시 EBCOS 취급"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "운전모드 스위치를 비상으로 전환"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_010.jpg",
-                  "caption": "TCMS 화면"
-                },
-                {
-                  "src": "/images/edu/abb/img_011.jpg",
-                  "caption": "비상제동등 점등상태"
-                },
-                {
-                  "src": "/images/edu/abb/img_012.jpg",
-                  "caption": "주공기압력계(MR,BC)"
-                },
-                {
-                  "src": "/images/edu/abb/img_013.jpg",
-                  "caption": "운전실 회로차단기, 계전기"
-                },
-                {
-                  "src": "/images/edu/abb/img_014.jpg",
-                  "caption": "EBCOS"
-                },
-                {
-                  "src": "/images/edu/abb/img_015.jpg",
-                  "caption": "운전모드스위치(비상)"
+                  "src": "/images/edu/abb/abb_03.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 5 -\n3\n비상제동 풀기 불량\n불량현상\n1. 비상제동표시등점등\n2. 제동압력(BC) 4.1㎏/㎠현시\n3. 제동7 step시비상제동해방불능\n【단계별조치요령】\n1. 주공기압력확인, 운전모드확인, 주간제어기제동취급위치확인\n2. 비상․보안제동스위치취급상태확인\n3. 운전실회로차단기․계전기(비상제동NFB, ATC NFB 등) 상태확인\n4. 복귀불가시EBCOS 취급\n5. 운전모드스위치를비상으로전환\n【조치방법】\nTCMS 화면\n비상제동등 점등상태\n주공기압력계(MR,BC)\n운전실 회로차단기, 계전기\nEBCOS\n운전모드스위치(비상)\n- 6 -\n4\n제동 풀기 불량\n불량현상\n1. 주차제동등점등\n2. 역행(동력운전) 불능\n【단계별조치요령】\n1. 주공기압력확인, 제동압력확인\n2. TCMS 고장상태확인\n3. 강제완해스위치취급(강제완해스위치취급중ECUN 취급금지)\n4. 해당차호ECU차단기OFF/ON(대차타는냄새확인)\n5. 해당차호SR 콕크개방\n【조치방법】\n주차제동스위치\n주공기압력\n운전실회로차단기\n주차제동 완해 스위치\n임펄스 전자변\n주차제동 당김 고리"
             }
           ]
         },
         {
-          "id": "ch5a-4",
-          "title": "제동 풀기 불량",
-          "summary": [
-            "주차제동등 점등, 역행(동력운전) 불능"
-          ],
+          "id": "abb-03",
+          "title": "주차제동·출입문 표시등 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "주차제동등 점등"
-                },
-                {
-                  "term": "2",
-                  "desc": "역행(동력운전) 불능"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "주공기압력 확인, 제동압력 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "TCMS 고장상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "강제완해 스위치 취급 (강제완해 스위치 취급 중 ECUN 취급금지)"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "해당차호 ECU차단기 OFF/ON (대차 타는냄새 확인)"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "해당차호 SR 콕크 개방"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_023.jpg",
-                  "caption": "주차제동스위치"
-                },
-                {
-                  "src": "/images/edu/abb/img_024.jpg",
-                  "caption": "주공기압력"
-                },
-                {
-                  "src": "/images/edu/abb/img_026.jpg",
-                  "caption": "운전실회로차단기"
-                },
-                {
-                  "src": "/images/edu/abb/img_025.jpg",
-                  "caption": "주차제동 완해 스위치"
-                },
-                {
-                  "src": "/images/edu/abb/img_021.jpg",
-                  "caption": "임펄스 전자변"
-                },
-                {
-                  "src": "/images/edu/abb/img_027.jpg",
-                  "caption": "주차제동 당김 고리"
+                  "src": "/images/edu/abb/abb_04.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 7 -\n5\n주차제동 풀기 불량\n불량현상\n1. 주차제동등점등\n2. 역행(동력운전) 불능\n【단계별조치요령】\n1. 주차제동완해스위치확인\n2. 운전실좌측하부의주차제동변의완해측타격\n3. 완해불능시반대편운전실에서“1,2항”을실시\n4. 운전실배전반주차제동NFB ON 시킴\n5. 주차제동완해고리당김\n【조치방법】\n주차제동스위치\n주공기압력\n운전실회로차단기\n주차제동 완해 스위치\n임펄스 전자변\n주차제동 당김 고리\n- 8 -\n6\n운전실 출입문표시등 점등불량\n불량현상\n1. 운전실데스크출입문표시등소등\n2. 동력운전불능\n【단계별조치요령】\n1. TCMS 출입문닫힘상태확인\n2. 운전실출입문표시등상태, 전차량계전기투입상태확인\n3. 운전모드수동, 출입문모드수/수취급\n4. 출입문2~3회개․폐, ALL DOOR BYPASS 취급(사령에보고)\n【조치방법】\nTCMS 화면\n운전실 출입문 표시등\n전차량 닫힘계전기\n운전모드 수동\n출입문 모드 수/수\nALL DOOR BYPASS"
             }
           ]
         },
         {
-          "id": "ch5a-5",
-          "title": "주차제동 풀기 불량",
-          "summary": [
-            "주차제동등 점등, 역행(동력운전) 불능"
-          ],
+          "id": "abb-04",
+          "title": "출입문 열림·닫힘 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "주차제동등 점등"
-                },
-                {
-                  "term": "2",
-                  "desc": "역행(동력운전) 불능"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "주차제동 완해스위치 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "운전실 좌측 하부의 주차제동변의 완해측 타격"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "완해불능시 반대편 운전실에서 1,2항 실시"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "운전실 배전반 주차제동 NFB ON"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "주차제동 완해고리 당김"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_023.jpg",
-                  "caption": "주차제동스위치"
+                  "src": "/images/edu/abb/abb_05.webp",
+                  "caption": ""
                 },
                 {
-                  "src": "/images/edu/abb/img_024.jpg",
-                  "caption": "주공기압력"
-                },
-                {
-                  "src": "/images/edu/abb/img_026.jpg",
-                  "caption": "운전실회로차단기"
-                },
-                {
-                  "src": "/images/edu/abb/img_025.jpg",
-                  "caption": "주차제동 완해 스위치"
-                },
-                {
-                  "src": "/images/edu/abb/img_021.jpg",
-                  "caption": "임펄스 전자변"
-                },
-                {
-                  "src": "/images/edu/abb/img_027.jpg",
-                  "caption": "주차제동 당김 고리"
+                  "src": "/images/edu/abb/abb_06.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 9 -\n7\n전 차량 출입문 열림불량\n불량현상\n1. 역사정위치정차후출입문열리지않음\n2. 약10초후개별출입문개방불량고장현시\n【단계별조치요령】\n1. 정위치정차상태확인, 승강장안전문열림상태확인\n2. 운전실ATC 배전반내계전기(LDE,RDE) 동작상태확인\n3. 배전반전차량출입문회로차단기TRIP 확인\n3. 운전모드수동, 출입문모드수/수취급\n4. 출입문수동열림취급, 차내의CR 코크확인\n5. 비상모드로전환, 출입문모드수/수취급후출입문열림취급\n【조치방법】\nLDE,RDE) 동작상태 확인\n전차량 출입문 회로차단기\n TRIP 확인\n비상모드로 전환, \n출입문모드 수/수 취급\n- 10 -\n8\n전 차량 출입문 닫힘 불량\n불량현상\n1. 실제출입문닫힘\n①운전실출입문표시등소등\n②역행불가, 해당차호차측등점등\n2. 실제출입문닫힘불가(전량)\n①운전실출입문표시등소등\n②TCMS 모니터출입문열림표시\n③전차량차측등점등\n【단계별조치요령】\n1. 실제출입문닫힘(TCMS모니터닫힘불가고장없음)\n①운전모드수동, 출입문모드수/수취급→출입문수동열림/닫힘취급\n②운전실회로차단기및전차량닫힘계전기동작상태확인→불량시교환\n③각량출입문닫힘상태(도어스위치부위) 확인및연동계전기접점\n동작상태확인→\n불량시교환\n④\n전량출입문닫힘확인후ALL DOOR BY PASS 시키고역행가능\n2. 실제출입문닫힘불량(TCMS모니터닫힘불가고장현시)\n①운전모드수동, 출입문모드수/수취급→출입문수동열림/닫힘취급\n②전량출입문닫힘불가시\n- 출입문닫힘버튼확인후또다른출입문버튼취급.\n- 전차량출입문회로차단기를차단함\n③한량출입문닫힘불가시\n- CC 불량으로출입문개방신호계속출력확인\n- 한량출입문회로차단NFB를취급한다..\n- 출입문대표COCK 확인→차단시COCK를복귀시킴.\n※ ALL DOOR BY-PASS 스위치취급시확인사항\n- 운전모드수동모드, 출입문모드수/수모드"
+            },
+            {
+              "type": "searchText",
+              "content": "- 11 -\n【조치방법】\n출입문 스위치 동작\n전량 출입문 닫힘 표시등\n   점등 상태 확인\n전차량 닫힘 계전기 동작확인 및 \n교환\n각량 출입문 닫힘상태 \n(도어스위치 부위) 확인\nCC 출입문 개방신호 \n계속 출력 확인\nALL DOOR By Pass 취급\n- 12 -\n9\n출입문(1개) 닫힘불량\n불량현상\n1. 운전실출입문표시등점등안됨\n2. TCMS 출입문열림표시\n3. 해당차량차측등점등\n【단계별조치요령】\n1. TCMS 출입문위치확인, 해당차량차측등확인\n2. 해당차량출입문열림상태확인\n3. 출입문개별코크, 도어엔진V패킹너트, 출입문압봉, 전자변,\n소음기, 에어누기여부확인조치\n4 DOOR POCKET 출입문간섭확인\n5. 출입문개별By-Pass 스위치취급\n【조치방법】\n전량 출입문 닫힘 표시등\n   점등 상태 확인\n5106호 L1위 출입문\n도어엔진 동작상태 확인\n전차량 닫힘 계전기교환"
             }
           ]
         },
         {
-          "id": "ch5a-6",
-          "title": "운전실 출입문표시등 점등불량",
-          "summary": [
-            "운전실 데스크 출입문 표시등 소등, 동력운전 불능"
-          ],
+          "id": "abb-05",
+          "title": "역행불능·ATO/ATC 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "운전실 데스크 출입문 표시등 소등"
-                },
-                {
-                  "term": "2",
-                  "desc": "동력운전 불능"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "TCMS 출입문 닫힘상태 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "운전실 출입문 표시등 상태, 전차량 계전기 투입상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "운전모드 수동, 출입문 모드 수/수 취급"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "출입문 2~3회 개·폐, ALL DOOR BYPASS 취급 (관제에 보고)"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_028.jpg",
-                  "caption": "TCMS 화면"
-                },
-                {
-                  "src": "/images/edu/abb/img_029.jpg",
-                  "caption": "운전실 출입문 표시등"
-                },
-                {
-                  "src": "/images/edu/abb/img_030.jpg",
-                  "caption": "전차량 닫힘계전기"
-                },
-                {
-                  "src": "/images/edu/abb/img_031.jpg",
-                  "caption": "운전모드 수동 출입문 모드 수/수 ALL DOOR BYPASS"
+                  "src": "/images/edu/abb/abb_07.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 13 -\n10\n역행불능\n불량현상\n1. 역행(동력운전) 취급시전류계상승불량\n2. 전차선전압계“0” 현시\n3. 운전실출입문표시등점등안됨\n【단계별조치요령】\n1. 역행(동력운전) 취급시전류계상승불량, 전차선전압계“0”현시\n①TCMS 고장확인. 해당차호MIM 회로차단기차단\n②PAN UP 스위치취급\n2. 운전실출입문표시등점등안됨\n①운전모드수동, 출입문모드수/수취급→출입문수동열림/닫힘취급\n②운전실회로차단기및전차량닫힘계전기동작상태확인→불량시교환\n③각량출입문닫힘상태(도어스위치부위) 확인및연동계전기접점\n동작상태확인→\n불량시교환\n④원인불명시전량출입문닫힘확인후ALL DOOR BY PASS 시키고\n역행\n【조치방법】\n전압계, 전류계 OFF\nPan Up 스위치 취급\n- 14 -\n11\nATO/ATC 동작불량\n불량현상\n1. ADU 주/예비ATC 고장등점등\n2. 비상제동표시등점등\n3. TCMS 모니터ATC 통신고장, ATO 통신고장현시\n【단계별조치요령】\n1. ATC 전원공급기확인\n2. ATO/ ATC 각PCB LED 상태확인\n3. ATC CPU 보드를통하여ATC Event Log확인\n4. 전동차정지, 출입문닫힘상태에서ATO/ATC Reset\n【조치방법】\nATO/ ATC 각 PCB LED 상태 확인\n리셋스위치 reset 취급\nATC회로차단기로 \nATC reset 취급"
             }
           ]
         },
         {
-          "id": "ch5a-7",
-          "title": "전 차량 출입문 열림 불량",
-          "summary": [
-            "역사 정위치정차 후 출입문 열리지 않음"
-          ],
+          "id": "abb-06",
+          "title": "TC/LIU 불량",
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "역사 정위치정차 후 출입문 열리지 않음"
-                },
-                {
-                  "term": "2",
-                  "desc": "약 10초후 개별 출입문 개방불량 고장현시"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "정위치정차 상태 확인, 승강장안전문 열림상태 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "운전실 ATC 배전반내 계전기(LDE,RDE) 동작상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "배전반 전차량 출입문 회로차단기 TRIP 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "운전모드 수동, 출입문 모드 수/수 취급"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "출입문 수동 열림취급, 차내의 CR 코크 확인"
-                  ]
-                },
-                {
-                  "label": "6",
-                  "items": [
-                    "비상모드로 전환, 출입문모드 수/수 취급후 출입문 열림취급"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_034.jpg",
-                  "caption": "LDE,RDE 동작상태 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_035.jpg",
-                  "caption": "전차량 출입문 회로차단기 TRIP 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_036.jpg",
-                  "caption": "비상모드로 전환, 출입문모드 수/수 취급"
+                  "src": "/images/edu/abb/abb_08.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 15 -\n12\n전부 TC, LIU 불량\n불량현상\n1. TC고장\n- 운전실계기등(전압계,전류계) 소등, FIS 모니터현시불가\n- 비상전원차단등, 연장급전등, LIU절체등점등\n2. LIU고장(LIU2 컴퓨터로자동절체가안된경우)\n- FIS 모니터현시불가, ADU off, HCR/TCR계전기소자\n- 전류,전압,밧데리계기등소등, LIU1,2 STALL계전기소자\n- L/B 개방및AC형광등소등(단순LIU1 고장시고전압정상,\nLIU1 반복적리셋현상발생시고전압분리됨)\n【단계별조치요령】\n1. TC 고장\n①차량을재기동한다(차량재기동이라함은PAN하강, 역전기중립\n후차량을다시기동함을말한다)\n②TC 컴퓨터고장원인소멸시FIS 정상기동됨\n- 각종장치정상동작및차량정상기동정상운행(4/4출력)가능\n③재기동후에도동일고장이면, 1/2출력으로차량기지입고\n2. LIU 고장(LIU2 컴퓨터로자동절체가안된경우)\n①LIU Reset 스위치취급(22초이상)\n- LIU 절체등점등, ADU 현시상태확인\n(FIS 모니터현시불가,전압계/전류계OFF)\n- 운전실배전반Stall Relay2가여자되었는지확인\n②정상절체되면전동차출력정상\n③절체안될시차량을재기동한다.\n- 16 -\n【조치방법】\nP/S LED 확인\nTC LED확인\n조치안될시 PAN하강, 역전기 \nOFF로 열차 재기동\n리셋스위치 reset한다\nLIU 절체등 점등 확인\n조치 안될시 PAN하강, 역전기 \nOFF로 열차 재기동"
             }
           ]
         },
         {
-          "id": "ch5a-8",
-          "title": "전 차량 출입문 닫힘불량",
-          "summary": [
-            "실제 출입문 닫힘 후 표시등 소등 / 실제 닫힘불가(전량)"
-          ],
-          "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1. 실제 출입문 닫힘",
-                  "desc": "① 운전실 출입문표시등 소등 ② 역행불가, 해당차호 차측등 점등"
-                },
-                {
-                  "term": "2. 실제 출입문 닫힘불가(전량)",
-                  "desc": "① 운전실 출입문표시등 소등 ② TCMS 모니터 출입문 열림 표시 ③ 전 차량 차측등 점등"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "1. 실제 출입문 닫힘 (TCMS 모니터 닫힘불가 고장없음)"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"
-                  ]
-                },
-                {
-                  "label": "③",
-                  "items": [
-                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인 → 불량시 교환"
-                  ]
-                },
-                {
-                  "label": "④",
-                  "items": [
-                    "전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행가능"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "2. 실제 출입문 닫힘 불량 (TCMS 모니터 닫힘불가 고장현시)"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "전량 출입문 닫힘 불가시",
-                    "출입문 닫힘버튼 확인 후 또 다른 출입문 버튼취급",
-                    "전차량 출입문 회로차단기를 차단함"
-                  ]
-                },
-                {
-                  "label": "③",
-                  "items": [
-                    "한량 출입문 닫힘 불가시",
-                    "CC 불량으로 출입문 개방신호 계속 출력 확인",
-                    "한량 출입문회로 차단 NFB를 취급한다",
-                    "출입문 대표 COCK 확인 → 차단시 COCK를 복귀시킴"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "callout",
-              "variant": "warning",
-              "text": "※ ALL DOOR BY-PASS 스위치 취급시 확인사항: 운전모드 수동모드, 출입문모드 수/수모드"
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/abb/img_037.jpg",
-                  "caption": "출입문 스위치 동작"
-                },
-                {
-                  "src": "/images/edu/abb/img_038.jpg",
-                  "caption": "전량 출입문 닫힘 표시등 점등 상태 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_039.jpg",
-                  "caption": "전차량 닫힘 계전기 동작확인 및 교환"
-                },
-                {
-                  "src": "/images/edu/abb/img_040.jpg",
-                  "caption": "각량 출입문 닫힘상태 (도어스위치 부위) 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_041.jpg",
-                  "caption": "CC 출입문 개방신호 계속 출력 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_042.jpg",
-                  "caption": "ALL DOOR By Pass 취급"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ch5a-9",
-          "title": "출입문(1개) 닫힘불량",
-          "summary": [
-            "운전실 출입문표시등 점등 안됨, TCMS 출입문 열림표시"
-          ],
-          "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "운전실 출입문표시등 점등 안됨"
-                },
-                {
-                  "term": "2",
-                  "desc": "TCMS 출입문 열림표시"
-                },
-                {
-                  "term": "3",
-                  "desc": "해당 차량 차측등 점등"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "TCMS 출입문 위치 확인, 해당 차량 차측등 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "해당 차량 출입문 열림상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "출입문 개별코크, 도어엔진 V패킹너트, 출입문 압봉, 전자변, 소음기, 에어누기여부 확인 조치"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "DOOR POCKET 출입문 간섭확인"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "출입문 개별 By-Pass 스위치 취급"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/abb/img_043.jpg",
-                  "caption": "전량 출입문 닫힘 표시등 점등 상태 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_044.jpg",
-                  "caption": "5106호 L1위 출입문 도어엔진 동작상태 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_045.jpg",
-                  "caption": "전차량 닫힘 계전기교환"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ch5a-10",
-          "title": "역행불능",
-          "summary": [
-            "역행 취급 시 전류계 상승불량, 전차선 전압계 0 현시"
-          ],
-          "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "역행(동력운전) 취급 시 전류계 상승불량"
-                },
-                {
-                  "term": "2",
-                  "desc": "전차선 전압계 \"0\" 현시"
-                },
-                {
-                  "term": "3",
-                  "desc": "운전실 출입문표시등 점등 안됨"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "1. 전류계 상승불량, 전차선 전압계 \"0\" 현시"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "TCMS 고장 확인. 해당 차호 MIM 회로차단기 차단"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "PAN UP 스위치 취급"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "2. 운전실 출입문표시등 점등 안됨"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "운전모드 수동, 출입문 모드 수/수 취급 → 출입문 수동 열림/닫힘취급"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "운전실 회로차단기 및 전차량 닫힘계전기 동작상태 확인 → 불량시 교환"
-                  ]
-                },
-                {
-                  "label": "③",
-                  "items": [
-                    "각량 출입문 닫힘상태(도어스위치 부위) 확인 및 연동계전기 접점 동작상태 확인 → 불량시 교환"
-                  ]
-                },
-                {
-                  "label": "④",
-                  "items": [
-                    "원인불명시 전량 출입문 닫힘 확인후 ALL DOOR BY PASS 시키고 역행"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/abb/img_046.jpg",
-                  "caption": "전압계, 전류계 OFF"
-                },
-                {
-                  "src": "/images/edu/abb/img_048.jpg",
-                  "caption": "Pan Up 스위치 취급"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ch5a-11",
-          "title": "ATO/ATC 동작불량",
-          "summary": [
-            "ADU 주/예비 ATC 고장등 점등, 비상제동 표시등 점등"
-          ],
-          "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "ADU 주/예비 ATC 고장등 점등"
-                },
-                {
-                  "term": "2",
-                  "desc": "비상제동 표시등 점등"
-                },
-                {
-                  "term": "3",
-                  "desc": "TCMS 모니터 ATC 통신고장, ATO 통신고장 현시"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "ATC 전원공급기 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "ATO/ATC 각 PCB LED 상태 확인"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "ATC CPU 보드를 통하여 ATC Event Log 확인"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "전동차 정지, 출입문 닫힘상태에서 ATO/ATC Reset"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/abb/img_053.jpg",
-                  "caption": "ATO/ATC 각 PCB LED 상태 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_050.jpg",
-                  "caption": "리셋스위치 reset 취급"
-                },
-                {
-                  "src": "/images/edu/abb/img_052.jpg",
-                  "caption": "ATC회로차단기로 ATC reset 취급"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ch5a-12",
-          "title": "전부 TC, LIU 불량",
-          "summary": [
-            "TC 고장 — 계기등 소등, FIS 현시불가 / LIU 고장 — ADU off, 계기등 소등"
-          ],
-          "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1. TC고장",
-                  "desc": "운전실 계기등(전압계,전류계) 소등, FIS 모니터 현시불가, 비상전원차단등·연장급전등·LIU절체등 점등"
-                },
-                {
-                  "term": "2. LIU고장 (LIU2 자동절체 안된 경우)",
-                  "desc": "FIS 모니터 현시불가, ADU off, HCR/TCR계전기 소자, 전류·전압·밧데리 계기등 소등, LIU1,2 STALL계전기 소자, L/B 개방 및 AC형광등 소등"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "TC 고장 조치"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "차량을 재기동 (PAN하강, 역전기 중립 후 다시 기동)"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "TC 컴퓨터 고장원인 소멸시 FIS 정상 기동 — 정상운행(4/4출력) 가능"
-                  ]
-                },
-                {
-                  "label": "③",
-                  "items": [
-                    "재기동 후에도 동일고장이면 1/2출력으로 차량기지 입고"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "LIU 고장 조치 (LIU2 자동절체 안된 경우)"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "①",
-                  "items": [
-                    "LIU Reset 스위치 취급 (22초 이상) — LIU 절체등 점등, ADU 현시상태 확인",
-                    "(FIS 모니터현시불가, 전압계/전류계 OFF)",
-                    "운전실 배전반 Stall Relay2가 여자되었는지 확인"
-                  ]
-                },
-                {
-                  "label": "②",
-                  "items": [
-                    "정상 절체 되면 전동차 출력 정상"
-                  ]
-                },
-                {
-                  "label": "③",
-                  "items": [
-                    "절체 안될시 차량을 재기동"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/abb/img_054.jpg",
-                  "caption": "P/S LED 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_049.jpg",
-                  "caption": "TC LED확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_055.jpg",
-                  "caption": "조치안될시 PAN하강, 역전기 OFF로 열차 재기동"
-                },
-                {
-                  "src": "/images/edu/abb/img_050.jpg",
-                  "caption": "리셋스위치 reset한다"
-                },
-                {
-                  "src": "/images/edu/abb/img_056.jpg",
-                  "caption": "LIU 절체등 점등 확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_058.jpg",
-                  "caption": "조치 안될시 PAN하강, 역전기 OFF로 열차 재기동"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "ch5a-13",
+          "id": "abb-07",
           "title": "인버터(MIM/AIM) 불량",
-          "summary": [
-            "TCMS 인버터 고장기록 현시, 모듈콘텍터 차단, 비상전원차단등 점등"
-          ],
           "content": [
-            {
-              "type": "heading",
-              "text": "불량현상"
-            },
-            {
-              "type": "list",
-              "items": [
-                {
-                  "term": "1",
-                  "desc": "TCMS 인버터 고장기록 현시"
-                },
-                {
-                  "term": "2",
-                  "desc": "인버터 모듈콘텍터 차단, 주회로 차단기 개방"
-                },
-                {
-                  "term": "3",
-                  "desc": "운전실 표시등(비상전원차단등) 점등"
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "단계별 조치요령"
-            },
-            {
-              "type": "flow",
-              "steps": [
-                {
-                  "label": "1",
-                  "items": [
-                    "TCMS 고장정보 확인"
-                  ]
-                },
-                {
-                  "label": "2",
-                  "items": [
-                    "판타그라프 상승, L/B 투입 버튼 누름 (3/4출력으로 운행가능) — MIM1,2 단독고장일 경우"
-                  ]
-                },
-                {
-                  "label": "3",
-                  "items": [
-                    "인버터모듈 자체블록 되는 경우 (MIM1,2 동시) — 열차 재기동 하여야 함"
-                  ]
-                },
-                {
-                  "label": "4",
-                  "items": [
-                    "1/2출력(L/B개방) 되는 경우 — MIM1,2, AIM 동시 병발고장",
-                    "판상승 L/B투입 버튼 취급은 신중해야 함 (내부회로단락 포함될 경우)"
-                  ]
-                },
-                {
-                  "label": "5",
-                  "items": [
-                    "AIM고장으로 인한 연장급전 — 판타그라프 상승, L/B 투입 버튼 누름 (4/4출력으로 운행가능)"
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "heading",
-              "text": "조치방법 참고 사진"
-            },
             {
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/abb/img_047.jpg",
-                  "caption": "TCMS 모니터 고장확인"
-                },
-                {
-                  "src": "/images/edu/abb/img_059.jpg",
-                  "caption": "고장상황에 따라 Pan Up 스위치 취급"
+                  "src": "/images/edu/abb/abb_09.webp",
+                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "- 17 -\n13\n인버터(MIM/AIM) 불량\n불량현상\n1. TCMS 인버터고장기록현시\n2. 인버터모듈콘텍터차단, 주회로차단기개방\n3. 운전실표시등(비상전원차단등) 점등\n【단계별조치요령】\n1. TCMS 고장정보확인\n2. 판타그라프상승, L/B 투입버튼누름(3/4출력으로운행가능)\n- MIM1, 2 단독고장일경우\n- 고장내용: 내부회로단락, LCU통신고장, 전류센서접지고장,\nDC링크전압측정고장, 가선과전류, MIM과전압, 캐패시터그룹고장\n3. 인버터모듈자체블록되는경우(MIM1,2 동시)\n- 열차재기동하여야함\n- 전압센서고장, 상고장(30분내3회), MIM과전류(30분내3회)\nOVC제어고장, LFC 전압측정고장\n4. 1/2출력(L/B개방) 되는경우(판상승L/B투입버튼취급은신중해야함)\n- MIM1, 2, AIM 동시에병발고장발생\n(내부회로단락포함될경우L/B투입버튼취급은신중해야함)\n- 가선과전류(30분내3회까지허용, 4회시L/B 영구차단)\n단락회로시험고장(연장급전)\n5. AIM고장으로인한연장급전\n- 판타그라프상승, L/B 투입버튼누름(4/4출력으로운행가능)\n- 냉각고장, 공기흐름센서고장(열차재기동하여야함)\n- 18 -\n【조치방법】\nTCMS 모니터 고장확인\n고장상황에 따라\nPan Up 스위치 취급"
             }
           ]
         }

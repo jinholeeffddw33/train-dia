@@ -11,25 +11,6 @@
       "sections": [
         {
           "id": "duty-01",
-          "title": "승무본부 실천사항",
-          "content": [
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/duty/duty_p03.webp",
-                  "caption": ""
-                }
-              ]
-            },
-            {
-              "type": "searchText",
-              "content": "- 승무본부 실천사항 -"
-            }
-          ]
-        },
-        {
-          "id": "duty-02",
           "title": "기관사 주요업무",
           "content": [
             {
@@ -48,7 +29,7 @@
           ]
         },
         {
-          "id": "duty-03",
+          "id": "duty-02",
           "title": "운전업무 수행 시 준수사항",
           "content": [
             {
@@ -67,7 +48,7 @@
           ]
         },
         {
-          "id": "duty-04",
+          "id": "duty-03",
           "title": "기관사 기본직무 방법",
           "content": [
             {
@@ -110,7 +91,7 @@
           ]
         },
         {
-          "id": "duty-05",
+          "id": "duty-04",
           "title": "차량기지 출고요령",
           "content": [
             {
@@ -145,7 +126,7 @@
           ]
         },
         {
-          "id": "duty-06",
+          "id": "duty-05",
           "title": "차량기지 입고요령",
           "content": [
             {
@@ -164,7 +145,7 @@
           ]
         },
         {
-          "id": "duty-07",
+          "id": "duty-06",
           "title": "전동차 기동/정지 요령",
           "content": [
             {
@@ -183,7 +164,7 @@
           ]
         },
         {
-          "id": "duty-08",
+          "id": "duty-07",
           "title": "출발전 시험요령(PDT)",
           "content": [
             {
@@ -202,7 +183,7 @@
           ]
         },
         {
-          "id": "duty-09",
+          "id": "duty-08",
           "title": "열차무선전화 사용요령 / 열차운전 준비사항",
           "content": [
             {
@@ -221,7 +202,7 @@
           ]
         },
         {
-          "id": "duty-10",
+          "id": "duty-09",
           "title": "ATC 장치 고장시",
           "content": [
             {
@@ -240,7 +221,7 @@
           ]
         },
         {
-          "id": "duty-11",
+          "id": "duty-10",
           "title": "운전모드",
           "content": [
             {
@@ -259,7 +240,7 @@
           ]
         },
         {
-          "id": "duty-12",
+          "id": "duty-11",
           "title": "반복역 회차요령 / 지도승무 보고요령",
           "content": [
             {
@@ -278,7 +259,7 @@
           ]
         },
         {
-          "id": "duty-13",
+          "id": "duty-12",
           "title": "안내방송 / 객실냉난방 취급기준",
           "content": [
             {
@@ -297,7 +278,7 @@
           ]
         },
         {
-          "id": "duty-14",
+          "id": "duty-13",
           "title": "출입문 취급요령 및 승강장안전문",
           "content": [
             {
@@ -324,7 +305,7 @@
           ]
         },
         {
-          "id": "duty-15",
+          "id": "duty-14",
           "title": "기본운전취급 절차 / 운전실 주요기기",
           "content": [
             {
@@ -367,7 +348,7 @@
           ]
         },
         {
-          "id": "duty-16",
+          "id": "duty-15",
           "title": "운전관계 신호일반",
           "content": [
             {
@@ -386,7 +367,7 @@
           ]
         },
         {
-          "id": "duty-17",
+          "id": "duty-16",
           "title": "신호에 따른 운전취급",
           "content": [
             {
@@ -421,7 +402,7 @@
           ]
         },
         {
-          "id": "duty-18",
+          "id": "duty-17",
           "title": "선로전환기 정반위 표시등",
           "content": [
             {
@@ -448,7 +429,7 @@
           ]
         },
         {
-          "id": "duty-19",
+          "id": "duty-18",
           "title": "지적확인 환호 요령",
           "content": [
             {
@@ -499,7 +480,7 @@
           ]
         },
         {
-          "id": "duty-20",
+          "id": "duty-19",
           "title": "운전관계규정",
           "content": [
             {

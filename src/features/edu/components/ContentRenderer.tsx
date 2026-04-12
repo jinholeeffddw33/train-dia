@@ -273,7 +273,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                       onClick={() => openViewer(block.items, j)}
                       aria-label={img.caption || `슬라이드 ${j + 1} 확대`}
                     >
-                      <img src={img.src} alt={img.caption || ''} className={styles.slideImg} loading="lazy" />
+                      <img src={img.src} alt={img.caption || ''} className={styles.slideImg} loading={j < 2 ? 'eager' : 'lazy'} />
                     </button>
                     {img.caption && <figcaption className={styles.slideCaption}>{img.caption}</figcaption>}
                   </figure>

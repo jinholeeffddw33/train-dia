@@ -1205,8 +1205,10 @@
   display: block;
   width: 100%;
   height: auto;
+  min-height: 200px;
   border-radius: var(--dia-radius-md);
   background: var(--dia-surface);
+  object-fit: contain;
 }
 
 .slideTapHint {

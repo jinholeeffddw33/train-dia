@@ -338,7 +338,7 @@
 
 .subMenuGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--dia-space-3);
 }
 
@@ -377,6 +377,81 @@
   position: absolute;
   top: 0;
   right: -2px;
+}
+
+/* ── 새내기 학습 로드맵 ── */
+.roadmapPanel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
+  padding: var(--dia-space-5) var(--dia-space-4) var(--dia-space-6);
+  animation: slideUp 0.2s ease;
+}
+
+.roadmapDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin: calc(-1 * var(--dia-space-3)) 0 var(--dia-space-4);
+}
+
+.roadmapList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.roadmapItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+
+.roadmapItem:active {
+  transform: scale(0.98);
+}
+
+.roadmapStep {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: #fff;
+}
+
+.roadmapItemBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.roadmapItemLabel {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.roadmapItemDesc {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+
+.quickIconAmber {
+  color: var(--dia-amber);
 }
 
 /* 3D 아이콘 배경 — 그라데이션 + bloom + inset/depth/glow */

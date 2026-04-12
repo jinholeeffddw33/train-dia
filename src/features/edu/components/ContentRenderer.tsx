@@ -274,7 +274,6 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                       aria-label={img.caption || `슬라이드 ${j + 1} 확대`}
                     >
                       <img src={img.src} alt={img.caption || ''} className={styles.slideImg} loading="lazy" />
-                      <span className={styles.slideTapHint}>탭하여 확대</span>
                     </button>
                     {img.caption && <figcaption className={styles.slideCaption}>{img.caption}</figcaption>}
                   </figure>

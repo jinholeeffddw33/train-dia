@@ -631,6 +631,7 @@ function extractText(blocks: any[]): string {
   const parts: string[] = [];
   for (const b of blocks) {
     if (typeof b === 'string') { parts.push(b); continue; }
+    if (b.type === 'searchText' && b.content) { parts.push(b.content); continue; }
     if (b.text) parts.push(b.text);
     if (b.title) parts.push(b.title);
     if (b.items) {

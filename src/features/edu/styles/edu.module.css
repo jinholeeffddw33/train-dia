@@ -7,6 +7,7 @@
   background: var(--dia-bg);
   color: var(--dia-text-primary);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  overscroll-behavior: none;
 }
 
 .topBar {
@@ -1130,6 +1131,7 @@
   width: 100%;
   height: auto;
   border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
 }
 
 .slideTapHint {

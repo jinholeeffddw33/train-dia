@@ -215,7 +215,8 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
     setMode('section');
     const info = allSections.find(s => s.sectionId === sectionId);
     markSectionRead(sectionId, info?.chapterId);
-    window.scrollTo(0, 0);
+    // 안드로이드 Chrome에서 state 업데이트와 scrollTo 사이 흰색 프레임 방지
+    requestAnimationFrame(() => { window.scrollTo(0, 0); });
   }, [markSectionRead, allSections]);
 
   const toggleChapter = useCallback((chId: string) => {

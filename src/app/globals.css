@@ -136,6 +136,28 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
+/* ── Press Animation Utilities ── */
+.diaPress {
+  transition: transform var(--dia-transition-fast);
+}
+.diaPress:active {
+  transform: scale(0.98);
+}
+
+.diaPressBtn {
+  transition: transform var(--dia-transition-fast);
+}
+.diaPressBtn:active {
+  transform: scale(0.95);
+}
+
+.diaPressIcon {
+  transition: transform 100ms var(--dia-ease);
+}
+.diaPressIcon:active {
+  transform: scale(0.9);
+}
+
 /* 스켈레톤 로딩 shimmer */
 .diaSkeleton {
   background: linear-gradient(90deg, var(--dia-surface) 25%, var(--dia-surface-elevated) 50%, var(--dia-surface) 75%);

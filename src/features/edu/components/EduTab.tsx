@@ -9,6 +9,7 @@ import WrongReview from './WrongReview';
 import MyInfo from './MyInfo';
 import VideoEducation from './VideoEducation';
 import TrainingList from './TrainingList';
+import RescueProcedure from './RescueProcedure';
 
 type EduView =
   | { type: 'home' }
@@ -18,7 +19,8 @@ type EduView =
   | { type: 'wrong-review' }
   | { type: 'myinfo' }
   | { type: 'video' }
-  | { type: 'training' };
+  | { type: 'training' }
+  | { type: 'rescue-procedure' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -69,6 +71,8 @@ export default function EduTab({ onBack }: EduTabProps) {
           onSlide={(ids, title) => setView({ type: 'study', initChapters: ids, initTitle: title })}
         />
       );
+    case 'rescue-procedure':
+      return <RescueProcedure onBack={goHome} />;
     default:
       return (
         <EduHome
@@ -83,6 +87,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onMyInfo={() => setView({ type: 'myinfo' })}
           onVideo={() => setView({ type: 'video' })}
           onTraining={() => setView({ type: 'training' })}
+          onRescueProcedure={() => setView({ type: 'rescue-procedure' })}
         />
       );
   }

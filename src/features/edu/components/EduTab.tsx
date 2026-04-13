@@ -10,6 +10,7 @@ import MyInfo from './MyInfo';
 import VideoEducation from './VideoEducation';
 import TrainingList from './TrainingList';
 import RescueProcedure from './RescueProcedure';
+import RescueSimulation from './RescueSimulation';
 
 type EduView =
   | { type: 'home' }
@@ -20,7 +21,8 @@ type EduView =
   | { type: 'myinfo' }
   | { type: 'video' }
   | { type: 'training' }
-  | { type: 'rescue-procedure' };
+  | { type: 'rescue-procedure' }
+  | { type: 'rescue-simulation' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -73,6 +75,8 @@ export default function EduTab({ onBack }: EduTabProps) {
       );
     case 'rescue-procedure':
       return <RescueProcedure onBack={goHome} />;
+    case 'rescue-simulation':
+      return <RescueSimulation onBack={goHome} />;
     default:
       return (
         <EduHome
@@ -88,6 +92,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onVideo={() => setView({ type: 'video' })}
           onTraining={() => setView({ type: 'training' })}
           onRescueProcedure={() => setView({ type: 'rescue-procedure' })}
+          onRescueSimulation={() => setView({ type: 'rescue-simulation' })}
         />
       );
   }

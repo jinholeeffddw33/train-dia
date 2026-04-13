@@ -5,7 +5,7 @@ import {
   ArrowLeft, ChevronRight, X,
   Mic, TrainFront, DoorOpen, Wrench,
   GraduationCap, Award, User, ClipboardList,
-  RotateCcw, Clock, GitCompareArrows, Play, Link,
+  RotateCcw, Clock, GitCompareArrows, Play, Link, Zap,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -25,6 +25,7 @@ interface EduHomeProps {
   onVideo: () => void;
   onTraining: () => void;
   onRescueProcedure: () => void;
+  onRescueSimulation: () => void;
 }
 
 const MENU_ITEMS = [
@@ -61,7 +62,7 @@ function scoreGradeClass(score: number): string {
   return styles.gradeRed;
 }
 
-export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onChapters, onMyInfo, onVideo, onTraining, onRescueProcedure }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onChapters, onMyInfo, onVideo, onTraining, onRescueProcedure, onRescueSimulation }: EduHomeProps) {
   const {
     readCount, totalQuizzes, bestScore, latestScore, previousScore,
     streak, avgScore, progress, wrongCount, unresolvedWrongCount,
@@ -118,6 +119,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
     { id: 'rotem',   label: '로템\n전동차',   color: 'amber'  as const, targets: ['ch5c'],       coming: false },
     { id: 'compare', label: '전동차\n비교',   color: 'purple' as const, targets: ['ch5'],       coming: false },
     { id: 'rescue',  label: '구원연결\n조치순서', color: 'red' as const,    targets: [],            coming: false },
+    { id: 'rescue-sim', label: '구원연결\n시뮬레이션', color: 'amber' as const, targets: [],            coming: false },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
@@ -324,6 +326,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                   rotem: Wrench,
                   compare: GitCompareArrows,
                   rescue: Link,
+                  'rescue-sim': Zap,
                 };
                 const SubIcon = iconMap[sub.id] ?? Wrench;
                 return (
@@ -337,6 +340,10 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
                       setRepairOpen(false);
                       if (sub.id === 'rescue') {
                         onRescueProcedure();
+                        return;
+                      }
+                      if (sub.id === 'rescue-sim') {
+                        onRescueSimulation();
                         return;
                       }
                       onChapters([...sub.targets], sub.label);

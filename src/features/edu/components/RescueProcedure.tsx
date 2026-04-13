@@ -71,7 +71,7 @@ const TRAIN_TABLE = {
   headers: ['조합', '고장차 KEY', '고장차 PAN', '고장차 EROS', '구원차 EROS'],
   rows: [
     ['ABB — 우진/로템', 'On', '상승', '없음', 'N'],
-    ['우진/로템 — ABB', 'On', '하강', 'N', '없음'],
+    ['우진/로템 — ABB', 'On', '상승', 'N', '없음'],
     ['로템 — 우진', 'On', '상승', 'N', 'R1(전동차)'],
     ['우진 — 로템', 'On', '상승', 'N', 'R1(전동차)'],
     ['우진 — 우진', 'On', '하강', 'N', 'R1(전동차)'],
@@ -195,15 +195,18 @@ export default function RescueProcedure({ onBack }: RescueProcedureProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {TRAIN_TABLE.rows.map((row, i) => (
-                    <tr key={i}>
-                      {row.map((cell, j) => (
-                        <td key={j} className={j === 0 ? styles.rescueTableCombo : undefined}>
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {TRAIN_TABLE.rows.map((row, i) => {
+                    const isHighlight = row[0] === '우진 — 우진';
+                    return (
+                      <tr key={i} className={isHighlight ? styles.rescueRowHighlight : undefined}>
+                        {row.map((cell, j) => (
+                          <td key={j} className={j === 0 ? styles.rescueTableCombo : undefined}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

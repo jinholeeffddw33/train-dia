@@ -3349,6 +3349,19 @@
   color: var(--dia-blue);
 }
 
+.rescueRowHighlight {
+  background: var(--dia-amber-dim);
+}
+
+.rescueRowHighlight td {
+  color: var(--dia-amber);
+  font-weight: var(--dia-weight-bold);
+}
+
+:root.light .rescueRowHighlight td {
+  color: var(--dia-on-amber);
+}
+
 :root.light .rescueTableCombo {
   color: var(--dia-blue);
 }

@@ -4076,13 +4076,21 @@
   filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.6));
 }
 
-/* 밸브 위치 (상단/하단) */
-.mrValveTop,
-.mrValveBottom {
+/* 밸브 위치 (상단=왼쪽 정렬, 하단=오른쪽 정렬) */
+.mrValveTop {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 4px;
   min-height: 36px;
+  padding-left: 4px;
+}
+
+.mrValveBottom {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 36px;
+  padding-right: 4px;
 }
 
 .mrValve {

@@ -27,7 +27,7 @@ const CARS: Car[] = [
 /* ── 시나리오 정의 (16가지) ── */
 interface Scenario {
   id: string;
-  trainType: 'ABB' | '로템';
+  trainType: 'ABB' | '우진/로템';
   ruptureDesc: string;
   ruptureCars: number[]; // 0~7 index into CARS
   correctCuts: number[]; // CUT valve numbers
@@ -72,48 +72,48 @@ const ALL_SCENARIOS: Scenario[] = [
     speedLimit: 60,
     explanation: '5700대 파열 → 5600대 차량 을 ⑫ CUT. 제동축수 80%↑ → 60km/h.',
   },
-  // ── 로템 차량 (6가지 — PPT 슬라이드 13,17,18,19,20,22 기준) ──
+  // ── 우진/로템 차량 (6가지 — PPT 슬라이드 13,17,18,19,20,22 기준) ──
   {
-    id: 'rotem-1', trainType: '로템',
+    id: 'rotem-1', trainType: '우진/로템',
     ruptureDesc: '5200대(M1) 차량에서 주공기관 파열!',
     ruptureCars: [1], correctCuts: [3],
     speedLimit: 60,
-    explanation: '로템 5200대 파열 → 5200대 차량 을 ③ CUT. 5100대 CMN, CMSBN 차단 필요.',
+    explanation: '우진/로템 5200대 파열 → 5200대 차량 을 ③ CUT. 5100대 CMN, CMSBN 차단 필요.',
   },
   {
-    id: 'rotem-2', trainType: '로템',
+    id: 'rotem-2', trainType: '우진/로템',
     ruptureDesc: '5300대(M2) 차량에서 주공기관 파열!',
     ruptureCars: [2], correctCuts: [4, 7],
     speedLimit: 60,
-    explanation: '로템 5300대 파열 → 5200대 을 ④, 5400대 ⑦ CUT으로 양쪽 격리.',
+    explanation: '우진/로템 5300대 파열 → 5200대 을 ④, 5400대 ⑦ CUT으로 양쪽 격리.',
   },
   {
-    id: 'rotem-3', trainType: '로템',
+    id: 'rotem-3', trainType: '우진/로템',
     ruptureDesc: '5400대(M3) 차량에서 주공기관 파열!',
     ruptureCars: [3], correctCuts: [6, 9],
     speedLimit: 60,
-    explanation: '로템 5400대 파열 → 5300대 을 ⑥, 5500대 ⑨ CUT으로 양쪽 격리.',
+    explanation: '우진/로템 5400대 파열 → 5300대 을 ⑥, 5500대 ⑨ CUT으로 양쪽 격리.',
   },
   {
-    id: 'rotem-4', trainType: '로템',
+    id: 'rotem-4', trainType: '우진/로템',
     ruptureDesc: '5500대(M4) 차량에서 주공기관 파열!',
     ruptureCars: [4], correctCuts: [8, 11],
     speedLimit: 60,
-    explanation: '로템 5500대 파열 → 5400대 을 ⑧, 5600대 ⑪ CUT으로 양쪽 격리.',
+    explanation: '우진/로템 5500대 파열 → 5400대 을 ⑧, 5600대 ⑪ CUT으로 양쪽 격리.',
   },
   {
-    id: 'rotem-5', trainType: '로템',
+    id: 'rotem-5', trainType: '우진/로템',
     ruptureDesc: '5600대(M5) 차량에서 주공기관 파열!',
     ruptureCars: [5], correctCuts: [10, 13],
     speedLimit: 60,
-    explanation: '로템 5600대 파열 → 5500대 을 ⑩, 5700대 ⑬ CUT으로 양쪽 격리. PAN 하강·출력 반감.',
+    explanation: '우진/로템 5600대 파열 → 5500대 을 ⑩, 5700대 ⑬ CUT으로 양쪽 격리. PAN 하강·출력 반감.',
   },
   {
-    id: 'rotem-6', trainType: '로템',
+    id: 'rotem-6', trainType: '우진/로템',
     ruptureDesc: '5700대(M6) 차량에서 주공기관 파열!',
     ruptureCars: [6], correctCuts: [14],
     speedLimit: 60,
-    explanation: '로템 5700대 단일 파열 → ⑭ CUT. 5000대 CMN, CMSBN 차단 필요.',
+    explanation: '우진/로템 5700대 단일 파열 → ⑭ CUT. 5000대 CMN, CMSBN 차단 필요.',
   },
 ];
 

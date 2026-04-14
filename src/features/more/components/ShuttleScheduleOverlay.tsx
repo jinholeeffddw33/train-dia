@@ -10,10 +10,21 @@ interface Props {
   onClose: () => void;
 }
 
+type Tab = 'shuttle' | 'depot';
+
 export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
-  const [zoomed, setZoomed] = useState(false);
+  const [tab, setTab] = useState<Tab>('shuttle');
+  const [zoomed, setZoomed] = useState<string | null>(null);
 
   if (!open) return null;
+
+  const imgSrc = tab === 'shuttle'
+    ? '/images/shuttle-schedule.jpg'
+    : '/images/depot-schedule.jpg';
+
+  const imgAlt = tab === 'shuttle'
+    ? '2026년 고덕기지 승용차 운행 시간표'
+    : '2026년 고덕기지 입고열차';
 
   return (
     <div className={moreStyles.fullOverlay}>
@@ -26,19 +37,40 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
         >
           <X size={22} />
         </button>
-        <h2 className={moreStyles.overlayTitle}>승용차 운행 시간표</h2>
+        <h2 className={moreStyles.overlayTitle}>승용차 운행 시간표(고덕기지 입고열차)</h2>
       </div>
 
       <div className={styles.shuttleBody}>
+        <div className={styles.tabBar} role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'shuttle'}
+            className={`${styles.tabBtn} ${tab === 'shuttle' ? styles.tabBtnActive : ''}`}
+            onClick={() => setTab('shuttle')}
+          >
+            승용차 운행시간표
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'depot'}
+            className={`${styles.tabBtn} ${tab === 'depot' ? styles.tabBtnActive : ''}`}
+            onClick={() => setTab('depot')}
+          >
+            고덕기지 입고열차
+          </button>
+        </div>
+
         <button
           type="button"
           className={styles.imgBtn}
-          onClick={() => setZoomed(true)}
+          onClick={() => setZoomed(imgSrc)}
           aria-label="확대"
         >
           <img
-            src="/images/shuttle-schedule.jpg"
-            alt="2026년 고덕기지 승용차 운행 시간표"
+            src={imgSrc}
+            alt={imgAlt}
             className={styles.scheduleImg}
             loading="eager"
           />
@@ -48,15 +80,15 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
       {zoomed && (
         <div
           className={styles.zoomOverlay}
-          onClick={() => setZoomed(false)}
+          onClick={() => setZoomed(null)}
           role="button"
           tabIndex={0}
           aria-label="닫기"
-          onKeyDown={(e) => e.key === 'Escape' && setZoomed(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setZoomed(null)}
         >
           <img
-            src="/images/shuttle-schedule.jpg"
-            alt="2026년 고덕기지 승용차 운행 시간표"
+            src={zoomed}
+            alt={imgAlt}
             className={styles.zoomImg}
           />
         </div>

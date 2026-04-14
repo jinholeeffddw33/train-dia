@@ -174,7 +174,7 @@ export default function MoreTab() {
             <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
               <Car size={20} />
             </div>
-            <span className={styles.settingLabel}>승용차 운행 시간표</span>
+            <span className={styles.settingLabel}>승용차 운행 시간표(고덕기지 입고열차)</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>

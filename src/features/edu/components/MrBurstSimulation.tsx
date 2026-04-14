@@ -174,44 +174,72 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
   const [selected, setSelected] = useState<number[]>([]);
   const [answers, setAnswers] = useState<number[][]>([]);
   const [phase, setPhase] = useState<'play' | 'result'>('play');
+  const [wrongAttempt, setWrongAttempt] = useState(false); // 오답 표시
+  const [retryCount, setRetryCount] = useState<number[]>([]); // 각 문제 재시도 횟수
 
   const scenario = rounds[current];
 
   const toggleValve = useCallback((valve: number) => {
+    if (wrongAttempt) return; // 오답 표시 중에는 선택 불가
     setSelected(prev =>
       prev.includes(valve) ? prev.filter(v => v !== valve) : [...prev, valve]
     );
-  }, []);
+  }, [wrongAttempt]);
 
   const handleConfirm = useCallback(() => {
     if (selected.length === 0) return;
+    if (wrongAttempt) return;
+
+    const isCorrect = setsEqual(selected, scenario.correctCuts);
+
+    if (!isCorrect) {
+      // 오답 → 틀렸다고 알려주고 다시 풀기
+      setWrongAttempt(true);
+      setRetryCount(prev => {
+        const next = [...prev];
+        next[current] = (next[current] ?? 0) + 1;
+        return next;
+      });
+      return;
+    }
+
+    // 정답 → 다음 문제로
     const nextAnswers = [...answers, selected];
     setAnswers(nextAnswers);
 
     if (nextAnswers.length < TOTAL_ROUNDS) {
       setCurrent(c => c + 1);
       setSelected([]);
+      setWrongAttempt(false);
     } else {
       setPhase('result');
     }
-  }, [selected, answers]);
+  }, [selected, answers, scenario, wrongAttempt, current]);
+
+  const handleRetryQuestion = useCallback(() => {
+    setSelected([]);
+    setWrongAttempt(false);
+  }, []);
 
   const results = useMemo(() => {
     if (phase !== 'result') return [];
     return rounds.map((sc, i) => ({
       scenario: sc,
       userAnswer: answers[i] ?? [],
-      isCorrect: setsEqual(answers[i] ?? [], sc.correctCuts),
+      isCorrect: true, // 모든 문제를 맞혀야 넘어가므로 항상 정답
+      retries: retryCount[i] ?? 0,
     }));
-  }, [phase, rounds, answers]);
+  }, [phase, rounds, answers, retryCount]);
 
-  const correctCount = results.filter(r => r.isCorrect).length;
+  const perfectCount = results.filter(r => r.retries === 0).length;
 
   const handleRetry = useCallback(() => {
     setRounds(pickRandom(ALL_SCENARIOS, TOTAL_ROUNDS));
     setCurrent(0);
     setSelected([]);
     setAnswers([]);
+    setRetryCount([]);
+    setWrongAttempt(false);
     setPhase('play');
   }, []);
 
@@ -233,7 +261,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
       {/* 프로그레스 바 */}
       <div className={styles.rescueProgressBar}>
         <div
-          className={`${styles.rescueProgressFill} ${phase === 'result' ? (correctCount === TOTAL_ROUNDS ? styles.simProgressSuccess : styles.simProgressFail) : ''}`}
+          className={`${styles.rescueProgressFill} ${phase === 'result' ? (perfectCount === TOTAL_ROUNDS ? styles.simProgressSuccess : styles.simProgressFail) : ''}`}
           /* STYLE-EXCEPTION: 동적 width 퍼센트 값 */
           style={{ width: `${progressPercent}%` }}
         />
@@ -319,68 +347,95 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
 
           {/* 선택 현황 */}
           <div className={styles.mrSelectionInfo}>
-            {selected.length === 0 ? (
+            {selected.length === 0 && !wrongAttempt ? (
               <span className={styles.mrSelectionEmpty}>CUT 번호를 선택해주세요</span>
-            ) : (
+            ) : !wrongAttempt ? (
               <span className={styles.mrSelectionList}>
-                선택: {selected.sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')} CUT
+                선택: {[...selected].sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')} CUT
               </span>
-            )}
+            ) : null}
           </div>
+
+          {/* 오답 피드백 */}
+          {wrongAttempt && (
+            <div className={styles.mrWrongFeedback}>
+              <XCircle size={20} />
+              <div className={styles.mrWrongText}>
+                <strong>오답입니다!</strong>
+                <span>
+                  선택: {[...selected].sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')}
+                  {' → '}정답이 아닙니다. 다시 생각해보세요.
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* 경고 */}
-          <div className={styles.rescueWarning}>
-            <AlertTriangle size={16} />
-            <span>파열된 차량의 공기관을 격리할 CUT 번호를 정확히 선택하세요</span>
-          </div>
+          {!wrongAttempt && (
+            <div className={styles.rescueWarning}>
+              <AlertTriangle size={16} />
+              <span>파열된 차량의 공기관을 격리할 CUT 번호를 정확히 선택하세요</span>
+            </div>
+          )}
 
-          {/* 확인 버튼 */}
+          {/* 확인/다시풀기 버튼 */}
           <div className={styles.mrConfirmWrap}>
-            <button
-              type="button"
-              className={styles.mrConfirmBtn}
-              onClick={handleConfirm}
-              disabled={selected.length === 0}
-            >
-              확인 ({current + 1}/{TOTAL_ROUNDS})
-            </button>
+            {wrongAttempt ? (
+              <button
+                type="button"
+                className={styles.mrRetryQuestionBtn}
+                onClick={handleRetryQuestion}
+              >
+                <RotateCcw size={20} />
+                다시 풀기
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={styles.mrConfirmBtn}
+                onClick={handleConfirm}
+                disabled={selected.length === 0}
+              >
+                확인 ({current + 1}/{TOTAL_ROUNDS})
+              </button>
+            )}
           </div>
         </div>
       ) : (
         /* ── 결과 화면 ── */
         <div className={styles.simResultArea}>
           <div className={styles.simResultHeader}>
-            {correctCount === TOTAL_ROUNDS ? (
+            {perfectCount === TOTAL_ROUNDS ? (
               <>
                 <div className={styles.simSuccessIcon}><CheckCircle2 size={56} /></div>
                 <h2 className={styles.simSuccessTitle}>완벽합니다!</h2>
                 <p className={styles.simSuccessMsg}>
                   축하합니다! 🎉<br />
-                  {TOTAL_ROUNDS}문제 모두 정확하게 CUT 번호를 선택했습니다.<br />
+                  {TOTAL_ROUNDS}문제 모두 한 번에 정답!<br />
                   주공기관 파열 시 침착하게 대응할 수 있습니다!
                 </p>
               </>
-            ) : correctCount >= TOTAL_ROUNDS * 0.7 ? (
+            ) : perfectCount >= TOTAL_ROUNDS * 0.7 ? (
               <>
                 <div className={styles.simSuccessIcon}><CheckCircle2 size={56} /></div>
                 <h2 className={styles.simSuccessTitle}>잘했습니다!</h2>
                 <p className={styles.simSuccessMsg}>
-                  대부분 정확하지만, 틀린 부분을 복습하세요.
+                  대부분 한 번에 맞혔지만, 재시도한 문제를 복습하세요.
                 </p>
               </>
             ) : (
               <>
-                <div className={styles.simFailIcon}><XCircle size={56} /></div>
-                <h2 className={styles.simFailTitle}>재학습이 필요합니다</h2>
+                <div className={styles.simFailIcon}><AlertTriangle size={56} /></div>
+                <h2 className={styles.simFailTitle}>추가 학습이 필요합니다</h2>
                 <p className={styles.simFailMsg}>
-                  CUT 번호 선택에 오류가 있습니다.<br />
+                  여러 문제에서 재시도가 있었습니다.<br />
                   편성도와 밸브 위치를 다시 확인하세요.
                 </p>
               </>
             )}
             <div className={styles.simScoreBadge}>
-              <span className={styles.simScoreNum}>{correctCount}</span>
-              <span className={styles.simScoreLabel}>/ {TOTAL_ROUNDS} 정답</span>
+              <span className={styles.simScoreNum}>{perfectCount}</span>
+              <span className={styles.simScoreLabel}>/ {TOTAL_ROUNDS} 한 번에 정답</span>
             </div>
           </div>
 
@@ -389,15 +444,16 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
             {results.map((r, i) => (
               <div
                 key={i}
-                className={`${styles.mrReviewItem} ${r.isCorrect ? styles.simReviewCorrect : styles.simReviewWrong}`}
+                className={`${styles.mrReviewItem} ${r.retries === 0 ? styles.simReviewCorrect : styles.simReviewWrong}`}
               >
                 <div className={styles.simReviewHead}>
                   <span className={styles.simReviewStep}>
-                    {r.isCorrect
+                    {r.retries === 0
                       ? <CheckCircle2 size={18} className={styles.simReviewIconOk} />
-                      : <XCircle size={18} className={styles.simReviewIconFail} />
+                      : <RotateCcw size={18} className={styles.simReviewIconFail} />
                     }
                     {i + 1}번
+                    {r.retries > 0 && <span className={styles.mrRetryBadge}>{r.retries}회 재시도</span>}
                   </span>
                   <span className={`${styles.mrTrainBadge} ${r.scenario.trainType === 'ABB' ? styles.mrBadgeAbb : styles.mrBadgeRotem}`}>
                     {r.scenario.trainType}

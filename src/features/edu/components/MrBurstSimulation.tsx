@@ -8,16 +8,20 @@ interface MrBurstSimulationProps {
   onBack: () => void;
 }
 
-/* ── 편성 구조 ── */
-const CARS = [
-  { name: 'TC1', num: '5100', valves: [1, 2] },
-  { name: 'M1', num: '5200', valves: [3, 4] },
-  { name: 'M2', num: '5300', valves: [5, 6] },
-  { name: 'M3', num: '5400', valves: [7, 8] },
-  { name: 'M4', num: '5500', valves: [9, 10] },
-  { name: 'M5', num: '5600', valves: [11, 12] },
-  { name: 'M6', num: '5700', valves: [13, 14] },
-  { name: 'TC2', num: '5000', valves: [15] },
+/* ── 편성 구조 (이미지 기준 밸브 위치) ── */
+// pos: 'top' = 상단(MR관), 'bottom' = 하단(SR관)
+interface Valve { num: number; pos: 'top' | 'bottom' }
+interface Car { name: string; label: string; valves: Valve[] }
+
+const CARS: Car[] = [
+  { name: 'TC1', label: '100대', valves: [{ num: 1, pos: 'bottom' }, { num: 2, pos: 'bottom' }] },
+  { name: 'M1',  label: '200대', valves: [{ num: 3, pos: 'top' },    { num: 4, pos: 'bottom' }] },
+  { name: 'M2',  label: '300대', valves: [{ num: 5, pos: 'top' },    { num: 6, pos: 'bottom' }] },
+  { name: 'M3',  label: '400대', valves: [{ num: 7, pos: 'top' },    { num: 8, pos: 'bottom' }] },
+  { name: 'M4',  label: '500대', valves: [{ num: 9, pos: 'top' },    { num: 10, pos: 'bottom' }] },
+  { name: 'M5',  label: '600대', valves: [{ num: 11, pos: 'top' },   { num: 12, pos: 'bottom' }] },
+  { name: 'M6',  label: '700대', valves: [{ num: 13, pos: 'top' },   { num: 14, pos: 'bottom' }] },
+  { name: 'TC2', label: '0대',   valves: [{ num: 15, pos: 'top' },   { num: 16, pos: 'bottom' }] },
 ];
 
 /* ── 시나리오 정의 (16가지) ── */
@@ -148,7 +152,7 @@ const ALL_SCENARIOS: Scenario[] = [
   },
 ];
 
-const VALVE_LABELS = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮'];
+const VALVE_LABELS = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯'];
 
 const TOTAL_ROUNDS = 8;
 
@@ -249,40 +253,67 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
             <p className={styles.mrSituationText}>{scenario.ruptureDesc}</p>
           </div>
 
-          {/* 편성도 — 세로 리스트 */}
+          {/* 편성도 — 가로 다이어그램 (이미지와 동일한 배치) */}
           <div className={styles.mrDiagram}>
             <div className={styles.mrDiagramLabel}>▼ CUT할 번호를 선택하세요 (복수 선택 가능)</div>
-            <div className={styles.mrTrainList}>
-              {CARS.map((car, ci) => {
-                const isRuptured = scenario.ruptureCars.includes(ci);
-                return (
-                  <div key={ci} className={`${styles.mrCarRow} ${isRuptured ? styles.mrCarRowRuptured : ''}`}>
-                    {/* 차량 정보 */}
-                    <div className={styles.mrCarInfo}>
-                      <span className={styles.mrCarNameV}>{car.name}</span>
-                      <span className={styles.mrCarNumV}>{car.num}</span>
+            <div className={styles.mrTrainScroll}>
+              <div className={styles.mrTrainBody}>
+                {/* 열차 머리 (좌) */}
+                <div className={styles.mrTrainNose} />
+                {CARS.map((car, ci) => {
+                  const isRuptured = scenario.ruptureCars.includes(ci);
+                  const topValves = car.valves.filter(v => v.pos === 'top');
+                  const bottomValves = car.valves.filter(v => v.pos === 'bottom');
+                  return (
+                    <div key={ci} className={`${styles.mrCarCell} ${isRuptured ? styles.mrCarCellRuptured : ''}`}>
+                      {/* 상단 밸브 */}
+                      <div className={styles.mrValveTop}>
+                        {topValves.map(v => {
+                          const isSel = selected.includes(v.num);
+                          return (
+                            <button
+                              key={v.num}
+                              type="button"
+                              className={`${styles.mrValve} ${isSel ? styles.mrValveOn : ''}`}
+                              onClick={() => toggleValve(v.num)}
+                              aria-label={`CUT ${VALVE_LABELS[v.num - 1]}`}
+                              aria-pressed={isSel}
+                            >
+                              {VALVE_LABELS[v.num - 1]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {/* 차량 본체 */}
+                      <div className={styles.mrCarBody}>
+                        <span className={styles.mrCarLabel}>{car.label}</span>
+                      </div>
+                      {/* 하단 밸브 */}
+                      <div className={styles.mrValveBottom}>
+                        {bottomValves.map(v => {
+                          const isSel = selected.includes(v.num);
+                          return (
+                            <button
+                              key={v.num}
+                              type="button"
+                              className={`${styles.mrValve} ${isSel ? styles.mrValveOn : ''}`}
+                              onClick={() => toggleValve(v.num)}
+                              aria-label={`CUT ${VALVE_LABELS[v.num - 1]}`}
+                              aria-pressed={isSel}
+                            >
+                              {VALVE_LABELS[v.num - 1]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {/* 파열 표시 */}
+                      {isRuptured && <div className={styles.mrRuptureMarker}>💥</div>}
                     </div>
-                    {/* CUT 밸브 버튼들 */}
-                    <div className={styles.mrValveRowV}>
-                      {car.valves.map(v => {
-                        const isSelected = selected.includes(v);
-                        return (
-                          <button
-                            key={v}
-                            type="button"
-                            className={`${styles.mrValveBtnV} ${isSelected ? styles.mrValveSelectedV : ''}`}
-                            onClick={() => toggleValve(v)}
-                            aria-label={`CUT ${VALVE_LABELS[v - 1]}`}
-                            aria-pressed={isSelected}
-                          >
-                            {VALVE_LABELS[v - 1]}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+                {/* 열차 꼬리 (우) */}
+                <div className={styles.mrTrainTail} />
+              </div>
             </div>
           </div>
 
@@ -381,20 +412,29 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
                     const isRuptured = r.scenario.ruptureCars.includes(ci);
                     return (
                       <div key={ci} className={styles.mrMiniCarCol}>
+                        <div className={styles.mrMiniValves}>
+                          {car.valves.filter(v => v.pos === 'top').map(v => {
+                            const wasSelected = r.userAnswer.includes(v.num);
+                            const isCorrectV = r.scenario.correctCuts.includes(v.num);
+                            let cls = styles.mrMiniValve;
+                            if (isCorrectV && wasSelected) cls += ` ${styles.mrMiniValveOk}`;
+                            else if (isCorrectV && !wasSelected) cls += ` ${styles.mrMiniValveMissed}`;
+                            else if (!isCorrectV && wasSelected) cls += ` ${styles.mrMiniValveWrong}`;
+                            return <span key={v.num} className={cls}>{VALVE_LABELS[v.num - 1]}</span>;
+                          })}
+                        </div>
                         <div className={`${styles.mrMiniCar} ${isRuptured ? styles.mrMiniCarRuptured : ''}`}>
-                          {car.num}
+                          {car.label}
                         </div>
                         <div className={styles.mrMiniValves}>
-                          {car.valves.map(v => {
-                            const wasSelected = r.userAnswer.includes(v);
-                            const isCorrect = r.scenario.correctCuts.includes(v);
+                          {car.valves.filter(v => v.pos === 'bottom').map(v => {
+                            const wasSelected = r.userAnswer.includes(v.num);
+                            const isCorrectV = r.scenario.correctCuts.includes(v.num);
                             let cls = styles.mrMiniValve;
-                            if (isCorrect && wasSelected) cls += ` ${styles.mrMiniValveOk}`;
-                            else if (isCorrect && !wasSelected) cls += ` ${styles.mrMiniValveMissed}`;
-                            else if (!isCorrect && wasSelected) cls += ` ${styles.mrMiniValveWrong}`;
-                            return (
-                              <span key={v} className={cls}>{VALVE_LABELS[v - 1]}</span>
-                            );
+                            if (isCorrectV && wasSelected) cls += ` ${styles.mrMiniValveOk}`;
+                            else if (isCorrectV && !wasSelected) cls += ` ${styles.mrMiniValveMissed}`;
+                            else if (!isCorrectV && wasSelected) cls += ` ${styles.mrMiniValveWrong}`;
+                            return <span key={v.num} className={cls}>{VALVE_LABELS[v.num - 1]}</span>;
                           })}
                         </div>
                       </div>

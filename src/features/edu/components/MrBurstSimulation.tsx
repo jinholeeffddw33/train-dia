@@ -237,36 +237,40 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
 
       {phase === 'play' ? (
         <div className={styles.mrPlayArea}>
-          {/* 차종 + 상황 */}
-          <div className={styles.mrSituation}>
-            <span className={`${styles.mrTrainBadge} ${scenario.trainType === 'ABB' ? styles.mrBadgeAbb : styles.mrBadgeRotem}`}>
-              {scenario.trainType}
+          {/* 차종 배지 — 크게 */}
+          <div className={styles.mrTrainTypeHeader}>
+            <span className={`${styles.mrTrainTypeBig} ${scenario.trainType === 'ABB' ? styles.mrTypeBigAbb : styles.mrTypeBigRotem}`}>
+              {scenario.trainType} 차량
             </span>
+          </div>
+
+          {/* 상황 */}
+          <div className={styles.mrSituation}>
             <p className={styles.mrSituationText}>{scenario.ruptureDesc}</p>
           </div>
 
-          {/* 편성도 — 메인 인터랙션 */}
+          {/* 편성도 — 세로 리스트 */}
           <div className={styles.mrDiagram}>
             <div className={styles.mrDiagramLabel}>▼ CUT할 번호를 선택하세요 (복수 선택 가능)</div>
-            <div className={styles.mrTrainStrip}>
+            <div className={styles.mrTrainList}>
               {CARS.map((car, ci) => {
                 const isRuptured = scenario.ruptureCars.includes(ci);
                 return (
-                  <div key={ci} className={styles.mrCarCol}>
-                    {/* 차량 박스 */}
-                    <div className={`${styles.mrCarBox} ${isRuptured ? styles.mrCarRuptured : ''}`}>
-                      <span className={styles.mrCarName}>{car.name}</span>
-                      <span className={styles.mrCarNum}>{car.num}</span>
+                  <div key={ci} className={`${styles.mrCarRow} ${isRuptured ? styles.mrCarRowRuptured : ''}`}>
+                    {/* 차량 정보 */}
+                    <div className={styles.mrCarInfo}>
+                      <span className={styles.mrCarNameV}>{car.name}</span>
+                      <span className={styles.mrCarNumV}>{car.num}</span>
                     </div>
                     {/* CUT 밸브 버튼들 */}
-                    <div className={styles.mrValveRow}>
+                    <div className={styles.mrValveRowV}>
                       {car.valves.map(v => {
                         const isSelected = selected.includes(v);
                         return (
                           <button
                             key={v}
                             type="button"
-                            className={`${styles.mrValveBtn} ${isSelected ? styles.mrValveSelected : ''}`}
+                            className={`${styles.mrValveBtnV} ${isSelected ? styles.mrValveSelectedV : ''}`}
                             onClick={() => toggleValve(v)}
                             aria-label={`CUT ${VALVE_LABELS[v - 1]}`}
                             aria-pressed={isSelected}

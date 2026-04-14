@@ -3884,14 +3884,50 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* 차종 헤더 — 크게 */
+.mrTrainTypeHeader {
+  text-align: center;
+  padding: var(--dia-space-3) var(--dia-space-4) 0;
+}
+
+.mrTrainTypeBig {
+  display: inline-block;
+  font-size: 22px;
+  font-weight: var(--dia-weight-bold);
+  padding: var(--dia-space-2) var(--dia-space-5);
+  border-radius: var(--dia-radius-md);
+  letter-spacing: 0.05em;
+}
+
+.mrTypeBigAbb {
+  color: #fff;
+  background: var(--dia-blue);
+}
+
+.mrTypeBigRotem {
+  color: #fff;
+  background: var(--dia-green);
+}
+
+:root.light .mrTypeBigAbb {
+  color: #fff;
+  background: var(--dia-blue);
+}
+
+:root.light .mrTypeBigRotem {
+  color: #fff;
+  background: #16a34a;
+}
+
 /* 상황 설명 */
 .mrSituation {
   display: flex;
   flex-direction: column;
   gap: var(--dia-space-2);
-  padding: var(--dia-space-4) var(--dia-space-4) 0;
+  padding: var(--dia-space-3) var(--dia-space-4) 0;
 }
 
+/* 결과 화면용 작은 배지 (기존 유지) */
 .mrTrainBadge {
   display: inline-flex;
   align-self: flex-start;
@@ -3925,9 +3961,9 @@
   word-break: keep-all;
 }
 
-/* ── 편성도 ── */
+/* ── 편성도 (세로 리스트) ── */
 .mrDiagram {
-  padding: var(--dia-space-3) var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
 }
 
 .mrDiagramLabel {
@@ -3935,44 +3971,28 @@
   font-size: 13px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
-  margin-bottom: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
 }
 
-.mrTrainStrip {
-  display: flex;
-  gap: 2px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: var(--dia-space-2) var(--dia-space-1);
-  scroll-snap-type: x proximity;
-}
-
-.mrCarCol {
+.mrTrainList {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--dia-space-2);
-  flex: 1;
-  min-width: 42px;
-  scroll-snap-align: start;
 }
 
-/* 차량 박스 */
-.mrCarBox {
+/* 한 줄 = 차량 + CUT 버튼 */
+.mrCarRow {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 56px;
-  padding: var(--dia-space-1) 2px;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-surface);
-  border: 2px solid var(--dia-border-strong);
-  border-radius: var(--dia-radius-sm);
+  border: 2px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
   transition: all 0.2s ease;
 }
 
-.mrCarRuptured {
+.mrCarRowRuptured {
   background: var(--dia-red-dim);
   border-color: var(--dia-red);
   animation: mrPulseRed 1.2s ease-in-out infinite;
@@ -3984,51 +4004,59 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mrCarRuptured {
+  .mrCarRowRuptured {
     animation: none;
     box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.4);
   }
 }
 
-.mrCarName {
-  font-size: 12px;
+/* 차량 정보 (좌측) */
+.mrCarInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+}
+
+.mrCarNameV {
+  font-size: 14px;
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-secondary);
-  line-height: 1;
+  line-height: 1.2;
 }
 
-.mrCarRuptured .mrCarName {
+.mrCarRowRuptured .mrCarNameV {
   color: var(--dia-red);
 }
 
-.mrCarNum {
-  font-size: 12px;
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-tertiary);
-  line-height: 1;
-  margin-top: 2px;
+.mrCarNumV {
+  font-size: 16px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  line-height: 1.2;
 }
 
-.mrCarRuptured .mrCarNum {
+.mrCarRowRuptured .mrCarNumV {
   color: var(--dia-red);
 }
 
-/* CUT 밸브 버튼 */
-.mrValveRow {
+/* CUT 밸브 버튼 (우측) */
+.mrValveRowV {
   display: flex;
-  gap: 3px;
+  gap: var(--dia-space-2);
+  flex: 1;
   justify-content: center;
 }
 
-.mrValveBtn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+.mrValveBtnV {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: var(--dia-radius-full);
   border: 2px solid var(--dia-border-strong);
-  background: var(--dia-surface);
+  background: var(--dia-surface-elevated);
   color: var(--dia-text-secondary);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: var(--dia-weight-bold);
   cursor: pointer;
   display: flex;
@@ -4039,20 +4067,21 @@
   padding: 0;
 }
 
-.mrValveBtn:active {
+.mrValveBtnV:active {
   transform: scale(0.9);
 }
 
-.mrValveBtn:focus-visible {
+.mrValveBtnV:focus-visible {
   outline: 2px solid var(--dia-blue);
   outline-offset: 2px;
 }
 
-.mrValveSelected {
+.mrValveSelectedV {
   background: var(--dia-red);
   border-color: var(--dia-red);
   color: #fff;
-  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  transform: scale(1.08);
 }
 
 /* 선택 현황 */

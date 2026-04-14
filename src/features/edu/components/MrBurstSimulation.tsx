@@ -89,9 +89,9 @@ const ALL_SCENARIOS: Scenario[] = [
   {
     id: 'abb-8', trainType: 'ABB',
     ruptureDesc: '5700대(M6) 차량에서 주공기관 파열!',
-    ruptureCars: [6], correctCuts: [14],
+    ruptureCars: [6], correctCuts: [12],
     speedLimit: 60,
-    explanation: '5700대 단일 파열 → ⑭ CUT. 제동축수 80%↑ → 60km/h.',
+    explanation: '5700대 단일 파열 → 5600대 차량 을 ⑫ CUT. 제동축수 80%↑ → 60km/h.',
   },
   // ── 로템 차량 (8가지) ──
   {
@@ -175,51 +175,69 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
   const [answers, setAnswers] = useState<number[][]>([]);
   const [phase, setPhase] = useState<'play' | 'result'>('play');
   const [wrongAttempt, setWrongAttempt] = useState(false); // 오답 표시
+  const [showAnswer, setShowAnswer] = useState(false); // 3회 실패 시 정답 공개
   const [retryCount, setRetryCount] = useState<number[]>([]); // 각 문제 재시도 횟수
 
   const scenario = rounds[current];
+  const currentRetries = retryCount[current] ?? 0;
 
   const toggleValve = useCallback((valve: number) => {
-    if (wrongAttempt) return; // 오답 표시 중에는 선택 불가
+    if (wrongAttempt || showAnswer) return;
     setSelected(prev =>
       prev.includes(valve) ? prev.filter(v => v !== valve) : [...prev, valve]
     );
-  }, [wrongAttempt]);
+  }, [wrongAttempt, showAnswer]);
 
   const handleConfirm = useCallback(() => {
     if (selected.length === 0) return;
-    if (wrongAttempt) return;
+    if (wrongAttempt || showAnswer) return;
 
     const isCorrect = setsEqual(selected, scenario.correctCuts);
 
     if (!isCorrect) {
-      // 오답 → 틀렸다고 알려주고 다시 풀기
-      setWrongAttempt(true);
+      const newCount = (retryCount[current] ?? 0) + 1;
       setRetryCount(prev => {
         const next = [...prev];
-        next[current] = (next[current] ?? 0) + 1;
+        next[current] = newCount;
         return next;
       });
+
+      if (newCount >= 3) {
+        // 3번 틀림 → 정답 공개
+        setShowAnswer(true);
+      } else {
+        setWrongAttempt(true);
+      }
       return;
     }
 
     // 정답 → 다음 문제로
-    const nextAnswers = [...answers, selected];
+    goNext(selected);
+  }, [selected, answers, scenario, wrongAttempt, showAnswer, current, retryCount]);
+
+  const goNext = useCallback((sel: number[]) => {
+    const nextAnswers = [...answers, sel];
     setAnswers(nextAnswers);
 
     if (nextAnswers.length < TOTAL_ROUNDS) {
       setCurrent(c => c + 1);
       setSelected([]);
       setWrongAttempt(false);
+      setShowAnswer(false);
     } else {
       setPhase('result');
     }
-  }, [selected, answers, scenario, wrongAttempt, current]);
+  }, [answers]);
 
   const handleRetryQuestion = useCallback(() => {
     setSelected([]);
     setWrongAttempt(false);
   }, []);
+
+  // 정답 확인 후 다음으로 넘어가기
+  const handleSkipWithAnswer = useCallback(() => {
+    goNext(scenario.correctCuts);
+  }, [scenario, goNext]);
 
   const results = useMemo(() => {
     if (phase !== 'result') return [];
@@ -347,47 +365,69 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
 
           {/* 선택 현황 */}
           <div className={styles.mrSelectionInfo}>
-            {selected.length === 0 && !wrongAttempt ? (
+            {!wrongAttempt && !showAnswer && selected.length === 0 ? (
               <span className={styles.mrSelectionEmpty}>CUT 번호를 선택해주세요</span>
-            ) : !wrongAttempt ? (
+            ) : !wrongAttempt && !showAnswer ? (
               <span className={styles.mrSelectionList}>
                 선택: {[...selected].sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')} CUT
               </span>
             ) : null}
           </div>
 
-          {/* 오답 피드백 */}
-          {wrongAttempt && (
+          {/* 오답 피드백 (1~2회) */}
+          {wrongAttempt && !showAnswer && (
             <div className={styles.mrWrongFeedback}>
               <XCircle size={20} />
               <div className={styles.mrWrongText}>
-                <strong>오답입니다!</strong>
+                <strong>오답입니다! ({currentRetries}/3회)</strong>
                 <span>
                   선택: {[...selected].sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')}
-                  {' → '}정답이 아닙니다. 다시 생각해보세요.
+                  {' → '}다시 생각해보세요.
                 </span>
               </div>
             </div>
           )}
 
+          {/* 3회 실패 → 정답 공개 */}
+          {showAnswer && (
+            <div className={styles.mrAnswerReveal}>
+              <AlertTriangle size={20} />
+              <div className={styles.mrAnswerText}>
+                <strong>3회 오답 — 정답을 확인하세요</strong>
+                <span className={styles.mrAnswerCorrect}>
+                  정답: {scenario.correctCuts.sort((a, b) => a - b).map(v => VALVE_LABELS[v - 1]).join(', ')} CUT
+                </span>
+                <span className={styles.mrAnswerExplain}>{scenario.explanation}</span>
+              </div>
+            </div>
+          )}
+
           {/* 경고 */}
-          {!wrongAttempt && (
+          {!wrongAttempt && !showAnswer && (
             <div className={styles.rescueWarning}>
               <AlertTriangle size={16} />
               <span>파열된 차량의 공기관을 격리할 CUT 번호를 정확히 선택하세요</span>
             </div>
           )}
 
-          {/* 확인/다시풀기 버튼 */}
+          {/* 확인/다시풀기/다음 버튼 */}
           <div className={styles.mrConfirmWrap}>
-            {wrongAttempt ? (
+            {showAnswer ? (
+              <button
+                type="button"
+                className={styles.mrConfirmBtn}
+                onClick={handleSkipWithAnswer}
+              >
+                정답 확인, 다음 문제로
+              </button>
+            ) : wrongAttempt ? (
               <button
                 type="button"
                 className={styles.mrRetryQuestionBtn}
                 onClick={handleRetryQuestion}
               >
                 <RotateCcw size={20} />
-                다시 풀기
+                다시 풀기 ({currentRetries}/3)
               </button>
             ) : (
               <button

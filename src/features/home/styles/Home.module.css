@@ -526,19 +526,19 @@
   min-width: 52px;
   padding: var(--dia-space-2) var(--dia-space-1);
   border-radius: var(--dia-radius-lg);
-  background: var(--dia-surface-elevated);
-  border: 1px solid var(--dia-border);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-surface-elevated), var(--dia-surface));
+  border: none;
   scroll-snap-align: center;
-  transition: transform var(--dia-transition-fast), background var(--dia-transition-fast), box-shadow var(--dia-transition-fast), border-color var(--dia-transition-fast);
   -webkit-user-select: none;
   user-select: none;
-  box-shadow: var(--dia-card-inset), var(--dia-card-depth);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   position: relative;
   overflow: hidden;
 }
 
 .weekDay:active {
-  transform: scale(0.95);
   box-shadow: var(--dia-3d-pressed);
 }
 

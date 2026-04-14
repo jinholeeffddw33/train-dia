@@ -122,22 +122,22 @@
   height: 32px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  box-shadow: var(--dia-shadow-sm);
+  border: none;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--dia-text-secondary);
   cursor: pointer;
-  transition: background var(--dia-transition-fast), color var(--dia-transition-fast);
-  -webkit-tap-highlight-color: transparent;
 }
 
-.backBtn:hover {
-  background: var(--dia-surface-hover);
-  color: var(--dia-text-primary);
+@media (hover: hover) {
+  .backBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
 }
 
 .backBtn:active {
-  transform: scale(0.95);
+  box-shadow: var(--dia-3d-pressed);
 }

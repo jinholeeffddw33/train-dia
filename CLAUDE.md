@@ -179,12 +179,41 @@
 - 카드 안 버튼 행 → `flex-wrap: wrap` + `white-space: nowrap`
 - fixed/sticky spacer 높이 하드코딩 금지 → `ResizeObserver`
 
-### 4.6 애니메이션 규칙
+### 4.6 3D 버튼 규칙 (P0 — 모든 버튼 필수)
+모든 버튼은 3D press 효과를 가져야 한다. globals.css에 기본 `button:active` 정의 있음.
+
+#### CTA/액션 버튼 (startBtn, navBtnPrimary, biometricBtn 등)
+```css
+background:
+  radial-gradient(circle at 30% 25%, rgba(255,255,255, var(--dia-3d-bloom)), transparent 55%),
+  linear-gradient(145deg, var(--dia-3d-COLOR-start), var(--dia-3d-COLOR-end));
+box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-COLOR-glow);
+/* :active → box-shadow: var(--dia-3d-pressed); */
+```
+COLOR = `blue` | `green` | `amber` | `red` | `purple`
+
+#### 아이콘/보조 버튼 (backBtn, navBtn 등)
+```css
+box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+border: none;
+/* :active → box-shadow: var(--dia-3d-pressed); */
+```
+
+#### 텍스트 버튼 (deleteBtn, btnSecondary 등)
+- globals 기본 press(`translateY(1px) scale(0.97)`)만 적용, 추가 shadow 불필요
+
+#### 공통 hover (hover: hover 미디어 쿼리 안에서)
+```css
+filter: brightness(1.08);
+transform: translateY(-1px);
+```
+
+### 4.7 애니메이션 규칙
 - 허용: `box-shadow` 펄스, `opacity` 전환, `transform: scale()`
 - 금지: `filter: drop-shadow` 애니메이션, `width/height` 애니메이션, 3초 미만 루프
 - `prefers-reduced-motion: reduce` 대응 필수
 
-### 4.7 크로스 브라우저
+### 4.8 크로스 브라우저
 | 브라우저 | 우선순위 |
 |----------|----------|
 | Chrome (Android) | **주력** |

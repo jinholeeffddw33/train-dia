@@ -71,8 +71,13 @@
   justify-content: center;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   color: var(--dia-text-primary);
   font-size: 20px;
+}
+
+.backBtn:active {
+  box-shadow: var(--dia-3d-pressed);
 }
 
 .arrivalsTitle {

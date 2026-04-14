@@ -71,6 +71,15 @@ button {
   border: none;
   background: none;
   color: inherit;
+  transition:
+    transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
 }
 
 input, textarea, select {

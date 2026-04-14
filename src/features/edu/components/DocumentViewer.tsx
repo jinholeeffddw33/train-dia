@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   ArrowLeft, Search, Bookmark, AlertTriangle, Info, Check,
   TrainFront, Wrench, Building2, AlertCircle, FileText, Mic,
@@ -154,11 +154,30 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [tocSkipped, setTocSkipped] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+  const lastScrollY = useRef(0);
   const { progress, markSectionRead, toggleBookmark, isBookmarked } = useEduStore();
 
   // 섹션 보기에서 뒤로가기 → TOC로 복귀 (TOC 자동 스킵된 경우 제외)
   const goToc = useCallback(() => { setMode('toc'); setCurrentSection(null); }, []);
   useHistoryBack('doc-section', goToc, mode === 'section' && !tocSkipped);
+
+  /* 스크롤 방향 감지 — 아래로 스크롤하면 nav 숨김, 위로 올리면 나타남 */
+  useEffect(() => {
+    if (mode !== 'section') return;
+    const THRESHOLD = 10;
+    const handleScroll = () => {
+      const y = window.scrollY;
+      if (y - lastScrollY.current > THRESHOLD) {
+        setNavHidden(true);
+      } else if (lastScrollY.current - y > THRESHOLD) {
+        setNavHidden(false);
+      }
+      lastScrollY.current = y;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [mode]);
 
   useEffect(() => {
     fetch('/data/edu/handbook.json')
@@ -410,26 +429,32 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
           </div>
         )}
 
-        <div className={styles.sectionNav}>
-          {currentIdx > 0 && (
-            <button
-              type="button"
-              className={styles.navBtn}
-              onClick={() => openSection(allSections[currentIdx - 1].sectionId)}
-            >
-              ← 이전
-            </button>
-          )}
-          {currentIdx < allSections.length - 1 && (
-            <button
-              type="button"
-              className={`${styles.navBtn} ${styles.navBtnPrimary}`}
-              onClick={() => openSection(allSections[currentIdx + 1].sectionId)}
-            >
-              다음 →
-            </button>
-          )}
-        </div>
+        {/* spacer for fixed nav bar */}
+        {(currentIdx > 0 || currentIdx < allSections.length - 1) && (
+          <>
+            <div className={styles.navSpacer} />
+            <div className={`${styles.sectionNav} ${navHidden ? styles.sectionNavHidden : ''}`}>
+              {currentIdx > 0 && (
+                <button
+                  type="button"
+                  className={styles.navBtn}
+                  onClick={() => openSection(allSections[currentIdx - 1].sectionId)}
+                >
+                  ← 이전
+                </button>
+              )}
+              {currentIdx < allSections.length - 1 && (
+                <button
+                  type="button"
+                  className={`${styles.navBtn} ${styles.navBtnPrimary}`}
+                  onClick={() => openSection(allSections[currentIdx + 1].sectionId)}
+                >
+                  다음 →
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
     );
   }

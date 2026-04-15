@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createToken, COOKIE_NAME, TOKEN_MAX_AGE_PIN } from '@/lib/jwt';
 import { verifyPin, getProfileBySabun, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
+import { isAdmin } from '@/lib/auth';
 
 // ── POST: 로그인 (PIN 또는 최초 사번만) ──
 export async function POST(req: NextRequest) {
-  let body: { sabun?: string; pin?: string };
+  let body: { sabun?: string; pin?: string; name?: string };
   try {
     body = await req.json();
   } catch {
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
 
   const sabun = body.sabun?.trim();
   const pin = body.pin?.trim();
+  const nameInput = body.name?.trim();
 
   if (!sabun) {
     return NextResponse.json(
@@ -34,29 +36,50 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 최초 로그인 (must_change_pin = true): 사번만으로 로그인 허용
-  // 이후 로그인: PIN 필수
-  if (!profile.must_change_pin) {
-    if (!pin) {
+  const admin = isAdmin(sabun);
+
+  if (admin) {
+    // 관리자: 기존 PIN 로직 유지
+    if (!profile.must_change_pin) {
+      if (!pin) {
+        return NextResponse.json(
+          { code: 'MISSING_PIN', message: 'PIN을 입력해주세요' },
+          { status: 400 },
+        );
+      }
+      const pinValid = await verifyPin(pin, profile.pin_hash);
+      if (!pinValid) {
+        await auditLog(profile.id, profile.name, 'login_failed', {
+          metadata: { reason: 'invalid_pin' },
+          ip: getClientIP(req),
+        });
+        return NextResponse.json(
+          { code: 'AUTH_FAILED', message: 'PIN이 일치하지 않습니다' },
+          { status: 401 },
+        );
+      }
+    }
+  } else {
+    // 일반 사용자: 이름 확인
+    if (!nameInput) {
       return NextResponse.json(
-        { code: 'MISSING_PIN', message: 'PIN을 입력해주세요' },
+        { code: 'MISSING_NAME', message: '이름을 입력해주세요' },
         { status: 400 },
       );
     }
-    const pinValid = await verifyPin(pin, profile.pin_hash);
-    if (!pinValid) {
+    if (nameInput !== profile.name) {
       await auditLog(profile.id, profile.name, 'login_failed', {
-        metadata: { reason: 'invalid_pin' },
+        metadata: { reason: 'invalid_name' },
         ip: getClientIP(req),
       });
       return NextResponse.json(
-        { code: 'AUTH_FAILED', message: 'PIN이 일치하지 않습니다' },
+        { code: 'AUTH_FAILED', message: '이름이 일치하지 않습니다' },
         { status: 401 },
       );
     }
   }
 
-  // JWT 발급 (PIN 로그인: 7일 세션)
+  // JWT 발급 (365일 세션)
   const token = await createToken({
     sub: profile.id,
     sabun: profile.sabun,
@@ -65,9 +88,9 @@ export async function POST(req: NextRequest) {
     role: profile.role,
   }, TOKEN_MAX_AGE_PIN);
 
-  // 생체인증 등록 여부 확인
+  // 생체인증 등록 여부 확인 (관리자만)
   let hasBiometric = false;
-  if (serverSupabase) {
+  if (admin && serverSupabase) {
     const { data: creds } = await serverSupabase
       .from('webauthn_credentials')
       .select('credential_id')
@@ -77,7 +100,10 @@ export async function POST(req: NextRequest) {
   }
 
   // 감사 로그
-  await auditLog(profile.id, profile.name, profile.must_change_pin ? 'first_login' : 'login_pin', {
+  const auditAction = admin
+    ? (profile.must_change_pin ? 'first_login' : 'login_pin')
+    : 'login_name';
+  await auditLog(profile.id, profile.name, auditAction, {
     ip: getClientIP(req),
   });
 
@@ -90,7 +116,7 @@ export async function POST(req: NextRequest) {
       sabun: profile.sabun,
       personId: profile.person_id,
       role: profile.role,
-      mustChangePin: profile.must_change_pin,
+      mustChangePin: admin ? profile.must_change_pin : false,
       hasBiometric,
     },
   });

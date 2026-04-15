@@ -3,45 +3,42 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore, type SabunStatus } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
-import { Fingerprint, KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import styles from './AuthGate.module.css';
 
 type Screen =
-  | 'loading'        // 세션 확인 중
-  | 'sabun'          // 1단계: 사번 입력
-  | 'notice'         // 첫 방문자 안내 모달 (PIN = 0000)
-  | 'login'          // 2단계: PIN / 생체인증 로그인
-  | 'pin-setup'      // PIN 최초 설정
-  | 'biometric-setup'; // 생체인증 등록 권유
+  | 'loading'
+  | 'sabun'
+  | 'notice'         // 관리자 첫 방문: PIN 0000 안내
+  | 'login'          // 일반: 이름 입력 / 관리자: PIN 입력
+  | 'pin-setup';     // 관리자 PIN 최초 설정
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
-  const hasBiometric = useAuthStore((s) => s.hasBiometric);
   const lastSabun = useAuthStore((s) => s.lastSabun);
   const loading = useAuthStore((s) => s.loading);
   const error = useAuthStore((s) => s.error);
   const checkSabun = useAuthStore((s) => s.checkSabun);
   const loginWithPin = useAuthStore((s) => s.loginWithPin);
-  const loginWithBiometric = useAuthStore((s) => s.loginWithBiometric);
-  const registerBiometric = useAuthStore((s) => s.registerBiometric);
+  const loginWithName = useAuthStore((s) => s.loginWithName);
   const checkSession = useAuthStore((s) => s.checkSession);
   const clearError = useAuthStore((s) => s.clearError);
 
   const [screen, setScreen] = useState<Screen>('loading');
   const [sessionChecked, setSessionChecked] = useState(false);
-  const [skipBiometric, setSkipBiometric] = useState(false);
 
-  // 사번 입력 단계
+  // 사번 입력
   const [sabun, setSabun] = useState('');
-
-  // 사번 조회 결과
   const [sabunStatus, setSabunStatus] = useState<SabunStatus | null>(null);
 
-  // PIN 로그인 단계
+  // 이름 입력 (일반 기관사)
+  const [name, setName] = useState('');
+
+  // PIN 로그인 (관리자)
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
 
-  // PIN 설정 단계
+  // PIN 설정 (관리자 최초)
   const [newPin, setNewPin] = useState('');
   const [newPinConfirm, setNewPinConfirm] = useState('');
   const [pinChangeError, setPinChangeError] = useState('');
@@ -55,20 +52,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user?.sabun) {
       const { myDriver, setMyDriverById, setMyDriverBySabun, setMyDriver } = useDriverStore.getState();
-      // sabun + 이름으로 비교 — 이름 변경도 감지
       if (!myDriver || myDriver.s !== user.sabun || myDriver.n !== user.name) {
         if (user.personId && user.personId !== '0') {
           setMyDriverById(user.personId);
         } else {
           setMyDriverBySabun(user.sabun);
         }
-
-        // P/EXTRA에 없는 사용자 fallback (관리자 등)
         const updated = useDriverStore.getState().myDriver;
         if (!updated || updated.s !== user.sabun) {
           setMyDriver({ I: user.personId || '0', d: '', n: user.name, s: user.sabun });
         } else if (updated.n !== user.name) {
-          // DB 이름이 P 배열 이름과 다르면 DB(인증) 이름 우선
           setMyDriver({ ...updated, n: user.name });
         }
       }
@@ -81,18 +74,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     if (user) {
       if (user.mustChangePin) {
         setScreen('pin-setup');
-      } else if (!hasBiometric && !skipBiometric) {
-        setScreen('biometric-setup');
       }
-      // 그외 → children 렌더 (아래 early return)
+      // 그외 → children 렌더
     } else {
       setScreen('sabun');
       if (lastSabun) setSabun(lastSabun);
     }
-  }, [sessionChecked, user, hasBiometric, lastSabun, skipBiometric]);
+  }, [sessionChecked, user, lastSabun]);
 
   // ── 인증 완료 → 앱 렌더 ──
-  if (user && screen !== 'biometric-setup' && screen !== 'pin-setup') {
+  if (user && screen !== 'pin-setup') {
     return <>{children}</>;
   }
 
@@ -114,9 +105,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     const handleNext = async () => {
       if (!sabun.trim()) return;
       const status = await checkSabun(sabun.trim());
-      if (!status) return; // 에러는 store에서 처리
+      if (!status) return;
       setSabunStatus(status);
-      if (status.mustChangePin) {
+      if (status.isAdmin && status.mustChangePin) {
         setScreen('notice');
       } else {
         setScreen('login');
@@ -162,10 +153,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ── 첫 방문자 안내 모달 ──
+  // ── 관리자 첫 방문 안내 (PIN 0000) ──
   if (screen === 'notice') {
     const handleStart = async () => {
-      // 사번 + 빈 PIN → 서버에서 mustChangePin=true이면 허용
       const ok = await loginWithPin(sabun, '');
       if (ok) setScreen('pin-setup');
     };
@@ -176,30 +166,25 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <div className={styles.iconWrap}>
             <ShieldCheck size={40} className={styles.iconBlue} />
           </div>
-          <h1 className={styles.title}>보안 로그인 안내</h1>
+          <h1 className={styles.title}>관리자 보안 설정</h1>
           <p className={styles.subtitle}>
-            이제부터 개인 PIN으로 앱에 로그인합니다.<br />
-            처음 접속 시 아래 단계를 따라주세요.
+            관리자 계정은 PIN으로 보호됩니다.<br />
+            처음 접속 시 새 PIN을 설정해주세요.
           </p>
 
           <div className={styles.steps}>
             <div className={styles.step}>
               <span className={styles.stepNum}>1</span>
-              <span className={styles.stepText}>초기 PIN <strong>0000</strong> 입력 후 시작</span>
+              <span className={styles.stepText}>아래 버튼을 눌러 시작</span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>2</span>
-              <span className={styles.stepText}>본인만의 새 PIN으로 변경</span>
+              <span className={styles.stepText}>본인만의 새 PIN 설정</span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>3</span>
-              <span className={styles.stepText}>다음부터는 PIN 또는 지문으로 빠르게 로그인</span>
+              <span className={styles.stepText}>다음부터는 PIN으로 로그인</span>
             </div>
-          </div>
-
-          <div className={styles.pinHint}>
-            <span className={styles.pinHintLabel}>초기 PIN</span>
-            <span className={styles.pinHintCode}>0000</span>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
@@ -211,21 +196,71 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             disabled={loading}
           >
             {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
-            <span>{loading ? '잠시만요...' : '시작하기 →'}</span>
+            <span>{loading ? '잠시만요...' : 'PIN 설정 시작 →'}</span>
           </button>
         </div>
       </div>
     );
   }
 
-  // ── 2단계: PIN / 생체인증 로그인 ──
+  // ── 2단계: 로그인 ──
   if (screen === 'login') {
-    const hasBio = sabunStatus?.hasBiometric ?? hasBiometric;
+    const isAdminUser = sabunStatus?.isAdmin ?? false;
 
-    const handleBiometricLogin = async () => {
-      await loginWithBiometric(sabun);
-    };
+    // ── 일반 기관사: 이름만 입력 ──
+    if (!isAdminUser) {
+      const handleNameLogin = async () => {
+        if (!name.trim()) return;
+        await loginWithName(sabun, name.trim());
+      };
 
+      return (
+        <div className={styles.gate}>
+          <div className={styles.card}>
+            <div className={styles.icon}>🚇</div>
+            <h1 className={styles.title}>기관사 DIA</h1>
+            <p className={styles.subtitle}>사번 {sabun}</p>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="auth-name" className={styles.label}>이름</label>
+              <input
+                id="auth-name"
+                type="text"
+                className={styles.input}
+                placeholder="홍길동"
+                value={name}
+                onChange={(e) => { setName(e.target.value); clearError(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleNameLogin(); }}
+                autoComplete="off"
+                autoFocus
+              />
+            </div>
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <button
+              type="button"
+              className={styles.btn}
+              onClick={handleNameLogin}
+              disabled={loading || !name.trim()}
+            >
+              {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
+              <span>{loading ? '로그인 중...' : '로그인'}</span>
+            </button>
+
+            <button
+              type="button"
+              className={styles.btnSecondary}
+              onClick={() => { clearError(); setSabunStatus(null); setName(''); setScreen('sabun'); }}
+            >
+              ← 사번 다시 입력
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── 관리자: PIN 입력 ──
     const handlePinLogin = async () => {
       if (!pin) return;
       await loginWithPin(sabun, pin);
@@ -236,28 +271,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         <div className={styles.card}>
           <div className={styles.icon}>🚇</div>
           <h1 className={styles.title}>기관사 DIA</h1>
-          <p className={styles.subtitle}>사번 {sabun}</p>
+          <p className={styles.subtitle}>사번 {sabun} (관리자)</p>
 
-          {/* 생체인증 버튼 */}
-          {hasBio && (
-            <button
-              type="button"
-              className={styles.biometricBtn}
-              onClick={handleBiometricLogin}
-              disabled={loading}
-            >
-              <Fingerprint size={24} />
-              <span>{loading ? '인증 중...' : '지문 / 얼굴인식으로 로그인'}</span>
-            </button>
-          )}
-
-          {hasBio && (
-            <div className={styles.divider}>
-              <span>또는 PIN으로 로그인</span>
-            </div>
-          )}
-
-          {/* PIN 입력 */}
           <div className={styles.inputGroup}>
             <label htmlFor="auth-pin" className={styles.label}>PIN</label>
             <div className={styles.pinWrap}>
@@ -272,7 +287,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 onKeyDown={(e) => { if (e.key === 'Enter') handlePinLogin(); }}
                 maxLength={10}
                 autoComplete="off"
-                autoFocus={!hasBio}
+                autoFocus
               />
               <button
                 type="button"
@@ -300,12 +315,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             className={styles.btnSecondary}
-            onClick={() => {
-              clearError();
-              setSabunStatus(null);
-              setPin('');
-              setScreen('sabun');
-            }}
+            onClick={() => { clearError(); setSabunStatus(null); setPin(''); setScreen('sabun'); }}
           >
             ← 사번 다시 입력
           </button>
@@ -314,7 +324,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ── PIN 최초 설정 ──
+  // ── 관리자 PIN 최초 설정 ──
   if (screen === 'pin-setup') {
     const handleSetPin = async () => {
       setPinChangeError('');
@@ -339,7 +349,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       if (user) {
         useAuthStore.setState({ user: { ...user, mustChangePin: false } });
       }
-      setScreen('biometric-setup');
     };
 
     return (
@@ -394,51 +403,6 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             disabled={loading}
           >
             {loading ? '설정 중...' : 'PIN 설정 완료'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── 생체인증 등록 권유 ──
-  if (screen === 'biometric-setup' && user) {
-    const handleRegister = async () => {
-      const ok = await registerBiometric();
-      if (ok) setScreen('login');
-    };
-
-    return (
-      <div className={styles.gate}>
-        <div className={styles.card}>
-          <div className={styles.iconWrap}>
-            <Fingerprint size={48} className={styles.iconBlue} />
-          </div>
-          <h1 className={styles.title}>생체인증 등록</h1>
-          <p className={styles.subtitle}>
-            다음부터 지문 또는 얼굴인식으로<br />
-            빠르게 로그인할 수 있습니다
-          </p>
-
-          {error && <p className={styles.error}>{error}</p>}
-
-          <button
-            type="button"
-            className={styles.btn}
-            onClick={handleRegister}
-            disabled={loading}
-          >
-            {loading ? '등록 중...' : '생체인증 등록하기'}
-          </button>
-
-          <button
-            type="button"
-            className={styles.btnSecondary}
-            onClick={() => {
-              setSkipBiometric(true);
-              setScreen('login');
-            }}
-          >
-            나중에 할게요
           </button>
         </div>
       </div>

@@ -11,10 +11,10 @@ export interface TokenPayload extends JWTPayload {
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-/** 생체인증 로그인 세션: 24시간 */
+/** 생체인증 로그인 세션: 24시간 (WebAuthn 라우트에서 사용) */
 export const TOKEN_MAX_AGE_BIOMETRIC = 24 * 60 * 60;
-/** PIN 로그인 세션: 7일 */
-export const TOKEN_MAX_AGE_PIN = 7 * 24 * 60 * 60;
+/** PIN 로그인 세션: 365일 */
+export const TOKEN_MAX_AGE_PIN = 365 * 24 * 60 * 60;
 
 export async function createToken(
   payload: Omit<TokenPayload, 'iat' | 'exp'>,

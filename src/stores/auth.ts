@@ -18,6 +18,7 @@ export interface AuthUser {
 
 export interface SabunStatus {
   exists: boolean;
+  isAdmin: boolean;
   mustChangePin: boolean;
   hasBiometric: boolean;
 }
@@ -39,6 +40,8 @@ interface AuthState {
   checkSabun: (sabun: string) => Promise<SabunStatus | null>;
   /** PIN 로그인 */
   loginWithPin: (sabun: string, pin: string) => Promise<boolean>;
+  /** 이름 로그인 (일반 사용자) */
+  loginWithName: (sabun: string, name: string) => Promise<boolean>;
   /** 생체인증 로그인 */
   loginWithBiometric: (sabun: string) => Promise<boolean>;
   /** 생체인증 등록 */
@@ -87,6 +90,35 @@ export const useAuthStore = create<AuthState>()(
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sabun, ...(pin ? { pin } : {}) }),
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            set({ loading: false, error: data.message || '로그인에 실패했습니다' });
+            return false;
+          }
+
+          set({
+            user: data.user,
+            lastSabun: sabun,
+            hasBiometric: data.user.hasBiometric || get().hasBiometric,
+            loading: false,
+            error: '',
+          });
+          return true;
+        } catch {
+          set({ loading: false, error: '네트워크 오류. 인터넷 연결을 확인해주세요' });
+          return false;
+        }
+      },
+
+      loginWithName: async (sabun, name) => {
+        set({ loading: true, error: '' });
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sabun, name }),
           });
           const data = await res.json();
 

@@ -62,8 +62,8 @@ export async function GET(req: NextRequest) {
     isReaction ? a.score - b.score : b.score - a.score,
   );
 
-  // 탑 5
-  const top5 = ranked.slice(0, 5).map((r, i) => ({
+  // 탑 15
+  const top5 = ranked.slice(0, 15).map((r, i) => ({
     rank: i + 1,
     name: r.name,
     score: r.score,

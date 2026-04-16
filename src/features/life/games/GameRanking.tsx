@@ -45,7 +45,7 @@ export default function GameRanking({ game, scoreLabel = '점수', scoreUnit = '
 
   useEffect(() => { fetchRanking(); }, [fetchRanking]);
 
-  const medals = ['🥇', '🥈', '🥉', '4', '5'];
+  const medals = ['🥇', '🥈', '🥉'];
 
   return (
     <div className={styles.wrap}>
@@ -81,7 +81,7 @@ export default function GameRanking({ game, scoreLabel = '점수', scoreUnit = '
                 className={`${styles.row} ${entry.isMe ? styles.rowMe : ''} ${entry.rank <= 3 ? styles.rowTop3 : ''}`}
               >
                 <span className={styles.rank}>
-                  {entry.rank <= 3 ? medals[entry.rank - 1] : entry.rank}
+                  {entry.rank <= 3 ? medals[entry.rank - 1] : `${entry.rank}`}
                 </span>
                 <span className={styles.name}>
                   {entry.name}

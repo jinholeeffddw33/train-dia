@@ -49,7 +49,11 @@ const TONES: Record<FeedbackKind, ToneSpec[]> = {
     { freq: 1047, duration: 0.2, type: 'triangle', gain: 0.25 },
   ],
   ready:    [{ freq: 1320, duration: 0.06, type: 'sine', gain: 0.2 }],
-  button:   [{ freq: 600, duration: 0.04, type: 'sine', gain: 0.12 }],
+  button:   [
+    { freq: 440, duration: 0.06, type: 'triangle', gain: 0.18 },
+    { freq: 660, duration: 0.06, type: 'triangle', gain: 0.18 },
+    { freq: 880, duration: 0.08, type: 'triangle', gain: 0.2 },
+  ],
 };
 
 const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
@@ -59,7 +63,7 @@ const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
   gameover: [80, 60, 80, 60, 120],
   record: [60, 40, 60, 40, 120],
   ready: 30,
-  button: 10,
+  button: [20, 40, 30],
 };
 
 function loadPref(key: string, defaultValue: boolean): boolean {

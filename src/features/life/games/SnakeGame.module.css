@@ -71,6 +71,35 @@
   font-variant-numeric: tabular-nums;
 }
 
+.toggleBtn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-elevated);
+  border: none;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+}
+
+.toggleBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.toggleBtnOff {
+  color: var(--dia-text-tertiary);
+  opacity: 0.6;
+}
+
 /* ── Game Area ── */
 .gameArea {
   flex: 1;

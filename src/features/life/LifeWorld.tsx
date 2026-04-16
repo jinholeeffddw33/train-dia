@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X, Gamepad2, Zap, Bug } from 'lucide-react';
+import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X, Gamepad2, Zap, Bug, Brain, Palette } from 'lucide-react';
 
 const ReactionTest = lazy(() => import('./games/ReactionTest'));
 const SnakeGame = lazy(() => import('./games/SnakeGame'));
+const MentalMath = lazy(() => import('./games/MentalMath'));
+const SimonSays = lazy(() => import('./games/SimonSays'));
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useDriverStore } from '@/stores/driver';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
@@ -50,12 +52,14 @@ const ICON_COLOR: Record<string, string> = {
   purple: styles.iconPurple,
 };
 
-type GameId = 'reaction' | 'snake';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon';
 type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | { type: 'list'; category: LifeCategory } | { type: 'detail'; category: LifeCategory; postId: string } | { type: 'write'; category: LifeCategory };
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
   { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
+  { id: 'mental', label: '암산 스프린트', icon: Brain, color: 'blue', desc: '60초 안에 계산 문제 최대한 많이!' },
+  { id: 'simon', label: '색깔 따라하기', icon: Palette, color: 'purple', desc: '순서를 기억하고 똑같이 눌러보세요' },
 ];
 
 /** localStorage에서 카테고리별 마지막 방문 시간 가져오기 */
@@ -225,7 +229,12 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
                 className={styles.gameCard}
                 onClick={() => setView({ type: 'game', gameId: g.id })}
               >
-                <div className={`${styles.gameCardIcon} ${g.color === 'amber' ? styles.iconBgAmber : styles.iconBgGreen}`}>
+                <div className={`${styles.gameCardIcon} ${
+                  g.color === 'amber' ? styles.iconBgAmber :
+                  g.color === 'blue' ? styles.iconBgBlue :
+                  g.color === 'purple' ? styles.iconBgPurple :
+                  styles.iconBgGreen
+                }`}>
                   <Icon size={24} />
                 </div>
                 <div className={styles.gameCardText}>
@@ -248,6 +257,8 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
       <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
         {view.gameId === 'reaction' && <ReactionTest onBack={goBack} />}
         {view.gameId === 'snake' && <SnakeGame onBack={goBack} />}
+        {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
+        {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
       </Suspense>
     );
   }

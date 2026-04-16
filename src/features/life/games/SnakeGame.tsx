@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff } from 'lucide-react';
 import GameRanking from './GameRanking';
+import { useGameFeedback } from './useGameFeedback';
 import styles from './SnakeGame.module.css';
 
 /* ──────────────────────────────────────────────
@@ -125,6 +126,10 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
   const rafRef = useRef<number>(0);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
+  const { feedback, soundOn, vibrateOn, toggleSound, toggleVibrate } = useGameFeedback();
+  const feedbackRef = useRef(feedback);
+  useEffect(() => { feedbackRef.current = feedback; }, [feedback]);
+
   useEffect(() => { setBest(loadBest()); }, []);
 
   /* ── Canvas draw ── */
@@ -239,6 +244,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
         const newScore = scoreRef.current + 10;
         scoreRef.current = newScore;
         appleCountRef.current += 1;
+        feedbackRef.current('tick');
         setScore(newScore);
         appleRef.current = randomApple(newSnake, obstaclesRef.current);
         // 50점까지만 속도 증가, 이후 고정
@@ -265,8 +271,13 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
 
     const s = scoreRef.current;
     const b = loadBest();
-    if (s > b) { saveBest(s); setBest(s); setIsNewRecord(true); }
-    else { setIsNewRecord(false); }
+    if (s > b) {
+      saveBest(s); setBest(s); setIsNewRecord(true);
+      feedbackRef.current('record');
+    } else {
+      setIsNewRecord(false);
+      feedbackRef.current('gameover');
+    }
 
     // 서버에 점수 저장
     if (s > 0) {
@@ -279,6 +290,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
   }, []);
 
   const startGame = useCallback(() => {
+    feedbackRef.current('button');
     const init = [{ x: 7, y: 7 }];
     snakeRef.current = init;
     obstaclesRef.current = [];
@@ -384,6 +396,24 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <h1 className={styles.headerTitle}>사과 먹기</h1>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${!soundOn ? styles.toggleBtnOff : ''}`}
+            onClick={toggleSound}
+            aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+            aria-pressed={soundOn}
+          >
+            {soundOn ? <Volume2 size={18} strokeWidth={2} /> : <VolumeX size={18} strokeWidth={2} />}
+          </button>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${!vibrateOn ? styles.toggleBtnOff : ''}`}
+            onClick={toggleVibrate}
+            aria-label={vibrateOn ? '진동 끄기' : '진동 켜기'}
+            aria-pressed={vibrateOn}
+          >
+            {vibrateOn ? <Vibrate size={18} strokeWidth={2} /> : <VibrateOff size={18} strokeWidth={2} />}
+          </button>
         </header>
         <div className={styles.fullPage}>
           <span className={styles.bigEmoji}>🍎</span>
@@ -411,6 +441,24 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <h1 className={styles.headerTitle}>사과 먹기</h1>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${!soundOn ? styles.toggleBtnOff : ''}`}
+            onClick={toggleSound}
+            aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+            aria-pressed={soundOn}
+          >
+            {soundOn ? <Volume2 size={18} strokeWidth={2} /> : <VolumeX size={18} strokeWidth={2} />}
+          </button>
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${!vibrateOn ? styles.toggleBtnOff : ''}`}
+            onClick={toggleVibrate}
+            aria-label={vibrateOn ? '진동 끄기' : '진동 켜기'}
+            aria-pressed={vibrateOn}
+          >
+            {vibrateOn ? <Vibrate size={18} strokeWidth={2} /> : <VibrateOff size={18} strokeWidth={2} />}
+          </button>
         </header>
         <div className={styles.fullPage}>
           <h2 className={styles.pageTitle}>게임 오버</h2>
@@ -436,6 +484,24 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           <span className={styles.scoreLabel}>점수</span>
           <span className={styles.scoreValue}>{score}</span>
         </div>
+        <button
+          type="button"
+          className={`${styles.toggleBtn} ${!soundOn ? styles.toggleBtnOff : ''}`}
+          onClick={toggleSound}
+          aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+          aria-pressed={soundOn}
+        >
+          {soundOn ? <Volume2 size={18} strokeWidth={2} /> : <VolumeX size={18} strokeWidth={2} />}
+        </button>
+        <button
+          type="button"
+          className={`${styles.toggleBtn} ${!vibrateOn ? styles.toggleBtnOff : ''}`}
+          onClick={toggleVibrate}
+          aria-label={vibrateOn ? '진동 끄기' : '진동 켜기'}
+          aria-pressed={vibrateOn}
+        >
+          {vibrateOn ? <Vibrate size={18} strokeWidth={2} /> : <VibrateOff size={18} strokeWidth={2} />}
+        </button>
       </header>
 
       <div className={styles.gameArea} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>

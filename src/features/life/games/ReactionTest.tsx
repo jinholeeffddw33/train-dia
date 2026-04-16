@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff } from 'lucide-react';
 import GameRanking from './GameRanking';
+import { useGameFeedback } from './useGameFeedback';
 import styles from './ReactionTest.module.css';
 
 /* ── 타입 ── */
@@ -58,6 +59,9 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
   const [times, setTimes] = useState<number[]>([]);
   const [best, setBest] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { feedback, soundOn, vibrateOn, toggleSound, toggleVibrate } = useGameFeedback();
+  const feedbackRef = useRef(feedback);
+  useEffect(() => { feedbackRef.current = feedback; }, [feedback]);
 
   // 최고 기록 로드
   useEffect(() => {
@@ -73,10 +77,12 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
 
   /* 다음 라운드 시작 — 대기 상태 */
   const startWaiting = useCallback(() => {
+    feedbackRef.current('button');
     if (timerRef.current) clearTimeout(timerRef.current);
     setState({ phase: 'waiting' });
     const delay = DELAY_MIN + Math.random() * (DELAY_MAX - DELAY_MIN);
     timerRef.current = setTimeout(() => {
+      feedbackRef.current('ready');
       setState({ phase: 'ready', startedAt: performance.now() });
     }, delay);
   }, []);
@@ -100,6 +106,7 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
     if (currentState.phase === 'waiting') {
       // 너무 빨리 누름
       if (timerRef.current) clearTimeout(timerRef.current);
+      feedbackRef.current('fail');
       setState({ phase: 'tooEarly' });
       return;
     }
@@ -112,6 +119,7 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
 
     if (currentState.phase === 'ready') {
       const elapsed = Math.round(performance.now() - currentState.startedAt);
+      feedbackRef.current('success');
       setState({ phase: 'result', time: elapsed });
 
       const newTimes = [...times, elapsed];
@@ -123,10 +131,12 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
           // 게임 종료
           const avg = Math.round(newTimes.reduce((a, b) => a + b, 0) / newTimes.length);
           const currentBest = loadBest();
-          if (currentBest === null || avg < currentBest) {
+          const isRecord = currentBest === null || avg < currentBest;
+          if (isRecord) {
             saveBest(avg);
             setBest(avg);
           }
+          feedbackRef.current(isRecord ? 'record' : 'success');
           setState({ phase: 'finished', times: newTimes });
         } else {
           setRound(newTimes.length + 1);
@@ -172,6 +182,24 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
         {state.phase !== 'idle' && state.phase !== 'finished' && (
           <span className={styles.roundBadge}>{round} / {TOTAL_ROUNDS}</span>
         )}
+        <button
+          type="button"
+          className={`${styles.toggleBtn} ${!soundOn ? styles.toggleBtnOff : ''}`}
+          onClick={toggleSound}
+          aria-label={soundOn ? '효과음 끄기' : '효과음 켜기'}
+          aria-pressed={soundOn}
+        >
+          {soundOn ? <Volume2 size={18} strokeWidth={2} /> : <VolumeX size={18} strokeWidth={2} />}
+        </button>
+        <button
+          type="button"
+          className={`${styles.toggleBtn} ${!vibrateOn ? styles.toggleBtnOff : ''}`}
+          onClick={toggleVibrate}
+          aria-label={vibrateOn ? '진동 끄기' : '진동 켜기'}
+          aria-pressed={vibrateOn}
+        >
+          {vibrateOn ? <Vibrate size={18} strokeWidth={2} /> : <VibrateOff size={18} strokeWidth={2} />}
+        </button>
       </header>
 
       {/* 게임 영역 */}

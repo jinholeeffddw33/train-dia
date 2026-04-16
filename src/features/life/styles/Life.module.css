@@ -276,6 +276,20 @@
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-amber-glow);
 }
 
+.gameCardIcon.iconBgBlue {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
+}
+
+.gameCardIcon.iconBgPurple {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-purple, #8B5CF6), var(--dia-purple, #7C3AED));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), 0 0 12px rgba(139, 92, 246, 0.3);
+}
+
 .gameCardText {
   flex: 1;
   min-width: 0;

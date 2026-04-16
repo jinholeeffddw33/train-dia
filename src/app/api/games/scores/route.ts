@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 
-const VALID_GAMES = ['snake', 'reaction'] as const;
+const VALID_GAMES = ['snake', 'reaction', 'mental', 'simon'] as const;
 
 /** POST: 점수 저장 */
 export async function POST(req: NextRequest) {

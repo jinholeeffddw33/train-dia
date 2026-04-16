@@ -23,7 +23,7 @@ interface RankingData {
 }
 
 interface GameRankingProps {
-  game: 'snake' | 'reaction';
+  game: 'snake' | 'reaction' | 'mental' | 'simon';
   /** reaction은 낮을수록 좋음 */
   scoreLabel?: string;
   scoreUnit?: string;

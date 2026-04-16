@@ -1,0 +1,477 @@
+/* ===== Mental Math Sprint Game ===== */
+
+/* ── 전체 래퍼 ── */
+.wrap {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  background: var(--dia-bg);
+}
+
+/* ── 오답 플래시 ── */
+@keyframes mentalFlashError {
+  0%   { background: var(--dia-red-dim); }
+  50%  { background: var(--dia-red-dim); }
+  100% { background: var(--dia-bg); }
+}
+
+.flashError {
+  animation: mentalFlashError 0.4s ease-out;
+}
+
+/* ── 상단 헤더 ── */
+.header {
+  position: relative;
+  z-index: var(--dia-layer-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-bg);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.backBtn,
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface);
+  border: none;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .backBtn:hover,
+  .iconBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.backBtn:active,
+.iconBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+}
+
+.backBtn:focus-visible,
+.iconBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.iconBtn[aria-pressed='false'] {
+  opacity: 0.55;
+}
+
+.headerTitle {
+  flex: 1;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  margin: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scoreDisplay {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.scoreNum {
+  color: var(--dia-blue);
+}
+
+.scoreSep {
+  color: var(--dia-text-tertiary);
+}
+
+.scoreTime {
+  color: var(--dia-text-secondary);
+}
+
+.scoreTimeDanger {
+  color: var(--dia-red);
+}
+
+/* ── 메인 영역 ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--dia-space-4);
+  gap: var(--dia-space-4);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ── 인트로 카드 ── */
+.introCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  padding: var(--dia-space-6);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-card-depth);
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.emoji {
+  font-size: clamp(48px, 10vw, 72px);
+  line-height: 1;
+  margin: 0;
+}
+
+.introTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.introDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: var(--dia-leading-relaxed);
+  margin: 0;
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  width: 100%;
+  text-align: left;
+}
+
+.ruleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.ruleIcon {
+  font-size: var(--dia-text-base);
+}
+
+/* ── 최고 기록 배지 ── */
+.bestRecord {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-4);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-amber);
+}
+
+/* ── 시작/다시하기 공통 버튼 ── */
+.startBtn,
+.retryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 52px;
+  min-height: 44px;
+  border-radius: var(--dia-radius-lg);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
+  color: #FFFFFF;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  border: none;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .startBtn:hover,
+  .retryBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.startBtn:active,
+.retryBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+}
+
+.startBtn:focus-visible,
+.retryBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+/* ── 퀴즈 영역 ── */
+.quizArea {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-5);
+  width: 100%;
+  max-width: 420px;
+  padding-top: var(--dia-space-3);
+}
+
+/* 상단 얇은 진행 바 */
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--dia-blue);
+  border-radius: var(--dia-radius-full);
+  transition: width 0.3s linear, background 0.2s ease;
+}
+
+/* ── 타이머 숫자 ── */
+.timer {
+  font-size: var(--dia-text-3xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.timerUnit {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  margin-left: var(--dia-space-1);
+}
+
+.timerDanger {
+  color: var(--dia-red);
+}
+
+/* ── 문제 표시 (거대한 숫자) ── */
+.question {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-4xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  padding: var(--dia-space-4) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-card-depth);
+  width: 100%;
+  text-align: center;
+  min-height: 96px;
+}
+
+.op {
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.qMark {
+  color: var(--dia-blue);
+}
+
+/* ── 선택지 ── */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  width: 100%;
+}
+
+.choiceBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  height: 56px;
+  min-height: 44px;
+  padding: 0 var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
+  color: #FFFFFF;
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+  border: none;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .choiceBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.choiceBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+  transform: scale(0.98);
+}
+
+.choiceBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.choiceKey {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.choiceVal {
+  flex: 1;
+  text-align: center;
+}
+
+.kbHint {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  margin: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── 결과 카드 ── */
+.resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+  padding: var(--dia-space-6);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-card-depth);
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+}
+
+.resultTitle {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.resultScore {
+  font-size: var(--dia-text-4xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.resultScoreUnit {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-secondary);
+  margin-left: var(--dia-space-1);
+}
+
+.newRecord {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-1) var(--dia-space-3);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-amber);
+}
+
+.resultStats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  width: 100%;
+}
+
+.statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+}
+
+.statLabel {
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.statValue {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}

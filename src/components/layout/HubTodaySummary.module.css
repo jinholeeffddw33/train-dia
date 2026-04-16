@@ -1,0 +1,211 @@
+/* ===== Hub Today Summary — 근무 한 줄 + 날씨 ===== */
+
+.row {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-4);
+  z-index: 1;
+  animation: fadeSlideUp 0.5s var(--dia-ease) both;
+  animation-delay: 0.1s;
+}
+
+.row:empty {
+  display: none;
+}
+
+/* ── 근무 요약 ── */
+.duty {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-5);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface);
+  box-shadow: var(--dia-card-depth);
+}
+
+.label {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: var(--dia-weight-bold);
+  letter-spacing: 0.02em;
+  color: var(--dia-text-primary);
+  padding-right: var(--dia-space-3);
+  border-right: 1px solid var(--dia-border);
+}
+
+.value {
+  font-size: 15px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+}
+
+.tone_working {
+  border-color: rgba(59, 130, 246, 0.45);
+  background:
+    linear-gradient(var(--dia-surface), var(--dia-surface)) padding-box,
+    linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.35)) border-box;
+  box-shadow: var(--dia-card-depth), 0 0 14px rgba(59, 130, 246, 0.18);
+}
+.tone_working .label { color: var(--dia-blue); }
+
+.tone_preparing {
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: var(--dia-card-depth), 0 0 12px rgba(34, 197, 94, 0.15);
+}
+.tone_preparing .label { color: var(--dia-green); }
+
+.tone_done {
+  border-color: rgba(139, 92, 246, 0.35);
+}
+.tone_done .label { color: var(--dia-purple); }
+
+.tone_rest .label { color: var(--dia-purple); }
+
+/* ── 날씨 ── */
+.weather {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface);
+  box-shadow: var(--dia-card-depth);
+}
+
+.wMain {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wIcon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.wCity {
+  font-size: 14px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  letter-spacing: 0.02em;
+  padding-right: 4px;
+  border-right: 1px solid var(--dia-border);
+  margin-right: 2px;
+}
+
+.wTemp {
+  font-size: 16px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.wCond {
+  font-size: 14px;
+  color: var(--dia-text-secondary);
+}
+
+/* ── 추가 정보 (강수/미세먼지) ── */
+.wExtra {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid var(--dia-border);
+}
+
+.wChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  padding: 3px 10px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+}
+
+:global(:root.light) .wChip {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* 미세먼지 칩 — 텍스트는 읽히게 유지, 점만 등급 색 */
+.dustDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dust_good .dustDot { background: var(--dia-green); }
+.dust_moderate .dustDot { background: #60a5fa; }
+.dust_bad .dustDot { background: var(--dia-amber); }
+.dust_very-bad .dustDot { background: var(--dia-red); }
+
+/* "매우 나쁨"은 글자도 경고색으로 */
+.dust_very-bad { color: var(--dia-red); }
+
+/* ── Empty (기관사 미선택) ── */
+.empty {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  border: 1px dashed var(--dia-border);
+  background: transparent;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s var(--dia-ease), background 0.2s var(--dia-ease);
+  font-family: inherit;
+}
+
+.empty:hover,
+.empty:focus-visible {
+  border-color: var(--dia-blue);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.emptyIcon { font-size: 16px; }
+.emptyText {
+  flex: 1;
+  font-size: 13px;
+  text-align: left;
+}
+.chevron {
+  font-size: 18px;
+  color: var(--dia-text-tertiary);
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 좁은 폭 (320px) 대응 ── */
+@media (max-width: 359px) {
+  .row {
+    flex-direction: column;
+  }
+  .weather {
+    align-self: stretch;
+    justify-content: center;
+  }
+}

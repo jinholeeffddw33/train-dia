@@ -63,6 +63,7 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
   const [activePad, setActivePad] = useState<number | null>(null);
   const [best, setBest] = useState<number | null>(null);
   const [isNewRecord, setIsNewRecord] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
 
   const seqRef = useRef<number[]>([]);
   const timersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
@@ -142,6 +143,7 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
     setRound(0);
     setUserStep(0);
     setActivePad(null);
+    setFinalScore(0);
     // 첫 라운드
     startNextRound(1);
   }, [startNextRound]);
@@ -150,6 +152,7 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
   const endGame = useCallback(
     (finalRound: number) => {
       feedbackRef.current('gameover');
+      setFinalScore(finalRound);
       setPhase('gameover');
       setActivePad(null);
 
@@ -354,9 +357,10 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
           <div className={styles.resultCard}>
             <h2 className={styles.resultTitle}>게임 오버</h2>
             <p className={styles.bigScore}>
-              {round}
+              {finalScore}
               <span className={styles.unit}>라운드</span>
             </p>
+            <p className={styles.resultSubtext}>클리어한 라운드</p>
             {isNewRecord && (
               <span className={styles.newRecord}>🏆 새로운 기록!</span>
             )}

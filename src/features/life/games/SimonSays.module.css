@@ -166,7 +166,7 @@
   cursor: pointer;
   min-height: 120px;
   transition: filter 0.1s ease, transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
-  opacity: 0.5;
+  opacity: 0.75;
   color: var(--dia-text-primary);
 }
 
@@ -355,6 +355,14 @@
   font-weight: var(--dia-weight-medium);
   color: var(--dia-text-secondary);
   margin-left: var(--dia-space-1);
+}
+
+.resultSubtext {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  margin: 0;
+  margin-top: calc(-1 * var(--dia-space-2));
 }
 
 .newRecord {

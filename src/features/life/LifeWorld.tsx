@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X, Gamepad2, Zap, Bug, Brain, Palette } from 'lucide-react';
+import { ArrowLeft, Heart, Target, BookOpen, MessageCircle, Plus, ChevronRight, ArrowUp, ImagePlus, Link2, X, Gamepad2, Zap, Bug, Brain, Palette, Bell } from 'lucide-react';
 
 const ReactionTest = lazy(() => import('./games/ReactionTest'));
 const SnakeGame = lazy(() => import('./games/SnakeGame'));
 const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
+const HalliGalli = lazy(() => import('./games/HalliGalli'));
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useDriverStore } from '@/stores/driver';
 import { useLifeStore, type LifeCategory, type LifePost } from '@/stores/life';
@@ -52,7 +53,7 @@ const ICON_COLOR: Record<string, string> = {
   purple: styles.iconPurple,
 };
 
-type GameId = 'reaction' | 'snake' | 'mental' | 'simon';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli';
 type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | { type: 'list'; category: LifeCategory } | { type: 'detail'; category: LifeCategory; postId: string } | { type: 'write'; category: LifeCategory };
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
@@ -60,6 +61,7 @@ const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc:
   { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
   { id: 'mental', label: '암산 스프린트', icon: Brain, color: 'blue', desc: '60초 안에 계산 문제 최대한 많이!' },
   { id: 'simon', label: '색깔 따라하기', icon: Palette, color: 'purple', desc: '순서를 기억하고 똑같이 눌러보세요' },
+  { id: 'halli', label: '할리갈리', icon: Bell, color: 'amber', desc: '같은 과일 5개면 종을 쳐라!' },
 ];
 
 /** localStorage에서 카테고리별 마지막 방문 시간 가져오기 */
@@ -259,6 +261,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
         {view.gameId === 'snake' && <SnakeGame onBack={goBack} />}
         {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
         {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
+        {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
       </Suspense>
     );
   }

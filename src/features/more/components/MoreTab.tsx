@@ -391,8 +391,7 @@ export default function MoreTab() {
           }}
         >
           <LogOut size={18} />
-          <span>로그아웃</span>
-          {authUser && <span className={styles.logoutUser}>{authUser.name}</span>}
+          <span>{authUser ? `${authUser.name} 로그아웃` : '로그아웃'}</span>
         </button>
       </section>
 

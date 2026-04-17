@@ -245,54 +245,63 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ── 종 버튼 ── */
-.bellBtn {
+/* ── 판정 버튼 (맞음 / 아님) ── */
+.judgeRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+  width: 100%;
+  max-width: 440px;
+}
+
+.judgeBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--dia-space-1);
-  width: 100%;
-  max-width: 360px;
   min-height: 96px;
-  padding: var(--dia-space-4) var(--dia-space-6);
+  padding: var(--dia-space-4) var(--dia-space-3);
   border-radius: var(--dia-radius-xl);
   border: none;
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
-    linear-gradient(145deg, var(--dia-3d-amber-start), var(--dia-3d-amber-end));
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-amber-glow);
   color: #FFFFFF;
   cursor: pointer;
-  font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-bold);
   transition: transform 0.06s ease, filter 0.1s ease;
 }
 
+.judgeYes {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-green-start), var(--dia-3d-green-end));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-green-glow);
+}
+
+.judgeNo {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, #EF4444, #B91C1C);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), 0 0 14px rgba(239, 68, 68, 0.3);
+}
+
 @media (hover: hover) {
-  .bellBtn:not(:disabled):hover {
+  .judgeBtn:hover {
     filter: brightness(1.08);
     transform: translateY(-1px);
   }
 }
 
-.bellBtn:not(:disabled):active {
+.judgeBtn:active {
   transform: scale(0.97);
   box-shadow: var(--dia-3d-pressed);
 }
 
-.bellBtn:focus-visible {
+.judgeBtn:focus-visible {
   outline: 3px solid var(--dia-text-primary);
   outline-offset: 3px;
 }
 
-.bellBtnCooldown {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.6);
-}
-
-.bellLabel {
+.judgeLabel {
   font-size: var(--dia-text-xl);
   letter-spacing: 0.02em;
 }

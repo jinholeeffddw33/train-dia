@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, Bell, Heart } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, Check, X as XIcon, Heart } from 'lucide-react';
 import GameRanking from './GameRanking';
 import { useGameFeedback } from './useGameFeedback';
 import styles from './HalliGalli.module.css';
@@ -34,8 +34,8 @@ const INITIAL_CARDS = 3;
 const MAX_CARDS = 4;
 const MAX_PER_CARD = 4; // 각 카드 과일 개수 상한 (합 5 확률↑, 화면 여유)
 
-const SCORE_CORRECT = 20;
-const SCORE_FALSE_ALARM = -10;
+const SCORE_CORRECT = 10;
+const SCORE_WRONG = -10;
 const SCORE_MISSED = -5;
 
 const INITIAL_INTERVAL = 2800; // ms — 3장이라 인지 시간 필요
@@ -43,7 +43,7 @@ const MIN_INTERVAL = 1200;
 const INTERVAL_PER_SCORE = 15; // 1점당 15ms씩 빨라짐
 
 const RESPONSE_WINDOW = 1700; // 3장 스캔 시간 고려
-const FALSE_ALARM_COOLDOWN = 500;
+const NEXT_DEAL_DELAY = 250; // 판정 후 다음 덱까지 짧은 간격
 
 const STORAGE_KEY = 'traindia-halli-best';
 
@@ -101,7 +101,6 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
   const [best, setBest] = useState(0);
   const [isNewRecord, setIsNewRecord] = useState(false);
   const [flash, setFlash] = useState<'none' | 'good' | 'bad'>('none');
-  const [cooldown, setCooldown] = useState(false);
 
   const cardIdRef = useRef(0);
   const cardsRef = useRef<Card[]>([]);
@@ -109,11 +108,10 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
   const hpRef = useRef(INITIAL_HP);
   const phaseRef = useRef<Phase>('idle');
   const lastWinStateRef = useRef<boolean>(false);
-  const winResolvedRef = useRef<boolean>(false); // 이미 맞춘/놓친 상태인지
+  const winResolvedRef = useRef<boolean>(false); // 이미 판정한 덱인지
   const dealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const missTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isUnmountedRef = useRef(false);
 
   const { feedback, soundOn, vibrateOn, toggleSound, toggleVibrate } = useGameFeedback();
@@ -127,7 +125,6 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
       if (dealTimerRef.current) clearTimeout(dealTimerRef.current);
       if (missTimerRef.current) clearTimeout(missTimerRef.current);
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
     };
   }, []);
 
@@ -194,7 +191,7 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
     if (hpRef.current <= 0) endGame();
   }, [endGame]);
 
-  /* 새 카드 덱 생성 */
+  /* 새 카드 덱 생성 — 모든 덱에 판정 필요 */
   const dealNewHand = useCallback(() => {
     if (phaseRef.current !== 'playing') return;
     clearMissTimer();
@@ -209,25 +206,23 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
     const winning = isWinningState(hand);
     lastWinStateRef.current = winning;
 
-    if (winning) {
-      // 놓침 타이머 시작
-      missTimerRef.current = setTimeout(() => {
-        if (isUnmountedRef.current || phaseRef.current !== 'playing') return;
-        if (!winResolvedRef.current) {
-          winResolvedRef.current = true;
-          feedbackRef.current('fail');
-          applyScoreDelta(SCORE_MISSED);
-          applyHpDelta(-1);
-          triggerFlash('bad');
-        }
-      }, RESPONSE_WINDOW);
-    }
-
-    // 다음 덱 스케줄
-    const nextAt = winning ? RESPONSE_WINDOW + 200 : nextInterval(scoreRef.current);
-    dealTimerRef.current = setTimeout(() => {
-      if (!isUnmountedRef.current) dealNewHand();
-    }, nextAt);
+    // 매 덱마다 놓침 타이머 (응답 윈도우 내 판정 필요)
+    const responseBudget = Math.max(1000, Math.min(RESPONSE_WINDOW, nextInterval(scoreRef.current) - 200));
+    missTimerRef.current = setTimeout(() => {
+      if (isUnmountedRef.current || phaseRef.current !== 'playing') return;
+      if (!winResolvedRef.current) {
+        winResolvedRef.current = true;
+        feedbackRef.current('fail');
+        applyScoreDelta(SCORE_MISSED);
+        applyHpDelta(-1);
+        triggerFlash('bad');
+        // 놓침 직후 바로 다음 덱
+        if (dealTimerRef.current) clearTimeout(dealTimerRef.current);
+        dealTimerRef.current = setTimeout(() => {
+          if (!isUnmountedRef.current) dealNewHand();
+        }, NEXT_DEAL_DELAY);
+      }
+    }, responseBudget);
   }, [clearMissTimer, genCard, applyScoreDelta, applyHpDelta, triggerFlash]);
 
   /* 시작 */
@@ -244,7 +239,6 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
     setHp(INITIAL_HP);
     setIsNewRecord(false);
     setFlash('none');
-    setCooldown(false);
     setPhase('playing');
 
     // 첫 덱은 약간 딜레이 후 펼쳐짐
@@ -253,48 +247,50 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
     }, 400);
   }, [dealNewHand]);
 
-  /* 종 터치 */
-  const handleBell = useCallback(() => {
+  /* 판정: 맞음(true) / 아님(false) */
+  const handleJudge = useCallback((userSaysYes: boolean) => {
     if (phaseRef.current !== 'playing') return;
-    if (cooldown) return;
+    if (winResolvedRef.current) return;
+
+    winResolvedRef.current = true;
+    clearMissTimer();
 
     const winning = isWinningState(cardsRef.current);
+    const correct = userSaysYes === winning;
 
-    if (winning) {
-      if (winResolvedRef.current) return;
-      winResolvedRef.current = true;
-      clearMissTimer();
-
+    if (correct) {
       feedbackRef.current('success');
       applyScoreDelta(SCORE_CORRECT);
       triggerFlash('good');
     } else {
-      // 가짜 종
       feedbackRef.current('fail');
-      applyScoreDelta(SCORE_FALSE_ALARM);
+      applyScoreDelta(SCORE_WRONG);
       applyHpDelta(-1);
       triggerFlash('bad');
-
-      setCooldown(true);
-      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
-      cooldownTimerRef.current = setTimeout(() => {
-        if (!isUnmountedRef.current) setCooldown(false);
-      }, FALSE_ALARM_COOLDOWN);
     }
-  }, [cooldown, clearMissTimer, applyScoreDelta, applyHpDelta, triggerFlash]);
 
-  /* 키보드: Space / Enter = 종 */
+    // 판정 후 즉시 다음 덱 (빠른 리듬)
+    if (dealTimerRef.current) clearTimeout(dealTimerRef.current);
+    dealTimerRef.current = setTimeout(() => {
+      if (!isUnmountedRef.current) dealNewHand();
+    }, NEXT_DEAL_DELAY);
+  }, [clearMissTimer, applyScoreDelta, applyHpDelta, triggerFlash, dealNewHand]);
+
+  /* 키보드: ← / A = 맞음, → / D = 아님 */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (phaseRef.current !== 'playing') return;
-      if (e.key === ' ' || e.key === 'Enter') {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
         e.preventDefault();
-        handleBell();
+        handleJudge(true);
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        handleJudge(false);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleBell]);
+  }, [handleJudge]);
 
   /* 렌더용 보조값 */
   const cardsToRender = useMemo(() => {
@@ -356,15 +352,15 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
         {/* 인트로 */}
         {phase === 'idle' && (
           <div className={styles.introCard}>
-            <p className={styles.emoji}>🔔</p>
+            <p className={styles.emoji}>🍎🍌🍇</p>
             <h2 className={styles.introTitle}>할리갈리</h2>
             <p className={styles.introDesc}>
-              같은 과일이 <strong>정확히 5개</strong>가 되는 순간
-              <br />재빨리 <strong>종</strong>을 쳐주세요!
+              카드마다 같은 과일이 <strong>정확히 5개</strong>인지
+              <br />매번 <strong>맞음</strong> / <strong>아님</strong>으로 판정!
             </p>
             <div className={styles.rules}>
-              <p>🔔 정답: +{SCORE_CORRECT}점</p>
-              <p>❌ 가짜 종: {SCORE_FALSE_ALARM}점 + 생명 −1</p>
+              <p>✅ 정답: +{SCORE_CORRECT}점</p>
+              <p>❌ 오답: {SCORE_WRONG}점 + 생명 −1</p>
               <p>⏰ 놓침: {SCORE_MISSED}점 + 생명 −1</p>
               <p>❤️ 생명 {INITIAL_HP}개 소진 시 게임오버</p>
             </div>
@@ -411,19 +407,29 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
               ))}
             </div>
 
-            <button
-              type="button"
-              className={`${styles.bellBtn} ${cooldown ? styles.bellBtnCooldown : ''}`}
-              onClick={handleBell}
-              aria-label="종 치기"
-              disabled={cooldown}
-            >
-              <Bell size={36} strokeWidth={2.2} />
-              <span className={styles.bellLabel}>종!</span>
-            </button>
+            <div className={styles.judgeRow}>
+              <button
+                type="button"
+                className={`${styles.judgeBtn} ${styles.judgeYes}`}
+                onClick={() => handleJudge(true)}
+                aria-label="같은 과일 5개 맞음"
+              >
+                <Check size={32} strokeWidth={2.4} />
+                <span className={styles.judgeLabel}>맞음</span>
+              </button>
+              <button
+                type="button"
+                className={`${styles.judgeBtn} ${styles.judgeNo}`}
+                onClick={() => handleJudge(false)}
+                aria-label="같은 과일 5개 아님"
+              >
+                <XIcon size={32} strokeWidth={2.4} />
+                <span className={styles.judgeLabel}>아님</span>
+              </button>
+            </div>
 
             <p className={styles.tapHint}>
-              같은 과일이 <strong>5개</strong>면 종을 쳐라!
+              같은 과일이 <strong>5개</strong>면 <strong>맞음</strong>, 아니면 <strong>아님</strong>
             </p>
           </div>
         )}

@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { TrainFront } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
+import { isOffice } from '@/lib/auth';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
@@ -15,6 +17,7 @@ import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
 import { useClock } from '../hooks/useClock';
 import RouteTimeline from './RouteTimeline';
+import DutyInfoCard from './DutyInfoCard';
 import styles from '../styles/Home.module.css';
 
 interface TodayCardProps {
@@ -24,6 +27,7 @@ interface TodayCardProps {
 
 export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps) {
   const driver = useDriverStore((s) => s.current);
+  const authUser = useAuthStore((s) => s.user);
   const getSwappedDia = useGetSwappedDia();
   const clock = useClock();
   const now = useMemo(() => {
@@ -79,6 +83,10 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   }, [segInfo, schedule, now]);
 
   if (!driver || !dia) {
+    // 내근직으로 로그인한 경우 → 오늘의 내근 근무 표시
+    if (authUser && isOffice(authUser.sabun)) {
+      return <DutyInfoCard selectedDate={selectedDate} />;
+    }
     return (
       <section className={styles.emptyCard} onClick={onEmptyClick} role={onEmptyClick ? 'button' : undefined} tabIndex={onEmptyClick ? 0 : undefined}>
         <TrainFront size={48} className={styles.emptyIcon} />

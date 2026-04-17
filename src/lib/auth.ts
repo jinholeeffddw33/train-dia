@@ -88,3 +88,8 @@ export function verifyUser(name: string, sabun: string): Person | null {
 export function isAdmin(sabun: string): boolean {
   return ADMIN_SABUNS.has(sabun);
 }
+
+/** 내근직 여부 확인 (기관사 외 모든 직원 — EXTRA_USERS) */
+export function isOffice(sabun: string): boolean {
+  return EXTRA_USERS.some((u) => u.s === sabun);
+}

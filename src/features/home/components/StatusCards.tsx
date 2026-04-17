@@ -2,9 +2,12 @@
 
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
+import { isOffice } from '@/lib/auth';
 import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today } from '@/lib/schedule';
 import { useSwapStore } from '@/stores/swap';
 import { DOW } from '@/lib/constants';
+import DutyInfoCard from './DutyInfoCard';
 import styles from '../styles/Home.module.css';
 
 interface StatusCardsProps {
@@ -14,8 +17,19 @@ interface StatusCardsProps {
 /** 기준일 +1 / +2 카드 */
 export default function StatusCards({ baseDate }: StatusCardsProps) {
   const driver = useDriverStore((s) => s.current);
+  const authUser = useAuthStore((s) => s.user);
   const swaps = useSwapStore((s) => s.swaps);
   const base = baseDate ?? today();
+
+  // 내근직 로그인 + 기관사 미선택 → 내일/모레 내근 근무 표시
+  const officeDates = useMemo(() => {
+    if (driver || !authUser || !isOffice(authUser.sabun)) return null;
+    return [1, 2].map((offset) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + offset);
+      return d;
+    });
+  }, [driver, authUser, base]);
 
   const cards = useMemo(() => {
     if (!driver) return [];
@@ -40,6 +54,16 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
       };
     });
   }, [driver, base, swaps]);
+
+  if (officeDates) {
+    return (
+      <>
+        {officeDates.map((d, i) => (
+          <DutyInfoCard key={i} selectedDate={d} />
+        ))}
+      </>
+    );
+  }
 
   if (!driver || cards.length === 0) return null;
 

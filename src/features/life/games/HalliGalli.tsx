@@ -30,18 +30,19 @@ const FRUITS: { emoji: string; label: string }[] = [
 
 const TARGET_TOTAL = 5;
 const INITIAL_HP = 3;
-const INITIAL_CARDS = 2;
+const INITIAL_CARDS = 3;
 const MAX_CARDS = 4;
+const MAX_PER_CARD = 4; // 각 카드 과일 개수 상한 (합 5 확률↑, 화면 여유)
 
 const SCORE_CORRECT = 20;
 const SCORE_FALSE_ALARM = -10;
 const SCORE_MISSED = -5;
 
-const INITIAL_INTERVAL = 2500; // ms
-const MIN_INTERVAL = 1000;
+const INITIAL_INTERVAL = 2800; // ms — 3장이라 인지 시간 필요
+const MIN_INTERVAL = 1200;
 const INTERVAL_PER_SCORE = 15; // 1점당 15ms씩 빨라짐
 
-const RESPONSE_WINDOW = 1500; // 종 5개 유지되는 시간 (기본 interval과 별개 한도)
+const RESPONSE_WINDOW = 1700; // 3장 스캔 시간 고려
 const FALSE_ALARM_COOLDOWN = 500;
 
 const STORAGE_KEY = 'traindia-halli-best';
@@ -56,9 +57,8 @@ function nextInterval(score: number): number {
 }
 
 function nextCardCount(score: number): number {
-  // 100점 이상: 4장, 40점 이상: 3장, 나머지: 2장
-  if (score >= 100) return MAX_CARDS;
-  if (score >= 40) return 3;
+  // 60점 이상: 4장 / 나머지: 3장
+  if (score >= 60) return MAX_CARDS;
   return INITIAL_CARDS;
 }
 
@@ -136,7 +136,7 @@ export default function HalliGalli({ onBack }: HalliGalliProps) {
     return {
       id: cardIdRef.current,
       fruit: randInt(FRUITS.length) as FruitId,
-      count: 1 + randInt(5),
+      count: 1 + randInt(MAX_PER_CARD),
     };
   }, []);
 

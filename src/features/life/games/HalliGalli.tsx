@@ -38,11 +38,11 @@ const SCORE_CORRECT = 10;
 const SCORE_WRONG = -10;
 const SCORE_MISSED = -5;
 
-const INITIAL_INTERVAL = 2800; // ms — 3장이라 인지 시간 필요
-const MIN_INTERVAL = 1200;
-const INTERVAL_PER_SCORE = 15; // 1점당 15ms씩 빨라짐
+const INITIAL_INTERVAL = 3500; // ms — 3장이라 인지 시간 필요
+const MIN_INTERVAL = 1800;
+const INTERVAL_PER_SCORE = 10; // 1점당 10ms씩 빨라짐
 
-const RESPONSE_WINDOW = 1700; // 3장 스캔 시간 고려
+const RESPONSE_WINDOW = 2500; // 3장 스캔 시간 고려
 const NEXT_DEAL_DELAY = 250; // 판정 후 다음 덱까지 짧은 간격
 
 const STORAGE_KEY = 'traindia-halli-best';

@@ -21,9 +21,9 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
   const swaps = useSwapStore((s) => s.swaps);
   const base = baseDate ?? today();
 
-  // 내근직 로그인 + 기관사 미선택 → 내일/모레 본인 근무 표시
+  // 내근직 로그인이면 driver 상태 무관하게 내일/모레 본인 근무 표시
   const officeCards = useMemo(() => {
-    if (driver || !authUser || !isOffice(authUser.sabun)) return null;
+    if (!authUser || !isOffice(authUser.sabun)) return null;
     return [1, 2].map((offset) => {
       const d = new Date(base);
       d.setDate(d.getDate() + offset);
@@ -33,7 +33,7 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
         duty: findDutyByName(authUser.name, d),
       };
     });
-  }, [driver, authUser, base]);
+  }, [authUser, base]);
 
   const cards = useMemo(() => {
     if (!driver) return [];

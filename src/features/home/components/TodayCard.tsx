@@ -82,11 +82,12 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     return false;
   }, [segInfo, schedule, now]);
 
+  // 내근직 로그인 → driver 상태 무관하게 항상 내근 근무 표시
+  if (authUser && isOffice(authUser.sabun)) {
+    return <DutyInfoCard selectedDate={selectedDate} hideTitle />;
+  }
+
   if (!driver || !dia) {
-    // 내근직으로 로그인한 경우 → 오늘의 내근 근무 표시
-    if (authUser && isOffice(authUser.sabun)) {
-      return <DutyInfoCard selectedDate={selectedDate} hideTitle />;
-    }
     return (
       <section className={styles.emptyCard} onClick={onEmptyClick} role={onEmptyClick ? 'button' : undefined} tabIndex={onEmptyClick ? 0 : undefined}>
         <TrainFront size={48} className={styles.emptyIcon} />

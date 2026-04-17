@@ -85,7 +85,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   if (!driver || !dia) {
     // 내근직으로 로그인한 경우 → 오늘의 내근 근무 표시
     if (authUser && isOffice(authUser.sabun)) {
-      return <DutyInfoCard selectedDate={selectedDate} />;
+      return <DutyInfoCard selectedDate={selectedDate} hideTitle />;
     }
     return (
       <section className={styles.emptyCard} onClick={onEmptyClick} role={onEmptyClick ? 'button' : undefined} tabIndex={onEmptyClick ? 0 : undefined}>

@@ -659,6 +659,32 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 내근직 내일/모레 카드 — 본인 배치 표시 */
+.officeDutyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-1);
+  flex-shrink: 0;
+  width: 80px;
+  line-height: 1.1;
+}
+
+.officeDutyLoc {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.officeDutyShift {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+}
+
+.officeDutyDay { color: var(--dia-blue); }
+.officeDutyNight { color: var(--dia-purple); }
+
 /* 내일/모레 타입별 좌측 3D 그라데이션 강조선 (pseudo-element로 border-radius 보존) */
 .statusCard.type_day::before,
 .statusCard.type_night::before,

@@ -7,9 +7,10 @@ import styles from '../styles/Home.module.css';
 
 interface DutyInfoCardProps {
   selectedDate?: Date;
+  hideTitle?: boolean;
 }
 
-export default function DutyInfoCard({ selectedDate }: DutyInfoCardProps) {
+export default function DutyInfoCard({ selectedDate, hideTitle }: DutyInfoCardProps) {
   const info = useMemo(() => {
     const d = selectedDate || today();
     return getDutyInfo(d);
@@ -24,11 +25,13 @@ export default function DutyInfoCard({ selectedDate }: DutyInfoCardProps) {
 
   return (
     <section className={styles.dutyInfoSection}>
-      <h3 className={styles.sectionTitle}>
-        {selectedDate && selectedDate.toDateString() !== today().toDateString()
-          ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 내근 근무`
-          : '오늘의 내근 근무'}
-      </h3>
+      {!hideTitle && (
+        <h3 className={styles.sectionTitle}>
+          {selectedDate && selectedDate.toDateString() !== today().toDateString()
+            ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 내근 근무`
+            : '오늘의 내근 근무'}
+        </h3>
+      )}
       <div className={styles.dutyInfoCard}>
         <table className={styles.dutyTable}>
           <thead>

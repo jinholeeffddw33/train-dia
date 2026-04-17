@@ -158,3 +158,23 @@ export function getDutyInfo(date: Date): DutyInfo {
 
   return { assignments, gwanje };
 }
+
+export type MyDuty =
+  | { location: '본소' | '기지' | '기지관제'; shift: '주간' | '야간' }
+  | 'off';
+
+/** 내근직 개인 근무 조회 — 이름으로 그 날짜의 배치 찾기 */
+export function findDutyByName(name: string, date: Date): MyDuty {
+  const info = getDutyInfo(date);
+  for (const a of info.assignments) {
+    if (a.manager === name || a.crew === name) {
+      return { location: a.location, shift: a.shift };
+    }
+  }
+  for (const g of info.gwanje) {
+    if (g.names[0] === name || g.names[1] === name) {
+      return { location: '기지관제', shift: g.shift };
+    }
+  }
+  return 'off';
+}

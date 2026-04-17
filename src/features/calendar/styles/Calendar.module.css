@@ -131,6 +131,32 @@
 .cellType_standby { color: var(--dia-amber); }
 .cellType_rest { color: var(--dia-gray); }
 
+/* 내근직 배지 — pill 형태로 눈에 띄게 */
+.cellOffice_day,
+.cellOffice_night,
+.cellOffice_rest {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1.2;
+}
+
+.cellOffice_day {
+  color: var(--dia-type-day);
+  background: var(--dia-type-day-bg);
+}
+
+.cellOffice_night {
+  color: var(--dia-type-night);
+  background: var(--dia-type-night-bg);
+}
+
+.cellOffice_rest {
+  color: var(--dia-type-rest);
+  background: var(--dia-type-rest-bg);
+}
+
 .memoDot {
   position: absolute;
   bottom: 4px;

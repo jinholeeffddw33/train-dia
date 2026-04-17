@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
+import { isOffice } from '@/lib/auth';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import SwapBottomSheet from './SwapBottomSheet';
@@ -16,7 +18,9 @@ function todayStr(): string {
 
 export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
+  const authUser = useAuthStore((s) => s.user);
   const cleanExpired = useSwapStore((s) => s.cleanExpired);
+  const officeMode = !!authUser && isOffice(authUser.sabun);
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
@@ -61,7 +65,7 @@ export default function CalendarTab() {
     setSwapTargetDate(null);
   };
 
-  if (!driver) {
+  if (!driver && !officeMode) {
     return (
       <div className={styles.empty}>
         <span className={styles.emptyIcon}>📅</span>
@@ -81,9 +85,9 @@ export default function CalendarTab() {
         <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
 
-      {/* 기관사 이름 */}
+      {/* 기관사/내근직 이름 */}
       <div className={styles.driverInfo}>
-        <span className={styles.driverName}>{driver.n}</span>
+        <span className={styles.driverName}>{officeMode ? authUser!.name : driver!.n}</span>
       </div>
 
       {/* 교번변경 모드 안내 배너 */}
@@ -105,19 +109,21 @@ export default function CalendarTab() {
         swapMode={swapMode}
       />
 
-      {/* 교번변경 버튼 */}
-      <div className={styles.swapBtnRow}>
-        <button
-          type="button"
-          className={`${styles.swapToggleBtn} ${swapMode ? styles.swapToggleBtnActive : ''}`}
-          onClick={toggleSwapMode}
-        >
-          {swapMode ? '변경 취소' : '교번변경'}
-        </button>
-      </div>
+      {/* 교번변경 버튼 — 내근직은 숨김 */}
+      {!officeMode && (
+        <div className={styles.swapBtnRow}>
+          <button
+            type="button"
+            className={`${styles.swapToggleBtn} ${swapMode ? styles.swapToggleBtnActive : ''}`}
+            onClick={toggleSwapMode}
+          >
+            {swapMode ? '변경 취소' : '교번변경'}
+          </button>
+        </div>
+      )}
 
-      {/* 선택된 날짜 상세 */}
-      {selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
+      {/* 선택된 날짜 상세 — 기관사만 */}
+      {!officeMode && selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
 
       {/* 월간 근무 요약 + 내근 근무 */}
       <MonthSummary />

@@ -2,8 +2,11 @@
 
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
+import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
+import { findDutyByName } from '@/lib/dutySchedule';
+import { isOffice } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
 import styles from '../styles/Calendar.module.css';
 
@@ -17,8 +20,10 @@ interface CalendarGridProps {
 
 export default function CalendarGrid({ year, month, selectedDate, onSelectDate, swapMode }: CalendarGridProps) {
   const driver = useDriverStore((s) => s.current);
+  const authUser = useAuthStore((s) => s.user);
   const memos = useMemoStore((s) => s.memos);
   const swaps = useSwapStore((s) => s.swaps);
+  const officeMode = !!authUser && isOffice(authUser.sabun);
 
   // 매 렌더마다 현재 날짜 계산 (자정 후에도 정확한 오늘 표시)
   const todayDate = new Date();
@@ -47,15 +52,38 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(year, month - 1, d);
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const originalDia = driver ? getDia(driver, date) : null;
-      const swap = swaps[dateStr] || null;
-      const isMySwap = swap && driver && swap.driverId === driver.I;
-      const dia = isMySwap ? swap.dia : originalDia;
-      const type = dia ? getType(dia) : null;
-      // 캘린더에서는 휴무 번호 표시 (휴37 등), 비번은 라벨만
-      const display = dia
-        ? (dia.startsWith('휴') ? dia : getDiaDisplay(dia))
-        : '';
+
+      let dia: string | null;
+      let type: string | null;
+      let display: string;
+      let isMySwap: boolean;
+
+      if (officeMode && authUser) {
+        // 내근직: 주/본, 야/기, 주/관, 비 형식 표시
+        const duty = findDutyByName(authUser.name, date);
+        if (duty === 'off') {
+          dia = 'off';
+          type = 'rest';
+          display = '비';
+        } else {
+          const shiftShort = duty.shift === '주간' ? '주' : '야';
+          const locShort = duty.location === '본소' ? '본' : duty.location === '기지' ? '기' : '관';
+          dia = `${shiftShort}/${locShort}`;
+          type = duty.shift === '주간' ? 'day' : 'night';
+          display = `${shiftShort}/${locShort}`;
+        }
+        isMySwap = false;
+      } else {
+        const originalDia = driver ? getDia(driver, date) : null;
+        const swap = swaps[dateStr] || null;
+        isMySwap = !!(swap && driver && swap.driverId === driver.I);
+        dia = isMySwap ? swap!.dia : originalDia;
+        type = dia ? getType(dia) : null;
+        // 캘린더에서는 휴무 번호 표시 (휴37 등), 비번은 라벨만
+        display = dia
+          ? (dia.startsWith('휴') ? dia : getDiaDisplay(dia))
+          : '';
+      }
       const hol = isHoliday(date);
       const hasMemo = !!memos[dateStr];
       const isToday = dateStr === todayStr;
@@ -82,7 +110,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       });
     }
     return result;
-  }, [driver, year, month, selectedDate, memos, swaps, todayStr]);
+  }, [driver, authUser, officeMode, year, month, selectedDate, memos, swaps, todayStr]);
 
   return (
     <div className={styles.grid}>
@@ -113,7 +141,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
               {cell.d}
             </span>
             {cell.type && (
-              <span className={`${styles.cellDia} ${cell.isSwapped ? styles.cellDiaSwapped : styles[`cellType_${cell.type}`]}`}>
+              <span className={`${styles.cellDia} ${cell.isSwapped ? styles.cellDiaSwapped : styles[officeMode ? `cellOffice_${cell.type}` : `cellType_${cell.type}`]}`}>
                 {cell.display}
               </span>
             )}

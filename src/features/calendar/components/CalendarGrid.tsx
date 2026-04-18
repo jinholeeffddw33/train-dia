@@ -77,10 +77,12 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
           display = '휴';
         } else {
           const shiftShort = duty.shift === '주간' ? '주' : '야';
-          const locShort = duty.location === '본소' ? '본' : duty.location === '기지' ? '기' : '관';
-          dia = `${shiftShort}/${locShort}`;
+          // 기지관제는 location 생략 (항상 관제라 중복)
+          const locSuffix = duty.location === '본소' ? '/본'
+            : duty.location === '기지' ? '/기' : '';
+          dia = `${shiftShort}${locSuffix}`;
           type = duty.shift === '주간' ? 'day' : 'night';
-          display = `${shiftShort}/${locShort}`;
+          display = `${shiftShort}${locSuffix}`;
         }
         isMySwap = false;
       } else {

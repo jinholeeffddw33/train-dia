@@ -94,7 +94,9 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
                   <span className={styles.statusCardDate}>{card.date}</span>
                 </div>
                 <div className={styles.officeDutyBox}>
-                  <span className={styles.officeDutyLoc}>{duty.location}</span>
+                  {duty.location !== '기지관제' && (
+                    <span className={styles.officeDutyLoc}>{duty.location}</span>
+                  )}
                   <span className={`${styles.officeDutyShift} ${shiftClass}`}>
                     {duty.shift}
                   </span>

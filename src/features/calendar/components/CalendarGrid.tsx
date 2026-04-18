@@ -62,15 +62,19 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       let isMySwap: boolean;
 
       if (officeMode) {
-        // 내근직: 주/본, 야/기, 주/관, 비 형식 표시
+        // 내근직: 주/본, 야/기, 주/관, 비(비번), 휴(휴무) 형식 표시
         const name = driver
           ? driver.n
           : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
         const duty = findDutyByName(name, date);
-        if (duty === 'off') {
-          dia = 'off';
-          type = 'rest';
+        if (duty === 'standby') {
+          dia = 'standby';
+          type = 'standby';
           display = '비';
+        } else if (duty === 'rest') {
+          dia = 'rest';
+          type = 'rest';
+          display = '휴';
         } else {
           const shiftShort = duty.shift === '주간' ? '주' : '야';
           const locShort = duty.location === '본소' ? '본' : duty.location === '기지' ? '기' : '관';

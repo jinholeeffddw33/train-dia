@@ -70,15 +70,17 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
       <div className={styles.statusCards}>
         {officeCards.map((card) => {
           const duty = card.duty;
-          if (duty === 'off') {
+          if (duty === 'standby' || duty === 'rest') {
+            const label = duty === 'standby' ? '비번' : '휴무';
+            const typeClass = duty === 'standby' ? styles.type_standby : styles.type_rest;
             return (
-              <div key={card.label} className={`${styles.statusCard} ${styles.type_rest}`}>
+              <div key={card.label} className={`${styles.statusCard} ${typeClass}`}>
                 <div className={styles.statusCardRow}>
                   <div className={styles.statusCardInfo}>
                     <span className={styles.statusCardLabel}>{card.label}</span>
                     <span className={styles.statusCardDate}>{card.date}</span>
                   </div>
-                  <span className={styles.statusCardDia}>휴무</span>
+                  <span className={styles.statusCardDia}>{label}</span>
                 </div>
               </div>
             );

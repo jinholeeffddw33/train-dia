@@ -161,7 +161,8 @@ export function getDutyInfo(date: Date): DutyInfo {
 
 export type MyDuty =
   | { location: '본소' | '기지' | '기지관제'; shift: '주간' | '야간' }
-  | 'off';
+  | 'standby'  // 비번 (야간 다음날)
+  | 'rest';    // 휴무
 
 /** 내근직 개인 근무 조회 — 이름으로 그 날짜의 배치 찾기 */
 export function findDutyByName(name: string, date: Date): MyDuty {
@@ -176,5 +177,18 @@ export function findDutyByName(name: string, date: Date): MyDuty {
       return { location: '기지관제', shift: g.shift };
     }
   }
-  return 'off';
+  // 근무 아님 → 조 소속 찾아서 pos로 비번/휴무 구분
+  // 8일 주기: [주간, 야간, 비번, 휴무, 주간, 야간, 비번, 휴무]
+  const daysSince = getDaysSinceRef(date);
+  for (const group of GROUPS) {
+    const inGroup =
+      group.gijiFirst.manager === name || group.gijiFirst.crew === name ||
+      group.bonsoFirst.manager === name || group.bonsoFirst.crew === name ||
+      group.gwanje[0] === name || group.gwanje[1] === name;
+    if (!inGroup) continue;
+    const pos = ((daysSince + group.offset) % 8 + 8) % 8;
+    if (pos === 2 || pos === 6) return 'standby';
+    if (pos === 3 || pos === 7) return 'rest';
+  }
+  return 'rest';
 }

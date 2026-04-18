@@ -134,6 +134,7 @@
 /* 내근직 배지 — pill 형태로 눈에 띄게 */
 .cellOffice_day,
 .cellOffice_night,
+.cellOffice_standby,
 .cellOffice_rest {
   font-size: var(--dia-text-sm);
   font-weight: 700;
@@ -150,6 +151,11 @@
 .cellOffice_night {
   color: var(--dia-type-night);
   background: var(--dia-type-night-bg);
+}
+
+.cellOffice_standby {
+  color: var(--dia-amber);
+  background: var(--dia-amber-dim, var(--dia-type-rest-bg));
 }
 
 .cellOffice_rest {

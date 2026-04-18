@@ -49,7 +49,7 @@ const GROUPS: GroupData[] = [
     offset: 5,
     gijiFirst: { manager: '김재범', crew: '정용식' },
     bonsoFirst: { manager: '조재홍', crew: '한태환' },
-    gwanje: ['신재윤', '이승훈'],
+    gwanje: ['신제윤', '이승훈'],
   },
 ];
 

@@ -20,7 +20,10 @@ export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
   const authUser = useAuthStore((s) => s.user);
   const cleanExpired = useSwapStore((s) => s.cleanExpired);
-  const officeMode = !!authUser && isOffice(authUser.sabun);
+  // 내근직 모드: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
+  const officeMode = driver
+    ? driver.I === '0'
+    : !!authUser && isOffice(authUser.sabun);
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
@@ -87,7 +90,7 @@ export default function CalendarTab() {
 
       {/* 기관사/내근직 이름 */}
       <div className={styles.driverInfo}>
-        <span className={styles.driverName}>{officeMode ? authUser!.name : driver!.n}</span>
+        <span className={styles.driverName}>{driver?.n ?? authUser?.name ?? ''}</span>
       </div>
 
       {/* 교번변경 모드 안내 배너 */}

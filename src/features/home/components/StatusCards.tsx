@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
-import { isOffice } from '@/lib/auth';
+import { isOffice, getOfficeName } from '@/lib/auth';
 import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today } from '@/lib/schedule';
 import { findDutyByName } from '@/lib/dutySchedule';
 import { useSwapStore } from '@/stores/swap';
@@ -21,19 +21,25 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
   const swaps = useSwapStore((s) => s.swaps);
   const base = baseDate ?? today();
 
-  // 내근직 로그인이면 driver 상태 무관하게 내일/모레 본인 근무 표시
+  // 내근직 모드: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
   const officeCards = useMemo(() => {
-    if (!authUser || !isOffice(authUser.sabun)) return null;
+    const isOfficeView = driver
+      ? driver.I === '0'
+      : !!authUser && isOffice(authUser.sabun);
+    if (!isOfficeView) return null;
+    const name = driver
+      ? driver.n
+      : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
     return [1, 2].map((offset) => {
       const d = new Date(base);
       d.setDate(d.getDate() + offset);
       return {
         label: offset === 1 ? '내일' : '모레',
         date: `${d.getMonth() + 1}/${d.getDate()}(${DOW[d.getDay()]})`,
-        duty: findDutyByName(authUser.name, d),
+        duty: findDutyByName(name, d),
       };
     });
-  }, [authUser, base]);
+  }, [driver, authUser, base]);
 
   const cards = useMemo(() => {
     if (!driver) return [];

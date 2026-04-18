@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { findDutyByName } from '@/lib/dutySchedule';
-import { isOffice } from '@/lib/auth';
+import { isOffice, getOfficeName } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
 import styles from '../styles/Calendar.module.css';
 
@@ -23,7 +23,10 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
   const authUser = useAuthStore((s) => s.user);
   const memos = useMemoStore((s) => s.memos);
   const swaps = useSwapStore((s) => s.swaps);
-  const officeMode = !!authUser && isOffice(authUser.sabun);
+  // 내근직 모드: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
+  const officeMode = driver
+    ? driver.I === '0'
+    : !!authUser && isOffice(authUser.sabun);
 
   // 매 렌더마다 현재 날짜 계산 (자정 후에도 정확한 오늘 표시)
   const todayDate = new Date();
@@ -58,9 +61,12 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       let display: string;
       let isMySwap: boolean;
 
-      if (officeMode && authUser) {
+      if (officeMode) {
         // 내근직: 주/본, 야/기, 주/관, 비 형식 표시
-        const duty = findDutyByName(authUser.name, date);
+        const name = driver
+          ? driver.n
+          : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
+        const duty = findDutyByName(name, date);
         if (duty === 'off') {
           dia = 'off';
           type = 'rest';

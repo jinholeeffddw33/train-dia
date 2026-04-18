@@ -82,8 +82,12 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     return false;
   }, [segInfo, schedule, now]);
 
-  // 내근직 로그인 → driver 상태 무관하게 항상 내근 근무 표시
-  if (authUser && isOffice(authUser.sabun)) {
+  // 내근직 모드 판정: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
+  const officeMode = driver
+    ? driver.I === '0'
+    : !!authUser && isOffice(authUser.sabun);
+
+  if (officeMode) {
     return <DutyInfoCard selectedDate={selectedDate} hideTitle />;
   }
 

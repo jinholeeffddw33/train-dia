@@ -93,3 +93,8 @@ export function isAdmin(sabun: string): boolean {
 export function isOffice(sabun: string): boolean {
   return EXTRA_USERS.some((u) => u.s === sabun);
 }
+
+/** 사번으로 EXTRA_USERS의 canonical name 조회 (dutySchedule과 매칭) */
+export function getOfficeName(sabun: string): string | null {
+  return EXTRA_USERS.find((u) => u.s === sabun)?.n ?? null;
+}

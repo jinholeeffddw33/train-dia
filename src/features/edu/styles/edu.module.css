@@ -4434,14 +4434,19 @@
 }
 
 .newcomerSubIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   margin-bottom: var(--dia-space-1);
+}
+
+.newcomerSubCard:active .newcomerSubIcon {
+  transform: scale(0.92);
+  transition: transform 0.12s ease;
 }
 
 .newcomerSubLabel {

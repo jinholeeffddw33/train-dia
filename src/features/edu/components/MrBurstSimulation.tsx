@@ -13,7 +13,20 @@ interface MrBurstSimulationProps {
 interface Valve { num: number; pos: 'top' | 'bottom' }
 interface Car { name: string; label: string; valves: Valve[] }
 
-const CARS: Car[] = [
+// ABB 차량: 원본 배치 (상·하 혼합)
+const CARS_ABB: Car[] = [
+  { name: 'TC1', label: '100대', valves: [{ num: 1, pos: 'bottom' }, { num: 2, pos: 'bottom' }] },
+  { name: 'M1',  label: '200대', valves: [{ num: 3, pos: 'top' },    { num: 4, pos: 'bottom' }] },
+  { name: 'M2',  label: '300대', valves: [{ num: 5, pos: 'top' },    { num: 6, pos: 'bottom' }] },
+  { name: 'M3',  label: '400대', valves: [{ num: 7, pos: 'top' },    { num: 8, pos: 'bottom' }] },
+  { name: 'M4',  label: '500대', valves: [{ num: 9, pos: 'top' },    { num: 10, pos: 'bottom' }] },
+  { name: 'M5',  label: '600대', valves: [{ num: 11, pos: 'top' },   { num: 12, pos: 'bottom' }] },
+  { name: 'M6',  label: '700대', valves: [{ num: 13, pos: 'top' },   { num: 14, pos: 'bottom' }] },
+  { name: 'TC2', label: '0대',   valves: [{ num: 15, pos: 'top' },   { num: 16, pos: 'top' }] },
+];
+
+// 우진/로템 차량: 100~700대 모두 아래쪽, 0대만 위쪽
+const CARS_ROTEM: Car[] = [
   { name: 'TC1', label: '100대', valves: [{ num: 1, pos: 'bottom' }, { num: 2, pos: 'bottom' }] },
   { name: 'M1',  label: '200대', valves: [{ num: 3, pos: 'bottom' }, { num: 4, pos: 'bottom' }] },
   { name: 'M2',  label: '300대', valves: [{ num: 5, pos: 'bottom' }, { num: 6, pos: 'bottom' }] },
@@ -23,6 +36,10 @@ const CARS: Car[] = [
   { name: 'M6',  label: '700대', valves: [{ num: 13, pos: 'bottom' }, { num: 14, pos: 'bottom' }] },
   { name: 'TC2', label: '0대',   valves: [{ num: 15, pos: 'top' },    { num: 16, pos: 'top' }] },
 ];
+
+function getCars(trainType: 'ABB' | '우진/로템'): Car[] {
+  return trainType === 'ABB' ? CARS_ABB : CARS_ROTEM;
+}
 
 /* ── 시나리오 정의 (16가지) ── */
 interface Scenario {
@@ -306,7 +323,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
               <div className={styles.mrTrainBody}>
                 {/* 열차 머리 (좌) */}
                 <div className={styles.mrTrainNose} />
-                {CARS.map((car, ci) => {
+                {getCars(scenario.trainType).map((car, ci) => {
                   const isRuptured = scenario.ruptureCars.includes(ci);
                   const topValves = car.valves.filter(v => v.pos === 'top');
                   const bottomValves = car.valves.filter(v => v.pos === 'bottom');
@@ -504,7 +521,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
 
                 {/* 미니 편성도 */}
                 <div className={styles.mrMiniDiagram}>
-                  {CARS.map((car, ci) => {
+                  {getCars(r.scenario.trainType).map((car, ci) => {
                     const isRuptured = r.scenario.ruptureCars.includes(ci);
                     return (
                       <div key={ci} className={styles.mrMiniCarCol}>

@@ -125,9 +125,9 @@ const ALL_SCENARIOS: Scenario[] = [
   {
     id: 'rotem-5', trainType: '우진/로템',
     ruptureDesc: '5500대(500대) 차량에서 주공기관 파열!',
-    ruptureCars: [4], correctCuts: [8, 9],
+    ruptureCars: [4], correctCuts: [8, 11],
     speedLimit: 60,
-    explanation: '우진/로템 500대 파열 → ⑧, ⑨ CUT.',
+    explanation: '우진/로템 500대 파열 → ⑧, ⑪ CUT으로 양쪽 격리.',
   },
   {
     id: 'rotem-6', trainType: '우진/로템',

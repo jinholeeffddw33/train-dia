@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Play } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Play, Eye } from 'lucide-react';
 import styles from '../styles/edu.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -33,17 +33,37 @@ const SOURCE_LABEL: Record<string, string> = {
 export default function VideoGuideList({ onBack }: VideoGuideListProps) {
   const [data, setData] = useState<VideoGuideData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch('/data/edu/video-guide.json')
       .then((r) => r.json())
       .then((json) => { setData(json); setLoading(false); })
       .catch(() => setLoading(false));
+
+    fetch('/api/edu/video-views')
+      .then((r) => r.ok ? r.json() : { counts: {} })
+      .then((json) => setViewCounts(json.counts || {}))
+      .catch(() => {});
   }, []);
 
   const sortedVideos = (data?.videos ?? []).slice().sort((a, b) => a.order - b.order);
 
-  const openVideo = (url: string) => {
+  const openVideo = (videoId: string, url: string) => {
+    // 조회 기록 전송 (유저당 영상당 1회만 카운트 — 서버에서 중복 처리)
+    fetch('/api/edu/video-views', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ videoId }),
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((res) => {
+        if (res && !res.duplicate) {
+          setViewCounts((prev) => ({ ...prev, [videoId]: (prev[videoId] ?? 0) + 1 }));
+        }
+      })
+      .catch(() => {});
+
     if (typeof window !== 'undefined') {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
@@ -83,7 +103,7 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                 <button
                   type="button"
                   className={styles.videoGuideCard}
-                  onClick={() => openVideo(video.url)}
+                  onClick={() => openVideo(video.id, video.url)}
                   aria-label={`${video.order}강 ${video.title} 재생`}
                 >
                   <div className={`${styles.videoGuideNumber} ${styles.iconBgBlue}`}>
@@ -97,12 +117,18 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                     {video.description && (
                       <div className={styles.videoGuideDesc}>{video.description}</div>
                     )}
-                    {video.source && (
-                      <div className={styles.videoGuideSource}>
-                        <ExternalLink size={12} />
-                        <span>{SOURCE_LABEL[video.source] ?? '외부 링크'}</span>
-                      </div>
-                    )}
+                    <div className={styles.videoGuideMeta}>
+                      {video.source && (
+                        <span className={styles.videoGuideSource}>
+                          <ExternalLink size={12} />
+                          <span>{SOURCE_LABEL[video.source] ?? '외부 링크'}</span>
+                        </span>
+                      )}
+                      <span className={styles.videoGuideViews}>
+                        <Eye size={12} />
+                        <span>{viewCounts[video.id] ?? 0}</span>
+                      </span>
+                    </div>
                   </div>
                 </button>
                 {idx < sortedVideos.length - 1 && (

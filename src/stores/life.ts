@@ -136,15 +136,51 @@ export const useLifeStore = create<LifeState>()((set, get) => ({
   },
 
   toggleLike: async (postId, name, sabun) => {
-    const res = await fetch(`/api/life/posts/${postId}/likes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, sabun }),
-    });
-    if (res.ok) {
-      const json = await res.json();
+    const current = get().posts.find((p) => p.id === postId);
+    if (!current) return;
+
+    // 낙관적 업데이트
+    const nextLiked = !current.likedByMe;
+    set((s) => ({
+      posts: s.posts.map((p) => p.id === postId ? {
+        ...p,
+        likedByMe: nextLiked,
+        likeCount: Math.max(0, p.likeCount + (nextLiked ? 1 : -1)),
+      } : p),
+    }));
+
+    // 샘플 게시물은 서버 호출 안 함 (DB에 없어서 count=1로 덮어써짐)
+    if (current.isSample) return;
+
+    try {
+      const res = await fetch(`/api/life/posts/${postId}/likes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, sabun }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        set((s) => ({
+          posts: s.posts.map((p) => p.id === postId ? { ...p, likeCount: json.likeCount, likedByMe: json.liked } : p),
+        }));
+      } else {
+        // 실패 시 원복
+        set((s) => ({
+          posts: s.posts.map((p) => p.id === postId ? {
+            ...p,
+            likedByMe: current.likedByMe,
+            likeCount: current.likeCount,
+          } : p),
+        }));
+      }
+    } catch {
+      // 네트워크 오류 시 원복
       set((s) => ({
-        posts: s.posts.map((p) => p.id === postId ? { ...p, likeCount: json.likeCount, likedByMe: json.liked } : p),
+        posts: s.posts.map((p) => p.id === postId ? {
+          ...p,
+          likedByMe: current.likedByMe,
+          likeCount: current.likeCount,
+        } : p),
       }));
     }
   },

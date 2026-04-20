@@ -392,11 +392,19 @@ function DetailView({ postId, name, sabun, onBack }: {
 }) {
   const post = useLifeStore((s) => s.posts.find((p) => p.id === postId) || null);
   const recordRead = useLifeStore((s) => s.recordRead);
+  const toggleLike = useLifeStore((s) => s.toggleLike);
+  const fetchPosts = useLifeStore((s) => s.fetchPosts);
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [cmts, setCmts] = useState<Array<{ id: string; comment: string; createdBy: string; createdAt: string }>>([]);
-  const [likeCount, setLikeCount] = useState(post?.likeCount ?? 0);
-  const [liked, setLiked] = useState(post?.likedByMe ?? false);
+
+  // 상세 진입 시 최신 좋아요/댓글 수 가져오기 (다른 사용자 변경 반영)
+  useEffect(() => {
+    if (post && !post.isSample) {
+      fetchPosts(post.category);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postId]);
 
   // 조회수 증가
   useEffect(() => {
@@ -429,17 +437,7 @@ function DetailView({ postId, name, sabun, onBack }: {
   const hasLink = post.linkUrl && post.linkUrl.length > 1;
 
   const handleLike = () => {
-    const nextLiked = !liked;
-    setLiked(nextLiked);
-    setLikeCount((c) => nextLiked ? c + 1 : Math.max(0, c - 1));
-    fetch(`/api/life/posts/${postId}/likes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, sabun }),
-    })
-      .then((r) => r.ok ? r.json() : null)
-      .then((json) => { if (json) { setLikeCount(json.likeCount); setLiked(json.liked); } })
-      .catch(() => {});
+    toggleLike(postId, name, sabun);
   };
 
   const handleComment = () => {
@@ -490,8 +488,8 @@ function DetailView({ postId, name, sabun, onBack }: {
             </a>
           )}
           <div className={styles.detailActions}>
-            <button type="button" className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ''}`} onClick={handleLike}>
-              {liked ? '❤️' : '🤍'} {likeCount}
+            <button type="button" className={`${styles.likeBtn} ${post.likedByMe ? styles.likeBtnActive : ''}`} onClick={handleLike}>
+              {post.likedByMe ? '❤️' : '🤍'} {post.likeCount}
             </button>
             <span className={styles.detailMeta}>💬 {cmts.length}</span>
             <span className={styles.detailMeta}>📖 {post.readCount ?? 0}명 읽음</span>

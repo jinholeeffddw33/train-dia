@@ -13,10 +13,11 @@ import RescueProcedure from './RescueProcedure';
 import RescueSimulation from './RescueSimulation';
 import MrBurstSimulation from './MrBurstSimulation';
 import NewcomerHome from './NewcomerHome';
+import VideoGuideList from './VideoGuideList';
 
 type EduView =
   | { type: 'home' }
-  | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[]; initTitle?: string }
+  | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[]; initTitle?: string; flatMode?: boolean }
   | { type: 'quiz'; chapter?: string }
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
@@ -26,7 +27,9 @@ type EduView =
   | { type: 'rescue-procedure' }
   | { type: 'rescue-simulation' }
   | { type: 'mr-burst' }
-  | { type: 'newcomer' };
+  | { type: 'newcomer' }
+  | { type: 'newcomer-video' }
+  | { type: 'newcomer-handbook' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -48,6 +51,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           initChapter={view.initChapter}
           initChapters={view.initChapters}
           initTitle={view.initTitle}
+          flatMode={view.flatMode}
         />
       );
     case 'quiz':
@@ -87,7 +91,19 @@ export default function EduTab({ onBack }: EduTabProps) {
       return (
         <NewcomerHome
           onBack={goHome}
-          onHandbook={() => setView({ type: 'study', initChapters: ['newcomer1', 'newcomer2', 'newcomer3'], initTitle: '신규 기관사 핸드북' })}
+          onVideo={() => setView({ type: 'newcomer-video' })}
+          onHandbook={() => setView({ type: 'newcomer-handbook' })}
+        />
+      );
+    case 'newcomer-video':
+      return <VideoGuideList onBack={() => setView({ type: 'newcomer' })} />;
+    case 'newcomer-handbook':
+      return (
+        <DocumentViewer
+          onBack={() => setView({ type: 'newcomer' })}
+          initChapters={['newcomer1', 'newcomer2', 'newcomer3']}
+          initTitle="새내기 핸드북"
+          flatMode
         />
       );
     default:

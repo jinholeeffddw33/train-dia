@@ -759,6 +759,16 @@
   background: var(--dia-surface-hover);
 }
 
+/* 플랫 모드: 챕터를 헤더로만 사용, 클릭 비활성 */
+.tocChapterHeader {
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tocChapterHeader:active {
+  background: none;
+}
+
 /* 3D 아이콘 배지 (목차용) */
 .tocChIconBadge {
   width: 36px;
@@ -4396,7 +4406,66 @@
   color: #fff;
 }
 
-/* ── 새내기 허브 화면 ── */
+/* ── 새내기 서브메뉴 (2-아이콘) ── */
+.newcomerSubMenu {
+  padding: var(--dia-space-4);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--dia-space-3);
+}
+
+.newcomerSubCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-5) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 160px;
+  transition: transform 0.15s ease;
+}
+
+.newcomerSubCard:active {
+  transform: scale(0.97);
+}
+
+.newcomerSubIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: var(--dia-space-1);
+}
+
+.newcomerSubLabel {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  text-align: center;
+}
+
+.newcomerSubMeta {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+
+/* 영상 가이드 부제 */
+.videoGuideSubtitle {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin: 0 0 var(--dia-space-2);
+  padding: 0 var(--dia-space-1);
+}
+
+/* ── 새내기 허브 화면 (구 버전, 일부 스타일 공용) ── */
 .newcomerBody {
   padding: var(--dia-space-4);
   display: flex;

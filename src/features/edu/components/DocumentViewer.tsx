@@ -22,6 +22,8 @@ interface DocumentViewerProps {
   initChapters?: string[];
   /** 아이콘 메뉴 진입 시 해당 메뉴 라벨을 제목으로 표시 */
   initTitle?: string;
+  /** 플랫 모드: 챕터 카드(토글) 대신 챕터 헤더만 표시, 섹션을 바로 리스트로 노출 */
+  flatMode?: boolean;
 }
 
 type ViewMode = 'toc' | 'section';
@@ -147,7 +149,7 @@ interface SearchResult {
   matchType: SearchMatchType;
 }
 
-export default function DocumentViewer({ onBack, initSection, initChapter, initChapters, initTitle }: DocumentViewerProps) {
+export default function DocumentViewer({ onBack, initSection, initChapter, initChapters, initTitle, flatMode }: DocumentViewerProps) {
   const [doc, setDoc] = useState<any>(null);
   const [mode, setMode] = useState<ViewMode>('toc');
   const [currentSection, setCurrentSection] = useState<string | null>(null);
@@ -554,7 +556,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
               ? doc.chapters.filter((ch: any) => initChapters.includes(ch.id))
               : doc.chapters.filter((ch: any) => !ch.hidden)
             ).map((ch: any, chIdx: number) => {
-              const isExpanded = expandedChapters.has(ch.id);
+              const isExpanded = flatMode ? true : expandedChapters.has(ch.id);
               const readCountInCh = ch.sections.filter((s: any) => readMap[s.id]).length;
               const color = CHAPTER_COLORS[chIdx % CHAPTER_COLORS.length];
               const ChIcon = getChapterIcon(ch.icon);
@@ -564,32 +566,60 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
 
               return (
                 <div key={ch.id} className={`${styles.tocChapter} ${ACCENT_BAR_MAP[color]}`}>
-                  <button type="button" className={styles.tocChapterBtn} onClick={() => toggleChapter(ch.id)}>
-                    <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
-                      <ChIcon size={18} />
-                    </span>
-                    <span className={styles.tocChBody}>
-                      <span className={styles.tocChTitle}>{ch.title}</span>
-                      {ch.sections.length > 0 && (
-                        <span className={styles.tocProgressRow}>
-                          <span className={styles.tocProgressTrack}>
-                            {/* STYLE-EXCEPTION: 동적 진도 퍼센트 — CSS만으로 표현 불가 */}
-                            <span
-                              className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
-                              style={{ width: `${progressPct}%` }}
-                              role="progressbar"
-                              aria-valuenow={progressPct}
-                              aria-valuemin={0}
-                              aria-valuemax={100}
-                            />
+                  {flatMode ? (
+                    <div className={`${styles.tocChapterBtn} ${styles.tocChapterHeader}`}>
+                      <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
+                        <ChIcon size={18} />
+                      </span>
+                      <span className={styles.tocChBody}>
+                        <span className={styles.tocChTitle}>{ch.title}</span>
+                        {ch.sections.length > 0 && (
+                          <span className={styles.tocProgressRow}>
+                            <span className={styles.tocProgressTrack}>
+                              <span
+                                className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
+                                style={{ width: `${progressPct}%` }}
+                                role="progressbar"
+                                aria-valuenow={progressPct}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                              />
+                            </span>
+                            <span className={styles.tocProgressLabel}>
+                              {readCountInCh}/{ch.sections.length}
+                            </span>
                           </span>
-                          <span className={styles.tocProgressLabel}>
-                            {readCountInCh}/{ch.sections.length}
+                        )}
+                      </span>
+                    </div>
+                  ) : (
+                    <button type="button" className={styles.tocChapterBtn} onClick={() => toggleChapter(ch.id)}>
+                      <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
+                        <ChIcon size={18} />
+                      </span>
+                      <span className={styles.tocChBody}>
+                        <span className={styles.tocChTitle}>{ch.title}</span>
+                        {ch.sections.length > 0 && (
+                          <span className={styles.tocProgressRow}>
+                            <span className={styles.tocProgressTrack}>
+                              {/* STYLE-EXCEPTION: 동적 진도 퍼센트 — CSS만으로 표현 불가 */}
+                              <span
+                                className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
+                                style={{ width: `${progressPct}%` }}
+                                role="progressbar"
+                                aria-valuenow={progressPct}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                              />
+                            </span>
+                            <span className={styles.tocProgressLabel}>
+                              {readCountInCh}/{ch.sections.length}
+                            </span>
                           </span>
-                        </span>
-                      )}
-                    </span>
-                  </button>
+                        )}
+                      </span>
+                    </button>
+                  )}
 
                   {isExpanded && (
                     <div className={styles.tocSections}>

@@ -96,11 +96,11 @@ export default function EduTab({ onBack }: EduTabProps) {
         />
       );
     case 'newcomer-video':
-      return <VideoGuideList onBack={() => setView({ type: 'newcomer' })} />;
+      return <VideoGuideList onBack={goHome} />;
     case 'newcomer-handbook':
       return (
         <DocumentViewer
-          onBack={() => setView({ type: 'newcomer' })}
+          onBack={goHome}
           initChapters={['newcomer1', 'newcomer2', 'newcomer3']}
           initTitle="새내기 핸드북"
           flatMode
@@ -123,7 +123,8 @@ export default function EduTab({ onBack }: EduTabProps) {
           onRescueProcedure={() => setView({ type: 'rescue-procedure' })}
           onRescueSimulation={() => setView({ type: 'rescue-simulation' })}
           onMrBurst={() => setView({ type: 'mr-burst' })}
-          onNewcomer={() => setView({ type: 'newcomer' })}
+          onNewcomerVideo={() => setView({ type: 'newcomer-video' })}
+          onNewcomerHandbook={() => setView({ type: 'newcomer-handbook' })}
         />
       );
   }

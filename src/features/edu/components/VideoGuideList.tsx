@@ -86,12 +86,14 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                   onClick={() => openVideo(video.url)}
                   aria-label={`${video.order}강 ${video.title} 재생`}
                 >
-                  <div className={styles.videoGuideNumber}>
-                    <Play size={18} fill="currentColor" />
-                    <span className={styles.videoGuideOrder}>{video.order}강</span>
+                  <div className={`${styles.videoGuideNumber} ${styles.iconBgBlue}`}>
+                    <Play size={26} fill="currentColor" strokeWidth={0} />
                   </div>
                   <div className={styles.videoGuideBody}>
-                    <div className={styles.videoGuideTitle}>{video.title}</div>
+                    <div className={styles.videoGuideTitle}>
+                      <span className={styles.videoGuideOrder}>{video.order}강</span>
+                      <span>{video.title}</span>
+                    </div>
                     {video.description && (
                       <div className={styles.videoGuideDesc}>{video.description}</div>
                     )}

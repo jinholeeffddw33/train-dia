@@ -1,0 +1,14 @@
+{
+  "title": "눈으로 보는 영상 가이드",
+  "subtitle": "새내기 기관사 필수 영상 · 순서대로 시청",
+  "videos": [
+    {
+      "id": "office-tour",
+      "order": 1,
+      "title": "우리 사무실 둘러보기",
+      "description": "답십리 승무사업소 사무실 소개",
+      "url": "https://cafe.naver.com/dapsimni5/39",
+      "source": "naver-cafe"
+    }
+  ]
+}

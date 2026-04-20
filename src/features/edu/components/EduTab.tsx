@@ -12,6 +12,7 @@ import TrainingList from './TrainingList';
 import RescueProcedure from './RescueProcedure';
 import RescueSimulation from './RescueSimulation';
 import MrBurstSimulation from './MrBurstSimulation';
+import NewcomerHome from './NewcomerHome';
 
 type EduView =
   | { type: 'home' }
@@ -24,7 +25,8 @@ type EduView =
   | { type: 'training' }
   | { type: 'rescue-procedure' }
   | { type: 'rescue-simulation' }
-  | { type: 'mr-burst' };
+  | { type: 'mr-burst' }
+  | { type: 'newcomer' };
 
 interface EduTabProps {
   onBack: () => void;
@@ -81,6 +83,13 @@ export default function EduTab({ onBack }: EduTabProps) {
       return <RescueSimulation onBack={goHome} />;
     case 'mr-burst':
       return <MrBurstSimulation onBack={goHome} />;
+    case 'newcomer':
+      return (
+        <NewcomerHome
+          onBack={goHome}
+          onHandbook={() => setView({ type: 'study', initChapters: ['newcomer1', 'newcomer2', 'newcomer3'], initTitle: '신규 기관사 핸드북' })}
+        />
+      );
     default:
       return (
         <EduHome
@@ -98,6 +107,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onRescueProcedure={() => setView({ type: 'rescue-procedure' })}
           onRescueSimulation={() => setView({ type: 'rescue-simulation' })}
           onMrBurst={() => setView({ type: 'mr-burst' })}
+          onNewcomer={() => setView({ type: 'newcomer' })}
         />
       );
   }

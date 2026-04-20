@@ -4395,3 +4395,188 @@
   background: var(--dia-red);
   color: #fff;
 }
+
+/* ── 새내기 허브 화면 ── */
+.newcomerBody {
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+}
+
+.newcomerSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.newcomerSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: 0 var(--dia-space-1);
+}
+
+.newcomerSectionIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--dia-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.newcomerSectionTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.newcomerSectionLabel {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.newcomerSectionSub {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+
+.newcomerEmpty {
+  padding: var(--dia-space-5);
+  background: var(--dia-bg);
+  border-radius: var(--dia-radius-lg);
+  text-align: center;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+}
+
+/* ── 영상 가이드 리스트 ── */
+.videoGuideList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.videoGuideItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.videoGuideCard {
+  display: flex;
+  align-items: stretch;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  transition: transform 0.15s ease;
+  min-height: 76px;
+}
+
+.videoGuideCard:active {
+  transform: scale(0.98);
+}
+
+.videoGuideNumber {
+  flex-shrink: 0;
+  width: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  color: #fff;
+  border-radius: var(--dia-radius-md);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-blue-glow);
+}
+
+.videoGuideOrder {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-bold);
+  letter-spacing: -0.3px;
+}
+
+.videoGuideBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.videoGuideTitle {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  line-height: 1.3;
+}
+
+.videoGuideDesc {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.4;
+}
+
+.videoGuideSource {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--dia-text-tertiary);
+  margin-top: 2px;
+}
+
+.videoGuideConnector {
+  width: 2px;
+  height: 12px;
+  background: var(--dia-border-light);
+  margin-left: 32px;
+  align-self: flex-start;
+}
+
+/* ── 신규 기관사 핸드북 카드 ── */
+.newcomerHandbookCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  transition: transform 0.15s ease;
+  min-height: 72px;
+}
+
+.newcomerHandbookCard:active {
+  transform: scale(0.98);
+}
+
+.newcomerHandbookText {
+  flex: 1;
+  min-width: 0;
+}
+
+.newcomerHandbookLabel {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.newcomerHandbookSub {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}

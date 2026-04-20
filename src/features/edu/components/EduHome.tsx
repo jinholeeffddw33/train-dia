@@ -27,6 +27,7 @@ interface EduHomeProps {
   onRescueProcedure: () => void;
   onRescueSimulation: () => void;
   onMrBurst: () => void;
+  onNewcomer: () => void;
 }
 
 const MENU_ITEMS = [
@@ -34,7 +35,7 @@ const MENU_ITEMS = [
   { id: 'announce', label: '안내방송', icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
   { id: 'train',    label: '전동차',   icon: TrainFront,    color: 'green'  as const, action: 'chapters' as const, targets: ['ch2', 'ch6'] },
   { id: 'repair',   label: '고장조치', icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
-  { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'chapters' as const, targets: ['newcomer1'] },
+  { id: 'door',     label: '새내기',   icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer' as const, targets: [] },
   { id: 'edu',      label: '교육훈련', icon: GraduationCap, color: 'blue'   as const, action: 'training' as const, targets: [] },
   { id: 'exam',     label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',   label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
@@ -63,7 +64,7 @@ function scoreGradeClass(score: number): string {
   return styles.gradeRed;
 }
 
-export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onChapters, onMyInfo, onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz, onChapter, onChapters, onMyInfo, onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomer }: EduHomeProps) {
   const {
     readCount, totalQuizzes, bestScore, latestScore, previousScore,
     streak, avgScore, progress, wrongCount, unresolvedWrongCount,
@@ -135,6 +136,7 @@ export default function EduHome({ onBack, onStudy, onQuiz, onSection, onWrongRev
       case 'training': onTraining(); break;
       case 'quiz':    onQuiz(); break;
       case 'myinfo':  onMyInfo(); break;
+      case 'newcomer': onNewcomer(); break;
     }
   };
 

@@ -1,6 +1,9 @@
 /* ===== Duty Tab — 근무 현황 ===== */
 
-.container { padding: var(--dia-space-4); }
+.container {
+  padding: var(--dia-space-4);
+  padding-top: calc(var(--dia-space-4) + env(safe-area-inset-top, 0px));
+}
 
 /* ── Notice Banner (공지 팝업) ── */
 .noticeBanner {

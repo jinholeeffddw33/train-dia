@@ -44,7 +44,7 @@ export default function NewcomerHome({ onBack, onVideo, onHandbook }: NewcomerHo
       <div className={styles.newcomerSubMenu}>
         <button type="button" className={styles.newcomerSubCard} onClick={onVideo}>
           <div className={`${styles.newcomerSubIcon} ${styles.iconBgBlue}`}>
-            <Eye size={32} />
+            <Eye size={26} />
           </div>
           <div className={styles.newcomerSubLabel}>영상 가이드</div>
           <div className={styles.newcomerSubMeta}>
@@ -54,7 +54,7 @@ export default function NewcomerHome({ onBack, onVideo, onHandbook }: NewcomerHo
 
         <button type="button" className={styles.newcomerSubCard} onClick={onHandbook}>
           <div className={`${styles.newcomerSubIcon} ${styles.iconBgAmber}`}>
-            <BookOpen size={32} />
+            <BookOpen size={26} />
           </div>
           <div className={styles.newcomerSubLabel}>새내기 핸드북</div>
           <div className={styles.newcomerSubMeta}>

@@ -15,13 +15,13 @@ interface Car { name: string; label: string; valves: Valve[] }
 
 const CARS: Car[] = [
   { name: 'TC1', label: '100대', valves: [{ num: 1, pos: 'bottom' }, { num: 2, pos: 'bottom' }] },
-  { name: 'M1',  label: '200대', valves: [{ num: 3, pos: 'top' },    { num: 4, pos: 'bottom' }] },
-  { name: 'M2',  label: '300대', valves: [{ num: 5, pos: 'top' },    { num: 6, pos: 'bottom' }] },
-  { name: 'M3',  label: '400대', valves: [{ num: 7, pos: 'top' },    { num: 8, pos: 'bottom' }] },
-  { name: 'M4',  label: '500대', valves: [{ num: 9, pos: 'top' },    { num: 10, pos: 'bottom' }] },
-  { name: 'M5',  label: '600대', valves: [{ num: 11, pos: 'top' },   { num: 12, pos: 'bottom' }] },
-  { name: 'M6',  label: '700대', valves: [{ num: 13, pos: 'top' },   { num: 14, pos: 'bottom' }] },
-  { name: 'TC2', label: '0대',   valves: [{ num: 15, pos: 'top' },   { num: 16, pos: 'top' }] },
+  { name: 'M1',  label: '200대', valves: [{ num: 3, pos: 'bottom' }, { num: 4, pos: 'bottom' }] },
+  { name: 'M2',  label: '300대', valves: [{ num: 5, pos: 'bottom' }, { num: 6, pos: 'bottom' }] },
+  { name: 'M3',  label: '400대', valves: [{ num: 7, pos: 'bottom' }, { num: 8, pos: 'bottom' }] },
+  { name: 'M4',  label: '500대', valves: [{ num: 9, pos: 'bottom' }, { num: 10, pos: 'bottom' }] },
+  { name: 'M5',  label: '600대', valves: [{ num: 11, pos: 'bottom' }, { num: 12, pos: 'bottom' }] },
+  { name: 'M6',  label: '700대', valves: [{ num: 13, pos: 'bottom' }, { num: 14, pos: 'bottom' }] },
+  { name: 'TC2', label: '0대',   valves: [{ num: 15, pos: 'top' },    { num: 16, pos: 'top' }] },
 ];
 
 /* ── 시나리오 정의 (16가지) ── */
@@ -125,9 +125,9 @@ const ALL_SCENARIOS: Scenario[] = [
   {
     id: 'rotem-5', trainType: '우진/로템',
     ruptureDesc: '5500대(500대) 차량에서 주공기관 파열!',
-    ruptureCars: [4], correctCuts: [8, 11],
+    ruptureCars: [4], correctCuts: [8, 9],
     speedLimit: 60,
-    explanation: '우진/로템 500대 파열 → ⑧, ⑪ CUT으로 양쪽 격리.',
+    explanation: '우진/로템 500대 파열 → ⑧, ⑨ CUT.',
   },
   {
     id: 'rotem-6', trainType: '우진/로템',

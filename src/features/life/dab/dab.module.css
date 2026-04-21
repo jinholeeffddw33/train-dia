@@ -531,3 +531,337 @@
 .bonsaiNight .bonsaiStartBtn {
   background: linear-gradient(145deg, #4ade80, #22c55e);
 }
+
+/* ───────────────────── 확장: 포인트 게이지 / 계절 / 도감 ───────────────────── */
+.bonsaiProgressBar {
+  position: relative;
+  margin: 0 16px 4px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 3;
+}
+
+.bonsaiNight .bonsaiProgressBar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.bonsaiProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.bonsaiProgressText {
+  position: absolute;
+  top: -3px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.bonsaiNight .bonsaiProgressText {
+  color: #cbd5e1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* 날씨 뱃지 */
+.weatherBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 4px 16px 0;
+  padding: 3px 10px;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  backdrop-filter: blur(6px);
+  z-index: 3;
+  position: relative;
+}
+
+.bonsaiNight .weatherBadge {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.weatherDusty {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #b91c1c !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.bonsaiNight .weatherDusty {
+  color: #fca5a5 !important;
+}
+
+/* 계절별 배경 */
+.season_spring {
+  background: linear-gradient(to bottom, #fff7f9, #fef3f6) !important;
+}
+.season_summer {
+  background: linear-gradient(to bottom, #f0fdf4, #ecfccb) !important;
+}
+.season_autumn {
+  background: linear-gradient(to bottom, #fff7ed, #fed7aa) !important;
+}
+.season_winter {
+  background: linear-gradient(to bottom, #f0f9ff, #e0f2fe) !important;
+}
+
+.bonsaiNight.season_spring,
+.bonsaiNight.season_summer,
+.bonsaiNight.season_autumn,
+.bonsaiNight.season_winter {
+  background: linear-gradient(to bottom, #0f172a, #1e1b3a) !important;
+}
+
+.seasonParticles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.rainEffect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* 완성 팝업 */
+.bonsaiCompleted {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 32px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #f59e0b;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.45);
+  z-index: 10;
+}
+
+.bonsaiCompletedEmoji {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.bonsaiCompletedTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #92400e;
+}
+
+.bonsaiCompletedSub {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+/* 하단 컨트롤 그룹 */
+.bonsaiActions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+
+.bonsaiCollectionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(6px);
+}
+
+.bonsaiNight .bonsaiCollectionBtn {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+.bonsaiCollectionBtn:active {
+  transform: scale(0.95);
+}
+
+/* ───────────────────── 도감 ───────────────────── */
+.collectionWrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(to bottom, #faf7f0, #f5f0e6);
+  color: #1e293b;
+  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+}
+
+:root.dark .collectionWrap {
+  background: linear-gradient(to bottom, #0f172a, #1e1b3a);
+  color: #e2e8f0;
+}
+
+.collectionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.collectionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+:root.dark .collectionCard {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.collectionCard:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.collectionCard:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+
+.collectionCard.completed {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.08), rgba(255, 255, 255, 0.85));
+}
+
+:root.dark .collectionCard.completed {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.15), rgba(30, 41, 59, 0.7));
+}
+
+.collectionCard.current {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.collectionIcon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.collectionEmoji {
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.collectionLock {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #475569;
+  border: 2px solid var(--dia-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.collectionCheck {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid var(--dia-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.collectionName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+:root.dark .collectionName {
+  color: #e2e8f0;
+}
+
+.collectionTheme {
+  font-size: 10px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.3;
+  min-height: 26px;
+}
+
+:root.dark .collectionTheme {
+  color: #94a3b8;
+}
+
+.collectionCurrent {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 999px;
+}

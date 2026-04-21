@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ArrowLeft, ExternalLink, Play, Eye } from 'lucide-react';
+import { useBonsaiStore } from '@/stores/bonsai';
 import styles from '../styles/edu.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -60,6 +61,8 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
       .then((res) => {
         if (res && !res.duplicate) {
           setViewCounts((prev) => ({ ...prev, [videoId]: (prev[videoId] ?? 0) + 1 }));
+          // 첫 시청 시 분재 성장 (연료 공급)
+          try { useBonsaiStore.getState().recordVideoComplete(); } catch { /* ignore */ }
         }
       })
       .catch(() => {});

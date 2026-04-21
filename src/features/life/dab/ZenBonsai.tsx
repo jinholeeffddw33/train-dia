@@ -2,17 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Leaf, Sparkles, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Leaf, Sparkles, RotateCcw, Library, CloudRain, Sun, Cloud, Snowflake } from 'lucide-react';
+import { getPlant, currentSeason, seasonLabel, type Plant, type Season } from './plants';
+import { useBonsaiStore, POINTS_PER_LEVEL, MAX_LEVEL } from '@/stores/bonsai';
+import { useSeoulWeather } from '@/features/home/hooks/useWeather';
+import BonsaiCollection from './BonsaiCollection';
 import styles from './dab.module.css';
 
 interface ZenBonsaiProps { onBack: () => void }
-
-/* ── 저장 키 ── */
-const STORAGE_KEY_LEVEL = 'life-bonsai-level';
-const STORAGE_KEY_LAST  = 'life-bonsai-last-grown';
-
-/* ── 성장 단계 (0~9) ── */
-const MAX_LEVEL = 9;
 
 /* ── 격려 메시지 ── */
 const ENCOURAGEMENTS = [
@@ -28,149 +25,101 @@ const ENCOURAGEMENTS = [
   '당신의 수고 덕분입니다',
 ];
 
-/* ── 밤 시간 판별 (22~06) ── */
+/** 밤 시간 판별 (22~06) */
 function isNightTime(): boolean {
   const h = new Date().getHours();
   return h >= 22 || h < 6;
 }
 
-/* ── 호흡 세션 길이 (초) ── */
 const BREATH_SESSION = 60;
 
-/* ── 반딧불 위치/속도 (고정 시드) ── */
+/* 반딧불 (고정 시드) */
 const FIREFLIES = Array.from({ length: 10 }, (_, i) => ({
   id: i,
-  cx: 20 + Math.random() * 280,
-  cy: 60 + Math.random() * 240,
-  delay: Math.random() * 4,
-  duration: 5 + Math.random() * 4,
+  cx: 20 + (i * 31 + 17) % 280,
+  cy: 60 + (i * 47 + 23) % 240,
+  delay: (i * 0.7) % 4,
+  duration: 5 + (i * 0.9) % 4,
+}));
+
+/* 꽃잎·낙엽·눈송이 파티클 (계절별) */
+const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  x: (i * 22 + 13) % 320,
+  delay: (i * 0.5) % 6,
+  duration: 8 + (i * 0.7) % 4,
+  size: 5 + (i % 4) * 1.5,
 }));
 
 /* ─────────────────────────────── 트리 SVG ─────────────────────────────── */
-function BonsaiTree({ level, night }: { level: number; night: boolean }) {
-  const leafColor = night ? '#86efac' : '#4ade80';
-  const leafColorAlt = night ? '#bbf7d0' : '#22c55e';
-  const trunkColor = night ? '#e2e8f0' : '#334155';
+function BonsaiTree({ level, plant, night }: { level: number; plant: Plant; night: boolean }) {
+  const leafColor = plant.leafColor;
+  const leafColorAlt = plant.leafColorAlt;
+  const trunkColor = night ? '#cbd5e1' : plant.trunkColor;
   const soilColor = night ? '#78716c' : '#57534e';
   const potColor = night ? '#44403c' : '#292524';
-
-  /* 잎사귀 설정 — 레벨에 따라 개수 증가 */
-  const leafCount = Math.max(0, level - 1) * 3 + (level > 0 ? 2 : 0);
+  const isBamboo = plant.id === 'bamboo';
 
   return (
     <svg viewBox="0 0 320 360" className={styles.bonsaiSvg} fill="none" aria-hidden>
-      {/* ── 화분 ── */}
-      <motion.g
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        {/* 화분 본체 (테이퍼 사다리꼴) */}
-        <path
-          d="M90 310 L100 340 L220 340 L230 310 Z"
-          fill={potColor}
-          opacity="0.85"
-        />
-        {/* 화분 위 가장자리 */}
+      {/* 화분 */}
+      <motion.g initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+        <path d="M90 310 L100 340 L220 340 L230 310 Z" fill={potColor} opacity="0.85" />
         <ellipse cx="160" cy="310" rx="72" ry="6" fill={potColor} />
-        {/* 흙 */}
         <ellipse cx="160" cy="310" rx="68" ry="4" fill={soilColor} />
       </motion.g>
 
-      {/* ── 씨앗 (레벨 0) ── */}
+      {/* 씨앗 (레벨 0) */}
       {level === 0 && (
-        <motion.ellipse
-          cx="160"
-          cy="308"
-          rx="5"
-          ry="3"
-          fill={night ? '#92400e' : '#78350f'}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6 }}
-        />
+        <motion.ellipse cx="160" cy="308" rx="5" ry="3" fill={night ? '#92400e' : '#78350f'}
+          initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.6 }} />
       )}
 
-      {/* ── 새싹 (레벨 1) ── */}
+      {/* 새싹 (레벨 1) */}
       {level >= 1 && (
-        <motion.g
-          initial={{ opacity: 0, scaleY: 0 }}
-          animate={{ opacity: 1, scaleY: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          style={{ transformOrigin: '160px 310px' }}
-        >
-          {/* 작은 줄기 */}
+        <motion.g initial={{ opacity: 0, scaleY: 0 }} animate={{ opacity: 1, scaleY: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }} style={{ transformOrigin: '160px 310px' }}>
           <path
-            d={level === 1
-              ? 'M160 310 Q 158 300 160 290'
-              : 'M160 310 Q 156 280 160 250'}
-            stroke={trunkColor}
-            strokeWidth={level === 1 ? '2' : '3'}
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.9"
+            d={level === 1 ? 'M160 310 Q 158 300 160 290' : 'M160 310 Q 156 280 160 250'}
+            stroke={trunkColor} strokeWidth={level === 1 ? '2' : '3'}
+            strokeLinecap="round" fill="none" opacity="0.9"
           />
         </motion.g>
       )}
 
-      {/* ── 나무 줄기 (레벨 2+) ── */}
+      {/* 나무 줄기 + 가지 (레벨 2+) */}
       {level >= 2 && (
-        <motion.g
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          {/* 메인 줄기 — 수묵화 필치처럼 굵기 변화 */}
-          <path
-            d="M160 310 Q 155 275 158 240 Q 162 210 160 180"
-            stroke={trunkColor}
-            strokeWidth="6"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* 가지 (레벨 3+) */}
-          {level >= 3 && (
+        <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+          {/* 메인 줄기 */}
+          {isBamboo ? (
             <>
-              <path
-                d="M158 240 Q 140 230 120 215"
-                stroke={trunkColor}
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M160 220 Q 180 210 200 195"
-                stroke={trunkColor}
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-              />
+              <path d="M155 310 L153 180" stroke={trunkColor} strokeWidth="5" fill="none" strokeLinecap="round" />
+              <path d="M165 310 L167 180" stroke={trunkColor} strokeWidth="5" fill="none" strokeLinecap="round" />
+              {/* 마디 */}
+              {[290, 260, 230, 200].map((y, i) => (
+                <rect key={i} x="148" y={y - 2} width="25" height="3" fill={trunkColor} opacity="0.7" rx="1" />
+              ))}
             </>
+          ) : (
+            <path
+              d="M160 310 Q 155 275 158 240 Q 162 210 160 180"
+              stroke={trunkColor} strokeWidth="6" strokeLinecap="round" fill="none"
+            />
           )}
 
-          {/* 추가 가지 (레벨 5+) */}
-          {level >= 5 && (
+          {level >= 3 && !isBamboo && (
             <>
-              <path
-                d="M158 195 Q 140 180 125 165"
-                stroke={trunkColor}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M160 180 Q 180 165 195 155"
-                stroke={trunkColor}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                fill="none"
-              />
+              <path d="M158 240 Q 140 230 120 215" stroke={trunkColor} strokeWidth="3" strokeLinecap="round" fill="none" />
+              <path d="M160 220 Q 180 210 200 195" stroke={trunkColor} strokeWidth="3" strokeLinecap="round" fill="none" />
             </>
           )}
-
-          {/* 상단 잔가지 (레벨 7+) */}
-          {level >= 7 && (
+          {level >= 5 && !isBamboo && (
+            <>
+              <path d="M158 195 Q 140 180 125 165" stroke={trunkColor} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <path d="M160 180 Q 180 165 195 155" stroke={trunkColor} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            </>
+          )}
+          {level >= 7 && !isBamboo && (
             <>
               <path d="M160 180 Q 150 160 145 145" stroke={trunkColor} strokeWidth="2" strokeLinecap="round" fill="none" />
               <path d="M160 180 Q 170 160 175 145" stroke={trunkColor} strokeWidth="2" strokeLinecap="round" fill="none" />
@@ -179,10 +128,9 @@ function BonsaiTree({ level, night }: { level: number; night: boolean }) {
         </motion.g>
       )}
 
-      {/* ── 잎사귀 군집 ── */}
+      {/* 잎사귀 군집 */}
       {level >= 2 && (
         <g>
-          {/* 잎사귀 클러스터 위치 — 레벨에 따라 노출 */}
           {[
             { cx: 120, cy: 215, r: 14, minLv: 3 },
             { cx: 200, cy: 195, r: 16, minLv: 3 },
@@ -195,62 +143,29 @@ function BonsaiTree({ level, night }: { level: number; night: boolean }) {
             { cx: 135, cy: 195, r: 10, minLv: 4 },
             { cx: 185, cy: 175, r: 11, minLv: 6 },
           ].filter(c => level >= c.minLv).map((c, i) => (
-            <motion.g
-              key={i}
-              style={{ transformOrigin: `${c.cx}px ${c.cy}px` }}
-              animate={{
-                rotate: [0, 2.5, -2, 1.5, 0],
-              }}
-              transition={{
-                duration: 4 + (i % 3),
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: i * 0.2,
-              }}
-            >
-              <circle
-                cx={c.cx}
-                cy={c.cy}
-                r={c.r}
-                fill={leafColor}
-                opacity="0.7"
-              />
-              <circle
-                cx={c.cx - c.r * 0.3}
-                cy={c.cy - c.r * 0.2}
-                r={c.r * 0.7}
-                fill={leafColorAlt}
-                opacity="0.55"
-              />
+            <motion.g key={i} style={{ transformOrigin: `${c.cx}px ${c.cy}px` }}
+              animate={{ rotate: [0, 2.5, -2, 1.5, 0] }}
+              transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}>
+              <circle cx={c.cx} cy={c.cy} r={c.r} fill={leafColor} opacity="0.78" />
+              <circle cx={c.cx - c.r * 0.3} cy={c.cy - c.r * 0.2} r={c.r * 0.7} fill={leafColorAlt} opacity="0.6" />
             </motion.g>
           ))}
         </g>
       )}
 
-      {/* ── 꽃 (레벨 8+) ── */}
-      {level >= 8 && (
+      {/* 꽃 (레벨 6+, 식물이 flowerColor 있을 때) */}
+      {level >= 6 && plant.flowerColor && (
         <g>
           {[
-            { cx: 155, cy: 200 },
-            { cx: 170, cy: 170 },
-            { cx: 140, cy: 175 },
-            { cx: 180, cy: 200 },
-          ].map((f, i) => (
-            <motion.circle
-              key={i}
-              cx={f.cx}
-              cy={f.cy}
-              r="3"
-              fill={night ? '#fda4af' : '#f472b6'}
+            { cx: 155, cy: 200 }, { cx: 170, cy: 170 }, { cx: 140, cy: 175 }, { cx: 180, cy: 200 },
+            { cx: 130, cy: 200, minLv: 7 }, { cx: 195, cy: 180, minLv: 7 },
+          ].filter(f => level >= (f.minLv ?? 6)).map((f, i) => (
+            <motion.circle key={i} cx={f.cx} cy={f.cy} r="3.5" fill={plant.flowerColor!}
               animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
-            />
+              transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }} />
           ))}
         </g>
       )}
-
-      {/* 기이 표시 (leafCount 변수 사용 회피 경고 방지용) */}
-      {leafCount > 0 && <g />}
     </svg>
   );
 }
@@ -260,25 +175,49 @@ function Fireflies() {
   return (
     <svg className={styles.bonsaiFireflies} viewBox="0 0 320 360" aria-hidden>
       {FIREFLIES.map((f) => (
-        <motion.circle
-          key={f.id}
-          cx={f.cx}
-          cy={f.cy}
-          r="2.5"
-          fill="#fde68a"
+        <motion.circle key={f.id} cx={f.cx} cy={f.cy} r="2.5" fill="#fde68a"
           animate={{
             opacity: [0, 0.9, 0.2, 0.8, 0],
             cx: [f.cx, f.cx + 20, f.cx - 15, f.cx + 10, f.cx],
             cy: [f.cy, f.cy - 15, f.cy + 10, f.cy - 8, f.cy],
           }}
-          transition={{
-            duration: f.duration,
-            repeat: Infinity,
-            delay: f.delay,
-            ease: 'easeInOut',
+          transition={{ duration: f.duration, repeat: Infinity, delay: f.delay, ease: 'easeInOut' }}
+          style={{ filter: 'drop-shadow(0 0 4px #fcd34d)' }} />
+      ))}
+    </svg>
+  );
+}
+
+/* ─────────────────────────────── 계절 파티클 ─────────────────────────────── */
+function SeasonParticles({ season }: { season: Season }) {
+  if (season === 'summer') return null;
+
+  const particleColor =
+    season === 'spring' ? '#fbcfe8' :  // 벚꽃
+    season === 'autumn' ? '#fb923c' :  // 낙엽
+    '#e2e8f0';                          // 눈
+
+  return (
+    <svg className={styles.seasonParticles} viewBox="0 0 320 420" aria-hidden>
+      {PARTICLES.map((p) => (
+        <motion.circle
+          key={p.id}
+          cx={p.x}
+          cy={-10}
+          r={p.size}
+          fill={particleColor}
+          opacity={0.7}
+          animate={{
+            cy: [-10, 430],
+            cx: [p.x, p.x + 20, p.x - 15, p.x + 10],
+            rotate: [0, 180, 360],
+            opacity: [0, 0.8, 0.8, 0],
           }}
-          style={{
-            filter: 'drop-shadow(0 0 4px #fcd34d)',
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: 'linear',
           }}
         />
       ))}
@@ -286,65 +225,116 @@ function Fireflies() {
   );
 }
 
+/* ─────────────────────────────── 날씨 효과 ─────────────────────────────── */
+function RainEffect() {
+  return (
+    <svg className={styles.rainEffect} viewBox="0 0 320 420" aria-hidden>
+      {Array.from({ length: 18 }, (_, i) => {
+        const x = (i * 19 + 7) % 320;
+        const delay = (i * 0.15) % 1.5;
+        return (
+          <motion.line
+            key={i}
+            x1={x}
+            x2={x - 4}
+            y1={-20}
+            y2={0}
+            stroke="#93c5fd"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity={0.6}
+            animate={{
+              y1: [-20, 440],
+              y2: [0, 460],
+            }}
+            transition={{
+              duration: 1.1,
+              repeat: Infinity,
+              delay,
+              ease: 'linear',
+            }}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
 /* ─────────────────────────────── 메인 ─────────────────────────────── */
 export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
-  const [level, setLevel] = useState(0);
+  const {
+    currentPlantId, level, points, collection,
+    lastReason, streak,
+    completeBreath, dailyCheckin, recordTap, switchPlant, resetCurrent,
+  } = useBonsaiStore();
+
+  const plant = getPlant(currentPlantId);
+  const season = currentSeason();
+  const weather = useSeoulWeather();
+
   const [night, setNight] = useState(false);
   const [breathing, setBreathing] = useState(false);
   const [remaining, setRemaining] = useState(BREATH_SESSION);
   const [message, setMessage] = useState<string | null>(null);
   const [justGrew, setJustGrew] = useState(false);
+  const [completedPopup, setCompletedPopup] = useState(false);
+  const [collectionOpen, setCollectionOpen] = useState(false);
   const msgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const didCheckinRef = useRef(false);
 
-  /* 초기 로드 */
+  /* 초기 로드: 밤 감지 + 출근 체크인 */
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_LEVEL);
-      if (stored) setLevel(Math.min(MAX_LEVEL, Math.max(0, parseInt(stored, 10) || 0)));
-    } catch { /* ignore */ }
     setNight(isNightTime());
     const nightCheck = setInterval(() => setNight(isNightTime()), 60_000);
+
+    // 하루 첫 접속 체크인 (한 번만)
+    if (!didCheckinRef.current) {
+      didCheckinRef.current = true;
+      const granted = dailyCheckin();
+      if (granted) {
+        setTimeout(() => {
+          setJustGrew(true);
+          setTimeout(() => setJustGrew(false), 2000);
+        }, 300);
+      }
+    }
+
     return () => clearInterval(nightCheck);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* 나무 터치 → 격려 메시지 */
   const handleTreeTap = useCallback(() => {
     const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
     setMessage(msg);
     if (msgTimerRef.current) clearTimeout(msgTimerRef.current);
     msgTimerRef.current = setTimeout(() => setMessage(null), 2500);
-  }, []);
+    recordTap();
+  }, [recordTap]);
 
-  /* 호흡 세션 시작 */
   const startBreathing = useCallback(() => {
     setRemaining(BREATH_SESSION);
     setBreathing(true);
   }, []);
 
-  /* 호흡 세션 중단 (완료 전) */
   const stopBreathing = useCallback(() => {
     setBreathing(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
   }, []);
 
-  /* 호흡 세션 완료 → 성장 */
   const completeBreathing = useCallback(() => {
     setBreathing(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
-    setLevel((prev) => {
-      const next = Math.min(MAX_LEVEL, prev + 1);
-      try {
-        localStorage.setItem(STORAGE_KEY_LEVEL, String(next));
-        localStorage.setItem(STORAGE_KEY_LAST, new Date().toISOString());
-      } catch { /* ignore */ }
-      return next;
-    });
-    setJustGrew(true);
-    setTimeout(() => setJustGrew(false), 2000);
-  }, []);
+    const res = completeBreath();
+    if (res.completed) {
+      setCompletedPopup(true);
+      setTimeout(() => setCompletedPopup(false), 3500);
+    } else if (res.leveledUp) {
+      setJustGrew(true);
+      setTimeout(() => setJustGrew(false), 2000);
+    }
+  }, [completeBreath]);
 
-  /* 타이머 틱 */
   useEffect(() => {
     if (!breathing) return;
     intervalRef.current = setInterval(() => {
@@ -356,20 +346,18 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
         return r - 1;
       });
     }, 1000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [breathing, completeBreathing]);
 
-  /* 리셋 */
-  const resetGrowth = useCallback(() => {
-    if (!confirm('분재를 씨앗 상태로 되돌릴까요?')) return;
-    setLevel(0);
-    try {
-      localStorage.removeItem(STORAGE_KEY_LEVEL);
-      localStorage.removeItem(STORAGE_KEY_LAST);
-    } catch { /* ignore */ }
-  }, []);
+  const handleReset = useCallback(() => {
+    if (!confirm('현재 분재를 씨앗 상태로 되돌릴까요? (도감은 유지)')) return;
+    resetCurrent();
+  }, [resetCurrent]);
+
+  const handleSelectPlant = useCallback((id: typeof currentPlantId) => {
+    switchPlant(id);
+    setCollectionOpen(false);
+  }, [switchPlant]);
 
   const levelLabel =
     level === 0 ? '씨앗' :
@@ -379,75 +367,101 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
     level <= 7 ? '큰 나무' :
     '꽃핀 분재';
 
+  const pointProgress = Math.min(100, (points / POINTS_PER_LEVEL) * 100);
+  const isRaining = weather?.condition?.includes('비') || weather?.condition?.includes('소나기');
+  const isSnowing = weather?.condition?.includes('눈');
+  const isDusty = weather?.dustLevel === 'bad' || weather?.dustLevel === 'very-bad';
+
+  const weatherIcon =
+    isRaining ? <CloudRain size={13} /> :
+    isSnowing ? <Snowflake size={13} /> :
+    weather?.condition?.includes('맑') ? <Sun size={13} /> :
+    <Cloud size={13} />;
+
+  /* 도감 화면 */
+  if (collectionOpen) {
+    return <BonsaiCollection onBack={() => setCollectionOpen(false)} onStartPlant={handleSelectPlant} />;
+  }
+
   return (
-    <div className={`${styles.bonsaiWrap} ${night ? styles.bonsaiNight : ''}`}>
+    <div
+      className={`${styles.bonsaiWrap} ${night ? styles.bonsaiNight : ''} ${styles[`season_${season}`]}`}
+    >
       {/* 헤더 */}
       <div className={styles.bonsaiHeader}>
         <button type="button" className={styles.bonsaiBackBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <div className={styles.bonsaiHeaderCenter}>
-          <span className={styles.bonsaiBrand}>ZEN BONSAI</span>
+          <span className={styles.bonsaiBrand}>
+            {plant.emoji} {plant.name} · {seasonLabel(season)}
+          </span>
           <span className={styles.bonsaiLevelText}>
-            {levelLabel} · {level}/{MAX_LEVEL}
+            {levelLabel} · Lv {level}/{MAX_LEVEL} · 🔥 {streak}일
           </span>
         </div>
-        <button type="button" className={styles.bonsaiResetBtn} onClick={resetGrowth} aria-label="처음부터">
+        <button type="button" className={styles.bonsaiResetBtn} onClick={handleReset} aria-label="리셋">
           <RotateCcw size={16} />
         </button>
       </div>
 
-      {/* 수묵화 배경 */}
+      {/* 포인트 게이지 */}
+      <div className={styles.bonsaiProgressBar}>
+        <div className={styles.bonsaiProgressFill} style={{ width: `${pointProgress}%` }} />
+        <span className={styles.bonsaiProgressText}>
+          {points.toFixed(1)} / {POINTS_PER_LEVEL}
+        </span>
+      </div>
+
+      {/* 날씨 뱃지 */}
+      {weather?.condition && (
+        <div className={`${styles.weatherBadge} ${isDusty ? styles.weatherDusty : ''}`}>
+          {weatherIcon}
+          <span>{weather.condition}{isDusty ? ' · 미세먼지 나쁨' : ''}</span>
+        </div>
+      )}
+
+      {/* 스테이지 */}
       <div className={styles.bonsaiStage}>
-        {/* 배경 원 (달/해) */}
-        <motion.div
-          className={styles.bonsaiMoon}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: night ? 0.35 : 0.2 }}
-          transition={{ duration: 2 }}
-        />
+        <motion.div className={styles.bonsaiMoon}
+          initial={{ opacity: 0 }} animate={{ opacity: night ? 0.35 : 0.2 }} transition={{ duration: 2 }} />
 
-        {/* 반딧불 (밤만) */}
         {night && <Fireflies />}
+        <SeasonParticles season={season} />
+        {isRaining && <RainEffect />}
 
-        {/* 분재 트리 — 탭 가능 */}
-        <motion.button
-          type="button"
-          className={styles.bonsaiTreeBtn}
-          onClick={handleTreeTap}
-          aria-label="나무 터치"
-          whileTap={{ scale: 0.97 }}
-          animate={justGrew ? { scale: [1, 1.06, 1] } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <BonsaiTree level={level} night={night} />
+        <motion.button type="button" className={styles.bonsaiTreeBtn} onClick={handleTreeTap}
+          aria-label="나무 터치" whileTap={{ scale: 0.97 }}
+          animate={justGrew ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.6 }}>
+          <BonsaiTree level={level} plant={plant} night={night} />
         </motion.button>
 
-        {/* 성장 순간 — 반짝임 */}
         <AnimatePresence>
           {justGrew && (
-            <motion.div
-              className={styles.bonsaiSparkle}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-            >
+            <motion.div className={styles.bonsaiSparkle}
+              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
               <Sparkles size={28} />
-              <span>자라났어요</span>
+              <span>{lastReason ?? '자라났어요'}</span>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* 격려 메시지 팝업 */}
+        <AnimatePresence>
+          {completedPopup && (
+            <motion.div className={styles.bonsaiCompleted}
+              initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
+              <span className={styles.bonsaiCompletedEmoji}>{plant.emoji}</span>
+              <span className={styles.bonsaiCompletedTitle}>{plant.name} 완성!</span>
+              <span className={styles.bonsaiCompletedSub}>도감에 추가되었어요</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {message && (
-            <motion.div
-              className={styles.bonsaiMessage}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35 }}
-            >
+            <motion.div className={styles.bonsaiMessage}
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35 }}>
               <Leaf size={14} />
               <span>{message}</span>
             </motion.div>
@@ -455,35 +469,18 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
         </AnimatePresence>
       </div>
 
-      {/* 호흡 세션 오버레이 */}
+      {/* 호흡 오버레이 */}
       <AnimatePresence>
         {breathing && (
-          <motion.div
-            className={styles.bonsaiBreathOverlay}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className={styles.bonsaiBreathCircle}
-              animate={{
-                scale: [1, 1.35, 1.35, 1],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                times: [0, 0.4, 0.6, 1],
-              }}
-            />
+          <motion.div className={styles.bonsaiBreathOverlay}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className={styles.bonsaiBreathCircle}
+              animate={{ scale: [1, 1.35, 1.35, 1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', times: [0, 0.4, 0.6, 1] }} />
             <div className={styles.bonsaiBreathInfo}>
               <span className={styles.bonsaiBreathLabel}>숨을 천천히 들이쉬고 내쉬세요</span>
               <span className={styles.bonsaiBreathTime}>{remaining}초</span>
-              <button
-                type="button"
-                className={styles.bonsaiBreathCancel}
-                onClick={stopBreathing}
-              >
+              <button type="button" className={styles.bonsaiBreathCancel} onClick={stopBreathing}>
                 중단
               </button>
             </div>
@@ -494,16 +491,17 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
       {/* 하단 컨트롤 */}
       <div className={styles.bonsaiBottom}>
         <p className={styles.bonsaiHint}>
-          휴식 1분을 완료하면 분재가 한 단계 자라납니다
+          {collection.length}/{9} 완성 · 퀴즈·영상 시청·매일 접속으로도 자라납니다
         </p>
-        <button
-          type="button"
-          className={styles.bonsaiStartBtn}
-          onClick={startBreathing}
-          disabled={breathing || level >= MAX_LEVEL}
-        >
-          {level >= MAX_LEVEL ? '이미 완성된 분재' : '휴식 시작 (1분)'}
-        </button>
+        <div className={styles.bonsaiActions}>
+          <button type="button" className={styles.bonsaiCollectionBtn} onClick={() => setCollectionOpen(true)}>
+            <Library size={16} /> 도감
+          </button>
+          <button type="button" className={styles.bonsaiStartBtn}
+            onClick={startBreathing} disabled={breathing || level >= MAX_LEVEL}>
+            {level >= MAX_LEVEL ? '이미 완성' : '휴식 시작 (1분)'}
+          </button>
+        </div>
       </div>
     </div>
   );

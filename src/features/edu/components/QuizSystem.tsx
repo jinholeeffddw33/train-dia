@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ArrowLeft, Shield, Crown, Lock, Check } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useBonsaiStore } from '@/stores/bonsai';
 import { useEduStore } from '../hooks/useEduStore';
 import type { QuizMode } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -248,6 +249,10 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     } else {
       const percent = toScore100(score, questions.length);
       addQuizRecord({ score, total: questions.length, percent, mode: quizMode });
+      // 70점 이상 합격 시 분재 성장 (연료 공급)
+      if (percent >= 70) {
+        try { useBonsaiStore.getState().recordQuizPass(); } catch { /* ignore */ }
+      }
       // 등급 도전 모드일 때 점수 기록 + 서버 전송
       if (quizMode === 'level' && quizLevelId) {
         updateLevelScore(quizLevelId, percent);

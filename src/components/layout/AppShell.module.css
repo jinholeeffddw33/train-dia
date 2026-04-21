@@ -115,11 +115,11 @@
 /* ── Back to Hub button ── */
 .backBtn {
   position: fixed;
-  top: 4px;
-  left: 8px;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  left: calc(env(safe-area-inset-left, 0px) + 10px);
   z-index: var(--dia-layer-fixed);
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface);
   border: none;

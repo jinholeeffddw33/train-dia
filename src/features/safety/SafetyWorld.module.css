@@ -92,7 +92,7 @@
 .heroBanner {
   position: relative;
   overflow: hidden;
-  padding: 56px 24px 0;
+  padding: calc(56px + env(safe-area-inset-top, 0px)) 24px 0;
   text-align: center;
   background:
     radial-gradient(circle at top, rgba(245, 158, 11, 0.12), transparent 40%),
@@ -127,7 +127,7 @@
 
 .heroBackBtn {
   position: absolute;
-  top: var(--dia-space-3);
+  top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
   left: var(--dia-space-3);
   width: 40px;
   height: 40px;

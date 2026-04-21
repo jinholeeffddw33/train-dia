@@ -18,6 +18,7 @@
   align-items: center;
   gap: var(--dia-space-3);
   padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
   background: var(--dia-bg-elevated);
   border-bottom: 1px solid var(--dia-border);
   -webkit-backdrop-filter: blur(12px);
@@ -72,7 +73,7 @@
 .heroBanner {
   position: relative;
   overflow: hidden;
-  padding: 56px 24px 0;
+  padding: calc(56px + env(safe-area-inset-top, 0px)) 24px 0;
   text-align: center;
   /* 다크 — 앱 배경에서 시작해 살짝 퍼플 */
   background:
@@ -110,7 +111,7 @@
 
 .heroBackBtn {
   position: absolute;
-  top: var(--dia-space-3);
+  top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
   left: var(--dia-space-3);
   width: 40px;
   height: 40px;

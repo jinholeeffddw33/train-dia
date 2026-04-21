@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Droplet, Music2, Zap, Bug, Brain, Palette, Bell } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './styles/Life.module.css';
 
@@ -10,7 +10,7 @@ const SnakeGame = lazy(() => import('./games/SnakeGame'));
 const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
-const GravityZen = lazy(() => import('./dab/GravityZen'));
+const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 
 class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => void }, { hasError: boolean }> {
@@ -33,7 +33,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
 }
 
 type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli';
-type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'gravity' | 'asmr';
+type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
@@ -89,13 +89,13 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className={styles.dabCardWrap}>
-          <button type="button" className={styles.dabCard} onClick={() => setView('gravity')}>
+          <button type="button" className={styles.dabCard} onClick={() => setView('bonsai')}>
             <div className={`${styles.dabCardIcon} ${styles.dabIconBlue}`}>
-              <Droplet size={28} />
+              <Sprout size={28} />
             </div>
             <div className={styles.dabCardText}>
-              <span className={styles.dabCardLabel}>중력 물방울</span>
-              <span className={styles.dabCardDesc}>톡톡 떨어지는 물방울과 찰랑이는 수면</span>
+              <span className={styles.dabCardLabel}>젠 분재</span>
+              <span className={styles.dabCardDesc}>휴식을 완료할 때마다 한 단계씩 자라나는 나무</span>
             </div>
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
@@ -183,12 +183,12 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // ── 중력 물방울 ──
-  if (view === 'gravity') {
+  // ── 젠 분재 ──
+  if (view === 'bonsai') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
         <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
-          <GravityZen onBack={goLifeHome} />
+          <ZenBonsai onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
     );

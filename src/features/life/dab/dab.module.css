@@ -2,74 +2,6 @@
  * DAB · Define Answer Beyond 휴식 모듈 스타일
  * ═══════════════════════════════════════════ */
 
-/* ── Gravity Zen (캔버스 전체) ── */
-.zenWrap {
-  position: fixed;
-  inset: 0;
-  background: var(--dia-bg);
-  overflow: hidden;
-  z-index: 10;
-  touch-action: none;
-}
-
-.zenCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: pointer;
-  touch-action: none;
-}
-
-.zenBackBtn {
-  position: absolute;
-  top: calc(var(--dia-space-3) + env(safe-area-inset-top));
-  left: var(--dia-space-3);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  color: rgba(226, 232, 240, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 20;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.15s ease;
-}
-
-.zenBackBtn:active {
-  transform: scale(0.92);
-}
-
-.zenHint {
-  position: absolute;
-  top: calc(var(--dia-space-3) + env(safe-area-inset-top) + 4px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 14px;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 999px;
-  color: rgba(224, 242, 254, 0.85);
-  font-size: 13px;
-  font-weight: 500;
-  pointer-events: none;
-  z-index: 15;
-  animation: zenHintFade 10s ease forwards;
-}
-
-@keyframes zenHintFade {
-  0%, 70% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
 /* ── ASMR Therapy ── */
 .asmrWrap {
   min-height: 100vh;
@@ -284,17 +216,6 @@
 }
 
 /* ── 라이트 모드 오버라이드 ── */
-:root.light .zenBackBtn {
-  background: rgba(255, 255, 255, 0.75);
-  border-color: rgba(100, 116, 139, 0.3);
-  color: #1e293b;
-}
-
-:root.light .zenHint {
-  background: rgba(255, 255, 255, 0.75);
-  color: #1e293b;
-}
-
 :root.light .asmrWrap {
   background:
     radial-gradient(ellipse 80% 50% at 50% 10%, rgba(99, 102, 241, 0.12), transparent 70%),
@@ -309,4 +230,304 @@
 :root.light .themeCardActive {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.05));
   border-color: rgba(99, 102, 241, 0.5);
+}
+
+/* ───────────────────── Zen Bonsai ───────────────────── */
+.bonsaiWrap {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #faf7f0, #f5f0e6);
+  color: #1e293b;
+  position: relative;
+  overflow: hidden;
+}
+
+:root.dark .bonsaiWrap,
+.bonsaiNight {
+  background: linear-gradient(to bottom, #0f172a, #1e1b3a);
+  color: #e2e8f0;
+}
+
+.bonsaiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
+  gap: var(--dia-space-2);
+  position: relative;
+  z-index: 3;
+}
+
+.bonsaiBackBtn,
+.bonsaiResetBtn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #334155;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(8px);
+}
+
+.bonsaiNight .bonsaiBackBtn,
+.bonsaiNight .bonsaiResetBtn {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.bonsaiBackBtn:active,
+.bonsaiResetBtn:active {
+  transform: scale(0.92);
+}
+
+.bonsaiHeaderCenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.bonsaiBrand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  color: #64748b;
+}
+
+.bonsaiNight .bonsaiBrand {
+  color: #94a3b8;
+}
+
+.bonsaiLevelText {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.bonsaiNight .bonsaiLevelText {
+  color: #cbd5e1;
+}
+
+.bonsaiStage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-2);
+}
+
+.bonsaiMoon {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fefce8, #fef3c7 60%, transparent 75%);
+  pointer-events: none;
+}
+
+.bonsaiNight .bonsaiMoon {
+  background: radial-gradient(circle at 35% 35%, #f8fafc, #cbd5e1 50%, transparent 70%);
+}
+
+.bonsaiFireflies {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bonsaiTreeBtn {
+  position: relative;
+  z-index: 2;
+  width: min(320px, 90vw);
+  aspect-ratio: 320 / 360;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bonsaiSvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+}
+
+.bonsaiNight .bonsaiSvg {
+  filter: drop-shadow(0 2px 12px rgba(253, 224, 71, 0.08));
+}
+
+.bonsaiMessage {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #15803d;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  z-index: 4;
+  white-space: nowrap;
+}
+
+.bonsaiNight .bonsaiMessage {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(134, 239, 172, 0.3);
+  color: #86efac;
+}
+
+.bonsaiSparkle {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
+  z-index: 4;
+}
+
+.bonsaiBreathOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.bonsaiBreathCircle {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(134, 239, 172, 0.45), rgba(34, 197, 94, 0.15) 60%, transparent 75%);
+  box-shadow: 0 0 40px rgba(134, 239, 172, 0.5);
+}
+
+.bonsaiBreathInfo {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #e2e8f0;
+}
+
+.bonsaiBreathLabel {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bonsaiBreathTime {
+  font-size: 42px;
+  font-weight: 800;
+  color: #bbf7d0;
+  font-variant-numeric: tabular-nums;
+}
+
+.bonsaiBreathCancel {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bonsaiBreathCancel:active {
+  transform: scale(0.95);
+}
+
+.bonsaiBottom {
+  padding: var(--dia-space-4);
+  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.bonsaiHint {
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
+}
+
+.bonsaiNight .bonsaiHint {
+  color: #94a3b8;
+}
+
+.bonsaiStartBtn {
+  width: 100%;
+  max-width: 280px;
+  padding: 14px 20px;
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.12s ease;
+}
+
+.bonsaiStartBtn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+
+.bonsaiStartBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(145deg, #94a3b8, #64748b);
+  box-shadow: none;
+}
+
+.bonsaiNight .bonsaiStartBtn {
+  background: linear-gradient(145deg, #4ade80, #22c55e);
 }

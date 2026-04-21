@@ -1,0 +1,293 @@
+/* ═══════════════════════════════════════════
+ * DAB · Define Answer Beyond 휴식 모듈 스타일
+ * ═══════════════════════════════════════════ */
+
+/* ── Gravity Zen (캔버스 전체) ── */
+.zenWrap {
+  position: fixed;
+  inset: 0;
+  background: var(--dia-bg);
+  overflow: hidden;
+  z-index: 10;
+  touch-action: none;
+}
+
+.zenCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.zenBackBtn {
+  position: absolute;
+  top: calc(var(--dia-space-3) + env(safe-area-inset-top));
+  left: var(--dia-space-3);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: rgba(226, 232, 240, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+}
+
+.zenBackBtn:active {
+  transform: scale(0.92);
+}
+
+.zenHint {
+  position: absolute;
+  top: calc(var(--dia-space-3) + env(safe-area-inset-top) + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 999px;
+  color: rgba(224, 242, 254, 0.85);
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 15;
+  animation: zenHintFade 10s ease forwards;
+}
+
+@keyframes zenHintFade {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── ASMR Therapy ── */
+.asmrWrap {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 10%, rgba(99, 102, 241, 0.18), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(168, 85, 247, 0.12), transparent 70%),
+    var(--dia-bg);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.asmrHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+}
+
+.asmrBackBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+}
+
+.asmrBackBtn:active {
+  transform: scale(0.92);
+  background: var(--dia-surface-hover);
+}
+
+.asmrTitle {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  flex: 1;
+}
+
+.asmrBody {
+  padding: var(--dia-space-2) var(--dia-space-4) var(--dia-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.asmrSub {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+/* 웨이브폼 */
+.waveWrap {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  overflow: hidden;
+}
+
+.waveCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.waveIdle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  pointer-events: none;
+}
+
+.asmrError {
+  padding: var(--dia-space-3);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--dia-radius-md);
+  color: #fca5a5;
+  font-size: var(--dia-text-sm);
+  text-align: center;
+}
+
+/* 테마 카드 */
+.themeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.themeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.2s ease;
+  min-height: 80px;
+}
+
+.themeCard:active {
+  transform: scale(0.98);
+}
+
+.themeCardActive {
+  border-color: rgba(129, 140, 248, 0.6);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.08));
+}
+
+.themeBlue .themeIcon { background: linear-gradient(135deg, #60a5fa, #3b82f6); color: #fff; }
+.themeGreen .themeIcon { background: linear-gradient(135deg, #6ee7b7, #34d399); color: #fff; }
+.themeAmber .themeIcon { background: linear-gradient(135deg, #fcd34d, #f59e0b); color: #fff; }
+
+.themeIcon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.themeText {
+  flex: 1;
+  min-width: 0;
+}
+
+.themeLabel {
+  display: block;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.themeDesc {
+  display: block;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+
+.themePlayBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(129, 140, 248, 0.15);
+  color: rgba(199, 210, 254, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.themeCardActive .themePlayBtn {
+  background: linear-gradient(135deg, #818cf8, #a78bfa);
+  color: #fff;
+  animation: themePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes themePulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(129, 140, 248, 0.4); }
+  50%      { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(129, 140, 248, 0); }
+}
+
+.themeLoading {
+  animation: themeLoadingBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes themeLoadingBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ── 라이트 모드 오버라이드 ── */
+:root.light .zenBackBtn {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(100, 116, 139, 0.3);
+  color: #1e293b;
+}
+
+:root.light .zenHint {
+  background: rgba(255, 255, 255, 0.75);
+  color: #1e293b;
+}
+
+:root.light .asmrWrap {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 10%, rgba(99, 102, 241, 0.12), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(168, 85, 247, 0.08), transparent 70%),
+    var(--dia-bg);
+}
+
+:root.light .waveWrap {
+  background: #f8fafc;
+}
+
+:root.light .themeCardActive {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.05));
+  border-color: rgba(99, 102, 241, 0.5);
+}

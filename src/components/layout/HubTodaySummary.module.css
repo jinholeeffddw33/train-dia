@@ -141,7 +141,7 @@
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* 미세먼지 칩 — 텍스트는 읽히게 유지, 점만 등급 색 */
+/* 미세먼지 칩 — 등급별로 배경·테두리·글자색 전체 변경 */
 .dustDot {
   width: 8px;
   height: 8px;
@@ -150,13 +150,65 @@
   flex-shrink: 0;
 }
 
-.dust_good .dustDot { background: var(--dia-green); }
-.dust_moderate .dustDot { background: #60a5fa; }
-.dust_bad .dustDot { background: var(--dia-amber); }
-.dust_very-bad .dustDot { background: var(--dia-red); }
+/* 좋음 — 초록 */
+.dust_good {
+  background: rgba(34, 197, 94, 0.16);
+  color: var(--dia-green);
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.35);
+}
+.dust_good .dustDot { background: var(--dia-green); box-shadow: 0 0 6px rgba(34, 197, 94, 0.55); }
 
-/* "매우 나쁨"은 글자도 경고색으로 */
-.dust_very-bad { color: var(--dia-red); }
+/* 보통 — 파랑 */
+.dust_moderate {
+  background: rgba(59, 130, 246, 0.16);
+  color: #60a5fa;
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.35);
+}
+.dust_moderate .dustDot { background: #60a5fa; box-shadow: 0 0 6px rgba(96, 165, 250, 0.55); }
+
+/* 나쁨 — 앰버 */
+.dust_bad {
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--dia-amber);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.4);
+}
+.dust_bad .dustDot { background: var(--dia-amber); box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+
+/* 매우 나쁨 — 빨강 (경고 강조) */
+.dust_very-bad {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--dia-red);
+  box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.45);
+  animation: dustPulse 2.2s ease-in-out infinite;
+}
+.dust_very-bad .dustDot { background: var(--dia-red); box-shadow: 0 0 8px rgba(239, 68, 68, 0.7); }
+
+@keyframes dustPulse {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.45); }
+  50% { box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.75); }
+}
+
+/* 라이트 모드 — 대비 강화 */
+:global(:root.light) .dust_good {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+  box-shadow: inset 0 0 0 1px rgba(21, 128, 61, 0.4);
+}
+:global(:root.light) .dust_moderate {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
+  box-shadow: inset 0 0 0 1px rgba(29, 78, 216, 0.4);
+}
+:global(:root.light) .dust_bad {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+  box-shadow: inset 0 0 0 1px rgba(180, 83, 9, 0.4);
+}
+:global(:root.light) .dust_very-bad {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+  box-shadow: inset 0 0 0 1px rgba(185, 28, 28, 0.45);
+}
 
 /* ── Empty (기관사 미선택) ── */
 .empty {

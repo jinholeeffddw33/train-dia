@@ -157,6 +157,25 @@
   pointer-events: none;
 }
 
+/* ── YouTube 플레이어 ── */
+.ytPlayerWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: var(--dia-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--dia-border-light);
+}
+
+.ytPlayerFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 .asmrError {
   padding: var(--dia-space-3);
   background: rgba(239, 68, 68, 0.1);

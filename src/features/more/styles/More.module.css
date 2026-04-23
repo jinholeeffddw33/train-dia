@@ -1431,3 +1431,230 @@
   color: var(--dia-text-tertiary);
   padding: var(--dia-space-4) 0;
 }
+
+/* ═══════════════════════════════════════════
+ * 의견/버그 제보 — 탭 + 대화창
+ * ═══════════════════════════════════════════ */
+
+/* 탭 */
+.feedbackTabs {
+  display: flex;
+  gap: 0;
+  padding: 0 var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border-light);
+  background: var(--dia-bg);
+}
+
+.feedbackTab {
+  position: relative;
+  flex: 1;
+  padding: var(--dia-space-3) var(--dia-space-2);
+  background: none;
+  border: none;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.feedbackTabActive {
+  color: var(--dia-blue);
+  border-bottom-color: var(--dia-blue);
+}
+
+.feedbackTabDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dia-red);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* 내 제보 리스트 아이템 (탭 가능) */
+.feedbackThreadItem {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  padding-right: var(--dia-space-6);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--dia-border-light);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s ease;
+}
+
+.feedbackThreadItem:active {
+  background: var(--dia-surface-hover);
+}
+
+.feedbackThreadArrow {
+  position: absolute;
+  right: var(--dia-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dia-text-tertiary);
+}
+
+.feedbackReplyBadge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--dia-green);
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+/* 대화창 레이아웃 — fullOverlay가 스크롤 컨테이너, 입력창은 sticky bottom */
+.threadWrap {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 80px);
+}
+
+.chatScroll {
+  flex: 1;
+  padding: var(--dia-space-4);
+  padding-bottom: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  background: var(--dia-bg);
+}
+
+.chatLoading {
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  padding: var(--dia-space-3);
+}
+
+.chatBubble {
+  position: relative;
+  max-width: 78%;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-lg);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.chatBubble p {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  white-space: pre-wrap;
+}
+
+.chatBubbleMine {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  border-bottom-right-radius: 4px;
+}
+
+.chatBubbleMine p {
+  color: #fff;
+}
+
+.chatBubbleAdmin,
+.chatBubbleUser {
+  align-self: flex-start;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+  border-bottom-left-radius: 4px;
+}
+
+.chatAuthor {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+  margin-bottom: 4px;
+  letter-spacing: 0.2px;
+}
+
+.chatBubbleAdmin .chatAuthor {
+  color: var(--dia-blue);
+}
+
+.chatTime {
+  display: block;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.chatBubbleAdmin .chatTime,
+.chatBubbleUser .chatTime {
+  color: var(--dia-text-tertiary);
+}
+
+/* 입력창 — sticky bottom */
+.chatInputBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  padding-bottom: calc(var(--dia-space-2) + env(safe-area-inset-bottom, 0px));
+  background: var(--dia-surface);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.chatInput {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-family: inherit;
+  color: var(--dia-text-primary);
+  resize: none;
+  box-sizing: border-box;
+  line-height: 1.4;
+  max-height: 120px;
+}
+
+.chatInput:focus {
+  outline: none;
+  border-color: var(--dia-blue);
+}
+
+.chatSendBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+
+.chatSendBtn:active {
+  transform: scale(0.92);
+}
+
+.chatSendBtn:disabled {
+  background: var(--dia-border);
+  cursor: not-allowed;
+}

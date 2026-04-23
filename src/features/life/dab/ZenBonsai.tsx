@@ -52,13 +52,22 @@ const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
 }));
 
 /* ─────────────────────────────── 트리 SVG ─────────────────────────────── */
-function BonsaiTree({ level, plant, night }: { level: number; plant: Plant; night: boolean }) {
+/** 다음 레벨을 향한 0~1 진행도 — 잎/가지가 연속적으로 자라도록 */
+function BonsaiTree({ level, progress, plant, night }: { level: number; progress: number; plant: Plant; night: boolean }) {
   const leafColor = plant.leafColor;
   const leafColorAlt = plant.leafColorAlt;
   const trunkColor = night ? '#cbd5e1' : plant.trunkColor;
   const soilColor = night ? '#78716c' : '#57534e';
   const potColor = night ? '#44403c' : '#292524';
   const isBamboo = plant.id === 'bamboo';
+  /** 부드러운 성장 — level + progress (float) */
+  const effLv = level + progress;
+  /** 요소가 minLv 도달 직전·직후로 투명도·스케일 전환: minLv-1 → 0, minLv → 1 */
+  const appear = (minLv: number): number => {
+    if (effLv <= minLv - 1) return 0;
+    if (effLv >= minLv) return 1;
+    return effLv - (minLv - 1);
+  };
 
   return (
     <svg viewBox="0 0 320 360" className={styles.bonsaiSvg} fill="none" aria-hidden>
@@ -128,8 +137,8 @@ function BonsaiTree({ level, plant, night }: { level: number; plant: Plant; nigh
         </motion.g>
       )}
 
-      {/* 잎사귀 군집 */}
-      {level >= 2 && (
+      {/* 잎사귀 군집 — 포인트 누적에 따라 부드럽게 자라남 */}
+      {effLv >= 1.3 && (
         <g>
           {[
             { cx: 120, cy: 215, r: 14, minLv: 3 },
@@ -142,28 +151,39 @@ function BonsaiTree({ level, plant, night }: { level: number; plant: Plant; nigh
             { cx: 160, cy: 130, r: 16, minLv: 8 },
             { cx: 135, cy: 195, r: 10, minLv: 4 },
             { cx: 185, cy: 175, r: 11, minLv: 6 },
-          ].filter(c => level >= c.minLv).map((c, i) => (
-            <motion.g key={i} style={{ transformOrigin: `${c.cx}px ${c.cy}px` }}
-              animate={{ rotate: [0, 2.5, -2, 1.5, 0] }}
-              transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}>
-              <circle cx={c.cx} cy={c.cy} r={c.r} fill={leafColor} opacity="0.78" />
-              <circle cx={c.cx - c.r * 0.3} cy={c.cy - c.r * 0.2} r={c.r * 0.7} fill={leafColorAlt} opacity="0.6" />
-            </motion.g>
-          ))}
+          ].map((c, i) => {
+            const a = appear(c.minLv);
+            if (a <= 0) return null;
+            const scale = 0.3 + a * 0.7; // 작게 시작해서 완전 크기까지
+            return (
+              <motion.g key={i} style={{ transformOrigin: `${c.cx}px ${c.cy}px`, opacity: a }}
+                animate={{ rotate: [0, 2.5, -2, 1.5, 0], scale: [scale, scale * 1.02, scale] }}
+                transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.2 }}>
+                <circle cx={c.cx} cy={c.cy} r={c.r} fill={leafColor} opacity="0.78" />
+                <circle cx={c.cx - c.r * 0.3} cy={c.cy - c.r * 0.2} r={c.r * 0.7} fill={leafColorAlt} opacity="0.6" />
+              </motion.g>
+            );
+          })}
         </g>
       )}
 
-      {/* 꽃 (레벨 6+, 식물이 flowerColor 있을 때) */}
-      {level >= 6 && plant.flowerColor && (
+      {/* 꽃 (레벨 6+, 식물이 flowerColor 있을 때) — 연속 개화 */}
+      {effLv >= 5.3 && plant.flowerColor && (
         <g>
           {[
-            { cx: 155, cy: 200 }, { cx: 170, cy: 170 }, { cx: 140, cy: 175 }, { cx: 180, cy: 200 },
+            { cx: 155, cy: 200, minLv: 6 }, { cx: 170, cy: 170, minLv: 6 },
+            { cx: 140, cy: 175, minLv: 6 }, { cx: 180, cy: 200, minLv: 6 },
             { cx: 130, cy: 200, minLv: 7 }, { cx: 195, cy: 180, minLv: 7 },
-          ].filter(f => level >= (f.minLv ?? 6)).map((f, i) => (
-            <motion.circle key={i} cx={f.cx} cy={f.cy} r="3.5" fill={plant.flowerColor!}
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }} />
-          ))}
+          ].map((f, i) => {
+            const a = appear(f.minLv);
+            if (a <= 0) return null;
+            return (
+              <motion.circle key={i} cx={f.cx} cy={f.cy} r={3.5 * a} fill={plant.flowerColor!}
+                opacity={a}
+                animate={{ opacity: [0.7 * a, a, 0.7 * a] }}
+                transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }} />
+            );
+          })}
         </g>
       )}
     </svg>
@@ -277,25 +297,51 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
   const [remaining, setRemaining] = useState(BREATH_SESSION);
   const [message, setMessage] = useState<string | null>(null);
   const [justGrew, setJustGrew] = useState(false);
+  /** 오늘 첫 성장 시 무지개 이펙트 */
+  const [rainbow, setRainbow] = useState(false);
+  /** 마일스톤 팝업 ('lv3' | 'lv6' | null) */
+  const [milestonePopup, setMilestonePopup] = useState<'lv3' | 'lv6' | null>(null);
   const [completedPopup, setCompletedPopup] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
   const msgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const didCheckinRef = useRef(false);
 
+  /** 성장 결과 공통 처리 */
+  const handleGrowthResult = useCallback((res: { leveledUp: boolean; completed: boolean; firstToday: boolean; milestone: 'lv3' | 'lv6' | null }) => {
+    if (res.completed) {
+      setCompletedPopup(true);
+      setTimeout(() => setCompletedPopup(false), 3500);
+      return;
+    }
+    if (res.milestone) {
+      setMilestonePopup(res.milestone);
+      setTimeout(() => setMilestonePopup(null), 3000);
+    }
+    if (res.leveledUp) {
+      setJustGrew(true);
+      if (res.firstToday) {
+        setRainbow(true);
+        setTimeout(() => setRainbow(false), 2000);
+      }
+      setTimeout(() => setJustGrew(false), 2000);
+    }
+  }, []);
+
   /* 초기 로드: 밤 감지 + 출근 체크인 */
   useEffect(() => {
     setNight(isNightTime());
     const nightCheck = setInterval(() => setNight(isNightTime()), 60_000);
 
-    // 하루 첫 접속 체크인 (한 번만)
+    // 하루 첫 접속 체크인 (한 번만) — 성장 이펙트는 스토어 상태로 감지
     if (!didCheckinRef.current) {
       didCheckinRef.current = true;
       const granted = dailyCheckin();
       if (granted) {
+        // 체크인은 조용히 반짝만
         setTimeout(() => {
           setJustGrew(true);
-          setTimeout(() => setJustGrew(false), 2000);
+          setTimeout(() => setJustGrew(false), 1500);
         }, 300);
       }
     }
@@ -326,14 +372,8 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
     setBreathing(false);
     if (intervalRef.current) clearInterval(intervalRef.current);
     const res = completeBreath();
-    if (res.completed) {
-      setCompletedPopup(true);
-      setTimeout(() => setCompletedPopup(false), 3500);
-    } else if (res.leveledUp) {
-      setJustGrew(true);
-      setTimeout(() => setJustGrew(false), 2000);
-    }
-  }, [completeBreath]);
+    handleGrowthResult(res);
+  }, [completeBreath, handleGrowthResult]);
 
   useEffect(() => {
     if (!breathing) return;
@@ -433,15 +473,47 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
         <motion.button type="button" className={styles.bonsaiTreeBtn} onClick={handleTreeTap}
           aria-label="나무 터치" whileTap={{ scale: 0.97 }}
           animate={justGrew ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.6 }}>
-          <BonsaiTree level={level} plant={plant} night={night} />
+          <BonsaiTree level={level} progress={points / POINTS_PER_LEVEL} plant={plant} night={night} />
         </motion.button>
+
+        {/* 무지개 링 — 오늘 첫 성장 시 */}
+        <AnimatePresence>
+          {rainbow && (
+            <motion.div className={styles.bonsaiRainbow}
+              initial={{ opacity: 0, scale: 0.6 }}
+              animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 1.6] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.6 }}
+              aria-hidden
+            />
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {justGrew && (
-            <motion.div className={styles.bonsaiSparkle}
+            <motion.div className={`${styles.bonsaiSparkle} ${rainbow ? styles.bonsaiSparkleRainbow : ''}`}
               initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}>
               <Sparkles size={28} />
-              <span>{lastReason ?? '자라났어요'}</span>
+              <span>{rainbow ? '오늘 첫 성장! ' : ''}{lastReason ?? '자라났어요'}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 마일스톤 팝업 (레벨 3·6 최초 도달) */}
+        <AnimatePresence>
+          {milestonePopup && (
+            <motion.div className={styles.bonsaiMilestone}
+              initial={{ opacity: 0, y: 14, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}>
+              <Sparkles size={24} />
+              <span className={styles.bonsaiMilestoneTitle}>
+                {milestonePopup === 'lv3' ? '어린 나무 달성!' : '꽃이 피었습니다!'}
+              </span>
+              <span className={styles.bonsaiMilestoneSub}>
+                {milestonePopup === 'lv3' ? '잎사귀가 무성해졌어요' : '이제 꽃이 맺히기 시작해요'}
+              </span>
             </motion.div>
           )}
         </AnimatePresence>

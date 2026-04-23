@@ -2,22 +2,24 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { PlantId } from '@/features/life/dab/plants';
 
-/** 레벨당 필요 포인트 */
-export const POINTS_PER_LEVEL = 10;
+/** 레벨당 필요 포인트 (완화: 10 → 5) */
+export const POINTS_PER_LEVEL = 5;
 export const MAX_LEVEL = 9;
 
-/** 행동별 획득 포인트 */
+/** 행동별 획득 포인트 (전반적 상향) */
 export const POINT_REWARDS = {
-  breath: 3,       // 호흡 세션 1분 완료
-  dailyCheckin: 2, // 하루 첫 접속
-  quiz: 3,         // 퀴즈 합격 (70점+)
-  video: 2,        // 영상 강의 완주
-  tap: 0.1,        // 나무 터치 (최대치 있음)
-  hazard: 2,       // 안전 제보 작성
+  breath: 5,       // 호흡 세션 1분 완료 (3 → 5, 한 번만 해도 1레벨)
+  dailyCheckin: 3, // 하루 첫 접속 (2 → 3)
+  quiz: 5,         // 퀴즈 합격 70점+ (3 → 5)
+  video: 3,        // 영상 강의 첫 시청 (2 → 3)
+  tap: 0.3,        // 나무 터치 (0.1 → 0.3)
+  hazard: 3,       // 안전 제보 작성
 };
 
-/** 오늘 터치로 얻을 수 있는 최대 포인트 (어뷰징 방지) */
-const DAILY_TAP_CAP = 1.5;
+/** 오늘 터치로 얻을 수 있는 최대 포인트 (1.5 → 3.0) */
+const DAILY_TAP_CAP = 3.0;
+/** 스트릭 보너스 상한 (+N) — 16일차 이후 고정 +15 */
+const MAX_STREAK_BONUS = 15;
 
 interface ActionCounts {
   breath: number;
@@ -26,45 +28,44 @@ interface ActionCounts {
   hazard: number;
 }
 
-interface BonsaiState {
-  /** 현재 키우는 식물 id */
-  currentPlantId: PlantId;
-  /** 현재 레벨 (0-9) */
-  level: number;
-  /** 현재 레벨 내 포인트 진행도 (0 ~ POINTS_PER_LEVEL) */
-  points: number;
-  /** 완성한 식물 id 목록 */
-  collection: PlantId[];
-  /** 마지막 출근 체크인 날짜 (YYYY-MM-DD) */
-  lastCheckinDate: string;
-  /** 연속 접속 일수 */
-  streak: number;
-  /** 행동별 누적 횟수 (해금 조건용) */
-  actionCounts: ActionCounts;
-  /** 마지막 성장 사유 (UI 표시용) */
-  lastReason: string | null;
-  /** 오늘 터치로 얻은 포인트 (DAILY_TAP_CAP 관리) */
-  todayTapPoints: number;
-  /** 마지막 터치 날짜 (todayTapPoints 리셋용) */
-  lastTapDate: string;
+interface Milestones {
+  lv3: boolean;
+  lv6: boolean;
+}
 
-  /** 포인트 추가 → 자동으로 레벨업 처리 + 완성 시 도감 추가 */
-  addPoints: (amount: number, reason: string) => { leveledUp: boolean; completed: boolean };
-  /** 호흡 세션 완료 */
-  completeBreath: () => { leveledUp: boolean; completed: boolean };
-  /** 하루 첫 접속 체크인 (같은 날 재호출 시 no-op) */
+export interface GrowthResult {
+  leveledUp: boolean;
+  completed: boolean;
+  /** 오늘 첫 성장이면 true (무지개 이펙트용) */
+  firstToday: boolean;
+  /** 이번 성장으로 도달한 마일스톤 (한 번만 true) */
+  milestone: 'lv3' | 'lv6' | null;
+}
+
+interface BonsaiState {
+  currentPlantId: PlantId;
+  level: number;
+  points: number;
+  collection: PlantId[];
+  lastCheckinDate: string;
+  streak: number;
+  actionCounts: ActionCounts;
+  lastReason: string | null;
+  todayTapPoints: number;
+  lastTapDate: string;
+  /** 마지막 성장 발생 날짜 (YYYY-MM-DD) — 오늘 첫 성장 판별용 */
+  lastGrowthDate: string;
+  /** 식물별 마일스톤 달성 여부 (현재 식물 기준) */
+  milestones: Milestones;
+
+  addPoints: (amount: number, reason: string) => GrowthResult;
+  completeBreath: () => GrowthResult;
   dailyCheckin: () => boolean;
-  /** 퀴즈 합격 */
-  recordQuizPass: () => { leveledUp: boolean; completed: boolean };
-  /** 영상 시청 완료 */
-  recordVideoComplete: () => { leveledUp: boolean; completed: boolean };
-  /** 나무 터치 (하루 최대치 제한) */
-  recordTap: () => { leveledUp: boolean; completed: boolean; capped: boolean };
-  /** 식물 전환 (해금된 식물만 가능, 호출부에서 검증) */
+  recordQuizPass: () => GrowthResult;
+  recordVideoComplete: () => GrowthResult;
+  recordTap: () => GrowthResult & { capped: boolean };
   switchPlant: (id: PlantId) => void;
-  /** 현재 분재 리셋 (씨앗 상태로) — 수집품은 유지 */
   resetCurrent: () => void;
-  /** 전체 초기화 */
   resetAll: () => void;
 }
 
@@ -92,6 +93,8 @@ export const useBonsaiStore = create<BonsaiState>()(
       lastReason: null,
       todayTapPoints: 0,
       lastTapDate: '',
+      lastGrowthDate: '',
+      milestones: { lv3: false, lv6: false },
 
       addPoints: (amount, reason) => {
         const s = get();
@@ -106,26 +109,41 @@ export const useBonsaiStore = create<BonsaiState>()(
           leveledUp = true;
         }
 
-        // 최대 레벨 달성 → 도감 추가
         let newCollection = s.collection;
-        let nextPlantId = s.currentPlantId;
         if (newLevel >= MAX_LEVEL) {
-          newPoints = POINTS_PER_LEVEL; // 가득 찬 상태로 고정
+          newPoints = POINTS_PER_LEVEL;
           if (!s.collection.includes(s.currentPlantId)) {
             newCollection = [...s.collection, s.currentPlantId];
             completed = true;
           }
         }
 
+        // 오늘 첫 성장 판별
+        const today = todayStr();
+        const firstToday = leveledUp && s.lastGrowthDate !== today;
+
+        // 마일스톤 (레벨 3 · 6 처음 도달 시 한 번만)
+        let milestone: 'lv3' | 'lv6' | null = null;
+        const newMilestones = { ...s.milestones };
+        if (!s.milestones.lv3 && newLevel >= 3) {
+          newMilestones.lv3 = true;
+          milestone = 'lv3';
+        }
+        if (!s.milestones.lv6 && newLevel >= 6) {
+          newMilestones.lv6 = true;
+          milestone = 'lv6'; // lv6이 더 큰 이벤트이므로 덮어씀
+        }
+
         set({
           level: newLevel,
           points: newPoints,
           collection: newCollection,
-          currentPlantId: nextPlantId,
           lastReason: reason,
+          lastGrowthDate: leveledUp ? today : s.lastGrowthDate,
+          milestones: newMilestones,
         });
 
-        return { leveledUp, completed };
+        return { leveledUp, completed, firstToday, milestone };
       },
 
       completeBreath: () => {
@@ -139,19 +157,19 @@ export const useBonsaiStore = create<BonsaiState>()(
         const today = todayStr();
         if (s.lastCheckinDate === today) return false;
 
-        // 스트릭 계산
         const yesterday = yesterdayStr();
         const newStreak = s.lastCheckinDate === yesterday ? s.streak + 1 : 1;
 
-        // 스트릭 보너스 (7일/30일 달성 시 ×2)
-        let bonus = 1;
-        if (newStreak === 7 || newStreak === 30) bonus = 2;
+        // 스트릭 선형 보너스 — N일차 = 기본 + (N-1), 상한 MAX_STREAK_BONUS
+        const streakBonus = Math.min(MAX_STREAK_BONUS, newStreak - 1);
+        const total = POINT_REWARDS.dailyCheckin + streakBonus;
 
-        set({
-          lastCheckinDate: today,
-          streak: newStreak,
-        });
-        get().addPoints(POINT_REWARDS.dailyCheckin * bonus, `출근 체크인 (${newStreak}일차)`);
+        set({ lastCheckinDate: today, streak: newStreak });
+
+        const reason = streakBonus > 0
+          ? `출근 ${newStreak}일 연속 (+${streakBonus} 보너스)`
+          : `출근 ${newStreak}일차`;
+        get().addPoints(total, reason);
         return true;
       },
 
@@ -172,7 +190,7 @@ export const useBonsaiStore = create<BonsaiState>()(
         const today = todayStr();
         const todayTaps = s.lastTapDate === today ? s.todayTapPoints : 0;
         if (todayTaps >= DAILY_TAP_CAP) {
-          return { leveledUp: false, completed: false, capped: true };
+          return { leveledUp: false, completed: false, firstToday: false, milestone: null, capped: true };
         }
         const grant = Math.min(POINT_REWARDS.tap, DAILY_TAP_CAP - todayTaps);
         set({ todayTapPoints: todayTaps + grant, lastTapDate: today });
@@ -180,9 +198,22 @@ export const useBonsaiStore = create<BonsaiState>()(
         return { ...res, capped: false };
       },
 
-      switchPlant: (id) => set({ currentPlantId: id, level: 0, points: 0, lastReason: null }),
+      switchPlant: (id) =>
+        set({
+          currentPlantId: id,
+          level: 0,
+          points: 0,
+          lastReason: null,
+          milestones: { lv3: false, lv6: false },
+        }),
 
-      resetCurrent: () => set({ level: 0, points: 0, lastReason: null }),
+      resetCurrent: () =>
+        set({
+          level: 0,
+          points: 0,
+          lastReason: null,
+          milestones: { lv3: false, lv6: false },
+        }),
 
       resetAll: () =>
         set({
@@ -196,11 +227,13 @@ export const useBonsaiStore = create<BonsaiState>()(
           lastReason: null,
           todayTapPoints: 0,
           lastTapDate: '',
+          lastGrowthDate: '',
+          milestones: { lv3: false, lv6: false },
         }),
     }),
     {
       name: 'train-dia-bonsai',
-      version: 1,
+      version: 2,
     },
   ),
 );

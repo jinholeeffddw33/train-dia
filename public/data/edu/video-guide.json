@@ -43,6 +43,13 @@
       "title": "알아야 할 주박요령",
       "url": "https://youtu.be/n-K-f0vRrNM",
       "source": "youtube"
+    },
+    {
+      "id": "manual-driving-tips",
+      "order": 7,
+      "title": "수동운전 요령",
+      "url": "https://youtu.be/pInrhL0YF6Y",
+      "source": "youtube"
     }
   ]
 }

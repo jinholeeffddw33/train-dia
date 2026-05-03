@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './styles/Life.module.css';
 
@@ -10,6 +10,7 @@ const SnakeGame = lazy(() => import('./games/SnakeGame'));
 const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
+const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
 const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 
@@ -32,10 +33,11 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
   }
 }
 
-type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi';
 type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
+  { id: 'multi', label: '온라인 대전', icon: Users, color: 'purple', desc: '동료와 함께! 오목 · 윷놀이' },
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
   { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
   { id: 'mental', label: '암산 스프린트', icon: Brain, color: 'blue', desc: '60초 안에 계산 문제 최대한 많이!' },
@@ -178,6 +180,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
           {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
           {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
+          {view.gameId === 'multi' && <MultiLobby onBack={goBack} />}
         </Suspense>
       </LifeErrorBoundary>
     );

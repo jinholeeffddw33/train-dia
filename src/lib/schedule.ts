@@ -5,6 +5,7 @@ import { LABELS, DIR, dirFull, dirSub } from './constants';
 import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
+import { TRANSITION_MAY_2026 } from '@/data/transition';
 
 // ===== 날짜 유틸 =====
 
@@ -57,6 +58,14 @@ export function getDia(person: Person | null, date: Date): string {
     if (isHoliday(date)) return '휴일';
     const wd = countWeekdays(WEEKDAY_REF, date);
     return WEEKDAY_DIAS[((wd + person.w) % 4 + 4) % 4];
+  }
+  // 2026년 5월 1~4일 transition 기간 (이전 cycle → 새 cycle 연결)
+  if (date.getFullYear() === 2026 && date.getMonth() === 4) {
+    const day = date.getDate();
+    if (day >= 1 && day <= 4 && person.s) {
+      const tr = TRANSITION_MAY_2026[person.s];
+      if (tr) return tr[day - 1];
+    }
   }
   const r = CYCLE.indexOf(person.d);
   if (r === -1) return person.d;

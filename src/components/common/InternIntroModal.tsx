@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { X, Sparkles } from 'lucide-react';
-import { INTERN_USERS } from '@/lib/auth';
 import styles from './InternIntroModal.module.css';
 
 const STORAGE_KEY = 'intern-intro-2026-dismiss';
@@ -81,29 +80,16 @@ export default function InternIntroModal() {
         </div>
 
         <div className={styles.body}>
-          <p className={styles.subtitle}>
-            새로 합류한 인턴사원 6명이에요. 사업소에서 만나면 반갑게 인사해주세요.
-          </p>
-
           <div className={styles.photoWrap}>
             <Image
               src="/images/interns-2026.jpg"
-              alt="2026년 신규임용 직원 6명 사진"
+              alt="2026년 신규임용 직원 6명 사진 (이름과 사번 포함)"
               width={620}
               height={840}
               className={styles.photo}
               priority
             />
           </div>
-
-          <ul className={styles.list}>
-            {INTERN_USERS.map((u) => (
-              <li key={u.s} className={styles.item}>
-                <span className={styles.name}>{u.n}</span>
-                <span className={styles.sabun}>{u.s}</span>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div className={styles.footer}>

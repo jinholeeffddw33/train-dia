@@ -15,7 +15,7 @@
 .content {
   width: 100%;
   max-width: 460px;
-  max-height: 92vh;
+  max-height: 96vh;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-2xl);
@@ -77,62 +77,24 @@
 .body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--dia-space-4) var(--dia-space-5);
+  padding: var(--dia-space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-4);
-}
-
-.subtitle {
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-secondary);
-  line-height: 1.5;
-  text-align: center;
+  min-height: 0;
 }
 
 .photoWrap {
   width: 100%;
-  border-radius: var(--dia-radius-xl);
+  border-radius: var(--dia-radius-lg);
   overflow: hidden;
   background: var(--dia-surface-hover);
-  border: 1px solid var(--dia-border-light);
 }
 
 .photo {
   width: 100%;
   height: auto;
   display: block;
-}
-
-.list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--dia-space-2);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-surface-hover);
-  border: 1px solid var(--dia-border-light);
-  border-radius: var(--dia-radius-md);
-}
-
-.name {
-  font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
-}
-
-.sabun {
-  font-size: 12px;
-  color: var(--dia-text-tertiary);
-  font-variant-numeric: tabular-nums;
+  object-fit: contain;
 }
 
 .footer {

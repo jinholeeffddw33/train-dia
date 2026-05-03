@@ -10,59 +10,59 @@
       "source": "youtube"
     },
     {
-      "id": "attendance-roll-call",
+      "id": "crew-office-day",
       "order": 2,
+      "title": "승무사업소의 하루",
+      "url": "https://youtu.be/VWrhYJH15sQ",
+      "source": "youtube"
+    },
+    {
+      "id": "attendance-roll-call",
+      "order": 3,
       "title": "출근점호 요령",
       "url": "https://youtu.be/oSWcF2mLskw",
       "source": "youtube"
     },
     {
       "id": "shift-handover-checklist",
-      "order": 3,
+      "order": 4,
       "title": "완벽한 교대를 위한 1분 체크리스트",
       "url": "https://youtu.be/Eo8GVZiM1AI",
       "source": "youtube"
     },
     {
       "id": "depot-in-out-guide",
-      "order": 4,
+      "order": 5,
       "title": "입출고 가이드",
       "url": "https://youtu.be/ttHzgAELKms",
       "source": "youtube"
     },
     {
-      "id": "newcomer-vacation-guide",
-      "order": 5,
-      "title": "새내기를 위한 휴가 가이드",
-      "url": "https://youtu.be/vt1YYw9SYPo",
-      "source": "youtube"
-    },
-    {
-      "id": "overnight-parking-guide",
-      "order": 6,
-      "title": "알아야 할 주박요령",
-      "url": "https://youtu.be/n-K-f0vRrNM",
-      "source": "youtube"
-    },
-    {
       "id": "manual-driving-tips",
-      "order": 7,
+      "order": 6,
       "title": "수동운전 요령",
       "url": "https://youtu.be/pInrhL0YF6Y",
       "source": "youtube"
     },
     {
-      "id": "promotion-guide",
-      "order": 8,
-      "title": "승진! 그것이 알고싶다",
-      "url": "https://youtu.be/7-XCv8RrGDc",
+      "id": "overnight-parking-guide",
+      "order": 7,
+      "title": "알아야 할 주박요령",
+      "url": "https://youtu.be/n-K-f0vRrNM",
       "source": "youtube"
     },
     {
-      "id": "crew-office-day",
+      "id": "newcomer-vacation-guide",
+      "order": 8,
+      "title": "새내기를 위한 휴가 가이드",
+      "url": "https://youtu.be/vt1YYw9SYPo",
+      "source": "youtube"
+    },
+    {
+      "id": "promotion-guide",
       "order": 9,
-      "title": "승무사업소의 하루",
-      "url": "https://youtu.be/VWrhYJH15sQ",
+      "title": "승진! 그것이 알고싶다",
+      "url": "https://youtu.be/7-XCv8RrGDc",
       "source": "youtube"
     }
   ]

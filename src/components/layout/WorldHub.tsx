@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
+import { isIntern } from '@/lib/auth';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
 import HubTodaySummary from './HubTodaySummary';
@@ -95,6 +96,7 @@ function LottieIcon({ src, className, width = 62, height }: { src: string; class
 export default function WorldHub({ onEnter }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
+  const role = driver?.s && isIntern(driver.s) ? '인턴사원님' : '기관사님';
   const { getUnread, alertUnread } = useSafetyUnread();
   const safetyTotal = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
 
@@ -106,7 +108,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
   return (
     <div className={styles.hub}>
       <header className={styles.header}>
-        {name && <p className={styles.greeting}>{name} 기관사님, 안녕하세요</p>}
+        {name && <p className={styles.greeting}>{name} {role}, 안녕하세요</p>}
         <h1 className={styles.title}>답십리 승무사업소</h1>
       </header>
 

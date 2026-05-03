@@ -99,12 +99,19 @@ export function isAdmin(sabun: string): boolean {
   return ADMIN_SABUNS.has(sabun);
 }
 
-/** 내근직 여부 확인 (기관사 외 모든 직원 — EXTRA_USERS) */
+/** 내근직 여부 확인 (기관사 외 모든 직원 — EXTRA_USERS + 교번 미배정 INTERN_USERS) */
 export function isOffice(sabun: string): boolean {
-  return EXTRA_USERS.some((u) => u.s === sabun);
+  return EXTRA_USERS.some((u) => u.s === sabun) || INTERN_USERS.some((u) => u.s === sabun);
 }
 
-/** 사번으로 EXTRA_USERS의 canonical name 조회 (dutySchedule과 매칭) */
+/** 사번으로 EXTRA_USERS/INTERN_USERS의 canonical name 조회 (dutySchedule과 매칭) */
 export function getOfficeName(sabun: string): string | null {
-  return EXTRA_USERS.find((u) => u.s === sabun)?.n ?? null;
+  return EXTRA_USERS.find((u) => u.s === sabun)?.n
+    ?? INTERN_USERS.find((u) => u.s === sabun)?.n
+    ?? null;
+}
+
+/** 인턴사원 여부 확인 (2026년 신규임용 6명) */
+export function isIntern(sabun: string): boolean {
+  return INTERN_USERS.some((u) => u.s === sabun);
 }

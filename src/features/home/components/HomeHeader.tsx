@@ -5,6 +5,7 @@ import { DOW } from '@/lib/constants';
 import { today } from '@/lib/schedule';
 import { ChevronDown } from 'lucide-react';
 import HeaderClock from './HeaderClock';
+import { isIntern } from '@/lib/auth';
 import styles from '../styles/Home.module.css';
 
 function getGreeting(): string {
@@ -49,7 +50,7 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
           >
             {driver ? (
               <span className={styles.headerName}>
-                {driver.n} <span className={styles.headerRole}>기관사님</span>
+                {driver.n} <span className={styles.headerRole}>{driver.s && isIntern(driver.s) ? '인턴사원님' : '기관사님'}</span>
                 <ChevronDown size={16} className={styles.headerChevron} />
               </span>
             ) : (

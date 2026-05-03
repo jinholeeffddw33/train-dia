@@ -5,6 +5,7 @@ import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
+import InternIntroModal from '../common/InternIntroModal';
 
 import { useTrainStore } from '@/stores/train';
 import { useExchangeStore } from '@/stores/exchange';
@@ -84,6 +85,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
         exchangeCount={exchangeCount}
       />
       <ToastContainer />
+      <InternIntroModal />
     </div>
   );
 }

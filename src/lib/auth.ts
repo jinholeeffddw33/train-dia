@@ -46,7 +46,17 @@ export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '박용덕', s: '21711438' },
 ];
 
-const ALL_USERS = [...P, ...EXTRA_USERS];
+/** 2026년 신규임용 인턴사원 (2026.4.30. 자) — 교번 미배정 상태, 내근직 아님 */
+export const INTERN_USERS: Person[] = [
+  { I: '0', d: '', n: '이지은', s: '22600393' },
+  { I: '0', d: '', n: '손예빈', s: '22600418' },
+  { I: '0', d: '', n: '김경률', s: '22600439' },
+  { I: '0', d: '', n: '최승빈', s: '22600472' },
+  { I: '0', d: '', n: '황정욱', s: '22600491' },
+  { I: '0', d: '', n: '박민석', s: '22600519' },
+];
+
+const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 
 /** 관리자 사번 목록 (21명) */
 const ADMIN_SABUNS = new Set([

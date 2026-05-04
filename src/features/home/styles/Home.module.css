@@ -11,6 +11,31 @@
   user-select: none;
 }
 
+/* 새로고침 버튼 — PWA standalone에서 pull-to-refresh 미지원 환경 보완 */
+.refreshBtn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 3;
+  transition: transform 0.18s ease, background 0.15s ease;
+}
+
+.refreshBtn:active {
+  transform: scale(0.88) rotate(180deg);
+  background: rgba(255, 255, 255, 0.25);
+}
+
 /* 뒤로가기 버튼(32px @ left:8px) 공간 확보 */
 :global([data-has-back]) .headerSection {
   padding-left: 44px;

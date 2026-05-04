@@ -376,7 +376,7 @@ export default function MoreTab() {
             <span className={styles.settingIcon}>ℹ️</span>
             <span className={styles.settingLabel}>버전</span>
           </div>
-          <span className={styles.settingValue}>v2.1.0</span>
+          <span className={styles.settingValue}>v3.1.1</span>
         </div>
 
         {/* 로그아웃 */}

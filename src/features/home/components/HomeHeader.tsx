@@ -3,7 +3,7 @@
 import { useDriverStore } from '@/stores/driver';
 import { DOW } from '@/lib/constants';
 import { today } from '@/lib/schedule';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, RotateCw } from 'lucide-react';
 import HeaderClock from './HeaderClock';
 import { isIntern } from '@/lib/auth';
 import styles from '../styles/Home.module.css';
@@ -32,8 +32,21 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
   const dow = DOW[td.getDay()];
   const dateStr = `${td.getMonth() + 1}월 ${td.getDate()}일 (${dow})`;
 
+  const handleRefresh = () => {
+    if (typeof window !== 'undefined') window.location.reload();
+  };
+
   return (
     <header className={styles.headerSection}>
+      <button
+        type="button"
+        className={styles.refreshBtn}
+        onClick={handleRefresh}
+        aria-label="새로고침"
+        title="새로고침"
+      >
+        <RotateCw size={13} strokeWidth={2.2} />
+      </button>
       <div className={styles.headerTop}>
         {/* 왼쪽: 인사말 + 이름 */}
         <div className={styles.headerLeft}>

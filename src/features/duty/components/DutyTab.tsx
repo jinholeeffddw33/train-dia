@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X, Megaphone } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Megaphone, Sparkles } from 'lucide-react';
 import { P } from '@/data/cycle';
 import { getDia, getType, getSchedule, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
+import { LATEST_UPDATE_ID } from '@/data/dutyUpdates';
 import type { Person, Schedule } from '@/lib/types';
 import styles from '../styles/Duty.module.css';
 
@@ -68,6 +69,13 @@ function initAnnounce(): boolean {
   return Date.now() - Number(ts) < ANNOUNCE_DURATION;
 }
 
+const UPDATE_SEEN_KEY = 'dutyUpdate_seenId';
+
+function initUpdateBadge(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(UPDATE_SEEN_KEY) !== LATEST_UPDATE_ID;
+}
+
 export default function DutyTab() {
   const [date, setDate] = useState(() => {
     const d = new Date();
@@ -76,10 +84,16 @@ export default function DutyTab() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [expandedDia, setExpandedDia] = useState<string | null>(null);
   const [showAnnounce, setShowAnnounce] = useState(initAnnounce);
+  const [showUpdate, setShowUpdate] = useState(initUpdateBadge);
 
   function dismissAnnounce() {
     localStorage.setItem(ANNOUNCE_DISMISSED_KEY, '1');
     setShowAnnounce(false);
+  }
+
+  function dismissUpdate() {
+    localStorage.setItem(UPDATE_SEEN_KEY, LATEST_UPDATE_ID);
+    setShowUpdate(false);
   }
 
   // 역방향 조회: 다이아 → 기관사
@@ -135,6 +149,21 @@ export default function DutyTab() {
 
   return (
     <div className={styles.container}>
+      {/* 업데이트 알림 — "업데이트" 버튼 눌러야만 닫힘 */}
+      {showUpdate && (
+        <div className={styles.updateChip}>
+          <Sparkles size={12} className={styles.updateChipIcon} aria-hidden="true" />
+          <span className={styles.updateChipText}>새 업데이트가 있어요</span>
+          <button
+            type="button"
+            className={styles.updateChipBtn}
+            onClick={dismissUpdate}
+          >
+            업데이트
+          </button>
+        </div>
+      )}
+
       {/* 제보 기능 안내 배너 (48h + X 닫기) */}
       {showAnnounce && (
         <div className={styles.noticeBanner}>

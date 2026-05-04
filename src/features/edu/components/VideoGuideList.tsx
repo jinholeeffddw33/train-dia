@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Play, Eye } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Play } from 'lucide-react';
 import { useBonsaiStore } from '@/stores/bonsai';
 import styles from '../styles/edu.module.css';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface VideoItem {
   id: string;
@@ -13,6 +11,7 @@ interface VideoItem {
   title: string;
   description?: string;
   url: string;
+  thumbnail?: string;
   source?: string;
 }
 
@@ -31,27 +30,25 @@ const SOURCE_LABEL: Record<string, string> = {
   'youtube': '유튜브',
 };
 
+function getYouTubeThumbnail(url: string): string | null {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{6,})/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/mqdefault.jpg` : null;
+}
+
 export default function VideoGuideList({ onBack }: VideoGuideListProps) {
   const [data, setData] = useState<VideoGuideData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [viewCounts, setViewCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch('/data/edu/video-guide.json')
       .then((r) => r.json())
       .then((json) => { setData(json); setLoading(false); })
       .catch(() => setLoading(false));
-
-    fetch('/api/edu/video-views')
-      .then((r) => r.ok ? r.json() : { counts: {} })
-      .then((json) => setViewCounts(json.counts || {}))
-      .catch(() => {});
   }, []);
 
   const sortedVideos = (data?.videos ?? []).slice().sort((a, b) => a.order - b.order);
 
   const openVideo = (videoId: string, url: string) => {
-    // 조회 기록 전송 (유저당 영상당 1회만 카운트 — 서버에서 중복 처리)
     fetch('/api/edu/video-views', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -60,8 +57,6 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
       .then((r) => r.ok ? r.json() : null)
       .then((res) => {
         if (res && !res.duplicate) {
-          setViewCounts((prev) => ({ ...prev, [videoId]: (prev[videoId] ?? 0) + 1 }));
-          // 첫 시청 시 분재 성장 (연료 공급)
           try { useBonsaiStore.getState().recordVideoComplete(); } catch { /* ignore */ }
         }
       })
@@ -101,44 +96,54 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
 
         {!loading && sortedVideos.length > 0 && (
           <div className={styles.videoGuideList}>
-            {sortedVideos.map((video, idx) => (
-              <div key={video.id} className={styles.videoGuideItem}>
-                <button
-                  type="button"
-                  className={styles.videoGuideCard}
-                  onClick={() => openVideo(video.id, video.url)}
-                  aria-label={`${video.order}강 ${video.title} 재생`}
-                >
-                  <div className={`${styles.videoGuideNumber} ${styles.iconBgBlue}`}>
-                    <Play size={26} fill="currentColor" strokeWidth={0} />
-                  </div>
-                  <div className={styles.videoGuideBody}>
-                    <div className={styles.videoGuideTitle}>
-                      <span className={styles.videoGuideOrder}>{video.order}강</span>
-                      <span>{video.title}</span>
-                    </div>
-                    {video.description && (
-                      <div className={styles.videoGuideDesc}>{video.description}</div>
-                    )}
-                    <div className={styles.videoGuideMeta}>
-                      {video.source && (
-                        <span className={styles.videoGuideSource}>
-                          <ExternalLink size={12} />
-                          <span>{SOURCE_LABEL[video.source] ?? '외부 링크'}</span>
+            {sortedVideos.map((video, idx) => {
+              const thumb = video.thumbnail || getYouTubeThumbnail(video.url);
+              return (
+                <div key={video.id} className={styles.videoGuideItem}>
+                  <button
+                    type="button"
+                    className={styles.videoGuideCard}
+                    onClick={() => openVideo(video.id, video.url)}
+                    aria-label={`${video.order}강 ${video.title} 재생`}
+                  >
+                    <div className={styles.videoGuideThumb}>
+                      {thumb ? (
+                        <>
+                          <img src={thumb} alt="" loading="lazy" className={styles.videoGuideThumbImg} />
+                          <span className={styles.videoGuideThumbPlay} aria-hidden>
+                            <Play size={14} fill="currentColor" strokeWidth={0} />
+                          </span>
+                        </>
+                      ) : (
+                        <span className={`${styles.videoGuideThumbFallback} ${styles.iconBgBlue}`}>
+                          <Play size={20} fill="currentColor" strokeWidth={0} />
                         </span>
                       )}
-                      <span className={styles.videoGuideViews}>
-                        <Eye size={12} />
-                        <span>{viewCounts[video.id] ?? 0}</span>
-                      </span>
                     </div>
-                  </div>
-                </button>
-                {idx < sortedVideos.length - 1 && (
-                  <div className={styles.videoGuideConnector} aria-hidden />
-                )}
-              </div>
-            ))}
+                    <div className={styles.videoGuideBody}>
+                      <div className={styles.videoGuideTitle}>
+                        <span className={styles.videoGuideOrder}>{video.order}강</span>
+                        <span>{video.title}</span>
+                      </div>
+                      {video.description && (
+                        <div className={styles.videoGuideDesc}>{video.description}</div>
+                      )}
+                      <div className={styles.videoGuideMeta}>
+                        {video.source && (
+                          <span className={styles.videoGuideSource}>
+                            <ExternalLink size={12} />
+                            <span>{SOURCE_LABEL[video.source] ?? '외부 링크'}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                  {idx < sortedVideos.length - 1 && (
+                    <div className={styles.videoGuideConnector} aria-hidden />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

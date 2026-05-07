@@ -4,7 +4,7 @@ import { useState, useMemo, useRef, useCallback } from 'react';
 import { Minus, Plus, X, RotateCcw, Pencil, UserPlus, Check } from 'lucide-react';
 import { useCompareStore } from '@/stores/compare';
 import { P as P_RAW } from '@/data/cycle';
-import { getDia, getType, getDiaDisplay } from '@/lib/schedule';
+import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
 import type { Person } from '@/lib/types';
@@ -40,6 +40,7 @@ export default function CompareTab() {
         const dow = DOW[date.getDay()];
         const isSun = date.getDay() === 0;
         const isSat = date.getDay() === 6;
+        const isHol = !isSun && !isSat && isHoliday(date);
 
         const dias = persons.map((p) => (p ? getDia(p, date) : null));
         const types = dias.map((dia) => (dia ? getType(dia) : null));
@@ -50,7 +51,7 @@ export default function CompareTab() {
 
         // 월이 바뀌는 날에 월 표시
         const label = (i === 0 || d === 1) ? `${m}/${d}` : `${d}`;
-        result.push({ d, label, dow, isSun, isSat, disps, types, allRest, isToday: i === 0 });
+        result.push({ d, label, dow, isSun, isSat, isHol, disps, types, allRest, isToday: i === 0 });
       }
     } else {
       // 미래/과거 월: 1일~말일
@@ -60,6 +61,7 @@ export default function CompareTab() {
         const dow = DOW[date.getDay()];
         const isSun = date.getDay() === 0;
         const isSat = date.getDay() === 6;
+        const isHol = !isSun && !isSat && isHoliday(date);
 
         const dias = persons.map((p) => (p ? getDia(p, date) : null));
         const types = dias.map((dia) => (dia ? getType(dia) : null));
@@ -68,7 +70,7 @@ export default function CompareTab() {
         const filledCount = types.filter((t) => t !== null).length;
         const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
 
-        result.push({ d, label: `${d}`, dow, isSun, isSat, disps, types, allRest, isToday: false });
+        result.push({ d, label: `${d}`, dow, isSun, isSat, isHol, disps, types, allRest, isToday: false });
       }
     }
     return result;
@@ -209,7 +211,7 @@ export default function CompareTab() {
                 /* STYLE-EXCEPTION: 비교 인원 수에 따라 동적 grid columns 필요 */
                 style={{ gridTemplateColumns: gridCols }}
               >
-                <span className={`${styles.tableDate} ${row.isSun ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
+                <span className={`${styles.tableDate} ${row.isSun || row.isHol ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
                   {row.label} ({row.dow})
                 </span>
                 {row.disps.map((disp, idx) => (

@@ -24,6 +24,7 @@
     "node_modules",
     "app.js", "data.js", "subway.js", "sw.js",
     "extract-*.js", "update-*.js", "verify-*.js", "find-*.js",
+    "scripts/verify-*.ts",
     "cloudflare-worker.js"
   ]
 }

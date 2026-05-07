@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Copy, CheckCircle2, Dice5, Home } from 'lucide-react';
 import { useMultiGame } from '../useMultiGame';
 import { useGameFeedback } from '../../useGameFeedback';
@@ -87,6 +87,35 @@ export default function YutnoriGame({ roomCode, role, onLeave }: Props) {
     onRemoteRestart: handleRemoteRestart,
   });
 
+  // 게임 종료 시 결과 저장 (host만 — 중복 방지)
+  const postedWinnerRef = useRef<Player | null>(null);
+  const [ratingDelta, setRatingDelta] = useState<number | null>(null);
+  useEffect(() => {
+    if (state.winner === null) {
+      postedWinnerRef.current = null;
+      setRatingDelta(null);
+      return;
+    }
+    if (postedWinnerRef.current === state.winner) return;
+    if (role !== 'host' || !opponent) return;
+    postedWinnerRef.current = state.winner;
+    fetch('/api/games/multi-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game: 'yutnori',
+        opponentSabun: opponent.sabun,
+        opponentName: opponent.name,
+        isWinner: state.winner === myPlayer,
+      }),
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((res) => {
+        if (res && typeof res.myDelta === 'number') setRatingDelta(res.myDelta);
+      })
+      .catch(() => {});
+  }, [state.winner, role, opponent, myPlayer]);
+
   const myTurn = state.turn === myPlayer && state.winner === null && !!opponent;
 
   const handleThrow = useCallback(() => {
@@ -169,7 +198,12 @@ export default function YutnoriGame({ roomCode, role, onLeave }: Props) {
 
   const statusText = (() => {
     if (state.winner !== null) {
-      return state.winner === myPlayer ? '🎉 승리!' : '😢 패배';
+      const base = state.winner === myPlayer ? '🎉 승리!' : '😢 패배';
+      if (role === 'host' && ratingDelta !== null && ratingDelta !== 0) {
+        const sign = ratingDelta > 0 ? '+' : '';
+        return `${base} (${sign}${ratingDelta})`;
+      }
+      return base;
     }
     if (!connected) return '연결 중...';
     if (!opponent) return '상대방을 기다리는 중...';

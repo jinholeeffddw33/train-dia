@@ -1,0 +1,216 @@
+/* ===== 온라인 대전 랭킹 ===== */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border-light);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  border-radius: var(--dia-radius-md);
+  flex-shrink: 0;
+}
+
+.backBtn:active {
+  transform: scale(0.95);
+  transition: transform 0.12s ease;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4) 0;
+}
+
+.tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  cursor: pointer;
+  min-height: 44px;
+  transition: all var(--dia-transition-fast);
+}
+
+.tab:active {
+  transform: scale(0.95);
+  transition: transform 0.12s ease;
+}
+
+.tabActive {
+  color: #fff;
+  background: var(--dia-blue);
+  border-color: var(--dia-blue);
+}
+
+.body {
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.intro {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.loading,
+.empty {
+  margin: 0;
+  padding: var(--dia-space-6) 0;
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.6;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  min-height: 48px;
+}
+
+.rowTop3 {
+  border-color: var(--dia-amber-dim);
+}
+
+.rowMe {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+}
+
+.rank {
+  width: 32px;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--dia-text-primary);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meTag {
+  font-size: 12px;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+  background: var(--dia-blue-dim);
+  padding: 1px 8px;
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.wl {
+  font-size: 12px;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.rating {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-amber);
+  font-variant-numeric: tabular-nums;
+}
+
+.myRank {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: var(--dia-space-2) var(--dia-space-3);
+  align-items: center;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  margin-top: var(--dia-space-2);
+  background: var(--dia-blue-dim);
+  border: 1px solid var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+}
+
+.myRankLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-blue);
+}
+
+.myRankValue {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.myRankScore {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Copy, CheckCircle2 } from 'lucide-react';
 import { useMultiGame } from '../useMultiGame';
 import { useGameFeedback } from '../../useGameFeedback';
@@ -87,6 +87,35 @@ export default function OmokGame({ roomCode, role, onLeave }: Props) {
     onRemoteRestart: handleRemoteRestart,
   });
 
+  // 게임 종료 시 결과 저장 (host만 — 중복 방지)
+  const postedWinnerRef = useRef<Stone>(0);
+  const [ratingDelta, setRatingDelta] = useState<number | null>(null);
+  useEffect(() => {
+    if (winner === 0) {
+      postedWinnerRef.current = 0;
+      setRatingDelta(null);
+      return;
+    }
+    if (postedWinnerRef.current === winner) return;
+    if (role !== 'host' || !opponent) return;
+    postedWinnerRef.current = winner;
+    fetch('/api/games/multi-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game: 'omok',
+        opponentSabun: opponent.sabun,
+        opponentName: opponent.name,
+        isWinner: winner === myStone,
+      }),
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((res) => {
+        if (res && typeof res.myDelta === 'number') setRatingDelta(res.myDelta);
+      })
+      .catch(() => {});
+  }, [winner, role, opponent, myStone]);
+
   const myTurn = turn === myStone && winner === 0 && !!opponent;
 
   const placeStone = useCallback((x: number, y: number) => {
@@ -137,7 +166,12 @@ export default function OmokGame({ roomCode, role, onLeave }: Props) {
 
   const statusText = (() => {
     if (winner !== 0) {
-      return winner === myStone ? '🎉 승리!' : '😢 패배';
+      const base = winner === myStone ? '🎉 승리!' : '😢 패배';
+      if (role === 'host' && ratingDelta !== null && ratingDelta !== 0) {
+        const sign = ratingDelta > 0 ? '+' : '';
+        return `${base} (${sign}${ratingDelta})`;
+      }
+      return base;
     }
     if (!connected) return '연결 중...';
     if (!opponent) return '상대방을 기다리는 중...';

@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { ArrowLeft, Users, Target, Dice5, Plus, LogIn } from 'lucide-react';
+import { ArrowLeft, Users, Target, Dice5, Plus, LogIn, Trophy } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import OmokGame from './omok/OmokGame';
 import YutnoriGame from './yutnori/YutnoriGame';
+import MultiRanking from './MultiRanking';
 import styles from './MultiLobby.module.css';
 
 type GameKind = 'omok' | 'yutnori';
 type Phase =
   | { kind: 'select' }
+  | { kind: 'ranking' }
   | { kind: 'mode'; game: GameKind }
   | { kind: 'create'; game: GameKind; code: string }
   | { kind: 'join'; game: GameKind }
@@ -77,6 +79,11 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
         </div>
       </div>
     );
+  }
+
+  // ── 랭킹 ──
+  if (phase.kind === 'ranking') {
+    return <MultiRanking onBack={() => setPhase({ kind: 'select' })} />;
   }
 
   // ── 게임 진행 ──
@@ -168,6 +175,15 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
         <p className={styles.formSubInline}>
           <Users size={14} /> <span>두 명이 함께하는 턴제 게임이에요</span>
         </p>
+        <button type="button" className={styles.modeCard} onClick={() => setPhase({ kind: 'ranking' })}>
+          <div className={`${styles.modeIcon} ${styles.modeIconAmber}`}>
+            <Trophy size={28} strokeWidth={2.5} />
+          </div>
+          <div className={styles.modeText}>
+            <span className={styles.modeLabel}>랭킹 보기</span>
+            <span className={styles.modeDesc}>오목 · 윷놀이 Elo 레이팅 순위</span>
+          </div>
+        </button>
         <button type="button" className={styles.modeCard} onClick={() => handleSelectGame('omok')}>
           <div className={`${styles.modeIcon} ${styles.modeIconBlack}`}>
             <Target size={28} strokeWidth={2.5} />

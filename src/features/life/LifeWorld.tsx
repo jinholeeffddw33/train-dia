@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './styles/Life.module.css';
 
@@ -11,6 +11,7 @@ const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
 const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
+const HallOfFame = lazy(() => import('./games/HallOfFame'));
 const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 
@@ -34,7 +35,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
 }
 
 type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi';
-type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr';
+type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'multi', label: '온라인 대전', icon: Users, color: 'purple', desc: '동료와 함께! 오목 · 윷놀이' },
@@ -52,10 +53,10 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   const goLifeHome = useCallback(() => setView('home'), []);
   useHistoryBack('life-l1', goLifeHome, view !== 'home');
 
-  // 뒤로가기 Level 2: game → games
-  const isDepth2 = typeof view === 'object' && view.type === 'game';
+  // 뒤로가기 Level 2: game/hof → games
+  const isDepth2 = (typeof view === 'object' && view.type === 'game') || view === 'hof';
   const goToParent2 = useCallback(() => {
-    if (typeof view === 'object' && view.type === 'game') setView('games');
+    if ((typeof view === 'object' && view.type === 'game') || view === 'hof') setView('games');
   }, [view]);
   useHistoryBack('life-l2', goToParent2, isDepth2);
 
@@ -139,6 +140,20 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           <h2 className={styles.headerTitle}>미니 게임</h2>
         </div>
         <div className={styles.menuContent}>
+          <button
+            type="button"
+            className={styles.gameCard}
+            onClick={() => setView('hof')}
+          >
+            <div className={`${styles.gameCardIcon} ${styles.iconBgAmber}`}>
+              <Trophy size={24} />
+            </div>
+            <div className={styles.gameCardText}>
+              <span className={styles.gameCardLabel}>명예의 전당</span>
+              <span className={styles.gameCardDesc}>매월 1·2·3등 영구 기록</span>
+            </div>
+            <ChevronRight size={18} className={styles.gameEntryArrow} />
+          </button>
           {GAMES.map((g) => {
             const Icon = g.icon;
             return (
@@ -181,6 +196,18 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
           {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
           {view.gameId === 'multi' && <MultiLobby onBack={goBack} />}
+        </Suspense>
+      </LifeErrorBoundary>
+    );
+  }
+
+  // ── 명예의 전당 ──
+  if (view === 'hof') {
+    const goBack = () => setView('games');
+    return (
+      <LifeErrorBoundary onBack={goBack}>
+        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+          <HallOfFame onBack={goBack} />
         </Suspense>
       </LifeErrorBoundary>
     );

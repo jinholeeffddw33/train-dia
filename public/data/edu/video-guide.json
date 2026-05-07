@@ -81,6 +81,14 @@
       "url": "https://youtu.be/7-XCv8RrGDc",
       "thumbnail": "/data/edu/thumbnails/promotion-guide.jpg",
       "source": "youtube"
+    },
+    {
+      "id": "rescue-coupling",
+      "order": 11,
+      "title": "5호선 구원연결 이해하기",
+      "url": "https://youtu.be/zzBidwDgTnE",
+      "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
+      "source": "youtube"
     }
   ]
 }

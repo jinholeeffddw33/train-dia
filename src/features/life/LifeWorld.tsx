@@ -38,7 +38,6 @@ type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi';
 type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
-  { id: 'multi', label: '온라인 대전', icon: Users, color: 'purple', desc: '동료와 함께! 오목 · 윷놀이' },
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
   { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
   { id: 'mental', label: '암산 스프린트', icon: Brain, color: 'blue', desc: '60초 안에 계산 문제 최대한 많이!' },
@@ -142,18 +141,42 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
         <div className={styles.menuContent}>
           <button
             type="button"
-            className={styles.gameCard}
+            className={`${styles.gameCard} ${styles.gameCardHof}`}
             onClick={() => setView('hof')}
           >
             <div className={`${styles.gameCardIcon} ${styles.iconBgAmber}`}>
               <Trophy size={24} />
             </div>
             <div className={styles.gameCardText}>
-              <span className={styles.gameCardLabel}>명예의 전당</span>
+              <span className={styles.gameCardLabel}>
+                <span className={styles.hofCrown} aria-hidden>👑</span>
+                명예의 전당
+              </span>
               <span className={styles.gameCardDesc}>매월 1·2·3등 영구 기록</span>
             </div>
             <ChevronRight size={18} className={styles.gameEntryArrow} />
           </button>
+
+          <button
+            type="button"
+            className={`${styles.gameCard} ${styles.gameCardMulti}`}
+            onClick={() => setView({ type: 'game', gameId: 'multi' })}
+          >
+            <div className={`${styles.gameCardIcon} ${styles.iconBgPurple}`}>
+              <Users size={24} />
+            </div>
+            <div className={styles.gameCardText}>
+              <span className={styles.gameCardLabel}>
+                온라인 대전
+                <span className={styles.liveBadge}>LIVE</span>
+              </span>
+              <span className={styles.gameCardDesc}>동료와 함께! 오목 · 윷놀이</span>
+            </div>
+            <ChevronRight size={18} className={styles.gameEntryArrow} />
+          </button>
+
+          <div className={styles.sectionLabel}>혼자 즐기기</div>
+
           {GAMES.map((g) => {
             const Icon = g.icon;
             return (

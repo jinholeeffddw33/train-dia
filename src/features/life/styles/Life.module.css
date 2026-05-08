@@ -311,6 +311,94 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── 명예의 전당 (강조 카드) ── */
+.gameCardHof {
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 0%, rgba(245, 158, 11, 0.18), transparent 55%),
+    linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02) 60%),
+    var(--dia-surface);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, 0.12) inset,
+    0 6px 18px rgba(245, 158, 11, 0.18);
+  overflow: hidden;
+}
+
+.gameCardHof::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 110px; height: 110px;
+  background: radial-gradient(circle at 80% 20%, rgba(252, 211, 77, 0.35), transparent 60%);
+  pointer-events: none;
+}
+
+.gameCardHof:active {
+  background:
+    radial-gradient(circle at 85% 0%, rgba(245, 158, 11, 0.22), transparent 55%),
+    linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04) 60%),
+    var(--dia-surface-hover);
+}
+
+.hofCrown {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+/* ── 온라인 대전 (강조 카드) ── */
+.gameCardMulti {
+  background:
+    radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.16), transparent 55%),
+    linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(139, 92, 246, 0.02) 60%),
+    var(--dia-surface);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.1) inset,
+    0 6px 18px rgba(139, 92, 246, 0.18);
+}
+
+.gameCardMulti:active {
+  background:
+    radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.22), transparent 55%),
+    linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(139, 92, 246, 0.04) 60%),
+    var(--dia-surface-hover);
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius: var(--dia-radius-full);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  animation: liveBadgePulse 2s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+@keyframes liveBadgePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+  50% { opacity: 0.85; box-shadow: 0 0 14px rgba(239, 68, 68, 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveBadge { animation: none; }
+}
+
+/* ── 섹션 구분 라벨 ── */
+.sectionLabel {
+  margin: var(--dia-space-4) var(--dia-space-1) var(--dia-space-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+  letter-spacing: 0.3px;
+}
+
 /* ── 헤더 (리스트/상세/글쓰기 공통) ── */
 .header {
   position: sticky; top: 0; z-index: 20;

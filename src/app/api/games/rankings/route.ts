@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
+import { settleAndResetPastMonths } from '@/lib/games/monthlyReset';
 
 /** GET: 랭킹 조회 — ?game=snake&period=all|month */
 export async function GET(req: NextRequest) {
@@ -12,6 +13,8 @@ export async function GET(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ code: 'UNAUTHORIZED', message: '로그인이 필요합니다' }, { status: 401 });
   }
+
+  await settleAndResetPastMonths();
 
   const { searchParams } = new URL(req.url);
   const game = searchParams.get('game') ?? 'snake';

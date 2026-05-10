@@ -214,17 +214,17 @@ export default function OmokGame({ roomCode, role, onLeave }: Props) {
 
       <div className={styles.boardOuter}>
         <div className={styles.board} role="grid" aria-label="오목판">
-          {/* 격자선 */}
-          <svg className={styles.gridSvg} viewBox={`0 0 ${SIZE - 1} ${SIZE - 1}`} preserveAspectRatio="none" aria-hidden>
+          {/* 격자선 — 각 셀의 중심을 통과하도록 0.5 오프셋 */}
+          <svg className={styles.gridSvg} viewBox={`0 0 ${SIZE} ${SIZE}`} preserveAspectRatio="none" aria-hidden>
             {Array.from({ length: SIZE }).map((_, i) => (
-              <line key={`h${i}`} x1="0" y1={i} x2={SIZE - 1} y2={i} stroke="currentColor" strokeWidth="0.04" />
+              <line key={`h${i}`} x1="0.5" y1={i + 0.5} x2={SIZE - 0.5} y2={i + 0.5} stroke="currentColor" strokeWidth="0.04" />
             ))}
             {Array.from({ length: SIZE }).map((_, i) => (
-              <line key={`v${i}`} x1={i} y1="0" x2={i} y2={SIZE - 1} stroke="currentColor" strokeWidth="0.04" />
+              <line key={`v${i}`} x1={i + 0.5} y1="0.5" x2={i + 0.5} y2={SIZE - 0.5} stroke="currentColor" strokeWidth="0.04" />
             ))}
             {/* 화점 */}
             {[3, 7, 11].flatMap((cy) => [3, 7, 11].map((cx) => (
-              <circle key={`hs-${cx}-${cy}`} cx={cx} cy={cy} r="0.15" fill="currentColor" />
+              <circle key={`hs-${cx}-${cy}`} cx={cx + 0.5} cy={cy + 0.5} r="0.15" fill="currentColor" />
             )))}
           </svg>
           {/* 셀 (탭 영역 + 돌) */}

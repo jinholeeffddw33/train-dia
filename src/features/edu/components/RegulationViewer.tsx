@@ -87,6 +87,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const [fontSize, setFontSize] = useState<FontSize>('normal');
   const [pdfOpen, setPdfOpen] = useState(false);
   const [tocOpen, setTocOpen] = useState(true);
+  const [visiblePage, setVisiblePage] = useState<number>(1);
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const pageRefs = useRef<Map<number, HTMLElement>>(new Map());
   const tocAnchorRefs = useRef<Map<string, HTMLElement>>(new Map());
@@ -118,6 +119,33 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
       });
     }
   }, [initialPage, loading, pages]);
+
+  // 본문 스크롤에 따라 현재 보이는 페이지 추적
+  useEffect(() => {
+    if (loading || pages.length === 0 || !bodyRef.current) return;
+    const root = bodyRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // 가장 위쪽에 보이는 페이지를 현재 페이지로 인식
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          const pageStr = (visible[0].target as HTMLElement).dataset.page;
+          if (pageStr) setVisiblePage(parseInt(pageStr, 10));
+        }
+      },
+      { root, threshold: [0, 0.1], rootMargin: '0px 0px -70% 0px' },
+    );
+    pageRefs.current.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [loading, pages]);
+
+  // PDF iframe src에 현재 페이지 hash 추가
+  const pdfSrcWithPage = useMemo(() => {
+    if (!pdfUrl) return '';
+    return `${pdfUrl}#page=${visiblePage}`;
+  }, [pdfUrl, visiblePage]);
 
   // 목차 (장·절) 파싱
   const tocEntries = useMemo(() => parseToc(pages), [pages]);
@@ -392,6 +420,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
                 if (el) pageRefs.current.set(p.page, el);
                 else pageRefs.current.delete(p.page);
               }}
+              data-page={p.page}
               className={styles.page}
             >
               <span className={styles.pageNum}>p. {p.page}</span>
@@ -409,10 +438,10 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
             <button type="button" className={styles.backBtn} onClick={() => setPdfOpen(false)} aria-label="닫기">
               <ArrowLeft size={20} />
             </button>
-            <h2 className={styles.title}>{title} (원본)</h2>
+            <h2 className={styles.title}>{title} (원본 p.{visiblePage})</h2>
           </div>
           <div className={styles.pdfIframeWrap}>
-            <iframe src={pdfUrl} title={`${title} 원본 PDF`} className={styles.pdfIframe} />
+            <iframe src={pdfSrcWithPage} title={`${title} 원본 PDF p.${visiblePage}`} className={styles.pdfIframe} />
           </div>
         </div>
       )}

@@ -7,6 +7,9 @@
       "url": "/data/edu/regulations/operation-rules-search.json",
       "pdfUrl": "/data/edu/regulations/operation-rules.pdf",
       "version": "24.5.8"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/operation-rules-quiz.json"
     }
   },
   {

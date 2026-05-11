@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { ArrowLeft, Shield, Crown, Lock, Check } from 'lucide-react';
+import { ArrowLeft, Shield, Crown, Lock, Check, BookOpen, AlertCircle } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useBonsaiStore } from '@/stores/bonsai';
 import { useEduStore } from '../hooks/useEduStore';
@@ -115,6 +115,49 @@ function isLevelPassed(levelId: number, levelScores: Record<number, number>, lev
 /** 영역 이름 맵 */
 const AREA_LABELS: Record<string, string> = {};
 
+/** 규정 시험 목록 (training.json과 동기화) */
+interface RegulationDef {
+  id: string;
+  title: string;
+  quizUrl: string;
+  totalQuestions: number;
+  shortName: string;
+}
+
+const REGULATIONS: RegulationDef[] = [
+  { id: 'crew-management-rules',  title: '승무원지도운용내규',     shortName: '승무원',   quizUrl: '/data/edu/regulations/crew-management-rules-quiz.json',  totalQuestions: 64 },
+  { id: 'operating-staff-rules',  title: '운전관계직원업무내규',   shortName: '운전직원', quizUrl: '/data/edu/regulations/operating-staff-rules-quiz.json',  totalQuestions: 104 },
+  { id: 'depot-operation-rules',  title: '차량기지운전취급내규',   shortName: '차량기지', quizUrl: '/data/edu/regulations/depot-operation-rules-quiz.json',  totalQuestions: 126 },
+  { id: 'safety-record-rules',    title: '운전무사고성적심사규정', shortName: '무사고',   quizUrl: '/data/edu/regulations/safety-record-rules-quiz.json',    totalQuestions: 26 },
+];
+
+/** 규정 wrongAnswer의 chapterId 프리픽스 */
+const REG_CHAPTER_PREFIX = 'reg::';
+
+/** 규정 raw 문제(options/answer) → 통합 스키마(choices/answer) */
+interface RawRegQuestion {
+  id: string;
+  page?: number;
+  question: string;
+  options: string[];
+  answer: number;
+  explanation: string;
+}
+function normalizeRegQuestion(q: RawRegQuestion, reg: RegulationDef) {
+  return {
+    id: `${reg.id}::${q.id}`,
+    chapter: reg.id,
+    area: reg.id,
+    level: 0,
+    page: q.page,
+    question: q.question,
+    choices: q.options,
+    answer: q.answer,
+    explanation: q.explanation,
+    _regulationTitle: reg.title,
+  };
+}
+
 export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
   const [levels, setLevels] = useState<LevelDef[]>([]);
@@ -123,6 +166,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   const [quizMode, setQuizMode] = useState<QuizMode>(wrongOnly ? 'wrong-only' : 'standard');
   const [quizLevelId, setQuizLevelId] = useState<number | undefined>();
   const [quizAreaId, setQuizAreaId] = useState<string | undefined>();
+  const [quizRegulationId, setQuizRegulationId] = useState<string | undefined>();
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -132,8 +176,8 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
   const [resolvedInSession, setResolvedInSession] = useState(0);
 
   const {
-    addQuizRecord, addWrongAnswer, resolveWrongAnswer, updateLevelScore,
-    previousScore, totalQuizzes, unresolvedWrongs, levelScores,
+    addQuizRecord, addWrongAnswer, resolveWrongAnswer, updateLevelScore, updateRegulationScore,
+    previousScore, totalQuizzes, unresolvedWrongs, levelScores, regulationScores,
   } = useEduStore();
 
   // 퀴즈/결과 화면에서 뒤로가기 → setup 화면으로 복귀
@@ -212,8 +256,24 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     const pool = allQuestions.filter(q => q.area === areaId);
     setQuizAreaId(areaId);
     setQuizLevelId(undefined);
+    setQuizRegulationId(undefined);
     startQuizWith(pool, pool.length, 'area');
   }, [allQuestions, startQuizWith]);
+
+  const startRegulationQuiz = useCallback(async (reg: RegulationDef) => {
+    try {
+      const res = await fetch(reg.quizUrl);
+      const data: { questions: RawRegQuestion[] } = await res.json();
+      const pool = data.questions.map((q) => normalizeRegQuestion(q, reg));
+      if (pool.length === 0) return;
+      setQuizRegulationId(reg.id);
+      setQuizLevelId(undefined);
+      setQuizAreaId(undefined);
+      startQuizWith(pool, pool.length, 'regulation');
+    } catch {
+      // 무시 (loading 실패 시 setup에 머무름)
+    }
+  }, [startQuizWith]);
 
   const handleSelect = useCallback((choiceIdx: number) => {
     if (answered) return;
@@ -229,13 +289,14 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
     } else {
       setWrongInSession(prev => prev + 1);
       if (!q._isFromWrongNote) {
+        const isReg = !!q._regulationTitle;
         addWrongAnswer({
           questionId: q.id, question: q.question,
           choices: q.originalChoices, answer: q.originalAnswer,
           selected: q.originalChoices.indexOf(q.choices[choiceIdx]),
           explanation: q.explanation,
-          chapter: AREA_LABELS[q.area] ?? q.chapter,
-          chapterId: q.chapter,
+          chapter: isReg ? q._regulationTitle : (AREA_LABELS[q.area] ?? q.chapter),
+          chapterId: isReg ? `${REG_CHAPTER_PREFIX}${q.chapter}` : q.chapter,
         });
       }
     }
@@ -252,6 +313,10 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
       // 70점 이상 합격 시 분재 성장 (연료 공급)
       if (percent >= 70) {
         try { useBonsaiStore.getState().recordQuizPass(); } catch { /* ignore */ }
+      }
+      // 규정 시험 점수 저장
+      if (quizMode === 'regulation' && quizRegulationId) {
+        updateRegulationScore(quizRegulationId, score, questions.length);
       }
       // 등급 도전 모드일 때 점수 기록 + 서버 전송
       if (quizMode === 'level' && quizLevelId) {
@@ -272,7 +337,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
       }
       setPhase('result');
     }
-  }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizLevelId, updateLevelScore]);
+  }, [currentIdx, questions.length, score, addQuizRecord, quizMode, quizLevelId, quizRegulationId, updateLevelScore, updateRegulationScore]);
 
   const nextBtnRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -418,6 +483,51 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
             })}
           </div>
 
+          {/* 규정별 시험 */}
+          <div className={styles.sectionDivider}>규정별 시험</div>
+          <div className={styles.regulationList}>
+            {REGULATIONS.map((reg) => {
+              const rec = regulationScores[reg.id];
+              const unresolved = unresolvedWrongs.filter(
+                (w) => w.chapterId === `${REG_CHAPTER_PREFIX}${reg.id}`,
+              ).length;
+              const bestPercent = rec?.bestPercent ?? 0;
+              const attempts = rec?.attempts ?? 0;
+              const gradeClass = !rec ? '' : bestPercent >= 80 ? styles.gradeGreen : bestPercent >= 60 ? styles.gradeOrange : styles.gradeRed;
+              return (
+                <button
+                  key={reg.id}
+                  type="button"
+                  className={styles.regulationCard}
+                  onClick={() => startRegulationQuiz(reg)}
+                >
+                  <div className={styles.regulationCardIcon}>
+                    <BookOpen size={22} />
+                  </div>
+                  <div className={styles.regulationCardBody}>
+                    <div className={styles.regulationCardTitle}>{reg.title}</div>
+                    <div className={styles.regulationCardMeta}>
+                      <span>{reg.totalQuestions}문제</span>
+                      {attempts > 0 && <span>· 도전 {attempts}회</span>}
+                      {unresolved > 0 && (
+                        <span className={styles.regulationCardWrong}>
+                          <AlertCircle size={11} /> 오답 {unresolved}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={styles.regulationCardRight}>
+                    {rec ? (
+                      <span className={`${styles.regulationCardScore} ${gradeClass}`}>{bestPercent}점</span>
+                    ) : (
+                      <span className={styles.regulationCardGo}>도전</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
           {/* 시험 기록 */}
           <div className={styles.sectionDivider}>시험 기록</div>
           {totalQuizzes > 0 ? (
@@ -460,7 +570,11 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
             <ArrowLeft size={20} strokeWidth={2} />
           </button>
           <h1 className={styles.topTitle}>
-            {isWrongMode ? '오답 재시험 결과' : isLevelMode && levelDef ? `${levelDef.name} 결과` : '결과'}
+            {isWrongMode ? '오답 재시험 결과'
+              : isLevelMode && levelDef ? `${levelDef.name} 결과`
+              : quizMode === 'regulation' && quizRegulationId
+                ? `${REGULATIONS.find((r) => r.id === quizRegulationId)?.shortName ?? '규정'} 결과`
+                : '결과'}
           </h1>
         </div>
 
@@ -518,6 +632,13 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
               </button>
             ) : isLevelMode && quizLevelId ? (
               <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => startLevelQuiz(quizLevelId)}>
+                다시 도전
+              </button>
+            ) : quizMode === 'regulation' && quizRegulationId ? (
+              <button type="button" className={`${styles.resultBtn} ${styles.resultBtnPrimary}`} onClick={() => {
+                const reg = REGULATIONS.find((r) => r.id === quizRegulationId);
+                if (reg) startRegulationQuiz(reg);
+              }}>
                 다시 도전
               </button>
             ) : (

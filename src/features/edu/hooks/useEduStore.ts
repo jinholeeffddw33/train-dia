@@ -2,7 +2,15 @@ import { useState, useCallback, useEffect } from 'react';
 
 /* ── 타입 ── */
 
-export type QuizMode = 'quick' | 'standard' | 'full' | 'chapter' | 'wrong-only' | 'level' | 'area';
+export type QuizMode = 'quick' | 'standard' | 'full' | 'chapter' | 'wrong-only' | 'level' | 'area' | 'regulation';
+
+export interface RegulationScore {
+  bestPercent: number;
+  bestScore: number;
+  bestTotal: number;
+  attempts: number;
+  lastDate: string;
+}
 
 export interface QuizRecord {
   date: string;       // ISO
@@ -46,10 +54,12 @@ export interface EduProgress {
   lastStudyDate?: string;                       // YYYY-MM-DD
   /** 등급 해금 상태: levelScores[level] = 최고점수 (70+ or 80+ 이면 다음 레벨 해금) */
   levelScores: Record<number, number>;
+  /** 규정별 점수: regulationId → 최고 기록 */
+  regulationScores: Record<string, RegulationScore>;
 }
 
 const STORAGE_KEY = 'train-dia-edu-progress';
-const CURRENT_VERSION = 4;
+const CURRENT_VERSION = 5;
 const MAX_RECENT_SECTIONS = 10;
 
 const EMPTY_PROGRESS: EduProgress = {
@@ -61,6 +71,7 @@ const EMPTY_PROGRESS: EduProgress = {
   recentSections: [],
   streak: 0,
   levelScores: {},
+  regulationScores: {},
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -119,6 +130,19 @@ function migrateProgress(data: any): EduProgress {
   // v4+: levelScores 기본값
   if (!data.levelScores) {
     data.levelScores = {};
+  }
+
+  // v4 → v5: regulationScores 추가
+  if (data.version < 5) {
+    data = {
+      ...data,
+      version: 5,
+      regulationScores: data.regulationScores ?? {},
+    };
+  }
+
+  if (!data.regulationScores) {
+    data.regulationScores = {};
   }
 
   return data as EduProgress;
@@ -251,6 +275,28 @@ export function useEduStore() {
     }));
   }, []);
 
+  /* ── 규정 점수 기록 ── */
+  const updateRegulationScore = useCallback((regulationId: string, score: number, total: number) => {
+    setProgress(prev => {
+      const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+      const existing = prev.regulationScores[regulationId];
+      const now = new Date().toISOString();
+      const next: RegulationScore = existing
+        ? {
+            bestPercent: Math.max(existing.bestPercent, percent),
+            bestScore: percent > existing.bestPercent ? score : existing.bestScore,
+            bestTotal: percent > existing.bestPercent ? total : existing.bestTotal,
+            attempts: existing.attempts + 1,
+            lastDate: now,
+          }
+        : { bestPercent: percent, bestScore: score, bestTotal: total, attempts: 1, lastDate: now };
+      return {
+        ...prev,
+        regulationScores: { ...prev.regulationScores, [regulationId]: next },
+      };
+    });
+  }, []);
+
   /* ── 등급 점수 기록 ── */
   const updateLevelScore = useCallback((level: number, percent: number) => {
     setProgress(prev => {
@@ -303,5 +349,7 @@ export function useEduStore() {
     unresolvedWrongs,
     updateLevelScore,
     levelScores: progress.levelScores,
+    updateRegulationScore,
+    regulationScores: progress.regulationScores,
   };
 }

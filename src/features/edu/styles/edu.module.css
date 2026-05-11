@@ -1691,6 +1691,114 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── 규정별 시험 카드 ── */
+.regulationList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-4);
+}
+
+.regulationCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: var(--dia-space-3);
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.04)),
+    var(--dia-surface);
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+.regulationCard:active {
+  transform: scale(0.98);
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(139, 92, 246, 0.08)),
+    var(--dia-surface-hover);
+}
+
+.regulationCardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--dia-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+  color: #60A5FA;
+  flex-shrink: 0;
+}
+
+.regulationCardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.regulationCardTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.regulationCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--dia-text-tertiary);
+}
+
+.regulationCardWrong {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 6px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  font-weight: 700;
+}
+
+.regulationCardRight {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+}
+
+.regulationCardScore {
+  font-size: 17px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.regulationCardGo {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60A5FA;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 /* ── 결과 — 등급 뱃지 ── */
 .resultLevelBadge {
   display: flex;

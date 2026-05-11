@@ -3154,6 +3154,25 @@
   padding: var(--dia-space-4);
 }
 
+/* PDF 뷰어 — 풀스크린 iframe */
+.pdfIframeWrap {
+  flex: 1;
+  width: 100%;
+  background: var(--dia-bg-elevated);
+  overflow: hidden;
+}
+
+.pdfIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+.trainingBtnPdf {
+  /* PDF 버튼 — 슬라이드/동영상과 동일한 3D 스타일 */
+}
+
 /* ===== 구원연결 조치순서 인터랙티브 뷰어 ===== */
 
 .rescueScreen {

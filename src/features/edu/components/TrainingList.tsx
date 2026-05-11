@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, BookOpen, Play, X, Calendar } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, X, FileText } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from '../styles/edu.module.css';
+import RegulationViewer from './RegulationViewer';
 
 interface TrainingItem {
   id: string;
@@ -11,6 +12,7 @@ interface TrainingItem {
   category: string;
   slide?: { chapterIds: string[] };
   video?: { youtubeId: string };
+  doc?: { url: string; pdfUrl?: string; version?: string };
 }
 
 interface TrainingListProps {
@@ -23,9 +25,13 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeVideo, setActiveVideo] = useState<{ title: string; youtubeId: string } | null>(null);
+  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string; pdfUrl?: string } | null>(null);
 
   const closePlayer = useCallback(() => setActiveVideo(null), []);
   useHistoryBack('training-video', closePlayer, !!activeVideo);
+
+  const closeDoc = useCallback(() => setActiveDoc(null), []);
+  useHistoryBack('training-doc', closeDoc, !!activeDoc);
 
   useEffect(() => {
     fetch('/data/edu/training.json')
@@ -103,10 +109,30 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
                   <span>동영상</span>
                 </button>
               )}
+              {item.doc && (
+                <button
+                  type="button"
+                  className={`${styles.trainingBtn} ${styles.trainingBtnPdf}`}
+                  onClick={() => setActiveDoc({ title: item.title, url: item.doc!.url, pdfUrl: item.doc!.pdfUrl })}
+                >
+                  <FileText size={18} />
+                  <span>본문 열기</span>
+                </button>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* 규정 본문 뷰어 (검색·하이라이트·원본 PDF 보기) */}
+      {activeDoc && (
+        <RegulationViewer
+          title={activeDoc.title}
+          url={activeDoc.url}
+          pdfUrl={activeDoc.pdfUrl}
+          onClose={closeDoc}
+        />
+      )}
 
       {/* 동영상 풀스크린 플레이어 */}
       {activeVideo && (

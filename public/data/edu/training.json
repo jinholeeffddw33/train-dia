@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "operation-rules",
+    "title": "운전취급규정",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/operation-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/operation-rules.pdf",
+      "version": "24.5.8"
+    }
+  }
+]

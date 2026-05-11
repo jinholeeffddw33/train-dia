@@ -1,0 +1,295 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: max(var(--dia-space-3), env(safe-area-inset-top)) var(--dia-space-3) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.backBtn,
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-primary);
+  background: transparent;
+  border: none;
+  transition: background var(--dia-transition-fast), transform 0.12s ease;
+}
+
+.backBtn:active,
+.iconBtn:active {
+  background: var(--dia-surface-hover);
+  transform: scale(0.92);
+}
+
+.title {
+  flex: 1;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.searchWrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  padding: 0 var(--dia-space-3);
+  min-width: 0;
+}
+
+.searchIcon {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--dia-text-primary);
+  font-size: 15px;
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--dia-text-tertiary);
+}
+
+.searchClear {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-tertiary);
+  background: transparent;
+  border: none;
+  flex-shrink: 0;
+}
+
+.searchClear:active {
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-primary);
+}
+
+.matchInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--dia-space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+}
+
+.navBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  transition: transform 0.12s ease, background var(--dia-transition-fast);
+}
+
+.navBtn:active {
+  transform: scale(0.92);
+  background: var(--dia-surface-hover);
+}
+
+.navBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fontControls {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.fontLabel {
+  font-size: 13px;
+  color: var(--dia-text-tertiary);
+  margin-right: var(--dia-space-2);
+  flex-shrink: 0;
+}
+
+.fontBtn {
+  flex: 1;
+  height: 32px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform 0.12s ease, background var(--dia-transition-fast);
+}
+
+.fontBtn:active {
+  transform: scale(0.95);
+}
+
+.fontBtnActive {
+  background: var(--dia-blue, #3B82F6);
+  border-color: var(--dia-blue, #3B82F6);
+  color: #fff;
+}
+
+.pdfBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 0 12px;
+  height: 32px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.pdfBtn:active {
+  transform: scale(0.95);
+  background: var(--dia-surface-hover);
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-6) + env(safe-area-inset-bottom));
+}
+
+.loading,
+.emptyState {
+  padding: var(--dia-space-10) var(--dia-space-4);
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: 15px;
+}
+
+.page {
+  margin-bottom: var(--dia-space-6);
+  padding-bottom: var(--dia-space-5);
+  border-bottom: 1px dashed var(--dia-border-light, var(--dia-border));
+}
+
+.page:last-child {
+  border-bottom: none;
+}
+
+.pageNum {
+  display: inline-block;
+  padding: 2px 10px;
+  margin-bottom: var(--dia-space-3);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+}
+
+.pageText {
+  font-size: var(--reg-font-size, 16px);
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: var(--dia-text-primary);
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.highlight {
+  background: rgba(245, 158, 11, 0.4);
+  color: var(--dia-text-primary);
+  padding: 1px 2px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.highlightActive {
+  background: #f59e0b;
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.4);
+}
+
+/* PDF 풀스크린 */
+.pdfOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.pdfHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: max(var(--dia-space-3), env(safe-area-inset-top)) var(--dia-space-3) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.pdfIframeWrap {
+  flex: 1;
+  background: var(--dia-bg-elevated);
+  overflow: hidden;
+}
+
+.pdfIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}

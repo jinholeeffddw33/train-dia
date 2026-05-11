@@ -56,6 +56,9 @@
       "url": "/data/edu/regulations/depot-operation-rules-search.json",
       "pdfUrl": "/data/edu/regulations/depot-operation-rules.pdf",
       "version": "24.5.8"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/depot-operation-rules-quiz.json"
     }
   }
 ]

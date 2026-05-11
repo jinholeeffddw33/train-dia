@@ -30,6 +30,9 @@
       "url": "/data/edu/regulations/operating-staff-rules-search.json",
       "pdfUrl": "/data/edu/regulations/operating-staff-rules.pdf",
       "version": "21.11.5"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/operating-staff-rules-quiz.json"
     }
   },
   {

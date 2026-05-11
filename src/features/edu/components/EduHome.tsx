@@ -38,7 +38,7 @@ const MENU_ITEMS = [
   { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  color: 'green'  as const, action: 'video-guide' as const, targets: [] },
   { id: 'repair',         label: '고장조치',  icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
   { id: 'newcomer',       label: '새내기',    icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer-handbook' as const, targets: [] },
-  { id: 'edu',            label: '교육훈련',  icon: GraduationCap, color: 'blue'   as const, action: 'training' as const, targets: [] },
+  { id: 'edu',            label: '규정',     icon: GraduationCap, color: 'blue'   as const, action: 'training' as const, targets: [] },
   { id: 'exam',           label: '평가',     icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',         label: '내 정보',  icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
 ];

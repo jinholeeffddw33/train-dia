@@ -46,7 +46,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} />
         </button>
-        <h2 className={styles.topTitle}>교육훈련</h2>
+        <h2 className={styles.topTitle}>규정</h2>
       </div>
 
       <div className={styles.trainingListWrap}>
@@ -58,7 +58,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
 
         {error && (
           <div className={styles.videoEmpty}>
-            <p>교육자료를 불러올 수 없어요</p>
+            <p>규정 자료를 불러올 수 없어요</p>
             <button
               type="button"
               className={styles.videoRetryBtn}
@@ -72,7 +72,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
         {!loading && !error && items.length === 0 && (
           <div className={styles.videoEmpty}>
             <BookOpen size={40} />
-            <p>아직 등록된 교육자료가 없어요</p>
+            <p>아직 등록된 규정이 없어요</p>
           </div>
         )}
 

@@ -141,10 +141,11 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     return () => observer.disconnect();
   }, [loading, pages]);
 
-  // PDF iframe src에 현재 페이지 hash 추가
+  // PDF.js 자체 뷰어로 표시 (iOS Safari 등 모든 브라우저에서 #page=N 정확 동작)
   const pdfSrcWithPage = useMemo(() => {
     if (!pdfUrl) return '';
-    return `${pdfUrl}#page=${visiblePage}`;
+    const encoded = encodeURIComponent(pdfUrl);
+    return `/pdfjs/web/viewer.html?file=${encoded}#page=${visiblePage}`;
   }, [pdfUrl, visiblePage]);
 
   // 목차 (장·절) 파싱

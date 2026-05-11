@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './RegulationViewer.module.css';
 
@@ -26,8 +26,57 @@ const FONT_SIZE_MAP: Record<FontSize, string> = {
   large: '20px',
 };
 
+interface TocEntry {
+  id: string;
+  kind: 'chapter' | 'section';
+  num: number;
+  title: string;
+  page: number;
+  startInPage: number;
+  matchLength: number;
+}
+
+const CHAPTER_RE = /제\s*(\d+)\s*장\s*([\s\S]{1,30}?)(?=\s*제\s*\d+\s*[조절])/g;
+const SECTION_RE = /제\s*(\d+)\s*절\s*([\s\S]{1,30}?)(?=\s*제\s*\d+\s*조)/g;
+
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseToc(pages: RegulationPage[]): TocEntry[] {
+  const entries: TocEntry[] = [];
+  for (const p of pages) {
+    for (const m of p.text.matchAll(CHAPTER_RE)) {
+      const num = parseInt(m[1], 10);
+      const title = m[2].replace(/\s+/g, '').trim();
+      if (!title) continue;
+      entries.push({
+        id: `ch-${p.page}-${m.index}`,
+        kind: 'chapter',
+        num,
+        title,
+        page: p.page,
+        startInPage: m.index ?? 0,
+        matchLength: m[0].length,
+      });
+    }
+    for (const m of p.text.matchAll(SECTION_RE)) {
+      const num = parseInt(m[1], 10);
+      const title = m[2].replace(/\s+/g, '').trim();
+      if (!title) continue;
+      entries.push({
+        id: `sec-${p.page}-${m.index}`,
+        kind: 'section',
+        num,
+        title,
+        page: p.page,
+        startInPage: m.index ?? 0,
+        matchLength: m[0].length,
+      });
+    }
+  }
+  // 페이지·페이지내 위치 순으로 정렬
+  return entries.sort((a, b) => (a.page === b.page ? a.startInPage - b.startInPage : a.page - b.page));
 }
 
 export default function RegulationViewer({ title, url, pdfUrl, initialPage, onClose }: Props) {
@@ -37,8 +86,10 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const [activeMatchIdx, setActiveMatchIdx] = useState(0);
   const [fontSize, setFontSize] = useState<FontSize>('normal');
   const [pdfOpen, setPdfOpen] = useState(false);
+  const [tocOpen, setTocOpen] = useState(true);
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
   const pageRefs = useRef<Map<number, HTMLElement>>(new Map());
+  const tocAnchorRefs = useRef<Map<string, HTMLElement>>(new Map());
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useHistoryBack('regulation-pdf', () => setPdfOpen(false), pdfOpen);
@@ -68,7 +119,10 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     }
   }, [initialPage, loading, pages]);
 
-  // Pre-compute total match count and per-page positions
+  // 목차 (장·절) 파싱
+  const tocEntries = useMemo(() => parseToc(pages), [pages]);
+
+  // 검색 매치 카운트
   const { totalMatches, perPageMatchCount } = useMemo(() => {
     const q = query.trim();
     if (!q) return { totalMatches: 0, perPageMatchCount: [] as number[] };
@@ -82,13 +136,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     return { totalMatches: total, perPageMatchCount: perPage };
   }, [query, pages]);
 
-  // Reset active match when query changes
+  // 검색어 변경 시 활성 매치 리셋
   useEffect(() => {
     setActiveMatchIdx(0);
     matchRefs.current = [];
   }, [query]);
 
-  // Scroll active match into view
+  // 활성 매치로 스크롤
   useEffect(() => {
     if (totalMatches === 0) return;
     const el = matchRefs.current[activeMatchIdx];
@@ -97,16 +151,17 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     }
   }, [activeMatchIdx, totalMatches]);
 
-  const renderPageText = useCallback((text: string, pageStartIdx: number) => {
+  // 검색 하이라이트만 적용된 텍스트 렌더
+  const renderHighlighted = useCallback((text: string, startIdx: number): ReactNode[] => {
     const q = query.trim();
-    if (!q) return <span>{text}</span>;
+    if (!q) return [<span key="t">{text}</span>];
     const re = new RegExp(`(${escapeRegExp(q)})`, 'gi');
     const parts = text.split(re);
-    let localMatchIdx = 0;
+    let local = 0;
     return parts.map((part, i) => {
       if (i % 2 === 1) {
-        const globalIdx = pageStartIdx + localMatchIdx;
-        localMatchIdx += 1;
+        const globalIdx = startIdx + local;
+        local += 1;
         const isActive = globalIdx === activeMatchIdx;
         return (
           <mark
@@ -122,6 +177,58 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     });
   }, [query, activeMatchIdx]);
 
+  // 페이지 텍스트를 장·절 마커 기준으로 분할 후 렌더
+  const renderPageBody = useCallback((p: RegulationPage, pageStartIdx: number) => {
+    const pageToc = tocEntries.filter((e) => e.page === p.page);
+    const segments: ReactNode[] = [];
+    const q = query.trim();
+    const countRe = q ? new RegExp(escapeRegExp(q), 'gi') : null;
+    let cursor = 0;
+    let localMatchOffset = 0;
+
+    const pushText = (slice: string, key: string) => {
+      if (slice.length === 0) return;
+      segments.push(
+        <span key={key}>{renderHighlighted(slice, pageStartIdx + localMatchOffset)}</span>,
+      );
+      if (countRe) {
+        localMatchOffset += (slice.match(countRe) || []).length;
+      }
+    };
+
+    for (const toc of pageToc) {
+      if (cursor < toc.startInPage) {
+        pushText(p.text.slice(cursor, toc.startInPage), `t-${cursor}`);
+      }
+      const markerText = p.text.slice(toc.startInPage, toc.startInPage + toc.matchLength);
+      // 머리말 부분 추출: "제N장" + 공백/줄바꿈 후의 제목까지
+      const headerLabel = `제${toc.num}${toc.kind === 'chapter' ? '장' : '절'}`;
+      segments.push(
+        <span
+          key={toc.id}
+          ref={(el) => {
+            if (el) tocAnchorRefs.current.set(toc.id, el);
+            else tocAnchorRefs.current.delete(toc.id);
+          }}
+          className={toc.kind === 'chapter' ? styles.chapterMark : styles.sectionMark}
+          data-toc-id={toc.id}
+        >
+          <span className={toc.kind === 'chapter' ? styles.chapterBadge : styles.sectionBadge}>{headerLabel}</span>
+          <span className={styles.markTitle}>{toc.title}</span>
+          {/* 원문에 포함된 raw 마커도 검색 인덱스 유지를 위해 보이지 않게 유지 */}
+          <span className={styles.srOnly}>{markerText}</span>
+        </span>,
+      );
+      cursor = toc.startInPage + toc.matchLength;
+    }
+
+    if (cursor < p.text.length) {
+      pushText(p.text.slice(cursor), `t-${cursor}-end`);
+    }
+
+    return segments;
+  }, [tocEntries, query, renderHighlighted]);
+
   const handlePrev = useCallback(() => {
     setActiveMatchIdx((prev) => (prev - 1 + totalMatches) % totalMatches);
   }, [totalMatches]);
@@ -136,6 +243,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
       handleNext();
     }
   }, [totalMatches, handleNext]);
+
+  const scrollToToc = useCallback((tocId: string) => {
+    const el = tocAnchorRefs.current.get(tocId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   const computedFontSize = FONT_SIZE_MAP[fontSize];
 
@@ -230,6 +344,45 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
         {!loading && pages.length === 0 && (
           <div className={styles.emptyState}>본문을 불러올 수 없어요</div>
         )}
+
+        {/* 목차 카드 */}
+        {!loading && tocEntries.length > 0 && (
+          <div className={styles.tocCard}>
+            <button
+              type="button"
+              className={styles.tocToggle}
+              onClick={() => setTocOpen((o) => !o)}
+              aria-expanded={tocOpen}
+            >
+              <span className={styles.tocToggleLeft}>
+                <List size={18} />
+                <span className={styles.tocToggleLabel}>목차</span>
+                <span className={styles.tocCount}>{tocEntries.filter((e) => e.kind === 'chapter').length}장 · {tocEntries.filter((e) => e.kind === 'section').length}절</span>
+              </span>
+              {tocOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+            {tocOpen && (
+              <ul className={styles.tocList}>
+                {tocEntries.map((entry) => (
+                  <li key={entry.id} className={entry.kind === 'chapter' ? styles.tocItemChapter : styles.tocItemSection}>
+                    <button
+                      type="button"
+                      className={entry.kind === 'chapter' ? styles.tocBtnChapter : styles.tocBtnSection}
+                      onClick={() => scrollToToc(entry.id)}
+                    >
+                      <span className={entry.kind === 'chapter' ? styles.tocBadgeChapter : styles.tocBadgeSection}>
+                        제{entry.num}{entry.kind === 'chapter' ? '장' : '절'}
+                      </span>
+                      <span className={styles.tocTitle}>{entry.title}</span>
+                      <span className={styles.tocPage}>p.{entry.page}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
         {!loading && pages.map((p, idx) => {
           const pageStartIdx = perPageMatchCount.slice(0, idx).reduce((a, b) => a + b, 0);
           return (
@@ -243,7 +396,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
             >
               <span className={styles.pageNum}>p. {p.page}</span>
               <div className={styles.pageText}>
-                {renderPageText(p.text, pageStartIdx)}
+                {renderPageBody(p, pageStartIdx)}
               </div>
             </section>
           );

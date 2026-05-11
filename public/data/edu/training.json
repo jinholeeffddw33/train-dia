@@ -17,6 +17,9 @@
       "url": "/data/edu/regulations/crew-management-rules-search.json",
       "pdfUrl": "/data/edu/regulations/crew-management-rules.pdf",
       "version": "24.5.8"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/crew-management-rules-quiz.json"
     }
   },
   {
@@ -37,6 +40,9 @@
       "url": "/data/edu/regulations/safety-record-rules-search.json",
       "pdfUrl": "/data/edu/regulations/safety-record-rules.pdf",
       "version": "24.5.8"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/safety-record-rules-quiz.json"
     }
   },
   {

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, BookOpen, Play, X, FileText } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from '../styles/edu.module.css';
 import RegulationViewer from './RegulationViewer';
+import QuizPlayer from './QuizPlayer';
 
 interface TrainingItem {
   id: string;
@@ -13,6 +14,7 @@ interface TrainingItem {
   slide?: { chapterIds: string[] };
   video?: { youtubeId: string };
   doc?: { url: string; pdfUrl?: string; version?: string };
+  quiz?: { url: string };
 }
 
 interface TrainingListProps {
@@ -25,13 +27,17 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeVideo, setActiveVideo] = useState<{ title: string; youtubeId: string } | null>(null);
-  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string; pdfUrl?: string } | null>(null);
+  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string; pdfUrl?: string; initialPage?: number } | null>(null);
+  const [activeQuiz, setActiveQuiz] = useState<{ title: string; url: string; docUrl?: string; pdfUrl?: string } | null>(null);
 
   const closePlayer = useCallback(() => setActiveVideo(null), []);
   useHistoryBack('training-video', closePlayer, !!activeVideo);
 
   const closeDoc = useCallback(() => setActiveDoc(null), []);
   useHistoryBack('training-doc', closeDoc, !!activeDoc);
+
+  const closeQuiz = useCallback(() => setActiveQuiz(null), []);
+  useHistoryBack('training-quiz', closeQuiz, !!activeQuiz);
 
   useEffect(() => {
     fetch('/data/edu/training.json')
@@ -119,6 +125,21 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
                   <span>본문 열기</span>
                 </button>
               )}
+              {item.quiz && (
+                <button
+                  type="button"
+                  className={`${styles.trainingBtn} ${styles.trainingBtnPdf}`}
+                  onClick={() => setActiveQuiz({
+                    title: item.title,
+                    url: item.quiz!.url,
+                    docUrl: item.doc?.url,
+                    pdfUrl: item.doc?.pdfUrl,
+                  })}
+                >
+                  <HelpCircle size={18} />
+                  <span>문제 풀기</span>
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -130,7 +151,27 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
           title={activeDoc.title}
           url={activeDoc.url}
           pdfUrl={activeDoc.pdfUrl}
+          initialPage={activeDoc.initialPage}
           onClose={closeDoc}
+        />
+      )}
+
+      {/* 규정 문제 풀이 */}
+      {activeQuiz && (
+        <QuizPlayer
+          title={activeQuiz.title}
+          url={activeQuiz.url}
+          onClose={closeQuiz}
+          onViewBody={(page) => {
+            if (activeQuiz.docUrl) {
+              setActiveDoc({
+                title: activeQuiz.title,
+                url: activeQuiz.docUrl,
+                pdfUrl: activeQuiz.pdfUrl,
+                initialPage: page,
+              });
+            }
+          }}
         />
       )}
 

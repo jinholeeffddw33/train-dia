@@ -14,6 +14,7 @@ interface Props {
   title: string;
   url: string;
   pdfUrl?: string;
+  initialPage?: number;
   onClose: () => void;
 }
 
@@ -29,7 +30,7 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export default function RegulationViewer({ title, url, pdfUrl, onClose }: Props) {
+export default function RegulationViewer({ title, url, pdfUrl, initialPage, onClose }: Props) {
   const [pages, setPages] = useState<RegulationPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -37,6 +38,7 @@ export default function RegulationViewer({ title, url, pdfUrl, onClose }: Props)
   const [fontSize, setFontSize] = useState<FontSize>('normal');
   const [pdfOpen, setPdfOpen] = useState(false);
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
+  const pageRefs = useRef<Map<number, HTMLElement>>(new Map());
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useHistoryBack('regulation-pdf', () => setPdfOpen(false), pdfOpen);
@@ -54,6 +56,17 @@ export default function RegulationViewer({ title, url, pdfUrl, onClose }: Props)
       .catch(() => active && setLoading(false));
     return () => { active = false; };
   }, [url]);
+
+  // initialPage가 지정되면 해당 페이지로 스크롤
+  useEffect(() => {
+    if (!initialPage || loading || pages.length === 0) return;
+    const el = pageRefs.current.get(initialPage);
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: 'auto', block: 'start' });
+      });
+    }
+  }, [initialPage, loading, pages]);
 
   // Pre-compute total match count and per-page positions
   const { totalMatches, perPageMatchCount } = useMemo(() => {
@@ -220,7 +233,14 @@ export default function RegulationViewer({ title, url, pdfUrl, onClose }: Props)
         {!loading && pages.map((p, idx) => {
           const pageStartIdx = perPageMatchCount.slice(0, idx).reduce((a, b) => a + b, 0);
           return (
-            <section key={p.page} className={styles.page}>
+            <section
+              key={p.page}
+              ref={(el) => {
+                if (el) pageRefs.current.set(p.page, el);
+                else pageRefs.current.delete(p.page);
+              }}
+              className={styles.page}
+            >
               <span className={styles.pageNum}>p. {p.page}</span>
               <div className={styles.pageText}>
                 {renderPageText(p.text, pageStartIdx)}

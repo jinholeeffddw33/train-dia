@@ -125,6 +125,7 @@ interface RegulationDef {
 }
 
 const REGULATIONS: RegulationDef[] = [
+  { id: 'operation-rules',        title: '운전취급규정',           shortName: '운전취급', quizUrl: '/data/edu/regulations/operation-rules-quiz.json',        totalQuestions: 268 },
   { id: 'crew-management-rules',  title: '승무원지도운용내규',     shortName: '승무원',   quizUrl: '/data/edu/regulations/crew-management-rules-quiz.json',  totalQuestions: 64 },
   { id: 'operating-staff-rules',  title: '운전관계직원업무내규',   shortName: '운전직원', quizUrl: '/data/edu/regulations/operating-staff-rules-quiz.json',  totalQuestions: 104 },
   { id: 'depot-operation-rules',  title: '차량기지운전취급내규',   shortName: '차량기지', quizUrl: '/data/edu/regulations/depot-operation-rules-quiz.json',  totalQuestions: 126 },

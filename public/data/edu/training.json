@@ -8,5 +8,45 @@
       "pdfUrl": "/data/edu/regulations/operation-rules.pdf",
       "version": "24.5.8"
     }
+  },
+  {
+    "id": "crew-management-rules",
+    "title": "승무원지도운용내규",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/crew-management-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/crew-management-rules.pdf",
+      "version": "24.5.8"
+    }
+  },
+  {
+    "id": "operating-staff-rules",
+    "title": "운전관계직원업무내규",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/operating-staff-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/operating-staff-rules.pdf",
+      "version": "21.11.5"
+    }
+  },
+  {
+    "id": "safety-record-rules",
+    "title": "운전무사고성적심사규정",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/safety-record-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/safety-record-rules.pdf",
+      "version": "24.5.8"
+    }
+  },
+  {
+    "id": "depot-operation-rules",
+    "title": "차량기지운전취급내규",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/depot-operation-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/depot-operation-rules.pdf",
+      "version": "24.5.8"
+    }
   }
 ]

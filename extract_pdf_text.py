@@ -3,8 +3,15 @@ import json
 import re
 from pathlib import Path
 
-PDF_PATH = Path("public/data/edu/regulations/operation-rules.pdf")
-OUT_PATH = Path("public/data/edu/regulations/operation-rules-search.json")
+REG_DIR = Path("public/data/edu/regulations")
+
+TARGETS = [
+    "operation-rules",
+    "crew-management-rules",
+    "operating-staff-rules",
+    "safety-record-rules",
+    "depot-operation-rules",
+]
 
 
 def normalize(text: str) -> str:
@@ -14,8 +21,10 @@ def normalize(text: str) -> str:
     return text.strip()
 
 
-def main() -> None:
-    doc = fitz.open(PDF_PATH)
+def extract_one(slug: str) -> None:
+    pdf_path = REG_DIR / f"{slug}.pdf"
+    out_path = REG_DIR / f"{slug}-search.json"
+    doc = fitz.open(pdf_path)
     pages = []
     for i, page in enumerate(doc, start=1):
         raw = page.get_text("text") or ""
@@ -23,9 +32,14 @@ def main() -> None:
         if not text:
             continue
         pages.append({"page": i, "text": text})
-    OUT_PATH.write_text(json.dumps(pages, ensure_ascii=False), encoding="utf-8")
-    total_chars = sum(len(p["text"]) for p in pages)
-    print(f"OK {len(pages)} pages, {total_chars:,} chars -> {OUT_PATH}")
+    out_path.write_text(json.dumps(pages, ensure_ascii=False), encoding="utf-8")
+    total = sum(len(p["text"]) for p in pages)
+    print(f"OK {slug}: {len(pages)} pages, {total:,} chars")
+
+
+def main() -> None:
+    for slug in TARGETS:
+        extract_one(slug)
 
 
 if __name__ == "__main__":

@@ -29,6 +29,8 @@ function getRouteImagePath(dia: string, date: Date): string | null {
 
 /** 주간 다이아 1~44 */
 const DAY_DIAS = Array.from({ length: 44 }, (_, i) => String(i + 1));
+/** 통상근무 다이아 51~54 (평일 전용) */
+const WEEKDAY_DIAS_LIST = ['51', '52', '53', '54'];
 /** 주간 대기 대1~대10 */
 const DAY_STANDBY = Array.from({ length: 10 }, (_, i) => `대${i + 1}`);
 /** 야간 다이아 62~91 */
@@ -36,7 +38,7 @@ const NIGHT_DIAS = Array.from({ length: 30 }, (_, i) => String(i + 62));
 /** 야간 대기 대61~대66 */
 const NIGHT_STANDBY = Array.from({ length: 6 }, (_, i) => `대${i + 61}`);
 
-const ALL_WORKING_DIAS = [...DAY_DIAS, ...DAY_STANDBY, ...NIGHT_DIAS, ...NIGHT_STANDBY];
+const ALL_WORKING_DIAS = [...DAY_DIAS, ...WEEKDAY_DIAS_LIST, ...DAY_STANDBY, ...NIGHT_DIAS, ...NIGHT_STANDBY];
 
 type FilterType = 'all' | 'day' | 'night' | 'standby';
 
@@ -93,7 +95,13 @@ export default function DutyTab() {
       }
     }
 
-    return ALL_WORKING_DIAS.map((dia): DiaEntry => {
+    // 통상근무 51~54는 평일에만 표시
+    const isHol = checkHoliday(date);
+    const workingDias = isHol
+      ? [...DAY_DIAS, ...DAY_STANDBY, ...NIGHT_DIAS, ...NIGHT_STANDBY]
+      : ALL_WORKING_DIAS;
+
+    return workingDias.map((dia): DiaEntry => {
       const driver = diaToDriver.get(dia) || null;
       const schedule = getSchedule(dia, date);
       const type = getType(dia);

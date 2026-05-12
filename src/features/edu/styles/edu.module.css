@@ -990,9 +990,6 @@
 /* ── 검색 wrap ── */
 .searchWrap {
   padding: var(--dia-space-3) var(--dia-space-4);
-  position: sticky;
-  top: 52px;
-  z-index: var(--dia-layer-sticky);
   background: var(--dia-bg);
 }
 
@@ -1634,11 +1631,9 @@
   align-items: center;
   justify-content: space-between;
   margin: 0 var(--dia-space-4) var(--dia-space-2);
-  background: rgba(30, 58, 100, 0.25);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(96, 165, 250, 0.12);
-  border-left: 3px solid rgba(96, 165, 250, 0.3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-left: 3px solid rgba(96, 165, 250, 0.45);
   border-radius: var(--dia-radius-md);
   padding: var(--dia-space-3) var(--dia-space-4);
   cursor: pointer;
@@ -1653,7 +1648,7 @@
 
 .levelCard:active:not(.levelLocked) {
   transform: scale(0.98);
-  background: rgba(30, 58, 100, 0.4);
+  background: var(--dia-surface-hover);
 }
 
 /* 등급 색상별 좌측 액센트바 */
@@ -1735,10 +1730,8 @@
   justify-content: center;
   gap: 4px;
   min-height: 56px;
-  background: rgba(30, 58, 100, 0.2);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(96, 165, 250, 0.1);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-md);
   padding: var(--dia-space-2) var(--dia-space-1);
   cursor: pointer;
@@ -1752,8 +1745,8 @@
 
 .areaChip:active {
   transform: scale(0.96);
-  background: rgba(30, 58, 100, 0.35);
-  border-color: rgba(96, 165, 250, 0.25);
+  background: var(--dia-surface-hover);
+  border-color: var(--dia-border-strong);
 }
 
 .areaChipName {
@@ -2730,24 +2723,27 @@
       rgba(10, 15, 31, 0.48) 100%);
 }
 
-/* screen 자체를 투명으로 만들어 Lottie 노출 */
-/* + 이 화면은 Lottie 보라 배경 위에 떠있으므로 라이트 모드에서도 항상 다크 톤 고정 */
-.screen {
+/* EduHome 전용 wrapper — Lottie 배경 위 항상 다크 톤 고정 */
+.screenHome {
   position: relative;
   background: transparent !important;
-  /* 다크 토큰 값으로 고정 (라이트 모드 진입해도 이 화면 안에서는 다크 색상 사용) */
+  color-scheme: dark;
+  --dia-bg: #0F172A;
+  --dia-bg-elevated: #131B2E;
+  --dia-surface: #1E293B;
+  --dia-surface-elevated: #273549;
+  --dia-surface-hover: #334155;
   --dia-text-primary: #F1F5F9;
   --dia-text-secondary: #94A3B8;
   --dia-text-tertiary: #64748B;
-  --dia-surface: #1E293B;
-  --dia-surface-hover: #334155;
   --dia-border: rgba(255, 255, 255, 0.08);
+  --dia-border-strong: rgba(255, 255, 255, 0.15);
   --dia-border-light: rgba(255, 255, 255, 0.04);
 }
 
 /* 본문은 Lottie 위에 떠야 함 */
-.screen > header,
-.screen > div:not(.lottieBgLayer):not(.lottieBgOverlay) {
+.screenHome > header,
+.screenHome > div:not(.lottieBgLayer):not(.lottieBgOverlay) {
   position: relative;
   z-index: 1;
 }

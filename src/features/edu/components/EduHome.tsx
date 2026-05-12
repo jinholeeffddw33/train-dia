@@ -38,12 +38,12 @@ interface EduHomeProps {
 }
 
 const MENU_ITEMS = [
-  { id: 'duty',           label: '승무 기본',  icon: ClipboardList, action: 'chapters' as const, targets: ['ch1'] },
+  { id: 'duty',           label: '기본업무',   icon: ClipboardList, action: 'chapters' as const, targets: ['ch1'] },
   { id: 'announce',       label: '안내방송',   icon: Mic,           action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
-  { id: 'video-guide',    label: '교육 영상',  icon: Clapperboard,  action: 'video-guide' as const, targets: [] },
-  { id: 'repair',         label: '장애 조치',  icon: Wrench,        action: 'submenu'  as const, targets: [] },
-  { id: 'newcomer',       label: '신규 교육',  icon: DoorOpen,      action: 'newcomer-handbook' as const, targets: [] },
-  { id: 'edu',            label: '운행 규정',  icon: BookOpen,      action: 'training' as const, targets: [] },
+  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  action: 'video-guide' as const, targets: [] },
+  { id: 'repair',         label: '고장조치',   icon: Wrench,        action: 'submenu'  as const, targets: [] },
+  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      action: 'newcomer-handbook' as const, targets: [] },
+  { id: 'edu',            label: '규정',      icon: BookOpen,      action: 'training' as const, targets: [] },
   { id: 'exam',           label: '평가',      icon: Award,         action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',         label: '내 정보',   icon: User,          action: 'myinfo'   as const, targets: [] },
 ];
@@ -123,7 +123,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
   };
 
   return (
-    <div className={styles.screen}>
+    <div className={`${styles.screen} ${styles.screenHome}`}>
       {/* ── 풀스크린 Lottie 배경 (기차 애니메이션) ── */}
       <div className={styles.lottieBgLayer} aria-hidden="true">
         <Lottie

@@ -59,12 +59,13 @@ export function getDia(person: Person | null, date: Date): string {
     const wd = countWeekdays(WEEKDAY_REF, date);
     return WEEKDAY_DIAS[((wd + person.w) % 4 + 4) % 4];
   }
-  // 2026년 5월 1~4일 transition 기간 (이전 cycle → 새 cycle 연결)
+  // 2026년 5월 1~31일 전체 transition (0515 보완 근무계획 그대로)
+  // 6/1부터는 새 CYCLE (DB_STD=2026-05-16) 패턴이 정상 적용됨
   if (date.getFullYear() === 2026 && date.getMonth() === 4) {
     const day = date.getDate();
-    if (day >= 1 && day <= 4 && person.s) {
+    if (day >= 1 && day <= 31 && person.s) {
       const tr = TRANSITION_MAY_2026[person.s];
-      if (tr) return tr[day - 1];
+      if (tr && tr[day - 1]) return tr[day - 1];
     }
   }
   const r = CYCLE.indexOf(person.d);

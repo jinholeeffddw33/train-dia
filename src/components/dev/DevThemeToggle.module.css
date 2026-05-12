@@ -1,0 +1,48 @@
+/* 개발 전용 다크/라이트 토글 — 우상단 고정, 작은 pill */
+.toggle {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  right: calc(env(safe-area-inset-right, 0px) + 8px);
+  z-index: 9999;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  min-height: 0;
+
+  background: rgba(15, 23, 42, 0.72);
+  color: #E2E8F0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+
+  opacity: 0.55;
+  transition: opacity 0.15s ease, transform 0.12s ease;
+}
+
+.toggle:hover { opacity: 1; }
+.toggle:active { transform: scale(0.94); }
+.toggle:focus-visible {
+  outline: 2px solid #A855F7;
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+:global(:root.light) .toggle {
+  background: rgba(255, 255, 255, 0.85);
+  color: #0F172A;
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+.label { line-height: 1; }

@@ -2706,28 +2706,66 @@
 /* 5호선 보라 — 단일 포인트 컬러 */
 .eduHomeRoot { --edu-accent: #A855F7; }
 
-/* ── 히어로 (V3) ── */
+/* ── 풀스크린 Lottie 배경 ── */
+.lottieBgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: #0a0f1f;
+}
+
+/* 가독성 오버레이 — Lottie 위 다크 베일 (상단 진하게 → 텍스트 가독성 확보) */
+.lottieBgOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg,
+      rgba(10, 15, 31, 0.55) 0%,
+      rgba(10, 15, 31, 0.36) 30%,
+      rgba(10, 15, 31, 0.32) 60%,
+      rgba(10, 15, 31, 0.48) 100%);
+}
+
+/* screen 자체를 투명으로 만들어 Lottie 노출 */
+/* + 이 화면은 Lottie 보라 배경 위에 떠있으므로 라이트 모드에서도 항상 다크 톤 고정 */
+.screen {
+  position: relative;
+  background: transparent !important;
+  /* 다크 토큰 값으로 고정 (라이트 모드 진입해도 이 화면 안에서는 다크 색상 사용) */
+  --dia-text-primary: #F1F5F9;
+  --dia-text-secondary: #94A3B8;
+  --dia-text-tertiary: #64748B;
+  --dia-surface: #1E293B;
+  --dia-surface-hover: #334155;
+  --dia-border: rgba(255, 255, 255, 0.08);
+  --dia-border-light: rgba(255, 255, 255, 0.04);
+}
+
+/* 본문은 Lottie 위에 떠야 함 */
+.screen > header,
+.screen > div:not(.lottieBgLayer):not(.lottieBgOverlay) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 히어로 (V3) ── Lottie 배경 위에 떠있음 */
 .heroV3 {
   position: relative;
   padding: calc(20px + env(safe-area-inset-top, 0px)) var(--dia-space-5) var(--dia-space-6);
-  background:
-    radial-gradient(120% 80% at 0% 0%, rgba(168, 85, 247, 0.08), transparent 60%),
-    var(--dia-bg);
-  border-bottom: 1px solid var(--dia-border-light);
-}
-
-:root.light .heroV3 {
-  background:
-    radial-gradient(120% 80% at 0% 0%, rgba(168, 85, 247, 0.05), transparent 60%),
-    var(--dia-bg);
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .heroBackV3 {
   width: 40px;
   height: 40px;
   border-radius: var(--dia-radius-full);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: rgba(20, 28, 50, 0.6);
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2735,6 +2773,15 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   margin-bottom: var(--dia-space-5);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.heroBackV3:active {
+  transform: translateY(1px) scale(0.95);
+  box-shadow: var(--dia-3d-pressed);
 }
 
 .heroBackV3:active { transform: scale(0.95); }
@@ -2750,20 +2797,16 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px 4px 8px;
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.28);
+  padding: 5px 12px 5px 10px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(196, 181, 253, 0.5);
   border-radius: var(--dia-radius-full);
-  font-size: var(--dia-text-meta);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #C4B5FD;
-}
-
-:root.light .heroPill {
-  background: rgba(168, 85, 247, 0.08);
-  border-color: rgba(168, 85, 247, 0.25);
-  color: #7C3AED;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #E9D5FF;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .heroPillDot {
@@ -2776,25 +2819,28 @@
 
 .heroTitleV3 {
   margin: 4px 0 0;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: var(--dia-text-primary);
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .heroOrgV3 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--dia-text-secondary);
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .heroDescV3 {
   margin: 4px 0 0;
-  font-size: var(--dia-text-meta);
-  font-weight: 400;
-  color: var(--dia-text-tertiary);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
   line-height: 1.4;
 }
 
@@ -2821,19 +2867,22 @@
   gap: 8px;
   padding: var(--dia-space-3) 4px;
   min-height: 84px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-light);
+  background: rgba(20, 28, 50, 0.55);
+  border: none;
   border-radius: 12px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
   color: var(--dia-text-primary);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
 }
 
 .menuTileV3:active {
-  transform: scale(0.97);
-  background: var(--dia-surface-hover);
-  border-color: var(--dia-border);
+  transform: translateY(1px) scale(0.97);
+  background: rgba(30, 40, 70, 0.7);
+  box-shadow: var(--dia-3d-pressed);
 }
 
 .menuTileV3:focus-visible {
@@ -2867,21 +2916,24 @@
   align-items: center;
   gap: var(--dia-space-3);
   padding: var(--dia-space-4);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-light);
+  background: rgba(20, 28, 50, 0.6);
+  border: none;
   border-radius: 14px;
   cursor: pointer;
   width: 100%;
   text-align: left;
   -webkit-tap-highlight-color: transparent;
   min-height: 72px;
-  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  /* 메인 CTA — 3D inset + depth + 보라 glow */
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-purple-glow);
 }
 
 .resumeV3:active {
-  transform: scale(0.99);
-  background: var(--dia-surface-hover);
-  border-color: rgba(168, 85, 247, 0.35);
+  transform: translateY(1px) scale(0.99);
+  box-shadow: var(--dia-3d-pressed);
 }
 
 .resumeV3:focus-visible {
@@ -2933,8 +2985,8 @@
   align-items: center;
   gap: var(--dia-space-3);
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-light);
+  background: rgba(20, 28, 50, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   cursor: pointer;
   width: 100%;
@@ -2942,6 +2994,8 @@
   -webkit-tap-highlight-color: transparent;
   min-height: 60px;
   transition: background 0.15s ease, transform 0.12s ease;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .listRowV3:active {
@@ -3000,9 +3054,10 @@
 
 .statsHeadingV3 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--dia-text-secondary);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
   letter-spacing: -0.005em;
 }
 
@@ -3018,29 +3073,33 @@
   align-items: flex-start;
   gap: 6px;
   padding: var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border-light);
+  background: rgba(20, 28, 50, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   min-height: 84px;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .statCellIconV3 {
-  color: var(--dia-text-tertiary);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .statCellValueV3 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
-  color: var(--dia-text-primary);
+  color: #ffffff;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .statCellLabelV3 {
-  font-size: var(--dia-text-sm);
-  font-weight: 500;
-  color: var(--dia-text-tertiary);
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* 320px 좁은 화면 대응 — 폰트는 14px 유지, 레이아웃만 압축 */
@@ -3050,7 +3109,7 @@
   .menuGridV3 { gap: 6px; }
   .menuTileV3 { min-height: 78px; padding: var(--dia-space-2) 2px; }
   .menuTileLabelV3 { letter-spacing: -0.02em; }
-  .statCellValueV3 { font-size: 20px; }
+  .statCellValueV3 { font-size: 22px; }
 }
 
 

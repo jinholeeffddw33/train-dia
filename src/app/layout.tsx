@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
+import DevThemeToggle from '@/components/dev/DevThemeToggle';
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
@@ -40,7 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={notoSansKR.className}>{children}</body>
+      <body className={notoSansKR.className}>
+        {children}
+        <DevThemeToggle />
+      </body>
     </html>
   );
 }

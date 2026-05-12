@@ -38,12 +38,12 @@ interface EduHomeProps {
 }
 
 const MENU_ITEMS = [
-  { id: 'duty',           label: '기본업무',   icon: ClipboardList, action: 'chapters' as const, targets: ['ch1'] },
+  { id: 'duty',           label: '승무 기본',  icon: ClipboardList, action: 'chapters' as const, targets: ['ch1'] },
   { id: 'announce',       label: '안내방송',   icon: Mic,           action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
-  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  action: 'video-guide' as const, targets: [] },
-  { id: 'repair',         label: '고장조치',   icon: Wrench,        action: 'submenu'  as const, targets: [] },
-  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      action: 'newcomer-handbook' as const, targets: [] },
-  { id: 'edu',            label: '규정',      icon: BookOpen,      action: 'training' as const, targets: [] },
+  { id: 'video-guide',    label: '교육 영상',  icon: Clapperboard,  action: 'video-guide' as const, targets: [] },
+  { id: 'repair',         label: '장애 조치',  icon: Wrench,        action: 'submenu'  as const, targets: [] },
+  { id: 'newcomer',       label: '신규 교육',  icon: DoorOpen,      action: 'newcomer-handbook' as const, targets: [] },
+  { id: 'edu',            label: '운행 규정',  icon: BookOpen,      action: 'training' as const, targets: [] },
   { id: 'exam',           label: '평가',      icon: Award,         action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',         label: '내 정보',   icon: User,          action: 'myinfo'   as const, targets: [] },
 ];
@@ -63,8 +63,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
     progress, wrongCount, unresolvedWrongCount,
   } = useEduStore();
 
-  const [docMeta, setDocMeta] = useState<{ version?: string; updatedAt?: string } | null>(null);
-
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
   // prefers-reduced-motion 존중 — 모션 줄임 설정 시 애니메이션 정지
@@ -76,19 +74,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
     const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  // handbook.json에서 메타 정보만 로드
-  useEffect(() => {
-    fetch('/data/edu/handbook.json')
-      .then(r => r.json())
-      .then(data => {
-        setDocMeta({
-          version: data.version,
-          updatedAt: data.updatedAt,
-        });
-      })
-      .catch(() => {});
   }, []);
 
   const hasLastRead = !!progress.lastReadSectionId;
@@ -156,12 +141,10 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
       {/* 가독성 오버레이 — 본문 텍스트 가독성 확보 */}
       <div className={styles.lottieBgOverlay} aria-hidden="true" />
 
-      <div className={styles.screenContent}>
-
       {/* ── 절제된 히어로: 단색 배경 + 좌측 정렬 텍스트 + 소형 LINE5 pill ── */}
       <header className={styles.heroV3}>
         <button type="button" className={styles.heroBackV3} onClick={onBack} aria-label="뒤로가기">
-          <ArrowLeft size={20} strokeWidth={2} />
+          <ArrowLeft size={24} strokeWidth={2} />
         </button>
 
         <div className={styles.heroTextV3}>
@@ -169,9 +152,8 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
             <span className={styles.heroPillDot} />
             LINE 5
           </span>
-          <h1 className={styles.heroTitleV3}>교육 과정</h1>
-          <p className={styles.heroOrgV3}>5호선 기관사 승무사업소</p>
-          <p className={styles.heroDescV3}>현장에서 필요한 교육을 빠르게 확인하세요</p>
+          <h1 className={styles.heroTitleV3}>5호선 승무 교육</h1>
+          <p className={styles.heroDescV3}>운행 전 필요한 절차와 장애 대응 기준을 확인하세요</p>
         </div>
       </header>
 
@@ -188,7 +170,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
                 onClick={() => handleMenuClick(item)}
               >
                 <span className={styles.menuTileIconV3} aria-hidden="true">
-                  <Icon size={22} strokeWidth={1.8} />
+                  <Icon size={26} strokeWidth={1.8} />
                 </span>
                 <span className={styles.menuTileLabelV3}>{item.label}</span>
               </button>
@@ -210,7 +192,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
               </span>
             </div>
             <span className={styles.resumeArrowV3} aria-hidden="true">
-              <ChevronRight size={20} strokeWidth={2.2} />
+              <ChevronRight size={24} strokeWidth={2.2} />
             </span>
           </button>
         )}
@@ -219,7 +201,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
         {wrongCount > 0 && (
           <button type="button" className={styles.listRowV3} onClick={onWrongReview}>
             <span className={styles.listRowIconV3} aria-hidden="true">
-              <RotateCcw size={18} strokeWidth={1.8} />
+              <RotateCcw size={22} strokeWidth={1.8} />
             </span>
             <span className={styles.listRowBodyV3}>
               <span className={styles.listRowTitleV3}>오답노트</span>
@@ -229,7 +211,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
                   : `전체 ${wrongCount}문제 (모두 해결)`}
               </span>
             </span>
-            <ChevronRight size={18} className={styles.listRowArrowV3} />
+            <ChevronRight size={22} className={styles.listRowArrowV3} />
           </button>
         )}
 
@@ -239,17 +221,17 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
             <h2 className={styles.statsHeadingV3}>학습 현황</h2>
             <div className={styles.statsRowV3}>
               <div className={styles.statCellV3}>
-                <BookOpen size={16} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
+                <BookOpen size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
                 <span className={styles.statCellValueV3}>{readCount}</span>
                 <span className={styles.statCellLabelV3}>학습 섹션</span>
               </div>
               <div className={styles.statCellV3}>
-                <FileText size={16} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
+                <FileText size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
                 <span className={styles.statCellValueV3}>{totalQuizzes}</span>
                 <span className={styles.statCellLabelV3}>시험 응시</span>
               </div>
               <div className={styles.statCellV3}>
-                <Award size={16} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
+                <Award size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
                 <span className={styles.statCellValueV3}>
                   {totalQuizzes > 0 ? bestScore : '-'}
                 </span>
@@ -259,13 +241,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
           </section>
         )}
 
-        {/* 교육자료 기준일 */}
-        {docMeta?.version && (
-          <div className={styles.docVersionBanner}>
-            교육자료 기준: {docMeta.version}
-            {docMeta.updatedAt && ` · 최종 개정 ${docMeta.updatedAt}`}
-          </div>
-        )}
       </div>
 
       {/* 고장조치 서브메뉴 */}

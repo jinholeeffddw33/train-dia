@@ -38,17 +38,26 @@ interface EduHomeProps {
 }
 
 const MENU_ITEMS = [
-  { id: 'duty',           label: '기본업무',   icon: ClipboardList, action: 'chapters' as const, targets: ['ch1'] },
-  { id: 'announce',       label: '안내방송',   icon: Mic,           action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
-  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  action: 'video-guide' as const, targets: [] },
-  { id: 'repair',         label: '고장조치',   icon: Wrench,        action: 'submenu'  as const, targets: [] },
-  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      action: 'newcomer-handbook' as const, targets: [] },
-  { id: 'edu',            label: '규정',      icon: BookOpen,      action: 'training' as const, targets: [] },
-  { id: 'exam',           label: '평가',      icon: Award,         action: 'quiz'     as const, targets: [] },
-  { id: 'myinfo',         label: '내 정보',   icon: User,          action: 'myinfo'   as const, targets: [] },
+  { id: 'duty',           label: '기본업무',   icon: ClipboardList, color: 'blue'   as const, action: 'chapters' as const, targets: ['ch1'] },
+  { id: 'announce',       label: '안내방송',   icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
+  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  color: 'green'  as const, action: 'video-guide' as const, targets: [] },
+  { id: 'repair',         label: '고장조치',   icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
+  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer-handbook' as const, targets: [] },
+  { id: 'edu',            label: '규정',      icon: BookOpen,      color: 'blue'   as const, action: 'training' as const, targets: [] },
+  { id: 'exam',           label: '평가',      icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
+  { id: 'myinfo',         label: '내 정보',   icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },
 ];
 
-// 고장조치 서브메뉴는 단일 회색 톤 (전역 ICON_BG_MAP 제거)
+// SVG 그라데이션 URL 매핑 — 아이콘 stroke에 그라데이션 적용
+const ICON_GRADIENT_MAP = {
+  blue:   'url(#eduIconGradBlue)',
+  purple: 'url(#eduIconGradPurple)',
+  green:  'url(#eduIconGradGreen)',
+  amber:  'url(#eduIconGradAmber)',
+  red:    'url(#eduIconGradRed)',
+} as const;
+
+// 고장조치 서브메뉴는 기존 3D 쿠션 스타일 유지 (서브메뉴는 박스 컨테이너 그대로)
 const SUBMENU_COLOR_MAP = {
   blue:   styles.iconBgBlue,
   purple: styles.iconBgPurple,
@@ -141,6 +150,32 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
       {/* 가독성 오버레이 — 본문 텍스트 가독성 확보 */}
       <div className={styles.lottieBgOverlay} aria-hidden="true" />
 
+      {/* SVG 그라데이션 defs — 흰 카드 위에서도 또렷하도록 진한 톤만 사용 */}
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="eduIconGradBlue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#1E40AF" />
+          </linearGradient>
+          <linearGradient id="eduIconGradPurple" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#8B5CF6" />
+            <stop offset="100%" stopColor="#5B21B6" />
+          </linearGradient>
+          <linearGradient id="eduIconGradGreen" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#22C55E" />
+            <stop offset="100%" stopColor="#15803D" />
+          </linearGradient>
+          <linearGradient id="eduIconGradAmber" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="#B45309" />
+          </linearGradient>
+          <linearGradient id="eduIconGradRed" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#EF4444" />
+            <stop offset="100%" stopColor="#991B1B" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* ── 절제된 히어로: 단색 배경 + 좌측 정렬 텍스트 + 소형 LINE5 pill ── */}
       <header className={styles.heroV3}>
         <button type="button" className={styles.heroBackV3} onClick={onBack} aria-label="뒤로가기">
@@ -166,11 +201,11 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
               <button
                 key={item.id}
                 type="button"
-                className={styles.menuTileV3}
+                className={`${styles.menuTileV3} ${styles[`menuTileV3_${item.color}`]}`}
                 onClick={() => handleMenuClick(item)}
               >
                 <span className={styles.menuTileIconV3} aria-hidden="true">
-                  <Icon size={26} strokeWidth={1.8} />
+                  <Icon size={34} strokeWidth={2.4} color={ICON_GRADIENT_MAP[item.color]} />
                 </span>
                 <span className={styles.menuTileLabelV3}>{item.label}</span>
               </button>

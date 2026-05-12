@@ -379,10 +379,18 @@
 .subMenuPanel {
   width: 100%;
   max-width: 480px;
+  /* 컨텐츠 전부를 담을 만큼 자라되 화면 85% 한계 — flex 부모에서 줄어들지 않게 flex-shrink: 0 */
+  flex-shrink: 0;
+  max-height: 85dvh;
+  overflow-y: auto;
   background: var(--dia-surface);
   border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
-  padding: var(--dia-space-5) var(--dia-space-4) var(--dia-space-6);
-  animation: slideUp 0.2s ease;
+  padding:
+    var(--dia-space-5)
+    var(--dia-space-4)
+    calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
+  animation: slideUp 0.25s ease;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes slideUp {

@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import AuthGate from '@/components/common/AuthGate';
+import InAppBrowserGate from '@/components/common/InAppBrowserGate';
 import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
 import AppShell from '@/components/layout/AppShell';
@@ -77,24 +78,27 @@ export default function HomePage() {
   useHistoryBack(`world-${world}`, handleBack, world !== null);
 
   return (
-    <AuthGate>
-      <RefreshGuideModal />
-      <CycleChangeModal />
-      {world === null ? (
-        <WorldHub onEnter={handleEnter} />
-      ) : world === 'duty' ? (
-        <AppShell onBack={handleBack}>
-          {(activeTab) => <TabContent tab={activeTab} />}
-        </AppShell>
-      ) : world === 'edu' ? (
-        <EduTab onBack={handleBack} />
-      ) : world === 'safety' ? (
-        <SafetyWorld onBack={handleBack} />
-      ) : world === 'life' ? (
-        <LifeWorld onBack={handleBack} />
-      ) : (
-        <ComingSoon worldId={world} onBack={handleBack} />
-      )}
-    </AuthGate>
+    <>
+      <InAppBrowserGate />
+      <AuthGate>
+        <RefreshGuideModal />
+        <CycleChangeModal />
+        {world === null ? (
+          <WorldHub onEnter={handleEnter} />
+        ) : world === 'duty' ? (
+          <AppShell onBack={handleBack}>
+            {(activeTab) => <TabContent tab={activeTab} />}
+          </AppShell>
+        ) : world === 'edu' ? (
+          <EduTab onBack={handleBack} />
+        ) : world === 'safety' ? (
+          <SafetyWorld onBack={handleBack} />
+        ) : world === 'life' ? (
+          <LifeWorld onBack={handleBack} />
+        ) : (
+          <ComingSoon worldId={world} onBack={handleBack} />
+        )}
+      </AuthGate>
+    </>
   );
 }

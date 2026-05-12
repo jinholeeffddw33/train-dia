@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { openInChrome } from '@/hooks/useInAppBrowser';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useThemeStore } from '@/stores/theme';
@@ -624,37 +625,35 @@ export default function MoreTab() {
               /* ── Android 비크롬 브라우저 안내 ── */
               <div className={styles.installGuide}>
                 <p className={styles.installGuideDesc}>
-                  네이버 앱 등에서는 설치가 안 돼요.<br />
-                  크롬(Chrome) 앱에서 열면 원클릭으로 설치할 수 있어요.
+                  지금 보고 계신 화면(네이버·카톡 등)에서는<br />
+                  <strong>홈 화면 추가가 안 돼요.</strong><br />
+                  <strong>Chrome 앱</strong>으로 열어야 설치할 수 있어요.
                 </p>
                 <ol className={styles.installSteps}>
                   <li className={styles.installStep}>
                     <span className={styles.installStepNum}>1</span>
                     <div className={styles.installStepText}>
-                      <strong>아래 버튼</strong>으로 크롬에서 열기<br />
-                      <span className={styles.installStepSub}>크롬이 없으면 Play 스토어에서 설치</span>
+                      아래 <strong>파란 버튼</strong>을 누르세요<br />
+                      <span className={styles.installStepSub}>Chrome 앱이 자동으로 열려요</span>
                     </div>
                   </li>
                   <li className={styles.installStep}>
                     <span className={styles.installStepNum}>2</span>
                     <div className={styles.installStepText}>
-                      <strong>하단 설치 배너</strong> 탭<br />
-                      <span className={styles.installStepSub}>"홈 화면에 추가" 또는 "앱 설치" 버튼</span>
+                      화면 아래에 뜨는 <strong>"앱 설치"</strong>를 누르세요<br />
+                      <span className={styles.installStepSub}>"홈 화면에 추가"라고 뜨기도 해요</span>
                     </div>
                   </li>
                 </ol>
                 <button
                   type="button"
                   className={styles.openInChromeBtn}
-                  onClick={() => {
-                    const { host, pathname, search } = window.location;
-                    window.location.href = `intent://${host}${pathname}${search}#Intent;scheme=https;package=com.android.chrome;end`;
-                  }}
+                  onClick={openInChrome}
                 >
-                  크롬으로 열기
+                  Chrome으로 열기
                 </button>
                 <p className={styles.installGuideTip}>
-                  💡 크롬에서 설치하면 앱처럼 바로 실행돼요
+                  💡 Chrome이 없으면 자동으로 Play 스토어가 열려요
                 </p>
               </div>
             )}

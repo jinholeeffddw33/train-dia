@@ -152,7 +152,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
             <span className={styles.heroPillDot} />
             LINE 5
           </span>
-          <h1 className={styles.heroTitleV3}>5호선 승무 교육</h1>
+          <h1 className={styles.heroTitleV3}>교육</h1>
           <p className={styles.heroDescV3}>운행 전 필요한 절차와 장애 대응 기준을 확인하세요</p>
         </div>
       </header>

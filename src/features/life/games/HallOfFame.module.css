@@ -39,7 +39,7 @@
 .title svg { color: var(--dia-amber); }
 
 .subtitle {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   margin: 0;
   line-height: var(--dia-leading-normal);
@@ -64,7 +64,7 @@
   margin: 0;
 }
 .emptyHint {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   margin: 0;
 }

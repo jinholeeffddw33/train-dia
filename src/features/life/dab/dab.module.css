@@ -299,7 +299,7 @@
 }
 
 .bonsaiBrand {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   letter-spacing: 0.35em;
   color: #64748b;
@@ -310,7 +310,7 @@
 }
 
 .bonsaiLevelText {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: #334155;
 }
@@ -412,7 +412,7 @@
   padding: 8px 14px;
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: #92400e;
   box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
@@ -469,7 +469,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   color: #cbd5e1;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -491,7 +491,7 @@
 }
 
 .bonsaiHint {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: #64748b;
   text-align: center;
   margin: 0;
@@ -559,7 +559,7 @@
   position: absolute;
   top: -3px;
   right: 4px;
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: #475569;
   font-variant-numeric: tabular-nums;
@@ -582,7 +582,7 @@
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: #475569;
   backdrop-filter: blur(6px);
@@ -677,7 +677,7 @@
 }
 
 .bonsaiCompletedSub {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: #b45309;
 }
@@ -830,7 +830,7 @@
 }
 
 .collectionName {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: #1e293b;
 }
@@ -840,7 +840,7 @@
 }
 
 .collectionTheme {
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   color: #64748b;
   text-align: center;
   line-height: 1.3;
@@ -861,7 +861,7 @@
   padding: 2px 6px;
   background: #3b82f6;
   color: #fff;
-  font-size: 9px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   border-radius: 999px;
 }
@@ -922,7 +922,7 @@
 }
 
 .bonsaiMilestoneSub {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: #065f46;
   opacity: 0.85;

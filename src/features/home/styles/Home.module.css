@@ -85,7 +85,7 @@
 }
 
 .headerGreeting {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: rgba(255, 255, 255, 0.65);
   margin-bottom: 2px;
 }
@@ -98,7 +98,7 @@
 }
 
 .headerDate {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.3px;
@@ -111,7 +111,7 @@
 }
 
 .headerOrg {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.35);
   letter-spacing: 1px;
@@ -1244,7 +1244,7 @@
   gap: 4px;
   padding: 4px 12px;
   border-radius: var(--dia-radius-full);
-  font-size: 12px;
+  font-size: var(--dia-text-sm);
   font-weight: 500;
   color: var(--dia-text-tertiary);
   background: var(--dia-surface);
@@ -1264,7 +1264,7 @@
 }
 
 .alarmNextDay {
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   padding: 1px 5px;
   border-radius: var(--dia-radius-sm);
   background: var(--dia-amber);
@@ -1284,7 +1284,7 @@
 }
 
 .alarmPickerLabel {
-  font-size: 11px;
+  font-size: var(--dia-text-sm);
   font-weight: 600;
   color: var(--dia-text-secondary);
 }
@@ -1298,7 +1298,7 @@
 .alarmChip {
   padding: 5px 12px;
   border-radius: var(--dia-radius-full);
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 500;
   color: var(--dia-text-secondary);
   background: var(--dia-bg);
@@ -1418,7 +1418,7 @@
   display: inline-block;
   padding: 1px 6px;
   margin-left: 4px;
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   font-weight: 800;
   color: #fff;
   background: linear-gradient(135deg, #f43f5e, #ec4899);
@@ -1544,7 +1544,7 @@
 }
 
 .weekSwapLabel {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-green-text);
   margin-top: 1px;
@@ -1556,7 +1556,7 @@
 }
 
 .statusSwapTag {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-green-text);
   margin-left: auto;
@@ -1619,7 +1619,7 @@
 
 .dutyNameCell {
   padding: var(--dia-space-2) var(--dia-space-3);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   text-align: center;
   border-bottom: 1px solid var(--dia-border);
   white-space: nowrap;

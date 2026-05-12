@@ -145,7 +145,7 @@
 }
 
 .modeDesc {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-secondary);
   line-height: 1.4;
 }

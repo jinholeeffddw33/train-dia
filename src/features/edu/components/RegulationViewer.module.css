@@ -113,7 +113,7 @@
   align-items: center;
   gap: 6px;
   padding: 0 var(--dia-space-2);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: var(--dia-text-secondary);
   white-space: nowrap;
@@ -152,7 +152,7 @@
 }
 
 .fontLabel {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   margin-right: var(--dia-space-2);
   flex-shrink: 0;
@@ -165,7 +165,7 @@
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   transition: transform 0.12s ease, background var(--dia-transition-fast);
 }
@@ -191,7 +191,7 @@
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-primary);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -230,7 +230,7 @@
   display: inline-block;
   padding: 2px 10px;
   margin-bottom: var(--dia-space-3);
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: var(--dia-text-tertiary);
   background: var(--dia-surface);
@@ -296,7 +296,7 @@
 
 .tocCount {
   margin-left: var(--dia-space-2);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: var(--dia-text-tertiary);
 }
@@ -360,7 +360,7 @@
     linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(59, 130, 246, 0.08));
   border: 1px solid rgba(59, 130, 246, 0.4);
   color: #3B82F6;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -376,7 +376,7 @@
     linear-gradient(135deg, rgba(139, 92, 246, 0.16), rgba(139, 92, 246, 0.06));
   border: 1px solid rgba(139, 92, 246, 0.35);
   color: #8B5CF6;
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -390,7 +390,7 @@
 }
 
 .tocPage {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: var(--dia-text-tertiary);
   flex-shrink: 0;
@@ -439,7 +439,7 @@
 }
 
 .sectionBadge {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   background: rgba(139, 92, 246, 0.16);
   border: 1px solid rgba(139, 92, 246, 0.35);
 }

@@ -238,7 +238,7 @@
 .emptyIcon { font-size: 16px; }
 .emptyText {
   flex: 1;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   text-align: left;
 }
 .chevron {

@@ -64,7 +64,7 @@
 
 .heroSub {
   position: relative;
-  font-size: 13px; font-weight: 500;
+  font-size: var(--dia-text-meta); font-weight: 500;
   margin-top: 4px;
   color: var(--dia-text-secondary);
   letter-spacing: 0.5px;
@@ -119,7 +119,7 @@
   border-radius: var(--dia-radius-full);
   background: var(--dia-red, #ef4444);
   color: #fff;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   line-height: 1;
@@ -132,7 +132,7 @@
 }
 
 .menuDesc {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
 }
 
@@ -370,7 +370,7 @@
   align-items: center;
   margin-left: 8px;
   padding: 1px 7px;
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 800;
   letter-spacing: 0.5px;
   color: #fff;
@@ -393,7 +393,7 @@
 /* ── 섹션 구분 라벨 ── */
 .sectionLabel {
   margin: var(--dia-space-4) var(--dia-space-1) var(--dia-space-2);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: var(--dia-text-tertiary);
   letter-spacing: 0.3px;
@@ -475,7 +475,7 @@
 /* 카테고리 설명 */
 .catDesc {
   padding: var(--dia-space-3) var(--dia-space-4);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   line-height: 1.5;
   text-align: center;
@@ -517,12 +517,12 @@
 }
 
 .postAuthor {
-  font-size: 13px; font-weight: 600;
+  font-size: var(--dia-text-meta); font-weight: 600;
   color: var(--dia-text-primary);
 }
 
 .sampleBadge {
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   padding: 1px 6px;
   border-radius: var(--dia-radius-full);
@@ -531,7 +531,7 @@
 }
 
 .postDate {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   margin-left: auto;
 }
@@ -552,7 +552,7 @@
 
 .postMeta {
   display: flex; gap: var(--dia-space-4);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
 }
 
@@ -630,12 +630,12 @@
 }
 
 .commentAuthor {
-  font-size: 13px; font-weight: 600;
+  font-size: var(--dia-text-meta); font-weight: 600;
   color: var(--dia-text-primary);
 }
 
 .commentDate {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
 }
 
@@ -800,7 +800,7 @@
   gap: 4px;
   padding: 8px 14px;
   border-radius: var(--dia-radius-full);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: var(--dia-text-secondary);
   background: var(--dia-bg);
@@ -815,7 +815,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-blue);
   margin-top: var(--dia-space-2);
   word-break: break-all;
@@ -863,7 +863,7 @@
 
 .dabBrand {
   position: relative;
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   letter-spacing: 1px;
   color: rgba(199, 210, 254, 0.75);

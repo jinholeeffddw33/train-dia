@@ -37,7 +37,7 @@
 }
 
 .statLabel {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: var(--dia-text-tertiary);
 }
@@ -255,7 +255,7 @@
 }
 
 .fontSizeBtnSmall {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
 }
 
 .fontSizeBtnNormal {
@@ -1066,7 +1066,7 @@
   background: var(--dia-green-dim);
   color: var(--dia-green);
   border-radius: var(--dia-radius-sm);
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
 }
 
@@ -1504,7 +1504,7 @@
 }
 
 .feedbackReplyBadge {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   color: #fff;
   background: var(--dia-green);
@@ -1574,7 +1574,7 @@
 
 .chatAuthor {
   display: block;
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   color: var(--dia-text-tertiary);
   margin-bottom: 4px;
@@ -1587,7 +1587,7 @@
 
 .chatTime {
   display: block;
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   color: rgba(255, 255, 255, 0.75);
   margin-top: 4px;
   text-align: right;

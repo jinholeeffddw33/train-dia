@@ -74,7 +74,7 @@
   border-radius: var(--dia-radius-full);
   background: var(--dia-red);
   color: white;
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   display: flex;
   align-items: center;

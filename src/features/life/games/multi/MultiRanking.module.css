@@ -154,7 +154,7 @@
 }
 
 .meTag {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-blue);
   background: var(--dia-blue-dim);
@@ -172,7 +172,7 @@
 }
 
 .wl {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
   font-variant-numeric: tabular-nums;
 }

@@ -83,7 +83,7 @@
 }
 
 .meTag {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-blue);
   background: rgba(59, 130, 246, 0.15);

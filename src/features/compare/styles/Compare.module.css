@@ -40,7 +40,7 @@
 }
 
 .groupLabel {
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   white-space: nowrap;
@@ -55,7 +55,7 @@
 }
 
 .groupBadge {
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-on-color);
   background: var(--dia-blue);
@@ -118,7 +118,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
   color: var(--dia-red);
-  font-size: 13px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
   white-space: nowrap;
   min-height: 40px;

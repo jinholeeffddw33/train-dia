@@ -630,7 +630,7 @@
   border-radius: 11px;
   background: var(--dia-red);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   display: flex;
   align-items: center;

@@ -13,6 +13,19 @@
     }
   },
   {
+    "id": "crew-business-rules",
+    "title": "전동차승무원업무예규",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/crew-business-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/crew-business-rules.pdf",
+      "version": "25.7.1"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/crew-business-rules-quiz.json"
+    }
+  },
+  {
     "id": "crew-management-rules",
     "title": "승무원지도운용내규",
     "category": "규정",

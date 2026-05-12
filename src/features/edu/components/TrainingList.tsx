@@ -27,6 +27,7 @@ interface RegMeta {
 
 const REG_META: Record<string, RegMeta> = {
   'operation-rules':       { theme: 'blue',   icon: Train,      subtitle: '열차 운전·신호·폐색 기본 원칙' },
+  'crew-business-rules':   { theme: 'purple', icon: BookOpen,   subtitle: '전동차 출고·운전·기기취급 매뉴얼' },
   'crew-management-rules': { theme: 'purple', icon: Users,      subtitle: '승무원 지도·운용·교육 관리' },
   'operating-staff-rules': { theme: 'amber',  icon: UserCheck,  subtitle: '운전관계 직원의 안전 작업' },
   'depot-operation-rules': { theme: 'green',  icon: Warehouse,  subtitle: '차량기지 입·출고 운전 취급' },

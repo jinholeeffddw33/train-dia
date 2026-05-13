@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
 import { isIntern } from '@/lib/auth';
+import { APP_VERSION } from '@/lib/constants';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
 import HubTodaySummary from './HubTodaySummary';
@@ -199,7 +200,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
 
       <div className={styles.footer}>
         <span className={styles.footerBrand}>Train DIA v2</span>
-        <span className={styles.footerVersion}>v3.1.2</span>
+        <span className={styles.footerVersion}>{APP_VERSION}</span>
       </div>
     </div>
   );

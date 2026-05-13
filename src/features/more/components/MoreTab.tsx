@@ -23,6 +23,7 @@ import FeedbackOverlay from './FeedbackOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminDashboard from './AdminDashboard';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
+import { APP_VERSION } from '@/lib/constants';
 import styles from '../styles/More.module.css';
 
 const LEVEL_ADMIN_SABUN = '21711694'; // 이현구
@@ -377,7 +378,7 @@ export default function MoreTab() {
             <span className={styles.settingIcon}>ℹ️</span>
             <span className={styles.settingLabel}>버전</span>
           </div>
-          <span className={styles.settingValue}>v3.1.2</span>
+          <span className={styles.settingValue}>{APP_VERSION}</span>
         </div>
 
         {/* 로그아웃 */}

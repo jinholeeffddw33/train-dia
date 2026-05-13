@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, AlertCircle } from 'lucide-react';
+import { APP_VERSION } from '@/lib/constants';
 import styles from './CycleChangeModal.module.css';
 
 const STORAGE_KEY = 'cycle-change-2026-05-15-dismiss';
@@ -80,7 +81,8 @@ export default function CycleChangeModal() {
         <div className={styles.body}>
           <p className={styles.message}>
             <span className={styles.highlight}>15일부터</span> 변경된 교번 배열이 적용되었습니다.{'\n'}
-            오류가 있을 경우 알려주시면 수정하겠습니다.
+            오류가 있을 경우 알려주시면 수정하겠습니다.{'\n\n'}
+            현재 이 앱의 버전은 <span className={styles.highlight}>{APP_VERSION.toUpperCase()}</span>입니다.
           </p>
         </div>
 

@@ -197,7 +197,10 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
 
       <InstallCard />
 
-      <span className={styles.footer}>Train DIA v2</span>
+      <div className={styles.footer}>
+        <span className={styles.footerBrand}>Train DIA v2</span>
+        <span className={styles.footerVersion}>v3.1.2</span>
+      </div>
     </div>
   );
 }

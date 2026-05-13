@@ -678,10 +678,34 @@
 .footer {
   position: absolute;
   bottom: var(--dia-space-6);
-  font-size: var(--dia-text-sm);
-  color: var(--dia-text-tertiary);
-  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
   z-index: 1;
+}
+
+.footerBrand {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #60A5FA, #8B5CF6 50%, #38BDF8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 6px rgba(96, 165, 250, 0.25);
+}
+
+.footerVersion {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #fff;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  border-radius: var(--dia-radius-full);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 }
 
 /* ── Entry animation ── */

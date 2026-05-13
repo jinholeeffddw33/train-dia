@@ -3,9 +3,9 @@ import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 import { settleAndResetPastMonths } from '@/lib/games/monthlyReset';
 
-const VALID_GAMES = ['omok', 'yutnori'] as const;
+const VALID_GAMES = ['omok', 'reversi'] as const;
 
-/** GET: 멀티 게임 랭킹 — ?game=omok|yutnori */
+/** GET: 멀티 게임 랭킹 — ?game=omok|reversi */
 export async function GET(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json({ code: 'SERVICE_UNAVAILABLE', message: '서비스 준비 중' }, { status: 503 });

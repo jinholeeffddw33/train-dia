@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 
-const VALID_GAMES = ['omok', 'yutnori'] as const;
+const VALID_GAMES = ['omok', 'reversi'] as const;
 const DEFAULT_RATING = 1200;
 const K_FACTOR = 32;
 

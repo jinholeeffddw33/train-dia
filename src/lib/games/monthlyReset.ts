@@ -1,7 +1,7 @@
 import { serverSupabase } from '@/lib/serverSupabase';
 
 const SINGLE_GAMES = ['snake', 'reaction', 'mental', 'simon', 'halli'] as const;
-const MULTI_GAMES = ['omok', 'yutnori'] as const;
+const MULTI_GAMES = ['omok', 'reversi'] as const;
 
 type SingleGame = typeof SINGLE_GAMES[number];
 type MultiGame = typeof MULTI_GAMES[number];

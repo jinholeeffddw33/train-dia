@@ -27,10 +27,10 @@ const GAME_LABEL: Record<string, string> = {
   simon: '색깔 따라하기',
   halli: '할리갈리',
   omok: '오목',
-  yutnori: '윷놀이',
+  reversi: '오델로',
 };
 
-const GAME_ORDER = ['snake', 'reaction', 'mental', 'simon', 'halli', 'omok', 'yutnori'];
+const GAME_ORDER = ['snake', 'reaction', 'mental', 'simon', 'halli', 'omok', 'reversi'];
 
 const MEDAL = ['🥇', '🥈', '🥉'];
 

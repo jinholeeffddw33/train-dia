@@ -170,7 +170,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
                 온라인 대전
                 <span className={styles.liveBadge}>LIVE</span>
               </span>
-              <span className={styles.gameCardDesc}>동료와 함께! 오목 · 윷놀이</span>
+              <span className={styles.gameCardDesc}>동료와 함께! 오목 · 오델로</span>
             </div>
             <ChevronRight size={18} className={styles.gameEntryArrow} />
           </button>

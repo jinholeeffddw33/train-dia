@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Target, Dice5, Trophy } from 'lucide-react';
+import { ArrowLeft, Target, Disc, Trophy } from 'lucide-react';
 import styles from './MultiRanking.module.css';
 
-type GameKind = 'omok' | 'yutnori';
+type GameKind = 'omok' | 'reversi';
 
 interface RankRow {
   rank: number;
@@ -74,11 +74,11 @@ export default function MultiRanking({ onBack }: Props) {
         </button>
         <button
           type="button"
-          className={`${styles.tab} ${game === 'yutnori' ? styles.tabActive : ''}`}
-          onClick={() => setGame('yutnori')}
-          aria-pressed={game === 'yutnori'}
+          className={`${styles.tab} ${game === 'reversi' ? styles.tabActive : ''}`}
+          onClick={() => setGame('reversi')}
+          aria-pressed={game === 'reversi'}
         >
-          <Dice5 size={16} /> 윷놀이
+          <Disc size={16} /> 오델로
         </button>
       </div>
 

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { ArrowLeft, Users, Target, Dice5, Plus, LogIn, Trophy } from 'lucide-react';
+import { ArrowLeft, Users, Target, Disc, Plus, LogIn, Trophy } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import OmokGame from './omok/OmokGame';
-import YutnoriGame from './yutnori/YutnoriGame';
+import ReversiGame from './reversi/ReversiGame';
 import MultiRanking from './MultiRanking';
 import styles from './MultiLobby.module.css';
 
-type GameKind = 'omok' | 'yutnori';
+type GameKind = 'omok' | 'reversi';
 type Phase =
   | { kind: 'select' }
   | { kind: 'ranking' }
@@ -91,7 +91,7 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
     if (phase.game === 'omok') {
       return <OmokGame roomCode={phase.code} role={phase.role} onLeave={() => setPhase({ kind: 'select' })} />;
     }
-    return <YutnoriGame roomCode={phase.code} role={phase.role} onLeave={() => setPhase({ kind: 'select' })} />;
+    return <ReversiGame roomCode={phase.code} role={phase.role} onLeave={() => setPhase({ kind: 'select' })} />;
   }
 
   // ── 방 코드 입력 ──
@@ -129,7 +129,7 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
 
   // ── 게임 선택 후 모드(만들기/참여) ──
   if (phase.kind === 'mode') {
-    const gameLabel = phase.game === 'omok' ? '오목' : '윷놀이';
+    const gameLabel = phase.game === 'omok' ? '오목' : '오델로';
     return (
       <div className={styles.wrap}>
         <div className={styles.header}>
@@ -181,7 +181,7 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
           </div>
           <div className={styles.modeText}>
             <span className={styles.modeLabel}>랭킹 보기</span>
-            <span className={styles.modeDesc}>오목 · 윷놀이 Elo 레이팅 순위</span>
+            <span className={styles.modeDesc}>오목 · 오델로 Elo 레이팅 순위</span>
           </div>
         </button>
         <button type="button" className={styles.modeCard} onClick={() => handleSelectGame('omok')}>
@@ -193,13 +193,13 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
             <span className={styles.modeDesc}>먼저 5개를 한 줄로 만든 사람이 승리</span>
           </div>
         </button>
-        <button type="button" className={styles.modeCard} onClick={() => handleSelectGame('yutnori')}>
-          <div className={`${styles.modeIcon} ${styles.modeIconAmber}`}>
-            <Dice5 size={28} strokeWidth={2.5} />
+        <button type="button" className={styles.modeCard} onClick={() => handleSelectGame('reversi')}>
+          <div className={`${styles.modeIcon} ${styles.modeIconGreen}`}>
+            <Disc size={28} strokeWidth={2.5} />
           </div>
           <div className={styles.modeText}>
-            <span className={styles.modeLabel}>윷놀이</span>
-            <span className={styles.modeDesc}>윷을 던져 말 4개를 먼저 골인시키세요</span>
+            <span className={styles.modeLabel}>오델로</span>
+            <span className={styles.modeDesc}>돌을 끼워 뒤집기! 더 많은 돌을 차지하세요</span>
           </div>
         </button>
       </div>

@@ -17,7 +17,7 @@ interface UseMultiGameOptions<TMove> {
   /** 방 코드 (4자리) */
   roomCode: string;
   /** 게임 종류 (channel namespace 분리) */
-  gameKind: 'omok' | 'yutnori';
+  gameKind: 'omok' | 'reversi';
   /** 호스트 여부 */
   role: Role;
   /** 상대방의 move를 받았을 때 */

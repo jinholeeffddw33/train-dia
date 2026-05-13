@@ -199,7 +199,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
       <InstallCard />
 
       <div className={styles.footer}>
-        <span className={styles.footerBrand}>Train DIA v2</span>
+        <span className={styles.footerBrand}>Train DIA</span>
         <span className={styles.footerVersion}>{APP_VERSION}</span>
       </div>
     </div>

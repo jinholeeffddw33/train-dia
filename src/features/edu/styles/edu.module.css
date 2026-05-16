@@ -1040,10 +1040,52 @@
 }
 
 .callout {
+  position: relative;
   padding: var(--dia-space-3) var(--dia-space-4);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
   line-height: var(--dia-leading-normal);
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+
+.calloutSpeakBtn {
+  float: right;
+  margin-left: var(--dia-space-2);
+  margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  height: 28px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  border: none;
+  border-radius: var(--dia-radius-full);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.15s ease;
+}
+
+.calloutSpeakBtn:active {
+  transform: scale(0.95);
+}
+
+.calloutSpeakBtnActive {
+  background: linear-gradient(135deg, #EF4444, #DC2626);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  animation: speakPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes speakPulse {
+  0%, 100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calloutSpeakBtnActive { animation: none; }
 }
 
 .calloutWarning {
@@ -3861,6 +3903,34 @@
   --reg-icon-start: #F87171;
   --reg-icon-end: #DC2626;
   --reg-icon-shadow: rgba(220, 38, 38, 0.5);
+}
+
+.regThemeSky {
+  --reg-accent: #7DD3FC;
+  --reg-tint-1: rgba(56, 189, 248, 0.12);
+  --reg-tint-2: rgba(56, 189, 248, 0.02);
+  --reg-border: rgba(56, 189, 248, 0.3);
+  --reg-border-strong: rgba(56, 189, 248, 0.5);
+  --reg-glow: 0 12px 32px rgba(56, 189, 248, 0.18);
+  --reg-glow-1: rgba(125, 211, 252, 0.22);
+  --reg-glow-2: rgba(14, 165, 233, 0.15);
+  --reg-icon-start: #7DD3FC;
+  --reg-icon-end: #0EA5E9;
+  --reg-icon-shadow: rgba(14, 165, 233, 0.5);
+}
+
+.regThemeRose {
+  --reg-accent: #FB7185;
+  --reg-tint-1: rgba(244, 63, 94, 0.12);
+  --reg-tint-2: rgba(244, 63, 94, 0.02);
+  --reg-border: rgba(244, 63, 94, 0.3);
+  --reg-border-strong: rgba(244, 63, 94, 0.5);
+  --reg-glow: 0 12px 32px rgba(244, 63, 94, 0.18);
+  --reg-glow-1: rgba(251, 113, 133, 0.22);
+  --reg-glow-2: rgba(225, 29, 72, 0.15);
+  --reg-icon-start: #FB7185;
+  --reg-icon-end: #E11D48;
+  --reg-icon-shadow: rgba(225, 29, 72, 0.5);
 }
 
 .trainingCardHeader {

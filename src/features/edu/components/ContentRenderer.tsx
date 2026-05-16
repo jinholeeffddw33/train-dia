@@ -1,9 +1,21 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Volume2, Square } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useSpeak } from '@/hooks/useSpeak';
 import styles from '../styles/edu.module.css';
+
+/** 안내방송 텍스트로 보이는 callout인지 판정 (따옴표로 시작) */
+function looksLikeAnnouncement(text: string): boolean {
+  const t = text.trim();
+  return t.startsWith('"') || t.startsWith("'") || t.startsWith('“') || t.startsWith('「');
+}
+
+/** 듣기용으로 따옴표 등 표기 기호 제거 */
+function cleanForSpeech(text: string): string {
+  return text.replace(/^["'“「]+|["'”」]+$/g, '').replace(/\s+/g, ' ').trim();
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -220,6 +232,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
   const [viewer, setViewer] = useState<{ images: { src: string; caption?: string }[]; index: number } | null>(null);
   const closeViewer = useCallback(() => setViewer(null), []);
   useHistoryBack('slide-viewer', closeViewer, !!viewer);
+  const { speak, speakingId, supported: speakSupported } = useSpeak();
 
   // 모든 이미지 블록에서 이미지를 합산 (풀스크린에서 전체 스와이프용)
   const allImages = blocks
@@ -241,7 +254,10 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
             return <h3 key={i} className={styles.heading}>{block.text}</h3>;
           case 'text':
             return <p key={i} className={styles.textBlock}>{block.text}</p>;
-          case 'callout':
+          case 'callout': {
+            const isAnnounce = typeof block.text === 'string' && looksLikeAnnouncement(block.text);
+            const announceId = `cb-${i}`;
+            const isPlaying = speakingId === announceId;
             return (
               <div
                 key={i}
@@ -251,9 +267,21 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                   styles.calloutInfo
                 }`}
               >
+                {isAnnounce && speakSupported && (
+                  <button
+                    type="button"
+                    className={`${styles.calloutSpeakBtn} ${isPlaying ? styles.calloutSpeakBtnActive : ''}`}
+                    onClick={() => speak(announceId, cleanForSpeech(block.text))}
+                    aria-label={isPlaying ? '안내방송 정지' : '안내방송 듣기'}
+                  >
+                    {isPlaying ? <Square size={14} /> : <Volume2 size={14} />}
+                    <span>{isPlaying ? '정지' : '듣기'}</span>
+                  </button>
+                )}
                 {block.text}
               </div>
             );
+          }
           case 'flow':
             return <FlowBlock key={i} title={block.title} steps={block.steps} />;
           case 'table':

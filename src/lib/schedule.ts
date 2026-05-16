@@ -519,14 +519,17 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   if (cachedMap !== null && cachedMinute === currentMinute) {
     return cachedMap;
   }
-  const map = new Map<string, string>();
+
+  // 답십리 교대 정확도를 위해 2-pass 매핑:
+  // 1) strictMap — 실제 운행 구간(seg.d ≤ now < seg.a)에 있는 열차만
+  // 2) marginMap — 전환 마진(교대 직전/직후) — strict에 없을 때만 채움
+  const strictMap = new Map<string, string>();
+  const marginMap = new Map<string, string>();
+
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  // 어제 날짜 (야간 근무 자정 넘김 대응)
   const yesterday = new Date(todayDate);
   yesterday.setDate(yesterday.getDate() - 1);
-
   const dates = [todayDate, yesterday];
 
   for (const date of dates) {
@@ -535,8 +538,7 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
     for (const person of P) {
       if (person.n.startsWith('결원')) continue;
       const dia = getDia(person, date);
-      const tp = getType(dia);
-      if (tp === 'rest') continue;
+      if (getType(dia) === 'rest') continue;
 
       const sc = getSchedule(dia, date);
       if (!sc || !sc.g || sc.g.length === 0) continue;
@@ -545,7 +547,7 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
       if (isYesterday) {
         const startMins = sc.s ? timeToMins(sc.s) : -1;
         const endMins = sc.e ? timeToMins(sc.e) : -1;
-        if (startMins < 0 || endMins < 0 || endMins >= startMins) continue; // 야간 아님
+        if (startMins < 0 || endMins < 0 || endMins >= startMins) continue;
       }
 
       const segs = sc.g;
@@ -556,52 +558,58 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
         const arrMins = timeToMins(seg.a);
         if (depMins < 0 || arrMins < 0) continue;
 
-        let isActive = false;
+        let isStrict = false;
+        let isMargin = false;
 
         if (arrMins > depMins) {
-          // 같은 날 구간
-          if (!isYesterday && nowMins >= depMins && nowMins < arrMins) {
-            isActive = true;
-          }
+          if (!isYesterday && nowMins >= depMins && nowMins < arrMins) isStrict = true;
         } else {
-          // 자정 넘김 구간 (예: 23:00 ~ 02:00)
+          // 자정 넘김
           if (isYesterday) {
-            if (nowMins < arrMins) isActive = true;
+            if (nowMins < arrMins) isStrict = true;
           } else {
-            if (nowMins >= depMins) isActive = true;
+            if (nowMins >= depMins) isStrict = true;
           }
         }
 
-        // 구간 전환 마진: 이전 구간 도착 ~ 현재 구간 출발 사이에도 양쪽 열차번호 유지
-        if (!isActive && !isYesterday && si > 0) {
+        // 전환 마진 — 직전 구간 도착 후 30분 이내 + 현재 구간 출발 직전 (열차가 답십리에서 곧 출발)
+        if (!isStrict && !isYesterday && si > 0) {
           const prevSeg = segs[si - 1];
           const prevArr = timeToMins(prevSeg.a);
-          if (prevArr >= 0 && prevArr <= depMins && nowMins >= prevArr && nowMins < depMins) {
-            // 이전 구간 도착 후 ~ 현재 구간 출발 전 (전환 시간)
-            // 현재 구간 열차번호도 매핑 (곧 탈 열차)
-            isActive = true;
+          if (prevArr >= 0 && prevArr <= depMins) {
+            // 답십리 도착 직후 ~ 다음 출발 직전 (출발 30분 이내만 마진 적용)
+            const marginStart = Math.max(prevArr, depMins - 30);
+            if (nowMins >= marginStart && nowMins < depMins) isMargin = true;
           }
         }
 
-        // 마지막 구간 도착 후 5분 마진 (열차가 아직 역에 정차 중일 수 있음)
-        if (!isActive && !isYesterday && si === segs.length - 1 && arrMins > depMins) {
-          if (nowMins >= arrMins && nowMins < arrMins + 5) {
-            isActive = true;
-          }
+        // 마지막 구간 도착 후 5분 마진 (열차 정차 중일 수 있음)
+        if (!isStrict && !isYesterday && si === segs.length - 1 && arrMins > depMins) {
+          if (nowMins >= arrMins && nowMins < arrMins + 5) isMargin = true;
         }
 
-        if (isActive) {
+        if (isStrict) {
           for (const trainNo of seg.n) {
-            map.set(String(trainNo), person.n);
+            strictMap.set(String(trainNo), person.n);
+          }
+        } else if (isMargin) {
+          for (const trainNo of seg.n) {
+            if (!marginMap.has(String(trainNo))) {
+              marginMap.set(String(trainNo), person.n);
+            }
           }
         }
       }
     }
   }
 
+  // strict 우선 — strict에 있는 열차는 margin이 덮어쓰지 못함
+  const finalMap = new Map<string, string>(marginMap);
+  strictMap.forEach((v, k) => finalMap.set(k, v));
+
   cachedMinute = currentMinute;
-  cachedMap = map;
-  return map;
+  cachedMap = finalMap;
+  return finalMap;
 }
 
 // ===== 교대 방향 =====

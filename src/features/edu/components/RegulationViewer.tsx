@@ -44,6 +44,20 @@ function escapeRegExp(s: string): string {
 }
 
 /**
+ * 검색용 정규식 생성. PDF 추출 본문은 한글 사이 공백이 제거된 상태로 저장되므로,
+ * 사용자가 "열차 운전"으로 띄어 써도 본문의 "열차운전"·"열차\n운전" 모두 매치되도록
+ * 검색어 내 공백을 \s* 로 치환한다.
+ */
+function buildSearchRegex(query: string, capture: boolean): RegExp | null {
+  const trimmed = query.trim();
+  if (!trimmed) return null;
+  const tokens = trimmed.split(/\s+/).map(escapeRegExp);
+  if (tokens.length === 0) return null;
+  const pattern = tokens.join('\\s*');
+  return new RegExp(capture ? `(${pattern})` : pattern, 'gi');
+}
+
+/**
  * 원본 텍스트를 그대로 유지하면서, 구조적 시작점(제N조/장/절·항번호·번호항목·부칙·별표 등)을
  * 기준으로 블록 경계 인덱스를 계산한다. 텍스트 내용은 한 글자도 바뀌지 않으며,
  * 각 블록은 CSS white-space:normal 로 렌더되어 블록 내부 줄바꿈은 자연스럽게 흐른다.
@@ -206,9 +220,8 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
   // 검색 매치 카운트
   const { totalMatches, perPageMatchCount } = useMemo(() => {
-    const q = query.trim();
-    if (!q) return { totalMatches: 0, perPageMatchCount: [] as number[] };
-    const re = new RegExp(escapeRegExp(q), 'gi');
+    const re = buildSearchRegex(query, false);
+    if (!re) return { totalMatches: 0, perPageMatchCount: [] as number[] };
     let total = 0;
     const perPage = pages.map((p) => {
       const cnt = (p.text.match(re) || []).length;
@@ -235,9 +248,8 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
   // 검색 하이라이트만 적용된 텍스트 렌더
   const renderHighlighted = useCallback((text: string, startIdx: number): ReactNode[] => {
-    const q = query.trim();
-    if (!q) return [<span key="t">{text}</span>];
-    const re = new RegExp(`(${escapeRegExp(q)})`, 'gi');
+    const re = buildSearchRegex(query, true);
+    if (!re) return [<span key="t">{text}</span>];
     const parts = text.split(re);
     let local = 0;
     return parts.map((part, i) => {
@@ -263,8 +275,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const renderPageBody = useCallback((p: RegulationPage, pageStartIdx: number) => {
     const pageToc = tocEntries.filter((e) => e.page === p.page);
     const segments: ReactNode[] = [];
-    const q = query.trim();
-    const countRe = q ? new RegExp(escapeRegExp(q), 'gi') : null;
+    const countRe = buildSearchRegex(query, false);
     let cursor = 0;
     let localMatchOffset = 0;
 
@@ -338,10 +349,11 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
         >
           <span className={toc.kind === 'chapter' ? styles.chapterBadge : styles.sectionBadge}>{headerLabel}</span>
           <span className={styles.markTitle}>{toc.title}</span>
-          {/* 원문에 포함된 raw 마커도 검색 인덱스 유지를 위해 보이지 않게 유지 */}
-          <span className={styles.srOnly}>{markerText}</span>
+          {/* 원문에 포함된 raw 마커도 검색 인덱스 유지를 위해 보이지 않게 유지 + 매치 ref 등록 */}
+          <span className={styles.srOnly}>{renderHighlighted(markerText, pageStartIdx + localMatchOffset)}</span>
         </span>,
       );
+      if (countRe) localMatchOffset += (markerText.match(countRe) || []).length;
       cursor = toc.startInPage + toc.matchLength;
     }
 

@@ -271,7 +271,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                   <button
                     type="button"
                     className={`${styles.calloutSpeakBtn} ${isPlaying ? styles.calloutSpeakBtnActive : ''}`}
-                    onClick={() => speak(announceId, cleanForSpeech(block.text))}
+                    onClick={() => speak(announceId, block.text, cleanForSpeech(block.text))}
                     aria-label={isPlaying ? '안내방송 정지' : '안내방송 듣기'}
                   >
                     {isPlaying ? <Square size={14} /> : <Volume2 size={14} />}

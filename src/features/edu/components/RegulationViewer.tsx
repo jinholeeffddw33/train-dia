@@ -43,6 +43,59 @@ function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/**
+ * 원본 텍스트를 그대로 유지하면서, 구조적 시작점(제N조/장/절·항번호·번호항목·부칙·별표 등)을
+ * 기준으로 블록 경계 인덱스를 계산한다. 텍스트 내용은 한 글자도 바뀌지 않으며,
+ * 각 블록은 CSS white-space:normal 로 렌더되어 블록 내부 줄바꿈은 자연스럽게 흐른다.
+ */
+const STRUCTURAL_LINE_START = /^[ \t]*(제\s*\d+\s*[조장절]|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮]|\d+\s*\.\s|[가나다라마바사아자차카타파하]\s*\.\s|\(\d+\)|【|\[|부\s*칙|별\s*표|◦|○|※|[-─]\s*\d+\s*[-─])/;
+
+/** 라인 경계를 묶어서 블록 [startOffset, endOffset) 목록 반환 */
+function computeBlocks(text: string): Array<[number, number]> {
+  if (text.length === 0) return [];
+  // 각 라인의 [start, endExclusive] 수집 (endExclusive 는 개행 직전 또는 텍스트 끝)
+  type Line = { start: number; end: number; blank: boolean; structural: boolean };
+  const lines: Line[] = [];
+  let lineStart = 0;
+  for (let i = 0; i <= text.length; i++) {
+    if (i === text.length || text[i] === '\n') {
+      const raw = text.slice(lineStart, i);
+      lines.push({
+        start: lineStart,
+        end: i,
+        blank: raw.trim() === '',
+        structural: STRUCTURAL_LINE_START.test(raw),
+      });
+      lineStart = i + 1;
+    }
+  }
+  const blocks: Array<[number, number]> = [];
+  let curStart: number | null = null;
+  let curEnd: number = 0;
+  let prevBlank = true;
+  for (const ln of lines) {
+    if (ln.blank) {
+      if (curStart !== null) {
+        blocks.push([curStart, curEnd]);
+        curStart = null;
+      }
+      prevBlank = true;
+      continue;
+    }
+    // 새 블록 시작: 현재 진행 중인 블록이 없거나, 이 라인이 구조적 시작
+    if (curStart === null || ln.structural) {
+      if (curStart !== null) blocks.push([curStart, curEnd]);
+      curStart = ln.start;
+      curEnd = ln.end;
+    } else {
+      curEnd = ln.end;
+    }
+    prevBlank = false;
+  }
+  if (curStart !== null) blocks.push([curStart, curEnd]);
+  return blocks;
+}
+
 function parseToc(pages: RegulationPage[]): TocEntry[] {
   const entries: TocEntry[] = [];
   for (const p of pages) {
@@ -215,14 +268,55 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     let cursor = 0;
     let localMatchOffset = 0;
 
+    // 조문 머리(예: "제39조(열차의운전방향)") 강조용 정규식
+    const ARTICLE_RE = /제\s*\d+\s*조(?:\s*\([^)]+\))?/g;
+
+    const renderBlock = (blockText: string, blockKey: string): ReactNode => {
+      const children: ReactNode[] = [];
+      let bcur = 0;
+      let subKey = 0;
+      for (const m of blockText.matchAll(ARTICLE_RE)) {
+        const mStart = m.index!;
+        const mEnd = mStart + m[0].length;
+        if (bcur < mStart) {
+          const pre = blockText.slice(bcur, mStart);
+          children.push(
+            <span key={`p-${subKey++}`}>{renderHighlighted(pre, pageStartIdx + localMatchOffset)}</span>,
+          );
+          if (countRe) localMatchOffset += (pre.match(countRe) || []).length;
+        }
+        children.push(
+          <span key={`a-${subKey++}`} className={styles.articleMark}>
+            {renderHighlighted(m[0], pageStartIdx + localMatchOffset)}
+          </span>,
+        );
+        if (countRe) localMatchOffset += (m[0].match(countRe) || []).length;
+        bcur = mEnd;
+      }
+      if (bcur < blockText.length) {
+        const tail = blockText.slice(bcur);
+        children.push(
+          <span key={`p-${subKey++}`}>{renderHighlighted(tail, pageStartIdx + localMatchOffset)}</span>,
+        );
+        if (countRe) localMatchOffset += (tail.match(countRe) || []).length;
+      }
+      return <div key={blockKey} className={styles.textBlock}>{children}</div>;
+    };
+
     const pushText = (slice: string, key: string) => {
       if (slice.length === 0) return;
-      segments.push(
-        <span key={key}>{renderHighlighted(slice, pageStartIdx + localMatchOffset)}</span>,
-      );
-      if (countRe) {
-        localMatchOffset += (slice.match(countRe) || []).length;
+      // 원본 텍스트는 그대로 두고, 구조적 시작점 기준으로 블록 div를 만들어 white-space:normal로 렌더
+      const blocks = computeBlocks(slice);
+      // 블록 사이의 gap(공백·개행만)은 검색 매칭이 없으므로 무시
+      if (blocks.length === 0) {
+        // 텍스트는 있는데 비-공백 라인이 없는 경우(드물지만 안전망)
+        if (countRe) localMatchOffset += (slice.match(countRe) || []).length;
+        return;
       }
+      blocks.forEach(([s, e], bi) => {
+        const blockText = slice.slice(s, e);
+        segments.push(renderBlock(blockText, `${key}-b${bi}`));
+      });
     };
 
     for (const toc of pageToc) {

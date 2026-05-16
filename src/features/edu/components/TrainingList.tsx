@@ -17,7 +17,7 @@ interface TrainingItem {
   quiz?: { url: string };
 }
 
-type RegTheme = 'blue' | 'purple' | 'amber' | 'green' | 'red';
+type RegTheme = 'blue' | 'sky' | 'purple' | 'amber' | 'green' | 'rose';
 
 interface RegMeta {
   theme: RegTheme;
@@ -27,19 +27,20 @@ interface RegMeta {
 
 const REG_META: Record<string, RegMeta> = {
   'operation-rules':       { theme: 'blue',   icon: Train,      subtitle: '열차 운전·신호·폐색 기본 원칙' },
-  'crew-business-rules':   { theme: 'purple', icon: BookOpen,   subtitle: '전동차 출고·운전·기기취급 매뉴얼' },
+  'crew-business-rules':   { theme: 'sky',    icon: BookOpen,   subtitle: '전동차 출고·운전·기기취급 매뉴얼' },
   'crew-management-rules': { theme: 'purple', icon: Users,      subtitle: '승무원 지도·운용·교육 관리' },
   'operating-staff-rules': { theme: 'amber',  icon: UserCheck,  subtitle: '운전관계 직원의 안전 작업' },
   'depot-operation-rules': { theme: 'green',  icon: Warehouse,  subtitle: '차량기지 입·출고 운전 취급' },
-  'safety-record-rules':   { theme: 'red',    icon: Award,      subtitle: '무사고 누적·심사·포상' },
+  'safety-record-rules':   { theme: 'rose',   icon: Award,      subtitle: '무사고 누적·심사·포상' },
 };
 
 const THEME_CLASS: Record<RegTheme, string> = {
   blue:   styles.regThemeBlue,
+  sky:    styles.regThemeSky,
   purple: styles.regThemePurple,
   amber:  styles.regThemeAmber,
   green:  styles.regThemeGreen,
-  red:    styles.regThemeRed,
+  rose:   styles.regThemeRose,
 };
 
 interface TrainingListProps {

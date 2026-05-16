@@ -256,6 +256,12 @@
   white-space: nowrap; border: 0;
 }
 
+/* 원본 텍스트를 그대로 유지하면서, 블록 내부 줄바꿈만 자연스럽게 흐르도록 */
+.textBlock {
+  white-space: normal;
+  margin: 0 0 0.35em;
+}
+
 /* ── 목차 카드 ── */
 .tocCard {
   margin-bottom: var(--dia-space-5);
@@ -455,6 +461,24 @@
 
 .sectionMark .markTitle {
   font-size: 17px;
+}
+
+/* ── 본문 내 "제N조(제목)" 마커 — 자체 줄로 분리·강조 ── */
+.articleMark {
+  display: block;
+  margin: 0.9em 0 0.25em;
+  font-weight: 800;
+  font-size: 1.1em;
+  color: #3B82F6;
+  letter-spacing: 0.2px;
+}
+
+.articleMark:first-child {
+  margin-top: 0;
+}
+
+:global(.light) .articleMark {
+  color: #1D4ED8;
 }
 
 /* ── 검색 하이라이트 ── */

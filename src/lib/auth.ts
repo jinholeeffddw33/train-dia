@@ -110,7 +110,7 @@ export function getOfficeName(sabun: string): string | null {
     ?? null;
 }
 
-/** 인턴사원 여부 확인 (2026년 신규임용 6명) */
+/** 인턴사원 여부 확인 (2026년 신규임용 4명 — 6명 중 2명 퇴사) */
 export function isIntern(sabun: string): boolean {
   return INTERN_USERS.some((u) => u.s === sabun);
 }
@@ -140,6 +140,22 @@ const MANAGER_SABUNS: ReadonlySet<string> = new Set([
 ]);
 export function isManager(sabun: string): boolean {
   return MANAGER_SABUNS.has(sabun);
+}
+
+/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (8명) */
+const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
+  '21704630', // 안성숙
+  '21711216', // 이태원
+  '21711197', // 이선길
+  '21711694', // 이현구
+  '21713568', // 신승헌
+  '21714898', // 강병우
+  '21715676', // 김민정
+  '21706363', // 김대환
+]);
+export function isRegularDayOffice(sabun: string | undefined | null): boolean {
+  if (!sabun) return false;
+  return REGULAR_DAY_OFFICE_SABUNS.has(sabun);
 }
 
 /** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 인턴 > 기관사 */

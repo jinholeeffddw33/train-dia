@@ -3,9 +3,9 @@
 import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
-import { isOffice, getOfficeName } from '@/lib/auth';
-import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today } from '@/lib/schedule';
-import { findDutyByName } from '@/lib/dutySchedule';
+import { isOffice, getOfficeName, isRegularDayOffice } from '@/lib/auth';
+import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today, isHoliday } from '@/lib/schedule';
+import { findDutyByName, type MyDuty } from '@/lib/dutySchedule';
 import { useSwapStore } from '@/stores/swap';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Home.module.css';
@@ -30,13 +30,26 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
     const name = driver
       ? driver.n
       : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
+    const sabun = driver?.s ?? authUser?.sabun ?? '';
+    const isRegular = isRegularDayOffice(sabun);
     return [1, 2].map((offset) => {
       const d = new Date(base);
       d.setDate(d.getDate() + offset);
+      let duty: MyDuty;
+      if (isRegular) {
+        // 주간 통상근무자: 평일=주간 본소, 토·일·공휴일=휴무
+        const dow = d.getDay();
+        const isWeekend = dow === 0 || dow === 6;
+        duty = (isWeekend || isHoliday(d))
+          ? 'rest'
+          : { location: '본소', shift: '주간' };
+      } else {
+        duty = findDutyByName(name, d);
+      }
       return {
         label: offset === 1 ? '내일' : '모레',
         date: `${d.getMonth() + 1}/${d.getDate()}(${DOW[d.getDay()]})`,
-        duty: findDutyByName(name, d),
+        duty,
       };
     });
   }, [driver, authUser, base]);

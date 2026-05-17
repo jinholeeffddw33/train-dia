@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getDiaDisplay, isHoliday, getSchedule, isDepotStart } from '@/lib/schedule';
 import { findDutyByName } from '@/lib/dutySchedule';
-import { isOffice, getOfficeName } from '@/lib/auth';
+import { isOffice, getOfficeName, isRegularDayOffice } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
 import styles from '../styles/Calendar.module.css';
 
@@ -64,27 +64,39 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       let isMySwap: boolean;
 
       if (officeMode) {
-        // 내근직: 주/본, 야/기, 주/관, 비(비번), 휴(휴무) 형식 표시
-        const name = driver
-          ? driver.n
-          : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
-        const duty = findDutyByName(name, date);
-        if (duty === 'standby') {
-          dia = 'standby';
-          type = 'standby';
-          display = '비';
-        } else if (duty === 'rest') {
-          dia = 'rest';
-          type = 'rest';
-          display = '휴';
+        const sabun = driver?.s ?? authUser?.sabun ?? '';
+        // 주간 통상근무자: 평일=주간, 토·일·공휴일=휴
+        if (isRegularDayOffice(sabun)) {
+          const dow = date.getDay();
+          const isWeekend = dow === 0 || dow === 6;
+          if (isWeekend || isHoliday(date)) {
+            dia = 'rest'; type = 'rest'; display = '휴';
+          } else {
+            dia = '주'; type = 'day'; display = '주';
+          }
         } else {
-          const shiftShort = duty.shift === '주간' ? '주' : '야';
-          // 기지관제는 location 생략 (항상 관제라 중복)
-          const locSuffix = duty.location === '본소' ? '/본'
-            : duty.location === '기지' ? '/기' : '';
-          dia = `${shiftShort}${locSuffix}`;
-          type = duty.shift === '주간' ? 'day' : 'night';
-          display = `${shiftShort}${locSuffix}`;
+          // 내근직: 주/본, 야/기, 주/관, 비(비번), 휴(휴무) 형식 표시
+          const name = driver
+            ? driver.n
+            : (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
+          const duty = findDutyByName(name, date);
+          if (duty === 'standby') {
+            dia = 'standby';
+            type = 'standby';
+            display = '비';
+          } else if (duty === 'rest') {
+            dia = 'rest';
+            type = 'rest';
+            display = '휴';
+          } else {
+            const shiftShort = duty.shift === '주간' ? '주' : '야';
+            // 기지관제는 location 생략 (항상 관제라 중복)
+            const locSuffix = duty.location === '본소' ? '/본'
+              : duty.location === '기지' ? '/기' : '';
+            dia = `${shiftShort}${locSuffix}`;
+            type = duty.shift === '주간' ? 'day' : 'night';
+            display = `${shiftShort}${locSuffix}`;
+          }
         }
         isMySwap = false;
       } else {

@@ -159,9 +159,9 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
           <button
             key={cell.key}
             type="button"
-            className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''} ${swapMode ? styles.cellSwapMode : ''} ${cell.isSwapped ? styles.cellSwapped : ''}`}
+            className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''} ${swapMode ? styles.cellSwapMode : ''} ${cell.isSwapped ? styles.cellSwapped : ''} ${cell.depotStart ? styles.cellDepotStart : ''}`}
             onClick={() => onSelectDate(cell.dateStr)}
-            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
+            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.depotStart ? ' 기지 출근' : ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
             aria-current={cell.isToday ? 'date' : undefined}
           >
             <span className={`${styles.cellDate} ${cell.isSun || cell.hol ? styles.cellDateSun : ''} ${cell.isSat ? styles.cellDateSat : ''}`}>

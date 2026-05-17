@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
-import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
+import { getDia, getType, getDiaDisplay, isHoliday, getSchedule } from '@/lib/schedule';
 import { findDutyByName } from '@/lib/dutySchedule';
 import { isOffice, getOfficeName } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
@@ -36,6 +36,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
   type DateCell = {
     key: string; empty: false; d: number; dateStr: string;
     dia: string | null; type: string | null; display: string;
+    startTime: string | null;
     hol: boolean; hasMemo: boolean; isToday: boolean; isSelected: boolean;
     isSun: boolean; isSat: boolean; isSwapped: boolean;
   };
@@ -104,6 +105,15 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       const isSat = date.getDay() === 6;
       const isSwapped = !!isMySwap;
 
+      // 출근시각: 휴/비번 외의 근무일에만 표기 (내근직 제외)
+      let startTime: string | null = null;
+      if (!officeMode && dia && type !== 'rest') {
+        const sched = getSchedule(dia, date);
+        if (sched && sched.s && /^\d{1,2}:\d{2}$/.test(sched.s)) {
+          startTime = sched.s;
+        }
+      }
+
       result.push({
         key: dateStr,
         empty: false,
@@ -112,6 +122,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
         dia,
         type,
         display,
+        startTime,
         hol,
         hasMemo,
         isToday,
@@ -155,6 +166,13 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             {cell.type && (
               <span className={`${styles.cellDia} ${cell.isSwapped ? styles.cellDiaSwapped : styles[officeMode ? `cellOffice_${cell.type}` : `cellType_${cell.type}`]}`}>
                 {cell.display}
+              </span>
+            )}
+            {cell.startTime && (
+              <span
+                className={`${styles.cellStartTime} ${cell.type ? styles[`cellStartTime_${cell.type}`] || '' : ''}`}
+              >
+                {cell.startTime}
               </span>
             )}
             {cell.isSwapped && <span className={styles.swapTag}>변경</span>}

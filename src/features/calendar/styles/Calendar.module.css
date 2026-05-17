@@ -73,7 +73,7 @@
 
 .dowHeader {
   text-align: center;
-  font-size: var(--dia-text-meta);
+  font-size: 16px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
   padding: var(--dia-space-2) 0;
@@ -83,20 +83,20 @@
 .dowSat { color: var(--dia-blue); }
 
 .cellEmpty {
-  min-height: 52px;
+  min-height: 64px;
 }
 
 .cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 3px;
-  padding: 6px 0;
+  padding: 8px 0;
   border-radius: var(--dia-radius-sm);
   transition: background var(--dia-transition-fast);
   position: relative;
-  min-height: 52px;
+  min-height: 64px;
 }
 
 .cell:active { background: var(--dia-surface-hover); }
@@ -112,7 +112,7 @@
 }
 
 .cellDate {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   line-height: 1;
@@ -122,15 +122,32 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: var(--dia-text-meta);
+  font-size: 16px;
   font-weight: var(--dia-weight-semibold);
   line-height: 1;
+}
+
+/* 교번 아래 출근시각 — 교번 색과 동일 톤 */
+.cellStartTime {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  margin-top: 1px;
 }
 
 .cellType_day { color: var(--dia-blue); }
 .cellType_night { color: var(--dia-purple); }
 .cellType_standby { color: var(--dia-amber); }
 .cellType_rest { color: var(--dia-gray); }
+
+/* 출근시각 — 교번 type별 색상 매칭 */
+.cellStartTime_day { color: var(--dia-blue); }
+.cellStartTime_night { color: var(--dia-purple); }
+.cellStartTime_standby { color: var(--dia-amber); }
+.cellStartTime_rest { color: var(--dia-gray); }
 
 /* 내근직 배지 — pill 형태로 눈에 띄게 */
 .cellOffice_day,

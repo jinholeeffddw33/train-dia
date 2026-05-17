@@ -73,7 +73,7 @@
 
 .dowHeader {
   text-align: center;
-  font-size: 16px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-tertiary);
   padding: var(--dia-space-2) 0;
@@ -112,7 +112,7 @@
 }
 
 .cellDate {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   line-height: 1;
@@ -122,14 +122,14 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: 16px;
-  font-weight: var(--dia-weight-semibold);
+  font-size: 20px;
+  font-weight: var(--dia-weight-bold);
   line-height: 1;
 }
 
 /* 교번 아래 출근시각 — 교번 색과 동일 톤 */
 .cellStartTime {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1;
   color: var(--dia-text-tertiary);

@@ -114,3 +114,8 @@ export function getOfficeName(sabun: string): string | null {
 export function isIntern(sabun: string): boolean {
   return INTERN_USERS.some((u) => u.s === sabun);
 }
+
+/** 사업소장 여부 확인 (안성숙 소장) */
+export function isChief(sabun: string): boolean {
+  return sabun === '21704630';
+}

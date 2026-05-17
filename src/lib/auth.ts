@@ -119,3 +119,35 @@ export function isIntern(sabun: string): boolean {
 export function isChief(sabun: string): boolean {
   return sabun === '21704630';
 }
+
+/** 부소장 여부 (이태원) */
+export function isViceChief(sabun: string): boolean {
+  return sabun === '21711216';
+}
+
+/** 부장 여부 (10명) */
+const MANAGER_SABUNS: ReadonlySet<string> = new Set([
+  '21711197', // 이선길
+  '21711694', // 이현구
+  '21707420', // 김창환
+  '21707096', // 장진수
+  '21706206', // 최승곤
+  '21709589', // 김진완
+  '21707406', // 김봉철
+  '21706208', // 이병홍
+  '21707084', // 김재범
+  '21709373', // 조재홍
+]);
+export function isManager(sabun: string): boolean {
+  return MANAGER_SABUNS.has(sabun);
+}
+
+/** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 인턴 > 기관사 */
+export function getUserRole(sabun: string | undefined | null): string {
+  if (!sabun) return '기관사님';
+  if (isChief(sabun)) return '소장님';
+  if (isViceChief(sabun)) return '부소장님';
+  if (isManager(sabun)) return '부장님';
+  if (isIntern(sabun)) return '인턴사원님';
+  return '기관사님';
+}

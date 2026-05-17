@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useDriverStore } from '@/stores/driver';
-import { isIntern, isChief } from '@/lib/auth';
+import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
@@ -97,9 +97,7 @@ function LottieIcon({ src, className, width = 62, height }: { src: string; class
 export default function WorldHub({ onEnter }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
-  const role = driver?.s
-    ? (isChief(driver.s) ? '소장님' : isIntern(driver.s) ? '인턴사원님' : '기관사님')
-    : '기관사님';
+  const role = getUserRole(driver?.s);
   const { getUnread, alertUnread } = useSafetyUnread();
   const safetyTotal = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
 

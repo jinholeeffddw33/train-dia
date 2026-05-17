@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
-import { getDia, getType, getDiaDisplay, isHoliday, getSchedule } from '@/lib/schedule';
+import { getDia, getType, getDiaDisplay, isHoliday, getSchedule, isDepotStart } from '@/lib/schedule';
 import { findDutyByName } from '@/lib/dutySchedule';
 import { isOffice, getOfficeName } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
@@ -37,6 +37,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
     key: string; empty: false; d: number; dateStr: string;
     dia: string | null; type: string | null; display: string;
     startTime: string | null;
+    depotStart: boolean;
     hol: boolean; hasMemo: boolean; isToday: boolean; isSelected: boolean;
     isSun: boolean; isSat: boolean; isSwapped: boolean;
   };
@@ -107,11 +108,13 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
 
       // 출근시각: 휴/비번 외의 근무일에만 표기 (내근직 제외)
       let startTime: string | null = null;
+      let depotStart = false;
       if (!officeMode && dia && type !== 'rest') {
         const sched = getSchedule(dia, date);
         if (sched && sched.s && /^\d{1,2}:\d{2}$/.test(sched.s)) {
           startTime = sched.s;
         }
+        depotStart = isDepotStart(dia, date);
       }
 
       result.push({
@@ -123,6 +126,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
         type,
         display,
         startTime,
+        depotStart,
         hol,
         hasMemo,
         isToday,
@@ -170,8 +174,9 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             )}
             {cell.startTime && (
               <span
-                className={`${styles.cellStartTime} ${cell.type ? styles[`cellStartTime_${cell.type}`] || '' : ''}`}
+                className={`${styles.cellStartTime} ${cell.type ? styles[`cellStartTime_${cell.type}`] || '' : ''} ${cell.depotStart ? styles.cellStartTimeDepot : ''}`}
               >
+                {cell.depotStart && <span className={styles.depotMark}>기</span>}
                 {cell.startTime}
               </span>
             )}

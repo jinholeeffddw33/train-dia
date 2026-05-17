@@ -149,6 +149,29 @@
 .cellStartTime_standby { color: var(--dia-amber); }
 .cellStartTime_rest { color: var(--dia-gray); }
 
+/* 기지 출근 — 출근시각에 "기" 마커를 붙여 구분 */
+.cellStartTimeDepot {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.depotMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12px;
+  height: 12px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: var(--dia-amber);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 /* 내근직 배지 — pill 형태로 눈에 띄게 */
 .cellOffice_day,
 .cellOffice_night,

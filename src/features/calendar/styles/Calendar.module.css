@@ -83,7 +83,7 @@
 .dowSat { color: var(--dia-blue); }
 
 .cellEmpty {
-  min-height: 64px;
+  min-height: 52px;
 }
 
 .cell {
@@ -92,11 +92,11 @@
   align-items: center;
   justify-content: flex-start;
   gap: 3px;
-  padding: 8px 0;
+  padding: 6px 0;
   border-radius: var(--dia-radius-sm);
   transition: background var(--dia-transition-fast);
   position: relative;
-  min-height: 64px;
+  min-height: 52px;
 }
 
 .cell:active { background: var(--dia-surface-hover); }
@@ -112,8 +112,8 @@
 }
 
 .cellDate {
-  font-size: 18px;
-  font-weight: var(--dia-weight-bold);
+  font-size: 15px;
+  font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   line-height: 1;
 }
@@ -122,14 +122,14 @@
 .cellDateSat { color: var(--dia-blue); }
 
 .cellDia {
-  font-size: 15px;
+  font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
   line-height: 1;
 }
 
-/* 교번 아래 출근시각 — 교번 색과 동일 톤 */
+/* 교번 아래 출근시각 (소형) — 교번 색과 동일 톤 */
 .cellStartTime {
-  font-size: var(--dia-text-meta);
+  font-size: 10px;
   font-weight: 600;
   line-height: 1;
   color: var(--dia-text-tertiary);

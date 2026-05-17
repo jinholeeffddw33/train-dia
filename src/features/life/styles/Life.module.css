@@ -961,6 +961,19 @@
   letter-spacing: -0.2px;
 }
 
+.dabCardNewBadge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  color: #0F172A;
+  background: var(--dia-amber);
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
 .dabCardDesc {
   display: block;
   font-size: var(--dia-text-sm);

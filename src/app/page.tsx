@@ -6,6 +6,7 @@ import AuthGate from '@/components/common/AuthGate';
 import InAppBrowserGate from '@/components/common/InAppBrowserGate';
 import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
+import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
@@ -83,6 +84,7 @@ export default function HomePage() {
       <AuthGate>
         <RefreshGuideModal />
         <CycleChangeModal />
+        <InternWelcomeModal />
         {world === null ? (
           <WorldHub onEnter={handleEnter} />
         ) : world === 'duty' ? (

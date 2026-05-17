@@ -30,7 +30,7 @@ export default function HomeTipsQuiz() {
       <div className={styles.tipCard}>
         <span className={styles.tipIcon}>{todayTip.icon}</span>
         <div className={styles.tipContent}>
-          <span className={styles.tipLabel}>오늘의 한마디 <span className={styles.newBadge}>NEW</span></span>
+          <span className={styles.tipLabel}>오늘의 한 줄 <span className={styles.newBadge}>NEW</span></span>
           <p className={styles.tipText}>{todayTip.text}</p>
         </div>
       </div>

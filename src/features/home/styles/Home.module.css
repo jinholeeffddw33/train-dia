@@ -1420,8 +1420,8 @@
   margin-left: 4px;
   font-size: var(--dia-text-meta);
   font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, #f43f5e, #ec4899);
+  color: #0F172A;
+  background: var(--dia-amber);
   border-radius: 8px;
   letter-spacing: 0;
   text-transform: none;

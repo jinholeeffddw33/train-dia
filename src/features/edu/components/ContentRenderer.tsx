@@ -207,11 +207,36 @@ function isPlainNumber(s: string): boolean {
   return /^[0-9①②③④⑤⑥⑦⑧⑨⑩]+\.?$/.test(s.trim());
 }
 
+/** 대화 화자 분류 — 기관사(나) / 관제·취급실(상대) */
+function speakerRole(term: string): 'driver' | 'control' | null {
+  const t = term.trim();
+  if (t === '기관사') return 'driver';
+  if (t === '관제사' || t === '운전관제' || t === '취급실' || t === '기지관제' || t === '관제') return 'control';
+  return null;
+}
+
 function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
   return (
     <div className={styles.defList}>
       {items.map((item, i) => {
         const hideNumber = isPlainNumber(item.term) && item.desc;
+        const role = speakerRole(item.term);
+        if (role) {
+          const isDriver = role === 'driver';
+          return (
+            <div
+              key={i}
+              className={`${styles.dialogItem} ${isDriver ? styles.dialogDriver : styles.dialogControl}`}
+            >
+              <div className={styles.dialogSpeaker}>
+                <span className={styles.dialogAvatar} aria-hidden>{isDriver ? '👤' : '📻'}</span>
+                <span className={styles.dialogSpeakerLabel}>{item.term}</span>
+                {isDriver && <span className={styles.dialogMeBadge}>나</span>}
+              </div>
+              <div className={styles.dialogLine}>{item.desc}</div>
+            </div>
+          );
+        }
         return (
           <div key={i} className={styles.defItem}>
             {hideNumber

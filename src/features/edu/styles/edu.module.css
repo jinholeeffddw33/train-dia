@@ -1305,6 +1305,73 @@
   color: var(--dia-text-secondary);
 }
 
+/* ── 통화요령 대화 (기관사 vs 관제·취급실) ── */
+.dialogItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+}
+
+/* 기관사(나) — 블루 톤으로 강조 */
+.dialogDriver {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+  border-left: 4px solid var(--dia-blue);
+}
+
+/* 관제·취급실(상대) — 회색 톤으로 가라앉힘 */
+.dialogControl {
+  background: var(--dia-surface);
+  border-left: 3px solid var(--dia-text-tertiary);
+}
+
+.dialogSpeaker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dialogAvatar {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.dialogSpeakerLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--dia-text-secondary);
+}
+
+.dialogDriver .dialogSpeakerLabel {
+  color: var(--dia-blue);
+}
+
+.dialogMeBadge {
+  padding: 1px 6px;
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+}
+
+.dialogLine {
+  font-size: var(--dia-text-base);
+  line-height: 1.55;
+  color: var(--dia-text-primary);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.dialogDriver .dialogLine {
+  font-weight: 600;
+}
+
 /* ── 슬라이드 리스트 (1열 풀와이드) ── */
 .slideList {
   display: flex;

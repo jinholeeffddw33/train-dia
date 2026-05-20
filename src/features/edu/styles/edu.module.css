@@ -855,42 +855,56 @@
   background: var(--dia-surface-hover);
 }
 
-/* 표준 안내방송 바로가기 (ch8 카드 우측) — 컴팩트 pill 버튼 */
+/* 표준 안내방송 바로가기 (ch8 카드 우측) — 솔리드 버튼 */
 .tocBroadcastShortcut {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 6px 10px;
+  gap: 5px;
+  padding: 10px 14px;
   margin: auto var(--dia-space-3) auto 0;
-  border: 1px solid var(--dia-blue);
-  border-radius: 999px;
-  background: var(--dia-blue-dim);
-  color: var(--dia-blue);
-  font-size: var(--dia-text-meta);
+  border: none;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.18), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-blue-start, #60A5FA), var(--dia-3d-blue-end, #2563EB));
+  color: #fff;
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   white-space: nowrap;
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform 0.12s ease, background var(--dia-transition-fast);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    0 2px 6px rgba(37, 99, 235, 0.35);
+  transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.15s ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+.tocBroadcastShortcutIcon {
+  flex-shrink: 0;
 }
 
 .tocBroadcastShortcutArrow {
   flex-shrink: 0;
-  opacity: 0.8;
+  opacity: 0.85;
+  margin-left: 1px;
 }
 
 .tocBroadcastShortcut:active {
-  transform: scale(0.95);
-  background: var(--dia-blue);
-  color: #fff;
+  transform: scale(0.96);
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,0.15),
+    0 1px 3px rgba(37, 99, 235, 0.25);
 }
 
 @media (hover: hover) {
   .tocBroadcastShortcut:hover {
-    background: var(--dia-blue);
-    color: #fff;
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      0 4px 10px rgba(37, 99, 235, 0.4);
   }
 }
 

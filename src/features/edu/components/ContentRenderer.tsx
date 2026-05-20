@@ -254,7 +254,7 @@ function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported }:
                 <span className={styles.dialogAvatar} aria-hidden>{isDriver ? '👤' : '📻'}</span>
                 <span className={styles.dialogSpeakerLabel}>{item.term}</span>
                 {isDriver && <span className={styles.dialogMeBadge}>나</span>}
-                {hasAnnounce && speakSupported && (
+                {isDriver && hasAnnounce && speakSupported && (
                   <button
                     type="button"
                     className={`${styles.listSpeakBtn} ${isPlaying ? styles.listSpeakBtnActive : ''}`}

@@ -220,16 +220,20 @@ function speakerRole(term: string): 'driver' | 'control' | null {
   return null;
 }
 
+interface ListItem { term: string; desc: string; audioId?: string }
 interface ListBlockProps {
-  items: { term: string; desc: string }[];
+  items: ListItem[];
   blockKey: string;
   speak: (id: string, text: string) => void;
   stop: () => void;
   speakingId: string | null;
   speakSupported: boolean;
+  playAudio: (id: string, url: string) => Promise<boolean>;
+  stopAudio: () => void;
+  audioPlayingId: string | null;
 }
 
-function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported }: ListBlockProps) {
+function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported, playAudio, stopAudio, audioPlayingId }: ListBlockProps) {
   return (
     <div className={styles.defList}>
       {items.map((item, i) => {
@@ -237,9 +241,13 @@ function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported }:
         const role = speakerRole(item.term);
         const hasAnnounce = !!item.desc && looksLikeAnnouncement(item.desc);
         const itemId = `li-${blockKey}-${i}`;
-        const isPlaying = speakingId === itemId;
-        const onSpeak = () => {
-          if (isPlaying) { stop(); return; }
+        const isPlaying = speakingId === itemId || audioPlayingId === itemId;
+        const onSpeak = async () => {
+          if (isPlaying) { stopAudio(); stop(); return; }
+          if (item.audioId) {
+            const ok = await playAudio(itemId, `/audio/broadcasts/${item.audioId}.mp3`);
+            if (ok) return;
+          }
           speak(itemId, cleanForSpeech(item.desc));
         };
 
@@ -511,6 +519,9 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                 stop={stop}
                 speakingId={speakingId}
                 speakSupported={speakSupported}
+                playAudio={playAudio}
+                stopAudio={stopAudio}
+                audioPlayingId={audioPlayingId}
               />
             );
           case 'images':

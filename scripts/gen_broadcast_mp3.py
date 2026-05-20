@@ -74,6 +74,16 @@ async def main():
                         out = f"{OUT_DIR}/{aid}.mp3"
                         if not os.path.exists(out):
                             tasks.append((clean, out, aid))
+                elif btype == "list":
+                    for item in block.get("items", []):
+                        desc = item.get("desc", "")
+                        if isinstance(desc, str) and desc.strip().startswith(QUOTE_CHARS):
+                            clean = desc.strip().lstrip('"\'“”「」').rstrip('"\'“”「」')
+                            aid = audio_id(clean)
+                            item["audioId"] = aid
+                            out = f"{OUT_DIR}/{aid}.mp3"
+                            if not os.path.exists(out):
+                                tasks.append((clean, out, aid))
 
     sys.stdout.write(f"생성 대상: {len(tasks)}건 / 음성: {VOICE} / 속도: {RATE}\n")
 

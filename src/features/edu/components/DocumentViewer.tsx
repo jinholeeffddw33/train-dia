@@ -641,9 +641,8 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
                           onClick={(e) => { e.stopPropagation(); jumpToChapter('ch11'); }}
                           aria-label="표준 안내방송으로 이동"
                         >
-                          <Megaphone size={16} />
-                          <span className={styles.tocBroadcastShortcutLabel}>표준<br/>안내방송</span>
-                          <ChevronRight size={14} className={styles.tocBroadcastShortcutArrow} />
+                          <span>표준 안내방송</span>
+                          <ChevronRight size={13} className={styles.tocBroadcastShortcutArrow} />
                         </button>
                       )}
                     </div>

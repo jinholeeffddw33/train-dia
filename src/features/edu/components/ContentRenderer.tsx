@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, Volume2, Square, Copy, Check } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSpeak } from '@/hooks/useSpeak';
+import { useBroadcastAudio } from '@/hooks/useBroadcastAudio';
 import styles from '../styles/edu.module.css';
 
 /** 안내방송 텍스트로 보이는 callout인지 판정 (따옴표로 시작) */
@@ -12,9 +13,13 @@ function looksLikeAnnouncement(text: string): boolean {
   return t.startsWith('"') || t.startsWith("'") || t.startsWith('“') || t.startsWith('「');
 }
 
-/** 듣기용으로 따옴표 등 표기 기호 제거 */
+/** 듣기용으로 따옴표 등 표기 기호 제거 + 공란(○) 처리 */
 function cleanForSpeech(text: string): string {
-  return text.replace(/^["'“「]+|["'”」]+$/g, '').replace(/\s+/g, ' ').trim();
+  return text
+    .replace(/^["'“「]+|["'”」]+$/g, '')   // 양끝 따옴표 제거
+    .replace(/○+/g, '...')                 // 공란을 짧은 멈춤(말줄임표)으로 — Web Speech가 자연 멈춤으로 처리
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -295,16 +300,14 @@ function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported }:
 }
 
 /* ── 안내방송 카드 (broadcast) ── */
-interface BroadcastVersion { label: string; text: string }
+interface BroadcastVersion { label: string; text: string; audioId?: string }
 interface BroadcastBlockProps {
   id: string;
   label: string;
   color?: string;
   text?: string;
+  audioId?: string;
   versions?: BroadcastVersion[];
-  speak: (id: string, text: string) => void;
-  stop: () => void;
-  isPlaying: boolean;
   speakSupported: boolean;
 }
 
@@ -324,11 +327,17 @@ function renderWithPlaceholders(text: string): React.ReactNode[] {
   return parts;
 }
 
-function BroadcastCard({ id, label, color, text, versions, speak, stop, isPlaying, speakSupported }: BroadcastBlockProps) {
+function BroadcastCard({ id, label, color, text, audioId, versions, speakSupported }: BroadcastBlockProps) {
   const [activeVer, setActiveVer] = useState(0);
   const [copied, setCopied] = useState(false);
   const body = versions ? versions[activeVer]?.text || '' : (text || '');
+  const currentAudioId = versions ? versions[activeVer]?.audioId : audioId;
   const colorClass = color ? styles[`broadcastColor_${color}`] : '';
+
+  const { speak, stop: stopSpeak, speakingId } = useSpeak();
+  const { play: playAudio, stop: stopAudio, playingId } = useBroadcastAudio();
+  const playKey = `${id}-${activeVer}`;
+  const isPlaying = playingId === playKey || speakingId === playKey;
 
   const onCopy = useCallback(async () => {
     try {
@@ -336,7 +345,6 @@ function BroadcastCard({ id, label, color, text, versions, speak, stop, isPlayin
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // 폴백 — 텍스트 선택만
       const range = document.createRange();
       const sel = window.getSelection();
       const el = document.getElementById(`bc-body-${id}`);
@@ -348,10 +356,15 @@ function BroadcastCard({ id, label, color, text, versions, speak, stop, isPlayin
     }
   }, [body, id]);
 
-  const onSpeak = useCallback(() => {
-    if (isPlaying) { stop(); return; }
-    speak(id, cleanForSpeech(body));
-  }, [id, body, isPlaying, speak, stop]);
+  const onSpeak = useCallback(async () => {
+    if (isPlaying) { stopAudio(); stopSpeak(); return; }
+    // MP3 우선, 실패 시 Web Speech 폴백
+    if (currentAudioId) {
+      const ok = await playAudio(playKey, `/audio/broadcasts/${currentAudioId}.mp3`);
+      if (ok) return;
+    }
+    speak(playKey, cleanForSpeech(body));
+  }, [isPlaying, currentAudioId, playKey, body, playAudio, stopAudio, speak, stopSpeak]);
 
   return (
     <div className={`${styles.broadcastCard} ${colorClass}`}>
@@ -467,10 +480,8 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                 label={block.label}
                 color={block.color}
                 text={block.text}
+                audioId={block.audioId}
                 versions={block.versions}
-                speak={speak}
-                stop={stop}
-                isPlaying={speakingId === bid}
                 speakSupported={speakSupported}
               />
             );

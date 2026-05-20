@@ -39,7 +39,7 @@ interface EduHomeProps {
 
 const MENU_ITEMS = [
   { id: 'duty',           label: '기본업무',   icon: ClipboardList, color: 'blue'   as const, action: 'chapters' as const, targets: ['ch1'] },
-  { id: 'announce',       label: '안내방송',   icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10'] },
+  { id: 'announce',       label: '안내방송',   icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10', 'ch11'] },
   { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  color: 'green'  as const, action: 'video-guide' as const, targets: [] },
   { id: 'repair',         label: '고장조치',   icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
   { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer-handbook' as const, targets: [] },

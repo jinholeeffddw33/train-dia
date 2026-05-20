@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Volume2, Square } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Volume2, Square, Copy, Check } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSpeak } from '@/hooks/useSpeak';
 import styles from '../styles/edu.module.css';
@@ -253,11 +253,121 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
   );
 }
 
+/* ── 안내방송 카드 (broadcast) ── */
+interface BroadcastVersion { label: string; text: string }
+interface BroadcastBlockProps {
+  id: string;
+  label: string;
+  color?: string;
+  text?: string;
+  versions?: BroadcastVersion[];
+  speak: (id: string, text: string) => void;
+  stop: () => void;
+  isPlaying: boolean;
+  speakSupported: boolean;
+}
+
+/** 본문 내 ○○·○ 빈칸을 노란 칩으로 강조 (인라인) */
+function renderWithPlaceholders(text: string): React.ReactNode[] {
+  const re = /(○{1,}\S*?○{1,}|○{1,}(?=[\s,.가-힣]|$))/g;
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  let idx = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(<span key={`t${idx++}`}>{text.slice(last, m.index)}</span>);
+    parts.push(<span key={`p${idx++}`} className={styles.broadcastPlaceholder}>{m[0]}</span>);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(<span key={`t${idx++}`}>{text.slice(last)}</span>);
+  return parts;
+}
+
+function BroadcastCard({ id, label, color, text, versions, speak, stop, isPlaying, speakSupported }: BroadcastBlockProps) {
+  const [activeVer, setActiveVer] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const body = versions ? versions[activeVer]?.text || '' : (text || '');
+  const colorClass = color ? styles[`broadcastColor_${color}`] : '';
+
+  const onCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(body);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // 폴백 — 텍스트 선택만
+      const range = document.createRange();
+      const sel = window.getSelection();
+      const el = document.getElementById(`bc-body-${id}`);
+      if (el && sel) {
+        range.selectNodeContents(el);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }, [body, id]);
+
+  const onSpeak = useCallback(() => {
+    if (isPlaying) { stop(); return; }
+    speak(id, cleanForSpeech(body));
+  }, [id, body, isPlaying, speak, stop]);
+
+  return (
+    <div className={`${styles.broadcastCard} ${colorClass}`}>
+      <div className={styles.broadcastHeader}>
+        <span className={styles.broadcastLabel}>{label}</span>
+        {versions && versions.length > 1 && (
+          <div className={styles.broadcastVerTabs} role="tablist">
+            {versions.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === activeVer}
+                tabIndex={i === activeVer ? 0 : -1}
+                className={`${styles.broadcastVerTab} ${i === activeVer ? styles.broadcastVerTabActive : ''}`}
+                onClick={() => { setActiveVer(i); setCopied(false); }}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <p id={`bc-body-${id}`} className={styles.broadcastBody}>
+        {renderWithPlaceholders(body)}
+      </p>
+      <div className={styles.broadcastActions}>
+        <button
+          type="button"
+          className={`${styles.broadcastActionBtn} ${copied ? styles.broadcastActionBtnDone : ''}`}
+          onClick={onCopy}
+          aria-label="멘트 복사"
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          <span>{copied ? '복사됨' : '복사'}</span>
+        </button>
+        {speakSupported && (
+          <button
+            type="button"
+            className={`${styles.broadcastActionBtn} ${isPlaying ? styles.broadcastActionBtnActive : ''}`}
+            onClick={onSpeak}
+            aria-label={isPlaying ? '듣기 정지' : '듣기'}
+          >
+            {isPlaying ? <Square size={14} /> : <Volume2 size={14} />}
+            <span>{isPlaying ? '정지' : '듣기'}</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ContentRenderer({ blocks }: ContentRendererProps) {
   const [viewer, setViewer] = useState<{ images: { src: string; caption?: string }[]; index: number } | null>(null);
   const closeViewer = useCallback(() => setViewer(null), []);
   useHistoryBack('slide-viewer', closeViewer, !!viewer);
-  const { speak, speakingId, supported: speakSupported } = useSpeak();
+  const { speak, stop, speakingId, supported: speakSupported } = useSpeak();
 
   // 모든 이미지 블록에서 이미지를 합산 (풀스크린에서 전체 스와이프용)
   const allImages = blocks
@@ -305,6 +415,23 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                 )}
                 {block.text}
               </div>
+            );
+          }
+          case 'broadcast': {
+            const bid = `bc-${i}`;
+            return (
+              <BroadcastCard
+                key={i}
+                id={bid}
+                label={block.label}
+                color={block.color}
+                text={block.text}
+                versions={block.versions}
+                speak={speak}
+                stop={stop}
+                isPlaying={speakingId === bid}
+                speakSupported={speakSupported}
+              />
             );
           }
           case 'flow':

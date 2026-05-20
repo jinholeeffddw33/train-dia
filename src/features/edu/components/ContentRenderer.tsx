@@ -215,12 +215,29 @@ function speakerRole(term: string): 'driver' | 'control' | null {
   return null;
 }
 
-function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
+interface ListBlockProps {
+  items: { term: string; desc: string }[];
+  blockKey: string;
+  speak: (id: string, text: string) => void;
+  stop: () => void;
+  speakingId: string | null;
+  speakSupported: boolean;
+}
+
+function ListBlock({ items, blockKey, speak, stop, speakingId, speakSupported }: ListBlockProps) {
   return (
     <div className={styles.defList}>
       {items.map((item, i) => {
         const hideNumber = isPlainNumber(item.term) && item.desc;
         const role = speakerRole(item.term);
+        const hasAnnounce = !!item.desc && looksLikeAnnouncement(item.desc);
+        const itemId = `li-${blockKey}-${i}`;
+        const isPlaying = speakingId === itemId;
+        const onSpeak = () => {
+          if (isPlaying) { stop(); return; }
+          speak(itemId, cleanForSpeech(item.desc));
+        };
+
         if (role) {
           const isDriver = role === 'driver';
           return (
@@ -232,6 +249,17 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
                 <span className={styles.dialogAvatar} aria-hidden>{isDriver ? '👤' : '📻'}</span>
                 <span className={styles.dialogSpeakerLabel}>{item.term}</span>
                 {isDriver && <span className={styles.dialogMeBadge}>나</span>}
+                {hasAnnounce && speakSupported && (
+                  <button
+                    type="button"
+                    className={`${styles.listSpeakBtn} ${isPlaying ? styles.listSpeakBtnActive : ''}`}
+                    onClick={onSpeak}
+                    aria-label={isPlaying ? '듣기 정지' : '듣기'}
+                  >
+                    {isPlaying ? <Square size={12} /> : <Volume2 size={12} />}
+                    <span>{isPlaying ? '정지' : '듣기'}</span>
+                  </button>
+                )}
               </div>
               <div className={styles.dialogLine}>{item.desc}</div>
             </div>
@@ -242,7 +270,20 @@ function ListBlock({ items }: { items: { term: string; desc: string }[] }) {
             {hideNumber
               ? <div className={styles.defDesc}>{item.desc}</div>
               : <>
-                  <div className={styles.defTerm}>{item.term}</div>
+                  <div className={styles.defTermRow}>
+                    <div className={styles.defTerm}>{item.term}</div>
+                    {hasAnnounce && speakSupported && (
+                      <button
+                        type="button"
+                        className={`${styles.listSpeakBtn} ${isPlaying ? styles.listSpeakBtnActive : ''}`}
+                        onClick={onSpeak}
+                        aria-label={isPlaying ? '듣기 정지' : '안내방송 듣기'}
+                      >
+                        {isPlaying ? <Square size={12} /> : <Volume2 size={12} />}
+                        <span>{isPlaying ? '정지' : '듣기'}</span>
+                      </button>
+                    )}
+                  </div>
                   {item.desc && <div className={styles.defDesc}>{item.desc}</div>}
                 </>
             }
@@ -441,7 +482,17 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
           case 'compare':
             return <CompareBlock key={i} items={block.items} />;
           case 'list':
-            return <ListBlock key={i} items={block.items} />;
+            return (
+              <ListBlock
+                key={i}
+                items={block.items}
+                blockKey={String(i)}
+                speak={speak}
+                stop={stop}
+                speakingId={speakingId}
+                speakSupported={speakSupported}
+              />
+            );
           case 'images':
             return (
               <div key={i} className={styles.slideList}>

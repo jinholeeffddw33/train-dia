@@ -1509,6 +1509,43 @@
   font-weight: 600;
 }
 
+/* ── 리스트 안내방송 듣기 버튼 ── */
+.defTermRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: var(--dia-space-1);
+}
+
+.defTermRow .defTerm {
+  margin-bottom: 0;
+}
+
+.listSpeakBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  margin-left: auto;
+  border: 1px solid var(--dia-blue);
+  border-radius: 999px;
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  transition: transform 0.12s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.listSpeakBtn:active { transform: scale(0.95); }
+
+.listSpeakBtnActive {
+  background: var(--dia-blue);
+  color: #fff;
+}
+
 /* ── 슬라이드 리스트 (1열 풀와이드) ── */
 .slideList {
   display: flex;

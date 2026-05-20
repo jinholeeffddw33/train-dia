@@ -830,8 +830,15 @@
 .tocAccentAmber  { border-left-color: var(--dia-3d-amber-start); }
 .tocAccentRed    { border-left-color: var(--dia-3d-red-start); }
 
+.tocChapterRow {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
 .tocChapterBtn {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
@@ -846,6 +853,52 @@
 
 .tocChapterBtn:active {
   background: var(--dia-surface-hover);
+}
+
+/* 표준 안내방송 바로가기 (ch8 카드 우측) */
+.tocBroadcastShortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  margin: var(--dia-space-2) var(--dia-space-2) var(--dia-space-2) 0;
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,0.25), transparent 55%),
+    linear-gradient(145deg, #FBBF24, #F59E0B);
+  color: #0F172A;
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: transform 0.12s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tocBroadcastShortcutLabel {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tocBroadcastShortcutArrow {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.tocBroadcastShortcut:active {
+  transform: scale(0.95);
+  filter: brightness(0.95);
+}
+
+@media (hover: hover) {
+  .tocBroadcastShortcut:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
 }
 
 /* 플랫 모드: 챕터를 헤더로만 사용, 클릭 비활성 */

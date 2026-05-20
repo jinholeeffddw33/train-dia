@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   ArrowLeft, Search, Bookmark, AlertTriangle, Info, Check,
   TrainFront, Wrench, Building2, AlertCircle, FileText, Mic,
-  Radio, Satellite, Rocket, Shield,
+  Radio, Satellite, Rocket, Shield, Megaphone, ChevronRight,
   type LucideIcon,
 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
@@ -158,6 +158,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   const [tocSkipped, setTocSkipped] = useState(false);
   const [navHidden, setNavHidden] = useState(false);
   const lastScrollY = useRef(0);
+  const chapterCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { progress, markSectionRead, toggleBookmark, isBookmarked } = useEduStore();
 
   // 섹션 보기에서 뒤로가기 → TOC로 복귀 (TOC 자동 스킵된 경우 제외)
@@ -248,6 +249,14 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
       if (next.has(chId)) next.delete(chId);
       else next.add(chId);
       return next;
+    });
+  }, []);
+
+  // 특정 챕터로 점프 — 펼침 + 스크롤
+  const jumpToChapter = useCallback((chId: string) => {
+    setExpandedChapters(prev => new Set(prev).add(chId));
+    requestAnimationFrame(() => {
+      chapterCardRefs.current[chId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }, []);
 
@@ -564,8 +573,13 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
                 ? Math.round((readCountInCh / ch.sections.length) * 100)
                 : 0;
 
+              const hasBroadcastShortcut = ch.id === 'ch8' && initChapters?.includes('ch11');
               return (
-                <div key={ch.id} className={`${styles.tocChapter} ${ACCENT_BAR_MAP[color]}`}>
+                <div
+                  key={ch.id}
+                  ref={(el) => { chapterCardRefs.current[ch.id] = el; }}
+                  className={`${styles.tocChapter} ${ACCENT_BAR_MAP[color]}`}
+                >
                   {flatMode ? (
                     <div className={`${styles.tocChapterBtn} ${styles.tocChapterHeader}`}>
                       <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
@@ -593,32 +607,46 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
                       </span>
                     </div>
                   ) : (
-                    <button type="button" className={styles.tocChapterBtn} onClick={() => toggleChapter(ch.id)}>
-                      <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
-                        <ChIcon size={18} />
-                      </span>
-                      <span className={styles.tocChBody}>
-                        <span className={styles.tocChTitle}>{ch.title}</span>
-                        {ch.sections.length > 0 && (
-                          <span className={styles.tocProgressRow}>
-                            <span className={styles.tocProgressTrack}>
-                              {/* STYLE-EXCEPTION: 동적 진도 퍼센트 — CSS만으로 표현 불가 */}
-                              <span
-                                className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
-                                style={{ width: `${progressPct}%` }}
-                                role="progressbar"
-                                aria-valuenow={progressPct}
-                                aria-valuemin={0}
-                                aria-valuemax={100}
-                              />
+                    <div className={styles.tocChapterRow}>
+                      <button type="button" className={styles.tocChapterBtn} onClick={() => toggleChapter(ch.id)}>
+                        <span className={`${styles.tocChIconBadge} ${ICON_BG_MAP[color]}`}>
+                          <ChIcon size={18} />
+                        </span>
+                        <span className={styles.tocChBody}>
+                          <span className={styles.tocChTitle}>{ch.title}</span>
+                          {ch.sections.length > 0 && (
+                            <span className={styles.tocProgressRow}>
+                              <span className={styles.tocProgressTrack}>
+                                {/* STYLE-EXCEPTION: 동적 진도 퍼센트 — CSS만으로 표현 불가 */}
+                                <span
+                                  className={`${styles.tocProgressFill} ${PROGRESS_BAR_MAP[color]}`}
+                                  style={{ width: `${progressPct}%` }}
+                                  role="progressbar"
+                                  aria-valuenow={progressPct}
+                                  aria-valuemin={0}
+                                  aria-valuemax={100}
+                                />
+                              </span>
+                              <span className={styles.tocProgressLabel}>
+                                {readCountInCh}/{ch.sections.length}
+                              </span>
                             </span>
-                            <span className={styles.tocProgressLabel}>
-                              {readCountInCh}/{ch.sections.length}
-                            </span>
-                          </span>
-                        )}
-                      </span>
-                    </button>
+                          )}
+                        </span>
+                      </button>
+                      {hasBroadcastShortcut && (
+                        <button
+                          type="button"
+                          className={styles.tocBroadcastShortcut}
+                          onClick={(e) => { e.stopPropagation(); jumpToChapter('ch11'); }}
+                          aria-label="표준 안내방송으로 이동"
+                        >
+                          <Megaphone size={16} />
+                          <span className={styles.tocBroadcastShortcutLabel}>표준<br/>안내방송</span>
+                          <ChevronRight size={14} className={styles.tocBroadcastShortcutArrow} />
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {isExpanded && (

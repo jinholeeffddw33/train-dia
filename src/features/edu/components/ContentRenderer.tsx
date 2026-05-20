@@ -422,6 +422,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
   const closeViewer = useCallback(() => setViewer(null), []);
   useHistoryBack('slide-viewer', closeViewer, !!viewer);
   const { speak, stop, speakingId, supported: speakSupported } = useSpeak();
+  const { play: playAudio, stop: stopAudio, playingId: audioPlayingId } = useBroadcastAudio();
 
   // 모든 이미지 블록에서 이미지를 합산 (풀스크린에서 전체 스와이프용)
   const allImages = blocks
@@ -446,7 +447,15 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
           case 'callout': {
             const isAnnounce = typeof block.text === 'string' && looksLikeAnnouncement(block.text);
             const announceId = `cb-${i}`;
-            const isPlaying = speakingId === announceId;
+            const isPlaying = speakingId === announceId || audioPlayingId === announceId;
+            const onPlay = async () => {
+              if (isPlaying) { stopAudio(); stop(); return; }
+              if (block.audioId) {
+                const ok = await playAudio(announceId, `/audio/broadcasts/${block.audioId}.mp3`);
+                if (ok) return;
+              }
+              speak(announceId, cleanForSpeech(block.text));
+            };
             return (
               <div
                 key={i}
@@ -460,7 +469,7 @@ export default function ContentRenderer({ blocks }: ContentRendererProps) {
                   <button
                     type="button"
                     className={`${styles.calloutSpeakBtn} ${isPlaying ? styles.calloutSpeakBtnActive : ''}`}
-                    onClick={() => speak(announceId, cleanForSpeech(block.text))}
+                    onClick={onPlay}
                     aria-label={isPlaying ? '안내방송 정지' : '안내방송 듣기'}
                   >
                     {isPlaying ? <Square size={14} /> : <Volume2 size={14} />}

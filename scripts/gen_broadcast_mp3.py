@@ -43,24 +43,37 @@ async def main():
         sys.stdout.write("ch11 없음\n")
         return
 
+    QUOTE_CHARS = ('"', "'", "“", "「")  # 따옴표 시작 = 안내방송
+
     tasks = []  # (text, out_path, block_ref, key)
-    for sec in ch11["sections"]:
-        for block in sec["content"]:
-            if block.get("type") != "broadcast":
-                continue
-            if "versions" in block:
-                for v in block["versions"]:
-                    aid = audio_id(v["text"])
-                    v["audioId"] = aid
-                    out = f"{OUT_DIR}/{aid}.mp3"
-                    if not os.path.exists(out):
-                        tasks.append((v["text"], out, aid))
-            elif "text" in block:
-                aid = audio_id(block["text"])
-                block["audioId"] = aid
-                out = f"{OUT_DIR}/{aid}.mp3"
-                if not os.path.exists(out):
-                    tasks.append((block["text"], out, aid))
+    for ch in data["chapters"]:
+        for sec in ch.get("sections", []):
+            for block in sec.get("content", []):
+                btype = block.get("type")
+                if btype == "broadcast":
+                    if "versions" in block:
+                        for v in block["versions"]:
+                            aid = audio_id(v["text"])
+                            v["audioId"] = aid
+                            out = f"{OUT_DIR}/{aid}.mp3"
+                            if not os.path.exists(out):
+                                tasks.append((v["text"], out, aid))
+                    elif "text" in block:
+                        aid = audio_id(block["text"])
+                        block["audioId"] = aid
+                        out = f"{OUT_DIR}/{aid}.mp3"
+                        if not os.path.exists(out):
+                            tasks.append((block["text"], out, aid))
+                elif btype == "callout" and isinstance(block.get("text"), str):
+                    txt = block["text"].strip()
+                    if txt.startswith(QUOTE_CHARS):
+                        # 따옴표 제거하고 합성
+                        clean = txt.lstrip('"\'“”「」').rstrip('"\'“”「」')
+                        aid = audio_id(clean)
+                        block["audioId"] = aid
+                        out = f"{OUT_DIR}/{aid}.mp3"
+                        if not os.path.exists(out):
+                            tasks.append((clean, out, aid))
 
     sys.stdout.write(f"생성 대상: {len(tasks)}건 / 음성: {VOICE} / 속도: {RATE}\n")
 

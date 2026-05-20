@@ -212,11 +212,11 @@ function isPlainNumber(s: string): boolean {
   return /^[0-9①②③④⑤⑥⑦⑧⑨⑩]+\.?$/.test(s.trim());
 }
 
-/** 대화 화자 분류 — 기관사(나) / 관제·취급실(상대) */
+/** 대화 화자 분류 — 기관사(나) / 관제(상대) */
 function speakerRole(term: string): 'driver' | 'control' | null {
   const t = term.trim();
   if (t === '기관사') return 'driver';
-  if (t === '관제사' || t === '운전관제' || t === '취급실' || t === '기지관제' || t === '관제') return 'control';
+  if (t === '관제사' || t === '운전관제' || t === '기지관제' || t === '관제') return 'control';
   return null;
 }
 

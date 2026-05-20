@@ -1442,7 +1442,7 @@
   color: var(--dia-text-secondary);
 }
 
-/* ── 통화요령 대화 (기관사 vs 관제·취급실) ── */
+/* ── 통화요령 대화 (기관사 vs 관제) ── */
 .dialogItem {
   display: flex;
   flex-direction: column;
@@ -1459,7 +1459,7 @@
   border-left: 4px solid var(--dia-blue);
 }
 
-/* 관제·취급실(상대) — 회색 톤으로 가라앉힘 */
+/* 관제(상대) — 회색 톤으로 가라앉힘 */
 .dialogControl {
   background: var(--dia-surface);
   border-left: 3px solid var(--dia-text-tertiary);

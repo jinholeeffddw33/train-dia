@@ -426,6 +426,126 @@
   font-size: var(--dia-text-sm);
 }
 
+/* 이미지 picker (글쓰기 모달) */
+.imagePickerRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.imagePreviewItem {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: var(--dia-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface-hover);
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imagePreviewRemove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.imagePreviewRemove:active { transform: scale(0.9); }
+
+.imagePickerBtn {
+  width: 88px;
+  height: 88px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg-elevated);
+  border: 1.5px dashed var(--dia-border-strong, var(--dia-border));
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-meta);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, background var(--dia-transition-fast);
+}
+
+.imagePickerBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }
+
+.imageHiddenInput {
+  display: none;
+}
+
+/* 글 카드 썸네일 */
+.postThumbRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.postThumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--dia-radius-sm);
+  border: 1px solid var(--dia-border);
+  flex-shrink: 0;
+}
+
+.postThumbMore {
+  padding: 0 8px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+}
+
+/* 글 상세 본문 이미지 */
+.detailImagesWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.detailImageLink {
+  display: block;
+  border-radius: var(--dia-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface-hover);
+}
+
+.detailImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 480px;
+  object-fit: contain;
+}
+
 .catGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

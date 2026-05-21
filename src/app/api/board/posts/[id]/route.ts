@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 
   const { data: post, error } = await serverSupabase
     .from('board_posts')
-    .select('id, category, title, body, author_alias, author_hash, like_count, comment_count, created_at, metadata, status')
+    .select('id, category, title, body, author_alias, author_hash, like_count, comment_count, created_at, metadata, status, images')
     .eq('id', id)
     .single();
   if (error || !post) return NextResponse.json({ code: 'NOT_FOUND' }, { status: 404 });
@@ -62,6 +62,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       comment_count: post.comment_count,
       created_at: post.created_at,
       metadata: post.metadata,
+      images: post.images || [],
       i_liked: !!myLike,
     },
     comments: (comments || []).map((c) => ({

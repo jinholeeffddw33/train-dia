@@ -15,6 +15,7 @@ interface PostDetail {
   comment_count: number;
   created_at: string;
   metadata: { when?: string; place?: string; capacity?: number } | null;
+  images: string[];
   i_liked: boolean;
 }
 
@@ -234,6 +235,15 @@ export default function BoardPostDetail({ id, onClose }: Props) {
                 </div>
               )}
               <div className={styles.detailBodyText}>{post.body}</div>
+              {post.images && post.images.length > 0 && (
+                <div className={styles.detailImagesWrap}>
+                  {post.images.map((url, i) => (
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={styles.detailImageLink}>
+                      <img src={url} alt={`첨부 사진 ${i + 1}`} className={styles.detailImage} loading="lazy" />
+                    </a>
+                  ))}
+                </div>
+              )}
               <div className={styles.detailActions}>
                 <button
                   type="button"

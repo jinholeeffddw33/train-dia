@@ -20,6 +20,7 @@ interface PostSummary {
   comment_count: number;
   created_at: string;
   metadata?: { when?: string; place?: string; capacity?: number } | null;
+  images?: string[];
 }
 
 const CATEGORIES: { id: BoardCategory; label: string; emoji: string; color: string }[] = [
@@ -175,6 +176,16 @@ export default function BoardWorld({ onBack }: Props) {
             </div>
             <h3 className={styles.postTitle}>{p.title}</h3>
             <p className={styles.postBody}>{p.body}</p>
+            {p.images && p.images.length > 0 && (
+              <div className={styles.postThumbRow}>
+                {p.images.slice(0, 3).map((url, i) => (
+                  <img key={i} src={url} alt="" className={styles.postThumb} loading="lazy" />
+                ))}
+                {p.images.length > 3 && (
+                  <span className={styles.postThumbMore}>+{p.images.length - 3}</span>
+                )}
+              </div>
+            )}
             {p.category === 'meet' && p.metadata?.when && (
               <div className={styles.metaChips}>
                 <span className={styles.metaChip}>📅 {p.metadata.when}</span>

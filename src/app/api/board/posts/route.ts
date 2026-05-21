@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const to = from + pageSize - 1;
 
   let q = serverSupabase.from('board_posts')
-    .select('id, category, title, body, author_alias, author_hash, like_count, comment_count, created_at, metadata')
+    .select('id, category, title, body, author_alias, author_hash, like_count, comment_count, created_at, metadata, images')
     .eq('status', 'active');
   if (cat) q = q.eq('category', cat);
 
@@ -64,12 +64,16 @@ export async function GET(req: NextRequest) {
     comment_count: p.comment_count,
     created_at: p.created_at,
     metadata: p.metadata,
+    images: p.images || [],
   }));
 
   return NextResponse.json({ posts: safe, page, hasMore: safe.length === pageSize });
 }
 
-// ── POST: 글 작성 ──
+const MAX_IMAGES = 3;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+// ── POST: 글 작성 (JSON 또는 multipart/form-data) ──
 export async function POST(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json({ code: 'DB_NOT_CONFIGURED' }, { status: 500 });
@@ -77,16 +81,43 @@ export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
 
-  type Body = { category?: string; title?: string; body?: string; metadata?: Record<string, unknown> };
-  let payload: Body;
-  try {
-    payload = (await req.json()) as Body;
-  } catch {
-    return NextResponse.json({ code: 'BAD_JSON' }, { status: 400 });
+  const ct = req.headers.get('content-type') || '';
+  let cat: ReturnType<typeof parseCategory> = null;
+  let title = '';
+  let body = '';
+  let metadata: Record<string, unknown> = {};
+  const images: File[] = [];
+
+  if (ct.includes('multipart/form-data')) {
+    let form: FormData;
+    try { form = await req.formData(); } catch { return NextResponse.json({ code: 'BAD_FORM' }, { status: 400 }); }
+    cat = parseCategory((form.get('category') as string) || null);
+    title = ((form.get('title') as string) || '').trim();
+    body = ((form.get('body') as string) || '').trim();
+    const metaRaw = form.get('metadata');
+    if (typeof metaRaw === 'string' && metaRaw) {
+      try { metadata = JSON.parse(metaRaw); } catch { /* ignore */ }
+    }
+    const files = form.getAll('images').filter((v): v is File => v instanceof File && v.size > 0);
+    for (const f of files.slice(0, MAX_IMAGES)) {
+      if (f.size > MAX_IMAGE_BYTES) {
+        return NextResponse.json({ code: 'FILE_TOO_LARGE', message: '사진은 5MB 이하만 업로드할 수 있어요' }, { status: 400 });
+      }
+      if (!/^image\//.test(f.type)) {
+        return NextResponse.json({ code: 'BAD_FILE_TYPE', message: '사진만 업로드할 수 있어요' }, { status: 400 });
+      }
+      images.push(f);
+    }
+  } else {
+    type Body = { category?: string; title?: string; body?: string; metadata?: Record<string, unknown> };
+    let payload: Body;
+    try { payload = (await req.json()) as Body; } catch { return NextResponse.json({ code: 'BAD_JSON' }, { status: 400 }); }
+    cat = parseCategory(payload.category ?? null);
+    title = (payload.title || '').trim();
+    body = (payload.body || '').trim();
+    metadata = payload.metadata ?? {};
   }
-  const cat = parseCategory(payload.category ?? null);
-  const title = (payload.title || '').trim();
-  const body = (payload.body || '').trim();
+
   if (!cat) return NextResponse.json({ code: 'BAD_CATEGORY' }, { status: 400 });
   if (title.length < 1 || title.length > 80) return NextResponse.json({ code: 'BAD_TITLE' }, { status: 400 });
   if (body.length < 1 || body.length > 2000) return NextResponse.json({ code: 'BAD_BODY' }, { status: 400 });
@@ -103,6 +134,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ code: 'RATE_LIMIT', message: '1분 후 다시 시도해주세요' }, { status: 429 });
   }
 
+  // 이미지 업로드
+  const imageUrls: string[] = [];
+  for (const f of images) {
+    const ext = (f.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+    const fileName = `${cat}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const buf = Buffer.from(await f.arrayBuffer());
+    const { error: upErr } = await serverSupabase.storage
+      .from('board-photos')
+      .upload(fileName, buf, { contentType: f.type, upsert: false });
+    if (upErr) {
+      return NextResponse.json({ code: 'UPLOAD_FAILED', message: '사진 업로드에 실패했어요', detail: upErr.message }, { status: 500 });
+    }
+    imageUrls.push(
+      serverSupabase.storage.from('board-photos').getPublicUrl(fileName).data.publicUrl,
+    );
+  }
+
   // 가명 결정 — 카테고리에 따라 scope 분리
   const scope = cat === 'advice' ? 'advice' : 'general';
   const { hash, alias } = await getOrCreateAlias(auth.sabun, scope);
@@ -115,7 +163,8 @@ export async function POST(req: NextRequest) {
       body,
       author_hash: hash,
       author_alias: alias,
-      metadata: payload.metadata ?? {},
+      images: imageUrls.length > 0 ? imageUrls : null,
+      metadata,
     })
     .select('id')
     .single();

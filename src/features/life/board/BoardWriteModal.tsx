@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { X, Send } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { X, Send, ImagePlus } from 'lucide-react';
 import type { BoardCategory } from './BoardWorld';
 import styles from './Board.module.css';
+
+const MAX_IMAGES = 3;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 const CATEGORIES: { id: BoardCategory; label: string; emoji: string }[] = [
   { id: 'free',   label: '자유',    emoji: '💬' },
@@ -28,6 +31,38 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
   const [metaCapacity, setMetaCapacity] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // 미리보기 URL 생성 / 정리
+    const urls = images.map((f) => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => { urls.forEach((u) => URL.revokeObjectURL(u)); };
+  }, [images]);
+
+  const onPickFiles = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = ''; // 같은 파일 재선택 가능하게
+    if (files.length === 0) return;
+    const remain = MAX_IMAGES - images.length;
+    if (remain <= 0) { setError(`사진은 최대 ${MAX_IMAGES}장까지 가능해요`); return; }
+    const accepted: File[] = [];
+    for (const f of files.slice(0, remain)) {
+      if (!/^image\//.test(f.type)) { setError('사진 파일만 올릴 수 있어요'); continue; }
+      if (f.size > MAX_IMAGE_BYTES) { setError('사진은 5MB 이하만 올릴 수 있어요'); continue; }
+      accepted.push(f);
+    }
+    if (accepted.length > 0) {
+      setImages((prev) => [...prev, ...accepted]);
+      setError(null);
+    }
+  }, [images.length]);
+
+  const removeImage = useCallback((idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -56,11 +91,13 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
         const cap = parseInt(metaCapacity);
         if (!isNaN(cap) && cap > 0) metadata.capacity = cap;
       }
-      const res = await fetch('/api/board/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, title: t, body: b, metadata }),
-      });
+      const form = new FormData();
+      form.append('category', category);
+      form.append('title', t);
+      form.append('body', b);
+      form.append('metadata', JSON.stringify(metadata));
+      for (const f of images) form.append('images', f);
+      const res = await fetch('/api/board/posts', { method: 'POST', body: form });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
         throw new Error(j.message || '글 등록에 실패했어요');
@@ -71,7 +108,7 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
     } finally {
       setSubmitting(false);
     }
-  }, [submitting, title, body, category, metaWhen, metaPlace, metaCapacity, onDone]);
+  }, [submitting, title, body, category, metaWhen, metaPlace, metaCapacity, images, onDone]);
 
   return (
     <div
@@ -135,6 +172,44 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
               rows={8}
             />
             <span className={styles.formCount}>{body.length} / 2000</span>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>사진 (최대 {MAX_IMAGES}장, 1장당 5MB)</label>
+            <div className={styles.imagePickerRow}>
+              {previews.map((src, i) => (
+                <div key={i} className={styles.imagePreviewItem}>
+                  <img src={src} alt={`첨부 ${i + 1}`} className={styles.imagePreview} />
+                  <button
+                    type="button"
+                    className={styles.imagePreviewRemove}
+                    onClick={() => removeImage(i)}
+                    aria-label="사진 삭제"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+              {images.length < MAX_IMAGES && (
+                <button
+                  type="button"
+                  className={styles.imagePickerBtn}
+                  onClick={() => fileRef.current?.click()}
+                  aria-label="사진 추가"
+                >
+                  <ImagePlus size={22} />
+                  <span>{images.length}/{MAX_IMAGES}</span>
+                </button>
+              )}
+            </div>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onPickFiles}
+              className={styles.imageHiddenInput}
+            />
           </div>
 
           {category === 'meet' && (

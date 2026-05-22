@@ -380,11 +380,13 @@
 
 /* ===== 교번변경 (Swap) ===== */
 
-/* 교번변경 버튼 영역 */
+/* 교번변경 버튼 영역 — 캘린더 마지막 행 빈 칸 위치로 끌어올림 (원래 자리) */
 .swapBtnRow {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: var(--dia-space-4);
+  margin: -68px 4px var(--dia-space-3);
+  position: relative;
+  z-index: 2;
 }
 
 /* 개인별 임무카드 진입 버튼 — driverInfo 행 우측에 배치되어 별도 영역 불필요 */

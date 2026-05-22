@@ -1,18 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { X, ArrowLeft, MapPin } from 'lucide-react';
+import { X, ArrowLeft, MapPin, Train, Waves, Building2, Shuffle, Wrench, Mountain } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import moreStyles from '../styles/More.module.css';
 import styles from '../styles/JubakLocation.module.css';
 
-const STATIONS: { slug: string; label: string }[] = [
-  { slug: 'hwagok',          label: '화곡' },
-  { slug: 'yeouido',         label: '여의도' },
-  { slug: 'aeogae',          label: '애오개' },
-  { slug: 'wangsimni',       label: '왕십리' },
-  { slug: 'gunja',           label: '군자' },
-  { slug: 'hanamgeomdansan', label: '하남검단산' },
+const STATIONS: { slug: string; label: string; sub: string; theme: string; Icon: typeof Train }[] = [
+  { slug: 'hwagok',          label: '화곡',       sub: '5호선 서부',     theme: 'cyan',    Icon: Train },
+  { slug: 'yeouido',         label: '여의도',     sub: '한강 도심',      theme: 'purple',  Icon: Waves },
+  { slug: 'aeogae',          label: '애오개',     sub: '시내 중심',      theme: 'pink',    Icon: Building2 },
+  { slug: 'wangsimni',       label: '왕십리',     sub: '환승 허브',      theme: 'green',   Icon: Shuffle },
+  { slug: 'gunja',           label: '군자',       sub: '기지 인근',      theme: 'amber',   Icon: Wrench },
+  { slug: 'hanamgeomdansan', label: '하남검단산', sub: '5호선 동단',     theme: 'rose',    Icon: Mountain },
 ];
 
 interface Props {
@@ -68,20 +68,28 @@ export default function JubakLocationOverlay({ open, onClose }: Props) {
           <>
             <p className={styles.intro}>주박위치를 확인할 역을 선택하세요</p>
             <div className={styles.grid}>
-              {STATIONS.map((s) => (
-                <button
-                  key={s.slug}
-                  type="button"
-                  className={styles.stationBtn}
-                  onClick={() => setActiveSlug(s.slug)}
-                  aria-label={`${s.label} 주박위치 보기`}
-                >
-                  <div className={styles.stationIcon}>
-                    <MapPin size={26} strokeWidth={2.2} />
-                  </div>
-                  <span className={styles.stationLabel}>{s.label}</span>
-                </button>
-              ))}
+              {STATIONS.map((s, idx) => {
+                const Icon = s.Icon;
+                return (
+                  <button
+                    key={s.slug}
+                    type="button"
+                    className={`${styles.stationBtn} ${styles[`theme_${s.theme}`]}`}
+                    onClick={() => setActiveSlug(s.slug)}
+                    aria-label={`${s.label} 주박위치 보기`}
+                  >
+                    <span className={styles.stationIndex} aria-hidden>{String(idx + 1).padStart(2, '0')}</span>
+                    <div className={styles.stationIcon}>
+                      <Icon size={22} strokeWidth={2.2} />
+                    </div>
+                    <span className={styles.stationLabel}>{s.label}</span>
+                    <span className={styles.stationSub}>{s.sub}</span>
+                    <span className={styles.stationCorner} aria-hidden>
+                      <MapPin size={11} />
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </>
         )}

@@ -1,0 +1,206 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-modal);
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-3);
+  padding-top: max(var(--dia-space-3), env(safe-area-inset-top));
+  padding-bottom: max(var(--dia-space-3), env(safe-area-inset-bottom));
+  animation: fadeIn 200ms var(--dia-ease);
+}
+
+.content {
+  width: 100%;
+  max-width: 540px;
+  max-height: 96vh;
+  background: var(--dia-surface);
+  /* 중요 임무 카드 — 빨간 강조 테두리 + 두꺼운 외곽선 */
+  border: 3px solid var(--dia-red);
+  border-radius: var(--dia-radius-2xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 4px rgba(239, 68, 68, 0.2),
+    0 24px 60px rgba(0, 0, 0, 0.6);
+  animation: popIn 280ms var(--dia-ease);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04));
+  border-bottom: 2px solid var(--dia-red);
+  flex-shrink: 0;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  min-width: 0;
+}
+
+.titleIcon {
+  color: var(--dia-red);
+  flex-shrink: 0;
+}
+
+.titleWrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  color: var(--dia-red);
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitle strong {
+  color: var(--dia-red);
+  font-weight: 800;
+}
+
+.closeBtn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-tertiary);
+  background: transparent;
+  border: none;
+  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover { background: var(--dia-surface-hover); color: var(--dia-text-primary); }
+.closeBtn:active { transform: scale(0.9); }
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--dia-space-3);
+  min-height: 0;
+  background: var(--dia-bg);
+}
+
+.photoWrap {
+  width: 100%;
+  border-radius: var(--dia-radius-lg);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--dia-border);
+}
+
+.photo {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.footer {
+  display: flex;
+  gap: 10px;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-top: 1px solid var(--dia-border);
+  flex-shrink: 0;
+  background: var(--dia-bg-elevated);
+}
+
+.btnPrimary {
+  flex: 1;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom, 0.25)), transparent 55%),
+    linear-gradient(145deg, #f87171, #dc2626);
+  color: #fff;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  transition: transform 0.12s ease, filter 0.15s ease;
+}
+
+.btnPrimary:active {
+  transform: scale(0.95);
+  box-shadow: var(--dia-3d-pressed);
+}
+
+/* ── 캘린더 진입 버튼 (중요 카드 강조) ── */
+.entryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 2px solid var(--dia-red);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 55%),
+    linear-gradient(145deg, #fca5a5, #dc2626);
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.18),
+    var(--dia-3d-depth);
+  transition: transform 0.12s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  /* 살짝 펄스 */
+  animation: missionPulse 2.6s ease-in-out infinite;
+}
+
+.entryBtn:active {
+  transform: scale(0.96);
+  box-shadow: var(--dia-3d-pressed);
+}
+
+@media (hover: hover) {
+  .entryBtn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+}
+
+.entryIcon {
+  flex-shrink: 0;
+}
+
+@keyframes missionPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18), var(--dia-3d-depth); }
+  50%      { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.06), var(--dia-3d-depth); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}

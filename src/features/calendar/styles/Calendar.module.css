@@ -386,6 +386,13 @@
   margin-bottom: var(--dia-space-4);
 }
 
+/* 개인별 임무카드 진입 버튼 영역 — 캘린더 직후 우측 배치 */
+.missionBtnRow {
+  display: flex;
+  justify-content: flex-end;
+  margin: var(--dia-space-2) 0 var(--dia-space-3);
+}
+
 .swapToggleBtn {
   padding: var(--dia-space-2) var(--dia-space-5);
   border-radius: var(--dia-radius-full);

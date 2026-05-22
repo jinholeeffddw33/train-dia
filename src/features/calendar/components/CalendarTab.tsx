@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
-import { isOffice } from '@/lib/auth';
+import { isOffice, getOfficeName } from '@/lib/auth';
+import { ShieldAlert } from 'lucide-react';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import SwapBottomSheet from './SwapBottomSheet';
+import MissionCardModal from './MissionCardModal';
 import { MonthSummary, DutyInfoCard } from '@/features/home';
 import styles from '../styles/Calendar.module.css';
+import missionStyles from '../styles/MissionCard.module.css';
 
 function todayStr(): string {
   const d = new Date();
@@ -29,6 +32,11 @@ export default function CalendarTab() {
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
   const [swapMode, setSwapMode] = useState(false);
   const [swapTargetDate, setSwapTargetDate] = useState<string | null>(null);
+  const [missionOpen, setMissionOpen] = useState(false);
+
+  // 임무카드 표시용 사번·이름
+  const missionSabun = driver?.s ?? authUser?.sabun ?? '';
+  const missionName = driver?.n ?? (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
 
   // 앱 시작 시 만료된 교번변경 정리
   useEffect(() => {
@@ -112,6 +120,21 @@ export default function CalendarTab() {
         swapMode={swapMode}
       />
 
+      {/* 개인별 임무카드 진입 버튼 — 로그인된 사용자만 노출 */}
+      {missionName && (
+        <div className={styles.missionBtnRow}>
+          <button
+            type="button"
+            className={missionStyles.entryBtn}
+            onClick={() => setMissionOpen(true)}
+            aria-label="개인별 임무카드 열기"
+          >
+            <ShieldAlert size={16} className={missionStyles.entryIcon} />
+            <span>개인별 임무카드</span>
+          </button>
+        </div>
+      )}
+
       {/* 교번변경 버튼 — 내근직은 숨김 */}
       {!officeMode && (
         <div className={styles.swapBtnRow}>
@@ -131,6 +154,15 @@ export default function CalendarTab() {
       {/* 월간 근무 요약 + 내근 근무 */}
       <MonthSummary />
       <DutyInfoCard selectedDate={selectedDate ? new Date(selectedDate + 'T00:00:00') : undefined} />
+
+      {/* 임무카드 모달 */}
+      {missionOpen && (
+        <MissionCardModal
+          sabun={missionSabun}
+          name={missionName}
+          onClose={() => setMissionOpen(false)}
+        />
+      )}
 
       {/* 교번변경 바텀시트 */}
       {swapTargetDate && (

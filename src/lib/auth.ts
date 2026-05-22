@@ -169,3 +169,72 @@ export function getUserRole(sabun: string | undefined | null): string {
   if (isIntern(sabun)) return '인턴사원님';
   return '기관사님';
 }
+
+/**
+ * 개인별 임무카드 분류 (재난 대응 임무 카드)
+ * 출처: 2026년 5월 인력운용 분류
+ */
+export type MissionCardKind = 'jido-bujang' | 'unyong-bujang' | 'jiwon-gigwansa' | 'kiji-gwanjewon' | 'gigwansa';
+
+// 지도부장 — 이선길·이현구 (+ 소장·안전관리자·지도기관사도 본부 운영 라인이라 같이)
+const JIDO_BUJANG_SABUNS: ReadonlySet<string> = new Set([
+  '21704630', // 안성숙 (소장)
+  '21711197', // 이선길
+  '21711694', // 이현구
+  '21713568', // 신승헌 (안전관리자)
+  '21714898', // 강병우 (지도기관사)
+  '21706363', // 김대환 (지도기관사)
+]);
+
+// 운용부장 (운용계획부장) — 8명
+const UNYONG_BUJANG_SABUNS: ReadonlySet<string> = new Set([
+  '21707096', // 장진수
+  '21709589', // 김진완
+  '21707420', // 김창환
+  '21706206', // 최승곤
+  '21707406', // 김봉철
+  '21706208', // 이병홍
+  '21707084', // 김재범
+  '21709373', // 조재홍
+]);
+
+// 지원기관사 — 8명
+const JIWON_GIGWANSA_SABUNS: ReadonlySet<string> = new Set([
+  '21711719', // 박종길
+  '21715437', // 석영훈
+  '21713554', // 반헌준
+  '21714586', // 이수윤
+  '21715494', // 김준홍
+  '21714013', // 정광구
+  '21714357', // 정용식
+  '21713547', // 한태환
+]);
+
+// 기지관제원 — 8명
+const KIJI_GWANJEWON_SABUNS: ReadonlySet<string> = new Set([
+  '21706327', // 현덕일
+  '21711438', // 박용덕
+  '21706306', // 윤경일
+  '21711304', // 전동규
+  '21709635', // 정성한
+  '21710720', // 이동복
+  '21709575', // 신제윤
+  '21711443', // 이승훈
+]);
+
+export function getMissionCardKind(sabun: string | undefined | null): MissionCardKind {
+  if (!sabun) return 'gigwansa';
+  if (JIDO_BUJANG_SABUNS.has(sabun)) return 'jido-bujang';
+  if (UNYONG_BUJANG_SABUNS.has(sabun)) return 'unyong-bujang';
+  if (JIWON_GIGWANSA_SABUNS.has(sabun)) return 'jiwon-gigwansa';
+  if (KIJI_GWANJEWON_SABUNS.has(sabun)) return 'kiji-gwanjewon';
+  return 'gigwansa';
+}
+
+export const MISSION_CARD_META: Record<MissionCardKind, { label: string; image: string }> = {
+  'jido-bujang':    { label: '지도부장',   image: '/notice/mission-cards/jido-bujang.jpg' },
+  'unyong-bujang':  { label: '운용부장',   image: '/notice/mission-cards/unyong-bujang.jpg' },
+  'jiwon-gigwansa': { label: '지원기관사', image: '/notice/mission-cards/jiwon-gigwansa.jpg' },
+  'kiji-gwanjewon': { label: '기지관제원', image: '/notice/mission-cards/kiji-gwanjewon.jpg' },
+  'gigwansa':       { label: '기관사',     image: '/notice/mission-cards/gigwansa.jpg' },
+};

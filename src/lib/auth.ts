@@ -176,11 +176,15 @@ export function getUserRole(sabun: string | undefined | null): string {
  */
 export type MissionCardKind = 'jido-bujang' | 'unyong-bujang' | 'jiwon-gigwansa' | 'kiji-gwanjewon' | 'gigwansa';
 
-// 지도부장 — 이선길·이현구 (+ 소장·안전관리자·지도기관사도 본부 운영 라인이라 같이)
+// 지도부장 — 이선길·이현구 (소장·안전관리·지도기관사는 카드 미발급)
 const JIDO_BUJANG_SABUNS: ReadonlySet<string> = new Set([
-  '21704630', // 안성숙 (소장)
   '21711197', // 이선길
   '21711694', // 이현구
+]);
+
+// 임무카드 제외 대상 — 소장(안성숙)·안전관리자(신승헌)·지도기관사(강병우·김대환)
+const MISSION_EXCLUDED_SABUNS: ReadonlySet<string> = new Set([
+  '21704630', // 안성숙 (소장)
   '21713568', // 신승헌 (안전관리자)
   '21714898', // 강병우 (지도기관사)
   '21706363', // 김대환 (지도기관사)
@@ -222,8 +226,13 @@ const KIJI_GWANJEWON_SABUNS: ReadonlySet<string> = new Set([
   '21711443', // 이승훈
 ]);
 
-export function getMissionCardKind(sabun: string | undefined | null): MissionCardKind {
+/**
+ * 사번에 해당하는 임무카드 종류 반환. null이면 카드 미발급 대상.
+ * (소장·안전관리자·지도기관사는 임무카드 미발급)
+ */
+export function getMissionCardKind(sabun: string | undefined | null): MissionCardKind | null {
   if (!sabun) return 'gigwansa';
+  if (MISSION_EXCLUDED_SABUNS.has(sabun)) return null;
   if (JIDO_BUJANG_SABUNS.has(sabun)) return 'jido-bujang';
   if (UNYONG_BUJANG_SABUNS.has(sabun)) return 'unyong-bujang';
   if (JIWON_GIGWANSA_SABUNS.has(sabun)) return 'jiwon-gigwansa';

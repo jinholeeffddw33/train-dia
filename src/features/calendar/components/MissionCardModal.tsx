@@ -14,9 +14,13 @@ interface Props {
 export default function MissionCardModal({ sabun, name, onClose }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const kind = getMissionCardKind(sabun);
-  const meta = MISSION_CARD_META[kind];
+  const meta = kind ? MISSION_CARD_META[kind] : null;
 
   const handleClose = useCallback(() => onClose(), [onClose]);
+
+  // 카드 미발급 대상이면 모달 자체를 띄우지 않음 (안전망)
+  useEffect(() => { if (!meta) onClose(); }, [meta, onClose]);
+  if (!meta) return null;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };

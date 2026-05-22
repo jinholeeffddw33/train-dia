@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
-import { isOffice, getOfficeName } from '@/lib/auth';
+import { isOffice, getOfficeName, getMissionCardKind } from '@/lib/auth';
 import { ShieldAlert } from 'lucide-react';
 import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
@@ -34,9 +34,10 @@ export default function CalendarTab() {
   const [swapTargetDate, setSwapTargetDate] = useState<string | null>(null);
   const [missionOpen, setMissionOpen] = useState(false);
 
-  // 임무카드 표시용 사번·이름
+  // 임무카드 표시용 사번·이름 (카드 미발급 대상은 진입 버튼 숨김)
   const missionSabun = driver?.s ?? authUser?.sabun ?? '';
   const missionName = driver?.n ?? (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
+  const hasMissionCard = !!missionSabun && getMissionCardKind(missionSabun) !== null;
 
   // 앱 시작 시 만료된 교번변경 정리
   useEffect(() => {
@@ -120,8 +121,8 @@ export default function CalendarTab() {
         swapMode={swapMode}
       />
 
-      {/* 개인별 임무카드 진입 버튼 — 로그인된 사용자만 노출 */}
-      {missionName && (
+      {/* 개인별 임무카드 진입 버튼 — 카드 발급 대상에만 노출 */}
+      {missionName && hasMissionCard && (
         <div className={styles.missionBtnRow}>
           <button
             type="button"

@@ -53,6 +53,8 @@ export const INTERN_USERS: Person[] = [
   { I: '0', d: '', n: '최승빈', s: '22600472' },
   { I: '0', d: '', n: '황정욱', s: '22600491' },
   { I: '0', d: '', n: '박민석', s: '22600519' },
+  { I: '0', d: '', n: '한지승', s: '22601004' },
+  { I: '0', d: '', n: '강미진', s: '22601008' },
 ];
 
 const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];

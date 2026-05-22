@@ -80,13 +80,12 @@ export default function JubakLocationOverlay({ open, onClose }: Props) {
                   >
                     <span className={styles.stationIndex} aria-hidden>{String(idx + 1).padStart(2, '0')}</span>
                     <div className={styles.stationIcon}>
-                      <Icon size={22} strokeWidth={2.2} />
+                      <Icon size={20} strokeWidth={2.2} />
                     </div>
-                    <span className={styles.stationLabel}>{s.label}</span>
-                    <span className={styles.stationSub}>{s.sub}</span>
-                    <span className={styles.stationCorner} aria-hidden>
-                      <MapPin size={11} />
-                    </span>
+                    <div className={styles.stationText}>
+                      <span className={styles.stationLabel}>{s.label}</span>
+                      <span className={styles.stationSub}>{s.sub}</span>
+                    </div>
                   </button>
                 );
               })}

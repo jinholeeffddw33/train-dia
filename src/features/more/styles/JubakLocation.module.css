@@ -25,185 +25,146 @@
   width: 100%;
 }
 
-/* ── 카드 베이스 (미래지향 글래스+네온) ── */
+/* ── 카드 베이스 (은은한 파스텔 + 글래스) ── */
 .stationBtn {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  min-height: 112px;
-  padding: 12px 12px 10px;
-  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
-  border-radius: 16px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 12px;
+  border: 1px solid var(--card-border, rgba(96, 165, 250, 0.25));
+  border-radius: 14px;
   background:
-    linear-gradient(135deg, var(--card-tint, rgba(96, 165, 250, 0.18)), transparent 60%),
-    linear-gradient(180deg, var(--card-bg1, #0F172A), var(--card-bg2, #1E293B));
-  color: #fff;
+    linear-gradient(135deg, var(--card-tint, rgba(96, 165, 250, 0.10)), var(--card-tint-2, rgba(96, 165, 250, 0.04)));
+  color: var(--dia-text-primary);
   text-align: left;
   cursor: pointer;
   overflow: hidden;
-  isolation: isolate;
   transition: transform 0.14s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   -webkit-tap-highlight-color: transparent;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 6px 18px rgba(0, 0, 0, 0.25);
-}
-
-/* 카드 우상단 미세 글로우 */
-.stationBtn::before {
-  content: '';
-  position: absolute;
-  top: -40%;
-  right: -30%;
-  width: 70%;
-  height: 90%;
-  background: radial-gradient(circle, var(--card-glow, rgba(96, 165, 250, 0.35)) 0%, transparent 60%);
-  filter: blur(8px);
-  z-index: -1;
-  pointer-events: none;
 }
 
 .stationBtn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
   border-color: var(--card-accent, #60A5FA);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 0 2px var(--card-accent, #60A5FA),
-    0 8px 22px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 2px var(--card-tint, rgba(96, 165, 250, 0.18));
 }
 
 @media (hover: hover) {
   .stationBtn:hover {
     border-color: var(--card-accent, #60A5FA);
-    transform: translateY(-2px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 0 0 1.5px var(--card-accent, #60A5FA),
-      0 10px 24px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
   }
 }
 
-/* 카드 좌상단 번호 — 라이트 모드 적용시에도 유지 */
+/* 우상단 번호 — 가벼운 모노 톤 */
 .stationIndex {
   position: absolute;
-  top: 8px;
-  left: 12px;
+  top: 6px;
+  right: 10px;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
   color: var(--card-accent, #60A5FA);
-  opacity: 0.85;
+  opacity: 0.7;
   font-family: 'Menlo', 'Consolas', monospace;
 }
 
-/* 우상단 메타 핀 */
+/* 우상단 핀 배지는 가로 컴팩트 레이아웃에서 생략 */
 .stationCorner {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--card-accent, #60A5FA);
+  display: none;
 }
 
 .stationIcon {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 18px;
-  border-radius: 12px;
-  background:
-    linear-gradient(135deg, var(--card-accent, #60A5FA), var(--card-accent-deep, #1D4ED8));
-  color: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 4px 12px var(--card-glow, rgba(96, 165, 250, 0.4));
+  border-radius: 10px;
+  background: var(--card-icon-bg, rgba(96, 165, 250, 0.18));
+  color: var(--card-accent, #60A5FA);
+  flex-shrink: 0;
+}
+
+.stationText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .stationLabel {
-  font-size: 17px;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.2px;
-  margin-top: 6px;
-  line-height: 1.1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  letter-spacing: 0.1px;
+  line-height: 1.15;
+  display: block;
 }
 
 .stationSub {
   font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
-  letter-spacing: 0.3px;
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+  letter-spacing: 0.2px;
+  display: block;
+  margin-top: 1px;
 }
 
-/* ── 색상 테마 변수 ── */
+/* 라벨·부제를 묶는 컨테이너용 wrapper로는 같은 flex column 사용 */
+.stationBtn .stationLabel {
+  margin-top: 0;
+}
+
+/* ── 색상 테마 — 은은한 파스텔 ── */
 .theme_cyan {
-  --card-accent: #22D3EE;
-  --card-accent-deep: #0E7490;
-  --card-glow: rgba(34, 211, 238, 0.45);
-  --card-tint: rgba(34, 211, 238, 0.16);
-  --card-border: rgba(34, 211, 238, 0.22);
-  --card-bg1: #082F49;
-  --card-bg2: #164E63;
+  --card-accent: #0891B2;            /* 텍스트/아이콘 (충분히 진해서 가독성 OK) */
+  --card-tint:    rgba(34, 211, 238, 0.10);
+  --card-tint-2:  rgba(34, 211, 238, 0.03);
+  --card-border:  rgba(34, 211, 238, 0.30);
+  --card-icon-bg: rgba(34, 211, 238, 0.18);
 }
 
 .theme_purple {
-  --card-accent: #A78BFA;
-  --card-accent-deep: #5B21B6;
-  --card-glow: rgba(167, 139, 250, 0.45);
-  --card-tint: rgba(167, 139, 250, 0.16);
-  --card-border: rgba(167, 139, 250, 0.22);
-  --card-bg1: #2E1065;
-  --card-bg2: #4C1D95;
+  --card-accent: #7C3AED;
+  --card-tint:    rgba(167, 139, 250, 0.10);
+  --card-tint-2:  rgba(167, 139, 250, 0.03);
+  --card-border:  rgba(167, 139, 250, 0.30);
+  --card-icon-bg: rgba(167, 139, 250, 0.18);
 }
 
 .theme_pink {
-  --card-accent: #F472B6;
-  --card-accent-deep: #BE185D;
-  --card-glow: rgba(244, 114, 182, 0.45);
-  --card-tint: rgba(244, 114, 182, 0.16);
-  --card-border: rgba(244, 114, 182, 0.22);
-  --card-bg1: #500724;
-  --card-bg2: #831843;
+  --card-accent: #DB2777;
+  --card-tint:    rgba(244, 114, 182, 0.10);
+  --card-tint-2:  rgba(244, 114, 182, 0.03);
+  --card-border:  rgba(244, 114, 182, 0.30);
+  --card-icon-bg: rgba(244, 114, 182, 0.18);
 }
 
 .theme_green {
-  --card-accent: #34D399;
-  --card-accent-deep: #047857;
-  --card-glow: rgba(52, 211, 153, 0.45);
-  --card-tint: rgba(52, 211, 153, 0.16);
-  --card-border: rgba(52, 211, 153, 0.22);
-  --card-bg1: #022C22;
-  --card-bg2: #064E3B;
+  --card-accent: #059669;
+  --card-tint:    rgba(52, 211, 153, 0.10);
+  --card-tint-2:  rgba(52, 211, 153, 0.03);
+  --card-border:  rgba(52, 211, 153, 0.30);
+  --card-icon-bg: rgba(52, 211, 153, 0.18);
 }
 
 .theme_amber {
-  --card-accent: #FBBF24;
-  --card-accent-deep: #B45309;
-  --card-glow: rgba(251, 191, 36, 0.45);
-  --card-tint: rgba(251, 191, 36, 0.16);
-  --card-border: rgba(251, 191, 36, 0.22);
-  --card-bg1: #451A03;
-  --card-bg2: #78350F;
+  --card-accent: #D97706;
+  --card-tint:    rgba(251, 191, 36, 0.12);
+  --card-tint-2:  rgba(251, 191, 36, 0.04);
+  --card-border:  rgba(251, 191, 36, 0.35);
+  --card-icon-bg: rgba(251, 191, 36, 0.22);
 }
 
 .theme_rose {
-  --card-accent: #FB7185;
-  --card-accent-deep: #BE123C;
-  --card-glow: rgba(251, 113, 133, 0.45);
-  --card-tint: rgba(251, 113, 133, 0.16);
-  --card-border: rgba(251, 113, 133, 0.22);
-  --card-bg1: #4C0519;
-  --card-bg2: #881337;
+  --card-accent: #E11D48;
+  --card-tint:    rgba(251, 113, 133, 0.10);
+  --card-tint-2:  rgba(251, 113, 133, 0.03);
+  --card-border:  rgba(251, 113, 133, 0.30);
+  --card-icon-bg: rgba(251, 113, 133, 0.18);
 }
 
 .photoBtn {

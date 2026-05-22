@@ -152,23 +152,24 @@
   box-shadow: var(--dia-3d-pressed);
 }
 
-/* ── 캘린더 진입 버튼 (중요 카드 강조) ── */
+/* ── 캘린더 진입 버튼 (중요 카드 강조 — 파랑 바탕·노랑 글자) ── */
 .entryBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  border: 2px solid var(--dia-red);
+  border: 2px solid var(--dia-amber);
   border-radius: 999px;
   background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 55%),
-    linear-gradient(145deg, #fca5a5, #dc2626);
-  color: #fff;
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(145deg, #60A5FA, #1D4ED8);
+  color: var(--dia-amber);
   font-size: var(--dia-text-sm);
   font-weight: 800;
   letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   box-shadow:
-    0 0 0 3px rgba(239, 68, 68, 0.18),
+    0 0 0 3px rgba(245, 158, 11, 0.25),
     var(--dia-3d-depth);
   transition: transform 0.12s ease, filter 0.15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -188,11 +189,12 @@
 
 .entryIcon {
   flex-shrink: 0;
+  color: var(--dia-amber);
 }
 
 @keyframes missionPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18), var(--dia-3d-depth); }
-  50%      { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.06), var(--dia-3d-depth); }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25), var(--dia-3d-depth); }
+  50%      { box-shadow: 0 0 0 9px rgba(245, 158, 11, 0.08), var(--dia-3d-depth); }
 }
 
 @keyframes fadeIn {

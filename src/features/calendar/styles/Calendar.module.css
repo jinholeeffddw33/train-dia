@@ -386,11 +386,14 @@
   margin-bottom: var(--dia-space-4);
 }
 
-/* 개인별 임무카드 진입 버튼 영역 — 캘린더 직후 우측 배치 */
+/* 개인별 임무카드 진입 버튼 영역 — 캘린더 마지막 행 빈 영역으로 끌어올림 */
 .missionBtnRow {
   display: flex;
   justify-content: flex-end;
-  margin: var(--dia-space-2) 0 var(--dia-space-3);
+  /* 마지막 주 빈 칸 위치까지 위로 끌어올림 (셀 높이 ≈ 64px 기준) */
+  margin: -68px 4px var(--dia-space-3);
+  position: relative;
+  z-index: 2;
 }
 
 .swapToggleBtn {

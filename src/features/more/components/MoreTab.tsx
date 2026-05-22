@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3 } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { openInChrome } from '@/hooks/useInAppBrowser';
@@ -18,6 +18,7 @@ import { ContactsTab } from '@/features/contacts';
 // DriverSelector 제거됨 — 기관사 변경은 인증으로 고정
 import HealingCardOverlay from './HealingCardOverlay';
 import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
+import JubakLocationOverlay from './JubakLocationOverlay';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import FeedbackOverlay from './FeedbackOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
@@ -49,6 +50,7 @@ export default function MoreTab() {
   const [healingOpen, setHealingOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [shuttleOpen, setShuttleOpen] = useState(false);
+  const [jubakOpen, setJubakOpen] = useState(false);
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -177,6 +179,20 @@ export default function MoreTab() {
               <Car size={20} />
             </div>
             <span className={styles.settingLabel}>승용차 운행 시간표(고덕기지 입고열차)</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.toolBtn}
+          onClick={() => setJubakOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <MapPin size={20} />
+            </div>
+            <span className={styles.settingLabel}>5호선 주박위치</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -704,6 +720,12 @@ export default function MoreTab() {
       <ShuttleScheduleOverlay
         open={shuttleOpen}
         onClose={() => setShuttleOpen(false)}
+      />
+
+      {/* 5호선 주박위치 오버레이 */}
+      <JubakLocationOverlay
+        open={jubakOpen}
+        onClose={() => setJubakOpen(false)}
       />
 
       {/* 바로가기 오버레이 */}

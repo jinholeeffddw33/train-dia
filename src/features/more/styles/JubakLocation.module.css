@@ -1,0 +1,104 @@
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.intro {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  margin: var(--dia-space-2) 0 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stationBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 110px;
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  transition: transform 0.12s ease, background var(--dia-transition-fast), border-color var(--dia-transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stationBtn:active {
+  transform: scale(0.96);
+  background: var(--dia-surface-hover);
+  border-color: var(--dia-blue);
+}
+
+@media (hover: hover) {
+  .stationBtn:hover { border-color: var(--dia-blue); }
+}
+
+.stationIcon {
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+.stationLabel {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.photoBtn {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  overflow: hidden;
+  background: #fff;
+  cursor: zoom-in;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* 풀스크린 확대 */
+.zoomOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--dia-layer-modal) + 1);
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-3);
+  cursor: zoom-out;
+}
+
+.zoomImg {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}

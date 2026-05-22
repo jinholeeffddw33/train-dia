@@ -97,9 +97,20 @@ export default function CalendarTab() {
         <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
 
-      {/* 기관사/내근직 이름 */}
+      {/* 기관사/내근직 이름 + 임무카드 진입 (우측) */}
       <div className={styles.driverInfo}>
         <span className={styles.driverName}>{driver?.n ?? authUser?.name ?? ''}</span>
+        {missionName && hasMissionCard && (
+          <button
+            type="button"
+            className={missionStyles.entryBtn}
+            onClick={() => setMissionOpen(true)}
+            aria-label="개인별 임무카드 열기"
+          >
+            <ShieldAlert size={16} className={missionStyles.entryIcon} />
+            <span>개인별 임무카드</span>
+          </button>
+        )}
       </div>
 
       {/* 교번변경 모드 안내 배너 */}
@@ -120,21 +131,6 @@ export default function CalendarTab() {
         onSelectDate={handleDateSelect}
         swapMode={swapMode}
       />
-
-      {/* 개인별 임무카드 진입 버튼 — 카드 발급 대상에만 노출 */}
-      {missionName && hasMissionCard && (
-        <div className={styles.missionBtnRow}>
-          <button
-            type="button"
-            className={missionStyles.entryBtn}
-            onClick={() => setMissionOpen(true)}
-            aria-label="개인별 임무카드 열기"
-          >
-            <ShieldAlert size={16} className={missionStyles.entryIcon} />
-            <span>개인별 임무카드</span>
-          </button>
-        </div>
-      )}
 
       {/* 교번변경 버튼 — 내근직은 숨김 */}
       {!officeMode && (

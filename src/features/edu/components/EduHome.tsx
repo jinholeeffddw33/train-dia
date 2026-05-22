@@ -8,7 +8,7 @@ import {
   Mic, DoorOpen, Wrench,
   Award, User, ClipboardList,
   RotateCcw, GitCompareArrows, Link, Zap, Wind,
-  Clapperboard, BookOpen, FileText,
+  Clapperboard, BookOpen,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -66,11 +66,8 @@ const SUBMENU_COLOR_MAP = {
   red:    styles.iconBgRed,
 } as const;
 
-export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomerVideo, onNewcomerHandbook }: EduHomeProps) {
-  const {
-    readCount, totalQuizzes, bestScore,
-    progress, wrongCount, unresolvedWrongCount,
-  } = useEduStore();
+export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomerVideo, onNewcomerHandbook }: EduHomeProps) {
+  const { wrongCount, unresolvedWrongCount } = useEduStore();
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
@@ -83,24 +80,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
     const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener('change', onChange);
     return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  const hasLastRead = !!progress.lastReadSectionId;
-
-  const [sectionNames, setSectionNames] = useState<Record<string, string>>({});
-  useEffect(() => {
-    fetch('/data/edu/handbook.json')
-      .then(r => r.json())
-      .then(data => {
-        const names: Record<string, string> = {};
-        for (const ch of data.chapters) {
-          for (const sec of ch.sections) {
-            names[sec.id] = sec.title;
-          }
-        }
-        setSectionNames(names);
-      })
-      .catch(() => {});
   }, []);
 
   const [repairOpen, setRepairOpen] = useState(false);
@@ -213,25 +192,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
           })}
         </nav>
 
-        {/* ── 이어서 보기 — 텍스트 중심 CTA ── */}
-        {hasLastRead && (
-          <button
-            type="button"
-            className={styles.resumeV3}
-            onClick={() => onSection(progress.lastReadSectionId!)}
-          >
-            <div className={styles.resumeBodyV3}>
-              <span className={styles.resumeLabelV3}>이어서 보기</span>
-              <span className={styles.resumeTitleV3}>
-                {sectionNames[progress.lastReadSectionId!] ?? progress.lastReadSectionId}
-              </span>
-            </div>
-            <span className={styles.resumeArrowV3} aria-hidden="true">
-              <ChevronRight size={24} strokeWidth={2.2} />
-            </span>
-          </button>
-        )}
-
         {/* ── 오답노트 — 있을 때만 한 줄 리스트 ── */}
         {wrongCount > 0 && (
           <button type="button" className={styles.listRowV3} onClick={onWrongReview}>
@@ -248,32 +208,6 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection, 
             </span>
             <ChevronRight size={22} className={styles.listRowArrowV3} />
           </button>
-        )}
-
-        {/* ── 학습 현황 — 숫자 중심 3카드, 그래프 없음 ── */}
-        {(totalQuizzes > 0 || readCount > 0) && (
-          <section className={styles.statsSectionV3} aria-label="학습 현황">
-            <h2 className={styles.statsHeadingV3}>학습 현황</h2>
-            <div className={styles.statsRowV3}>
-              <div className={styles.statCellV3}>
-                <BookOpen size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
-                <span className={styles.statCellValueV3}>{readCount}</span>
-                <span className={styles.statCellLabelV3}>학습 섹션</span>
-              </div>
-              <div className={styles.statCellV3}>
-                <FileText size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
-                <span className={styles.statCellValueV3}>{totalQuizzes}</span>
-                <span className={styles.statCellLabelV3}>시험 응시</span>
-              </div>
-              <div className={styles.statCellV3}>
-                <Award size={20} strokeWidth={1.8} className={styles.statCellIconV3} aria-hidden="true" />
-                <span className={styles.statCellValueV3}>
-                  {totalQuizzes > 0 ? bestScore : '-'}
-                </span>
-                <span className={styles.statCellLabelV3}>최고 점수</span>
-              </div>
-            </div>
-          </section>
         )}
 
       </div>

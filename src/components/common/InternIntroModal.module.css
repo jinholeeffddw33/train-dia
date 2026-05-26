@@ -14,7 +14,7 @@
 
 .content {
   width: 100%;
-  max-width: 460px;
+  max-width: 640px;
   max-height: 96vh;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);

@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { X, Sparkles } from 'lucide-react';
 import styles from './InternIntroModal.module.css';
 
-const STORAGE_KEY = 'intern-intro-2026-dismiss';
-const SHOW_FROM = '2026-05-03';
-const SHOW_UNTIL = '2026-05-05';
+const STORAGE_KEY = 'intern-welcome-2026-05-dismiss';
+const SHOW_FROM = '2026-05-26';
+const SHOW_UNTIL = '2026-05-29';
 
 function todayStr(): string {
   const d = new Date();
@@ -60,14 +60,14 @@ export default function InternIntroModal() {
       className={styles.overlay}
       role="dialog"
       aria-modal="true"
-      aria-label="2026년 신규임용 직원 안내"
+      aria-label="2026년 신규임용 인턴사원 환영"
       onClick={(e) => { if (e.target === overlayRef.current) handleClose(); }}
     >
       <div ref={contentRef} className={styles.content}>
         <div className={styles.header}>
           <div className={styles.titleArea}>
             <Sparkles size={18} className={styles.titleIcon} />
-            <h2 className={styles.title}>2026년 신규임용 직원</h2>
+            <h2 className={styles.title}>2026년 신규임용 인턴사원</h2>
           </div>
           <button
             type="button"
@@ -82,10 +82,10 @@ export default function InternIntroModal() {
         <div className={styles.body}>
           <div className={styles.photoWrap}>
             <Image
-              src="/images/interns-2026.jpg"
-              alt="2026년 신규임용 직원 6명 사진 (이름과 사번 포함)"
-              width={620}
-              height={840}
+              src="/images/interns-welcome-2026-05.png"
+              alt="2026년 신규임용 인턴사원 강미진·한지승 환영 — 답십리승무사업소"
+              width={1345}
+              height={784}
               className={styles.photo}
               priority
             />

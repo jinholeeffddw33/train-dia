@@ -59,6 +59,31 @@
   margin-bottom: var(--dia-space-2);
 }
 
+/* ── 입력란 도움말 (label 옆) ── */
+.hint {
+  margin-top: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-left: 3px solid var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.hintStrong {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.hintLine {
+  display: block;
+  margin-top: var(--dia-space-1);
+  color: var(--dia-text-tertiary);
+}
+
 /* ── 안내 단계 목록 ── */
 .steps {
   display: flex;

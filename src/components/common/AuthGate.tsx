@@ -135,6 +135,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
               autoComplete="off"
               autoFocus
             />
+            <div className={styles.hint}>
+              본인 <span className={styles.hintStrong}>사번 8자리</span>를 그대로 입력하세요.
+              <span className={styles.hintLine}>예) 21712345 — 숫자만, 공백·하이픈 없이</span>
+            </div>
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
@@ -234,6 +238,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 autoComplete="off"
                 autoFocus
               />
+              <div className={styles.hint}>
+                <span className={styles.hintStrong}>본인 이름 3글자</span>를 그대로 입력하세요. (PIN 아님)
+                <span className={styles.hintLine}>예) 박종길 · 장진수 — 공백 없이, 한자·영문 불가</span>
+                <span className={styles.hintLine}>※ 일반 기관사는 PIN을 사용하지 않습니다.</span>
+              </div>
             </div>
 
             {error && <p className={styles.error}>{error}</p>}
@@ -297,6 +306,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
               >
                 {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+            </div>
+            <div className={styles.hint}>
+              본인이 설정한 <span className={styles.hintStrong}>PIN(4자리 이상 숫자)</span>를 입력하세요.
+              <span className={styles.hintLine}>초기 PIN을 잊었다면 이현구(관리자)에게 초기화 요청 → 사번 뒤 6자리로 리셋됩니다.</span>
             </div>
           </div>
 

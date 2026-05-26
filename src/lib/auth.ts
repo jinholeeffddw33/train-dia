@@ -174,21 +174,30 @@ export function getUserRole(sabun: string | undefined | null): string {
  * 개인별 임무카드 분류 (재난 대응 임무 카드)
  * 출처: 2026년 5월 인력운용 분류
  */
-export type MissionCardKind = 'jido-bujang' | 'unyong-bujang' | 'jiwon-gigwansa' | 'kiji-gwanjewon' | 'gigwansa';
+export type MissionCardKind =
+  | 'so-jang'
+  | 'bu-so-jang'
+  | 'jido-bujang-lee-hyungoo'
+  | 'jido-bujang-lee-seongil'
+  | 'anjeon-gwanrija'
+  | 'jido-gigwansa'
+  | 'samu-jikwon'
+  | 'unyong-bujang'
+  | 'jiwon-gigwansa'
+  | 'kiji-gwanjewon'
+  | 'gigwansa';
 
-// 지도부장 — 이선길·이현구 (소장·안전관리·지도기관사는 카드 미발급)
-const JIDO_BUJANG_SABUNS: ReadonlySet<string> = new Set([
-  '21711197', // 이선길
-  '21711694', // 이현구
-]);
-
-// 임무카드 제외 대상 — 소장(안성숙)·안전관리자(신승헌)·지도기관사(강병우·김대환)
-const MISSION_EXCLUDED_SABUNS: ReadonlySet<string> = new Set([
-  '21704630', // 안성숙 (소장)
-  '21713568', // 신승헌 (안전관리자)
-  '21714898', // 강병우 (지도기관사)
-  '21706363', // 김대환 (지도기관사)
-]);
+// 사번별 전용 임무카드 (개인 이름이 박힌 카드 — 일반 역할 카드보다 우선)
+const SABUN_SPECIFIC_CARDS: Record<string, MissionCardKind> = {
+  '21704630': 'so-jang',                  // 안성숙 — 소장
+  '21711216': 'bu-so-jang',               // 이태원 — 부소장
+  '21711694': 'jido-bujang-lee-hyungoo',  // 이현구 — 지도부장
+  '21711197': 'jido-bujang-lee-seongil',  // 이선길 — 지도부장
+  '21713568': 'anjeon-gwanrija',          // 신승헌 — 안전관리자
+  '21714898': 'jido-gigwansa',            // 강병우 — 지도기관사
+  '21706363': 'jido-gigwansa',            // 김대환 — 지도기관사
+  '21715676': 'samu-jikwon',              // 김민정 — 사무직원
+};
 
 // 운용부장 (운용계획부장) — 8명
 const UNYONG_BUJANG_SABUNS: ReadonlySet<string> = new Set([
@@ -227,13 +236,12 @@ const KIJI_GWANJEWON_SABUNS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * 사번에 해당하는 임무카드 종류 반환. null이면 카드 미발급 대상.
- * (소장·안전관리자·지도기관사는 임무카드 미발급)
+ * 사번에 해당하는 임무카드 종류 반환.
+ * 우선순위: 사번별 전용 카드(SABUN_SPECIFIC_CARDS) > 역할별 카드 > 기관사(기본).
  */
 export function getMissionCardKind(sabun: string | undefined | null): MissionCardKind | null {
   if (!sabun) return 'gigwansa';
-  if (MISSION_EXCLUDED_SABUNS.has(sabun)) return null;
-  if (JIDO_BUJANG_SABUNS.has(sabun)) return 'jido-bujang';
+  if (SABUN_SPECIFIC_CARDS[sabun]) return SABUN_SPECIFIC_CARDS[sabun];
   if (UNYONG_BUJANG_SABUNS.has(sabun)) return 'unyong-bujang';
   if (JIWON_GIGWANSA_SABUNS.has(sabun)) return 'jiwon-gigwansa';
   if (KIJI_GWANJEWON_SABUNS.has(sabun)) return 'kiji-gwanjewon';
@@ -241,9 +249,15 @@ export function getMissionCardKind(sabun: string | undefined | null): MissionCar
 }
 
 export const MISSION_CARD_META: Record<MissionCardKind, { label: string; image: string }> = {
-  'jido-bujang':    { label: '지도부장',   image: '/notice/mission-cards/jido-bujang.jpg' },
-  'unyong-bujang':  { label: '운용부장',   image: '/notice/mission-cards/unyong-bujang.jpg' },
-  'jiwon-gigwansa': { label: '지원기관사', image: '/notice/mission-cards/jiwon-gigwansa.jpg' },
-  'kiji-gwanjewon': { label: '기지관제원', image: '/notice/mission-cards/kiji-gwanjewon.jpg' },
-  'gigwansa':       { label: '기관사',     image: '/notice/mission-cards/gigwansa.jpg' },
+  'so-jang':                 { label: '소장',         image: '/notice/mission-cards/so-jang.jpg' },
+  'bu-so-jang':              { label: '부소장',       image: '/notice/mission-cards/bu-so-jang.jpg' },
+  'jido-bujang-lee-hyungoo': { label: '지도부장',     image: '/notice/mission-cards/jido-bujang-lee-hyungoo.jpg' },
+  'jido-bujang-lee-seongil': { label: '지도부장',     image: '/notice/mission-cards/jido-bujang-lee-seongil.jpg' },
+  'anjeon-gwanrija':         { label: '안전관리자',   image: '/notice/mission-cards/anjeon-gwanrija.jpg' },
+  'jido-gigwansa':           { label: '지도기관사',   image: '/notice/mission-cards/jido-gigwansa.jpg' },
+  'samu-jikwon':             { label: '사무직원',     image: '/notice/mission-cards/samu-jikwon.jpg' },
+  'unyong-bujang':           { label: '운용부장',     image: '/notice/mission-cards/unyong-bujang.jpg' },
+  'jiwon-gigwansa':          { label: '지원기관사',   image: '/notice/mission-cards/jiwon-gigwansa.jpg' },
+  'kiji-gwanjewon':          { label: '기지관제원',   image: '/notice/mission-cards/kiji-gwanjewon.jpg' },
+  'gigwansa':                { label: '기관사',       image: '/notice/mission-cards/gigwansa.jpg' },
 };

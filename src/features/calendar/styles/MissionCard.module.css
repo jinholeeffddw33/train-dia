@@ -6,16 +6,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--dia-space-3);
-  padding-top: max(var(--dia-space-3), env(safe-area-inset-top));
-  padding-bottom: max(var(--dia-space-3), env(safe-area-inset-bottom));
+  padding: var(--dia-space-1);
+  padding-top: max(var(--dia-space-1), env(safe-area-inset-top));
+  padding-bottom: max(var(--dia-space-1), env(safe-area-inset-bottom));
   animation: fadeIn 200ms var(--dia-ease);
 }
 
 .content {
   width: 100%;
-  max-width: 540px;
-  max-height: 96vh;
+  max-width: 720px;
+  max-height: 98vh;
   background: var(--dia-surface);
   /* 중요 임무 카드 — 빨간 강조 테두리 + 두꺼운 외곽선 */
   border: 3px solid var(--dia-red);
@@ -98,17 +98,15 @@
 .body {
   flex: 1;
   overflow-y: auto;
-  padding: var(--dia-space-3);
+  padding: 0;
   min-height: 0;
-  background: var(--dia-bg);
+  background: #fff;
 }
 
 .photoWrap {
   width: 100%;
-  border-radius: var(--dia-radius-lg);
   overflow: hidden;
   background: #fff;
-  border: 1px solid var(--dia-border);
 }
 
 .photo {

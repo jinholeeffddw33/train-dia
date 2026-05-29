@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
-import { useSwapStore } from '@/stores/swap';
 import { isOffice, getOfficeName, getMissionCardKind } from '@/lib/auth';
 import { ShieldAlert } from 'lucide-react';
 import CalendarGrid from './CalendarGrid';
@@ -22,7 +21,6 @@ function todayStr(): string {
 export default function CalendarTab() {
   const driver = useDriverStore((s) => s.current);
   const authUser = useAuthStore((s) => s.user);
-  const cleanExpired = useSwapStore((s) => s.cleanExpired);
   // 내근직 모드: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
   const officeMode = driver
     ? driver.I === '0'
@@ -38,11 +36,6 @@ export default function CalendarTab() {
   const missionSabun = driver?.s ?? authUser?.sabun ?? '';
   const missionName = driver?.n ?? (authUser ? getOfficeName(authUser.sabun) ?? authUser.name : '');
   const hasMissionCard = !!missionSabun && getMissionCardKind(missionSabun) !== null;
-
-  // 앱 시작 시 만료된 교번변경 정리
-  useEffect(() => {
-    cleanExpired();
-  }, [cleanExpired]);
 
   const prevMonth = () => {
     if (month === 1) { setYear(year - 1); setMonth(12); }

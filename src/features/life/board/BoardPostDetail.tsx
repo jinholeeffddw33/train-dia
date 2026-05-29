@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Heart, MessageSquare, Trash2, AlertTriangle, Send, CornerDownRight } from 'lucide-react';
+import { X, Heart, MessageSquare, Trash2, AlertTriangle, Send, CornerDownRight, VenetianMask } from 'lucide-react';
 import styles from './Board.module.css';
 
 interface PostDetail {
@@ -10,6 +10,7 @@ interface PostDetail {
   title: string;
   body: string;
   author_alias: string;
+  is_anonymous: boolean;
   is_mine: boolean;
   like_count: number;
   comment_count: number;
@@ -217,6 +218,7 @@ export default function BoardPostDetail({ id, onClose }: Props) {
           <>
             <article className={styles.detailPost}>
               <div className={styles.postHeader}>
+                {post.is_anonymous && <VenetianMask size={13} className={styles.anonIcon} aria-label="익명" />}
                 <span className={styles.postAlias}>{post.author_alias}</span>
                 {post.is_mine && <span className={styles.mineBadge}>내 글</span>}
                 <span className={styles.postTime}>{relTime(post.created_at)}</span>

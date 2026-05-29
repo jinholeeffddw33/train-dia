@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const to = from + pageSize - 1;
 
   let q = serverSupabase.from('board_posts')
-    .select('id, category, title, body, author_alias, author_hash, like_count, comment_count, created_at, metadata, images')
+    .select('id, category, title, body, author_alias, author_hash, is_anonymous, like_count, comment_count, created_at, metadata, images')
     .eq('status', 'active');
   if (cat) q = q.eq('category', cat);
 
@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
     title: p.title,
     body: p.body,
     author_alias: p.author_alias,
+    is_anonymous: p.is_anonymous,
     is_mine: p.author_hash === myHash,
     like_count: p.like_count,
     comment_count: p.comment_count,
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
   let title = '';
   let body = '';
   let metadata: Record<string, unknown> = {};
+  let anonymous = false;
   const images: File[] = [];
 
   if (ct.includes('multipart/form-data')) {
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
     if (typeof metaRaw === 'string' && metaRaw) {
       try { metadata = JSON.parse(metaRaw); } catch { /* ignore */ }
     }
+    anonymous = (form.get('anonymous') as string) === 'true';
     const files = form.getAll('images').filter((v): v is File => v instanceof File && v.size > 0);
     for (const f of files.slice(0, MAX_IMAGES)) {
       if (f.size > MAX_IMAGE_BYTES) {
@@ -109,13 +112,14 @@ export async function POST(req: NextRequest) {
       images.push(f);
     }
   } else {
-    type Body = { category?: string; title?: string; body?: string; metadata?: Record<string, unknown> };
+    type Body = { category?: string; title?: string; body?: string; metadata?: Record<string, unknown>; anonymous?: boolean };
     let payload: Body;
     try { payload = (await req.json()) as Body; } catch { return NextResponse.json({ code: 'BAD_JSON' }, { status: 400 }); }
     cat = parseCategory(payload.category ?? null);
     title = (payload.title || '').trim();
     body = (payload.body || '').trim();
     metadata = payload.metadata ?? {};
+    anonymous = !!payload.anonymous;
   }
 
   if (!cat) return NextResponse.json({ code: 'BAD_CATEGORY' }, { status: 400 });
@@ -151,9 +155,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 가명 결정 — 카테고리에 따라 scope 분리
-  const scope = cat === 'advice' ? 'advice' : 'general';
-  const { hash, alias } = await getOrCreateAlias(auth.sabun, scope);
+  // 작성자 표시 결정 — 익명이면 가명(advice 는 별도 scope), 실명이면 이름.
+  // author_hash 는 익명/실명 무관 항상 사번 해시 (내 글 판별·차단·rate limit 용, 클라엔 미노출)
+  let displayName: string;
+  if (anonymous) {
+    const scope = cat === 'advice' ? 'advice' : 'general';
+    const r = await getOrCreateAlias(auth.sabun, scope);
+    displayName = r.alias;
+  } else {
+    displayName = auth.name;
+  }
 
   const { data, error } = await serverSupabase
     .from('board_posts')
@@ -161,8 +172,9 @@ export async function POST(req: NextRequest) {
       category: cat,
       title,
       body,
-      author_hash: hash,
-      author_alias: alias,
+      author_hash: myHash,
+      author_alias: displayName,
+      is_anonymous: anonymous,
       images: imageUrls.length > 0 ? imageUrls : null,
       metadata,
     })

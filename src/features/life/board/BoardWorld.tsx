@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Pencil, RefreshCw, Heart, MessageSquare, Clock, Flame } from 'lucide-react';
+import { ArrowLeft, Pencil, RefreshCw, Heart, MessageSquare, Clock, Flame, VenetianMask } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import BoardWriteModal from './BoardWriteModal';
 import BoardPostDetail from './BoardPostDetail';
@@ -15,6 +15,7 @@ interface PostSummary {
   title: string;
   body: string;
   author_alias: string;
+  is_anonymous?: boolean;
   is_mine: boolean;
   like_count: number;
   comment_count: number;
@@ -169,6 +170,7 @@ export default function BoardWorld({ onBack }: Props) {
             onClick={() => setDetailId(p.id)}
           >
             <div className={styles.postHeader}>
+              {p.is_anonymous && <VenetianMask size={12} className={styles.anonIcon} aria-label="익명" />}
               <span className={styles.postAlias}>{p.author_alias}</span>
               {isHot(p) && <span className={styles.hotBadge}><Flame size={11} /> HOT</span>}
               {p.is_mine && <span className={styles.mineBadge}>내 글</span>}

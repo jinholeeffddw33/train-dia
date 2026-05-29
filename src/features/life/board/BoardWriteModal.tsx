@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Send, ImagePlus } from 'lucide-react';
+import { X, Send, ImagePlus, User, VenetianMask } from 'lucide-react';
 import type { BoardCategory } from './BoardWorld';
 import styles from './Board.module.css';
 
@@ -29,6 +29,7 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
   const [metaWhen, setMetaWhen] = useState('');
   const [metaPlace, setMetaPlace] = useState('');
   const [metaCapacity, setMetaCapacity] = useState('');
+  const [anonymous, setAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
@@ -96,6 +97,7 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
       form.append('title', t);
       form.append('body', b);
       form.append('metadata', JSON.stringify(metadata));
+      form.append('anonymous', String(anonymous));
       for (const f of images) form.append('images', f);
       const res = await fetch('/api/board/posts', { method: 'POST', body: form });
       if (!res.ok) {
@@ -108,7 +110,7 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
     } finally {
       setSubmitting(false);
     }
-  }, [submitting, title, body, category, metaWhen, metaPlace, metaCapacity, images, onDone]);
+  }, [submitting, title, body, category, metaWhen, metaPlace, metaCapacity, images, anonymous, onDone]);
 
   return (
     <div
@@ -141,9 +143,35 @@ export default function BoardWriteModal({ defaultCategory, onClose, onDone }: Pr
                 </button>
               ))}
             </div>
-            {category === 'advice' && (
-              <p className={styles.formHint}>고민상담은 다른 카테고리와 별도 가명으로 작성됩니다</p>
-            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>작성자 표시</label>
+            <div className={styles.identityRow}>
+              <button
+                type="button"
+                className={`${styles.identityChip} ${!anonymous ? styles.identityChipActive : ''}`}
+                onClick={() => setAnonymous(false)}
+                aria-pressed={!anonymous}
+              >
+                <User size={15} /> 실명
+              </button>
+              <button
+                type="button"
+                className={`${styles.identityChip} ${anonymous ? styles.identityChipActive : ''}`}
+                onClick={() => setAnonymous(true)}
+                aria-pressed={anonymous}
+              >
+                <VenetianMask size={15} /> 익명
+              </button>
+            </div>
+            <p className={styles.formHint}>
+              {anonymous
+                ? (category === 'advice'
+                    ? '고민상담 전용 가명으로 익명 표시돼요'
+                    : '가명(예: 겸손한구간)으로 익명 표시돼요')
+                : '내 이름으로 표시돼요'}
+            </p>
           </div>
 
           <div className={styles.formGroup}>

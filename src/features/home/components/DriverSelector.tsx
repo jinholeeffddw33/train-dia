@@ -4,15 +4,16 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import { P } from '@/data/cycle';
-import { EXTRA_USERS } from '@/lib/auth';
+import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
 
-/** 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원) */
-const ALL_PEOPLE = [...P, ...EXTRA_USERS];
+/** 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원 + 인턴) */
+const ALL_PEOPLE = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 const SORTED_P = [...ALL_PEOPLE].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
-/** EXTRA_USERS의 I는 '0'이므로 구분용 Set */
+/** I가 '0'인 직원/인턴 구분용 Set */
 const EXTRA_SET = new Set(EXTRA_USERS.map((u) => u.s));
+const INTERN_SET = new Set(INTERN_USERS.map((u) => u.s));
 
 interface DriverSelectorProps {
   open: boolean;
@@ -100,6 +101,7 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
           </button>
         )}
         {filtered.map((p) => {
+          const isIntern = INTERN_SET.has(p.s);
           const isExtra = EXTRA_SET.has(p.s);
           const isMe = myDriver && p.n === myDriver.n && p.s === myDriver.s;
           if (isMe) return null; // 위에 고정 표시했으므로 중복 제거
@@ -111,9 +113,9 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
               className={`${styles.personItem} ${isActive ? styles.personItemActive : ''}`}
               onClick={() => handlePick(p)}
             >
-              <span className={styles.personNum}>{isExtra ? '' : p.I}</span>
+              <span className={styles.personNum}>{p.I === '0' ? '' : p.I}</span>
               <span className={styles.personName}>{p.n}</span>
-              <span className={styles.personDia}>{isExtra ? '직원' : p.d}</span>
+              <span className={styles.personDia}>{isIntern ? '인턴' : isExtra ? '직원' : p.d}</span>
             </button>
           );
         })}

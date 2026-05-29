@@ -112,7 +112,7 @@ export function getOfficeName(sabun: string): string | null {
     ?? null;
 }
 
-/** 인턴사원 여부 확인 (2026년 신규임용 4명 — 6명 중 2명 퇴사) */
+/** 인턴사원 여부 확인 (2026년 신규임용 6명 — 통상근무 중) */
 export function isIntern(sabun: string): boolean {
   return INTERN_USERS.some((u) => u.s === sabun);
 }
@@ -144,7 +144,7 @@ export function isManager(sabun: string): boolean {
   return MANAGER_SABUNS.has(sabun);
 }
 
-/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (8명) */
+/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 8명 + 인턴 6명) */
 const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '21704630', // 안성숙
   '21711216', // 이태원
@@ -154,6 +154,12 @@ const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '21714898', // 강병우
   '21715676', // 김민정
   '21706363', // 김대환
+  '22600439', // 김경률 (인턴)
+  '22600472', // 최승빈 (인턴)
+  '22600491', // 황정욱 (인턴)
+  '22600519', // 박민석 (인턴)
+  '22601004', // 한지승 (인턴)
+  '22601008', // 강미진 (인턴)
 ]);
 export function isRegularDayOffice(sabun: string | undefined | null): boolean {
   if (!sabun) return false;
@@ -166,7 +172,7 @@ export function getUserRole(sabun: string | undefined | null): string {
   if (isChief(sabun)) return '소장님';
   if (isViceChief(sabun)) return '부소장님';
   if (isManager(sabun)) return '부장님';
-  if (isIntern(sabun)) return '인턴사원님';
+  if (isIntern(sabun)) return '인턴님';
   return '기관사님';
 }
 

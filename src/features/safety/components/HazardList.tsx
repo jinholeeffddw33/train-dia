@@ -45,7 +45,8 @@ function parseDateInfo(iso: string) {
 
 type CardSubKey = 'notice' | 'train' | 'driving' | 'incident' | 'hazard';
 
-const TRAIN_TAG_RE = /^\d+편성$/;
+/** 편성 태그 — `503편성` (특정 편성) 또는 `전편성` (전체 편성 공지) */
+const TRAIN_TAG_RE = /^(?:\d+|전)편성$/;
 const DRIVING_TAGS = new Set(['시설물', '열차', '신호']);
 
 function getDescriptionTag(desc: string): string {

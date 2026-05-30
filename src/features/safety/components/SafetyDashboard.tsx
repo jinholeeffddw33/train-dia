@@ -30,7 +30,8 @@ function parseDescription(desc: string): { tag: string; title: string; body: str
   return { tag: m[1].trim(), title: m[2].trim(), body };
 }
 
-const TRAIN_TAG_RE = /^\d+편성$/;
+/** 편성 태그 — `503편성` (특정 편성) 또는 `전편성` (전체 편성 공지) */
+const TRAIN_TAG_RE = /^(?:\d+|전)편성$/;
 const DRIVING_TAGS = new Set(['시설물', '열차', '신호']);
 const DRIVING_TONE: Record<string, string> = { 시설물: 'amber', 열차: 'blue', 신호: 'red' };
 

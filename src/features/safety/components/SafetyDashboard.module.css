@@ -5,27 +5,27 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  /* 다크 모드: 헤더 #6D28D9에서 시작해 본문 끝까지 점진 어둡게 — 경계 없이 자연스럽게 이어짐 */
+  /* 다크 모드: 하늘색에서 시작해 딥 네이비로 — 헤더 투명, 경계 없음 */
   background:
-    radial-gradient(circle at 85% 12%, rgba(167, 139, 250, 0.30), transparent 55%),
-    radial-gradient(circle at 10% 95%, rgba(76, 29, 149, 0.40), transparent 55%),
-    linear-gradient(180deg, #6D28D9 0%, #5B21B6 6%, #4C1D95 14%, #3B1F6B 28%, #2A1957 55%, #1E1448 85%, #15102E 100%);
+    radial-gradient(circle at 85% 12%, rgba(125, 211, 252, 0.25), transparent 55%),
+    radial-gradient(circle at 10% 95%, rgba(7, 89, 133, 0.45), transparent 55%),
+    linear-gradient(180deg, #0369A1 0%, #075985 8%, #0C4A6E 18%, #0B3B5C 32%, #0A2E4A 55%, #082238 85%, #051828 100%);
   background-attachment: fixed;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 라이트 모드: 헤더 #6D28D9에서 시작해 라벤더로 점진 밝아짐 — 경계 없이 자연스럽게 이어짐 */
+/* 라이트 모드: 하늘색에서 시작해 페일 스카이로 — 헤더 투명, 경계 없음 */
 :global(.light) .wrap {
   background:
-    radial-gradient(circle at 85% 12%, rgba(196, 181, 253, 0.55), transparent 55%),
-    radial-gradient(circle at 10% 95%, rgba(167, 139, 250, 0.25), transparent 55%),
-    linear-gradient(180deg, #6D28D9 0%, #7C3AED 5%, #8B5CF6 10%, #A78BFA 16%, #C4B5FD 26%, #DDD6FE 50%, #EDE9FE 75%, #F5F3FF 100%);
+    radial-gradient(circle at 85% 12%, rgba(186, 230, 253, 0.60), transparent 55%),
+    radial-gradient(circle at 10% 95%, rgba(125, 211, 252, 0.30), transparent 55%),
+    linear-gradient(180deg, #0284C7 0%, #0EA5E9 5%, #38BDF8 10%, #7DD3FC 16%, #BAE6FD 26%, #DDF2FE 50%, #E0F2FE 75%, #F0F9FF 100%);
   background-attachment: fixed;
 }
 
-/* ── 헤더 — 보라 그라데이션 (180deg 수직 → 본문 상단과 균일 매칭) ── */
+/* ── 헤더 — 완전 투명: wrap 그라데이션 위에 얹혀 경계가 보이지 않음 ── */
 .header {
   display: flex;
   align-items: center;
@@ -33,11 +33,10 @@
   padding: var(--dia-space-2) var(--dia-space-3);
   padding-top: calc(var(--dia-space-2) + env(safe-area-inset-top, 0px));
   flex-shrink: 0;
-  background:
-    radial-gradient(circle at 80% 0%, rgba(167, 139, 250, 0.18), transparent 60%),
-    linear-gradient(180deg, #312E81 0%, #5B21B6 60%, #6D28D9 100%);
+  background: transparent;
   color: #fff;
   flex-wrap: wrap;
+  border-bottom: none;
 }
 
 .backBtn,
@@ -66,7 +65,7 @@
   width: 28px;
   height: 28px;
   border-radius: var(--dia-radius-full);
-  background: linear-gradient(145deg, #A78BFA, #7C3AED);
+  background: linear-gradient(145deg, #7DD3FC, #0284C7);
   color: #fff;
   font-size: 14px;
   font-weight: var(--dia-weight-bold);
@@ -105,7 +104,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 2px #4C1D95;
+  box-shadow: 0 0 0 2px #0C4A6E;
 }
 
 .userChip {
@@ -127,7 +126,7 @@
   width: 22px;
   height: 22px;
   border-radius: var(--dia-radius-full);
-  background: linear-gradient(145deg, #C4B5FD, #8B5CF6);
+  background: linear-gradient(145deg, #BAE6FD, #0EA5E9);
   color: #fff;
   font-size: 11px;
   font-weight: var(--dia-weight-bold);
@@ -148,8 +147,8 @@
   display: flex;
   justify-content: center;
   padding: 6px var(--dia-space-3);
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.15), rgba(245, 158, 11, 0.10));
-  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  background: linear-gradient(180deg, rgba(14, 165, 233, 0.15), rgba(245, 158, 11, 0.08));
+  border-bottom: none;
   font-size: 13px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-amber);
@@ -544,7 +543,7 @@
   font-weight: var(--dia-weight-bold);
   padding: 2px 8px;
   border-radius: var(--dia-radius-md);
-  background: var(--dia-purple, #8B5CF6);
+  background: var(--dia-sky, #38BDF8);
   color: #fff;
 }
 
@@ -828,7 +827,7 @@
 }
 
 /* ───── 그라데이션 배경 위 카드가 떠 있는 듯한 효과 ───── */
-/* 라이트 모드: 보라 톤 부드러운 외부 그림자 */
+/* 라이트 모드: 하늘색 톤 부드러운 외부 그림자 */
 :global(.light) .noticeEmpty,
 :global(.light) .catBtn,
 :global(.light) .hazardCard,
@@ -837,7 +836,7 @@
 :global(.light) .trainItem {
   background: #FFFFFF;
   box-shadow:
-    0 4px 14px rgba(99, 79, 165, 0.10),
+    0 4px 14px rgba(14, 116, 165, 0.12),
     0 1px 2px rgba(15, 23, 42, 0.04);
 }
 

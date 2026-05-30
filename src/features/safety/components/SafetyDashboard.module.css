@@ -5,24 +5,22 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  /* 다크 모드: 하늘색에서 시작해 딥 네이비로 — 헤더 투명, 경계 없음 */
+  /* 스마트승무원 스타일: 솔리드 베이스 + 상단 sky 헤더 영역만 강조 → 본문은 차분 */
   background:
-    radial-gradient(circle at 85% 12%, rgba(125, 211, 252, 0.25), transparent 55%),
-    radial-gradient(circle at 10% 95%, rgba(7, 89, 133, 0.45), transparent 55%),
-    linear-gradient(180deg, #0369A1 0%, #075985 8%, #0C4A6E 18%, #0B3B5C 32%, #0A2E4A 55%, #082238 85%, #051828 100%);
-  background-attachment: fixed;
+    radial-gradient(70% 28% at 50% 4%, rgba(125, 211, 252, 0.35), transparent 70%),
+    linear-gradient(180deg, #0284C7 0px, #0369A1 60px, rgba(3, 105, 161, 0.55) 130px, rgba(3, 105, 161, 0.18) 200px, transparent 280px),
+    var(--dia-bg);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 라이트 모드: 하늘색에서 시작해 페일 스카이로 — 헤더 투명, 경계 없음 */
+/* 라이트 모드: 같은 구조 — 상단 sky 밴드 + dia-bg 본문 */
 :global(.light) .wrap {
   background:
-    radial-gradient(circle at 85% 12%, rgba(186, 230, 253, 0.60), transparent 55%),
-    radial-gradient(circle at 10% 95%, rgba(125, 211, 252, 0.30), transparent 55%),
-    linear-gradient(180deg, #0284C7 0%, #0EA5E9 5%, #38BDF8 10%, #7DD3FC 16%, #BAE6FD 26%, #DDF2FE 50%, #E0F2FE 75%, #F0F9FF 100%);
-  background-attachment: fixed;
+    radial-gradient(70% 28% at 50% 4%, rgba(186, 230, 253, 0.55), transparent 70%),
+    linear-gradient(180deg, #0EA5E9 0px, #38BDF8 60px, rgba(56, 189, 248, 0.45) 130px, rgba(125, 211, 252, 0.20) 200px, transparent 280px),
+    var(--dia-bg);
 }
 
 /* ── 헤더 — 완전 투명: wrap 그라데이션 위에 얹혀 경계가 보이지 않음 ── */

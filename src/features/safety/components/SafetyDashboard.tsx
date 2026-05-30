@@ -163,10 +163,10 @@ const HAZARD_ZONE_SAMPLES_RAW = [
   },
 ];
 
-// 최근 등록 4건 → 방화 기준 좌측부터 정렬
-const HAZARD_ZONES_TOP4 = [...HAZARD_ZONE_SAMPLES_RAW]
+// 최근 등록 3건 → 방화 기준 좌측부터 정렬
+const HAZARD_ZONES_TOP3 = [...HAZARD_ZONE_SAMPLES_RAW]
   .sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt))
-  .slice(0, 4)
+  .slice(0, 3)
   .sort((a, b) => stationOrderKey(a.station) - stationOrderKey(b.station));
 
 const CATEGORIES = [
@@ -210,17 +210,19 @@ export default function SafetyDashboard({
   /* === 실데이터 fetch — action(사고사례) + inspect(운전정보·열차정보) === */
   const [actionReports, setActionReports] = useState<ReportItem[]>([]);
   const [inspectReports, setInspectReports] = useState<ReportItem[]>([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
   useEffect(() => {
     let cancelled = false;
     const qs = sabun ? `?sabun=${encodeURIComponent(sabun)}` : '';
-    fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=action`)
+    const fetchAction = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=action`)
       .then(r => r.json())
       .then(j => { if (!cancelled) setActionReports(j.data ?? []); })
       .catch(() => {});
-    fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=inspect`)
+    const fetchInspect = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=inspect`)
       .then(r => r.json())
       .then(j => { if (!cancelled) setInspectReports(j.data ?? []); })
       .catch(() => {});
+    Promise.all([fetchAction, fetchInspect]).then(() => { if (!cancelled) setDataLoaded(true); });
     return () => { cancelled = true; };
   }, [sabun]);
 
@@ -245,7 +247,9 @@ export default function SafetyDashboard({
   const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
   const hasRealTrain = trainReports.length > 0;
   const hasRealNotice = noticeReports.length > 0;
-  const useRealData = hasRealLeft || hasRealTrain || hasRealNotice;
+  // 초기 fetch 완료 전에는 sample/real 전환을 멈춰서 진입 시 깜빡임 방지
+  const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice);
+  const showSamples = dataLoaded && !useRealData;
   const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
@@ -290,7 +294,7 @@ export default function SafetyDashboard({
         )}
       </header>
 
-      {!useRealData && (
+      {showSamples && (
         <div className={styles.prototypeNotice}>
           <span>목업 — 샘플 데이터입니다</span>
         </div>
@@ -439,7 +443,7 @@ export default function SafetyDashboard({
                     );
                   })
                 )
-              ) : leftIsIncident ? (
+              ) : showSamples && leftIsIncident ? (
                 INCIDENT_SAMPLES.slice(0, 3).map((it, i) => {
                   const id = `incident-sample-${i}-${it.uploadedAt}`;
                   const isRead = readIds.has(id);
@@ -468,7 +472,7 @@ export default function SafetyDashboard({
                     </li>
                   );
                 })
-              ) : (
+              ) : showSamples ? (
                 DRIVING_SAMPLES.slice(0, 3).map((it, i) => {
                   const id = `driving-sample-${i}-${it.uploadedAt}`;
                   const isRead = readIds.has(id);
@@ -497,7 +501,7 @@ export default function SafetyDashboard({
                     </li>
                   );
                 })
-              )}
+              ) : null}
             </ul>
           </div>
 
@@ -507,7 +511,7 @@ export default function SafetyDashboard({
               <h2 className={styles.colTitle}>최근 변경된 열차 정보</h2>
             </div>
             <ul className={styles.itemList}>
-              {hasRealTrain ? (
+              {dataLoaded && hasRealTrain ? (
                 trainReports.slice(0, 3).map((p) => {
                   const id = `train-${p.item.id}`;
                   const isRead = readIds.has(id);
@@ -542,7 +546,7 @@ export default function SafetyDashboard({
                     </li>
                   );
                 })
-              ) : (
+              ) : showSamples ? (
                 TRAIN_UPDATE_SAMPLES.map((it, i) => {
                   const id = `train-sample-${i}-${it.applied}`;
                   const isRead = readIds.has(id);
@@ -571,7 +575,7 @@ export default function SafetyDashboard({
                     </li>
                   );
                 })
-              )}
+              ) : null}
             </ul>
           </div>
         </section>
@@ -591,7 +595,7 @@ export default function SafetyDashboard({
             </div>
           </div>
           <div className={styles.hazardGrid}>
-            {HAZARD_ZONES_TOP4.map((h, i) => {
+            {HAZARD_ZONES_TOP3.map((h, i) => {
               const severe = h.severity === '위험';
               const id = `hazard-${h.station}-${h.uploadedAt}`;
               const isRead = readIds.has(id);
@@ -612,13 +616,13 @@ export default function SafetyDashboard({
                     registeredBy: h.registeredBy,
                   })}
                 >
-                  <div className={styles.hazardTopRow}>
-                    <span className={styles.hazardStation}>{h.station}</span>
-                    <span className={`${styles.severityBadge} ${severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
-                      {h.severity}
-                    </span>
+                  <span className={`${styles.severityBadge} ${severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
+                    {h.severity}
+                  </span>
+                  <span className={styles.hazardConfirm}>
                     <ConfirmBadge read={isRead} />
-                  </div>
+                  </span>
+                  <span className={styles.hazardStation}>{h.station}</span>
                   <p className={styles.hazardDesc}>{h.desc}</p>
                 </button>
               );

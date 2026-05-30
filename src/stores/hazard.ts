@@ -15,6 +15,9 @@ export interface HazardReport {
   likeCount: number;
   likedByMe: boolean;
   readCount: number;
+  resolved: boolean;
+  resolvedAt: string | null;
+  resolvedBy: string | null;
 }
 
 export interface HazardComment {
@@ -43,6 +46,7 @@ interface HazardState {
   addComment: (reportId: string, comment: string, name: string, sabun: string) => Promise<void>;
   updateReport: (reportId: string, description: string, location: string, name: string, sabun: string, removeFile?: boolean) => Promise<void>;
   deleteReport: (reportId: string, name: string, sabun: string) => Promise<void>;
+  toggleResolved: (reportId: string, resolved: boolean, name: string, sabun: string) => Promise<void>;
   updateComment: (reportId: string, commentId: string, comment: string, name: string, sabun: string) => Promise<void>;
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
   recordRead: (reportId: string, sabun: string, name: string) => Promise<void>;
@@ -172,6 +176,27 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       reports: state.reports.filter((r) => r.id !== reportId),
       comments: Object.fromEntries(
         Object.entries(state.comments).filter(([key]) => key !== reportId),
+      ),
+    }));
+  },
+
+  toggleResolved: async (reportId, resolved, name, sabun) => {
+    const res = await fetch(`/api/safety/hazards/${reportId}/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resolved, name, sabun }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error((err as { message?: string }).message || '조치완료 처리에 실패했습니다');
+    }
+    const result = (await res.json()) as { resolved: boolean; resolvedAt: string | null; resolvedBy: string | null };
+
+    set((state) => ({
+      reports: state.reports.map((r) =>
+        r.id === reportId
+          ? { ...r, resolved: result.resolved, resolvedAt: result.resolvedAt, resolvedBy: result.resolvedBy }
+          : r,
       ),
     }));
   },

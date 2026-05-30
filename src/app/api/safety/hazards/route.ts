@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
   const { data: d1, error: e1 } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, category, view_count, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
+    .select('id, photo_url, description, location, created_by, created_at, category, view_count, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // hazard_reads 테이블 없으면 reads 없이 재시도
     const { data: d2, error: e2 } = await serverSupabase
       .from('hazard_reports')
-      .select('id, photo_url, description, location, created_by, created_at, category, hazard_comments(count), hazard_likes(count)')
+      .select('id, photo_url, description, location, created_by, created_at, category, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count)')
       .eq('category', category)
       .order('created_at', { ascending: false });
     data = d2;
@@ -82,6 +82,9 @@ function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
     likeCount: (r.hazard_likes as { count: number }[])?.[0]?.count ?? 0,
     likedByMe: likedIds.has(r.id as string),
     readCount: (r.hazard_reads as { count: number }[])?.[0]?.count ?? 0,
+    resolved: !!r.resolved,
+    resolvedAt: (r.resolved_at as string | null) ?? null,
+    resolvedBy: (r.resolved_by as string | null) ?? null,
   }));
 }
 

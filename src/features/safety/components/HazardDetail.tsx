@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send } from 'lucide-react';
+import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -65,6 +65,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const addComment = useHazardStore((s) => s.addComment);
   const updateReport = useHazardStore((s) => s.updateReport);
   const deleteReport = useHazardStore((s) => s.deleteReport);
+  const toggleResolved = useHazardStore((s) => s.toggleResolved);
   const updateComment = useHazardStore((s) => s.updateComment);
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
@@ -142,6 +143,22 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       onBack();
     } catch (e) {
       setError(e instanceof Error ? e.message : '삭제에 실패했습니다');
+    }
+  };
+
+  const handleToggleResolved = async () => {
+    if (!name || !sabun || !report) return;
+    const nextResolved = !report.resolved;
+    const msg = nextResolved
+      ? '조치완료로 표시하시겠습니까?'
+      : '조치완료 표시를 해제하시겠습니까?';
+    if (!window.confirm(msg)) return;
+    setShowMenu(false);
+    setError('');
+    try {
+      await toggleResolved(reportId, nextResolved, name, sabun);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '조치완료 처리에 실패했습니다');
     }
   };
 
@@ -245,6 +262,15 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             </button>
             {showMenu && (
               <div className={styles.menuDropdown}>
+                {report?.category === 'hazard' && (
+                  <button type="button" className={styles.menuItem} onClick={handleToggleResolved}>
+                    {report.resolved ? (
+                      <><RotateCcw size={16} /> 조치완료 해제</>
+                    ) : (
+                      <><CheckCircle2 size={16} /> 조치완료 표시</>
+                    )}
+                  </button>
+                )}
                 {isMyReport && (
                   <button type="button" className={styles.menuItem} onClick={handleEditStart}>
                     <Pencil size={16} /> 수정
@@ -279,6 +305,16 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
         {/* 내용 */}
         <div className={styles.detailContent}>
+          {report.category === 'hazard' && report.resolved && (
+            <div className={styles.resolvedBanner}>
+              <CheckCircle2 size={18} strokeWidth={2.4} />
+              <span>
+                조치완료
+                {report.resolvedBy && <span className={styles.resolvedBy}> · {report.resolvedBy}</span>}
+                {report.resolvedAt && <span className={styles.resolvedAt}> · {new Date(report.resolvedAt).toLocaleDateString('ko-KR')}</span>}
+              </span>
+            </div>
+          )}
           {editMode ? (
             isNotice ? (
               /* 알림마당 수정: 번호별 항목 편집 */

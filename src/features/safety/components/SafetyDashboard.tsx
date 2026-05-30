@@ -11,8 +11,12 @@ import styles from './SafetyDashboard.module.css';
 interface ReportItem {
   id: string;
   description: string;
+  location: string;
   createdAt: string;
   createdBy: string;
+  resolved?: boolean;
+  resolvedAt?: string | null;
+  resolvedBy?: string | null;
 }
 
 /** description prefix 파싱: `[tag] title\nbody` (CRLF·LF 모두 대응) */
@@ -207,9 +211,10 @@ export default function SafetyDashboard({
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
   useEffect(() => { setReadIds(loadDashboardReadIds()); }, []);
 
-  /* === 실데이터 fetch — action(사고사례) + inspect(운전정보·열차정보) === */
+  /* === 실데이터 fetch — action + inspect + hazard === */
   const [actionReports, setActionReports] = useState<ReportItem[]>([]);
   const [inspectReports, setInspectReports] = useState<ReportItem[]>([]);
+  const [hazardReports, setHazardReports] = useState<ReportItem[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   useEffect(() => {
     let cancelled = false;
@@ -222,9 +227,39 @@ export default function SafetyDashboard({
       .then(r => r.json())
       .then(j => { if (!cancelled) setInspectReports(j.data ?? []); })
       .catch(() => {});
-    Promise.all([fetchAction, fetchInspect]).then(() => { if (!cancelled) setDataLoaded(true); });
+    const fetchHazard = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=hazard`)
+      .then(r => r.json())
+      .then(j => { if (!cancelled) setHazardReports(j.data ?? []); })
+      .catch(() => {});
+    Promise.all([fetchAction, fetchInspect, fetchHazard]).then(() => { if (!cancelled) setDataLoaded(true); });
     return () => { cancelled = true; };
   }, [sabun]);
+
+  /* === hazard 데이터 파싱: description prefix가 `[강동역·위험] 제목` 형식 === */
+  const parsedHazards = useMemo(() => {
+    return hazardReports.map((r) => {
+      const p = parseDescription(r.description);
+      // tag 형태: "강동역·위험" 또는 "강동역" (역만)
+      const parts = p.tag.split('·');
+      const station = (parts[0] || '').trim();
+      const severity = (parts[1] || '주의').trim();
+      return {
+        item: r,
+        station,
+        severity,
+        title: p.title,
+        desc: p.body || p.title,
+      };
+    }).filter((h) => h.station);
+  }, [hazardReports]);
+
+  const realHazardTop = useMemo(() => {
+    if (parsedHazards.length === 0) return [];
+    return [...parsedHazards]
+      .sort((a, b) => b.item.createdAt.localeCompare(a.item.createdAt))
+      .slice(0, 3)
+      .sort((a, b) => stationOrderKey(a.station) - stationOrderKey(b.station));
+  }, [parsedHazards]);
 
   /* === inspect 데이터를 prefix 태그로 분류 (열차 편성 vs 운전 vs 공지) === */
   const { trainReports, drivingReports, noticeReports } = useMemo(() => {
@@ -247,8 +282,9 @@ export default function SafetyDashboard({
   const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
   const hasRealTrain = trainReports.length > 0;
   const hasRealNotice = noticeReports.length > 0;
+  const hasRealHazard = parsedHazards.length > 0;
   // 초기 fetch 완료 전에는 sample/real 전환을 멈춰서 진입 시 깜빡임 방지
-  const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice);
+  const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice || hasRealHazard);
   const showSamples = dataLoaded && !useRealData;
   const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
@@ -595,38 +631,71 @@ export default function SafetyDashboard({
             </div>
           </div>
           <div className={styles.hazardGrid}>
-            {HAZARD_ZONES_TOP3.map((h, i) => {
-              const severe = h.severity === '위험';
-              const id = `hazard-${h.station}-${h.uploadedAt}`;
-              const isRead = readIds.has(id);
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                  onClick={() => openDetail({
-                    id, kind: 'hazard',
-                    badge: h.severity,
-                    badgeTone: severe ? 'red' : 'amber',
-                    title: h.station,
-                    meta: `등록 ${h.uploadedAt.slice(0,10)}`,
-                    body: h.detail,
-                    spot: h.spot,
-                    tips: h.tips,
-                    registeredBy: h.registeredBy,
-                  })}
-                >
-                  <span className={`${styles.severityBadge} ${severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
-                    {h.severity}
-                  </span>
-                  <span className={styles.hazardConfirm}>
-                    <ConfirmBadge read={isRead} />
-                  </span>
-                  <span className={styles.hazardStation}>{h.station}</span>
-                  <p className={styles.hazardDesc}>{h.desc}</p>
-                </button>
-              );
-            })}
+            {realHazardTop.length > 0 ? (
+              realHazardTop.map((h) => {
+                const severe = h.severity === '위험';
+                const id = `hazard-${h.item.id}`;
+                const isRead = readIds.has(id);
+                const isResolved = !!h.item.resolved;
+                return (
+                  <button
+                    key={h.item.id}
+                    type="button"
+                    className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isResolved ? styles.hazardCardResolved : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                    onClick={() => openDetail({
+                      id, kind: 'hazard',
+                      badge: isResolved ? '조치완료' : h.severity,
+                      badgeTone: isResolved ? 'green' : severe ? 'red' : 'amber',
+                      title: h.station,
+                      meta: `등록 ${formatDate(h.item.createdAt)} · ${h.item.createdBy}`,
+                      body: h.desc,
+                    })}
+                  >
+                    <span className={`${styles.severityBadge} ${isResolved ? styles.severityBadgeResolved : severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
+                      {isResolved ? '조치완료' : h.severity}
+                    </span>
+                    <span className={styles.hazardConfirm}>
+                      <ConfirmBadge read={isRead} />
+                    </span>
+                    <span className={styles.hazardStation}>{h.station}</span>
+                    <p className={styles.hazardDesc}>{h.title || h.desc}</p>
+                  </button>
+                );
+              })
+            ) : showSamples ? (
+              HAZARD_ZONES_TOP3.map((h, i) => {
+                const severe = h.severity === '위험';
+                const id = `hazard-${h.station}-${h.uploadedAt}`;
+                const isRead = readIds.has(id);
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                    onClick={() => openDetail({
+                      id, kind: 'hazard',
+                      badge: h.severity,
+                      badgeTone: severe ? 'red' : 'amber',
+                      title: h.station,
+                      meta: `등록 ${h.uploadedAt.slice(0,10)}`,
+                      body: h.detail,
+                      spot: h.spot,
+                      tips: h.tips,
+                      registeredBy: h.registeredBy,
+                    })}
+                  >
+                    <span className={`${styles.severityBadge} ${severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
+                      {h.severity}
+                    </span>
+                    <span className={styles.hazardConfirm}>
+                      <ConfirmBadge read={isRead} />
+                    </span>
+                    <span className={styles.hazardStation}>{h.station}</span>
+                    <p className={styles.hazardDesc}>{h.desc}</p>
+                  </button>
+                );
+              })
+            ) : null}
           </div>
         </section>
       </main>

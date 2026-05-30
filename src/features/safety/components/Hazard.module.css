@@ -255,6 +255,27 @@
   flex-wrap: wrap;
 }
 
+/* 조치완료 배너 — 상세 본문 최상단 */
+.resolvedBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0.08));
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: var(--dia-green);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  width: fit-content;
+}
+
+.resolvedBy,
+.resolvedAt {
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+
 /* ── Detail Header Card (분류별 그라데이션) ── */
 .detailHeaderCard {
   padding: var(--dia-space-3) var(--dia-space-4);

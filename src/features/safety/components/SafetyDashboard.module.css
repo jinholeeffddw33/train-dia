@@ -625,9 +625,19 @@
   letter-spacing: 0.3px;
 }
 
-.severityBadgeWarn   { background: var(--dia-amber); }
-.severityBadgeSevere { background: var(--dia-red); }
-.severityBadgeInfo   { background: var(--dia-blue); }
+.severityBadgeWarn     { background: var(--dia-amber); }
+.severityBadgeSevere   { background: var(--dia-red); }
+.severityBadgeInfo     { background: var(--dia-blue); }
+.severityBadgeResolved { background: var(--dia-green, #22C55E); }
+
+.hazardCardResolved {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.05);
+}
+.hazardCardResolved .hazardStation {
+  text-decoration: line-through;
+  color: var(--dia-text-secondary);
+}
 
 /* 확인(✓) 배지 — 카드 우상단 모서리에 절대 배치 */
 .hazardConfirm {

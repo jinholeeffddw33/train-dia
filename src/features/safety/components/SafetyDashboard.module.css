@@ -192,6 +192,13 @@
   margin: 0;
 }
 
+.sectionTitleSub {
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-medium);
+  color: var(--dia-amber);
+  margin-left: 4px;
+}
+
 .sectionMore {
   display: inline-flex;
   align-items: center;

@@ -289,6 +289,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
             value={trainNo}
             onChange={(e) => setTrainNo(e.target.value)}
           >
+            <option value="전">전편성</option>
             {TRAIN_NUMBERS.map((n) => (
               <option key={n} value={n}>{n}편성</option>
             ))}

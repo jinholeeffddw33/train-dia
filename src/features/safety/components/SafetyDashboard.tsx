@@ -619,7 +619,9 @@ export default function SafetyDashboard({
         {/* 주요 위험개소 — 4 카드 (방화 기준 좌→우) */}
         <section className={styles.section}>
           <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>주요 위험개소</h2>
+            <h2 className={styles.sectionTitle}>
+              주요 위험개소 <span className={styles.sectionTitleSub}>(주의 구간)</span>
+            </h2>
             <div className={styles.sectionHeadActions}>
               <button
                 type="button"

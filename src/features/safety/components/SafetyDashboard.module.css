@@ -65,7 +65,8 @@
   width: 28px;
   height: 28px;
   border-radius: var(--dia-radius-full);
-  background: linear-gradient(145deg, #7DD3FC, #0284C7);
+  /* 5호선 식별 아이콘 — 이전 보라 톤 유지 (배경 테마와 무관) */
+  background: linear-gradient(145deg, #A78BFA, #7C3AED);
   color: #fff;
   font-size: 14px;
   font-weight: var(--dia-weight-bold);

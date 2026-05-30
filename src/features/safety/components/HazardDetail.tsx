@@ -84,6 +84,12 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const canManage = isMyReport || adminUser;
   const isNotice = report?.category === 'inspect';
 
+  // 번호 목록 편집은 "순수 공지사항"(태그 prefix 없음)에만 적용.
+  // 열차정보·운전정보처럼 `[503편성] ...` 태그가 있는 inspect 글은 textarea 편집을 사용해야
+  // 첫 줄의 태그가 보존되어 cardKey 필터에서 올바른 카테고리로 유지됨.
+  const hasTagPrefix = ((report?.description ?? '').trim().startsWith('['));
+  const isPureNotice = isNotice && !hasTagPrefix;
+
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
   const [removeFile, setRemoveFile] = useState(false);
@@ -167,7 +173,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     setEditDesc(report.description);
     setEditLocation(report.location);
     setRemoveFile(false);
-    if (isNotice) {
+    if (isPureNotice) {
       setEditItems(parseDescToItems(report.description));
     }
     setEditMode(true);
@@ -175,7 +181,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   };
 
   const handleEditSave = async () => {
-    const desc = isNotice ? itemsToDesc(editItems) : editDesc.trim();
+    const desc = isPureNotice ? itemsToDesc(editItems) : editDesc.trim();
     if (!desc || !name || !sabun) return;
     setError('');
     try {
@@ -316,8 +322,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             </div>
           )}
           {editMode ? (
-            isNotice ? (
-              /* 알림마당 수정: 번호별 항목 편집 */
+            isPureNotice ? (
+              /* 공지사항 수정: 번호별 항목 편집 (태그 prefix 없는 순수 공지) */
               <>
                 <div className={styles.noticeEditHeader}>공지사항 수정</div>
                 <div className={styles.noticeItemList}>

@@ -140,7 +140,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
 
   return (
     <div className={styles.formWrap}>
-      <h2 className={styles.formTitle}>알림마당 등록</h2>
+      <h2 className={styles.formTitle}>공지사항 등록</h2>
 
       {/* 제목 (필수) */}
       <div className={styles.fieldGroup}>

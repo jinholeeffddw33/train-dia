@@ -42,18 +42,42 @@ function parseDateInfo(iso: string) {
   };
 }
 
+type CardSubKey = 'notice' | 'train' | 'driving' | 'incident' | 'hazard';
+
+const TRAIN_TAG_RE = /^\d+편성$/;
+const DRIVING_TAGS = new Set(['시설물', '열차', '신호']);
+
+function getDescriptionTag(desc: string): string {
+  const firstLine = (desc || '').split('\n')[0];
+  const m = firstLine.match(/^\[([^\]]+)\]/);
+  return m ? m[1] : '';
+}
+
 interface HazardListProps {
   onSelect: (id: string) => void;
   category?: SafetyCategory;
+  cardKey?: CardSubKey;
 }
 
-export default function HazardList({ onSelect, category }: HazardListProps) {
-  const reports = useHazardStore((s) => s.reports);
+export default function HazardList({ onSelect, category, cardKey }: HazardListProps) {
+  const allReports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
   const toggleLike = useHazardStore((s) => s.toggleLike);
   const name = useDriverStore((s) => s.myDriver?.n ?? '');
   const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
-  const isNotice = category === 'inspect';
+  const isNotice = category === 'inspect' && (!cardKey || cardKey === 'notice');
+
+  // cardKey별 inspect 하위 필터
+  const reports = useMemo(() => {
+    if (category !== 'inspect' || !cardKey) return allReports;
+    return allReports.filter((r) => {
+      const tag = getDescriptionTag(r.description);
+      if (cardKey === 'train') return TRAIN_TAG_RE.test(tag);
+      if (cardKey === 'driving') return DRIVING_TAGS.has(tag);
+      if (cardKey === 'notice') return !tag || (r.location === '점호내용' || r.location === '중요알림');
+      return true;
+    });
+  }, [allReports, category, cardKey]);
 
   // localStorage 기반 확인 상태 — 렌더 시점 1회 로드 (목록 재진입 시 갱신)
   const readIds = useMemo(() => loadReadIds(), [reports.length]);

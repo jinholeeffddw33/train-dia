@@ -142,7 +142,7 @@ function CategoryListView({
             <p className={styles.emptyHint}>{emptyConfig.hint}</p>
           </div>
         ) : (
-          <HazardList onSelect={onSelect} category={category} />
+          <HazardList onSelect={onSelect} category={category} cardKey={cardKey} />
         )}
       </main>
       <Modal open={showForm} onClose={onCloseForm}>

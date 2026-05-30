@@ -223,16 +223,18 @@ export default function SafetyDashboard({
     return () => { cancelled = true; };
   }, [sabun]);
 
-  /* === inspect 데이터를 prefix 태그로 분류 (열차 편성 vs 운전 분류) === */
-  const { trainReports, drivingReports } = useMemo(() => {
+  /* === inspect 데이터를 prefix 태그로 분류 (열차 편성 vs 운전 vs 공지) === */
+  const { trainReports, drivingReports, noticeReports } = useMemo(() => {
     const train: { item: ReportItem; tag: string; title: string; body: string }[] = [];
     const drive: { item: ReportItem; tag: string; title: string; body: string }[] = [];
+    const notice: { item: ReportItem; tag: string; title: string; body: string }[] = [];
     for (const r of inspectReports) {
       const p = parseDescription(r.description);
       if (TRAIN_TAG_RE.test(p.tag)) train.push({ item: r, ...p });
       else if (DRIVING_TAGS.has(p.tag)) drive.push({ item: r, ...p });
+      else notice.push({ item: r, ...p });
     }
-    return { trainReports: train, drivingReports: drive };
+    return { trainReports: train, drivingReports: drive, noticeReports: notice };
   }, [inspectReports]);
 
   /* === 좌측 섹션 결정 — 액션(사고사례)과 운전정보 중 더 최근 === */
@@ -241,7 +243,8 @@ export default function SafetyDashboard({
   const latestDrivingAt = drivingReports[0]?.item.createdAt ?? '';
   const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
   const hasRealTrain = trainReports.length > 0;
-  const useRealData = hasRealLeft || hasRealTrain;
+  const hasRealNotice = noticeReports.length > 0;
+  const useRealData = hasRealLeft || hasRealTrain || hasRealNotice;
   const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
@@ -306,10 +309,44 @@ export default function SafetyDashboard({
               </button>
             </div>
           </div>
-          <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
-            <p className={styles.noticeEmptyText}>등록된 공지사항이 없습니다</p>
-            <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시됩니다</p>
-          </button>
+          {noticeReports.length > 0 ? (
+            <ul className={styles.itemList}>
+              {noticeReports.slice(0, 3).map((p) => {
+                const id = `notice-${p.item.id}`;
+                const isRead = readIds.has(id);
+                return (
+                  <li key={p.item.id}>
+                    <button
+                      type="button"
+                      className={`${styles.noticeListItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                      onClick={() => openDetail({
+                        id, kind: 'incident',
+                        badge: p.item.createdBy ? '공지' : undefined,
+                        badgeTone: 'amber',
+                        title: p.title || '(제목 없음)',
+                        meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
+                        body: p.body,
+                      })}
+                    >
+                      <div className={styles.noticeListHead}>
+                        <span className={styles.noticeListTitle}>{p.title || '(제목 없음)'}</span>
+                        <ConfirmBadge read={isRead} />
+                      </div>
+                      <div className={styles.noticeListMeta}>
+                        <span>{formatDate(p.item.createdAt)}</span>
+                        {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
+              <p className={styles.noticeEmptyText}>등록된 공지사항이 없습니다</p>
+              <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시됩니다</p>
+            </button>
+          )}
         </section>
 
         {/* 4 카테고리 가로 1줄 (compact) */}

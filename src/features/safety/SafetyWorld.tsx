@@ -1,9 +1,7 @@
 'use client';
 
 import { Component, type ReactNode, useState, useEffect, useCallback } from 'react';
-import {
-  ArrowLeft, AlertTriangle, ShieldAlert, Wrench, ClipboardCheck,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
@@ -16,6 +14,7 @@ import HazardList from './components/HazardList';
 import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
+import SafetyDashboard from './components/SafetyDashboard';
 import { isAdmin } from '@/lib/auth';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
@@ -59,27 +58,6 @@ class SafetyErrorBoundary extends Component<
     return this.props.children;
   }
 }
-
-const MENU_ITEMS = [
-  { id: 'inspect', label: '알림마당',   icon: ClipboardCheck, color: 'green' as const, ready: true },
-  { id: 'alert',   label: '장애신고',   icon: AlertTriangle,  color: 'amber' as const, ready: true },
-  { id: 'hazard',  label: '위험개소',   icon: ShieldAlert,    color: 'red'   as const, ready: true },
-  { id: 'action',  label: '조치내용',   icon: Wrench,         color: 'blue'  as const, ready: true },
-] as const;
-
-const ICON_COLOR = {
-  amber: styles.iconAmber,
-  red:   styles.iconRed,
-  blue:  styles.iconBlue,
-  green: styles.iconGreen,
-} as const;
-
-const ICON_BG = {
-  amber: styles.iconBgAmber,
-  red:   styles.iconBgRed,
-  blue:  styles.iconBgBlue,
-  green: styles.iconBgGreen,
-} as const;
 
 type SafetyCategory = 'hazard' | 'action' | 'inspect';
 type SafetyView =
@@ -202,7 +180,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
   const sabun = authSabun || driverSabun;
-  const { getUnread, alertUnread, markAsRead, markAlertAsRead, fetchCounts } = useSafetyUnread();
+  const { getUnread, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
     fetchAlerts();
@@ -238,17 +216,6 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   }, [view]);
   useHistoryBack('safety-l2', goToList, isDetail);
 
-  const alerts = useAlertStore((s) => s.alerts);
-
-  const handleMenu = (id: string) => {
-    if (id === 'alert') {
-      // 장애 진입 시 현재 알림 전부 읽음 처리
-      alerts.forEach(a => markAlertAsRead(a.id));
-      setView('alert');
-    } else if (id === 'hazard' || id === 'action' || id === 'inspect') {
-      setView({ type: 'list', category: id });
-    }
-  };
 
   // ── 장애 리스트 화면 ──
   if (view === 'alert') {
@@ -309,88 +276,25 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     );
   }
 
-  // ── 메인 화면 (히어로 + 4아이콘) ──
+  // ── 메인 화면 (프로토타입 대시보드) ──
+  const totalUnread = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
+
+  const handleDashboardCategory = (id: 'incident' | 'driving' | 'train' | 'hazard') => {
+    if (id === 'hazard') {
+      setView({ type: 'list', category: 'hazard' });
+    } else if (id === 'incident') {
+      setView({ type: 'list', category: 'action' });
+    } else if (id === 'driving' || id === 'train') {
+      setView({ type: 'list', category: 'inspect' });
+    }
+  };
+
   return (
-    <div className={styles.wrap}>
-      {/* 히어로 배너 */}
-      <div className={styles.heroBanner}>
-        <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
-          <ArrowLeft size={20} strokeWidth={2} />
-        </button>
-        <div className={styles.heroHaze} />
-
-        <h1 className={styles.heroTitle}>Safety<br />Management</h1>
-        <p className={styles.heroSub}>SEOUL METRO · LINE 5</p>
-        <p className={styles.heroDesc}>5호선 안전 관리 시스템</p>
-
-        {/* 레이더 스캔 비주얼 */}
-        <div className={styles.heroVisual}>
-          <svg viewBox="0 0 240 240" className={styles.radarSvg} fill="none">
-            {/* 동심원 3개 */}
-            <circle cx="120" cy="120" r="110" stroke="url(#radarRing)" strokeWidth="1" opacity="0.2" />
-            <circle cx="120" cy="120" r="75" stroke="url(#radarRing)" strokeWidth="1" opacity="0.15" />
-            <circle cx="120" cy="120" r="40" stroke="url(#radarRing)" strokeWidth="1" opacity="0.1" />
-            {/* 십자 가이드 */}
-            <line x1="120" y1="10" x2="120" y2="230" stroke="url(#radarRing)" strokeWidth="0.5" opacity="0.1" />
-            <line x1="10" y1="120" x2="230" y2="120" stroke="url(#radarRing)" strokeWidth="0.5" opacity="0.1" />
-            {/* 스캔 라인 (회전 애니메이션은 CSS) */}
-            <line x1="120" y1="120" x2="120" y2="14" stroke="url(#scanLine)" strokeWidth="2" strokeLinecap="round" className={styles.radarScan} />
-            {/* 포인트 핑 */}
-            <circle cx="155" cy="72" r="4" fill="#22c55e" opacity="0.8" className={styles.radarPing1} />
-            <circle cx="85" cy="155" r="3" fill="#f59e0b" opacity="0.7" className={styles.radarPing2} />
-            <circle cx="170" cy="145" r="3" fill="#3b82f6" opacity="0.6" className={styles.radarPing3} />
-            <defs>
-              <linearGradient id="radarRing" x1="0" y1="0" x2="240" y2="240">
-                <stop stopColor="#f59e0b" />
-                <stop offset="1" stopColor="#ef4444" />
-              </linearGradient>
-              <linearGradient id="scanLine" x1="120" y1="120" x2="120" y2="14" gradientUnits="userSpaceOnUse">
-                <stop stopColor="rgba(245, 158, 11, 0)" />
-                <stop offset="1" stopColor="#f59e0b" />
-              </linearGradient>
-            </defs>
-          </svg>
-          {/* 중앙 방패 아이콘 */}
-          <div className={styles.heroBigBadge}>
-            <div className={styles.heroBigIcon}>
-              <ShieldAlert size={32} />
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.heroFade} />
-      </div>
-
-      {/* 4개 아이콘 메뉴 */}
-      <div className={styles.menuContent}>
-        <div className={styles.menuGrid}>
-          {MENU_ITEMS.map(item => {
-            const Icon = item.icon;
-            const unread = item.id === 'alert'
-              ? alertUnread
-              : (item.id === 'hazard' || item.id === 'action' || item.id === 'inspect')
-                ? getUnread(item.id)
-                : 0;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={`${styles.menuItem} ${!item.ready ? styles.menuItemDisabled : ''}`}
-                onClick={() => item.ready && handleMenu(item.id)}
-                disabled={!item.ready}
-              >
-                <div className={`${styles.menuIcon} ${ICON_BG[item.color]}`}>
-                  <Icon size={26} className={ICON_COLOR[item.color]} />
-                  {unread > 0 && (
-                    <span className={styles.menuBadge}>{unread > 99 ? '99+' : unread}</span>
-                  )}
-                </div>
-                <span className={styles.menuLabel}>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+    <SafetyDashboard
+      onBack={onBack}
+      onOpenCategory={handleDashboardCategory}
+      onOpenNotice={() => setView({ type: 'list', category: 'inspect' })}
+      unreadCount={totalUnread}
+    />
   );
 }

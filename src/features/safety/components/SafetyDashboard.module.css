@@ -269,46 +269,57 @@
   white-space: nowrap;
 }
 
-/* ── 리스트 탭 + 등록 ── */
-.listTabsRow {
-  display: flex;
-  align-items: center;
+/* ── 좌/우 2단 섹션 ── */
+.dualSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.listTabs {
-  flex: 1;
+.colWrap {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.colHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 4px;
-  padding: 3px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-full);
 }
 
-.listTab {
-  flex: 1;
-  padding: 7px 10px;
+.colTitle {
   font-size: 12px;
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-secondary);
-  background: transparent;
-  border: none;
-  border-radius: var(--dia-radius-full);
-  cursor: pointer;
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  min-height: 32px;
 }
 
-.listTabActive {
-  color: #fff;
+.addBtnMini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
   background:
     radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
     linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  border: none;
+  border-radius: var(--dia-radius-full);
+  color: #fff;
+  cursor: pointer;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  flex-shrink: 0;
 }
 
-.listTab:active { transform: scale(0.97); transition: transform 0.12s ease; }
+.addBtnMini:active { transform: scale(0.9); box-shadow: var(--dia-3d-pressed); transition: transform 0.12s ease; }
 
 .addBtn {
   display: inline-flex;
@@ -346,10 +357,11 @@
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  min-width: 0;
 }
 
 .incidentHeadRow,
@@ -375,16 +387,22 @@
 
 .incidentTitle,
 .trainTitle {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .incidentMeta {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex-wrap: wrap;
   font-size: 10px;
   color: var(--dia-text-tertiary);
@@ -396,10 +414,14 @@
 }
 
 .incidentSummary {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--dia-text-secondary);
   margin: 0;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .newBadge {
@@ -442,31 +464,22 @@
   margin-top: 2px;
 }
 
-/* ── 주요 위험개소 가로 스크롤 ── */
-.hazardScroll {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 4px;
-  margin: 0 calc(-1 * var(--dia-space-3));
-  padding-left: var(--dia-space-3);
-  padding-right: var(--dia-space-3);
-  scrollbar-width: none;
+/* ── 주요 위험개소 4 카드 (방화 기준 좌→우) ── */
+.hazardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 
-.hazardScroll::-webkit-scrollbar { display: none; }
-
 .hazardCard {
-  flex: 0 0 150px;
-  scroll-snap-align: start;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
-  padding: 8px 10px;
+  padding: 8px 8px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .hazardCardSevere {
@@ -478,32 +491,42 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .hazardStation {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .severityBadge {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: var(--dia-weight-bold);
-  padding: 1px 6px;
+  padding: 1px 5px;
   border-radius: var(--dia-radius-full);
   color: #fff;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .severityBadgeWarn  { background: var(--dia-amber); }
 .severityBadgeSevere { background: var(--dia-red); }
 
 .hazardDesc {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--dia-text-secondary);
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 :global(.light) .prototypeNotice {

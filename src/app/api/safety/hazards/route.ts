@@ -119,11 +119,10 @@ export async function POST(req: NextRequest) {
   const sabun = (formData.get('sabun') as string | null)?.trim();
   const category = parseCategory(formData.get('category') as string | null);
 
-  // inspect(알림마당)는 photo 없어도 OK
-  const photoRequired = category !== 'inspect';
-  if ((!photo && photoRequired) || !description || !name || !sabun) {
+  // 모든 카테고리에서 사진은 선택사항
+  if (!description || !name || !sabun) {
     return NextResponse.json(
-      { code: 'MISSING_FIELDS', message: photoRequired ? '사진, 설명, 이름, 사번은 필수입니다' : '설명, 이름, 사번은 필수입니다' },
+      { code: 'MISSING_FIELDS', message: '설명, 이름, 사번은 필수입니다' },
       { status: 400 },
     );
   }

@@ -35,7 +35,7 @@ interface HazardState {
   loadingComments: boolean;
   fetchReports: (currentSabun?: string, category?: SafetyCategory) => Promise<void>;
   createReport: (params: {
-    photo: File;
+    photo: File | null;
     description: string;
     location: string;
     name: string;

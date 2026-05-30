@@ -139,7 +139,6 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   };
 
   const handleSubmit = async () => {
-    if (!photo) { setError('사진을 선택해주세요'); return; }
     if (!titleText.trim()) { setError('제목을 입력해주세요'); return; }
     if (!description.trim()) { setError('설명을 입력해주세요'); return; }
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }

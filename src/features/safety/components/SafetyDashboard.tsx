@@ -11,6 +11,8 @@ interface Props {
   onOpenCategory: (id: 'incident' | 'driving' | 'train' | 'hazard') => void;
   onOpenNotice?: () => void;
   unreadCount?: number;
+  userName?: string;
+  userRole?: string;
 }
 
 /* === 프로토타입 샘플 데이터 (실데이터 연동은 후속) === */
@@ -78,21 +80,29 @@ const leftIsIncident = latestIncidentAt >= latestDrivingAt;
 const LEFT_TITLE = leftIsIncident ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, unreadCount = 0,
+  onBack, onOpenCategory, onOpenNotice, unreadCount = 0, userName = '', userRole = '',
 }: Props) {
+  const userLabel = userName ? `${userName} ${userRole.replace(/님$/, '')}` : '';
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={18} strokeWidth={2} />
         </button>
-        <h1 className={styles.headerTitle}>안전관리</h1>
+        <span className={styles.lineBadge} aria-hidden="true">5</span>
+        <h1 className={styles.headerTitle}>5호선 안전관리시스템</h1>
         <button type="button" className={styles.bellBtn} aria-label={`알림 ${unreadCount}건`}>
           <Bell size={18} strokeWidth={2} />
           {unreadCount > 0 && (
             <span className={styles.bellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
           )}
         </button>
+        {userLabel && (
+          <span className={styles.userChip} aria-label="사용자">
+            <span className={styles.userAvatar}>{userName.slice(0, 1) || '·'}</span>
+            <span className={styles.userText}>{userLabel}</span>
+          </span>
+        )}
       </header>
 
       <div className={styles.prototypeNotice}>

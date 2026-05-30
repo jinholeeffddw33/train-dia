@@ -526,11 +526,15 @@
 
 .kindRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 8px;
 }
 
 .kindBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 10px 8px;
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
@@ -544,6 +548,11 @@
 }
 
 .kindBtn:active { transform: scale(0.96); }
+
+.kindBtnIcon {
+  display: inline-flex;
+  align-items: center;
+}
 
 .kindBtnActive {
   color: #fff;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { Train } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -32,32 +33,73 @@ async function compressImage(file: File): Promise<File> {
   });
 }
 
-interface HazardFormProps {
-  onClose: () => void;
-  category?: 'hazard' | 'action' | 'inspect';
-  title?: string;
+export type HazardFormCardKey = 'incident' | 'driving' | 'train' | 'hazard';
+type DataCategory = 'hazard' | 'action' | 'inspect';
+
+interface KindOption {
+  value: string;
+  label: string;
+  icon?: React.ReactNode;
 }
 
-const CATEGORY_TITLES: Record<string, string> = {
-  hazard: '위험개소 등록',
-  action: '조치내용 등록',
-  inspect: '알림마당 등록',
+interface FormVariant {
+  title: string;
+  kinds?: readonly KindOption[];
+  /** 분류를 역 드롭다운으로 표시 */
+  stationPicker?: boolean;
+  showLocation: boolean;
+  dataCategory: DataCategory;
+}
+
+const INCIDENT_KINDS: readonly KindOption[] = [
+  { value: '시설물', label: '시설물' },
+  { value: '열차', label: '열차' },
+  { value: '신호', label: '신호' },
+];
+
+const TRAIN_KINDS: readonly KindOption[] = [
+  { value: '편성', label: '편성', icon: <Train size={16} strokeWidth={2.2} /> },
+];
+
+/** 5호선 전체 역 (방화 → 하남검단산/마천 분기 순) */
+const STATIONS: readonly string[] = [
+  '방화', '개화산', '김포공항', '송정', '마곡', '발산', '우장산', '화곡',
+  '까치산', '신정', '목동', '오목교', '양평', '영등포구청', '영등포시장',
+  '신길', '여의도', '여의나루', '마포', '공덕', '애오개', '충정로',
+  '서대문', '광화문', '종로3가', '을지로4가', '동대문역사문화공원', '청구',
+  '신금호', '행당', '왕십리', '마장', '답십리', '장한평', '군자',
+  '아차산', '광나루', '천호', '강동',
+  '길동', '굽은다리', '명일', '고덕', '상일동', '강일', '미사',
+  '하남풍산', '하남시청', '하남검단산',
+  '둔촌동', '올림픽공원', '방이', '오금', '개롱', '거여', '마천',
+];
+
+const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
+  incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, showLocation: true,  dataCategory: 'action'  },
+  driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: true,  dataCategory: 'inspect' },
+  train:    { title: '열차 정보 등록', kinds: TRAIN_KINDS,    showLocation: false, dataCategory: 'inspect' },
+  hazard:   { title: '위험개소 등록', stationPicker: true, showLocation: true, dataCategory: 'hazard'  },
 };
 
-const INCIDENT_KINDS = ['시설물', '열차', '신호'] as const;
-type IncidentKind = typeof INCIDENT_KINDS[number];
+interface HazardFormProps {
+  onClose: () => void;
+  cardKey: HazardFormCardKey;
+}
 
-export default function HazardForm({ onClose, category = 'hazard', title }: HazardFormProps) {
+export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
+  const variant = FORM_VARIANT[cardKey];
+  const defaultKind = variant.kinds?.[0]?.value ?? '';
+  const defaultStation = variant.stationPicker ? STATIONS[0] : '';
+
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [kind, setKind] = useState<IncidentKind>('시설물');
+  const [kind, setKind] = useState<string>(defaultKind);
+  const [station, setStation] = useState<string>(defaultStation);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const showKindSelector = category === 'action';
 
   const createReport = useHazardStore((s) => s.createReport);
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -81,13 +123,25 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
     if (!description.trim()) { setError('설명을 입력해주세요'); return; }
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }
 
+    if (variant.stationPicker && !station) { setError('역을 선택해주세요'); return; }
+
     setSubmitting(true);
     setError('');
     try {
-      const finalDescription = showKindSelector
-        ? `[${kind}] ${description.trim()}`
+      const tag = variant.stationPicker
+        ? (station ? `${station}역` : '')
+        : (variant.kinds && kind ? kind : '');
+      const finalDescription = tag
+        ? `[${tag}] ${description.trim()}`
         : description.trim();
-      await createReport({ photo, description: finalDescription, location: location.trim(), name, sabun, category });
+      await createReport({
+        photo,
+        description: finalDescription,
+        location: variant.showLocation ? location.trim() : '',
+        name,
+        sabun,
+        category: variant.dataCategory,
+      });
       if (preview) URL.revokeObjectURL(preview);
       onClose();
     } catch (e) {
@@ -99,7 +153,7 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
 
   return (
     <div className={styles.formWrap}>
-      <h2 className={styles.formTitle}>{title ?? CATEGORY_TITLES[category] ?? '등록'}</h2>
+      <h2 className={styles.formTitle}>{variant.title}</h2>
 
       {/* 사진 선택 */}
       <div
@@ -129,40 +183,60 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
         aria-label="사진 파일 선택"
       />
 
-      {/* 사고 사례 분류 (시설물 / 열차 / 신호) */}
-      {showKindSelector && (
+      {/* 분류 — variant.kinds (버튼 행) 또는 variant.stationPicker (역 드롭다운) */}
+      {variant.kinds && (
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>
             분류 <span className={styles.required}>*</span>
           </label>
           <div className={styles.kindRow}>
-            {INCIDENT_KINDS.map((k) => (
+            {variant.kinds.map((k) => (
               <button
-                key={k}
+                key={k.value}
                 type="button"
-                className={`${styles.kindBtn} ${kind === k ? styles.kindBtnActive : ''}`}
-                onClick={() => setKind(k)}
+                className={`${styles.kindBtn} ${kind === k.value ? styles.kindBtnActive : ''}`}
+                onClick={() => setKind(k.value)}
               >
-                {k}
+                {k.icon && <span className={styles.kindBtnIcon}>{k.icon}</span>}
+                {k.label}
               </button>
             ))}
           </div>
         </div>
       )}
+      {variant.stationPicker && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="hazard-station">
+            분류 (역) <span className={styles.required}>*</span>
+          </label>
+          <select
+            id="hazard-station"
+            className={styles.textInput}
+            value={station}
+            onChange={(e) => setStation(e.target.value)}
+          >
+            {STATIONS.map((s) => (
+              <option key={s} value={s}>{s}역</option>
+            ))}
+          </select>
+        </div>
+      )}
 
-      {/* 위치 (선택) */}
-      <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel} htmlFor="hazard-location">위치 (선택)</label>
-        <input
-          id="hazard-location"
-          type="text"
-          className={styles.textInput}
-          placeholder="예: 신답 → 용두 구간, 4번 선로"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          maxLength={100}
-        />
-      </div>
+      {/* 위치 (variant.showLocation일 때만) */}
+      {variant.showLocation && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="hazard-location">위치 (선택)</label>
+          <input
+            id="hazard-location"
+            type="text"
+            className={styles.textInput}
+            placeholder="예: 신답 → 용두 구간, 4번 선로"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            maxLength={100}
+          />
+        </div>
+      )}
 
       {/* 설명 (필수) */}
       <div className={styles.fieldGroup}>

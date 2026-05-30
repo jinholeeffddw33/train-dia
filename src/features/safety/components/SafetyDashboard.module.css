@@ -11,16 +11,19 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ── 헤더 (compact) ── */
+/* ── 헤더 — 보라 그라데이션 ── */
 .header {
   display: flex;
   align-items: center;
-  gap: var(--dia-space-2);
+  gap: 8px;
   padding: var(--dia-space-2) var(--dia-space-3);
   padding-top: calc(var(--dia-space-2) + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid var(--dia-border);
   flex-shrink: 0;
-  background: var(--dia-surface);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(167, 139, 250, 0.18), transparent 60%),
+    linear-gradient(135deg, #312E81 0%, #5B21B6 55%, #6D28D9 100%);
+  color: #fff;
+  flex-wrap: wrap;
 }
 
 .backBtn,
@@ -29,26 +32,48 @@
   height: 36px;
   min-width: 36px;
   border-radius: var(--dia-radius-full);
-  background: var(--dia-surface);
-  border: none;
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--dia-text-secondary);
+  color: #fff;
   cursor: pointer;
   position: relative;
+  box-shadow: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .backBtn:active,
-.bellBtn:active { box-shadow: var(--dia-3d-pressed); transform: scale(0.9); transition: transform 0.1s ease; }
+.bellBtn:active { transform: scale(0.9); transition: transform 0.1s ease; background: rgba(255, 255, 255, 0.22); }
+
+.lineBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(145deg, #A78BFA, #7C3AED);
+  color: #fff;
+  font-size: 14px;
+  font-weight: var(--dia-weight-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
 
 .headerTitle {
   flex: 1;
   font-size: 15px;
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
+  color: #fff;
   margin: 0;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .bellBadge {
@@ -66,15 +91,51 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 2px var(--dia-surface);
+  box-shadow: 0 0 0 2px #4C1D95;
+}
+
+.userChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 4px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 11px;
+  font-weight: var(--dia-weight-semibold);
+  color: #fff;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.userAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(145deg, #C4B5FD, #8B5CF6);
+  color: #fff;
+  font-size: 11px;
+  font-weight: var(--dia-weight-bold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .prototypeNotice {
   display: flex;
   justify-content: center;
   padding: 4px var(--dia-space-3);
-  background: rgba(245, 158, 11, 0.12);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.3);
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.15), rgba(245, 158, 11, 0.10));
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
   font-size: 11px;
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-amber);

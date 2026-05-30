@@ -15,7 +15,7 @@ import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
 import SafetyDashboard from './components/SafetyDashboard';
-import { isAdmin } from '@/lib/auth';
+import { isAdmin, getUserRole } from '@/lib/auth';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
@@ -79,10 +79,11 @@ const CARD_DISPLAY: Record<CardKey, { label: string; emptyIcon: string; emptyTex
 
 /** 카테고리별 리스트 화면 (위험/조치/점검 공통) */
 function CategoryListView({
-  category, label, emptyConfig, sabun,
+  category, cardKey, label, emptyConfig, sabun,
   onBack, onSelect, onShowForm, showForm, onCloseForm, onCountsChanged,
 }: {
   category: SafetyCategory;
+  cardKey: CardKey;
   label: string;
   emptyConfig: { icon: string; text: string; hint: string };
   sabun: string;
@@ -145,7 +146,7 @@ function CategoryListView({
         )}
       </main>
       <Modal open={showForm} onClose={onCloseForm}>
-        {category === 'inspect' ? (
+        {cardKey === 'notice' ? (
           <NoticeForm
             onClose={() => {
               onCloseForm();
@@ -155,7 +156,7 @@ function CategoryListView({
           />
         ) : (
           <HazardForm
-            category={category}
+            cardKey={cardKey}
             onClose={() => {
               onCloseForm();
               fetchReports(sabun, category);
@@ -177,8 +178,12 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
   const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
+  const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
   const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
+  const authName = useAuthStore((s) => s.user?.name ?? '');
   const sabun = authSabun || driverSabun;
+  const userName = authName || driverName;
+  const userRole = getUserRole(sabun);
   const { getUnread, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
@@ -263,6 +268,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     return (
       <CategoryListView
         category={cat}
+        cardKey={cardKey}
         label={display.label}
         emptyConfig={{ icon: display.emptyIcon, text: display.emptyText, hint: display.emptyHint }}
         sabun={sabun}
@@ -297,6 +303,8 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
       onOpenCategory={handleDashboardCategory}
       onOpenNotice={() => setView({ type: 'list', category: 'inspect', cardKey: 'notice' })}
       unreadCount={totalUnread}
+      userName={userName}
+      userRole={userRole}
     />
   );
 }

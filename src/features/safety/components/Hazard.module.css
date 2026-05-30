@@ -1046,8 +1046,9 @@
 
 .noticeLineHighlight {
   font-weight: 700;
-  color: #0f172a;
-  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
+  /* 토큰 기반 — 다크 모드는 밝은 글자, 라이트 모드는 어두운 글자로 자동 전환 */
+  color: var(--dia-text-primary);
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.18), transparent);
   padding: 3px 8px;
   border-radius: 4px;
   border-left: 2px solid #3b82f6;
@@ -1055,6 +1056,7 @@
 
 :root.light .noticeLineHighlight {
   color: #0f172a;
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
 }
 
 :root.light .noticeBodyPreview::after {

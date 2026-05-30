@@ -104,7 +104,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     return { tag: m[1].trim(), body: rest + (remaining ? '\n' + remaining : '') };
   };
   const reportTag = parseTaggedDesc(report?.description ?? '').tag;
-  const isTrainEdit = isNotice && TRAIN_TAG_RE.test(reportTag);
+  // 태그가 편성 패턴이면 카테고리 무관하게 열차 정보 편집 폼 사용
+  const isTrainEdit = TRAIN_TAG_RE.test(reportTag);
 
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);

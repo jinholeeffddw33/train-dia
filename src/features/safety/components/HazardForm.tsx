@@ -336,7 +336,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={submitting || !photo || !titleText.trim() || !description.trim()}
+        disabled={submitting}
       >
         {submitting ? '등록 중...' : '등록하기'}
       </button>

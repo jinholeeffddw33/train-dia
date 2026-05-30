@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Train } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -47,6 +46,8 @@ interface FormVariant {
   kinds?: readonly KindOption[];
   /** 분류를 역 드롭다운으로 표시 */
   stationPicker?: boolean;
+  /** 분류를 편성번호(501-580) 드롭다운으로 표시 */
+  trainPicker?: boolean;
   showLocation: boolean;
   dataCategory: DataCategory;
 }
@@ -57,9 +58,8 @@ const INCIDENT_KINDS: readonly KindOption[] = [
   { value: '신호', label: '신호' },
 ];
 
-const TRAIN_KINDS: readonly KindOption[] = [
-  { value: '편성', label: '편성', icon: <Train size={16} strokeWidth={2.2} /> },
-];
+/** 5호선 편성번호 501 ~ 580 (80개) */
+const TRAIN_NUMBERS: readonly string[] = Array.from({ length: 80 }, (_, i) => String(501 + i));
 
 /** 5호선 전체 역 (방화 → 하남검단산/마천 분기 순) */
 const STATIONS: readonly string[] = [
@@ -75,10 +75,10 @@ const STATIONS: readonly string[] = [
 ];
 
 const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
-  incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, showLocation: true,  dataCategory: 'action'  },
-  driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: true,  dataCategory: 'inspect' },
-  train:    { title: '열차 정보 등록', kinds: TRAIN_KINDS,    showLocation: false, dataCategory: 'inspect' },
-  hazard:   { title: '위험개소 등록', stationPicker: true, showLocation: true, dataCategory: 'hazard'  },
+  incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'action'  },
+  driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'inspect' },
+  train:    { title: '열차 정보 등록', trainPicker: true,     showLocation: false, dataCategory: 'inspect' },
+  hazard:   { title: '위험개소 등록', stationPicker: true,    showLocation: true,  dataCategory: 'hazard'  },
 };
 
 interface HazardFormProps {
@@ -90,13 +90,16 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const variant = FORM_VARIANT[cardKey];
   const defaultKind = variant.kinds?.[0]?.value ?? '';
   const defaultStation = variant.stationPicker ? STATIONS[0] : '';
+  const defaultTrain = variant.trainPicker ? TRAIN_NUMBERS[0] : '';
 
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [titleText, setTitleText] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [kind, setKind] = useState<string>(defaultKind);
   const [station, setStation] = useState<string>(defaultStation);
+  const [trainNo, setTrainNo] = useState<string>(defaultTrain);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -120,20 +123,22 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
 
   const handleSubmit = async () => {
     if (!photo) { setError('사진을 선택해주세요'); return; }
+    if (!titleText.trim()) { setError('제목을 입력해주세요'); return; }
     if (!description.trim()) { setError('설명을 입력해주세요'); return; }
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }
 
     if (variant.stationPicker && !station) { setError('역을 선택해주세요'); return; }
+    if (variant.trainPicker && !trainNo) { setError('편성을 선택해주세요'); return; }
 
     setSubmitting(true);
     setError('');
     try {
-      const tag = variant.stationPicker
-        ? (station ? `${station}역` : '')
-        : (variant.kinds && kind ? kind : '');
-      const finalDescription = tag
-        ? `[${tag}] ${description.trim()}`
-        : description.trim();
+      let tag = '';
+      if (variant.stationPicker) tag = station ? `${station}역` : '';
+      else if (variant.trainPicker) tag = trainNo ? `${trainNo}편성` : '';
+      else if (variant.kinds && kind) tag = kind;
+      const headline = tag ? `[${tag}] ${titleText.trim()}` : titleText.trim();
+      const finalDescription = `${headline}\n${description.trim()}`;
       await createReport({
         photo,
         description: finalDescription,
@@ -183,7 +188,23 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         aria-label="사진 파일 선택"
       />
 
-      {/* 분류 — variant.kinds (버튼 행) 또는 variant.stationPicker (역 드롭다운) */}
+      {/* 제목 (필수) */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel} htmlFor="hazard-title">
+          제목 <span className={styles.required}>*</span>
+        </label>
+        <input
+          id="hazard-title"
+          type="text"
+          className={styles.textInput}
+          placeholder="제목을 입력해주세요"
+          value={titleText}
+          onChange={(e) => setTitleText(e.target.value)}
+          maxLength={60}
+        />
+      </div>
+
+      {/* 분류 — variant.kinds (버튼 행) 또는 variant.stationPicker (역) / variant.trainPicker (편성) */}
       {variant.kinds && (
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel}>
@@ -217,6 +238,23 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
           >
             {STATIONS.map((s) => (
               <option key={s} value={s}>{s}역</option>
+            ))}
+          </select>
+        </div>
+      )}
+      {variant.trainPicker && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="hazard-train">
+            편성 <span className={styles.required}>*</span>
+          </label>
+          <select
+            id="hazard-train"
+            className={styles.textInput}
+            value={trainNo}
+            onChange={(e) => setTrainNo(e.target.value)}
+          >
+            {TRAIN_NUMBERS.map((n) => (
+              <option key={n} value={n}>{n}편성</option>
             ))}
           </select>
         </div>
@@ -261,7 +299,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={submitting || !photo || !description.trim()}
+        disabled={submitting || !photo || !titleText.trim() || !description.trim()}
       >
         {submitting ? '등록 중...' : '등록하기'}
       </button>

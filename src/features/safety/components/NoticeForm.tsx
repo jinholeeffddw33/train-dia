@@ -44,6 +44,7 @@ interface NoticeFormProps {
 
 export default function NoticeForm({ onClose }: NoticeFormProps) {
   const [noticeType, setNoticeType] = useState<NoticeType>('rollcall');
+  const [titleText, setTitleText] = useState('');
   const [items, setItems] = useState<string[]>(['']);
   const [longText, setLongText] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -76,6 +77,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   };
 
   const handleSubmit = async () => {
+    if (!titleText.trim()) { setError('제목을 입력해주세요'); return; }
     if (noticeType === 'important') {
       if (!longText.trim()) { setError('내용을 입력해주세요'); return; }
     } else {
@@ -87,9 +89,10 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
     setSubmitting(true);
     setError('');
     try {
-      const desc = noticeType === 'important'
+      const body = noticeType === 'important'
         ? longText.trim()
         : items.filter((s) => s.trim()).map((text, i) => `${i + 1}. ${text.trim()}`).join('\n');
+      const desc = `${titleText.trim()}\n${body}`;
       const filled = noticeType === 'important' ? [longText.trim()] : items.filter((s) => s.trim());
 
       // location 필드에 분류 저장
@@ -138,6 +141,22 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   return (
     <div className={styles.formWrap}>
       <h2 className={styles.formTitle}>알림마당 등록</h2>
+
+      {/* 제목 (필수) */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel} htmlFor="notice-title">
+          제목 <span className={styles.required}>*</span>
+        </label>
+        <input
+          id="notice-title"
+          type="text"
+          className={styles.textInput}
+          placeholder="제목을 입력해주세요"
+          value={titleText}
+          onChange={(e) => setTitleText(e.target.value)}
+          maxLength={60}
+        />
+      </div>
 
       {/* 분류 선택 */}
       <div className={styles.fieldGroup}>
@@ -251,7 +270,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={submitting || (noticeType === 'important' ? !longText.trim() : items.every((s) => !s.trim()))}
+        disabled={submitting || !titleText.trim() || (noticeType === 'important' ? !longText.trim() : items.every((s) => !s.trim()))}
       >
         {submitting ? '등록 중...' : '등록하기'}
       </button>

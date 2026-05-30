@@ -15,14 +15,15 @@ interface ReportItem {
   createdBy: string;
 }
 
-/** description prefix 파싱: `[tag] title\nbody` */
+/** description prefix 파싱: `[tag] title\nbody` (CRLF·LF 모두 대응) */
 function parseDescription(desc: string): { tag: string; title: string; body: string } {
-  const lines = (desc || '').split('\n');
-  const firstLine = lines[0] || '';
+  const normalized = (desc || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalized.split('\n');
+  const firstLine = (lines[0] || '').trim();
   const body = lines.slice(1).join('\n').trim();
   const m = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
-  if (!m) return { tag: '', title: firstLine.trim(), body };
-  return { tag: m[1], title: m[2].trim(), body };
+  if (!m) return { tag: '', title: firstLine, body };
+  return { tag: m[1].trim(), title: m[2].trim(), body };
 }
 
 const TRAIN_TAG_RE = /^\d+편성$/;
@@ -319,14 +320,7 @@ export default function SafetyDashboard({
                     <button
                       type="button"
                       className={`${styles.noticeListItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                      onClick={() => openDetail({
-                        id, kind: 'incident',
-                        badge: p.item.createdBy ? '공지' : undefined,
-                        badgeTone: 'amber',
-                        title: p.title || '(제목 없음)',
-                        meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
-                        body: p.body,
-                      })}
+                      onClick={() => onOpenNotice?.()}
                     >
                       <div className={styles.noticeListHead}>
                         <span className={styles.noticeListTitle}>{p.title || '(제목 없음)'}</span>

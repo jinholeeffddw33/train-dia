@@ -49,9 +49,10 @@ const TRAIN_TAG_RE = /^\d+편성$/;
 const DRIVING_TAGS = new Set(['시설물', '열차', '신호']);
 
 function getDescriptionTag(desc: string): string {
-  const firstLine = (desc || '').split('\n')[0];
+  const normalized = (desc || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const firstLine = (normalized.split('\n')[0] || '').trim();
   const m = firstLine.match(/^\[([^\]]+)\]/);
-  return m ? m[1] : '';
+  return m ? m[1].trim() : '';
 }
 
 interface HazardListProps {

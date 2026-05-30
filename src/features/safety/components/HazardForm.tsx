@@ -44,14 +44,20 @@ const CATEGORY_TITLES: Record<string, string> = {
   inspect: '알림마당 등록',
 };
 
+const INCIDENT_KINDS = ['시설물', '열차', '신호'] as const;
+type IncidentKind = typeof INCIDENT_KINDS[number];
+
 export default function HazardForm({ onClose, category = 'hazard', title }: HazardFormProps) {
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [kind, setKind] = useState<IncidentKind>('시설물');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const showKindSelector = category === 'action';
 
   const createReport = useHazardStore((s) => s.createReport);
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -78,7 +84,10 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
     setSubmitting(true);
     setError('');
     try {
-      await createReport({ photo, description: description.trim(), location: location.trim(), name, sabun, category });
+      const finalDescription = showKindSelector
+        ? `[${kind}] ${description.trim()}`
+        : description.trim();
+      await createReport({ photo, description: finalDescription, location: location.trim(), name, sabun, category });
       if (preview) URL.revokeObjectURL(preview);
       onClose();
     } catch (e) {
@@ -119,6 +128,27 @@ export default function HazardForm({ onClose, category = 'hazard', title }: Haza
         onChange={handlePhotoChange}
         aria-label="사진 파일 선택"
       />
+
+      {/* 사고 사례 분류 (시설물 / 열차 / 신호) */}
+      {showKindSelector && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel}>
+            분류 <span className={styles.required}>*</span>
+          </label>
+          <div className={styles.kindRow}>
+            {INCIDENT_KINDS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                className={`${styles.kindBtn} ${kind === k ? styles.kindBtnActive : ''}`}
+                onClick={() => setKind(k)}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 위치 (선택) */}
       <div className={styles.fieldGroup}>

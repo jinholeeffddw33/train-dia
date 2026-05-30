@@ -173,6 +173,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const [view, setView] = useState<SafetyView>('home');
   const [showAlertForm, setShowAlertForm] = useState(false);
   const [showHazardForm, setShowHazardForm] = useState(false);
+  const [dashboardForm, setDashboardForm] = useState<null | 'incident' | 'hazard' | 'notice'>(null);
 
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
@@ -180,6 +181,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
   const sabun = authSabun || driverSabun;
+  const adminUser = isAdmin(sabun);
   const { getUnread, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
@@ -289,12 +291,33 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     }
   };
 
+  const closeDashboardForm = () => {
+    setDashboardForm(null);
+    fetchHazards(sabun);
+    fetchCounts();
+  };
+
   return (
-    <SafetyDashboard
-      onBack={onBack}
-      onOpenCategory={handleDashboardCategory}
-      onOpenNotice={() => setView({ type: 'list', category: 'inspect' })}
-      unreadCount={totalUnread}
-    />
+    <>
+      <SafetyDashboard
+        onBack={onBack}
+        onOpenCategory={handleDashboardCategory}
+        onOpenNotice={() => setView({ type: 'list', category: 'inspect' })}
+        onAddNotice={adminUser ? () => setDashboardForm('notice') : undefined}
+        onAddIncident={() => setDashboardForm('incident')}
+        onAddHazardZone={adminUser ? () => setDashboardForm('hazard') : undefined}
+        isAdmin={adminUser}
+        unreadCount={totalUnread}
+      />
+      <Modal open={dashboardForm !== null} onClose={() => setDashboardForm(null)}>
+        {dashboardForm === 'notice' ? (
+          <NoticeForm onClose={closeDashboardForm} />
+        ) : dashboardForm === 'incident' ? (
+          <HazardForm category="action" onClose={closeDashboardForm} />
+        ) : dashboardForm === 'hazard' ? (
+          <HazardForm category="hazard" onClose={closeDashboardForm} />
+        ) : null}
+      </Modal>
+    </>
   );
 }

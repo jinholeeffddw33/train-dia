@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   ArrowLeft, AlertTriangle, TrainFront, Train, ShieldAlert,
-  Megaphone, ChevronRight, Bell,
+  Megaphone, ChevronRight, Bell, Plus,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
 
@@ -11,15 +11,14 @@ interface Props {
   onBack: () => void;
   onOpenCategory: (id: 'incident' | 'driving' | 'train' | 'hazard') => void;
   onOpenNotice?: () => void;
+  onAddNotice?: () => void;
+  onAddIncident?: () => void;
+  onAddHazardZone?: () => void;
+  isAdmin?: boolean;
   unreadCount?: number;
 }
 
-/* === 프로토타입 샘플 데이터 (실데이터 연동은 단계적 진행) === */
-
-const NOTICE_SAMPLE = {
-  title: '2026년 6월 1일부터 차내 방송 멘트가 변경됩니다.',
-  date: '2026.05.30',
-};
+/* === 프로토타입 샘플 데이터 (실데이터 연동은 후속) === */
 
 const INCIDENT_SAMPLES = [
   { kind: '시설물', kindColor: 'amber', title: '왕십리역 스크린도어 이상', date: '2026.05.28', time: '08:35', location: '왕십리역 승강장', summary: '스크린도어 2-3번 사이 이상 발생, 승객 안전 안내 후 조치' },
@@ -41,14 +40,15 @@ const HAZARD_ZONE_SAMPLES = [
 ];
 
 const CATEGORIES = [
-  { id: 'incident' as const, label: '최근 사고 사례',   sub: '사례 확인·예방',     icon: AlertTriangle, tone: 'amber' as const },
-  { id: 'driving'  as const, label: '운전 정보',        sub: '운전 주의사항',     icon: TrainFront,    tone: 'blue'  as const },
-  { id: 'train'    as const, label: '열차 정보',        sub: '변경 사항 확인',     icon: Train,         tone: 'green' as const },
-  { id: 'hazard'   as const, label: '위험개소 확인',    sub: '구간별 주의사항',   icon: ShieldAlert,   tone: 'red'   as const },
+  { id: 'incident' as const, label: '사고 사례',  icon: AlertTriangle, tone: 'amber' as const },
+  { id: 'driving'  as const, label: '운전 정보',  icon: TrainFront,    tone: 'blue'  as const },
+  { id: 'train'    as const, label: '열차 정보',  icon: Train,         tone: 'green' as const },
+  { id: 'hazard'   as const, label: '위험개소',   icon: ShieldAlert,   tone: 'red'   as const },
 ];
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, unreadCount = 0,
+  onBack, onOpenCategory, onOpenNotice, onAddNotice, onAddIncident, onAddHazardZone,
+  isAdmin = false, unreadCount = 0,
 }: Props) {
   const [listTab, setListTab] = useState<'incident' | 'train'>('incident');
 
@@ -56,11 +56,11 @@ export default function SafetyDashboard({
     <div className={styles.wrap}>
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
-          <ArrowLeft size={20} strokeWidth={2} />
+          <ArrowLeft size={18} strokeWidth={2} />
         </button>
         <h1 className={styles.headerTitle}>안전관리</h1>
         <button type="button" className={styles.bellBtn} aria-label={`알림 ${unreadCount}건`}>
-          <Bell size={20} strokeWidth={2} />
+          <Bell size={18} strokeWidth={2} />
           {unreadCount > 0 && (
             <span className={styles.bellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
           )}
@@ -72,66 +72,78 @@ export default function SafetyDashboard({
       </div>
 
       <main className={styles.content}>
-        {/* 공지사항 카드 */}
-        <button type="button" className={styles.noticeCard} onClick={onOpenNotice}>
-          <div className={styles.noticeIcon}>
-            <Megaphone size={20} strokeWidth={2} />
-          </div>
-          <div className={styles.noticeBody}>
-            <div className={styles.noticeTopRow}>
-              <span className={styles.noticeLabel}>공지사항</span>
-              <span className={styles.noticeMore}>전체보기 <ChevronRight size={14} /></span>
+        {/* 공지사항 카드 (최상단) */}
+        <section className={styles.noticeSection}>
+          <div className={styles.noticeHead}>
+            <div className={styles.noticeHeadLeft}>
+              <Megaphone size={14} className={styles.noticeHeadIcon} />
+              <span className={styles.noticeHeadLabel}>공지사항</span>
             </div>
-            <p className={styles.noticeTitle}>{NOTICE_SAMPLE.title}</p>
-            <span className={styles.noticeDate}>{NOTICE_SAMPLE.date}</span>
-          </div>
-        </button>
-
-        {/* 2×2 카테고리 그리드 */}
-        <section className={styles.section}>
-          <div className={styles.categoryGrid}>
-            {CATEGORIES.map(c => {
-              const Icon = c.icon;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  className={`${styles.categoryCard} ${styles[`cat_${c.tone}`]}`}
-                  onClick={() => onOpenCategory(c.id)}
-                >
-                  <div className={styles.categoryIconWrap}>
-                    <Icon size={26} strokeWidth={2.2} />
-                  </div>
-                  <span className={styles.categoryLabel}>{c.label}</span>
-                  <span className={styles.categorySub}>{c.sub}</span>
-                  <span className={styles.categoryGo}>바로가기 <ChevronRight size={14} /></span>
+            <div className={styles.sectionHeadActions}>
+              {isAdmin && (
+                <button type="button" className={styles.addBtn} onClick={onAddNotice} aria-label="공지사항 등록">
+                  <Plus size={12} strokeWidth={2.4} /> 등록
                 </button>
-              );
-            })}
+              )}
+              <button type="button" className={styles.sectionMore} onClick={onOpenNotice}>
+                전체보기 <ChevronRight size={12} />
+              </button>
+            </div>
           </div>
+          <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
+            <p className={styles.noticeEmptyText}>등록된 공지사항이 없습니다</p>
+            <p className={styles.noticeEmptyHint}>{isAdmin ? '+ 등록 버튼으로 새 공지를 작성해주세요' : '관리자가 등록한 공지가 여기에 표시됩니다'}</p>
+          </button>
         </section>
+
+        {/* 4 카테고리 가로 1줄 (compact) */}
+        <nav className={styles.categoryRow} aria-label="안전 카테고리">
+          {CATEGORIES.map(c => {
+            const Icon = c.icon;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                className={`${styles.catBtn} ${styles[`catTone_${c.tone}`]}`}
+                onClick={() => onOpenCategory(c.id)}
+              >
+                <span className={styles.catIconWrap}>
+                  <Icon size={20} strokeWidth={2.2} />
+                </span>
+                <span className={styles.catLabel}>{c.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
         {/* 최근 업로드 — 탭 전환 */}
         <section className={styles.section}>
-          <div className={styles.listTabs} role="tablist">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={listTab === 'incident'}
-              className={`${styles.listTab} ${listTab === 'incident' ? styles.listTabActive : ''}`}
-              onClick={() => setListTab('incident')}
-            >
-              최근 사고 사례
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={listTab === 'train'}
-              className={`${styles.listTab} ${listTab === 'train' ? styles.listTabActive : ''}`}
-              onClick={() => setListTab('train')}
-            >
-              최근 변경된 열차 정보
-            </button>
+          <div className={styles.listTabsRow}>
+            <div className={styles.listTabs} role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={listTab === 'incident'}
+                className={`${styles.listTab} ${listTab === 'incident' ? styles.listTabActive : ''}`}
+                onClick={() => setListTab('incident')}
+              >
+                사고 사례
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={listTab === 'train'}
+                className={`${styles.listTab} ${listTab === 'train' ? styles.listTabActive : ''}`}
+                onClick={() => setListTab('train')}
+              >
+                열차 정보
+              </button>
+            </div>
+            {listTab === 'incident' && (
+              <button type="button" className={styles.addBtn} onClick={onAddIncident} aria-label="사고 사례 등록">
+                <Plus size={14} strokeWidth={2.4} /> 등록
+              </button>
+            )}
           </div>
 
           {listTab === 'incident' ? (
@@ -173,17 +185,24 @@ export default function SafetyDashboard({
           )}
         </section>
 
-        {/* 주요 위험개소 — 가로 스크롤 */}
+        {/* 주요 위험개소 — 가로 스크롤 + 관리자 등록 */}
         <section className={styles.section}>
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>주요 위험개소</h2>
-            <button
-              type="button"
-              className={styles.sectionMore}
-              onClick={() => onOpenCategory('hazard')}
-            >
-              전체보기 <ChevronRight size={14} />
-            </button>
+            <div className={styles.sectionHeadActions}>
+              {isAdmin && (
+                <button type="button" className={styles.addBtn} onClick={onAddHazardZone} aria-label="위험개소 등록">
+                  <Plus size={14} strokeWidth={2.4} /> 등록
+                </button>
+              )}
+              <button
+                type="button"
+                className={styles.sectionMore}
+                onClick={() => onOpenCategory('hazard')}
+              >
+                전체보기 <ChevronRight size={12} />
+              </button>
+            </div>
           </div>
           <div className={styles.hazardScroll}>
             {HAZARD_ZONE_SAMPLES.map((h, i) => {

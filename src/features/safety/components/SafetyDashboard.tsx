@@ -78,8 +78,7 @@ const leftIsIncident = latestIncidentAt >= latestDrivingAt;
 const LEFT_TITLE = leftIsIncident ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, onAddNotice, onAddIncident, onAddHazardZone,
-  isAdmin = false, unreadCount = 0,
+  onBack, onOpenCategory, onOpenNotice, unreadCount = 0,
 }: Props) {
   return (
     <div className={styles.wrap}>
@@ -109,11 +108,6 @@ export default function SafetyDashboard({
               <span className={styles.noticeHeadLabel}>공지사항</span>
             </div>
             <div className={styles.sectionHeadActions}>
-              {isAdmin && (
-                <button type="button" className={styles.addBtn} onClick={onAddNotice} aria-label="공지사항 등록">
-                  <Plus size={12} strokeWidth={2.4} /> 등록
-                </button>
-              )}
               <button type="button" className={styles.sectionMore} onClick={onOpenNotice}>
                 전체보기 <ChevronRight size={12} />
               </button>
@@ -121,7 +115,7 @@ export default function SafetyDashboard({
           </div>
           <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
             <p className={styles.noticeEmptyText}>등록된 공지사항이 없습니다</p>
-            <p className={styles.noticeEmptyHint}>{isAdmin ? '+ 등록 버튼으로 새 공지를 작성해주세요' : '관리자가 등록한 공지가 여기에 표시됩니다'}</p>
+            <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시됩니다</p>
           </button>
         </section>
 
@@ -151,9 +145,6 @@ export default function SafetyDashboard({
           <div className={styles.colWrap}>
             <div className={styles.colHead}>
               <h2 className={styles.colTitle}>{LEFT_TITLE}</h2>
-              <button type="button" className={styles.addBtnMini} onClick={onAddIncident} aria-label="사고 사례 등록">
-                <Plus size={12} strokeWidth={2.4} />
-              </button>
             </div>
             <ul className={styles.itemList}>
               {leftIsIncident ? (
@@ -219,11 +210,6 @@ export default function SafetyDashboard({
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>주요 위험개소</h2>
             <div className={styles.sectionHeadActions}>
-              {isAdmin && (
-                <button type="button" className={styles.addBtn} onClick={onAddHazardZone} aria-label="위험개소 등록">
-                  <Plus size={12} strokeWidth={2.4} /> 등록
-                </button>
-              )}
               <button
                 type="button"
                 className={styles.sectionMore}

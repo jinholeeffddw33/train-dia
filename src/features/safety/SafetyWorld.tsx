@@ -60,22 +60,21 @@ class SafetyErrorBoundary extends Component<
 }
 
 type SafetyCategory = 'hazard' | 'action' | 'inspect';
+/** 진입한 카드의 표시 정보 — 데이터 카테고리는 같아도 헤더/빈상태 문구는 카드별로 다르게 노출 */
+type CardKey = 'incident' | 'driving' | 'train' | 'hazard' | 'notice';
 type SafetyView =
   | 'home'
   | 'alert'
-  | { type: 'list'; category: SafetyCategory }
-  | { type: 'detail'; category: SafetyCategory; id: string };
+  | { type: 'list'; category: SafetyCategory; cardKey: CardKey }
+  | { type: 'detail'; category: SafetyCategory; cardKey: CardKey; id: string };
 
-const CATEGORY_LABELS: Record<SafetyCategory, string> = {
-  hazard: '위험개소',
-  action: '조치내용',
-  inspect: '알림마당',
-};
-
-const CATEGORY_EMPTY: Record<SafetyCategory, { icon: string; text: string; hint: string }> = {
-  hazard:  { icon: '📷', text: '등록된 위험개소가 없어요', hint: '발견한 위험개소를 사진으로 공유해주세요' },
-  action:  { icon: '🔧', text: '등록된 조치내용이 없어요', hint: '조치한 내용을 사진과 함께 기록해주세요' },
-  inspect: { icon: '📋', text: '등록된 알림이 없어요', hint: '관리자가 등록한 알림이 여기에 표시됩니다' },
+/** 카드별 표시 정보 — 헤더 제목과 빈 상태 문구가 카드 라벨과 일치하도록 */
+const CARD_DISPLAY: Record<CardKey, { label: string; emptyIcon: string; emptyText: string; emptyHint: string }> = {
+  incident: { label: '사고 사례', emptyIcon: '⚠️', emptyText: '등록된 사고 사례가 없어요', emptyHint: '발생한 사고 사례를 기록해주세요' },
+  driving:  { label: '운전 정보', emptyIcon: '🚆', emptyText: '등록된 운전 정보가 없어요', emptyHint: '서행 구간·운전 변경 사항을 공유해주세요' },
+  train:    { label: '열차 정보', emptyIcon: '🚇', emptyText: '등록된 열차 정보가 없어요', emptyHint: '차량 업데이트·변경 사항을 공유해주세요' },
+  hazard:   { label: '위험개소', emptyIcon: '📷', emptyText: '등록된 위험개소가 없어요', emptyHint: '발견한 위험개소를 사진으로 공유해주세요' },
+  notice:   { label: '알림마당', emptyIcon: '📋', emptyText: '등록된 알림이 없어요', emptyHint: '관리자가 등록한 알림이 여기에 표시됩니다' },
 };
 
 /** 카테고리별 리스트 화면 (위험/조치/점검 공통) */
@@ -173,7 +172,6 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const [view, setView] = useState<SafetyView>('home');
   const [showAlertForm, setShowAlertForm] = useState(false);
   const [showHazardForm, setShowHazardForm] = useState(false);
-  const [dashboardForm, setDashboardForm] = useState<null | 'incident' | 'hazard' | 'notice'>(null);
 
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
@@ -181,7 +179,6 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const authSabun = useAuthStore((s) => s.user?.sabun ?? '');
   const sabun = authSabun || driverSabun;
-  const adminUser = isAdmin(sabun);
   const { getUnread, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
@@ -213,7 +210,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const isDetail = typeof view === 'object' && view.type === 'detail';
   const goToList = useCallback(() => {
     if (typeof view === 'object' && view.type === 'detail') {
-      setView({ type: 'list', category: view.category });
+      setView({ type: 'list', category: view.category, cardKey: view.cardKey });
     }
   }, [view]);
   useHistoryBack('safety-l2', goToList, isDetail);
@@ -249,10 +246,10 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   // ── 상세 화면 (위험/조치/점검 공통) ──
   if (typeof view === 'object' && view.type === 'detail') {
     return (
-      <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category })}>
+      <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category, cardKey: view.cardKey })}>
         <HazardDetail
           reportId={view.id}
-          onBack={() => setView({ type: 'list', category: view.category })}
+          onBack={() => setView({ type: 'list', category: view.category, cardKey: view.cardKey })}
         />
       </SafetyErrorBoundary>
     );
@@ -261,15 +258,16 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   // ── 리스트 화면 (위험/조치/점검 공통) ──
   if (typeof view === 'object' && view.type === 'list') {
     const cat = view.category;
-    const label = CATEGORY_LABELS[cat];
+    const cardKey = view.cardKey;
+    const display = CARD_DISPLAY[cardKey];
     return (
       <CategoryListView
         category={cat}
-        label={label}
-        emptyConfig={CATEGORY_EMPTY[cat]}
+        label={display.label}
+        emptyConfig={{ icon: display.emptyIcon, text: display.emptyText, hint: display.emptyHint }}
         sabun={sabun}
         onBack={goHome}
-        onSelect={(id) => { markAsRead(id); setView({ type: 'detail', category: cat, id }); }}
+        onSelect={(id) => { markAsRead(id); setView({ type: 'detail', category: cat, cardKey, id }); }}
         onShowForm={() => setShowHazardForm(true)}
         showForm={showHazardForm}
         onCloseForm={() => setShowHazardForm(false)}
@@ -283,41 +281,22 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   const handleDashboardCategory = (id: 'incident' | 'driving' | 'train' | 'hazard') => {
     if (id === 'hazard') {
-      setView({ type: 'list', category: 'hazard' });
+      setView({ type: 'list', category: 'hazard', cardKey: 'hazard' });
     } else if (id === 'incident') {
-      setView({ type: 'list', category: 'action' });
-    } else if (id === 'driving' || id === 'train') {
-      setView({ type: 'list', category: 'inspect' });
+      setView({ type: 'list', category: 'action', cardKey: 'incident' });
+    } else if (id === 'driving') {
+      setView({ type: 'list', category: 'inspect', cardKey: 'driving' });
+    } else if (id === 'train') {
+      setView({ type: 'list', category: 'inspect', cardKey: 'train' });
     }
   };
 
-  const closeDashboardForm = () => {
-    setDashboardForm(null);
-    fetchHazards(sabun);
-    fetchCounts();
-  };
-
   return (
-    <>
-      <SafetyDashboard
-        onBack={onBack}
-        onOpenCategory={handleDashboardCategory}
-        onOpenNotice={() => setView({ type: 'list', category: 'inspect' })}
-        onAddNotice={adminUser ? () => setDashboardForm('notice') : undefined}
-        onAddIncident={() => setDashboardForm('incident')}
-        onAddHazardZone={adminUser ? () => setDashboardForm('hazard') : undefined}
-        isAdmin={adminUser}
-        unreadCount={totalUnread}
-      />
-      <Modal open={dashboardForm !== null} onClose={() => setDashboardForm(null)}>
-        {dashboardForm === 'notice' ? (
-          <NoticeForm onClose={closeDashboardForm} />
-        ) : dashboardForm === 'incident' ? (
-          <HazardForm category="action" onClose={closeDashboardForm} />
-        ) : dashboardForm === 'hazard' ? (
-          <HazardForm category="hazard" onClose={closeDashboardForm} />
-        ) : null}
-      </Modal>
-    </>
+    <SafetyDashboard
+      onBack={onBack}
+      onOpenCategory={handleDashboardCategory}
+      onOpenNotice={() => setView({ type: 'list', category: 'inspect', cardKey: 'notice' })}
+      unreadCount={totalUnread}
+    />
   );
 }

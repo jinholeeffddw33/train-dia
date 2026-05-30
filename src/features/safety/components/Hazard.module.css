@@ -109,6 +109,16 @@
   color: var(--dia-red);
 }
 
+.cardStatConfirmed {
+  color: #fff;
+  background: var(--dia-green);
+  border-color: var(--dia-green);
+}
+
+.cardStatUnconfirmed {
+  color: var(--dia-text-tertiary);
+}
+
 /* ── Empty / Loading ── */
 .emptyState {
   display: flex;
@@ -1263,6 +1273,20 @@
 .readersBtnActive {
   border-color: var(--dia-blue);
   color: var(--dia-blue);
+}
+
+/* ── 확인 완료 표시 (상세) ── */
+.confirmedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-green);
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  min-height: 44px;
 }
 
 .readersList {

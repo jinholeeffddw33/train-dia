@@ -1,9 +1,19 @@
 'use client';
 
-import { Heart, MessageCircle, Eye, ThumbsUp, Paperclip } from 'lucide-react';
+import { useMemo } from 'react';
+import { Heart, MessageCircle, Check, ThumbsUp, Paperclip } from 'lucide-react';
 import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import styles from './Hazard.module.css';
+
+const READ_STORAGE_KEY = 'safety-read-ids';
+function loadReadIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(READ_STORAGE_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch { /* ignore */ }
+  return new Set();
+}
 
 function timeAgo(iso: string): string {
   const normalized = iso.replace(' ', 'T').replace(/\+00$/, '+00:00');
@@ -44,6 +54,9 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
   const name = useDriverStore((s) => s.myDriver?.n ?? '');
   const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
   const isNotice = category === 'inspect';
+
+  // localStorage 기반 확인 상태 — 렌더 시점 1회 로드 (목록 재진입 시 갱신)
+  const readIds = useMemo(() => loadReadIds(), [reports.length]);
 
   if (loading && reports.length === 0) {
     return (
@@ -134,10 +147,7 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                     <MessageCircle size={13} />
                     {r.commentCount}
                   </span>
-                  <span className={styles.cardStat}>
-                    <Eye size={13} />
-                    {r.readCount}
-                  </span>
+                  <ConfirmStat read={readIds.has(r.id)} />
                 </div>
               </div>
             </button>
@@ -183,14 +193,24 @@ export default function HazardList({ onSelect, category }: HazardListProps) {
                 <MessageCircle size={13} />
                 {r.commentCount}
               </span>
-              <span className={styles.cardStat}>
-                <Eye size={13} />
-                {r.readCount}
-              </span>
+              <ConfirmStat read={readIds.has(r.id)} />
             </div>
           </div>
         </button>
       ))}
     </div>
+  );
+}
+
+/** 확인 상태 표시 — 읽기 전: 외곽선 ✓, 읽음: 채워진 초록 ✓ + '확인' */
+function ConfirmStat({ read }: { read: boolean }) {
+  return (
+    <span
+      className={`${styles.cardStat} ${read ? styles.cardStatConfirmed : styles.cardStatUnconfirmed}`}
+      aria-label={read ? '확인 완료' : '확인 전'}
+    >
+      <Check size={13} strokeWidth={3} />
+      {read ? '확인' : '미확인'}
+    </span>
   );
 }

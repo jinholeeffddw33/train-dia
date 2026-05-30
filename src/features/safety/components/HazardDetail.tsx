@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, Eye, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send } from 'lucide-react';
+import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send } from 'lucide-react';
 import { useHazardStore, type HazardComment } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -53,9 +53,6 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
-  const [showReaders, setShowReaders] = useState(false);
-  const [readers, setReaders] = useState<{ name: string; readAt: string }[]>([]);
-  const [loadingReaders, setLoadingReaders] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +67,6 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
   const recordRead = useHazardStore((s) => s.recordRead);
-  const fetchReaders = useHazardStore((s) => s.fetchReaders);
   const incrementView = useHazardStore((s) => s.incrementView);
 
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -170,15 +166,6 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     } catch (e) {
       setError(e instanceof Error ? e.message : '수정에 실패했습니다');
     }
-  };
-
-  const handleShowReaders = async () => {
-    if (showReaders) { setShowReaders(false); return; }
-    setLoadingReaders(true);
-    setShowReaders(true);
-    const list = await fetchReaders(reportId);
-    setReaders(list);
-    setLoadingReaders(false);
   };
 
   const handleLike = async () => {
@@ -417,7 +404,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   </a>
                 )}
 
-                {/* 좋아요 + 조회수 */}
+                {/* 좋아요 + 확인 상태 */}
                 <div className={styles.likeSection}>
                   <button
                     type="button"
@@ -432,38 +419,15 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                     />
                     <span className={styles.likeCount}>{report.likeCount}</span>
                   </button>
-                  <button
-                    type="button"
-                    className={`${styles.readersBtn} ${showReaders ? styles.readersBtnActive : ''}`}
-                    onClick={handleShowReaders}
-                    aria-label="읽은 사람 보기"
-                  >
-                    <Eye size={16} />
-                    <span>{report.readCount}</span>
-                  </button>
+                  <span className={styles.confirmedBadge} aria-label="확인 완료">
+                    <Check size={16} strokeWidth={3} />
+                    <span>확인 완료</span>
+                  </span>
                 </div>
               </div>
             </>
           )}
         </div>
-
-        {/* 읽은 사람 목록 */}
-        {showReaders && (
-          <div className={styles.readersList}>
-            {loadingReaders ? (
-              <div className={styles.readersLoading}>불러오는 중...</div>
-            ) : readers.length === 0 ? (
-              <div className={styles.readersEmpty}>아직 읽은 사람이 없어요</div>
-            ) : (
-              readers.map((r, i) => (
-                <div key={i} className={styles.readerItem}>
-                  <span className={styles.readerName}>{r.name}</span>
-                  <span className={styles.readerTime}>{formatDate(r.readAt)}</span>
-                </div>
-              ))
-            )}
-          </div>
-        )}
 
         <div className={styles.divider} />
 

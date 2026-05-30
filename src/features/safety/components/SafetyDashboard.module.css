@@ -5,10 +5,22 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--dia-bg);
+  /* 다크 모드 (기본): 헤더에서 이어지는 깊은 보라 → 청보라 그라데이션 */
+  background:
+    radial-gradient(circle at 90% 0%, rgba(124, 58, 237, 0.18), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(56, 189, 248, 0.08), transparent 60%),
+    linear-gradient(180deg, #1B1740 0%, #161235 35%, #11102A 100%);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 라이트 모드: 라벤더·하늘색 부드러운 그라데이션 — 카드가 떠 있는 듯한 효과 */
+:global(.light) .wrap {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(167, 139, 250, 0.22), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(96, 165, 250, 0.12), transparent 60%),
+    linear-gradient(180deg, #F1ECFF 0%, #F7F4FF 40%, #FBFAFF 100%);
 }
 
 /* ── 헤더 — 보라 그라데이션 ── */
@@ -801,4 +813,28 @@
   margin: 4px 0 0;
   font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
+}
+
+/* ───── 그라데이션 배경 위 카드가 떠 있는 듯한 효과 ───── */
+/* 라이트 모드: 보라 톤 부드러운 외부 그림자 */
+:global(.light) .noticeEmpty,
+:global(.light) .catBtn,
+:global(.light) .hazardCard,
+:global(.light) .itemBtn,
+:global(.light) .incidentItem,
+:global(.light) .trainItem {
+  background: #FFFFFF;
+  box-shadow:
+    0 4px 14px rgba(99, 79, 165, 0.10),
+    0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+/* 다크 모드: 내부 하이라이트 + 외부 깊이 */
+.noticeEmpty,
+.catBtn,
+.hazardCard,
+.itemBtn {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.28);
 }

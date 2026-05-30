@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { Siren, AlertTriangle, Info } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -48,9 +49,24 @@ interface FormVariant {
   stationPicker?: boolean;
   /** 분류를 편성번호(501-580) 드롭다운으로 표시 */
   trainPicker?: boolean;
+  /** 심각도(위험/주의/알림) 선택 노출 */
+  severityPicker?: boolean;
   showLocation: boolean;
   dataCategory: DataCategory;
 }
+
+interface SeverityOption {
+  value: '위험' | '주의' | '알림';
+  label: string;
+  tone: 'red' | 'amber' | 'blue';
+  icon: React.ReactNode;
+}
+
+const SEVERITY_OPTIONS: readonly SeverityOption[] = [
+  { value: '위험', label: '위험', tone: 'red',   icon: <Siren        size={18} strokeWidth={2.2} /> },
+  { value: '주의', label: '주의', tone: 'amber', icon: <AlertTriangle size={18} strokeWidth={2.2} /> },
+  { value: '알림', label: '알림', tone: 'blue',  icon: <Info          size={18} strokeWidth={2.2} /> },
+];
 
 const INCIDENT_KINDS: readonly KindOption[] = [
   { value: '시설물', label: '시설물' },
@@ -78,7 +94,7 @@ const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
   incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'action'  },
   driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'inspect' },
   train:    { title: '열차 정보 등록', trainPicker: true,     showLocation: false, dataCategory: 'inspect' },
-  hazard:   { title: '위험개소 등록', stationPicker: true,    showLocation: true,  dataCategory: 'hazard'  },
+  hazard:   { title: '위험개소 등록', stationPicker: true, severityPicker: true, showLocation: false, dataCategory: 'hazard'  },
 };
 
 interface HazardFormProps {
@@ -100,6 +116,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const [kind, setKind] = useState<string>(defaultKind);
   const [station, setStation] = useState<string>(defaultStation);
   const [trainNo, setTrainNo] = useState<string>(defaultTrain);
+  const [severity, setSeverity] = useState<SeverityOption['value']>('주의');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -137,6 +154,9 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       if (variant.stationPicker) tag = station ? `${station}역` : '';
       else if (variant.trainPicker) tag = trainNo ? `${trainNo}편성` : '';
       else if (variant.kinds && kind) tag = kind;
+      // 위험개소: 역 + 심각도 함께 표기 → [강동역·위험] 형식
+      if (variant.severityPicker && tag) tag = `${tag}·${severity}`;
+      else if (variant.severityPicker) tag = severity;
       const headline = tag ? `[${tag}] ${titleText.trim()}` : titleText.trim();
       const finalDescription = `${headline}\n${description.trim()}`;
       await createReport({
@@ -202,6 +222,23 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
           onChange={(e) => setTitleText(e.target.value)}
           maxLength={60}
         />
+        {variant.severityPicker && (
+          <div className={styles.severityRow} role="radiogroup" aria-label="위험 정도">
+            {SEVERITY_OPTIONS.map((s) => (
+              <button
+                key={s.value}
+                type="button"
+                role="radio"
+                aria-checked={severity === s.value}
+                className={`${styles.severityBtn} ${styles[`severity_${s.tone}`]} ${severity === s.value ? styles.severityBtnActive : ''}`}
+                onClick={() => setSeverity(s.value)}
+              >
+                <span className={styles.severityIcon}>{s.icon}</span>
+                <span>{s.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 분류 — variant.kinds (버튼 행) 또는 variant.stationPicker (역) / variant.trainPicker (편성) */}

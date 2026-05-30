@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Heart, MessageCircle, Check, ThumbsUp, Paperclip } from 'lucide-react';
 import { useHazardStore, type SafetyCategory } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
+import AttachmentLightbox from './AttachmentLightbox';
 import styles from './Hazard.module.css';
 
 const READ_STORAGE_KEY = 'safety-read-ids';
@@ -66,6 +67,7 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
   const name = useDriverStore((s) => s.myDriver?.n ?? '');
   const sabun = useDriverStore((s) => s.myDriver?.s ?? '');
   const isNotice = category === 'inspect' && (!cardKey || cardKey === 'notice');
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   // cardKey별 inspect 하위 필터
   const reports = useMemo(() => {
@@ -154,7 +156,14 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
                 })}
               </div>
               {hasFile && (
-                <div className={styles.noticeFile}><Paperclip size={12} /> 첨부파일</div>
+                <button
+                  type="button"
+                  className={styles.noticeFile}
+                  onClick={(e) => { e.stopPropagation(); setLightboxUrl(r.photoUrl); }}
+                  aria-label="첨부파일 보기"
+                >
+                  <Paperclip size={12} /> 첨부파일
+                </button>
               )}
               <div className={styles.noticeFooter}>
                 <div className={styles.noticeReactions}>
@@ -177,6 +186,9 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
             </button>
           );
         })}
+        {lightboxUrl && (
+          <AttachmentLightbox url={lightboxUrl} onClose={() => setLightboxUrl(null)} />
+        )}
       </div>
     );
   }

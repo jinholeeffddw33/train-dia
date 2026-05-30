@@ -1045,14 +1045,17 @@
   align-items: center;
   gap: 4px;
   font-size: var(--dia-text-xs);
-  color: var(--dia-text-secondary);
+  color: var(--dia-blue);
   font-weight: 500;
   background: var(--dia-surface-elevated);
-  border: 1px solid var(--dia-border);
-  padding: 2px 10px;
+  border: 1px solid var(--dia-blue);
+  padding: 4px 10px;
   border-radius: var(--dia-radius-full);
   width: fit-content;
+  cursor: pointer;
+  font-family: inherit;
 }
+.noticeFile:active { transform: scale(0.95); transition: transform 0.12s ease; }
 
 .noticeAuthor {
   font-size: var(--dia-text-meta);
@@ -1409,6 +1412,37 @@
 }
 .lightboxClose:hover { background: rgba(255, 255, 255, 0.28); }
 .lightboxClose:active { transform: scale(0.95); }
+
+.lightboxFile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 18px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  max-width: 360px;
+}
+.lightboxFileText {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+.lightboxDownloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: var(--dia-blue);
+  color: #fff;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  text-decoration: none;
+}
+.lightboxDownloadBtn:active { transform: scale(0.97); }
 
 .readersList {
   margin: 0 var(--dia-space-4);

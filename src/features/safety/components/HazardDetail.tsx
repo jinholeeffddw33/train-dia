@@ -53,6 +53,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +113,19 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showMenu, commentMenuId]);
+
+  // 라이트박스: ESC로 닫기 + body 스크롤 잠금
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxOpen(false); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [lightboxOpen]);
 
   const handleSend = async () => {
     if (!commentText.trim()) return;
@@ -258,14 +272,21 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       </header>
 
       <div className={styles.detailScroll}>
-        {/* 사진 — 빈 URL/placeholder 숨김 + 로드 실패 시 숨김 */}
+        {/* 사진 — 빈 URL/placeholder 숨김 + 로드 실패 시 숨김. 탭하면 라이트박스로 확대 */}
         {report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
-          <img
-            src={report.photoUrl}
-            alt="첨부 사진"
-            className={styles.detailPhoto}
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
+          <button
+            type="button"
+            className={styles.detailPhotoBtn}
+            onClick={() => setLightboxOpen(true)}
+            aria-label="사진 크게 보기"
+          >
+            <img
+              src={report.photoUrl}
+              alt="첨부 사진"
+              className={styles.detailPhoto}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          </button>
         )}
 
         {/* 내용 */}
@@ -556,6 +577,32 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           </button>
         </div>
       </div>
+
+      {/* 사진 라이트박스 (전체화면 확대) */}
+      {lightboxOpen && report.photoUrl && (
+        <div
+          className={styles.lightboxOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="사진 크게 보기"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            className={styles.lightboxClose}
+            onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
+            aria-label="닫기"
+          >
+            <X size={22} strokeWidth={2.4} />
+          </button>
+          <img
+            src={report.photoUrl}
+            alt="첨부 사진"
+            className={styles.lightboxImage}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

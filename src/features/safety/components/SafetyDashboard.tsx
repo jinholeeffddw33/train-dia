@@ -1,11 +1,45 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ArrowLeft, AlertTriangle, TrainFront, Train, ShieldAlert,
   Megaphone, ChevronRight, Bell, Check, X,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
+
+/** DB report 형태 (필요한 필드만) */
+interface ReportItem {
+  id: string;
+  description: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+/** description prefix 파싱: `[tag] title\nbody` */
+function parseDescription(desc: string): { tag: string; title: string; body: string } {
+  const lines = (desc || '').split('\n');
+  const firstLine = lines[0] || '';
+  const body = lines.slice(1).join('\n').trim();
+  const m = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+  if (!m) return { tag: '', title: firstLine.trim(), body };
+  return { tag: m[1], title: m[2].trim(), body };
+}
+
+const TRAIN_TAG_RE = /^\d+편성$/;
+const DRIVING_TAGS = new Set(['시설물', '열차', '신호']);
+const DRIVING_TONE: Record<string, string> = { 시설물: 'amber', 열차: 'blue', 신호: 'red' };
+
+function formatDate(iso: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso.slice(0, 10);
+  const y = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
+  return `${y}.${mm}.${dd} ${hh}:${mi}`;
+}
 
 /** 대시보드 샘플 확인(읽음) 상태 — 카드별 고유 ID로 localStorage 저장 */
 const DASHBOARD_READ_KEY = 'safety-dashboard-read-ids';
@@ -27,6 +61,8 @@ interface Props {
   unreadCount?: number;
   userName?: string;
   userRole?: string;
+  /** 사용자 사번 — DB fetch에 사용 */
+  sabun?: string;
 }
 
 /* === 프로토타입 샘플 데이터 (실데이터 연동은 후속) === */
@@ -163,12 +199,51 @@ type SampleDetail = {
 };
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, unreadCount = 0, userName = '', userRole = '',
+  onBack, onOpenCategory, onOpenNotice, unreadCount = 0, userName = '', userRole = '', sabun = '',
 }: Props) {
   const userLabel = userName ? `${userName} ${userRole.replace(/님$/, '')}` : '';
 
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
   useEffect(() => { setReadIds(loadDashboardReadIds()); }, []);
+
+  /* === 실데이터 fetch — action(사고사례) + inspect(운전정보·열차정보) === */
+  const [actionReports, setActionReports] = useState<ReportItem[]>([]);
+  const [inspectReports, setInspectReports] = useState<ReportItem[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    const qs = sabun ? `?sabun=${encodeURIComponent(sabun)}` : '';
+    fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=action`)
+      .then(r => r.json())
+      .then(j => { if (!cancelled) setActionReports(j.data ?? []); })
+      .catch(() => {});
+    fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=inspect`)
+      .then(r => r.json())
+      .then(j => { if (!cancelled) setInspectReports(j.data ?? []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [sabun]);
+
+  /* === inspect 데이터를 prefix 태그로 분류 (열차 편성 vs 운전 분류) === */
+  const { trainReports, drivingReports } = useMemo(() => {
+    const train: { item: ReportItem; tag: string; title: string; body: string }[] = [];
+    const drive: { item: ReportItem; tag: string; title: string; body: string }[] = [];
+    for (const r of inspectReports) {
+      const p = parseDescription(r.description);
+      if (TRAIN_TAG_RE.test(p.tag)) train.push({ item: r, ...p });
+      else if (DRIVING_TAGS.has(p.tag)) drive.push({ item: r, ...p });
+    }
+    return { trainReports: train, drivingReports: drive };
+  }, [inspectReports]);
+
+  /* === 좌측 섹션 결정 — 액션(사고사례)과 운전정보 중 더 최근 === */
+  const parsedActions = useMemo(() => actionReports.map(r => ({ item: r, ...parseDescription(r.description) })), [actionReports]);
+  const latestActionAt = parsedActions[0]?.item.createdAt ?? '';
+  const latestDrivingAt = drivingReports[0]?.item.createdAt ?? '';
+  const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
+  const hasRealTrain = trainReports.length > 0;
+  const useRealData = hasRealLeft || hasRealTrain;
+  const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
+  const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
   const [selected, setSelected] = useState<SampleDetail | null>(null);
 
@@ -211,9 +286,11 @@ export default function SafetyDashboard({
         )}
       </header>
 
-      <div className={styles.prototypeNotice}>
-        <span>목업 — 샘플 데이터입니다</span>
-      </div>
+      {!useRealData && (
+        <div className={styles.prototypeNotice}>
+          <span>목업 — 샘플 데이터입니다</span>
+        </div>
+      )}
 
       <main className={styles.content}>
         {/* 공지사항 */}
@@ -255,17 +332,85 @@ export default function SafetyDashboard({
           })}
         </nav>
 
-        {/* 좌(사고/운전 동적) + 우(열차정보) 2단 */}
+        {/* 좌(사고/운전 동적) + 우(열차정보) 2단 — 실데이터 우선, 없으면 샘플 */}
         <section className={styles.dualSection}>
           {/* 좌측 */}
           <div className={styles.colWrap}>
             <div className={styles.colHead}>
-              <h2 className={styles.colTitle}>{LEFT_TITLE}</h2>
+              <h2 className={styles.colTitle}>{useRealData ? leftTitleReal : LEFT_TITLE}</h2>
             </div>
             <ul className={styles.itemList}>
-              {leftIsIncident ? (
+              {useRealData ? (
+                leftKindReal === 'incident' ? (
+                  parsedActions.slice(0, 3).map((p) => {
+                    const id = `incident-${p.item.id}`;
+                    const isRead = readIds.has(id);
+                    const tone = DRIVING_TONE[p.tag] ?? 'amber';
+                    return (
+                      <li key={p.item.id}>
+                        <button
+                          type="button"
+                          className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                          onClick={() => openDetail({
+                            id, kind: 'incident',
+                            badge: p.tag || '사고',
+                            badgeTone: tone,
+                            title: p.title,
+                            meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
+                            body: p.body,
+                          })}
+                        >
+                          <div className={styles.incidentHeadRow}>
+                            <span className={`${styles.kindBadge} ${styles[`kind_${tone}`]}`}>{p.tag || '사고'}</span>
+                            <span className={styles.incidentTitle}>{p.title}</span>
+                            <ConfirmBadge read={isRead} />
+                          </div>
+                          <div className={styles.incidentMeta}>
+                            <span>{formatDate(p.item.createdAt)}</span>
+                            {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
+                          </div>
+                          {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
+                        </button>
+                      </li>
+                    );
+                  })
+                ) : (
+                  drivingReports.slice(0, 3).map((p) => {
+                    const id = `driving-${p.item.id}`;
+                    const isRead = readIds.has(id);
+                    const tone = DRIVING_TONE[p.tag] ?? 'blue';
+                    return (
+                      <li key={p.item.id}>
+                        <button
+                          type="button"
+                          className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                          onClick={() => openDetail({
+                            id, kind: 'driving',
+                            badge: p.tag || '운전',
+                            badgeTone: tone,
+                            title: p.title,
+                            meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
+                            body: p.body,
+                          })}
+                        >
+                          <div className={styles.incidentHeadRow}>
+                            <span className={`${styles.kindBadge} ${styles[`kind_${tone}`]}`}>{p.tag || '운전'}</span>
+                            <span className={styles.incidentTitle}>{p.title}</span>
+                            <ConfirmBadge read={isRead} />
+                          </div>
+                          <div className={styles.incidentMeta}>
+                            <span>{formatDate(p.item.createdAt)}</span>
+                            {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
+                          </div>
+                          {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
+                        </button>
+                      </li>
+                    );
+                  })
+                )
+              ) : leftIsIncident ? (
                 INCIDENT_SAMPLES.slice(0, 3).map((it, i) => {
-                  const id = `incident-${i}-${it.uploadedAt}`;
+                  const id = `incident-sample-${i}-${it.uploadedAt}`;
                   const isRead = readIds.has(id);
                   return (
                     <li key={i}>
@@ -294,7 +439,7 @@ export default function SafetyDashboard({
                 })
               ) : (
                 DRIVING_SAMPLES.slice(0, 3).map((it, i) => {
-                  const id = `driving-${i}-${it.uploadedAt}`;
+                  const id = `driving-sample-${i}-${it.uploadedAt}`;
                   const isRead = readIds.has(id);
                   return (
                     <li key={i}>
@@ -331,34 +476,71 @@ export default function SafetyDashboard({
               <h2 className={styles.colTitle}>최근 변경된 열차 정보</h2>
             </div>
             <ul className={styles.itemList}>
-              {TRAIN_UPDATE_SAMPLES.map((it, i) => {
-                const id = `train-${i}-${it.applied}`;
-                const isRead = readIds.has(id);
-                return (
-                  <li key={i}>
-                    <button
-                      type="button"
-                      className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                      onClick={() => openDetail({
-                        id, kind: 'train', badge: 'NEW',
-                        title: it.title, meta: it.applied, bullets: it.items,
-                      })}
-                    >
-                      <div className={styles.trainHeadRow}>
-                        <span className={styles.newBadge}>NEW</span>
-                        <span className={styles.trainTitle}>{it.title}</span>
-                        <ConfirmBadge read={isRead} />
-                      </div>
-                      <ul className={styles.trainSubList}>
-                        {it.items.map((sub, j) => (
-                          <li key={j}>{sub}</li>
-                        ))}
-                      </ul>
-                      <span className={styles.trainApplied}>{it.applied}</span>
-                    </button>
-                  </li>
-                );
-              })}
+              {hasRealTrain ? (
+                trainReports.slice(0, 3).map((p) => {
+                  const id = `train-${p.item.id}`;
+                  const isRead = readIds.has(id);
+                  const bodyBullets = p.body ? p.body.split('\n').filter(Boolean) : [];
+                  return (
+                    <li key={p.item.id}>
+                      <button
+                        type="button"
+                        className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                        onClick={() => openDetail({
+                          id, kind: 'train',
+                          badge: p.tag || 'NEW',
+                          title: p.title,
+                          meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
+                          bullets: bodyBullets,
+                        })}
+                      >
+                        <div className={styles.trainHeadRow}>
+                          <span className={styles.newBadge}>{p.tag || 'NEW'}</span>
+                          <span className={styles.trainTitle}>{p.title}</span>
+                          <ConfirmBadge read={isRead} />
+                        </div>
+                        {bodyBullets.length > 0 && (
+                          <ul className={styles.trainSubList}>
+                            {bodyBullets.slice(0, 3).map((sub, j) => (
+                              <li key={j}>{sub}</li>
+                            ))}
+                          </ul>
+                        )}
+                        <span className={styles.trainApplied}>{formatDate(p.item.createdAt)} 등록</span>
+                      </button>
+                    </li>
+                  );
+                })
+              ) : (
+                TRAIN_UPDATE_SAMPLES.map((it, i) => {
+                  const id = `train-sample-${i}-${it.applied}`;
+                  const isRead = readIds.has(id);
+                  return (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
+                        onClick={() => openDetail({
+                          id, kind: 'train', badge: 'NEW',
+                          title: it.title, meta: it.applied, bullets: it.items,
+                        })}
+                      >
+                        <div className={styles.trainHeadRow}>
+                          <span className={styles.newBadge}>NEW</span>
+                          <span className={styles.trainTitle}>{it.title}</span>
+                          <ConfirmBadge read={isRead} />
+                        </div>
+                        <ul className={styles.trainSubList}>
+                          {it.items.map((sub, j) => (
+                            <li key={j}>{sub}</li>
+                          ))}
+                        </ul>
+                        <span className={styles.trainApplied}>{it.applied}</span>
+                      </button>
+                    </li>
+                  );
+                })
+              )}
             </ul>
           </div>
         </section>

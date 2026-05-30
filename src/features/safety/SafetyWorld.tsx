@@ -305,6 +305,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
       unreadCount={totalUnread}
       userName={userName}
       userRole={userRole}
+      sabun={sabun}
     />
   );
 }

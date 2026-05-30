@@ -283,7 +283,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             isNotice ? (
               /* 알림마당 수정: 번호별 항목 편집 */
               <>
-                <div className={styles.noticeEditHeader}>알림마당 수정</div>
+                <div className={styles.noticeEditHeader}>공지사항 수정</div>
                 <div className={styles.noticeItemList}>
                   {editItems.map((text, i) => (
                     <div key={i} className={`${styles.noticeItem} ${i < 2 ? styles.noticeItemHighlight : ''}`}>

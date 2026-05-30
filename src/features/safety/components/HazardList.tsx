@@ -99,8 +99,8 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
     return (
       <div className={styles.emptyState}>
         <span className={styles.emptyIcon}>{isNotice ? '📋' : '📷'}</span>
-        <p className={styles.emptyText}>{isNotice ? '등록된 알림이 없어요' : '등록된 글이 없어요'}</p>
-        <p className={styles.emptyHint}>{isNotice ? '관리자가 등록한 알림이 여기에 표시됩니다' : '사진과 함께 공유해주세요'}</p>
+        <p className={styles.emptyText}>{isNotice ? '등록된 공지가 없어요' : '등록된 글이 없어요'}</p>
+        <p className={styles.emptyHint}>{isNotice ? '관리자가 등록한 공지가 여기에 표시됩니다' : '사진과 함께 공유해주세요'}</p>
       </div>
     );
   }

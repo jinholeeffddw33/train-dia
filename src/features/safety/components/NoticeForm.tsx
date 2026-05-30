@@ -125,7 +125,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         body: JSON.stringify({
           name,
           sabun,
-          title: `📋 알림마당 — ${location}`,
+          title: `📋 공지사항 — ${location}`,
           message: filled[0].trim(),
         }),
       }).catch(() => {});

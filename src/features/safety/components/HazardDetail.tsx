@@ -90,9 +90,27 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const hasTagPrefix = ((report?.description ?? '').trim().startsWith('['));
   const isPureNotice = isNotice && !hasTagPrefix;
 
+  // 열차 정보 편집: 위치 대신 편성 dropdown 노출
+  const TRAIN_TAG_RE = /^(?:\d+|전)편성$/;
+  const TRAIN_NUMBERS = Array.from({ length: 80 }, (_, i) => String(501 + i));
+  const parseTaggedDesc = (desc: string): { tag: string; body: string } => {
+    const normalized = (desc || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalized.split('\n');
+    const firstLine = (lines[0] || '').trim();
+    const m = firstLine.match(/^\[([^\]]+)\]\s*(.*)$/);
+    if (!m) return { tag: '', body: normalized };
+    const rest = m[2].trim();
+    const remaining = lines.slice(1).join('\n');
+    return { tag: m[1].trim(), body: rest + (remaining ? '\n' + remaining : '') };
+  };
+  const reportTag = parseTaggedDesc(report?.description ?? '').tag;
+  const isTrainEdit = isNotice && TRAIN_TAG_RE.test(reportTag);
+
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
   const [removeFile, setRemoveFile] = useState(false);
+  // 열차 정보 수정용: 편성번호 별도 상태
+  const [editTrainTag, setEditTrainTag] = useState<string>('전');
 
   const parseDescToItems = (desc: string): string[] => {
     const lines = desc.split('\n');
@@ -170,18 +188,33 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
   const handleEditStart = () => {
     if (!report) return;
-    setEditDesc(report.description);
     setEditLocation(report.location);
     setRemoveFile(false);
     if (isPureNotice) {
+      setEditDesc(report.description);
       setEditItems(parseDescToItems(report.description));
+    } else if (isTrainEdit) {
+      // 열차 정보: [편성] prefix 제거하고 body만 textarea로 편집
+      const parsed = parseTaggedDesc(report.description);
+      setEditTrainTag(parsed.tag.replace(/편성$/, ''));
+      setEditDesc(parsed.body);
+    } else {
+      setEditDesc(report.description);
     }
     setEditMode(true);
     setShowMenu(false);
   };
 
   const handleEditSave = async () => {
-    const desc = isPureNotice ? itemsToDesc(editItems) : editDesc.trim();
+    let desc: string;
+    if (isPureNotice) {
+      desc = itemsToDesc(editItems);
+    } else if (isTrainEdit) {
+      const tag = editTrainTag.trim() || '전';
+      desc = `[${tag}편성] ${editDesc.trim()}`;
+    } else {
+      desc = editDesc.trim();
+    }
     if (!desc || !name || !sabun) return;
     setError('');
     try {
@@ -370,6 +403,35 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                     <X size={16} /> 취소
                   </button>
                   <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={editItems.every((s) => !s.trim())}>
+                    <Check size={16} /> 저장
+                  </button>
+                </div>
+              </>
+            ) : isTrainEdit ? (
+              /* 열차 정보 수정: 위치 대신 편성 dropdown */
+              <>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>편성</label>
+                  <select
+                    className={styles.textInput}
+                    value={editTrainTag}
+                    onChange={(e) => setEditTrainTag(e.target.value)}
+                  >
+                    <option value="전">전편성</option>
+                    {TRAIN_NUMBERS.map((n) => (
+                      <option key={n} value={n}>{n}편성</option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>설명</label>
+                  <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
+                </div>
+                <div className={styles.editActions}>
+                  <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
+                    <X size={16} /> 취소
+                  </button>
+                  <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={!editDesc.trim()}>
                     <Check size={16} /> 저장
                   </button>
                 </div>

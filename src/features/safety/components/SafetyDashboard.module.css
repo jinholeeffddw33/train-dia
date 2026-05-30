@@ -194,9 +194,17 @@
 
 .sectionTitleSub {
   font-size: var(--dia-text-meta);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-amber);
+  font-weight: var(--dia-weight-semibold);
+  /* 다크 모드: 밝은 amber */
+  color: #FCD34D;
   margin-left: 4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+:global(.light) .sectionTitleSub {
+  /* 라이트 모드: 진한 amber */
+  color: #92400E;
+  text-shadow: none;
 }
 
 .sectionMore {
@@ -240,14 +248,28 @@
 }
 
 .noticeHeadIcon {
-  color: var(--dia-amber);
+  /* 다크: 밝은 호박 / 라이트: 진한 호박 (sky-blue 배경 위 가독성 확보) */
+  color: #FCD34D;
+}
+
+:global(.light) .noticeHeadIcon {
+  color: #B45309;
 }
 
 .noticeHeadLabel {
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-amber);
+  /* 다크 모드: 밝은 amber */
+  color: #FCD34D;
   letter-spacing: 0.3px;
+  /* 가독성 보강: 살짝의 텍스트 그림자 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+:global(.light) .noticeHeadLabel {
+  /* 라이트 모드: 진한 amber (sky-blue 위 4.5:1 이상 대비) */
+  color: #92400E;
+  text-shadow: none;
 }
 
 .noticeEmpty {

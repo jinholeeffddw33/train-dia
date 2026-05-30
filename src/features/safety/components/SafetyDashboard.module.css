@@ -5,22 +5,24 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  /* 다크 모드 (기본): 헤더에서 이어지는 깊은 보라 → 청보라 그라데이션 */
+  /* 다크 모드: 헤더 보라(#312E81→#6D28D9)가 본문까지 진하게 이어지는 종방향 그라데이션 */
   background:
-    radial-gradient(circle at 90% 0%, rgba(124, 58, 237, 0.18), transparent 55%),
-    radial-gradient(circle at 0% 100%, rgba(56, 189, 248, 0.08), transparent 60%),
-    linear-gradient(180deg, #1B1740 0%, #161235 35%, #11102A 100%);
+    radial-gradient(circle at 85% 8%, rgba(124, 58, 237, 0.45), transparent 50%),
+    radial-gradient(circle at 10% 95%, rgba(76, 29, 149, 0.40), transparent 55%),
+    linear-gradient(180deg, #312E81 0%, #3B1F6B 25%, #2A1957 55%, #1E1448 85%, #15102E 100%);
+  background-attachment: fixed;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 라이트 모드: 라벤더·하늘색 부드러운 그라데이션 — 카드가 떠 있는 듯한 효과 */
+/* 라이트 모드: 헤더 보라가 라벤더로 자연스럽게 이어지는 진한 보라 그라데이션 */
 :global(.light) .wrap {
   background:
-    radial-gradient(circle at 90% 0%, rgba(167, 139, 250, 0.22), transparent 55%),
-    radial-gradient(circle at 0% 100%, rgba(96, 165, 250, 0.12), transparent 60%),
-    linear-gradient(180deg, #F1ECFF 0%, #F7F4FF 40%, #FBFAFF 100%);
+    radial-gradient(circle at 85% 8%, rgba(167, 139, 250, 0.55), transparent 50%),
+    radial-gradient(circle at 10% 95%, rgba(196, 181, 253, 0.35), transparent 55%),
+    linear-gradient(180deg, #C4B5FD 0%, #DDD6FE 18%, #E9E2FF 45%, #F1ECFF 75%, #F7F4FF 100%);
+  background-attachment: fixed;
 }
 
 /* ── 헤더 — 보라 그라데이션 ── */

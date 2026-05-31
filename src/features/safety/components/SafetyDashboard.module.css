@@ -606,6 +606,17 @@
   margin-top: 2px;
 }
 
+/* 본문 미리보기 — 한 줄만 보이고 넘치면 … (자세히는 클릭 후 모달) */
+.trainPreview {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin: 2px 0 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── 주요 위험개소 3 카드 (방화 기준 좌→우, 최근 3건) ── */
 .hazardGrid {
   display: grid;

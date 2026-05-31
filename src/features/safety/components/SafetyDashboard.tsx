@@ -365,11 +365,6 @@ export default function SafetyDashboard({
                     >
                       <div className={styles.noticeListHead}>
                         <span className={styles.noticeListTitle}>{p.title || '(제목 없음)'}</span>
-                        <ConfirmBadge read={isRead} />
-                      </div>
-                      <div className={styles.noticeListMeta}>
-                        <span>{formatDate(p.item.createdAt)}</span>
-                        {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
                       </div>
                     </button>
                   </li>
@@ -572,11 +567,7 @@ export default function SafetyDashboard({
                           <ConfirmBadge read={isRead} />
                         </div>
                         {bodyBullets.length > 0 && (
-                          <ul className={styles.trainSubList}>
-                            {bodyBullets.slice(0, 3).map((sub, j) => (
-                              <li key={j}>{sub}</li>
-                            ))}
-                          </ul>
+                          <p className={styles.trainPreview}>{bodyBullets[0]}</p>
                         )}
                         <span className={styles.trainApplied}>{formatDate(p.item.createdAt)} 등록</span>
                       </button>

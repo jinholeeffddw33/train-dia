@@ -284,9 +284,11 @@ export default function SafetyDashboard({
   const hasRealTrain = trainReports.length > 0;
   const hasRealNotice = noticeReports.length > 0;
   const hasRealHazard = parsedHazards.length > 0;
-  // 초기 fetch 완료 전에는 sample/real 전환을 멈춰서 진입 시 깜빡임 방지
+  // 진입 즉시 샘플로 채워 빈 화면 깜빡임 제거 → fetch 완료 후 실데이터 있으면 자연스럽게 교체
   const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice || hasRealHazard);
-  const showSamples = dataLoaded && !useRealData;
+  const showSamples = !useRealData;
+  // "목업 — 샘플 데이터입니다" 배너는 fetch 완료 후 실데이터가 정말 없을 때만 노출 (초기 깜빡임 방지)
+  const showProtoBanner = dataLoaded && showSamples;
   const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
@@ -331,7 +333,7 @@ export default function SafetyDashboard({
         )}
       </header>
 
-      {showSamples && (
+      {showProtoBanner && (
         <div className={styles.prototypeNotice}>
           <span>목업 — 샘플 데이터입니다</span>
         </div>

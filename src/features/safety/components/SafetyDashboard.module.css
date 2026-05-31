@@ -5,42 +5,41 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  /* Aurora Mesh — 보라·인디고·로즈·시안 4개 글로우가 부드럽게 겹쳐
-     모던 디자이너 풍의 mesh gradient 배경 (다크 모드) */
+  /* Aurora Mesh — 한 단계 더 진한 보라·인디고·로즈·시안 글로우 (다크) */
   background:
-    /* 우상단: 보라 메인 글로우 */
-    radial-gradient(60% 50% at 85% 8%, rgba(124, 58, 237, 0.55), transparent 60%),
+    /* 우상단: 보라 메인 글로우 (강) */
+    radial-gradient(60% 50% at 85% 8%, rgba(124, 58, 237, 0.70), transparent 60%),
     /* 좌상단: 인디고 보조 글로우 */
-    radial-gradient(55% 48% at 8% 6%, rgba(67, 56, 202, 0.48), transparent 65%),
+    radial-gradient(55% 48% at 8% 6%, rgba(67, 56, 202, 0.62), transparent 65%),
     /* 우하단: 로즈 액센트 */
-    radial-gradient(50% 42% at 92% 88%, rgba(190, 24, 93, 0.32), transparent 65%),
+    radial-gradient(50% 42% at 92% 88%, rgba(190, 24, 93, 0.42), transparent 65%),
     /* 좌하단: 시안 액센트 */
-    radial-gradient(45% 42% at 5% 92%, rgba(8, 145, 178, 0.28), transparent 65%),
+    radial-gradient(45% 42% at 5% 92%, rgba(8, 145, 178, 0.38), transparent 65%),
     /* 중앙: 보라 그라데이션 깊이 */
-    radial-gradient(75% 55% at 50% 50%, rgba(76, 29, 149, 0.30), transparent 80%),
-    /* 베이스 */
-    linear-gradient(180deg, #0a0e27 0%, #11163a 45%, #0a0e27 100%);
+    radial-gradient(75% 55% at 50% 50%, rgba(76, 29, 149, 0.40), transparent 80%),
+    /* 베이스: 더 깊은 나이트 */
+    linear-gradient(180deg, #050816 0%, #0B1230 45%, #050816 100%);
   background-attachment: fixed;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 라이트 모드: 동일 구조의 파스텔 Aurora Mesh */
+/* 라이트 모드: 더 진한 파스텔 — 더 명확한 컬러 톤 */
 :global(.light) .wrap {
   background:
-    /* 우상단: 라벤더 메인 */
-    radial-gradient(60% 50% at 85% 8%, rgba(196, 181, 253, 0.85), transparent 60%),
-    /* 좌상단: 페일 인디고 */
-    radial-gradient(55% 48% at 8% 6%, rgba(199, 210, 254, 0.75), transparent 65%),
+    /* 우상단: 라벤더 메인 (강) */
+    radial-gradient(60% 50% at 85% 8%, rgba(167, 139, 250, 0.95), transparent 60%),
+    /* 좌상단: 인디고 */
+    radial-gradient(55% 48% at 8% 6%, rgba(165, 180, 252, 0.90), transparent 65%),
     /* 우하단: 따뜻한 피치 */
-    radial-gradient(50% 42% at 92% 88%, rgba(253, 186, 200, 0.45), transparent 65%),
+    radial-gradient(50% 42% at 92% 88%, rgba(251, 146, 168, 0.60), transparent 65%),
     /* 좌하단: 민트/시안 */
-    radial-gradient(45% 42% at 5% 92%, rgba(167, 243, 232, 0.55), transparent 65%),
+    radial-gradient(45% 42% at 5% 92%, rgba(125, 211, 200, 0.70), transparent 65%),
     /* 중앙: 라벤더 깊이 */
-    radial-gradient(75% 55% at 50% 50%, rgba(237, 233, 254, 0.55), transparent 80%),
-    /* 베이스 */
-    linear-gradient(180deg, #fafaff 0%, #f5f3ff 45%, #fafaff 100%);
+    radial-gradient(75% 55% at 50% 50%, rgba(221, 214, 254, 0.75), transparent 80%),
+    /* 베이스: 라벤더 톤 화이트 */
+    linear-gradient(180deg, #EFEAFF 0%, #E4DCFD 45%, #EFEAFF 100%);
   background-attachment: fixed;
 }
 

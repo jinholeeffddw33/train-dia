@@ -175,9 +175,9 @@ const HAZARD_ZONES_TOP3 = [...HAZARD_ZONE_SAMPLES_RAW]
   .sort((a, b) => stationOrderKey(a.station) - stationOrderKey(b.station));
 
 const CATEGORIES = [
-  { id: 'incident' as const, label: '사고 사례',  icon: AlertTriangle, tone: 'amber' as const },
-  { id: 'driving'  as const, label: '운전 정보',  icon: TrainFront,    tone: 'blue'  as const },
-  { id: 'train'    as const, label: '열차 정보',  icon: Train,         tone: 'green' as const },
+  { id: 'incident' as const, label: '사고사례',  icon: AlertTriangle, tone: 'amber' as const },
+  { id: 'driving'  as const, label: '운전정보',  icon: TrainFront,    tone: 'blue'  as const },
+  { id: 'train'    as const, label: '열차정보',  icon: Train,         tone: 'green' as const },
   { id: 'hazard'   as const, label: '위험개소',   icon: ShieldAlert,   tone: 'red'   as const },
 ];
 

@@ -18,6 +18,8 @@ export const INTERN_SABUNS: ReadonlySet<string> = new Set([
 export const READ_TRACKING_EXCLUDED_SABUNS: ReadonlySet<string> = new Set([
   '21709649', // 조옥란
   '22200209', // 김현진
+  '030827',   // jinho (테스트/개발 계정)
+  '22000103', // 김다솜
 ]);
 
 /** 집계 대상에서 제외해야 하는 사번 여부 */

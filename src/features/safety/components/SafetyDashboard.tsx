@@ -212,27 +212,52 @@ export default function SafetyDashboard({
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
   useEffect(() => { setReadIds(loadDashboardReadIds()); }, []);
 
-  /* === 실데이터 fetch — action + inspect + hazard === */
-  const [actionReports, setActionReports] = useState<ReportItem[]>([]);
-  const [inspectReports, setInspectReports] = useState<ReportItem[]>([]);
-  const [hazardReports, setHazardReports] = useState<ReportItem[]>([]);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  /* === 실데이터 fetch — action + inspect + hazard ===
+     캐시 전략: 직전 fetch 결과를 localStorage 에 저장해두고, 재진입 시
+     초기 state 를 캐시에서 즉시 채워 깜빡임 제거. 그 후 백그라운드 refetch. */
+  const CACHE_KEY = 'safety-dashboard-cache-v1';
+  type Cache = { action: ReportItem[]; inspect: ReportItem[]; hazard: ReportItem[]; cachedAt: number };
+  const loadCache = (): Cache | null => {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      const c = JSON.parse(raw) as Cache;
+      if (!c || !Array.isArray(c.action) || !Array.isArray(c.inspect) || !Array.isArray(c.hazard)) return null;
+      return c;
+    } catch { return null; }
+  };
+  const [actionReports, setActionReports] = useState<ReportItem[]>(() => loadCache()?.action ?? []);
+  const [inspectReports, setInspectReports] = useState<ReportItem[]>(() => loadCache()?.inspect ?? []);
+  const [hazardReports, setHazardReports] = useState<ReportItem[]>(() => loadCache()?.hazard ?? []);
+  // 캐시가 있으면 dataLoaded=true 로 시작 → 진입 즉시 실데이터 노출
+  const [dataLoaded, setDataLoaded] = useState(() => loadCache() !== null);
   useEffect(() => {
     let cancelled = false;
     const qs = sabun ? `?sabun=${encodeURIComponent(sabun)}` : '';
+    let nextAction: ReportItem[] = [];
+    let nextInspect: ReportItem[] = [];
+    let nextHazard: ReportItem[] = [];
     const fetchAction = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=action`)
       .then(r => r.json())
-      .then(j => { if (!cancelled) setActionReports(j.data ?? []); })
+      .then(j => { nextAction = j.data ?? []; if (!cancelled) setActionReports(nextAction); })
       .catch(() => {});
     const fetchInspect = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=inspect`)
       .then(r => r.json())
-      .then(j => { if (!cancelled) setInspectReports(j.data ?? []); })
+      .then(j => { nextInspect = j.data ?? []; if (!cancelled) setInspectReports(nextInspect); })
       .catch(() => {});
     const fetchHazard = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=hazard`)
       .then(r => r.json())
-      .then(j => { if (!cancelled) setHazardReports(j.data ?? []); })
+      .then(j => { nextHazard = j.data ?? []; if (!cancelled) setHazardReports(nextHazard); })
       .catch(() => {});
-    Promise.all([fetchAction, fetchInspect, fetchHazard]).then(() => { if (!cancelled) setDataLoaded(true); });
+    Promise.all([fetchAction, fetchInspect, fetchHazard]).then(() => {
+      if (cancelled) return;
+      setDataLoaded(true);
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          action: nextAction, inspect: nextInspect, hazard: nextHazard, cachedAt: Date.now(),
+        } satisfies Cache));
+      } catch { /* ignore */ }
+    });
     return () => { cancelled = true; };
   }, [sabun]);
 
@@ -284,11 +309,11 @@ export default function SafetyDashboard({
   const hasRealTrain = trainReports.length > 0;
   const hasRealNotice = noticeReports.length > 0;
   const hasRealHazard = parsedHazards.length > 0;
-  // 진입 즉시 샘플로 채워 빈 화면 깜빡임 제거 → fetch 완료 후 실데이터 있으면 자연스럽게 교체
+  // 캐시 적용으로 재진입 시 dataLoaded=true 로 시작 → 실데이터 즉시 표시.
+  // 첫 진입(캐시 없음)은 빈 상태로 fetch 대기 (샘플 깜빡임 없음).
   const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice || hasRealHazard);
-  const showSamples = !useRealData;
-  // "목업 — 샘플 데이터입니다" 배너는 fetch 완료 후 실데이터가 정말 없을 때만 노출 (초기 깜빡임 방지)
-  const showProtoBanner = dataLoaded && showSamples;
+  const showSamples = dataLoaded && !useRealData;
+  const showProtoBanner = showSamples;
   const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 

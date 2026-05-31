@@ -537,10 +537,13 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                     />
                     <span className={styles.likeCount}>{report.likeCount}</span>
                   </button>
-                  <span className={styles.confirmedBadge} aria-label="확인 완료">
-                    <Check size={16} strokeWidth={3} />
-                    <span>확인 완료</span>
-                  </span>
+                  {/* 순수 공지사항만 확인 배지 미표시 — 위험·조치·열차·운전 정보는 유지 */}
+                  {!isPureNotice && (
+                    <span className={styles.confirmedBadge} aria-label="확인 완료">
+                      <Check size={16} strokeWidth={3} />
+                      <span>확인 완료</span>
+                    </span>
+                  )}
                 </div>
               </div>
             </>

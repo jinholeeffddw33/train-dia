@@ -182,7 +182,7 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
                     <MessageCircle size={13} />
                     {r.commentCount}
                   </span>
-                  <ConfirmStat read={readIds.has(r.id)} />
+                  {/* 공지사항은 확인(✓) 표시 미사용 */}
                 </div>
               </div>
             </button>

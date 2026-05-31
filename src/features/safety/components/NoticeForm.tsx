@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Plus, X, Paperclip } from 'lucide-react';
+import { X, Paperclip } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
@@ -26,7 +26,7 @@ async function compressImage(file: File): Promise<File> {
       );
       URL.revokeObjectURL(img.src);
     };
-    img.onerror = () => resolve(file); // 압축 실패 시 원본
+    img.onerror = () => resolve(file);
     img.src = URL.createObjectURL(file);
   });
 }
@@ -37,10 +37,13 @@ interface NoticeFormProps {
 
 export default function NoticeForm({ onClose }: NoticeFormProps) {
   const [titleText, setTitleText] = useState('');
-  const [items, setItems] = useState<string[]>(['']);
+  const [content, setContent] = useState('');
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const photoRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
@@ -51,46 +54,35 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   const name = authName || driverName;
   const sabun = authSabun || driverSabun;
 
-  const addItem = () => {
-    if (items.length >= 10) return;
-    setItems([...items, '']);
-  };
-
-  const removeItem = (idx: number) => {
-    if (items.length <= 1) return;
-    setItems(items.filter((_, i) => i !== idx));
-  };
-
-  const updateItem = (idx: number, val: string) => {
-    const next = [...items];
-    next[idx] = val;
-    setItems(next);
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setError('');
+    const compressed = await compressImage(f);
+    setPhoto(compressed);
+    setPhotoPreview(URL.createObjectURL(compressed));
   };
 
   const handleSubmit = async () => {
     if (!titleText.trim()) { setError('제목을 입력해주세요'); return; }
-    const filled = items.filter((s) => s.trim());
-    if (filled.length === 0) { setError('최소 1개 항목을 입력해주세요'); return; }
+    if (!content.trim()) { setError('내용을 입력해주세요'); return; }
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }
 
     setSubmitting(true);
     setError('');
     try {
-      const body = filled.map((text, i) => `${i + 1}. ${text.trim()}`).join('\n');
-      const desc = `${titleText.trim()}\n${body}`;
+      const desc = `${titleText.trim()}\n${content.trim()}`;
 
-      // 파일 첨부: 이미지면 압축, 없으면 photo 없이 전송
-      let photoFile: File | undefined;
-      if (file) {
-        if (file.type.startsWith('image/')) {
-          photoFile = await compressImage(file);
-        } else {
-          photoFile = file;
-        }
+      // 사진 우선, 그 외 일반 첨부파일
+      let photoFile: File | null = null;
+      if (photo) {
+        photoFile = photo;
+      } else if (file) {
+        photoFile = file.type.startsWith('image/') ? await compressImage(file) : file;
       }
 
       await createReport({
-        photo: photoFile as File,
+        photo: photoFile,
         description: desc,
         location: '',
         name,
@@ -106,10 +98,11 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
           name,
           sabun,
           title: '📋 공지사항',
-          message: filled[0].trim(),
+          message: titleText.trim(),
         }),
       }).catch(() => {});
 
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : '등록에 실패했습니다');
@@ -121,6 +114,36 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
   return (
     <div className={styles.formWrap}>
       <h2 className={styles.formTitle}>공지사항 등록</h2>
+
+      {/* 사진 (선택) */}
+      <div className={styles.fieldGroup}>
+        <div
+          className={`${styles.photoPickerArea} ${photoPreview ? styles.photoPickerAreaFilled : ''}`}
+          onClick={() => photoRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && photoRef.current?.click()}
+          aria-label="사진 선택"
+        >
+          {photoPreview ? (
+            <img src={photoPreview} alt="선택된 사진" className={styles.photoPreview} />
+          ) : (
+            <>
+              <span className={styles.photoPickerIcon}>📷</span>
+              <span className={styles.photoPickerLabel}>사진 촬영 / 선택 (선택)</span>
+              <span className={styles.photoPickerHint}>탭하여 사진을 추가하세요</span>
+            </>
+          )}
+        </div>
+        <input
+          ref={photoRef}
+          type="file"
+          accept="image/*"
+          className={styles.hiddenInput}
+          onChange={handlePhotoChange}
+          aria-label="사진 파일 선택"
+        />
+      </div>
 
       {/* 제목 (필수) */}
       <div className={styles.fieldGroup}>
@@ -138,42 +161,24 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         />
       </div>
 
-      {/* 내용 입력 — 번호별 항목 */}
+      {/* 내용 (필수) — 단일 textarea */}
       <div className={styles.fieldGroup}>
-        <label className={styles.fieldLabel}>
+        <label className={styles.fieldLabel} htmlFor="notice-content">
           내용 <span className={styles.required}>*</span>
-          <span className={styles.charCount}>{items.length}/10</span>
         </label>
-        <div className={styles.noticeItemList}>
-          {items.map((text, i) => (
-            <div key={i} className={`${styles.noticeItem} ${i < 2 ? styles.noticeItemHighlight : ''}`}>
-              <span className={`${styles.noticeItemNum} ${i < 2 ? styles.noticeItemNumHighlight : ''}`}>
-                {i + 1}
-              </span>
-              <input
-                type="text"
-                className={styles.noticeItemInput}
-                placeholder={i < 2 ? '강조 항목' : `${i + 1}번 항목`}
-                value={text}
-                onChange={(e) => updateItem(i, e.target.value)}
-                maxLength={200}
-              />
-              {items.length > 1 && (
-                <button type="button" className={styles.noticeItemDel} onClick={() => removeItem(i)} aria-label="삭제">
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-        {items.length < 10 && (
-          <button type="button" className={styles.noticeAddBtn} onClick={addItem}>
-            <Plus size={14} /> 항목 추가
-          </button>
-        )}
+        <textarea
+          id="notice-content"
+          className={styles.textArea}
+          placeholder="내용을 입력해주세요"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={6}
+          maxLength={2000}
+        />
+        <span className={styles.charCount}>{content.length}/2000</span>
       </div>
 
-      {/* 파일 첨부 */}
+      {/* 일반 파일 첨부 (선택) — 이미지가 아닌 PDF·문서 등 */}
       <div className={styles.fieldGroup}>
         <label className={styles.fieldLabel}>파일 첨부 (선택)</label>
         <button
@@ -216,7 +221,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         type="button"
         className={styles.submitBtn}
         onClick={handleSubmit}
-        disabled={submitting || !titleText.trim() || items.every((s) => !s.trim())}
+        disabled={submitting}
       >
         {submitting ? '등록 중...' : '등록하기'}
       </button>

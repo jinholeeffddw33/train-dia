@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send, CheckCircle2, RotateCcw } from 'lucide-react';
-import { useHazardStore, type HazardComment } from '@/stores/hazard';
+import { ArrowLeft, Heart, MoreVertical, Pencil, Trash2, X, Check, Plus, Paperclip, Send, CheckCircle2, RotateCcw, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { useHazardStore, type HazardComment, type ReadStatusResponse } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isAdmin } from '@/lib/auth';
@@ -55,6 +55,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [readStatus, setReadStatus] = useState<ReadStatusResponse | null>(null);
+  const [readStatusExpanded, setReadStatusExpanded] = useState(false);
+  const [readStatusTab, setReadStatusTab] = useState<'unread' | 'read'>('unread');
   const bottomRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +73,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const deleteComment = useHazardStore((s) => s.deleteComment);
   const toggleLike = useHazardStore((s) => s.toggleLike);
   const recordRead = useHazardStore((s) => s.recordRead);
+  const fetchReadStatus = useHazardStore((s) => s.fetchReadStatus);
   const incrementView = useHazardStore((s) => s.incrementView);
 
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -127,6 +131,16 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     if (sabun && name) recordRead(reportId, sabun, name);
     incrementView(reportId);
   }, [reportId, fetchComments, recordRead, incrementView, sabun, name]);
+
+  // 읽음 현황: 진입 시 + 본인 읽음 기록 후 잠시 뒤 재조회 (본인 카운트 반영)
+  useEffect(() => {
+    let cancelled = false;
+    fetchReadStatus(reportId).then((s) => { if (!cancelled) setReadStatus(s); });
+    const t = window.setTimeout(() => {
+      fetchReadStatus(reportId).then((s) => { if (!cancelled && s) setReadStatus(s); });
+    }, 1200);
+    return () => { cancelled = true; window.clearTimeout(t); };
+  }, [reportId, fetchReadStatus]);
 
   // 메뉴 외부 클릭 닫기
   useEffect(() => {
@@ -547,6 +561,79 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                 </div>
               </div>
             </>
+          )}
+        </div>
+
+        <div className={styles.divider} />
+
+        {/* 읽음 현황 — 펼침 카드 (전 직원 기준, 인턴·제외명단 제외) */}
+        <div className={styles.readStatusSection}>
+          <button
+            type="button"
+            className={styles.readStatusHeader}
+            onClick={() => setReadStatusExpanded((v) => !v)}
+            aria-expanded={readStatusExpanded}
+          >
+            <Users size={16} strokeWidth={2.2} />
+            <span className={styles.readStatusHeaderLabel}>읽음 현황</span>
+            {readStatus ? (
+              <span className={styles.readStatusCount}>
+                <strong>{readStatus.readCount}</strong>
+                <span>/ {readStatus.totalExpected}</span>
+              </span>
+            ) : (
+              <span className={styles.readStatusCount}>불러오는 중...</span>
+            )}
+            {readStatusExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+
+          {readStatusExpanded && readStatus && (
+            <div className={styles.readStatusBody}>
+              <div className={styles.readStatusTabs} role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={readStatusTab === 'unread'}
+                  className={`${styles.readStatusTab} ${readStatusTab === 'unread' ? styles.readStatusTabActive : ''}`}
+                  onClick={() => setReadStatusTab('unread')}
+                >
+                  안 읽음 <span className={styles.readStatusTabNum}>{readStatus.nonReaders.length}</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={readStatusTab === 'read'}
+                  className={`${styles.readStatusTab} ${readStatusTab === 'read' ? styles.readStatusTabActive : ''}`}
+                  onClick={() => setReadStatusTab('read')}
+                >
+                  읽음 <span className={styles.readStatusTabNum}>{readStatus.readers.length}</span>
+                </button>
+              </div>
+
+              {readStatusTab === 'unread' ? (
+                readStatus.nonReaders.length === 0 ? (
+                  <p className={styles.readStatusEmpty}>모두 읽었습니다 🎉</p>
+                ) : (
+                  <div className={styles.readStatusChips}>
+                    {readStatus.nonReaders.map((p) => (
+                      <span key={p.sabun} className={`${styles.readChip} ${styles.readChipUnread}`}>
+                        {p.name || p.sabun}
+                      </span>
+                    ))}
+                  </div>
+                )
+              ) : readStatus.readers.length === 0 ? (
+                <p className={styles.readStatusEmpty}>아직 읽은 사람이 없습니다</p>
+              ) : (
+                <div className={styles.readStatusChips}>
+                  {readStatus.readers.map((p) => (
+                    <span key={p.sabun} className={`${styles.readChip} ${styles.readChipRead}`}>
+                      {p.name || p.sabun}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
 

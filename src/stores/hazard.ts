@@ -22,6 +22,13 @@ export interface HazardReport {
   resolvedBy: string | null;
 }
 
+export interface ReadStatusResponse {
+  readers: { sabun: string; name: string; readAt: string }[];
+  nonReaders: { sabun: string; name: string }[];
+  totalExpected: number;
+  readCount: number;
+}
+
 export interface HazardComment {
   id: string;
   reportId: string;
@@ -54,6 +61,7 @@ interface HazardState {
   deleteComment: (reportId: string, commentId: string, name: string, sabun: string) => Promise<void>;
   recordRead: (reportId: string, sabun: string, name: string) => Promise<void>;
   fetchReaders: (reportId: string) => Promise<{ name: string; readAt: string }[]>;
+  fetchReadStatus: (reportId: string) => Promise<ReadStatusResponse | null>;
   toggleLike: (reportId: string, name: string, sabun: string) => Promise<void>;
   incrementView: (reportId: string) => Promise<void>;
 }
@@ -278,6 +286,17 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
       return json.data ?? [];
     } catch {
       return [];
+    }
+  },
+
+  fetchReadStatus: async (reportId) => {
+    try {
+      const res = await fetch(`/api/safety/hazards/${reportId}/read-status`);
+      if (!res.ok) return null;
+      const json = await res.json() as ReadStatusResponse;
+      return json;
+    } catch {
+      return null;
     }
   },
 

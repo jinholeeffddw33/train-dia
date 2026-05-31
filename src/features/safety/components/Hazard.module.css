@@ -329,6 +329,141 @@
   border-bottom: 1px solid var(--dia-border);
 }
 
+/* ── 읽음 현황 섹션 ── */
+.readStatusSection {
+  padding: var(--dia-space-3) var(--dia-space-4);
+}
+
+.readStatusHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  color: var(--dia-text-primary);
+  min-height: 48px;
+  transition: background var(--dia-transition-fast);
+}
+
+.readStatusHeader:active { background: var(--dia-surface-hover); transform: scale(0.99); }
+.readStatusHeader:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+
+.readStatusHeaderLabel {
+  flex: 1;
+  text-align: left;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.readStatusCount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-medium);
+}
+.readStatusCount strong {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-blue);
+}
+
+.readStatusBody {
+  margin-top: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.readStatusTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--dia-space-3);
+}
+
+.readStatusTab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+  min-height: 36px;
+}
+.readStatusTab:active { transform: scale(0.97); }
+
+.readStatusTabActive {
+  background: var(--dia-blue);
+  border-color: var(--dia-blue);
+  color: #fff;
+}
+
+.readStatusTabNum {
+  font-size: var(--dia-text-meta);
+  padding: 1px 6px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: var(--dia-weight-bold);
+}
+.readStatusTab:not(.readStatusTabActive) .readStatusTabNum {
+  background: var(--dia-border);
+  color: var(--dia-text-secondary);
+}
+
+.readStatusEmpty {
+  text-align: center;
+  padding: var(--dia-space-4) 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  margin: 0;
+}
+
+.readStatusChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.readChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.readChipUnread {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--dia-red);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.readChipRead {
+  background: rgba(34, 197, 94, 0.10);
+  color: var(--dia-green);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
 /* ── Comments ── */
 .commentsSection {
   padding: var(--dia-space-4);

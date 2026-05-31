@@ -539,6 +539,75 @@
   pointer-events: none;
 }
 
+/* ── 파일 첨부 영역 (사진과 분리, 동시 첨부 가능) ── */
+.attachmentArea {
+  width: 100%;
+  margin-top: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border: 1px dashed var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  cursor: pointer;
+  min-height: 56px;
+  transition: border-color var(--dia-transition-fast), background var(--dia-transition-fast);
+}
+
+.attachmentArea:hover,
+.attachmentArea:focus-visible {
+  border-color: var(--dia-blue);
+  outline: none;
+}
+
+.attachmentAreaFilled {
+  border-style: solid;
+  border-color: var(--dia-blue);
+}
+
+.attachmentIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.attachmentInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attachmentLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachmentHint {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+}
+
+.attachmentRemove {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-red);
+  background: transparent;
+  border: 1px solid var(--dia-red);
+  border-radius: var(--dia-radius-md);
+  min-height: 32px;
+  cursor: pointer;
+}
+
+.attachmentRemove:active { transform: scale(0.96); }
+
 .fieldGroup {
   display: flex;
   flex-direction: column;

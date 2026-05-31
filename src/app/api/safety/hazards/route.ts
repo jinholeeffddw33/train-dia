@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
   const { data: d1, error: e1 } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, description, location, created_by, created_at, category, view_count, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
+    .select('id, photo_url, attachment_url, attachment_name, description, location, created_by, created_at, category, view_count, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // hazard_reads 테이블 없으면 reads 없이 재시도
     const { data: d2, error: e2 } = await serverSupabase
       .from('hazard_reports')
-      .select('id, photo_url, description, location, created_by, created_at, category, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count)')
+      .select('id, photo_url, attachment_url, attachment_name, description, location, created_by, created_at, category, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count)')
       .eq('category', category)
       .order('created_at', { ascending: false });
     data = d2;
@@ -72,6 +72,8 @@ function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
   return data.map((r) => ({
     id: r.id,
     photoUrl: r.photo_url,
+    attachmentUrl: (r.attachment_url as string | null) ?? '',
+    attachmentName: (r.attachment_name as string | null) ?? '',
     description: r.description,
     location: r.location || '',
     createdBy: r.created_by,
@@ -113,6 +115,7 @@ export async function POST(req: NextRequest) {
   }
 
   const photo = formData.get('photo') as File | null;
+  const attachment = formData.get('attachment') as File | null;
   const description = (formData.get('description') as string | null)?.trim();
   const location = ((formData.get('location') as string | null) ?? '').trim();
   const name = (formData.get('name') as string | null)?.trim();
@@ -130,6 +133,13 @@ export async function POST(req: NextRequest) {
   if (photo && photo.size > 5 * 1024 * 1024) {
     return NextResponse.json(
       { code: 'FILE_TOO_LARGE', message: '사진은 5MB 이하로 올려주세요' },
+      { status: 400 },
+    );
+  }
+
+  if (attachment && attachment.size > 20 * 1024 * 1024) {
+    return NextResponse.json(
+      { code: 'ATTACHMENT_TOO_LARGE', message: '파일은 20MB 이하로 올려주세요' },
       { status: 400 },
     );
   }
@@ -165,9 +175,39 @@ export async function POST(req: NextRequest) {
       .getPublicUrl(fileName).data.publicUrl;
   }
 
+  // 첨부 파일 업로드 (있을 때만, 압축/변환 없이 원본 그대로)
+  let attachmentUrl = '';
+  let attachmentName = '';
+  if (attachment && attachment.size > 0) {
+    const safeExt = (attachment.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) || 'bin';
+    const filePath = `attachments/${category}/${Date.now()}_${Math.random().toString(36).slice(2)}.${safeExt}`;
+    const buffer = Buffer.from(await attachment.arrayBuffer());
+
+    const { error: upErr } = await serverSupabase.storage
+      .from('hazard-photos')
+      .upload(filePath, buffer, {
+        contentType: attachment.type || 'application/octet-stream',
+        upsert: false,
+      });
+
+    if (upErr) {
+      return NextResponse.json(
+        { code: 'ATTACHMENT_UPLOAD_FAILED', message: '파일 업로드에 실패했습니다', detail: upErr.message },
+        { status: 500 },
+      );
+    }
+
+    attachmentUrl = serverSupabase.storage
+      .from('hazard-photos')
+      .getPublicUrl(filePath).data.publicUrl;
+    attachmentName = attachment.name.slice(0, 200);
+  }
+
   // DB 삽입 (category 포함)
   const insertData: Record<string, string> = {
     photo_url: publicUrl,
+    attachment_url: attachmentUrl,
+    attachment_name: attachmentName,
     description,
     location,
     created_by: verified.n,

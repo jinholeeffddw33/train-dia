@@ -110,6 +110,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
 
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [attachment, setAttachment] = useState<File | null>(null);
   const [titleText, setTitleText] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
@@ -120,6 +121,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const attachmentRef = useRef<HTMLInputElement>(null);
 
   const createReport = useHazardStore((s) => s.createReport);
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -136,6 +138,24 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
     const compressed = await compressImage(file);
     setPhoto(compressed);
     setPreview(URL.createObjectURL(compressed));
+  };
+
+  const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError('');
+    if (file.size > 20 * 1024 * 1024) {
+      setError('파일은 20MB 이하만 첨부할 수 있어요');
+      e.target.value = '';
+      return;
+    }
+    setAttachment(file);
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const handleSubmit = async () => {
@@ -160,6 +180,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       const finalDescription = `${headline}\n${description.trim()}`;
       await createReport({
         photo,
+        attachment,
         description: finalDescription,
         location: variant.showLocation ? location.trim() : '',
         name,
@@ -179,7 +200,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
     <div className={styles.formWrap}>
       <h2 className={styles.formTitle}>{variant.title}</h2>
 
-      {/* 사진 선택 */}
+      {/* 사진 선택 (선택 사항) */}
       <div
         className={`${styles.photoPickerArea} ${preview ? styles.photoPickerAreaFilled : ''}`}
         onClick={() => fileRef.current?.click()}
@@ -193,8 +214,8 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         ) : (
           <>
             <span className={styles.photoPickerIcon}>📷</span>
-            <span className={styles.photoPickerLabel}>사진 촬영 / 선택</span>
-            <span className={styles.photoPickerHint}>탭하여 사진을 추가하세요</span>
+            <span className={styles.photoPickerLabel}>사진 촬영 / 선택 (선택 사항)</span>
+            <span className={styles.photoPickerHint}>사진과 파일을 함께 첨부할 수 있어요</span>
           </>
         )}
       </div>
@@ -205,6 +226,52 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         className={styles.hiddenInput}
         onChange={handlePhotoChange}
         aria-label="사진 파일 선택"
+      />
+
+      {/* 파일 첨부 (선택 사항, 사진과 동시 첨부 가능) */}
+      <div
+        className={`${styles.attachmentArea} ${attachment ? styles.attachmentAreaFilled : ''}`}
+        onClick={() => attachmentRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && attachmentRef.current?.click()}
+        aria-label="파일 첨부"
+      >
+        <span className={styles.attachmentIcon} aria-hidden="true">📎</span>
+        <div className={styles.attachmentInfo}>
+          {attachment ? (
+            <>
+              <span className={styles.attachmentLabel}>{attachment.name}</span>
+              <span className={styles.attachmentHint}>{formatFileSize(attachment.size)}</span>
+            </>
+          ) : (
+            <>
+              <span className={styles.attachmentLabel}>파일 첨부 (선택 사항)</span>
+              <span className={styles.attachmentHint}>PDF · 한글 · 워드 · 엑셀 등 모든 파일 (최대 20MB)</span>
+            </>
+          )}
+        </div>
+        {attachment && (
+          <button
+            type="button"
+            className={styles.attachmentRemove}
+            onClick={(e) => {
+              e.stopPropagation();
+              setAttachment(null);
+              if (attachmentRef.current) attachmentRef.current.value = '';
+            }}
+            aria-label="첨부 파일 제거"
+          >
+            제거
+          </button>
+        )}
+      </div>
+      <input
+        ref={attachmentRef}
+        type="file"
+        className={styles.hiddenInput}
+        onChange={handleAttachmentChange}
+        aria-label="파일 첨부 선택"
       />
 
       {/* 제목 (필수) */}

@@ -5,6 +5,8 @@ export type SafetyCategory = 'hazard' | 'action' | 'inspect';
 export interface HazardReport {
   id: string;
   photoUrl: string;
+  attachmentUrl: string;
+  attachmentName: string;
   description: string;
   location: string;
   createdBy: string;
@@ -36,6 +38,7 @@ interface HazardState {
   fetchReports: (currentSabun?: string, category?: SafetyCategory) => Promise<void>;
   createReport: (params: {
     photo: File | null;
+    attachment?: File | null;
     description: string;
     location: string;
     name: string;
@@ -82,9 +85,10 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     set({ loadingReports: false });
   },
 
-  createReport: async ({ photo, description, location, name, sabun, category }) => {
+  createReport: async ({ photo, attachment, description, location, name, sabun, category }) => {
     const formData = new FormData();
     if (photo) formData.append('photo', photo);
+    if (attachment) formData.append('attachment', attachment, attachment.name);
     formData.append('description', description);
     formData.append('location', location);
     formData.append('name', name);

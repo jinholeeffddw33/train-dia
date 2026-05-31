@@ -900,12 +900,156 @@
     0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
-/* 다크 모드: 내부 하이라이트 + 외부 깊이 */
-.noticeEmpty,
+/* ════════════════════════════════════════════════════════════════
+   3D 입체감 강화 — Aurora Mesh 위 카드가 또렷이 떠 있도록
+   다층 그림자 + 상단 하이라이트 + hover 리프트
+   ════════════════════════════════════════════════════════════════ */
+
 .catBtn,
 .hazardCard,
+.noticeListItem,
+.noticeEmpty,
 .itemBtn {
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+/* 다크 — 글래스 + 다층 그림자 + 보라 글로우 */
+.catBtn,
+.hazardCard,
+.noticeListItem,
+.noticeEmpty,
+.itemBtn {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%),
+    rgba(30, 27, 75, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 4px 16px rgba(0, 0, 0, 0.28);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    0 1px 2px rgba(0, 0, 0, 0.30),
+    0 8px 22px rgba(0, 0, 0, 0.32),
+    0 16px 36px rgba(76, 29, 149, 0.22);
+}
+
+.catBtn:hover,
+.hazardCard:hover,
+.noticeListItem:hover,
+.noticeEmpty:hover,
+.itemBtn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 2px 5px rgba(0, 0, 0, 0.30),
+    0 14px 30px rgba(0, 0, 0, 0.38),
+    0 22px 44px rgba(124, 58, 237, 0.30);
+}
+
+.catBtn:active,
+.hazardCard:active,
+.noticeListItem:active,
+.noticeEmpty:active,
+.itemBtn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.20);
+}
+
+/* 위험 카드 — 빨간 글로우로 차별화 */
+.hazardCardSevere {
+  background:
+    linear-gradient(180deg, rgba(239, 68, 68, 0.10) 0%, rgba(239, 68, 68, 0.04) 50%),
+    rgba(60, 20, 30, 0.55);
+  border: 1px solid rgba(239, 68, 68, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 200, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    0 1px 2px rgba(0, 0, 0, 0.30),
+    0 8px 22px rgba(0, 0, 0, 0.32),
+    0 16px 36px rgba(239, 68, 68, 0.25);
+}
+.hazardCardSevere:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 200, 0.20),
+    0 14px 30px rgba(0, 0, 0, 0.38),
+    0 22px 44px rgba(239, 68, 68, 0.35);
+}
+
+/* 라이트 — 부드러운 보라 톤 그림자, 클린 카드 */
+:global(.light) .catBtn,
+:global(.light) .hazardCard,
+:global(.light) .noticeListItem,
+:global(.light) .noticeEmpty,
+:global(.light) .itemBtn {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fafaff 100%);
+  border: 1px solid rgba(124, 58, 237, 0.10);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(99, 79, 165, 0.04),
+    0 1px 2px rgba(99, 79, 165, 0.06),
+    0 6px 16px rgba(99, 79, 165, 0.10),
+    0 14px 32px rgba(99, 79, 165, 0.06);
+}
+
+:global(.light) .catBtn:hover,
+:global(.light) .hazardCard:hover,
+:global(.light) .noticeListItem:hover,
+:global(.light) .noticeEmpty:hover,
+:global(.light) .itemBtn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 2px 6px rgba(99, 79, 165, 0.12),
+    0 12px 26px rgba(99, 79, 165, 0.15),
+    0 20px 40px rgba(99, 79, 165, 0.09);
+}
+
+:global(.light) .catBtn:active,
+:global(.light) .hazardCard:active,
+:global(.light) .noticeListItem:active,
+:global(.light) .noticeEmpty:active,
+:global(.light) .itemBtn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    inset 0 1px 3px rgba(99, 79, 165, 0.15),
+    0 1px 2px rgba(99, 79, 165, 0.08);
+}
+
+:global(.light) .hazardCardSevere {
+  background:
+    linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, #ffffff 100%);
+  border: 1px solid rgba(239, 68, 68, 0.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 16px rgba(239, 68, 68, 0.10),
+    0 14px 32px rgba(239, 68, 68, 0.08);
+}
+:global(.light) .hazardCardSevere:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 26px rgba(239, 68, 68, 0.18),
+    0 20px 40px rgba(239, 68, 68, 0.12);
+}
+
+/* 카테고리 아이콘 원형 — 더 입체적인 글래스 돔 */
+.catIconWrap {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.45),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.20),
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+:global(.light) .catIconWrap {
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.70),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.10),
+    0 3px 8px rgba(99, 79, 165, 0.18),
+    0 6px 14px rgba(99, 79, 165, 0.10);
 }

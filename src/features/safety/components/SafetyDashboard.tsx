@@ -493,15 +493,11 @@ export default function SafetyDashboard({
                           })}
                         >
                           <div className={styles.incidentHeadRow}>
-                            <span className={`${styles.kindBadge} ${styles[`kind_${tone}`]}`}>{p.tag || '운전'}</span>
+                            {/* 분류(시설물/열차/신호) 배지 미표시 — 운전정보는 호수만 작게 표시 */}
+                            {hoLabel && <span className={styles.hoBadgeMini}>{hoLabel}</span>}
                             <span className={styles.incidentTitle}>{p.title}</span>
                             <ConfirmBadge read={isRead} />
                           </div>
-                          {hoLabel && (
-                            <div className={styles.incidentMeta}>
-                              <span className={styles.hoBadge}>운전정보 {hoLabel}</span>
-                            </div>
-                          )}
                           {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
                         </button>
                       </li>

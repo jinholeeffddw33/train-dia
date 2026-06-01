@@ -179,18 +179,17 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       // 위험개소: 역 + 심각도 함께 표기 → [강동역·위험] 형식
       if (variant.severityPicker && tag) tag = `${tag}·${severity}`;
       else if (variant.severityPicker) tag = severity;
-      // 사고사례: 사례교육 호수 + 분류 → [사례교육 2026-1·열차] 형식
-      if (variant.caseEduPicker && caseEduNo.trim()) {
-        const hoLabel = `사례교육 ${caseEduNo.trim()}`;
-        tag = tag ? `${hoLabel}·${tag}` : hoLabel;
-      }
       const headline = tag ? `[${tag}] ${titleText.trim()}` : titleText.trim();
       const finalDescription = `${headline}\n${description.trim()}`;
+      // 사고사례: 호수는 location에 저장 (운전정보와 동일 포맷)
+      const finalLocation = variant.caseEduPicker
+        ? caseEduNo.trim()
+        : (variant.showLocation ? location.trim() : '');
       await createReport({
         photo,
         attachment,
         description: finalDescription,
-        location: variant.showLocation ? location.trim() : '',
+        location: finalLocation,
         name,
         sabun,
         category: variant.dataCategory,
@@ -374,13 +373,13 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       {variant.caseEduPicker && (
         <div className={styles.fieldGroup}>
           <label className={styles.fieldLabel} htmlFor="hazard-case-edu-no">
-            사례교육 호수 (선택)
+            사례교육 호수 (예: 1호)
           </label>
           <input
             id="hazard-case-edu-no"
             type="text"
             className={styles.textInput}
-            placeholder="예: 2026-1"
+            placeholder="예: 1호"
             value={caseEduNo}
             onChange={(e) => setCaseEduNo(e.target.value)}
             maxLength={20}

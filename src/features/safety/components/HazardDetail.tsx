@@ -230,13 +230,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       setEditDrivingKind(parsed.tag);
       setEditDesc(parsed.body);
     } else if (isIncidentEdit) {
-      // 사고사례: `[사례교육 2026-N·분류] 제목` 형식. 호수와 분류 분리
+      // 사고사례: 운전정보와 동일 포맷 — `[분류] 제목` + location에 호수
       const parsed = parseTaggedDesc(report.description);
-      const parts = (parsed.tag || '').split('·').map((s) => s.trim()).filter(Boolean);
-      const hoPart = parts.find((p) => /^사례교육\s/.test(p)) || '';
-      const kindPart = parts.find((p) => (DRIVING_KINDS as readonly string[]).includes(p)) || '';
-      setEditCaseEduNo(hoPart.replace(/^사례교육\s+/, ''));
+      const kindPart = (DRIVING_KINDS as readonly string[]).includes(parsed.tag) ? parsed.tag : '';
       setEditIncidentKind(kindPart || '열차');
+      setEditCaseEduNo(report.location || '');
       setEditDesc(parsed.body);
     } else {
       setEditDesc(report.description);
@@ -257,16 +255,16 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       desc = `[${kind}] ${editDesc.trim()}`;
     } else if (isIncidentEdit) {
       const kind = (DRIVING_KINDS as readonly string[]).includes(editIncidentKind) ? editIncidentKind : '열차';
-      const ho = editCaseEduNo.trim();
-      const tag = ho ? `사례교육 ${ho}·${kind}` : kind;
-      desc = `[${tag}] ${editDesc.trim()}`;
+      desc = `[${kind}] ${editDesc.trim()}`;
     } else {
       desc = editDesc.trim();
     }
     if (!desc || !name || !sabun) return;
+    // 호수는 location 컬럼에 저장 (사고사례=editCaseEduNo, 그 외=editLocation)
+    const finalLocation = isIncidentEdit ? editCaseEduNo.trim() : editLocation.trim();
     setError('');
     try {
-      await updateReport(reportId, desc, editLocation.trim(), name, sabun, removeFile || undefined);
+      await updateReport(reportId, desc, finalLocation, name, sabun, removeFile || undefined);
       setEditMode(false);
       setRemoveFile(false);
     } catch (e) {

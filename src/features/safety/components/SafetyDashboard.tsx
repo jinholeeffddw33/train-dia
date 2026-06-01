@@ -439,9 +439,7 @@ export default function SafetyDashboard({
                   parsedActions.slice(0, 3).map((p) => {
                     const id = `incident-${p.item.id}`;
                     const isRead = readIds.has(id);
-                    // 태그 형식: `사례교육 2026-N·분류` → 호수 = 첫 토큰, 분류 = 두 번째
-                    const tagParts = (p.tag || '').split('·').map((s) => s.trim()).filter(Boolean);
-                    const hoLabel = tagParts.find((t) => /^사례교육\s/.test(t)) || '';
+                    const hoLabel = (p.item.location || '').trim();
                     return (
                       <li key={p.item.id}>
                         <button
@@ -449,7 +447,7 @@ export default function SafetyDashboard({
                           className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
                           onClick={() => openDetail({
                             id, kind: 'incident',
-                            badge: hoLabel || p.tag || '사고',
+                            badge: hoLabel ? `사례교육 ${hoLabel}` : (p.tag || '사고'),
                             badgeTone: 'amber',
                             title: p.title,
                             meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
@@ -462,7 +460,7 @@ export default function SafetyDashboard({
                           </div>
                           {hoLabel && (
                             <div className={styles.incidentMeta}>
-                              <span className={styles.hoBadge}>{hoLabel}</span>
+                              <span className={styles.hoBadge}>사례교육 {hoLabel}</span>
                             </div>
                           )}
                           {p.body && <p className={styles.incidentSummary}>{p.body}</p>}

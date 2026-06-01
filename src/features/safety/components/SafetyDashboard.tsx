@@ -473,6 +473,7 @@ export default function SafetyDashboard({
                     const id = `driving-${p.item.id}`;
                     const isRead = readIds.has(id);
                     const tone = DRIVING_TONE[p.tag] ?? 'blue';
+                    const hoLabel = (p.item.location || '').trim();
                     return (
                       <li key={p.item.id}>
                         <button
@@ -482,8 +483,7 @@ export default function SafetyDashboard({
                             id, kind: 'driving',
                             badge: p.tag || '운전',
                             badgeTone: tone,
-                            title: p.title,
-                            meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
+                            title: hoLabel ? `${hoLabel} — ${p.title}` : p.title,
                             body: p.body,
                           })}
                         >
@@ -492,10 +492,11 @@ export default function SafetyDashboard({
                             <span className={styles.incidentTitle}>{p.title}</span>
                             <ConfirmBadge read={isRead} />
                           </div>
-                          <div className={styles.incidentMeta}>
-                            <span>{formatDate(p.item.createdAt)}</span>
-                            {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
-                          </div>
+                          {hoLabel && (
+                            <div className={styles.incidentMeta}>
+                              <span className={styles.hoBadge}>운전정보 {hoLabel}</span>
+                            </div>
+                          )}
                           {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
                         </button>
                       </li>

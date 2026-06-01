@@ -110,12 +110,17 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const reportTag = parseTaggedDesc(report?.description ?? '').tag;
   // 태그가 편성 패턴이면 카테고리 무관하게 열차 정보 편집 폼 사용
   const isTrainEdit = TRAIN_TAG_RE.test(reportTag);
+  // 운전 정보 분류 (시설물 / 열차 / 신호) 편집
+  const DRIVING_KINDS = ['시설물', '열차', '신호'] as const;
+  const isDrivingEdit = (DRIVING_KINDS as readonly string[]).includes(reportTag);
 
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
   const [removeFile, setRemoveFile] = useState(false);
   // 열차 정보 수정용: 편성번호 별도 상태
   const [editTrainTag, setEditTrainTag] = useState<string>('전');
+  // 운전 정보 수정용: 분류 별도 상태
+  const [editDrivingKind, setEditDrivingKind] = useState<string>('열차');
 
   const parseDescToItems = (desc: string): string[] => {
     const lines = desc.split('\n');
@@ -213,6 +218,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       const parsed = parseTaggedDesc(report.description);
       setEditTrainTag(parsed.tag.replace(/편성$/, ''));
       setEditDesc(parsed.body);
+    } else if (isDrivingEdit) {
+      // 운전 정보: [시설물/열차/신호] prefix 제거하고 body만 textarea로 편집
+      const parsed = parseTaggedDesc(report.description);
+      setEditDrivingKind(parsed.tag);
+      setEditDesc(parsed.body);
     } else {
       setEditDesc(report.description);
     }
@@ -227,6 +237,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     } else if (isTrainEdit) {
       const tag = editTrainTag.trim() || '전';
       desc = `[${tag}편성] ${editDesc.trim()}`;
+    } else if (isDrivingEdit) {
+      const kind = (DRIVING_KINDS as readonly string[]).includes(editDrivingKind) ? editDrivingKind : '열차';
+      desc = `[${kind}] ${editDesc.trim()}`;
     } else {
       desc = editDesc.trim();
     }
@@ -437,6 +450,41 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                       <option key={n} value={n}>{n}편성</option>
                     ))}
                   </select>
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>설명</label>
+                  <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
+                </div>
+                <div className={styles.editActions}>
+                  <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
+                    <X size={16} /> 취소
+                  </button>
+                  <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={!editDesc.trim()}>
+                    <Check size={16} /> 저장
+                  </button>
+                </div>
+              </>
+            ) : isDrivingEdit ? (
+              /* 운전 정보 수정: 분류(시설물/열차/신호) + 호수 + 설명 */
+              <>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>분류</label>
+                  <div className={styles.kindRow}>
+                    {DRIVING_KINDS.map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        className={`${styles.kindBtn} ${editDrivingKind === k ? styles.kindBtnActive : ''}`}
+                        onClick={() => setEditDrivingKind(k)}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>호수 (예: 1호)</label>
+                  <input type="text" className={styles.textInput} value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="예: 1호" maxLength={20} />
                 </div>
                 <div className={styles.editField}>
                   <label className={styles.editLabel}>설명</label>

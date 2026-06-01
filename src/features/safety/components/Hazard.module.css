@@ -1839,3 +1839,19 @@
   opacity: 0.35;
   cursor: not-allowed;
 }
+
+/* 운전 정보 리스트 카드 — 호수 배지 (예: "운전정보 1호") */
+.driveHoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(145deg, #7c3aed, #5b21b6);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+  letter-spacing: 0.3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}

@@ -195,7 +195,8 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
     );
   }
 
-  // 기존: 위험/조치
+  // 기존: 위험/조치 / 운전 정보 / 열차 정보
+  const isDriving = cardKey === 'driving';
   return (
     <div className={styles.list}>
       {reports.map((r) => (
@@ -213,7 +214,10 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
             loading="lazy"
           />
           <div className={styles.cardInfo}>
-            {r.location && (
+            {isDriving && r.location && (
+              <span className={styles.driveHoBadge}>운전정보 {r.location}</span>
+            )}
+            {!isDriving && r.location && (
               <span className={styles.cardLocation}>📍 {r.location}</span>
             )}
             <p className={styles.cardDesc}>{r.description}</p>

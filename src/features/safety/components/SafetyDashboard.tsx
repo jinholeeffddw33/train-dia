@@ -439,7 +439,9 @@ export default function SafetyDashboard({
                   parsedActions.slice(0, 3).map((p) => {
                     const id = `incident-${p.item.id}`;
                     const isRead = readIds.has(id);
-                    const tone = DRIVING_TONE[p.tag] ?? 'amber';
+                    // 태그 형식: `사례교육 2026-N·분류` → 호수 = 첫 토큰, 분류 = 두 번째
+                    const tagParts = (p.tag || '').split('·').map((s) => s.trim()).filter(Boolean);
+                    const hoLabel = tagParts.find((t) => /^사례교육\s/.test(t)) || '';
                     return (
                       <li key={p.item.id}>
                         <button
@@ -447,22 +449,22 @@ export default function SafetyDashboard({
                           className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
                           onClick={() => openDetail({
                             id, kind: 'incident',
-                            badge: p.tag || '사고',
-                            badgeTone: tone,
+                            badge: hoLabel || p.tag || '사고',
+                            badgeTone: 'amber',
                             title: p.title,
                             meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
                             body: p.body,
                           })}
                         >
                           <div className={styles.incidentHeadRow}>
-                            <span className={`${styles.kindBadge} ${styles[`kind_${tone}`]}`}>{p.tag || '사고'}</span>
                             <span className={styles.incidentTitle}>{p.title}</span>
                             <ConfirmBadge read={isRead} />
                           </div>
-                          <div className={styles.incidentMeta}>
-                            <span>{formatDate(p.item.createdAt)}</span>
-                            {p.item.createdBy && <><span className={styles.metaDot}>·</span><span>{p.item.createdBy}</span></>}
-                          </div>
+                          {hoLabel && (
+                            <div className={styles.incidentMeta}>
+                              <span className={styles.hoBadge}>{hoLabel}</span>
+                            </div>
+                          )}
                           {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
                         </button>
                       </li>

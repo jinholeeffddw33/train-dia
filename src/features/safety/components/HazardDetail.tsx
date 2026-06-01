@@ -113,6 +113,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   // 운전 정보 분류 (시설물 / 열차 / 신호) 편집
   const DRIVING_KINDS = ['시설물', '열차', '신호'] as const;
   const isDrivingEdit = (DRIVING_KINDS as readonly string[]).includes(reportTag);
+  // 사고사례 편집: category='action' → 사례교육 호수 + 분류 picker
+  // 태그 형식: `사례교육 2026-N·분류` 또는 `분류` (legacy)
+  const isIncidentEdit = report?.category === 'action';
 
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
@@ -121,6 +124,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editTrainTag, setEditTrainTag] = useState<string>('전');
   // 운전 정보 수정용: 분류 별도 상태
   const [editDrivingKind, setEditDrivingKind] = useState<string>('열차');
+  // 사고사례 수정용: 사례교육 호수 + 분류
+  const [editCaseEduNo, setEditCaseEduNo] = useState<string>('');
+  const [editIncidentKind, setEditIncidentKind] = useState<string>('열차');
 
   const parseDescToItems = (desc: string): string[] => {
     const lines = desc.split('\n');
@@ -223,6 +229,15 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       const parsed = parseTaggedDesc(report.description);
       setEditDrivingKind(parsed.tag);
       setEditDesc(parsed.body);
+    } else if (isIncidentEdit) {
+      // 사고사례: `[사례교육 2026-N·분류] 제목` 형식. 호수와 분류 분리
+      const parsed = parseTaggedDesc(report.description);
+      const parts = (parsed.tag || '').split('·').map((s) => s.trim()).filter(Boolean);
+      const hoPart = parts.find((p) => /^사례교육\s/.test(p)) || '';
+      const kindPart = parts.find((p) => (DRIVING_KINDS as readonly string[]).includes(p)) || '';
+      setEditCaseEduNo(hoPart.replace(/^사례교육\s+/, ''));
+      setEditIncidentKind(kindPart || '열차');
+      setEditDesc(parsed.body);
     } else {
       setEditDesc(report.description);
     }
@@ -240,6 +255,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     } else if (isDrivingEdit) {
       const kind = (DRIVING_KINDS as readonly string[]).includes(editDrivingKind) ? editDrivingKind : '열차';
       desc = `[${kind}] ${editDesc.trim()}`;
+    } else if (isIncidentEdit) {
+      const kind = (DRIVING_KINDS as readonly string[]).includes(editIncidentKind) ? editIncidentKind : '열차';
+      const ho = editCaseEduNo.trim();
+      const tag = ho ? `사례교육 ${ho}·${kind}` : kind;
+      desc = `[${tag}] ${editDesc.trim()}`;
     } else {
       desc = editDesc.trim();
     }
@@ -485,6 +505,48 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                 <div className={styles.editField}>
                   <label className={styles.editLabel}>호수 (예: 1호)</label>
                   <input type="text" className={styles.textInput} value={editLocation} onChange={(e) => setEditLocation(e.target.value)} placeholder="예: 1호" maxLength={20} />
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>설명</label>
+                  <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
+                </div>
+                <div className={styles.editActions}>
+                  <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
+                    <X size={16} /> 취소
+                  </button>
+                  <button type="button" className={styles.editSaveBtn} onClick={handleEditSave} disabled={!editDesc.trim()}>
+                    <Check size={16} /> 저장
+                  </button>
+                </div>
+              </>
+            ) : isIncidentEdit ? (
+              /* 사고사례 수정: 분류(시설물/열차/신호) + 사례교육 호수 + 설명 */
+              <>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>분류</label>
+                  <div className={styles.kindRow}>
+                    {DRIVING_KINDS.map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        className={`${styles.kindBtn} ${editIncidentKind === k ? styles.kindBtnActive : ''}`}
+                        onClick={() => setEditIncidentKind(k)}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>사례교육 호수 (예: 2026-1)</label>
+                  <input
+                    type="text"
+                    className={styles.textInput}
+                    value={editCaseEduNo}
+                    onChange={(e) => setEditCaseEduNo(e.target.value)}
+                    placeholder="예: 2026-1"
+                    maxLength={20}
+                  />
                 </div>
                 <div className={styles.editField}>
                   <label className={styles.editLabel}>설명</label>

@@ -51,6 +51,8 @@ interface FormVariant {
   trainPicker?: boolean;
   /** 심각도(위험/주의/알림) 선택 노출 */
   severityPicker?: boolean;
+  /** 사례교육 호수 입력 노출 (예: 2026-1) */
+  caseEduPicker?: boolean;
   showLocation: boolean;
   dataCategory: DataCategory;
 }
@@ -91,7 +93,7 @@ const STATIONS: readonly string[] = [
 ];
 
 const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
-  incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'action'  },
+  incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, caseEduPicker: true, showLocation: false, dataCategory: 'action'  },
   driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'inspect' },
   train:    { title: '열차 정보 등록', trainPicker: true,     showLocation: false, dataCategory: 'inspect' },
   hazard:   { title: '위험개소 등록', stationPicker: true, severityPicker: true, showLocation: false, dataCategory: 'hazard'  },
@@ -117,6 +119,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const [kind, setKind] = useState<string>(defaultKind);
   const [station, setStation] = useState<string>(defaultStation);
   const [trainNo, setTrainNo] = useState<string>(defaultTrain);
+  const [caseEduNo, setCaseEduNo] = useState<string>('');
   const [severity, setSeverity] = useState<SeverityOption['value']>('주의');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -176,6 +179,11 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       // 위험개소: 역 + 심각도 함께 표기 → [강동역·위험] 형식
       if (variant.severityPicker && tag) tag = `${tag}·${severity}`;
       else if (variant.severityPicker) tag = severity;
+      // 사고사례: 사례교육 호수 + 분류 → [사례교육 2026-1·열차] 형식
+      if (variant.caseEduPicker && caseEduNo.trim()) {
+        const hoLabel = `사례교육 ${caseEduNo.trim()}`;
+        tag = tag ? `${hoLabel}·${tag}` : hoLabel;
+      }
       const headline = tag ? `[${tag}] ${titleText.trim()}` : titleText.trim();
       const finalDescription = `${headline}\n${description.trim()}`;
       await createReport({
@@ -361,6 +369,22 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
               <option key={n} value={n}>{n}편성</option>
             ))}
           </select>
+        </div>
+      )}
+      {variant.caseEduPicker && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="hazard-case-edu-no">
+            사례교육 호수 (선택)
+          </label>
+          <input
+            id="hazard-case-edu-no"
+            type="text"
+            className={styles.textInput}
+            placeholder="예: 2026-1"
+            value={caseEduNo}
+            onChange={(e) => setCaseEduNo(e.target.value)}
+            maxLength={20}
+          />
         </div>
       )}
 

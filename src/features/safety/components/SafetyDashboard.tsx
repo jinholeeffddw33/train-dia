@@ -314,7 +314,12 @@ export default function SafetyDashboard({
   const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice || hasRealHazard);
   const showSamples = dataLoaded && !useRealData;
   const showProtoBanner = showSamples;
-  const leftKindReal = latestActionAt >= latestDrivingAt ? 'incident' : 'driving';
+  // 운전 정보가 1건이라도 있으면 운전 정보 우선 표시 (없을 때만 사고 사례)
+  const leftKindReal: 'incident' | 'driving' = drivingReports.length > 0
+    ? 'driving'
+    : parsedActions.length > 0 ? 'incident' : 'driving';
+  // (참고) 시간순 비교는 유지하지 않음 — 향후 동적 로직 복귀 시 latestActionAt/latestDrivingAt 활용
+  void latestActionAt; void latestDrivingAt;
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
 
   const [selected, setSelected] = useState<SampleDetail | null>(null);

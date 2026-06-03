@@ -573,13 +573,10 @@ export default function SafetyDashboard({
                       <button
                         type="button"
                         className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => openDetail({
-                          id, kind: 'train',
-                          badge: p.tag || 'NEW',
-                          title: p.title,
-                          meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
-                          bullets: bodyBullets,
-                        })}
+                        onClick={() => {
+                          markRead(id);
+                          onOpenReport?.(p.item.id, 'train');
+                        }}
                       >
                         <div className={styles.trainHeadRow}>
                           <span className={styles.newBadge}>{p.tag || 'NEW'}</span>
@@ -655,14 +652,10 @@ export default function SafetyDashboard({
                     key={h.item.id}
                     type="button"
                     className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isResolved ? styles.hazardCardResolved : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                    onClick={() => openDetail({
-                      id, kind: 'hazard',
-                      badge: isResolved ? '조치완료' : h.severity,
-                      badgeTone: isResolved ? 'green' : severe ? 'red' : 'amber',
-                      title: h.station,
-                      meta: `등록 ${formatDate(h.item.createdAt)} · ${h.item.createdBy}`,
-                      body: h.desc,
-                    })}
+                    onClick={() => {
+                      markRead(id);
+                      onOpenReport?.(h.item.id, 'hazard');
+                    }}
                   >
                     <span className={`${styles.severityBadge} ${isResolved ? styles.severityBadgeResolved : severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
                       {isResolved ? '조치완료' : h.severity}

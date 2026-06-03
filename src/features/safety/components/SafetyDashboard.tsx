@@ -187,7 +187,7 @@ const CATEGORIES = [
 const latestIncidentAt = INCIDENT_SAMPLES[0]?.uploadedAt ?? '';
 const latestDrivingAt = DRIVING_SAMPLES[0]?.uploadedAt ?? '';
 const leftIsIncident = latestIncidentAt >= latestDrivingAt;
-const LEFT_TITLE = leftIsIncident ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
+const LEFT_TITLE = leftIsIncident ? '최근 업로드된 사례교육' : '최근 업로드된 운전 정보';
 
 type SampleDetail = {
   id: string;
@@ -322,7 +322,7 @@ export default function SafetyDashboard({
     : parsedActions.length > 0 ? 'incident' : 'driving';
   // (참고) 시간순 비교는 유지하지 않음 — 향후 동적 로직 복귀 시 latestActionAt/latestDrivingAt 활용
   void latestActionAt; void latestDrivingAt;
-  const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사고 사례' : '최근 업로드된 운전 정보';
+  const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사례교육' : '최근 업로드된 운전 정보';
 
   const [selected, setSelected] = useState<SampleDetail | null>(null);
 
@@ -452,25 +452,18 @@ export default function SafetyDashboard({
                         <button
                           type="button"
                           className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                          onClick={() => openDetail({
-                            id, kind: 'incident',
-                            badge: hoLabel ? `사례교육 ${hoLabel}` : (p.tag || '사고'),
-                            badgeTone: 'amber',
-                            title: p.title,
-                            meta: `${formatDate(p.item.createdAt)} · ${p.item.createdBy}`,
-                            body: p.body,
-                          })}
+                          onClick={() => {
+                            markRead(id);
+                            // 클릭 시 요약 모달 대신 상세보기로 바로 진입
+                            onOpenReport?.(p.item.id, 'incident');
+                          }}
                         >
                           <div className={styles.incidentHeadRow}>
+                            {hoLabel && <span className={styles.hoBadgeMini}>사례교육 {hoLabel}</span>}
                             <span className={styles.incidentTitle}>{p.title}</span>
                             <ConfirmBadge read={isRead} />
                           </div>
-                          {hoLabel && (
-                            <div className={styles.incidentMeta}>
-                              <span className={styles.hoBadge}>사례교육 {hoLabel}</span>
-                            </div>
-                          )}
-                          {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
+                          {/* 본문 미리보기 제거 — 제목만 노출, 상세보기에서 전체 확인 */}
                         </button>
                       </li>
                     );

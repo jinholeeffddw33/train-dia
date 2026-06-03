@@ -592,8 +592,12 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                     <div className={styles.detailHeaderRow}>
                       {report.location && (
                         <span className={`${styles.noticeType} ${isImportant ? styles.noticeTypeImportant : styles.noticeTypeRollcall}`}>
-                          {/* 운전 정보(driving)는 "운전정보 N호" 로 정확히 표기, 그 외는 location 그대로 */}
-                          {isDrivingEdit && /^\d+호$/.test(report.location) ? `운전정보 ${report.location}` : report.location}
+                          {/* 운전정보/사례교육은 "운전정보 N호" / "사례교육 N호" 로 정확히 표기 */}
+                          {isDrivingEdit && /^\d+호$/.test(report.location)
+                            ? `운전정보 ${report.location}`
+                            : isIncidentEdit && /^\d+호$/.test(report.location)
+                            ? `사례교육 ${report.location}`
+                            : report.location}
                         </span>
                       )}
                       {di && (

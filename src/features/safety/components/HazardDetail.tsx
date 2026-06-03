@@ -590,13 +590,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                 return (
                   <div className={headerCardClass}>
                     <div className={styles.detailHeaderRow}>
-                      {report.location && (
+                      {/* 운전정보만 헤더에 "운전정보 N호" 라벨 노출. 사고사례는 아래 detailLocation에서 표시 */}
+                      {report.location && !isIncidentEdit && (
                         <span className={`${styles.noticeType} ${isImportant ? styles.noticeTypeImportant : styles.noticeTypeRollcall}`}>
-                          {/* 운전정보/사례교육은 "운전정보 N호" / "사례교육 N호" 로 정확히 표기 */}
                           {isDrivingEdit && /^\d+호$/.test(report.location)
                             ? `운전정보 ${report.location}`
-                            : isIncidentEdit && /^\d+호$/.test(report.location)
-                            ? `사례교육 ${report.location}`
                             : report.location}
                         </span>
                       )}
@@ -617,7 +615,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
               })()}
 
               {!isNotice && report.location && (
-                <span className={styles.detailLocation}>📍 {report.location}</span>
+                <span className={styles.detailLocation}>
+                  📍 {isIncidentEdit && /^\d+호$/.test(report.location)
+                    ? `사례교육 ${report.location}`
+                    : report.location}
+                </span>
               )}
 
               {/* 본문 + 첨부 + 좋아요/조회 통합 카드 */}

@@ -246,6 +246,8 @@
   font-size: var(--dia-text-base);
   color: var(--dia-text-primary);
   line-height: var(--dia-leading-relaxed);
+  /* description 의 줄바꿈을 그대로 보존 (제목 ↔ 재발방지 대책 ↔ 항목 구분) */
+  white-space: pre-wrap;
 }
 
 .detailMeta {

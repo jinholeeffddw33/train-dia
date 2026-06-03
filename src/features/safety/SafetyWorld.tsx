@@ -70,7 +70,7 @@ type SafetyView =
 
 /** 카드별 표시 정보 — 헤더 제목과 빈 상태 문구가 카드 라벨과 일치하도록 */
 const CARD_DISPLAY: Record<CardKey, { label: string; emptyIcon: string; emptyText: string; emptyHint: string }> = {
-  incident: { label: '사고 사례', emptyIcon: '⚠️', emptyText: '등록된 사고 사례가 없어요', emptyHint: '발생한 사고 사례를 기록해주세요' },
+  incident: { label: '사례교육', emptyIcon: '⚠️', emptyText: '등록된 사례교육이 없어요', emptyHint: '발생한 사고 사례를 사례교육으로 등록해주세요' },
   driving:  { label: '운전 정보', emptyIcon: '🚆', emptyText: '등록된 운전 정보가 없어요', emptyHint: '서행 구간·운전 변경 사항을 공유해주세요' },
   train:    { label: '열차 정보', emptyIcon: '🚇', emptyText: '등록된 열차 정보가 없어요', emptyHint: '차량 업데이트·변경 사항을 공유해주세요' },
   hazard:   { label: '위험개소', emptyIcon: '📷', emptyText: '등록된 위험개소가 없어요', emptyHint: '발견한 위험개소를 사진으로 공유해주세요' },

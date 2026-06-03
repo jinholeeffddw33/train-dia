@@ -297,11 +297,22 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     }
   };
 
+  /** 대시보드 카드 클릭 시 해당 리포트 상세보기로 바로 진입 */
+  const handleOpenReport = (reportId: string, cardKey: CardKey) => {
+    markAsRead(reportId);
+    let cat: SafetyCategory;
+    if (cardKey === 'hazard') cat = 'hazard';
+    else if (cardKey === 'incident') cat = 'action';
+    else cat = 'inspect';
+    setView({ type: 'detail', category: cat, cardKey, id: reportId });
+  };
+
   return (
     <SafetyDashboard
       onBack={onBack}
       onOpenCategory={handleDashboardCategory}
       onOpenNotice={() => setView({ type: 'list', category: 'inspect', cardKey: 'notice' })}
+      onOpenReport={handleOpenReport}
       unreadCount={totalUnread}
       userName={userName}
       userRole={userRole}

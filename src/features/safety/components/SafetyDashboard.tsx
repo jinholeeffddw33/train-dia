@@ -64,6 +64,8 @@ interface Props {
   onBack: () => void;
   onOpenCategory: (id: 'incident' | 'driving' | 'train' | 'hazard') => void;
   onOpenNotice?: () => void;
+  /** 카드 클릭 시 해당 리포트 상세보기로 직접 진입 (요약 모달 대신) */
+  onOpenReport?: (reportId: string, cardKey: 'incident' | 'driving' | 'train' | 'hazard') => void;
   unreadCount?: number;
   userName?: string;
   userRole?: string;
@@ -175,7 +177,7 @@ const HAZARD_ZONES_TOP3 = [...HAZARD_ZONE_SAMPLES_RAW]
   .sort((a, b) => stationOrderKey(a.station) - stationOrderKey(b.station));
 
 const CATEGORIES = [
-  { id: 'incident' as const, label: '사고사례',  icon: AlertTriangle, tone: 'amber' as const },
+  { id: 'incident' as const, label: '사례교육',  icon: AlertTriangle, tone: 'amber' as const },
   { id: 'driving'  as const, label: '운전정보',  icon: TrainFront,    tone: 'blue'  as const },
   { id: 'train'    as const, label: '열차정보',  icon: Train,         tone: 'green' as const },
   { id: 'hazard'   as const, label: '위험개소',   icon: ShieldAlert,   tone: 'red'   as const },
@@ -205,7 +207,7 @@ type SampleDetail = {
 };
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, unreadCount = 0, userName = '', userRole = '', sabun = '',
+  onBack, onOpenCategory, onOpenNotice, onOpenReport, unreadCount = 0, userName = '', userRole = '', sabun = '',
 }: Props) {
   const userLabel = userName ? `${userName} ${userRole.replace(/님$/, '')}` : '';
 
@@ -477,28 +479,24 @@ export default function SafetyDashboard({
                   drivingReports.slice(0, 3).map((p) => {
                     const id = `driving-${p.item.id}`;
                     const isRead = readIds.has(id);
-                    const tone = DRIVING_TONE[p.tag] ?? 'blue';
                     const hoLabel = (p.item.location || '').trim();
                     return (
                       <li key={p.item.id}>
                         <button
                           type="button"
                           className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                          onClick={() => openDetail({
-                            id, kind: 'driving',
-                            badge: p.tag || '운전',
-                            badgeTone: tone,
-                            title: hoLabel ? `${hoLabel} — ${p.title}` : p.title,
-                            body: p.body,
-                          })}
+                          onClick={() => {
+                            markRead(id);
+                            // 클릭 시 요약 모달 대신 상세보기로 바로 진입
+                            onOpenReport?.(p.item.id, 'driving');
+                          }}
                         >
                           <div className={styles.incidentHeadRow}>
-                            {/* 분류(시설물/열차/신호) 배지 미표시 — 운전정보는 호수만 작게 표시 */}
-                            {hoLabel && <span className={styles.hoBadgeMini}>{hoLabel}</span>}
+                            {hoLabel && <span className={styles.hoBadgeMini}>운전정보 {hoLabel}</span>}
                             <span className={styles.incidentTitle}>{p.title}</span>
                             <ConfirmBadge read={isRead} />
                           </div>
-                          {p.body && <p className={styles.incidentSummary}>{p.body}</p>}
+                          {/* 본문 미리보기 제거 — 제목만 노출, 상세보기에서 전체 확인 */}
                         </button>
                       </li>
                     );
@@ -598,7 +596,6 @@ export default function SafetyDashboard({
                         {bodyBullets.length > 0 && (
                           <p className={styles.trainPreview}>{bodyBullets[0]}</p>
                         )}
-                        <span className={styles.trainApplied}>{formatDate(p.item.createdAt)} 등록</span>
                       </button>
                     </li>
                   );

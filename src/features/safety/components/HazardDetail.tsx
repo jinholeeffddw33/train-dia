@@ -64,6 +64,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const report = useHazardStore((s) => s.reports.find((r) => r.id === reportId));
   const comments = useHazardStore((s) => s.comments[reportId] ?? EMPTY_COMMENTS);
   const loadingComments = useHazardStore((s) => s.loadingComments);
+  const loadingReports = useHazardStore((s) => s.loadingReports);
+  const reportsCount = useHazardStore((s) => s.reports.length);
+  const fetchReports = useHazardStore((s) => s.fetchReports);
   const fetchComments = useHazardStore((s) => s.fetchComments);
   const addComment = useHazardStore((s) => s.addComment);
   const updateReport = useHazardStore((s) => s.updateReport);
@@ -313,6 +316,12 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   };
 
   if (!report) {
+    // 로딩 중이거나 store가 비어 있으면 로딩 상태 (대시보드→상세 직행 시 race condition 대응)
+    const isLoading = loadingReports || reportsCount === 0;
+    // store가 비어 있고 fetch도 안 도는 상태면 한번 트리거
+    if (!loadingReports && reportsCount === 0) {
+      fetchReports();
+    }
     return (
       <div className={styles.detailWrap}>
         <header className={styles.detailHeader}>
@@ -321,9 +330,17 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           </button>
           <h1 className={styles.detailTitle}>상세보기</h1>
         </header>
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>게시물을 찾을 수 없어요</p>
-        </div>
+        {isLoading ? (
+          <div className={styles.loadingState}>
+            <span className={styles.loadingDot} />
+            <span className={styles.loadingDot} />
+            <span className={styles.loadingDot} />
+          </div>
+        ) : (
+          <div className={styles.emptyState}>
+            <p className={styles.emptyText}>게시물을 찾을 수 없어요</p>
+          </div>
+        )}
       </div>
     );
   }

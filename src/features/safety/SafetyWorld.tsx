@@ -304,6 +304,8 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     if (cardKey === 'hazard') cat = 'hazard';
     else if (cardKey === 'incident') cat = 'action';
     else cat = 'inspect';
+    // store에 해당 카테고리 데이터를 미리 적재 → HazardDetail 마운트 시 즉시 report 찾기 가능
+    fetchHazards(sabun, cat);
     setView({ type: 'detail', category: cat, cardKey, id: reportId });
   };
 

@@ -1,10 +1,17 @@
 {
   "title": "눈으로 보는 영상 가이드",
   "subtitle": "새내기 기관사 필수 영상 · 순서대로 시청",
+  "categories": [
+    { "id": "newcomer", "label": "신규 적응", "emoji": "🎓", "color": "blue" },
+    { "id": "daily",    "label": "일상 업무", "emoji": "🚆", "color": "green" },
+    { "id": "trouble",  "label": "고장 조치", "emoji": "🛠️", "color": "amber" },
+    { "id": "hr",       "label": "인사·복지", "emoji": "📋", "color": "purple" }
+  ],
   "videos": [
     {
       "id": "office-tour",
       "order": 1,
+      "category": "newcomer",
       "title": "우리 사무실 둘러보기",
       "url": "https://youtu.be/0kyP93YsMjw",
       "thumbnail": "/data/edu/thumbnails/office-tour.jpg",
@@ -13,6 +20,7 @@
     {
       "id": "crew-office-day",
       "order": 2,
+      "category": "newcomer",
       "title": "승무사업소의 하루",
       "url": "https://youtu.be/VWrhYJH15sQ",
       "thumbnail": "/data/edu/thumbnails/crew-office-day.jpg",
@@ -21,6 +29,7 @@
     {
       "id": "attendance-roll-call",
       "order": 3,
+      "category": "newcomer",
       "title": "출근점호 요령",
       "url": "https://youtu.be/oSWcF2mLskw",
       "thumbnail": "/data/edu/thumbnails/attendance-roll-call.jpg",
@@ -29,6 +38,7 @@
     {
       "id": "shift-handover-checklist",
       "order": 4,
+      "category": "daily",
       "title": "완벽한 교대를 위한 1분 체크리스트",
       "url": "https://youtu.be/Eo8GVZiM1AI",
       "thumbnail": "/data/edu/thumbnails/shift-handover-checklist.jpg",
@@ -37,6 +47,7 @@
     {
       "id": "depot-in-out-guide",
       "order": 5,
+      "category": "daily",
       "title": "입출고 가이드",
       "url": "https://youtu.be/ttHzgAELKms",
       "thumbnail": "/data/edu/thumbnails/depot-in-out-guide.jpg",
@@ -45,6 +56,7 @@
     {
       "id": "depot-out-inspection",
       "order": 6,
+      "category": "daily",
       "title": "출고 점검 가이드",
       "url": "https://youtu.be/bropvBk1qpo",
       "thumbnail": "/data/edu/thumbnails/depot-out-inspection.jpg",
@@ -53,6 +65,7 @@
     {
       "id": "manual-driving-tips",
       "order": 7,
+      "category": "daily",
       "title": "수동운전 요령",
       "url": "https://youtu.be/pInrhL0YF6Y",
       "thumbnail": "/data/edu/thumbnails/manual-driving-tips.jpg",
@@ -61,38 +74,16 @@
     {
       "id": "overnight-parking-guide",
       "order": 8,
+      "category": "daily",
       "title": "알아야 할 주박요령",
       "url": "https://youtu.be/n-K-f0vRrNM",
       "thumbnail": "/data/edu/thumbnails/overnight-parking-guide.jpg",
       "source": "youtube"
     },
     {
-      "id": "newcomer-vacation-guide",
-      "order": 9,
-      "title": "새내기를 위한 휴가 가이드",
-      "url": "https://youtu.be/vt1YYw9SYPo",
-      "thumbnail": "/data/edu/thumbnails/newcomer-vacation-guide.jpg",
-      "source": "youtube"
-    },
-    {
-      "id": "promotion-guide",
-      "order": 10,
-      "title": "승진! 그것이 알고싶다",
-      "url": "https://youtu.be/7-XCv8RrGDc",
-      "thumbnail": "/data/edu/thumbnails/promotion-guide.jpg",
-      "source": "youtube"
-    },
-    {
-      "id": "rescue-coupling",
-      "order": 11,
-      "title": "5호선 구원연결 이해하기",
-      "url": "https://youtu.be/zzBidwDgTnE",
-      "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
-      "source": "youtube"
-    },
-    {
       "id": "train-radio-lte-r",
-      "order": 12,
+      "order": 9,
+      "category": "daily",
       "title": "열차무전기 LTE-R 사용법",
       "url": "https://youtu.be/jLYTowSIQeg",
       "thumbnail": "/data/edu/thumbnails/train-radio-lte-r.jpg",
@@ -100,10 +91,38 @@
     },
     {
       "id": "uninterruptible-announce",
-      "order": 13,
+      "order": 10,
+      "category": "daily",
       "title": "무정전방송장치 사용법",
       "url": "https://youtu.be/PfCDzaQnOJs",
       "thumbnail": "/data/edu/thumbnails/uninterruptible-announce.jpg",
+      "source": "youtube"
+    },
+    {
+      "id": "rescue-coupling",
+      "order": 11,
+      "category": "trouble",
+      "title": "5호선 구원연결 이해하기",
+      "url": "https://youtu.be/zzBidwDgTnE",
+      "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
+      "source": "youtube"
+    },
+    {
+      "id": "newcomer-vacation-guide",
+      "order": 12,
+      "category": "hr",
+      "title": "새내기를 위한 휴가 가이드",
+      "url": "https://youtu.be/vt1YYw9SYPo",
+      "thumbnail": "/data/edu/thumbnails/newcomer-vacation-guide.jpg",
+      "source": "youtube"
+    },
+    {
+      "id": "promotion-guide",
+      "order": 13,
+      "category": "hr",
+      "title": "승진! 그것이 알고싶다",
+      "url": "https://youtu.be/7-XCv8RrGDc",
+      "thumbnail": "/data/edu/thumbnails/promotion-guide.jpg",
       "source": "youtube"
     }
   ]

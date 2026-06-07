@@ -8,6 +8,7 @@ import styles from '../styles/edu.module.css';
 interface VideoItem {
   id: string;
   order: number;
+  category?: string;
   title: string;
   description?: string;
   url: string;
@@ -15,9 +16,17 @@ interface VideoItem {
   source?: string;
 }
 
+interface VideoCategory {
+  id: string;
+  label: string;
+  emoji?: string;
+  color?: string;
+}
+
 interface VideoGuideData {
   title: string;
   subtitle?: string;
+  categories?: VideoCategory[];
   videos: VideoItem[];
 }
 
@@ -47,6 +56,25 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
   }, []);
 
   const sortedVideos = (data?.videos ?? []).slice().sort((a, b) => a.order - b.order);
+  const categories = data?.categories ?? [];
+  // 카테고리별로 그룹화 — 카테고리 없는 영상은 마지막에 "기타"로
+  const groupedVideos: { category: VideoCategory; items: VideoItem[] }[] = (() => {
+    if (categories.length === 0) return [];
+    const map = new Map<string, VideoItem[]>();
+    for (const cat of categories) map.set(cat.id, []);
+    const other: VideoItem[] = [];
+    for (const v of sortedVideos) {
+      if (v.category && map.has(v.category)) map.get(v.category)!.push(v);
+      else other.push(v);
+    }
+    const groups = categories
+      .map((c) => ({ category: c, items: map.get(c.id) ?? [] }))
+      .filter((g) => g.items.length > 0);
+    if (other.length > 0) {
+      groups.push({ category: { id: '_other', label: '기타', emoji: '📁' }, items: other });
+    }
+    return groups;
+  })();
 
   const openVideo = (videoId: string, url: string) => {
     fetch('/api/edu/video-views', {
@@ -94,7 +122,8 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
           </div>
         )}
 
-        {!loading && sortedVideos.length > 0 && (
+        {!loading && sortedVideos.length > 0 && groupedVideos.length === 0 && (
+          /* 카테고리 정보 없으면 기존 flat list 유지 (하위 호환) */
           <div className={styles.videoGuideList}>
             {sortedVideos.map((video, idx) => {
               const thumb = video.thumbnail || getYouTubeThumbnail(video.url);
@@ -144,6 +173,73 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {!loading && groupedVideos.length > 0 && (
+          <div className={styles.videoGuideGroups}>
+            {groupedVideos.map((group) => (
+              <section
+                key={group.category.id}
+                className={`${styles.videoGuideGroup} ${group.category.color ? styles[`videoGuideGroupColor_${group.category.color}`] : ''}`}
+              >
+                <header className={styles.videoGuideGroupHeader}>
+                  <span className={styles.videoGuideGroupEmoji}>{group.category.emoji}</span>
+                  <h2 className={styles.videoGuideGroupTitle}>{group.category.label}</h2>
+                  <span className={styles.videoGuideGroupCount}>{group.items.length}강</span>
+                </header>
+                <div className={styles.videoGuideList}>
+                  {group.items.map((video, idx) => {
+                    const thumb = video.thumbnail || getYouTubeThumbnail(video.url);
+                    return (
+                      <div key={video.id} className={styles.videoGuideItem}>
+                        <button
+                          type="button"
+                          className={styles.videoGuideCard}
+                          onClick={() => openVideo(video.id, video.url)}
+                          aria-label={`${video.order}강 ${video.title} 재생`}
+                        >
+                          <div className={styles.videoGuideThumb}>
+                            {thumb ? (
+                              <>
+                                <img src={thumb} alt="" loading="lazy" className={styles.videoGuideThumbImg} />
+                                <span className={styles.videoGuideThumbPlay} aria-hidden>
+                                  <Play size={14} fill="currentColor" strokeWidth={0} />
+                                </span>
+                              </>
+                            ) : (
+                              <span className={`${styles.videoGuideThumbFallback} ${styles.iconBgBlue}`}>
+                                <Play size={20} fill="currentColor" strokeWidth={0} />
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles.videoGuideBody}>
+                            <div className={styles.videoGuideTitle}>
+                              <span className={styles.videoGuideOrder}>{video.order}강</span>
+                              <span>{video.title}</span>
+                            </div>
+                            {video.description && (
+                              <div className={styles.videoGuideDesc}>{video.description}</div>
+                            )}
+                            <div className={styles.videoGuideMeta}>
+                              {video.source && (
+                                <span className={styles.videoGuideSource}>
+                                  <ExternalLink size={12} />
+                                  <span>{SOURCE_LABEL[video.source] ?? '외부 링크'}</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                        {idx < group.items.length - 1 && (
+                          <div className={styles.videoGuideConnector} aria-hidden />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
           </div>
         )}
       </div>

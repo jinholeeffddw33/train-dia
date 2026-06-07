@@ -5897,6 +5897,58 @@
   font-size: var(--dia-text-sm);
 }
 
+/* ── 영상 가이드 카테고리 그룹 ── */
+.videoGuideGroups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+}
+
+.videoGuideGroup {
+  padding: var(--dia-space-3) var(--dia-space-3) var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  border-left: 4px solid var(--vg-accent, var(--dia-blue));
+}
+
+.videoGuideGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px var(--dia-space-3);
+  border-bottom: 1px dashed var(--dia-border-light, var(--dia-border));
+  margin-bottom: var(--dia-space-2);
+}
+
+.videoGuideGroupEmoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.videoGuideGroupTitle {
+  flex: 1;
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--vg-accent, var(--dia-blue));
+  letter-spacing: 0.3px;
+}
+
+.videoGuideGroupCount {
+  padding: 2px 10px;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: var(--vg-accent, var(--dia-blue));
+  background: var(--vg-accent-bg, var(--dia-blue-dim));
+  border-radius: 999px;
+}
+
+.videoGuideGroupColor_blue   { --vg-accent: var(--dia-blue);   --vg-accent-bg: var(--dia-blue-dim); }
+.videoGuideGroupColor_green  { --vg-accent: var(--dia-green);  --vg-accent-bg: var(--dia-green-dim, var(--dia-surface-hover)); }
+.videoGuideGroupColor_amber  { --vg-accent: var(--dia-amber);  --vg-accent-bg: var(--dia-amber-dim, var(--dia-surface-hover)); }
+.videoGuideGroupColor_purple { --vg-accent: var(--dia-purple); --vg-accent-bg: var(--dia-purple-dim, var(--dia-surface-hover)); }
+
 /* ── 영상 가이드 리스트 ── */
 .videoGuideList {
   display: flex;

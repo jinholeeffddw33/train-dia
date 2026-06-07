@@ -81,9 +81,18 @@
       "source": "youtube"
     },
     {
-      "id": "train-radio-lte-r",
+      "id": "rescue-coupling",
       "order": 9,
-      "category": "daily",
+      "category": "trouble",
+      "title": "5호선 구원연결 이해하기",
+      "url": "https://youtu.be/zzBidwDgTnE",
+      "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
+      "source": "youtube"
+    },
+    {
+      "id": "train-radio-lte-r",
+      "order": 10,
+      "category": "trouble",
       "title": "열차무전기 LTE-R 사용법",
       "url": "https://youtu.be/jLYTowSIQeg",
       "thumbnail": "/data/edu/thumbnails/train-radio-lte-r.jpg",
@@ -91,20 +100,11 @@
     },
     {
       "id": "uninterruptible-announce",
-      "order": 10,
-      "category": "daily",
+      "order": 11,
+      "category": "trouble",
       "title": "무정전방송장치 사용법",
       "url": "https://youtu.be/PfCDzaQnOJs",
       "thumbnail": "/data/edu/thumbnails/uninterruptible-announce.jpg",
-      "source": "youtube"
-    },
-    {
-      "id": "rescue-coupling",
-      "order": 11,
-      "category": "trouble",
-      "title": "5호선 구원연결 이해하기",
-      "url": "https://youtu.be/zzBidwDgTnE",
-      "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
       "source": "youtube"
     },
     {

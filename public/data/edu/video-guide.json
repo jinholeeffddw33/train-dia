@@ -89,6 +89,14 @@
       "url": "https://youtu.be/zzBidwDgTnE",
       "thumbnail": "/data/edu/thumbnails/rescue-coupling.png",
       "source": "youtube"
+    },
+    {
+      "id": "train-radio-lte-r",
+      "order": 12,
+      "title": "열차무전기 LTE-R 사용법",
+      "url": "https://youtu.be/jLYTowSIQeg",
+      "thumbnail": "/data/edu/thumbnails/train-radio-lte-r.jpg",
+      "source": "youtube"
     }
   ]
 }

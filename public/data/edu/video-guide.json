@@ -97,6 +97,14 @@
       "url": "https://youtu.be/jLYTowSIQeg",
       "thumbnail": "/data/edu/thumbnails/train-radio-lte-r.jpg",
       "source": "youtube"
+    },
+    {
+      "id": "uninterruptible-announce",
+      "order": 13,
+      "title": "무정전방송장치 사용법",
+      "url": "https://youtu.be/PfCDzaQnOJs",
+      "thumbnail": "/data/edu/thumbnails/uninterruptible-announce.jpg",
+      "source": "youtube"
     }
   ]
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, MessageCircle } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './styles/Life.module.css';
 
@@ -14,7 +14,8 @@ const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
 const HallOfFame = lazy(() => import('./games/HallOfFame'));
 const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
-const BoardWorld = lazy(() => import('./board/BoardWorld'));
+const TodayFortune = lazy(() => import('./fortune/TodayFortune'));
+const AttendanceStamp = lazy(() => import('./stamp/AttendanceStamp'));
 
 class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => void }, { hasError: boolean }> {
   constructor(props: { children: ReactNode; onBack: () => void }) { super(props); this.state = { hasError: false }; }
@@ -36,7 +37,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
 }
 
 type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi';
-type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'board';
+type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
@@ -92,13 +93,24 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className={styles.dabCardWrap}>
-          <button type="button" className={styles.dabCard} onClick={() => setView('board')}>
+          <button type="button" className={styles.dabCard} onClick={() => setView('fortune')}>
             <div className={`${styles.dabCardIcon} ${styles.dabIconBlue}`}>
-              <MessageCircle size={28} />
+              <Sparkles size={28} />
             </div>
             <div className={styles.dabCardText}>
-              <span className={styles.dabCardLabel}>사업소 게시판 <span className={styles.dabCardNewBadge}>NEW</span></span>
-              <span className={styles.dabCardDesc}>답십리 동료와 익명으로 자유롭게 소통</span>
+              <span className={styles.dabCardLabel}>오늘의 운세 <span className={styles.dabCardNewBadge}>NEW</span></span>
+              <span className={styles.dabCardDesc}>5호선 기관사를 위한 오늘의 한 줄</span>
+            </div>
+            <ChevronRight size={18} className={styles.dabCardArrow} />
+          </button>
+
+          <button type="button" className={styles.dabCard} onClick={() => setView('stamp')}>
+            <div className={`${styles.dabCardIcon} ${styles.dabIconViolet}`}>
+              <Stamp size={28} />
+            </div>
+            <div className={styles.dabCardText}>
+              <span className={styles.dabCardLabel}>무사고 출근 도장 <span className={styles.dabCardNewBadge}>NEW</span></span>
+              <span className={styles.dabCardDesc}>매일 도장 찍고 마일스톤 응원 받기</span>
             </div>
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
@@ -270,12 +282,23 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // ── 사업소 게시판 ──
-  if (view === 'board') {
+  // ── 오늘의 운세 ──
+  if (view === 'fortune') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
         <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
-          <BoardWorld onBack={goLifeHome} />
+          <TodayFortune onBack={goLifeHome} />
+        </Suspense>
+      </LifeErrorBoundary>
+    );
+  }
+
+  // ── 무사고 출근 도장 ──
+  if (view === 'stamp') {
+    return (
+      <LifeErrorBoundary onBack={goLifeHome}>
+        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+          <AttendanceStamp onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
     );

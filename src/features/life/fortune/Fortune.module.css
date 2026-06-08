@@ -1,0 +1,271 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--dia-bg);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: max(var(--dia-space-3), env(safe-area-inset-top)) var(--dia-space-4) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.backBtn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-primary);
+  background: transparent;
+  border: none;
+  transition: background var(--dia-transition-fast), transform 0.12s ease;
+}
+
+.backBtn:active { background: var(--dia-surface-hover); transform: scale(0.92); }
+
+.topTitle {
+  flex: 1;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--dia-space-5) var(--dia-space-4);
+  gap: var(--dia-space-4);
+}
+
+.dateLine {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  letter-spacing: 0.3px;
+}
+
+/* ── 운세 카드 ── */
+.card {
+  width: 100%;
+  max-width: 420px;
+  min-height: 340px;
+  padding: var(--dia-space-5);
+  border-radius: var(--dia-radius-2xl);
+  cursor: pointer;
+  transition: transform 0.25s var(--dia-ease), box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 12px 30px rgba(0, 0, 0, 0.3);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: -30%; right: -30%;
+  width: 70%; height: 70%;
+  background: radial-gradient(circle, var(--card-glow, rgba(255, 255, 255, 0.18)) 0%, transparent 60%);
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.cardFront {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 300px;
+}
+
+.cardBack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.cardSparkleTop {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.15); }
+}
+
+.cardBigEmoji {
+  font-size: 90px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.cardToneLabel {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+.cardStars {
+  font-size: 20px;
+  color: #FBBF24;
+  letter-spacing: 2px;
+}
+
+.cardTapHint {
+  margin-top: 8px;
+  font-size: var(--dia-text-meta);
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
+}
+
+.cardEmojiSmall {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.cardHeadline {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: 0.2px;
+}
+
+.cardSections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--dia-radius-lg);
+  backdrop-filter: blur(4px);
+}
+
+.cardSection {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #fff;
+}
+
+.cardSectionIcon {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.cardSectionLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.cardSectionText {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.cardLuckyBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: var(--dia-radius-md);
+}
+
+.cardLuckyLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.3px;
+}
+
+.cardLuckyValue {
+  font-size: 16px;
+  font-weight: 800;
+  color: #FBBF24;
+  letter-spacing: 0.3px;
+}
+
+/* ── 톤별 색상 ── */
+.tone_great {
+  background: linear-gradient(135deg, #F472B6, #BE185D);
+  --card-glow: rgba(255, 255, 255, 0.3);
+}
+
+.tone_good {
+  background: linear-gradient(135deg, #60A5FA, #1D4ED8);
+  --card-glow: rgba(255, 255, 255, 0.22);
+}
+
+.tone_so-so {
+  background: linear-gradient(135deg, #34D399, #047857);
+  --card-glow: rgba(255, 255, 255, 0.2);
+}
+
+.tone_care {
+  background: linear-gradient(135deg, #FBBF24, #B45309);
+  --card-glow: rgba(255, 255, 255, 0.2);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 1px solid var(--dia-border);
+  border-radius: 999px;
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, background var(--dia-transition-fast);
+}
+
+.actionBtn:active {
+  transform: scale(0.96);
+  background: var(--dia-surface-hover);
+}
+
+.footnote {
+  margin-top: var(--dia-space-2);
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+  line-height: 1.6;
+}

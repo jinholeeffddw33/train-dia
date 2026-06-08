@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import styles from './RegulationViewer.module.css';
+
+/** url에서 regulationId 추출 (예: /data/edu/regulations/operation-rules-search.json → operation-rules) */
+function deriveRegulationId(url: string): string {
+  return url.match(/regulations\/([^/]+?)(?:-search)?\.(json|pdf)$/)?.[1] ?? url;
+}
 
 interface RegulationPage {
   page: number;
@@ -160,7 +166,20 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const tocAnchorRefs = useRef<Map<string, HTMLElement>>(new Map());
   const bodyRef = useRef<HTMLDivElement>(null);
 
+  // ── 형광·메모 (localStorage) ──
+  const regulationId = deriveRegulationId(url);
+  const { annotations, add: addAnnotation, update: updateAnnotation, remove: removeAnnotation } = useAnnotations(regulationId);
+  const [selPopover, setSelPopover] = useState<{
+    text: string; before: string; after: string; page: number; x: number; y: number;
+  } | null>(null);
+  const [memoEditor, setMemoEditor] = useState<{ id: string; text: string; memo: string } | null>(null);
+  const [memoDraft, setMemoDraft] = useState('');
+  const [notesOpen, setNotesOpen] = useState(false);
+
   useHistoryBack('regulation-pdf', () => setPdfOpen(false), pdfOpen);
+  useHistoryBack('regulation-popover', () => setSelPopover(null), !!selPopover);
+  useHistoryBack('regulation-memo', () => setMemoEditor(null), !!memoEditor);
+  useHistoryBack('regulation-notes', () => setNotesOpen(false), notesOpen);
 
   useEffect(() => {
     let active = true;
@@ -207,6 +226,229 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     pageRefs.current.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [loading, pages]);
+
+  // ── 텍스트 선택 캡처 → 형광 팝오버 ──
+  useEffect(() => {
+    if (loading || pages.length === 0) return;
+    const root = bodyRef.current;
+    if (!root) return;
+    const handleSelectionEnd = () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+      const range = sel.getRangeAt(0);
+      // 본문 영역 안의 선택만 처리
+      if (!root.contains(range.commonAncestorContainer)) return;
+      const text = sel.toString().trim();
+      if (text.length < 2 || text.length > 300) return; // 너무 짧거나 길면 무시
+      // 페이지 식별
+      const anchorEl = (range.commonAncestorContainer as Node).nodeType === Node.TEXT_NODE
+        ? (range.commonAncestorContainer as Text).parentElement
+        : (range.commonAncestorContainer as Element);
+      const pageEl = anchorEl?.closest('[data-page]') as HTMLElement | null;
+      if (!pageEl) return;
+      const page = parseInt(pageEl.dataset.page || '0', 10);
+      if (!page) return;
+      // 원본 페이지 텍스트에서 위치 찾기 + 컨텍스트 확보
+      const pageData = pages.find((p) => p.page === page);
+      if (!pageData) return;
+      const pos = pageData.text.indexOf(text);
+      if (pos < 0) return;
+      const before = pageData.text.slice(Math.max(0, pos - 30), pos);
+      const after = pageData.text.slice(pos + text.length, pos + text.length + 30);
+      // 팝오버 위치
+      const rect = range.getBoundingClientRect();
+      setSelPopover({
+        text, before, after, page,
+        x: rect.left + rect.width / 2,
+        y: rect.top,
+      });
+    };
+    document.addEventListener('mouseup', handleSelectionEnd);
+    document.addEventListener('touchend', handleSelectionEnd);
+    return () => {
+      document.removeEventListener('mouseup', handleSelectionEnd);
+      document.removeEventListener('touchend', handleSelectionEnd);
+    };
+  }, [loading, pages]);
+
+  // ── annotations → DOM 적용 (텍스트 노드 walk + wrap) ──
+  useEffect(() => {
+    const root = bodyRef.current;
+    if (!root) return;
+    // 1) 기존 annotation 마크 제거 (텍스트 노드로 복원)
+    root.querySelectorAll(`[data-anno]`).forEach((el) => {
+      const parent = el.parentNode;
+      if (!parent) return;
+      while (el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+      parent.normalize();
+    });
+    if (annotations.length === 0) return;
+
+    // 2) 각 annotation을 page DOM에서 텍스트 매칭 → wrap
+    const byPage = new Map<number, Annotation[]>();
+    for (const a of annotations) {
+      const arr = byPage.get(a.page) ?? [];
+      arr.push(a);
+      byPage.set(a.page, arr);
+    }
+
+    byPage.forEach((annos, pageNum) => {
+      const pageEl = root.querySelector(`[data-page="${pageNum}"]`) as HTMLElement | null;
+      if (!pageEl) return;
+      for (const anno of annos) {
+        // 페이지 DOM의 모든 텍스트 노드를 평탄화
+        const walker = document.createTreeWalker(pageEl, NodeFilter.SHOW_TEXT);
+        const nodes: Text[] = [];
+        let cursor: Node | null = walker.nextNode();
+        let flat = '';
+        const offsets: { node: Text; start: number }[] = [];
+        while (cursor) {
+          const tn = cursor as Text;
+          offsets.push({ node: tn, start: flat.length });
+          flat += tn.data;
+          nodes.push(tn);
+          cursor = walker.nextNode();
+        }
+        // before+text+after 형태로 위치 찾되, 본문 변형 가능성 대비 단계적 매칭
+        const needle = anno.text;
+        let idx = -1;
+        // 1차: full context로 시도
+        const fullCtx = anno.before + anno.text + anno.after;
+        idx = flat.indexOf(fullCtx);
+        if (idx >= 0) idx += anno.before.length;
+        // 2차: before만으로
+        if (idx < 0) {
+          const withBefore = anno.before + anno.text;
+          const found = flat.indexOf(withBefore);
+          if (found >= 0) idx = found + anno.before.length;
+        }
+        // 3차: text 단독 (첫 번째 매치)
+        if (idx < 0) idx = flat.indexOf(needle);
+        if (idx < 0) continue;
+        const endIdx = idx + needle.length;
+
+        // 시작/끝 텍스트 노드 + 노드 내 offset 찾기
+        const findNodeFor = (pos: number): { node: Text; offset: number } | null => {
+          for (let i = 0; i < offsets.length; i++) {
+            const o = offsets[i];
+            const nodeEnd = o.start + o.node.data.length;
+            if (pos >= o.start && pos <= nodeEnd) {
+              return { node: o.node, offset: pos - o.start };
+            }
+          }
+          return null;
+        };
+        const startLoc = findNodeFor(idx);
+        const endLoc = findNodeFor(endIdx);
+        if (!startLoc || !endLoc) continue;
+
+        // Range 생성 후 surroundContents 시도. 노드 경계 걸치면 splitText로 정리.
+        try {
+          const range = document.createRange();
+          range.setStart(startLoc.node, startLoc.offset);
+          range.setEnd(endLoc.node, endLoc.offset);
+          const span = document.createElement('span');
+          span.setAttribute('data-anno', anno.id);
+          span.setAttribute('data-color', anno.color);
+          span.className = styles.annotation + ' ' + styles[`annotationColor_${anno.color}`];
+          if (anno.memo) span.setAttribute('title', anno.memo);
+          // 단일 텍스트 노드 안이면 surroundContents 가능
+          if (startLoc.node === endLoc.node) {
+            range.surroundContents(span);
+          } else {
+            // 여러 노드 걸치면 extractContents → append → insert
+            const frag = range.extractContents();
+            span.appendChild(frag);
+            range.insertNode(span);
+          }
+          // 메모 있으면 작은 인디케이터 추가
+          if (anno.memo) {
+            const badge = document.createElement('span');
+            badge.className = styles.annotationMemoBadge;
+            badge.setAttribute('data-anno-badge', anno.id);
+            badge.textContent = '📝';
+            badge.setAttribute('aria-label', '메모 보기');
+            span.appendChild(badge);
+          }
+        } catch { /* 일부 케이스에서 wrap 실패 — 무시하고 다음 annotation 처리 */ }
+      }
+    });
+  }, [annotations, pages, query, activeMatchIdx, fontSize]);
+
+  // ── 본문 클릭 → annotation 클릭 처리 (메모 보기·편집) ──
+  useEffect(() => {
+    const root = bodyRef.current;
+    if (!root) return;
+    const onClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const annoEl = target.closest('[data-anno]') as HTMLElement | null;
+      if (!annoEl) return;
+      const id = annoEl.dataset.anno;
+      if (!id) return;
+      const anno = annotations.find((a) => a.id === id);
+      if (!anno) return;
+      e.stopPropagation();
+      setMemoEditor({ id, text: anno.text, memo: anno.memo ?? '' });
+      setMemoDraft(anno.memo ?? '');
+    };
+    root.addEventListener('click', onClick);
+    return () => root.removeEventListener('click', onClick);
+  }, [annotations]);
+
+  const handleAddHighlight = useCallback((color: HighlightColor) => {
+    if (!selPopover) return;
+    addAnnotation({
+      page: selPopover.page,
+      text: selPopover.text,
+      before: selPopover.before,
+      after: selPopover.after,
+      color,
+    });
+    setSelPopover(null);
+    window.getSelection()?.removeAllRanges();
+  }, [selPopover, addAnnotation]);
+
+  const handleAddWithMemo = useCallback(() => {
+    if (!selPopover) return;
+    const item = addAnnotation({
+      page: selPopover.page,
+      text: selPopover.text,
+      before: selPopover.before,
+      after: selPopover.after,
+      color: 'yellow',
+    });
+    setMemoEditor({ id: item.id, text: item.text, memo: '' });
+    setMemoDraft('');
+    setSelPopover(null);
+    window.getSelection()?.removeAllRanges();
+  }, [selPopover, addAnnotation]);
+
+  const handleMemoSave = useCallback(() => {
+    if (!memoEditor) return;
+    updateAnnotation(memoEditor.id, { memo: memoDraft.trim() });
+    setMemoEditor(null);
+  }, [memoEditor, memoDraft, updateAnnotation]);
+
+  const handleMemoDelete = useCallback(() => {
+    if (!memoEditor) return;
+    removeAnnotation(memoEditor.id);
+    setMemoEditor(null);
+  }, [memoEditor, removeAnnotation]);
+
+  const scrollToAnnotation = useCallback((anno: Annotation) => {
+    setNotesOpen(false);
+    requestAnimationFrame(() => {
+      const root = bodyRef.current;
+      if (!root) return;
+      const el = root.querySelector(`[data-anno="${anno.id}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else {
+        const pageEl = pageRefs.current.get(anno.page);
+        if (pageEl) pageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }, []);
 
   // PDF.js 자체 뷰어로 표시 (iOS Safari 등 모든 브라우저에서 #page=N 정확 동작)
   const pdfSrcWithPage = useMemo(() => {
@@ -471,6 +713,15 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
             <span>원본 PDF</span>
           </button>
         )}
+        <button
+          type="button"
+          className={styles.pdfBtn}
+          onClick={() => setNotesOpen(true)}
+          aria-label="내 메모·형광 목록"
+        >
+          <span>📝</span>
+          <span>내 메모 {annotations.length > 0 && `(${annotations.length})`}</span>
+        </button>
       </div>
 
       {/* STYLE-EXCEPTION: 사용자 선택 폰트 크기를 CSS 변수로 전달 (런타임 값) */}
@@ -549,6 +800,110 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
           </div>
           <div className={styles.pdfIframeWrap}>
             <iframe src={pdfSrcWithPage} title={`${title} 원본 PDF p.${visiblePage}`} className={styles.pdfIframe} />
+          </div>
+        </div>
+      )}
+
+      {/* 형광색 선택 팝오버 (텍스트 선택 직후) */}
+      {selPopover && (
+        <div
+          className={styles.annoPopover}
+          /* STYLE-EXCEPTION: 동적 좌표 (브라우저 selection 위치) */
+          style={{ left: selPopover.x, top: selPopover.y }}
+          role="dialog"
+          aria-label="형광 선택"
+        >
+          <button
+            type="button"
+            className={`${styles.annoColorBtn} ${styles.annoColorYellow}`}
+            onClick={() => handleAddHighlight('yellow')}
+            aria-label="노랑 형광"
+          />
+          <button
+            type="button"
+            className={`${styles.annoColorBtn} ${styles.annoColorPink}`}
+            onClick={() => handleAddHighlight('pink')}
+            aria-label="분홍 형광"
+          />
+          <button
+            type="button"
+            className={`${styles.annoColorBtn} ${styles.annoColorGreen}`}
+            onClick={() => handleAddHighlight('green')}
+            aria-label="초록 형광"
+          />
+          <button
+            type="button"
+            className={styles.annoMemoBtn}
+            onClick={handleAddWithMemo}
+            aria-label="형광 + 메모"
+          >
+            📝
+          </button>
+          <button
+            type="button"
+            className={styles.annoCloseBtn}
+            onClick={() => setSelPopover(null)}
+            aria-label="취소"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* 메모 작성·편집 모달 */}
+      {memoEditor && (
+        <div className={styles.memoOverlay} role="dialog" aria-modal="true" aria-label="메모">
+          <div className={styles.memoCard}>
+            <div className={styles.memoHeader}>
+              <h3 className={styles.memoTitle}>메모</h3>
+              <button type="button" className={styles.memoClose} onClick={() => setMemoEditor(null)} aria-label="닫기">✕</button>
+            </div>
+            <p className={styles.memoQuote}>"{memoEditor.text}"</p>
+            <textarea
+              className={styles.memoTextarea}
+              value={memoDraft}
+              onChange={(e) => setMemoDraft(e.target.value)}
+              placeholder="이 형광에 대한 메모를 적어두세요"
+              maxLength={500}
+              rows={5}
+              autoFocus
+            />
+            <div className={styles.memoActions}>
+              <button type="button" className={styles.memoDelete} onClick={handleMemoDelete}>형광·메모 삭제</button>
+              <button type="button" className={styles.memoSave} onClick={handleMemoSave}>저장</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 내 메모·형광 목록 시트 */}
+      {notesOpen && (
+        <div className={styles.notesOverlay} role="dialog" aria-modal="true" aria-label="내 메모 목록" onClick={(e) => { if (e.target === e.currentTarget) setNotesOpen(false); }}>
+          <div className={styles.notesSheet}>
+            <div className={styles.notesHeader}>
+              <h3 className={styles.notesTitle}>내 메모 · 형광 <span className={styles.notesCount}>{annotations.length}건</span></h3>
+              <button type="button" className={styles.memoClose} onClick={() => setNotesOpen(false)} aria-label="닫기">✕</button>
+            </div>
+            <div className={styles.notesList}>
+              {annotations.length === 0 && (
+                <p className={styles.notesEmpty}>본문에서 글자를 선택하면 형광을 칠하거나 메모를 남길 수 있어요</p>
+              )}
+              {annotations.slice().sort((a, b) => a.page - b.page || a.updatedAt.localeCompare(b.updatedAt)).map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  className={`${styles.notesItem} ${styles[`notesItemColor_${a.color}`]}`}
+                  onClick={() => scrollToAnnotation(a)}
+                >
+                  <div className={styles.notesItemHead}>
+                    <span className={styles.notesItemPage}>p. {a.page}</span>
+                    {a.memo && <span className={styles.notesItemMemoBadge}>📝</span>}
+                  </div>
+                  <p className={styles.notesItemText}>{a.text}</p>
+                  {a.memo && <p className={styles.notesItemMemo}>{a.memo}</p>}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

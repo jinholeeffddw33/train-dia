@@ -527,3 +527,313 @@
   border: none;
   background: #fff;
 }
+
+/* ─────────────────────────────────────────────
+ * 형광·메모 (Annotations)
+ * ───────────────────────────────────────────── */
+
+/* 본문에 적용되는 형광 mark */
+.annotation {
+  border-radius: 3px;
+  padding: 1px 1px;
+  cursor: pointer;
+  position: relative;
+  transition: filter 0.15s ease;
+}
+.annotation:hover { filter: brightness(0.95); }
+
+.annotationColor_yellow { background: rgba(250, 204, 21, 0.55); }
+.annotationColor_pink   { background: rgba(244, 114, 182, 0.45); }
+.annotationColor_green  { background: rgba(74, 222, 128, 0.45); }
+
+:global(.light) .annotationColor_yellow { background: rgba(250, 204, 21, 0.7); }
+:global(.light) .annotationColor_pink   { background: rgba(244, 114, 182, 0.55); }
+:global(.light) .annotationColor_green  { background: rgba(74, 222, 128, 0.55); }
+
+.annotationMemoBadge {
+  margin-left: 2px;
+  font-size: 11px;
+  vertical-align: super;
+}
+
+/* 형광 선택 팝오버 (선택 위에 떠 있음) */
+.annoPopover {
+  position: fixed;
+  transform: translate(-50%, -110%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--dia-surface-elevated, #1f2937);
+  border: 1px solid var(--dia-border);
+  border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  z-index: 1300;
+  animation: annoPop 160ms var(--dia-ease, ease-out);
+}
+
+@keyframes annoPop {
+  from { opacity: 0; transform: translate(-50%, -100%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -110%) scale(1); }
+}
+
+.annoColorBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.annoColorBtn:active { transform: scale(0.9); }
+
+.annoColorYellow { background: #FACC15; }
+.annoColorPink   { background: #F472B6; }
+.annoColorGreen  { background: #4ADE80; }
+
+.annoMemoBtn,
+.annoCloseBtn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--dia-text-primary, #fff);
+  cursor: pointer;
+  font-size: 14px;
+}
+.annoMemoBtn:active,
+.annoCloseBtn:active { transform: scale(0.9); }
+
+/* 메모 작성 모달 */
+.memoOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1310;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dia-space-4);
+}
+
+.memoCard {
+  width: 100%;
+  max-width: 420px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.memoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memoTitle {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.memoClose {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: var(--dia-text-tertiary);
+  border-radius: var(--dia-radius-full);
+  font-size: 16px;
+  cursor: pointer;
+}
+.memoClose:active { background: var(--dia-surface-hover); transform: scale(0.92); }
+
+.memoQuote {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--dia-bg-elevated);
+  border-left: 3px solid var(--dia-amber);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  font-style: italic;
+  line-height: 1.5;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.memoTextarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 12px;
+  background: var(--dia-bg-elevated);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.memoActions {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.memoDelete,
+.memoSave {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.memoDelete {
+  background: transparent;
+  color: var(--dia-red);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+.memoDelete:active { background: rgba(239, 68, 68, 0.1); transform: scale(0.97); }
+
+.memoSave {
+  flex: 1;
+  background: linear-gradient(145deg, #60A5FA, #2563EB);
+  color: #fff;
+}
+.memoSave:active { transform: scale(0.97); filter: brightness(0.95); }
+
+/* 내 메모 목록 시트 */
+.notesOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1305;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.notesSheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  background: var(--dia-surface);
+  border-top-left-radius: var(--dia-radius-2xl);
+  border-top-right-radius: var(--dia-radius-2xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.notesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.notesTitle {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.notesCount {
+  margin-left: 6px;
+  padding: 2px 8px;
+  font-size: var(--dia-text-meta);
+  background: var(--dia-amber-dim, var(--dia-surface-hover));
+  color: var(--dia-amber);
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.notesList {
+  overflow-y: auto;
+  padding: var(--dia-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notesEmpty {
+  text-align: center;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  padding: var(--dia-space-5) 0;
+}
+
+.notesItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--dia-bg-elevated);
+  border: 1px solid var(--dia-border);
+  border-left: 4px solid var(--dia-amber);
+  border-radius: var(--dia-radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dia-transition-fast);
+}
+
+.notesItem:active { background: var(--dia-surface-hover); }
+
+.notesItemColor_yellow { border-left-color: #FACC15; }
+.notesItemColor_pink   { border-left-color: #F472B6; }
+.notesItemColor_green  { border-left-color: #4ADE80; }
+
+.notesItemHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notesItemPage {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+  font-weight: 600;
+}
+
+.notesItemMemoBadge {
+  font-size: 12px;
+}
+
+.notesItemText {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notesItemMemo {
+  margin: 0;
+  padding-top: 4px;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  border-top: 1px dashed var(--dia-border);
+  line-height: 1.4;
+  white-space: pre-wrap;
+}

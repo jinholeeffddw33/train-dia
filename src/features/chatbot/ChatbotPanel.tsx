@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, Mic, MicOff } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { matchIntent, QUICK_QUESTIONS } from './intents';
 import { handleIntent } from './handlers';
 import styles from './Chatbot.module.css';
@@ -56,7 +57,7 @@ export default function ChatbotPanel({ onClose }: Props) {
       const intent = matchIntent(trimmed);
       const answer = await handleIntent(intent, { driver, today: new Date() });
       setMsgs((m) => [...m, { id: `b-${Date.now()}`, role: 'bot', text: answer }]);
-    } catch (e) {
+    } catch {
       setMsgs((m) => [...m, { id: `b-${Date.now()}`, role: 'bot', text: '답변 중 오류가 났어요. 다시 물어봐주세요' }]);
     } finally {
       setThinking(false);
@@ -64,6 +65,22 @@ export default function ChatbotPanel({ onClose }: Props) {
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [thinking, driver]);
+
+  // 음성 인식 — 최종 결과 받으면 자동 전송
+  const speech = useSpeechRecognition({
+    onResult: (text) => {
+      if (text) ask(text);
+    },
+    onInterim: (text) => {
+      // 인식 중간 결과는 입력란에 미리 채워 사용자가 볼 수 있게
+      if (text) setInput(text);
+    },
+  });
+
+  const toggleMic = useCallback(() => {
+    if (speech.listening) speech.stop();
+    else { setInput(''); speech.start(); }
+  }, [speech]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +137,9 @@ export default function ChatbotPanel({ onClose }: Props) {
           ))}
         </div>
 
+        {speech.error && (
+          <div className={styles.micError}>⚠️ {speech.error}</div>
+        )}
         <form className={styles.inputBar} onSubmit={onSubmit}>
           <input
             ref={inputRef}
@@ -127,10 +147,21 @@ export default function ChatbotPanel({ onClose }: Props) {
             className={styles.input}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="일상 질문을 입력하세요"
+            placeholder={speech.listening ? '듣고 있어요...' : '일상 질문을 입력하거나 🎤 눌러 말하세요'}
             autoComplete="off"
-            disabled={thinking}
+            disabled={thinking || speech.listening}
           />
+          {speech.supported && (
+            <button
+              type="button"
+              className={`${styles.micBtn} ${speech.listening ? styles.micBtnActive : ''}`}
+              onClick={toggleMic}
+              disabled={thinking}
+              aria-label={speech.listening ? '음성 인식 중지' : '음성으로 말하기'}
+            >
+              {speech.listening ? <MicOff size={18} /> : <Mic size={18} />}
+            </button>
+          )}
           <button type="submit" className={styles.sendBtn} disabled={thinking || !input.trim()} aria-label="보내기">
             <Send size={18} />
           </button>

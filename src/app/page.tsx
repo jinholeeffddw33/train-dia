@@ -13,6 +13,7 @@ import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
+import { ChatbotFab, ChatbotPanel } from '@/features/chatbot';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
@@ -43,6 +44,7 @@ function TabContent({ tab }: { tab: TabId }) {
 function HomeTab() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [driverOpen, setDriverOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   // 홈 진입 시 오늘 접속 기록 (오늘 1회만 서버에서 처리)
   useEffect(() => {
@@ -61,6 +63,10 @@ function HomeTab() {
       <StatusCards baseDate={selectedDate} />
       <HomeTipsQuiz />
       <DriverSelector open={driverOpen} onClose={() => setDriverOpen(false)} />
+
+      {/* 일상 도우미 챗봇 — 홈에도 노출. 드래그로 이동 (위치 캘린더와 공유) */}
+      <ChatbotFab onClick={() => setChatOpen(true)} />
+      {chatOpen && <ChatbotPanel onClose={() => setChatOpen(false)} />}
     </>
   );
 }

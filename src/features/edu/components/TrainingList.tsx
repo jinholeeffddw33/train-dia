@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle, Train, Users, UserCheck, Award, Warehouse, ChevronRight, FileCog } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle, Train, Users, UserCheck, Award, Warehouse, ChevronRight, FileCog, UserCog, Briefcase } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from '../styles/edu.module.css';
 import RegulationViewer from './RegulationViewer';
@@ -17,7 +17,7 @@ interface TrainingItem {
   quiz?: { url: string };
 }
 
-type RegTheme = 'blue' | 'sky' | 'purple' | 'amber' | 'green' | 'rose' | 'teal';
+type RegTheme = 'blue' | 'sky' | 'purple' | 'amber' | 'green' | 'rose' | 'teal' | 'indigo' | 'slate';
 
 interface RegMeta {
   theme: RegTheme;
@@ -33,6 +33,8 @@ const REG_META: Record<string, RegMeta> = {
   'depot-operation-rules': { theme: 'green',  icon: Warehouse,  subtitle: '차량기지 입·출고 운전 취급' },
   'safety-record-rules':   { theme: 'rose',   icon: Award,      subtitle: '무사고 누적·심사·포상' },
   'detail-operation-rules':{ theme: 'teal',   icon: FileCog,    subtitle: '화재·대용폐색·전령법·고장조치 세부절차' },
+  'hr-rules':              { theme: 'indigo', icon: UserCog,    subtitle: '채용·승진·휴직·징계·정년 등 인사 전반' },
+  'employment-rules':      { theme: 'slate',  icon: Briefcase,  subtitle: '근무시간·휴가·복무·복리후생·괴롭힘 방지' },
 };
 
 const THEME_CLASS: Record<RegTheme, string> = {
@@ -43,6 +45,8 @@ const THEME_CLASS: Record<RegTheme, string> = {
   green:  styles.regThemeGreen,
   rose:   styles.regThemeRose,
   teal:   styles.regThemeTeal,
+  indigo: styles.regThemeIndigo,
+  slate:  styles.regThemeSlate,
 };
 
 interface TrainingListProps {

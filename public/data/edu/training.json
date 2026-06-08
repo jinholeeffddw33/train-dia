@@ -89,5 +89,31 @@
     "quiz": {
       "url": "/data/edu/regulations/detail-operation-rules-quiz.json"
     }
+  },
+  {
+    "id": "hr-rules",
+    "title": "인사규정",
+    "category": "규정",
+    "doc": {
+      "url": "/data/edu/regulations/hr-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/hr-rules.pdf",
+      "version": "24.7.11"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/hr-rules-quiz.json"
+    }
+  },
+  {
+    "id": "employment-rules",
+    "title": "취업규칙",
+    "category": "규칙",
+    "doc": {
+      "url": "/data/edu/regulations/employment-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/employment-rules.pdf",
+      "version": "26.5.29"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/employment-rules-quiz.json"
+    }
   }
 ]

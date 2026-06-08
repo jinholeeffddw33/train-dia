@@ -131,6 +131,8 @@ const REGULATIONS: RegulationDef[] = [
   { id: 'depot-operation-rules',  title: '차량기지운전취급내규',   shortName: '차량기지', quizUrl: '/data/edu/regulations/depot-operation-rules-quiz.json',  totalQuestions: 126 },
   { id: 'safety-record-rules',    title: '운전무사고성적심사규정', shortName: '무사고',   quizUrl: '/data/edu/regulations/safety-record-rules-quiz.json',    totalQuestions: 26 },
   { id: 'detail-operation-rules', title: '운전취급세부요령',       shortName: '세부요령', quizUrl: '/data/edu/regulations/detail-operation-rules-quiz.json', totalQuestions: 28 },
+  { id: 'hr-rules',               title: '인사규정',               shortName: '인사',     quizUrl: '/data/edu/regulations/hr-rules-quiz.json',               totalQuestions: 58 },
+  { id: 'employment-rules',       title: '취업규칙',               shortName: '취업',     quizUrl: '/data/edu/regulations/employment-rules-quiz.json',       totalQuestions: 38 },
 ];
 
 /** 규정 wrongAnswer의 chapterId 프리픽스 */

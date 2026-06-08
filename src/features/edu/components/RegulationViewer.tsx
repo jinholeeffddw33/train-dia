@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import styles from './RegulationViewer.module.css';
@@ -165,6 +165,8 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const pageRefs = useRef<Map<number, HTMLElement>>(new Map());
   const tocAnchorRefs = useRef<Map<string, HTMLElement>>(new Map());
   const bodyRef = useRef<HTMLDivElement>(null);
+  const tocCardRef = useRef<HTMLDivElement>(null);
+  const [showTocFab, setShowTocFab] = useState(false);
 
   // ── 형광·메모 (localStorage) ──
   const regulationId = deriveRegulationId(url);
@@ -226,6 +228,16 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     pageRefs.current.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [loading, pages]);
+
+  // 목차로 즉시 스크롤
+  const scrollToTopToc = useCallback(() => {
+    const el = tocCardRef.current;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // 접혀 있던 경우 자동으로 펼침
+      if (!tocOpen) setTocOpen(true);
+    }
+  }, [tocOpen]);
 
   // ── 텍스트 선택 캡처 → 형광 팝오버 ──
   useEffect(() => {
@@ -459,6 +471,17 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
   // 목차 (장·절) 파싱
   const tocEntries = useMemo(() => parseToc(pages), [pages]);
+
+  // 목차 카드가 화면 밖으로 벗어나면 "목차로" FAB 노출
+  useEffect(() => {
+    if (loading || tocEntries.length === 0 || !tocCardRef.current || !bodyRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowTocFab(!entry.isIntersecting),
+      { root: bodyRef.current, threshold: 0 },
+    );
+    observer.observe(tocCardRef.current);
+    return () => observer.disconnect();
+  }, [loading, tocEntries.length]);
 
   // 검색 매치 카운트
   const { totalMatches, perPageMatchCount } = useMemo(() => {
@@ -733,7 +756,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
         {/* 목차 카드 */}
         {!loading && tocEntries.length > 0 && (
-          <div className={styles.tocCard}>
+          <div ref={tocCardRef} className={styles.tocCard}>
             <button
               type="button"
               className={styles.tocToggle}
@@ -789,6 +812,19 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
           );
         })}
       </div>
+
+      {/* 목차로 빠르게 이동하는 FAB — TOC 카드가 화면 밖으로 나갔을 때 노출 */}
+      {showTocFab && tocEntries.length > 0 && (
+        <button
+          type="button"
+          className={styles.tocFab}
+          onClick={scrollToTopToc}
+          aria-label="목차로 이동"
+        >
+          <ListTree size={18} />
+          <span>목차로</span>
+        </button>
+      )}
 
       {pdfOpen && pdfUrl && (
         <div className={styles.pdfOverlay} role="dialog" aria-modal="true" aria-label={`${title} 원본 PDF`}>

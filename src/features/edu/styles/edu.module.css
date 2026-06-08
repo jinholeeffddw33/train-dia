@@ -4234,6 +4234,20 @@
   --reg-icon-shadow: rgba(225, 29, 72, 0.5);
 }
 
+.regThemeTeal {
+  --reg-accent: #2DD4BF;
+  --reg-tint-1: rgba(20, 184, 166, 0.12);
+  --reg-tint-2: rgba(20, 184, 166, 0.02);
+  --reg-border: rgba(20, 184, 166, 0.3);
+  --reg-border-strong: rgba(20, 184, 166, 0.5);
+  --reg-glow: 0 12px 32px rgba(20, 184, 166, 0.18);
+  --reg-glow-1: rgba(45, 212, 191, 0.22);
+  --reg-glow-2: rgba(13, 148, 136, 0.15);
+  --reg-icon-start: #2DD4BF;
+  --reg-icon-end: #0D9488;
+  --reg-icon-shadow: rgba(13, 148, 136, 0.5);
+}
+
 .trainingCardHeader {
   display: flex;
   align-items: center;

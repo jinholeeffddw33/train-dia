@@ -76,5 +76,18 @@
     "quiz": {
       "url": "/data/edu/regulations/crew-business-rules-quiz.json"
     }
+  },
+  {
+    "id": "detail-operation-rules",
+    "title": "운전취급세부요령",
+    "category": "요령",
+    "doc": {
+      "url": "/data/edu/regulations/detail-operation-rules-search.json",
+      "pdfUrl": "/data/edu/regulations/detail-operation-rules.pdf",
+      "version": "23.7.17"
+    },
+    "quiz": {
+      "url": "/data/edu/regulations/detail-operation-rules-quiz.json"
+    }
   }
 ]

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle, Train, Users, UserCheck, Award, Warehouse, ChevronRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle, Train, Users, UserCheck, Award, Warehouse, ChevronRight, FileCog } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from '../styles/edu.module.css';
 import RegulationViewer from './RegulationViewer';
@@ -17,7 +17,7 @@ interface TrainingItem {
   quiz?: { url: string };
 }
 
-type RegTheme = 'blue' | 'sky' | 'purple' | 'amber' | 'green' | 'rose';
+type RegTheme = 'blue' | 'sky' | 'purple' | 'amber' | 'green' | 'rose' | 'teal';
 
 interface RegMeta {
   theme: RegTheme;
@@ -32,6 +32,7 @@ const REG_META: Record<string, RegMeta> = {
   'operating-staff-rules': { theme: 'amber',  icon: UserCheck,  subtitle: '운전관계 직원의 안전 작업' },
   'depot-operation-rules': { theme: 'green',  icon: Warehouse,  subtitle: '차량기지 입·출고 운전 취급' },
   'safety-record-rules':   { theme: 'rose',   icon: Award,      subtitle: '무사고 누적·심사·포상' },
+  'detail-operation-rules':{ theme: 'teal',   icon: FileCog,    subtitle: '화재·대용폐색·전령법·고장조치 세부절차' },
 };
 
 const THEME_CLASS: Record<RegTheme, string> = {
@@ -41,6 +42,7 @@ const THEME_CLASS: Record<RegTheme, string> = {
   amber:  styles.regThemeAmber,
   green:  styles.regThemeGreen,
   rose:   styles.regThemeRose,
+  teal:   styles.regThemeTeal,
 };
 
 interface TrainingListProps {

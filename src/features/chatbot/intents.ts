@@ -82,10 +82,16 @@ function normalize(text: string): string {
 
 function ruleMatches(rule: IntentRule, text: string): boolean {
   const t = ' ' + text + ' ';
+  // 정규식 우선
   if (rule.re && rule.re.test(text)) return true;
-  if (rule.all && rule.all.every((k) => t.includes(k.toLowerCase()))) return true;
-  if (rule.any && rule.any.some((k) => t.includes(k.toLowerCase()))) return true;
-  return false;
+  // all + any 둘 다 있으면 AND: all 전부 매치 AND any 중 하나 매치
+  // all만 있으면 all 전부, any만 있으면 any 중 하나
+  const hasAll = !!rule.all && rule.all.length > 0;
+  const hasAny = !!rule.any && rule.any.length > 0;
+  if (!hasAll && !hasAny) return false;
+  const allOk = !hasAll || rule.all!.every((k) => t.includes(k.toLowerCase()));
+  const anyOk = !hasAny || rule.any!.some((k) => t.includes(k.toLowerCase()));
+  return allOk && anyOk;
 }
 
 export function matchIntent(input: string): IntentId {

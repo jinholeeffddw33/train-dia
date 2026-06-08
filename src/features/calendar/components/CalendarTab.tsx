@@ -9,6 +9,7 @@ import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import SwapBottomSheet from './SwapBottomSheet';
 import MissionCardModal from './MissionCardModal';
+import { ChatbotFab, ChatbotPanel } from '@/features/chatbot';
 import { MonthSummary, DutyInfoCard } from '@/features/home';
 import styles from '../styles/Calendar.module.css';
 import missionStyles from '../styles/MissionCard.module.css';
@@ -31,6 +32,7 @@ export default function CalendarTab() {
   const [swapMode, setSwapMode] = useState(false);
   const [swapTargetDate, setSwapTargetDate] = useState<string | null>(null);
   const [missionOpen, setMissionOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   // 임무카드 표시용 사번·이름 (카드 미발급 대상은 진입 버튼 숨김)
   const missionSabun = driver?.s ?? authUser?.sabun ?? '';
@@ -153,6 +155,10 @@ export default function CalendarTab() {
           onClose={() => setMissionOpen(false)}
         />
       )}
+
+      {/* 일상 도우미 챗봇 — 근무 탭 전용. 드래그로 위치 이동 가능 */}
+      <ChatbotFab onClick={() => setChatOpen(true)} />
+      {chatOpen && <ChatbotPanel onClose={() => setChatOpen(false)} />}
 
       {/* 교번변경 바텀시트 */}
       {swapTargetDate && (

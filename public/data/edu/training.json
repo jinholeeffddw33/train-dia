@@ -94,6 +94,7 @@
     "id": "hr-rules",
     "title": "인사규정",
     "category": "규정",
+    "group": "hr",
     "doc": {
       "url": "/data/edu/regulations/hr-rules-search.json",
       "pdfUrl": "/data/edu/regulations/hr-rules.pdf",
@@ -107,6 +108,7 @@
     "id": "employment-rules",
     "title": "취업규칙",
     "category": "규칙",
+    "group": "hr",
     "doc": {
       "url": "/data/edu/regulations/employment-rules-search.json",
       "pdfUrl": "/data/edu/regulations/employment-rules.pdf",

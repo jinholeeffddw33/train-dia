@@ -3935,6 +3935,77 @@
 }
 
 /* ═══════════════════════════════════════════
+ * 규정 그룹 (운행 vs 인사·복무 시각 분리)
+ * ═══════════════════════════════════════════ */
+
+.regGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+.regGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--dia-radius-lg);
+  margin-top: var(--dia-space-2);
+}
+
+/* 운행 규정 헤더 — 블루 계열 */
+.regGroupHeaderOp {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(59, 130, 246, 0.04));
+  border-left: 4px solid var(--dia-blue);
+}
+
+.regGroupHeaderOp .regGroupTitle { color: var(--dia-blue); }
+.regGroupHeaderOp .regGroupCount {
+  background: rgba(59, 130, 246, 0.18);
+  color: var(--dia-blue);
+}
+
+/* 인사·복무 규정 헤더 — 인디고/슬레이트 톤 */
+.regGroupHeaderHr {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.14), rgba(100, 116, 139, 0.04));
+  border-left: 4px solid #818CF8;
+}
+
+.regGroupHeaderHr .regGroupTitle { color: #818CF8; }
+.regGroupHeaderHr .regGroupCount {
+  background: rgba(99, 102, 241, 0.18);
+  color: #818CF8;
+}
+
+/* 인사·복무 그룹 — 위쪽에 점선 구분선 + 상단 여백으로 시각 분리 */
+.regGroupHr {
+  position: relative;
+  margin-top: var(--dia-space-5);
+  padding-top: var(--dia-space-4);
+  border-top: 1px dashed var(--dia-border);
+}
+
+.regGroupEmoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.regGroupTitle {
+  flex: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.regGroupCount {
+  padding: 3px 12px;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+/* ═══════════════════════════════════════════
  * 규정 카드 (세련된 디자인)
  * ═══════════════════════════════════════════ */
 

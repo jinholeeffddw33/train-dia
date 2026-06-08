@@ -11,6 +11,7 @@ interface TrainingItem {
   id: string;
   title: string;
   category: string;
+  group?: 'operation' | 'hr';
   slide?: { chapterIds: string[] };
   video?: { youtubeId: string };
   doc?: { url: string; pdfUrl?: string; version?: string };
@@ -120,81 +121,112 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
           </div>
         )}
 
-        {!loading && !error && items.map(item => {
-          const meta = REG_META[item.id];
-          const themeClass = meta ? THEME_CLASS[meta.theme] : styles.regThemeBlue;
-          const Icon = meta?.icon ?? FileText;
-          const version = item.doc?.version;
-          return (
-            <article key={item.id} className={`${styles.regCard} ${themeClass}`}>
-              <div className={styles.regCardGlow} aria-hidden />
-              <div className={styles.regCardHeader}>
-                <div className={styles.regIconWrap}>
-                  <Icon size={26} strokeWidth={2} />
-                </div>
-                <div className={styles.regHeaderText}>
-                  <div className={styles.regCategoryRow}>
-                    <span className={styles.regCategoryDot} aria-hidden />
-                    <span className={styles.regCategoryText}>{item.category}</span>
-                    {version && <span className={styles.regVersionChip}>v{version}</span>}
+        {!loading && !error && (() => {
+          const renderCard = (item: TrainingItem) => {
+            const meta = REG_META[item.id];
+            const themeClass = meta ? THEME_CLASS[meta.theme] : styles.regThemeBlue;
+            const Icon = meta?.icon ?? FileText;
+            const version = item.doc?.version;
+            return (
+              <article key={item.id} className={`${styles.regCard} ${themeClass}`}>
+                <div className={styles.regCardGlow} aria-hidden />
+                <div className={styles.regCardHeader}>
+                  <div className={styles.regIconWrap}>
+                    <Icon size={26} strokeWidth={2} />
                   </div>
-                  <h3 className={styles.regTitle}>{item.title}</h3>
-                  {meta?.subtitle && <p className={styles.regSubtitle}>{meta.subtitle}</p>}
+                  <div className={styles.regHeaderText}>
+                    <div className={styles.regCategoryRow}>
+                      <span className={styles.regCategoryDot} aria-hidden />
+                      <span className={styles.regCategoryText}>{item.category}</span>
+                      {version && <span className={styles.regVersionChip}>v{version}</span>}
+                    </div>
+                    <h3 className={styles.regTitle}>{item.title}</h3>
+                    {meta?.subtitle && <p className={styles.regSubtitle}>{meta.subtitle}</p>}
+                  </div>
                 </div>
-              </div>
 
-              <div className={styles.regActions}>
-                {item.slide && (
-                  <button
-                    type="button"
-                    className={`${styles.regBtn} ${styles.regBtnGhost}`}
-                    onClick={() => onSlide(item.slide!.chapterIds, item.title)}
-                  >
-                    <BookOpen size={17} />
-                    <span>슬라이드</span>
-                  </button>
-                )}
-                {item.video && (
-                  <button
-                    type="button"
-                    className={`${styles.regBtn} ${styles.regBtnGhost}`}
-                    onClick={() => setActiveVideo({ title: item.title, youtubeId: item.video!.youtubeId })}
-                  >
-                    <Play size={17} />
-                    <span>동영상</span>
-                  </button>
-                )}
-                {item.doc && (
-                  <button
-                    type="button"
-                    className={`${styles.regBtn} ${styles.regBtnSolid}`}
-                    onClick={() => setActiveDoc({ title: item.title, url: item.doc!.url, pdfUrl: item.doc!.pdfUrl })}
-                  >
-                    <FileText size={17} />
-                    <span>본문 열기</span>
-                    <ChevronRight size={14} className={styles.regBtnArrow} />
-                  </button>
-                )}
-                {item.quiz && (
-                  <button
-                    type="button"
-                    className={`${styles.regBtn} ${styles.regBtnAccent}`}
-                    onClick={() => setActiveQuiz({
-                      title: item.title,
-                      url: item.quiz!.url,
-                      docUrl: item.doc?.url,
-                      pdfUrl: item.doc?.pdfUrl,
-                    })}
-                  >
-                    <HelpCircle size={17} />
-                    <span>문제 풀기</span>
-                    <ChevronRight size={14} className={styles.regBtnArrow} />
-                  </button>
-                )}
-              </div>
-            </article>
+                <div className={styles.regActions}>
+                  {item.slide && (
+                    <button
+                      type="button"
+                      className={`${styles.regBtn} ${styles.regBtnGhost}`}
+                      onClick={() => onSlide(item.slide!.chapterIds, item.title)}
+                    >
+                      <BookOpen size={17} />
+                      <span>슬라이드</span>
+                    </button>
+                  )}
+                  {item.video && (
+                    <button
+                      type="button"
+                      className={`${styles.regBtn} ${styles.regBtnGhost}`}
+                      onClick={() => setActiveVideo({ title: item.title, youtubeId: item.video!.youtubeId })}
+                    >
+                      <Play size={17} />
+                      <span>동영상</span>
+                    </button>
+                  )}
+                  {item.doc && (
+                    <button
+                      type="button"
+                      className={`${styles.regBtn} ${styles.regBtnSolid}`}
+                      onClick={() => setActiveDoc({ title: item.title, url: item.doc!.url, pdfUrl: item.doc!.pdfUrl })}
+                    >
+                      <FileText size={17} />
+                      <span>본문 열기</span>
+                      <ChevronRight size={14} className={styles.regBtnArrow} />
+                    </button>
+                  )}
+                  {item.quiz && (
+                    <button
+                      type="button"
+                      className={`${styles.regBtn} ${styles.regBtnAccent}`}
+                      onClick={() => setActiveQuiz({
+                        title: item.title,
+                        url: item.quiz!.url,
+                        docUrl: item.doc?.url,
+                        pdfUrl: item.doc?.pdfUrl,
+                      })}
+                    >
+                      <HelpCircle size={17} />
+                      <span>문제 풀기</span>
+                      <ChevronRight size={14} className={styles.regBtnArrow} />
+                    </button>
+                  )}
+                </div>
+              </article>
+            );
+          };
+
+          const opItems = items.filter((i) => (i.group ?? 'operation') === 'operation');
+          const hrItems = items.filter((i) => i.group === 'hr');
+
+          return (
+            <>
+              {opItems.length > 0 && (
+                <section className={styles.regGroup}>
+                  <header className={`${styles.regGroupHeader} ${styles.regGroupHeaderOp}`}>
+                    <span className={styles.regGroupEmoji} aria-hidden>🚆</span>
+                    <h2 className={styles.regGroupTitle}>운행 관련 규정</h2>
+                    <span className={styles.regGroupCount}>{opItems.length}건</span>
+                  </header>
+                  {opItems.map(renderCard)}
+                </section>
+              )}
+
+              {hrItems.length > 0 && (
+                <section className={`${styles.regGroup} ${styles.regGroupHr}`}>
+                  <header className={`${styles.regGroupHeader} ${styles.regGroupHeaderHr}`}>
+                    <span className={styles.regGroupEmoji} aria-hidden>👔</span>
+                    <h2 className={styles.regGroupTitle}>인사·복무 규정</h2>
+                    <span className={styles.regGroupCount}>{hrItems.length}건</span>
+                  </header>
+                  {hrItems.map(renderCard)}
+                </section>
+              )}
+            </>
           );
-        })}
+        })()}
       </div>
 
       {/* 규정 본문 뷰어 (검색·하이라이트·원본 PDF 보기) */}

@@ -48,7 +48,7 @@ const DEFAULT_SHORTCUTS: Array<{
   {
     seedKey: 'smrthink-cafe',
     type: 'web',
-    title: '스마트띵크 카페',
+    title: '답십리승무사업소 카페',
     url: 'https://cafe.naver.com/smrthink',
     pinned: true,
   },
@@ -64,6 +64,24 @@ export const useShortcutsStore = create<ShortcutsState>()(
         set((state) => {
           const newSeeds: Shortcut[] = [];
           const seededKeys = [...state.seededKeys];
+          let items = state.items;
+
+          // 명칭 마이그레이션 — 이미 시드된 항목 중 옛 제목이면 새 제목으로 갱신
+          // 사용자가 직접 수정한 항목은 옛 제목이 아니므로 보호됨
+          const RENAMES: Record<string, string> = {
+            '스마트띵크 카페': '답십리승무사업소 카페',
+          };
+          let mutated = false;
+          items = items.map((it) => {
+            if (!it.seedKey) return it;
+            const newTitle = RENAMES[it.title];
+            if (newTitle && newTitle !== it.title) {
+              mutated = true;
+              return { ...it, title: newTitle };
+            }
+            return it;
+          });
+
           for (const def of DEFAULT_SHORTCUTS) {
             if (seededKeys.includes(def.seedKey)) continue;
             newSeeds.push({
@@ -73,9 +91,8 @@ export const useShortcutsStore = create<ShortcutsState>()(
             });
             seededKeys.push(def.seedKey);
           }
-          if (newSeeds.length === 0) return state;
-          // 시드는 목록 맨 앞에 배치 (pinned 효과)
-          return { items: [...newSeeds, ...state.items], seededKeys };
+          if (newSeeds.length === 0 && !mutated) return state;
+          return { items: [...newSeeds, ...items], seededKeys };
         }),
 
       add: (item) =>

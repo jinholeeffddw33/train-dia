@@ -850,8 +850,11 @@
 .dabHero {
   position: relative;
   overflow: hidden;
+  min-height: 188px;
   padding: calc(env(safe-area-inset-top) + var(--dia-space-6)) var(--dia-space-5) var(--dia-space-10);
-  background: var(--dab-hero-bg);
+  background:
+    var(--dab-hero-scrim),
+    var(--dab-hero-photo) center / cover no-repeat;
   color: var(--dab-hero-ink);
   border-radius: 0 0 var(--dia-radius-2xl) var(--dia-radius-2xl);
 }

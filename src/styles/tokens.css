@@ -99,11 +99,12 @@
      DAB 휴식 모듈 — 파스텔 무드 (다크: 차분한 트와일라잇)
      카드별 연한 틴트 + 저채도 라인 아이콘
      ======================================== */
-  /* 히어로 — 새벽 안개 / 야간 숨고르기 */
-  --dab-hero-bg:
-    radial-gradient(ellipse 120% 90% at 22% 14%, rgba(94, 234, 212, 0.12), transparent 55%),
-    radial-gradient(ellipse 110% 85% at 86% 0%, rgba(167, 139, 250, 0.14), transparent 55%),
-    linear-gradient(180deg, #0c1428 0%, #111c38 100%);
+  /* 히어로 — 자연 사진 + 미스트 스크림 (가독성 보장) */
+  --dab-hero-photo: url('/images/rest-hero.webp');
+  /* 다크: 트와일라잇으로 진하게 덮어 사진은 은은하게만 */
+  --dab-hero-scrim:
+    radial-gradient(ellipse 110% 85% at 86% 0%, rgba(167, 139, 250, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(11, 18, 38, 0.74) 0%, rgba(15, 26, 52, 0.90) 100%);
   --dab-hero-ink: #f1f5f9;
   --dab-hero-sub: rgba(226, 232, 240, 0.82);
   --dab-hero-brand: rgba(199, 210, 254, 0.72);
@@ -312,10 +313,10 @@
   --dia-border-glow: rgba(0, 0, 0, 0.06);
 
   /* ── DAB 휴식 모듈 — 파스텔 무드 (라이트: 포근한 스파/자연) ── */
-  --dab-hero-bg:
-    radial-gradient(ellipse 120% 90% at 22% 12%, rgba(110, 231, 183, 0.34), transparent 55%),
-    radial-gradient(ellipse 110% 88% at 86% 2%, rgba(196, 181, 253, 0.32), transparent 55%),
-    linear-gradient(180deg, #e9f3ed 0%, #e6eef4 58%, #ece9f7 100%);
+  /* 라이트: 사진을 살리되 좌상단(글자 자리)만 밝게 덮어 가독성 확보 */
+  --dab-hero-scrim:
+    radial-gradient(ellipse 95% 85% at 18% 22%, rgba(255, 255, 255, 0.62), transparent 62%),
+    linear-gradient(180deg, rgba(247, 249, 246, 0.50) 0%, rgba(240, 244, 247, 0.30) 55%, rgba(236, 233, 247, 0.42) 100%);
   --dab-hero-ink: #1f2937;
   --dab-hero-sub: #4b5563;
   --dab-hero-brand: #6b7280;

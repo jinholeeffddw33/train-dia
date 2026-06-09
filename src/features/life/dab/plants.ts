@@ -12,7 +12,14 @@ export type PlantId =
   | 'camellia'
   | 'cherry'
   | 'chrysanthemum'
-  | 'ginkgo';
+  | 'ginkgo'
+  // ── Tier 2: 도감 완성자용 ──
+  | 'mugunghwa'
+  | 'lotus'
+  | 'magnolia'
+  | 'birch'
+  | 'hydrangea'
+  | 'ancient';
 
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 
@@ -139,6 +146,73 @@ export const PLANTS: Plant[] = [
     leafColorAlt: '#fde047',
     flowerColor: null,
     trunkColor: '#1c1917',
+    unlock: { type: 'collection', count: 8 },
+  },
+  // ── Tier 2: 도감 완성자용 (9종 이상 완성 + 추가 조건) ──
+  {
+    id: 'mugunghwa',
+    name: '무궁화',
+    emoji: '🌷',
+    theme: '한국의 여름',
+    leafColor: '#15803d',
+    leafColorAlt: '#86efac',
+    flowerColor: '#c084fc',
+    trunkColor: '#44403c',
+    unlock: { type: 'season', season: 'summer', count: 9 },
+  },
+  {
+    id: 'lotus',
+    name: '연꽃',
+    emoji: '🪷',
+    theme: '청정한 마음',
+    leafColor: '#16a34a',
+    leafColorAlt: '#86efac',
+    flowerColor: '#f9a8d4',
+    trunkColor: '#84cc16',
+    unlock: { type: 'breath', count: 50 },
+  },
+  {
+    id: 'magnolia',
+    name: '목련',
+    emoji: '🪻',
+    theme: '이른 봄의 풍요',
+    leafColor: '#65a30d',
+    leafColorAlt: '#a3e635',
+    flowerColor: '#fafafa',
+    trunkColor: '#57534e',
+    unlock: { type: 'season', season: 'spring', count: 10 },
+  },
+  {
+    id: 'birch',
+    name: '자작나무',
+    emoji: '🌲',
+    theme: '청정한 겨울',
+    leafColor: '#86efac',
+    leafColorAlt: '#bbf7d0',
+    flowerColor: null,
+    trunkColor: '#f1f5f9',
+    unlock: { type: 'season', season: 'winter', count: 11 },
+  },
+  {
+    id: 'hydrangea',
+    name: '수국',
+    emoji: '💠',
+    theme: '비 오는 날의 위로',
+    leafColor: '#16a34a',
+    leafColorAlt: '#86efac',
+    flowerColor: '#60a5fa',
+    trunkColor: '#3f3f46',
+    unlock: { type: 'collection', count: 12 },
+  },
+  {
+    id: 'ancient',
+    name: '천년 분재',
+    emoji: '🌟',
+    theme: '명예의 정점',
+    leafColor: '#7c3aed',
+    leafColorAlt: '#c4b5fd',
+    flowerColor: '#fbbf24',
+    trunkColor: '#1c1917',
     unlock: { type: 'all' },
   },
 ];
@@ -177,10 +251,14 @@ export function isUnlocked(
       return ctx.collection.length >= (unlock.count ?? 0);
     case 'breath':
       return ctx.breathSessions >= (unlock.count ?? 0);
-    case 'season':
-      return ctx.season === unlock.season;
+    case 'season': {
+      // season만 있으면 해당 계절 / count도 있으면 둘 다 만족
+      const seasonOk = ctx.season === unlock.season;
+      const countOk = unlock.count === undefined || ctx.collection.length >= unlock.count;
+      return seasonOk && countOk;
+    }
     case 'all':
-      // 나머지 8종 모두 완성해야 마지막 해금
+      // 나머지 식물 전부 완성해야 마지막 해금
       return ctx.collection.length >= PLANTS.length - 1;
   }
 }
@@ -217,7 +295,9 @@ export function unlockHint(plant: Plant): string {
     case 'breath':
       return `호흡 세션 ${unlock.count}회`;
     case 'season':
-      return `${seasonLabel(unlock.season!)}에만 해금`;
+      return unlock.count
+        ? `${seasonLabel(unlock.season!)} + 분재 ${unlock.count}종 완성`
+        : `${seasonLabel(unlock.season!)}에만 해금`;
     case 'all':
       return '모든 분재 완성 시';
   }

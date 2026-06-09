@@ -6,10 +6,10 @@ ZenBonsai 모듈이 자동으로 읽어들이는 분재 이미지. 파일이 있
 
 `{plantId}-{stage}.webp`
 
-- `plantId`: 9종 — `pine`·`maehwa`·`maple`·`bamboo`·`orchid`·`camellia`·`cherry`·`chrysanthemum`·`ginkgo`
+- `plantId`: 15종 — 기본 9종 + Tier 2 6종 (도감 완성자용)
 - `stage`: 5단계 — `0`(씨앗) · `1`(새싹) · `2`(어린 나무) · `3`(자란 나무) · `4`(완성·꽃 핀 상태)
 
-총 **9 × 5 = 45장** 필요.
+총 **15 × 5 = 75장** 필요.
 
 ## 권장 스펙
 
@@ -44,6 +44,12 @@ top-down 30° angle, museum-quality, clean composition --ar 4:5 --style raw
 | cherry | 벚나무 | cherry blossom bonsai, pale pink soft petals, spring atmosphere |
 | chrysanthemum | 국화 | chrysanthemum bonsai, golden yellow flowers, fall season |
 | ginkgo | 은행 | ginkgo bonsai, fan-shaped yellow autumn leaves, ancient gnarled trunk |
+| mugunghwa | 무궁화 | rose of sharon (Korean national flower) bonsai, lavender purple blossoms with dark red center, deep green leaves |
+| lotus | 연꽃 | lotus plant in shallow water bowl, pink lotus flower fully open, large round leaves above water |
+| magnolia | 목련 | white magnolia bonsai, large creamy white petals, bare branches in early spring |
+| birch | 자작나무 | birch bonsai, distinctive white papery bark, slender black-streaked trunk, small bright green leaves |
+| hydrangea | 수국 | hydrangea bonsai, large rounded clusters of pale blue and pink flowers, lush green leaves |
+| ancient | 천년 분재 | legendary ancient bonsai, gnarled and weathered thousand-year trunk, golden glow around it, mystic atmosphere, museum masterpiece |
 
 **단계별 추가 프롬프트**
 
@@ -58,7 +64,7 @@ top-down 30° angle, museum-quality, clean composition --ar 4:5 --style raw
 ## 권장 생성 방식
 
 1. **Midjourney** v6+ 또는 **SDXL** 사용
-2. 9종 × 5단계 = 45회 생성
+2. 15종 × 5단계 = 75회 생성 (기본 9종 먼저, Tier 2는 천천히)
 3. PNG → WebP 변환 (cwebp 또는 squoosh.app, quality 85)
 4. 알파 채널 보존 (`cwebp -q 85 -alpha_q 90 in.png -o out.webp`)
 5. 파일명 정확히 맞춰 이 디렉토리에 배치

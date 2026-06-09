@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Leaf, Sparkles, RotateCcw, Library, CloudRain, Sun, Cloud, Snowflake } from 'lucide-react';
-import { getPlant, currentSeason, seasonLabel, type Plant, type Season } from './plants';
+import { getPlant, currentSeason, seasonLabel, stageFromLevel, plantImagePath, type Plant, type Season } from './plants';
 import { useBonsaiStore, POINTS_PER_LEVEL, MAX_LEVEL } from '@/stores/bonsai';
 import { useSeoulWeather } from '@/features/home/hooks/useWeather';
 import BonsaiCollection from './BonsaiCollection';
@@ -51,7 +51,36 @@ const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
   size: 5 + (i % 4) * 1.5,
 }));
 
-/* ─────────────────────────────── 트리 SVG ─────────────────────────────── */
+/* ─────────────────────────────── 실사 이미지 컴포넌트 (있을 때만) ──────────── */
+/**
+ * /public/img/bonsai/{plantId}-{stage}.webp 가 존재하면 이미지로 렌더링,
+ * 없으면 null 반환 → 부모가 SVG 폴백으로 그림.
+ */
+function BonsaiPhoto({ level, plant }: { level: number; plant: Plant }) {
+  const stage = stageFromLevel(level);
+  const src = plantImagePath(plant.id, stage);
+  const [errored, setErrored] = useState(false);
+  if (errored) return null;
+  return (
+    <motion.div
+      key={`${plant.id}-${stage}`}
+      className={styles.bonsaiPhotoWrap}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={`${plant.name} 단계 ${stage}`}
+        className={styles.bonsaiPhoto}
+        onError={() => setErrored(true)}
+      />
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────── 트리 SVG (이미지 폴백) ────────────────────── */
 /** 다음 레벨을 향한 0~1 진행도 — 잎/가지가 연속적으로 자라도록 */
 function BonsaiTree({ level, progress, plant, night }: { level: number; progress: number; plant: Plant; night: boolean }) {
   const leafColor = plant.leafColor;
@@ -473,7 +502,9 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
         <motion.button type="button" className={styles.bonsaiTreeBtn} onClick={handleTreeTap}
           aria-label="나무 터치" whileTap={{ scale: 0.97 }}
           animate={justGrew ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.6 }}>
+          {/* 실사 이미지 자산이 있으면 그걸로, 없으면 SVG 폴백 */}
           <BonsaiTree level={level} progress={points / POINTS_PER_LEVEL} plant={plant} night={night} />
+          <BonsaiPhoto level={level} plant={plant} />
         </motion.button>
 
         {/* 무지개 링 — 오늘 첫 성장 시 */}

@@ -185,6 +185,27 @@ export function isUnlocked(
   }
 }
 
+/* ── 실사 이미지 자산 ──
+ * /public/img/bonsai/{plantId}-{stage}.webp
+ * stage 0: 씨앗, 1: 새싹, 2: 어린 나무, 3: 자란 나무, 4: 완성 (꽃)
+ * 이미지가 없으면 ZenBonsai가 자동으로 기존 SVG로 폴백.
+ */
+export type BonsaiStage = 0 | 1 | 2 | 3 | 4;
+
+/** level(0~8) → stage(0~4) 매핑 */
+export function stageFromLevel(level: number): BonsaiStage {
+  if (level <= 0) return 0;
+  if (level <= 2) return 1;
+  if (level <= 4) return 2;
+  if (level <= 6) return 3;
+  return 4;
+}
+
+/** 식물·단계별 이미지 경로 */
+export function plantImagePath(plantId: PlantId, stage: BonsaiStage): string {
+  return `/img/bonsai/${plantId}-${stage}.webp`;
+}
+
 /** 해금 조건 설명 */
 export function unlockHint(plant: Plant): string {
   const { unlock } = plant;

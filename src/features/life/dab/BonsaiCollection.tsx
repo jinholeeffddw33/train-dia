@@ -1,10 +1,26 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Lock, Check, Sparkles } from 'lucide-react';
-import { PLANTS, isUnlocked, unlockHint, currentSeason, type Plant } from './plants';
+import { PLANTS, isUnlocked, unlockHint, currentSeason, plantImagePath, type Plant } from './plants';
 import { useBonsaiStore } from '@/stores/bonsai';
 import styles from './dab.module.css';
+
+/** 완성 단계(4) 이미지 썸네일. 없으면 이모지 폴백 */
+function CollectionThumb({ plant, fallbackEmoji }: { plant: Plant; fallbackEmoji: string }) {
+  const [errored, setErrored] = useState(false);
+  if (errored) return <span className={styles.collectionEmoji}>{fallbackEmoji}</span>;
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={plantImagePath(plant.id, 4)}
+      alt={plant.name}
+      className={styles.collectionThumb}
+      onError={() => setErrored(true)}
+    />
+  );
+}
 
 interface BonsaiCollectionProps {
   onBack: () => void;
@@ -59,7 +75,9 @@ export default function BonsaiCollection({ onBack, onStartPlant }: BonsaiCollect
                     : 'linear-gradient(145deg, #94a3b8, #64748b)',
                 }}
               >
-                <span className={styles.collectionEmoji}>{plant.emoji}</span>
+                {unlocked
+                  ? <CollectionThumb plant={plant} fallbackEmoji={plant.emoji} />
+                  : <span className={styles.collectionEmoji}>{plant.emoji}</span>}
                 {!unlocked && (
                   <span className={styles.collectionLock}>
                     <Lock size={14} />

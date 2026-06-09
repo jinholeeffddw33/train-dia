@@ -64,7 +64,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   // ── 홈 화면 (DAB 휴식 모듈) ──
   if (view === 'home') {
     return (
-      <div className={styles.wrap}>
+      <div className={styles.dabPage}>
         <div className={styles.dabHero}>
           <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
@@ -74,28 +74,12 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           <p className={styles.dabBrand}>DAB · Define Answer Beyond</p>
           <h1 className={styles.dabTitle}>휴식 모듈</h1>
           <p className={styles.dabSub}>운행 사이, 잠시 숨을 고르세요</p>
-
-          {/* 부드러운 곡선 장식 */}
-          <svg viewBox="0 0 400 120" className={styles.dabWave} fill="none" aria-hidden>
-            <path d="M0 80 Q 100 40 200 70 T 400 60 L 400 120 L 0 120 Z" fill="url(#dabGrad1)" opacity="0.35" />
-            <path d="M0 95 Q 120 60 220 85 T 400 75 L 400 120 L 0 120 Z" fill="url(#dabGrad2)" opacity="0.5" />
-            <defs>
-              <linearGradient id="dabGrad1" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#a5b4fc" />
-                <stop offset="1" stopColor="#c4b5fd" />
-              </linearGradient>
-              <linearGradient id="dabGrad2" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#818cf8" />
-                <stop offset="1" stopColor="#a78bfa" />
-              </linearGradient>
-            </defs>
-          </svg>
         </div>
 
         <div className={styles.dabCardWrap}>
-          <button type="button" className={styles.dabCard} onClick={() => setView('fortune')}>
-            <div className={`${styles.dabCardIcon} ${styles.dabIconBlue}`}>
-              <Sparkles size={28} />
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardSage}`} onClick={() => setView('fortune')}>
+            <div className={styles.dabCardIcon}>
+              <Sparkles size={26} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>오늘의 운세 <span className={styles.dabCardNewBadge}>NEW</span></span>
@@ -104,9 +88,9 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
 
-          <button type="button" className={styles.dabCard} onClick={() => setView('stamp')}>
-            <div className={`${styles.dabCardIcon} ${styles.dabIconViolet}`}>
-              <Stamp size={28} />
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardSky}`} onClick={() => setView('stamp')}>
+            <div className={styles.dabCardIcon}>
+              <Stamp size={26} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>무사고 출근 도장 <span className={styles.dabCardNewBadge}>NEW</span></span>
@@ -115,9 +99,9 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
 
-          <button type="button" className={styles.dabCard} onClick={() => setView('bonsai')}>
-            <div className={`${styles.dabCardIcon} ${styles.dabIconBlue}`}>
-              <Sprout size={28} />
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardMint}`} onClick={() => setView('bonsai')}>
+            <div className={styles.dabCardIcon}>
+              <Sprout size={26} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>젠 분재</span>
@@ -126,9 +110,9 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
 
-          <button type="button" className={styles.dabCard} onClick={() => setView('asmr')}>
-            <div className={`${styles.dabCardIcon} ${styles.dabIconViolet}`}>
-              <Music2 size={28} />
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardLavender}`} onClick={() => setView('asmr')}>
+            <div className={styles.dabCardIcon}>
+              <Music2 size={26} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>ASMR 테라피</span>
@@ -137,9 +121,9 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
 
-          <button type="button" className={styles.dabCard} onClick={() => setView('games')}>
-            <div className={`${styles.dabCardIcon} ${styles.dabIconRose}`}>
-              <Gamepad2 size={28} />
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardPeach}`} onClick={() => setView('games')}>
+            <div className={styles.dabCardIcon}>
+              <Gamepad2 size={26} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>미니 게임</span>

@@ -96,6 +96,40 @@
   --dia-border-glow: rgba(255, 255, 255, 0.06);
 
   /* ========================================
+     DAB 휴식 모듈 — 파스텔 무드 (다크: 차분한 트와일라잇)
+     카드별 연한 틴트 + 저채도 라인 아이콘
+     ======================================== */
+  /* 히어로 — 새벽 안개 / 야간 숨고르기 */
+  --dab-hero-bg:
+    radial-gradient(ellipse 120% 90% at 22% 14%, rgba(94, 234, 212, 0.12), transparent 55%),
+    radial-gradient(ellipse 110% 85% at 86% 0%, rgba(167, 139, 250, 0.14), transparent 55%),
+    linear-gradient(180deg, #0c1428 0%, #111c38 100%);
+  --dab-hero-ink: #f1f5f9;
+  --dab-hero-sub: rgba(226, 232, 240, 0.82);
+  --dab-hero-brand: rgba(199, 210, 254, 0.72);
+  /* 페이지 배경 — 은은한 미스트 */
+  --dab-page-bg:
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(129, 140, 248, 0.05), transparent 60%),
+    var(--dia-bg);
+  /* 카드 5색 (card 배경 / icon 원형 / ink 선) */
+  --dab-card-sage:     linear-gradient(135deg, rgba(52, 211, 153, 0.10), rgba(52, 211, 153, 0.03)), var(--dia-surface);
+  --dab-icon-sage:     rgba(52, 211, 153, 0.16);
+  --dab-ink-sage:      #6ee7b7;
+  --dab-card-sky:      linear-gradient(135deg, rgba(96, 165, 250, 0.10), rgba(96, 165, 250, 0.03)), var(--dia-surface);
+  --dab-icon-sky:      rgba(96, 165, 250, 0.16);
+  --dab-ink-sky:       #93c5fd;
+  --dab-card-mint:     linear-gradient(135deg, rgba(45, 212, 191, 0.10), rgba(45, 212, 191, 0.03)), var(--dia-surface);
+  --dab-icon-mint:     rgba(45, 212, 191, 0.16);
+  --dab-ink-mint:      #5eead4;
+  --dab-card-lavender: linear-gradient(135deg, rgba(167, 139, 250, 0.12), rgba(167, 139, 250, 0.04)), var(--dia-surface);
+  --dab-icon-lavender: rgba(167, 139, 250, 0.18);
+  --dab-ink-lavender:  #c4b5fd;
+  --dab-card-peach:    linear-gradient(135deg, rgba(251, 176, 116, 0.10), rgba(251, 146, 116, 0.03)), var(--dia-surface);
+  --dab-icon-peach:    rgba(251, 176, 116, 0.16);
+  --dab-ink-peach:     #fcd9b0;
+  --dab-card-border:   rgba(255, 255, 255, 0.06);
+
+  /* ========================================
      3D Icon Tokens (ZINOSB-grade squircle)
      ======================================== */
   /* bloom: 아이콘 좌상단 빛 반사 강도 */
@@ -276,6 +310,34 @@
   --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.02) 100%);
   --dia-border-glow: rgba(0, 0, 0, 0.06);
+
+  /* ── DAB 휴식 모듈 — 파스텔 무드 (라이트: 포근한 스파/자연) ── */
+  --dab-hero-bg:
+    radial-gradient(ellipse 120% 90% at 22% 12%, rgba(110, 231, 183, 0.34), transparent 55%),
+    radial-gradient(ellipse 110% 88% at 86% 2%, rgba(196, 181, 253, 0.32), transparent 55%),
+    linear-gradient(180deg, #e9f3ed 0%, #e6eef4 58%, #ece9f7 100%);
+  --dab-hero-ink: #1f2937;
+  --dab-hero-sub: #4b5563;
+  --dab-hero-brand: #6b7280;
+  --dab-page-bg:
+    radial-gradient(ellipse 100% 40% at 50% 0%, rgba(196, 181, 253, 0.12), transparent 60%),
+    linear-gradient(180deg, #f3f6f4 0%, var(--dia-bg) 220px);
+  --dab-card-sage:     #eaf4ec;
+  --dab-icon-sage:     #d5e9d8;
+  --dab-ink-sage:      #4e8c5a;
+  --dab-card-sky:      #e9f1fb;
+  --dab-icon-sky:      #d6e6f7;
+  --dab-ink-sky:       #3e7bc2;
+  --dab-card-mint:     #e5f4f0;
+  --dab-icon-mint:     #cfeae2;
+  --dab-ink-mint:      #2f9684;
+  --dab-card-lavender: #efebfa;
+  --dab-icon-lavender: #e2daf6;
+  --dab-ink-lavender:  #6e5bc2;
+  --dab-card-peach:    #fbeee5;
+  --dab-icon-peach:    #f6dfd0;
+  --dab-ink-peach:     #be7848;
+  --dab-card-border:   rgba(0, 0, 0, 0.05);
 
   /* 3D Icon Tokens — Light mode (채도 유지, 글로우 약화) */
   --dia-3d-bloom: 0.28;

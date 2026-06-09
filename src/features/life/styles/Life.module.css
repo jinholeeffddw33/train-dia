@@ -850,8 +850,8 @@
 .dabHero {
   position: relative;
   overflow: hidden;
-  min-height: 188px;
-  padding: calc(env(safe-area-inset-top) + var(--dia-space-6)) var(--dia-space-5) var(--dia-space-10);
+  min-height: 168px;
+  padding: calc(env(safe-area-inset-top) + var(--dia-space-5)) var(--dia-space-5) var(--dia-space-8);
   background:
     var(--dab-hero-scrim),
     var(--dab-hero-photo) center / cover no-repeat;
@@ -898,10 +898,10 @@
 .dabCardWrap {
   position: relative;
   margin-top: calc(-1 * var(--dia-space-5));
-  padding: var(--dia-space-5) var(--dia-space-4) calc(var(--dia-space-8) + env(safe-area-inset-bottom));
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-8) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-4);
+  gap: var(--dia-space-3);
 }
 
 .dabCard {
@@ -910,7 +910,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-4);
-  padding: var(--dia-space-4) var(--dia-space-5);
+  padding: var(--dia-space-3) var(--dia-space-5);
   background: var(--_dabCard, var(--dia-surface));
   border: 1px solid var(--dab-card-border);
   border-radius: var(--dia-radius-2xl);
@@ -918,7 +918,7 @@
   -webkit-tap-highlight-color: transparent;
   text-align: left;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-height: 88px;
+  min-height: 74px;
   box-shadow: var(--dia-shadow-sm);
 }
 
@@ -952,8 +952,8 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--dia-radius-xl);
   display: flex;
   align-items: center;

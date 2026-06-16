@@ -6,6 +6,11 @@ import { EXTRA_USERS } from '@/lib/auth';
 
 const ALL_PEOPLE = [...P, ...EXTRA_USERS];
 
+function findById(id: string | null | undefined): Person | null {
+  if (!id) return null;
+  return ALL_PEOPLE.find((p) => p.I === id) ?? null;
+}
+
 interface DriverState {
   /** 본인 기관사 (최초 설정 후 잠금 — 행위 주체) */
   myDriver: Person | null;
@@ -31,6 +36,11 @@ interface DriverState {
   restore: () => void;
 }
 
+interface PersistedShape {
+  myDriverId: string | null;
+  currentId: string | null;
+}
+
 export const useDriverStore = create<DriverState>()(
   persist(
     (set, get) => ({
@@ -39,28 +49,27 @@ export const useDriverStore = create<DriverState>()(
       isViewMode: false,
 
       pick: (id: string) => {
-        const person = ALL_PEOPLE.find((p) => p.I === id) ?? null;
+        const person = findById(id);
         if (!person) return;
         const { myDriver } = get();
-        // myDriver는 절대 변경하지 않음 — 로그인 시에만 설정됨
         const isViewMode = myDriver ? person.I !== myDriver.I : false;
         set({ current: person, isViewMode });
       },
 
       setCurrent: (person: Person) => {
         const { myDriver } = get();
-        // myDriver는 절대 변경하지 않음 — 로그인 시에만 설정됨
-        const isViewMode = myDriver ? person.I !== myDriver.I : false;
-        set({ current: person, isViewMode });
+        const fresh = findById(person.I) ?? person;
+        const isViewMode = myDriver ? fresh.I !== myDriver.I : false;
+        set({ current: fresh, isViewMode });
       },
 
       setMyDriver: (person: Person) => {
-        set({ myDriver: person, current: person, isViewMode: false });
+        const fresh = findById(person.I) ?? person;
+        set({ myDriver: fresh, current: fresh, isViewMode: false });
       },
 
       setMyDriverById: (id: string) => {
-        // P + EXTRA_USERS 모두에서 검색
-        const person = ALL_PEOPLE.find((p) => p.I === id) ?? null;
+        const person = findById(id);
         if (person) {
           set({ myDriver: person, current: person, isViewMode: false });
         }
@@ -90,14 +99,34 @@ export const useDriverStore = create<DriverState>()(
     }),
     {
       name: 'dp',
+      version: 2,
+      // ID만 저장 — Person 객체 본체는 매번 cycle.ts에서 fresh 조회 (stale 방지)
       partialize: (state) => ({
-        current: state.current,
-        myDriver: state.myDriver,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state?.myDriver && state.current) {
-          state.isViewMode = state.current.I !== state.myDriver.I;
+        myDriverId: state.myDriver?.I ?? null,
+        currentId: state.current?.I ?? null,
+      }) as unknown as PersistedShape,
+      // v1(전체 Person 객체 저장) → v2(ID만 저장) 마이그레이션
+      migrate: (persisted: unknown, version: number) => {
+        if (!persisted || typeof persisted !== 'object') {
+          return { myDriverId: null, currentId: null } as PersistedShape;
         }
+        if (version < 2) {
+          const old = persisted as { myDriver?: Person | null; current?: Person | null };
+          return {
+            myDriverId: old.myDriver?.I ?? null,
+            currentId: old.current?.I ?? null,
+          } as PersistedShape;
+        }
+        return persisted as PersistedShape;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const raw = state as unknown as PersistedShape & DriverState;
+        const myDriver = findById(raw.myDriverId);
+        const current = findById(raw.currentId) ?? myDriver;
+        state.myDriver = myDriver;
+        state.current = current;
+        state.isViewMode = !!(myDriver && current && current.I !== myDriver.I);
       },
     },
   ),

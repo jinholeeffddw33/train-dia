@@ -1,11 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
+import { P } from '@/data/cycle';
+import { EXTRA_USERS } from '@/lib/auth';
+
+const ALL_PEOPLE = [...P, ...EXTRA_USERS];
+function findById(id: string | null | undefined): Person | null {
+  if (!id) return null;
+  return ALL_PEOPLE.find((p) => p.I === id) ?? null;
+}
 
 interface CompareGroup {
   memo: string;
   count: number;
   persons: (Person | null)[];
+}
+
+interface PersistedGroup {
+  memo: string;
+  count: number;
+  personIds: (string | null)[];
 }
 
 interface CompareState {
@@ -134,17 +148,42 @@ export const useCompareStore = create<CompareState>()(
     }),
     {
       name: 'dia-compare',
+      version: 2,
+      // Person 객체는 휘발 — ID만 저장하고 로드시 cycle.ts에서 fresh 조회
       partialize: (state) => ({
         activeGroup: state.activeGroup,
-        groups: state.groups,
-      }),
-      // 로드 시 activeGroup의 데이터를 count/persons에 동기화
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          const group = state.groups[state.activeGroup];
-          state.count = group.count;
-          state.persons = group.persons;
+        groups: state.groups.map((g) => ({
+          memo: g.memo,
+          count: g.count,
+          personIds: g.persons.map((p) => p?.I ?? null),
+        })) as [PersistedGroup, PersistedGroup, PersistedGroup, PersistedGroup],
+      }) as unknown as { activeGroup: number; groups: PersistedGroup[] },
+      migrate: (persisted: unknown, version: number) => {
+        if (!persisted || typeof persisted !== 'object') return persisted;
+        if (version < 2) {
+          const old = persisted as { activeGroup?: number; groups?: { memo: string; count: number; persons: (Person | null)[] }[] };
+          const groups = (old.groups ?? []).map((g) => ({
+            memo: g.memo ?? '',
+            count: g.count ?? 2,
+            personIds: (g.persons ?? []).map((p) => p?.I ?? null),
+          }));
+          while (groups.length < 4) groups.push({ memo: '', count: 2, personIds: [null, null] });
+          return { activeGroup: old.activeGroup ?? 0, groups };
         }
+        return persisted;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        const raw = state as unknown as { activeGroup: number; groups: PersistedGroup[] };
+        const hydratedGroups = raw.groups.map((g) => ({
+          memo: g.memo,
+          count: g.count,
+          persons: g.personIds.map((id) => findById(id)),
+        })) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
+        state.groups = hydratedGroups;
+        const active = hydratedGroups[raw.activeGroup] ?? hydratedGroups[0];
+        state.count = active.count;
+        state.persons = active.persons;
       },
     },
   ),

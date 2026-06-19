@@ -5,15 +5,22 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: calc(var(--dia-space-6) + env(safe-area-inset-top, 0px));
+  align-items: stretch;
+  gap: var(--dia-space-4);
+  padding-top: calc(var(--dia-space-4) + env(safe-area-inset-top, 0px));
   padding-bottom: calc(var(--dia-space-16, 64px) + env(safe-area-inset-bottom, 0px));
-  padding-left: max(var(--dia-space-5), env(safe-area-inset-left, 0px));
-  padding-right: max(var(--dia-space-5), env(safe-area-inset-right, 0px));
+  padding-left: max(var(--dia-space-4), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--dia-space-4), env(safe-area-inset-right, 0px));
   background: var(--dia-bg);
   position: relative;
   overflow-x: hidden;
+}
+
+/* 내부 컴포넌트 가로 정렬 — max-width 카드를 좌측 정렬 */
+.hub > * {
+  align-self: center;
+  width: 100%;
+  max-width: 420px;
 }
 
 /* ── Animated ambient orbs ── */
@@ -62,41 +69,172 @@
   background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
 }
 
-/* ── Header ── */
+/* ── Header (mockup 스타일 — 좌측 텍스트 + 우측 알림) ── */
 .header {
-  text-align: center;
-  margin-bottom: var(--dia-space-5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-1);
   z-index: 1;
   animation: fadeSlideUp 0.6s var(--dia-ease) both;
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
 }
 
 .greeting {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
-  margin-bottom: var(--dia-space-3);
+  margin: 0 0 6px;
 }
 
 .title {
-  font-size: var(--dia-text-3xl);
-  font-weight: var(--dia-weight-bold);
+  font-size: clamp(24px, 7vw, 30px);
+  font-weight: 800;
   color: var(--dia-text-primary);
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--dia-blue) 0%, var(--dia-purple) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-:global(:root.light) .title {
-  background: linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
+  margin: 0;
+  line-height: 1.15;
 }
 
 .subtitle {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
-  margin-top: var(--dia-space-2);
+  margin: 6px 0 0;
+}
+
+.bellBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.bellBtn:active {
+  transform: scale(0.92);
+  background: var(--dia-bg-surface, var(--dia-surface));
+}
+.bellBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.bellDot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dia-red);
+  border: 2px solid var(--dia-surface);
+}
+
+/* ── 주요 서비스 ── */
+.servicesWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+.servicesTitle {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  margin: var(--dia-space-2) 0 0;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+}
+
+.serviceCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  text-align: left;
+  min-height: 76px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--dia-shadow-sm);
+}
+.serviceCard:active {
+  transform: scale(0.97);
+}
+.serviceCard:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
+.serviceIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.iconDuty { background: rgba(59, 130, 246, 0.14); color: var(--dia-blue); }
+.iconEdu  { background: rgba(139, 92, 246, 0.14); color: var(--dia-purple); }
+.iconSafety { background: rgba(56, 189, 248, 0.14); color: var(--dia-sky); }
+.iconLife { background: rgba(34, 197, 94, 0.14);  color: var(--dia-green); }
+
+.serviceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.serviceLabel {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.serviceDesc {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+}
+
+.serviceBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--dia-red);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
 }
 
 /* ── Card Grid — 2×2 (legacy) ── */

@@ -1,0 +1,107 @@
+'use client';
+
+import { useEffect, useRef, useCallback, useState } from 'react';
+import Image from 'next/image';
+import { X } from 'lucide-react';
+import { getType, isHoliday } from '@/lib/schedule';
+import styles from './DiaChartModal.module.css';
+
+interface DiaChartModalProps {
+  open: boolean;
+  dia: string | null;
+  date: Date;
+  diaLabel?: string;
+  onClose: () => void;
+}
+
+function getRouteImagePath(dia: string, date: Date): string | null {
+  if (dia.startsWith('휴') || dia.startsWith('대')) return null;
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+  const h = isHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = isHoliday(tm);
+  const isNight = getType(dia) === 'night';
+  let prefix: string;
+  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
+  else if (h && th) prefix = 'p_hh';
+  else if (h && !th) prefix = 'p_hp';
+  else if (!h && th) prefix = 'p_ph';
+  else prefix = 'p_pp';
+  return `/images/route/${prefix}_${diaNum}.png`;
+}
+
+export default function DiaChartModal({ open, dia, date, diaLabel, onClose }: DiaChartModalProps) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [imgError, setImgError] = useState(false);
+
+  const handleClose = useCallback(() => onClose(), [onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    setImgError(false);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, handleClose]);
+
+  if (!open) return null;
+
+  const imgPath = dia ? getRouteImagePath(dia, date) : null;
+
+  return (
+    <div
+      ref={overlayRef}
+      className={styles.overlay}
+      role="dialog"
+      aria-modal="true"
+      aria-label="다이아 표"
+      onClick={(e) => { if (e.target === overlayRef.current) handleClose(); }}
+    >
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>
+            {diaLabel ? `${diaLabel} 다이아 표` : '다이아 표'}
+          </h2>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={handleClose}
+            aria-label="닫기"
+          >
+            <X size={22} strokeWidth={2.4} />
+          </button>
+        </div>
+        <div className={styles.body}>
+          {imgPath && !imgError ? (
+            <div className={styles.imgWrap}>
+              <Image
+                src={imgPath}
+                alt={`${diaLabel ?? dia} 다이아 운전행로`}
+                width={1200}
+                height={900}
+                className={styles.img}
+                onError={() => setImgError(true)}
+                priority
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className={styles.empty}>
+              <p>이 다이아의 표 이미지가 준비되지 않았어요.</p>
+              <p className={styles.emptySub}>
+                {dia ? `(${dia})` : ''}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

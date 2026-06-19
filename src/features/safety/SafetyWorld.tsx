@@ -184,7 +184,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const sabun = authSabun || driverSabun;
   const userName = authName || driverName;
   const userRole = getUserRole(sabun);
-  const { getUnread, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
+  const { getUnread, getUnreadIds, unreadAlertIds, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
     fetchAlerts();
@@ -309,12 +309,40 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     setView({ type: 'detail', category: cat, cardKey, id: reportId });
   };
 
+  /** 종 버튼 클릭 — 우선순위 높은 미확인 정보로 즉시 이동
+   *  우선순위: 위험개소 → 사고사례 → 운전/열차 정보 → 장애신고
+   *  각 카테고리 안에서는 최신순(API가 created_at DESC로 반환) */
+  const handleBellClick = () => {
+    const hazardUnread = getUnreadIds('hazard');
+    if (hazardUnread.length > 0) {
+      handleOpenReport(hazardUnread[0], 'hazard');
+      return;
+    }
+    const actionUnread = getUnreadIds('action');
+    if (actionUnread.length > 0) {
+      handleOpenReport(actionUnread[0], 'incident');
+      return;
+    }
+    const inspectUnread = getUnreadIds('inspect');
+    if (inspectUnread.length > 0) {
+      // inspect는 driving/train/notice 세분화되지만 detail 화면은 공통 → driving cardKey로 진입
+      handleOpenReport(inspectUnread[0], 'driving');
+      return;
+    }
+    if (unreadAlertIds.length > 0) {
+      setView('alert');
+      return;
+    }
+    // 모두 확인 완료 — 아무 동작 없음 (버튼은 disabled 상태)
+  };
+
   return (
     <SafetyDashboard
       onBack={onBack}
       onOpenCategory={handleDashboardCategory}
       onOpenNotice={() => setView({ type: 'list', category: 'inspect', cardKey: 'notice' })}
       onOpenReport={handleOpenReport}
+      onBellClick={handleBellClick}
       unreadCount={totalUnread}
       userName={userName}
       userRole={userRole}

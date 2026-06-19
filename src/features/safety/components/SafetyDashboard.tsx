@@ -66,6 +66,8 @@ interface Props {
   onOpenNotice?: () => void;
   /** 카드 클릭 시 해당 리포트 상세보기로 직접 진입 (요약 모달 대신) */
   onOpenReport?: (reportId: string, cardKey: 'incident' | 'driving' | 'train' | 'hazard') => void;
+  /** 종 버튼 클릭 — 가장 우선순위 높은 미확인 정보로 즉시 이동 */
+  onBellClick?: () => void;
   unreadCount?: number;
   userName?: string;
   userRole?: string;
@@ -207,7 +209,7 @@ type SampleDetail = {
 };
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, onOpenReport, unreadCount = 0, userName = '', userRole = '', sabun = '',
+  onBack, onOpenCategory, onOpenNotice, onOpenReport, onBellClick, unreadCount = 0, userName = '', userRole = '', sabun = '',
 }: Props) {
   const userLabel = userName ? `${userName} ${userRole.replace(/님$/, '')}` : '';
 
@@ -351,7 +353,14 @@ export default function SafetyDashboard({
         </button>
         <span className={styles.lineBadge} aria-hidden="true">5</span>
         <h1 className={styles.headerTitle}>5호선 안전관리시스템</h1>
-        <button type="button" className={styles.bellBtn} aria-label={`알림 ${unreadCount}건`}>
+        <button
+          type="button"
+          className={styles.bellBtn}
+          onClick={onBellClick}
+          disabled={!onBellClick || unreadCount === 0}
+          aria-label={unreadCount > 0 ? `미확인 ${unreadCount}건 — 첫 항목으로 이동` : '미확인 정보 없음'}
+          title={unreadCount > 0 ? `미확인 ${unreadCount}건` : '모두 확인 완료'}
+        >
           <Bell size={18} strokeWidth={2} />
           {unreadCount > 0 && (
             <span className={styles.bellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>

@@ -77,7 +77,20 @@ export function useSafetyUnread() {
     return unreadCount;
   }, [counts, readIds]);
 
-  const alertUnread = alerts.filter(a => !alertReadIds.has(a.id)).length;
+  /** 카테고리별 미확인 ID 목록 — counts 배열은 최신순(created_at DESC)으로 정렬되어 있음 */
+  const getUnreadIds = useCallback((category: 'hazard' | 'action' | 'inspect'): string[] => {
+    if (!counts) return [];
+    const cat = counts[category];
+    if (!cat) return [];
+    return cat.ids.filter(id => !readIds.has(id));
+  }, [counts, readIds]);
 
-  return { getUnread, alertUnread, markAsRead, markAlertAsRead, fetchCounts };
+  /** 미확인 알림(공지) ID 목록 — 최신순으로 정렬 */
+  const unreadAlertIds = alerts
+    .filter(a => !alertReadIds.has(a.id))
+    .map(a => a.id);
+
+  const alertUnread = unreadAlertIds.length;
+
+  return { getUnread, getUnreadIds, unreadAlertIds, alertUnread, markAsRead, markAlertAsRead, fetchCounts };
 }

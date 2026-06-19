@@ -4,12 +4,13 @@ import { useMemo } from 'react';
 import { TrainFront } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
-import { isOffice } from '@/lib/auth';
+import { isOffice, isIntern, isRegularDayOffice, getUserRole } from '@/lib/auth';
 import {
   getDia, getType, getSchedule, getLabel, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
   getRouteDirection, getSegmentDirection, getCurrentSegmentInfo,
   isSpecialRest, getSpecialRestLabel, isDepotStart, timeToMins,
+  isHoliday,
 } from '@/lib/schedule';
 import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import { useSegmentAlarm } from '@/hooks/useSegmentAlarm';
@@ -88,7 +89,49 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     : !!authUser && isOffice(authUser.sabun);
 
   if (officeMode) {
-    return <DutyInfoCard selectedDate={selectedDate} hideTitle />;
+    // 인사말 대상: 조회 중인 내근직(driver) 우선, 없으면 로그인 사용자
+    const greetTarget = driver && driver.I === '0'
+      ? { name: driver.n, sabun: driver.s ?? '' }
+      : authUser
+        ? { name: authUser.name, sabun: authUser.sabun }
+        : null;
+
+    let greetMain = '';
+    let greetSub = '';
+    if (greetTarget) {
+      const sabun = greetTarget.sabun;
+      const role = getUserRole(sabun); // 소장님/부소장님/부장님/인턴님
+      const regular = isRegularDayOffice(sabun); // 평일 통상근무자(주말·공휴일 휴무)
+      const weekend = td.getDay() === 0 || td.getDay() === 6;
+      const restToday = regular && (weekend || isHoliday(td));
+
+      if (restToday) {
+        greetMain = '오늘은 쉬는 날이에요';
+        greetSub = '편안한 하루 보내세요';
+      } else if (regular && isIntern(sabun)) {
+        greetMain = '오늘도 출근이에요';
+        greetSub = `${greetTarget.name} ${role}, 오늘도 화이팅이에요`;
+      } else if (regular) {
+        greetMain = '오늘 하루도 잘 부탁드려요';
+        greetSub = `${greetTarget.name} ${role}, 좋은 하루 보내세요`;
+      } else {
+        // 교대 근무 내근직 — 근무/휴무를 단정하지 않는 중립 인사
+        greetMain = '오늘도 좋은 하루예요';
+        greetSub = `${greetTarget.name} ${role}, 안전하게 근무하세요`;
+      }
+    }
+
+    return (
+      <>
+        {isToday && greetMain && (
+          <div className={styles.officeGreeting}>
+            <div className={styles.officeGreetMain}>{greetMain}</div>
+            {greetSub && <div className={styles.officeGreetSub}>{greetSub}</div>}
+          </div>
+        )}
+        <DutyInfoCard selectedDate={selectedDate} hideTitle />
+      </>
+    );
   }
 
   if (!driver || !dia) {
@@ -104,6 +147,8 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   const specialRest = isSpecialRest(schedule);
   const specialRestLabel = getSpecialRestLabel(schedule);
   const effectiveType = specialRest ? 'rest' : diaType;
+  // 비번(야간 근무 다음날, 교번이 '~'로 끝남)과 일반 휴무를 구분
+  const isBibeon = effectiveType === 'rest' && !specialRest && !!dia && dia.endsWith('~');
   const typeClass = effectiveType ? styles[`type_${effectiveType}`] : '';
   const depotStart = dia ? isDepotStart(dia, td) : false;
 
@@ -160,7 +205,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
       {isToday && banner && banner.state === 'working' && showDirBanner && segInfo && schedule?.g && (
         segInfo.status === 'after' ? (
           <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
-            <div className={styles.dirBannerDir}>근무 완료</div>
+            <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
             <div className={styles.dirBannerSub}>안전하게 마무리했어요</div>
           </div>
         ) : currentDirection && (
@@ -180,7 +225,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
 
       {isToday && banner && banner.state === 'done' && (
         <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
-          <div className={styles.dirBannerDir}>근무 완료</div>
+          <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
           <div className={styles.dirBannerSub}>편안한 퇴근길 되세요</div>
           {banner.next && banner.next.schedule && (
             <div className={styles.dirBannerNext}>
@@ -195,13 +240,15 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
         <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
           <div className={styles.dirBannerDir}>
             {effectiveType === 'rest'
-              ? '오늘은 쉬는 날이에요'
+              ? (isBibeon ? '오늘은 비번이에요' : '오늘은 휴무예요')
               : banner.next?.daysAhead === 0
-                ? '출근 전이에요'
+                ? '오늘 출근하는 날이에요'
                 : '오늘 근무가 끝났어요'}
           </div>
           {effectiveType === 'rest' && (
-            <div className={styles.dirBannerSub}>푹 쉬고 내일 힘내요</div>
+            <div className={styles.dirBannerSub}>
+              {isBibeon ? '어젯밤 근무 고생했어요. 푹 쉬세요' : '편안한 하루 보내세요'}
+            </div>
           )}
           {banner.next?.daysAhead === 0 && diaType !== 'rest' && (
             <div className={styles.dirBannerSub}>좋은 하루 시작하세요</div>
@@ -232,7 +279,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
       {/* 배너 없을 때 (비근무 상태 등) - 간단 상태 표시 */}
       {isToday && banner && !currentDirection && banner.state === 'working' && !showDirBanner && (
         <div className={`${styles.statusBanner} ${styles.banner_working}`}>
-          <span className={styles.bannerDot} />{LABELS.WORK} 중
+          <span className={styles.bannerDot} />지금 근무 중이에요
         </div>
       )}
 

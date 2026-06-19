@@ -1568,6 +1568,25 @@
   margin-bottom: var(--dia-space-4);
 }
 
+/* 내근직·인턴 홈 인사말 (내근 근무표 위) */
+.officeGreeting {
+  padding: 0 var(--dia-space-4);
+  margin-bottom: var(--dia-space-3);
+}
+
+.officeGreetMain {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.officeGreetSub {
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+  margin-top: var(--dia-space-1);
+}
+
 .dutyInfoCard {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);

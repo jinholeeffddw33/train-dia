@@ -812,14 +812,21 @@
   );
 }
 
-/* ── Version footer ── */
+/* ── Version footer — 하단 중앙 ── */
 .footer {
   position: absolute;
-  bottom: var(--dia-space-6);
+  bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--dia-space-2);
   z-index: 1;
+  pointer-events: none;
+}
+.footer > * {
+  pointer-events: auto;
 }
 
 .footerBrand {

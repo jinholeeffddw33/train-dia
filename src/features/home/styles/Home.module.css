@@ -1,142 +1,156 @@
 /* ===== Home Tab — v1 Night Shift Revival ===== */
 
-/* ── Header Section — v2 Clean Minimal (모킹업 기반) ── */
+/* ── Header Section (v1 파란색 그래디언트) ── */
 .headerSection {
-  background: var(--dia-bg);
-  color: var(--dia-text-primary);
-  padding: calc(14px + env(safe-area-inset-top, 20px)) var(--dia-space-4) var(--dia-space-3);
+  background: var(--dia-hero-gradient);
+  color: #fff;
+  padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
   position: relative;
+  overflow: hidden;
   -webkit-user-select: none;
   user-select: none;
 }
 
+/* 새로고침 버튼 — PWA standalone에서 pull-to-refresh 미지원 환경 보완 */
+.refreshBtn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 3;
+  transition: transform 0.18s ease, background 0.15s ease;
+}
+
+.refreshBtn:active {
+  transform: scale(0.88) rotate(180deg);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 뒤로가기 버튼(32px @ left:8px) 공간 확보 */
 :global([data-has-back]) .headerSection {
   padding-left: 44px;
 }
 
-.headerTopRow {
+:global(:root.light) .headerSection {
+  background: var(--dia-hero-gradient);
+}
+
+/* 배경 장식 — 깊이감 (ZINOSB-grade) */
+.headerSection::after {
+  content: '';
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.headerSection::before {
+  content: '';
+  position: absolute;
+  left: -50px;
+  bottom: -50px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
+/* 상단: 좌(인사말+이름) + 우(날짜+시계) */
+.headerTop {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  min-height: 36px;
-  gap: var(--dia-space-2);
+  align-items: flex-start;
 }
 
-.headerTopActions {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.headerIconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--dia-bg-card);
-  border: 1px solid var(--dia-border-light);
-  border-radius: 50%;
-  color: var(--dia-text-secondary);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.18s ease, background 0.15s ease;
-  padding: 0;
-}
-.headerIconBtn:active {
-  transform: scale(0.88);
-  background: var(--dia-bg-surface);
-}
-.headerIconBtn:focus-visible {
-  outline: 2px solid var(--dia-blue);
-  outline-offset: 2px;
-}
-
-/* refreshBtn 호환 (기존 컴포넌트가 참조) */
-.refreshBtn { display: none; }
-
-/* 인사말 + 이름 dropdown */
-.headerGreetingBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: var(--dia-text-secondary);
-  cursor: pointer;
-  text-align: left;
-  min-height: 36px;
-  -webkit-tap-highlight-color: transparent;
-}
-.headerGreetingBtn:active { transform: scale(0.985); }
-
-.headerGreetingText {
-  font-size: var(--dia-text-sm);
-  font-weight: 500;
-  color: var(--dia-text-secondary);
-}
-
-.headerNameInline {
-  font-size: var(--dia-text-sm);
-  font-weight: 700;
-  color: var(--dia-text-primary);
-  letter-spacing: -0.2px;
-}
-
-.headerRoleInline {
-  font-weight: 500;
-  color: var(--dia-text-secondary);
-  margin-left: 2px;
-}
-
-.headerChevronInline {
-  color: var(--dia-text-tertiary);
-  margin-top: 1px;
-  flex-shrink: 0;
-}
-
-/* 큰 사업소명 — 모킹업 핵심 */
-.headerOrgTitle {
-  font-size: clamp(26px, 8vw, 32px);
-  font-weight: 800;
-  color: var(--dia-text-primary);
-  letter-spacing: -0.8px;
-  margin: var(--dia-space-2) 0 6px;
-  line-height: 1.15;
-}
-
-.headerSubtitle {
-  font-size: var(--dia-text-sm);
-  font-weight: 500;
-  color: var(--dia-text-secondary);
-  margin: 0 0 var(--dia-space-2);
-}
-
-.headerMetaRow {
+.headerLeft {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.headerGreeting {
+  font-size: var(--dia-text-meta);
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 2px;
+}
+
+.headerRight {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .headerDate {
   font-size: var(--dia-text-meta);
   font-weight: 600;
-  color: var(--dia-text-tertiary);
-  letter-spacing: 0.2px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
 }
 
-.headerMetaDot {
-  color: var(--dia-text-tertiary);
-  font-weight: 600;
+.clockRow {
+  display: flex;
+  align-items: flex-end;
 }
 
-/* 호환용 — 기존 컴포넌트가 참조하던 클래스 */
-.clockRow { display: inline-flex; align-items: center; }
-.headerOrg { display: none; }
+.headerOrg {
+  font-size: var(--dia-text-meta);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 1px;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.headerNameBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.headerName {
+  font-size: clamp(22px, 6vw, 28px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerChevron {
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.headerRole {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 4px;
+}
 
 .viewModeBadge {
   display: inline-flex;
@@ -261,172 +275,17 @@
 
 /* ── Today Card ── */
 .todayCard {
-  margin: var(--dia-space-3) var(--dia-space-3) var(--dia-space-4);
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+  margin: var(--dia-space-4);
+  padding: var(--dia-space-5);
+  background: var(--dia-surface);
+  background-image: var(--dia-surface-ambient);
+  border: 1px solid var(--dia-border-glow);
+  border-radius: var(--dia-radius-xl);
+  box-shadow: var(--dia-card-inset), var(--dia-card-depth);
   -webkit-user-select: none;
   user-select: none;
   position: relative;
-  overflow: visible;
-}
-
-/* ── Hero Block (모킹업 스타일 — 그라데이션 + 큰 교번 + stats) ── */
-.heroBlock {
-  padding: var(--dia-space-4) var(--dia-space-4) var(--dia-space-3);
-  border-radius: 20px;
-  color: #fff;
-  position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06);
-  background: linear-gradient(135deg, #3B82F6 0%, #6366F1 55%, #8B5CF6 100%);
-}
-.heroBlock.type_night {
-  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #A855F7 100%);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.22), 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-.heroBlock.type_standby {
-  background: linear-gradient(135deg, #F59E0B 0%, #FB923C 60%, #F97316 100%);
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.22), 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-.heroBlock.type_rest {
-  background: linear-gradient(135deg, #64748B 0%, #475569 60%, #334155 100%);
-  box-shadow: 0 8px 24px rgba(71, 85, 105, 0.22), 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-/* 장식 — 우상단 광채 */
-.heroBlock::before {
-  content: '';
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.heroLabelRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-.heroLabel {
-  font-size: var(--dia-text-sm);
-  font-weight: 600;
-  color: rgba(255,255,255,0.78);
-  letter-spacing: 0.2px;
-}
-.heroDepotBadge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.22);
-  color: #fff;
-  font-size: var(--dia-text-meta);
-  font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.32);
-}
-
-.heroCenter {
-  display: flex;
-  align-items: center;
-  gap: var(--dia-space-3);
-  margin: var(--dia-space-2) 0 var(--dia-space-3);
-}
-.heroIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.22);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #fff;
-  flex-shrink: 0;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.heroNumberWrap {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-}
-.heroNumber {
-  font-size: clamp(40px, 11vw, 54px);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -1px;
-  line-height: 1;
-  text-shadow: 0 2px 0 rgba(0,0,0,0.15);
-}
-.heroNumberSuffix {
-  font-size: var(--dia-text-lg);
-  font-weight: 700;
-  color: rgba(255,255,255,0.85);
-}
-
-.heroStats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  padding: var(--dia-space-3) 0 var(--dia-space-2);
-  border-top: 1px solid rgba(255,255,255,0.18);
-}
-.heroStat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  min-width: 0;
-}
-.heroStatLabel {
-  font-size: var(--dia-text-meta);
-  font-weight: 500;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 4px;
-}
-.heroStatValue {
-  font-size: var(--dia-text-base);
-  font-weight: 800;
-  color: #fff;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.heroDetailBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  margin-top: var(--dia-space-2);
-  padding: var(--dia-space-3) var(--dia-space-3);
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.28);
-  border-radius: 12px;
-  color: #fff;
-  font-size: var(--dia-text-sm);
-  font-weight: 600;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, background 0.15s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-.heroDetailBtn:active {
-  transform: scale(0.985);
-  background: rgba(255,255,255,0.28);
 }
 
 /* 카드 상단 앰비언트 하이라이트 */
@@ -2119,4 +1978,3 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
-

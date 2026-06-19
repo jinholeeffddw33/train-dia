@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useTrainStore } from '@/stores/train';
-import { buildTrainDriverMap } from '@/lib/schedule';
+import { buildTrainDriverMap, buildTrainDiaMap, type TrainDiaInfo } from '@/lib/schedule';
+import DiaChartModal from '@/components/layout/DiaChartModal';
 import {
   LINE5_MAIN,
   LINE5_MACHEON,
@@ -35,6 +36,15 @@ export default function TrainList() {
 
   // 열차번호 → 답십리 기관사 이름 매핑 (data 변경 시에만 재계산)
   const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);
+  // 열차번호 → 기관사 다이아 정보 (이름 탭 → 행로표 미리보기)
+  const diaMap = useMemo(() => buildTrainDiaMap(new Date()), [data]);
+
+  // 기관사 이름 탭 → 해당 기관사 행로표 모달 열기
+  const [selectedDia, setSelectedDia] = useState<TrainDiaInfo | null>(null);
+  const openDriverChart = useCallback((trainNo: string) => {
+    const info = diaMap.get(trainNo);
+    if (info) setSelectedDia(info);
+  }, [diaMap]);
 
   const trainsByStation = useMemo(() => {
     const map = new Map<string, { trainNo: string; direction: string; status: string; dest: string }[]>();
@@ -134,7 +144,17 @@ export default function TrainList() {
                     className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
                   >
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
-                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    {driver && (
+                      <button
+                        type="button"
+                        className={styles.tkDriverName}
+                        onClick={() => openDriverChart(t.trainNo)}
+                        aria-label={`${driver} 기관사 행로표 보기`}
+                        title={`${driver} 기관사 행로표 보기`}
+                      >
+                        {driver}
+                      </button>
+                    )}
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
                   </div>
@@ -180,7 +200,17 @@ export default function TrainList() {
                   >
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    {driver && (
+                      <button
+                        type="button"
+                        className={styles.tkDriverName}
+                        onClick={() => openDriverChart(t.trainNo)}
+                        aria-label={`${driver} 기관사 행로표 보기`}
+                        title={`${driver} 기관사 행로표 보기`}
+                      >
+                        {driver}
+                      </button>
+                    )}
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
                   </div>
                 );
@@ -189,6 +219,16 @@ export default function TrainList() {
           </div>
         );
       })}
+
+      {/* 기관사 이름 탭 → 해당 기관사 행로표 미리보기 */}
+      <DiaChartModal
+        open={selectedDia !== null}
+        dia={selectedDia?.dia ?? null}
+        date={selectedDia?.date ?? new Date()}
+        diaLabel={selectedDia ? `${selectedDia.name} 기사` : undefined}
+        compact
+        onClose={() => setSelectedDia(null)}
+      />
     </div>
   );
 }

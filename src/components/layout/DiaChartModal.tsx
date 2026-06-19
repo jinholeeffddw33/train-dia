@@ -11,6 +11,8 @@ interface DiaChartModalProps {
   dia: string | null;
   date: Date;
   diaLabel?: string;
+  /** 작은 미리보기 — 화면을 꽉 채우지 않고 작게 표시 (예: 5호선 운행 화면 기관사 탭) */
+  compact?: boolean;
   onClose: () => void;
 }
 
@@ -32,7 +34,7 @@ function getRouteImagePath(dia: string, date: Date): string | null {
   return `/images/route/${prefix}_${diaNum}.png`;
 }
 
-export default function DiaChartModal({ open, dia, date, diaLabel, onClose }: DiaChartModalProps) {
+export default function DiaChartModal({ open, dia, date, diaLabel, compact, onClose }: DiaChartModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [imgError, setImgError] = useState(false);
 
@@ -64,7 +66,7 @@ export default function DiaChartModal({ open, dia, date, diaLabel, onClose }: Di
       aria-label="다이아 표"
       onClick={(e) => { if (e.target === overlayRef.current) handleClose(); }}
     >
-      <div className={styles.content}>
+      <div className={`${styles.content} ${compact ? styles.contentCompact : ''}`}>
         <div className={styles.header}>
           <h2 className={styles.title}>
             {diaLabel ? `${diaLabel} 다이아 표` : '다이아 표'}

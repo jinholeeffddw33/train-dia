@@ -32,6 +32,12 @@
   margin: auto;
 }
 
+/* 작은 미리보기 — 화면을 꽉 채우지 않게 폭/높이 축소 */
+.contentCompact {
+  max-width: 460px;
+  max-height: 72vh;
+}
+
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }

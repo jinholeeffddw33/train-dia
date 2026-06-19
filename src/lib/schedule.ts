@@ -506,6 +506,18 @@ export function findExchangePartners(
 let cachedMinute = -1;
 let cachedMap: Map<string, string> | null = null;
 
+/** 운행 열차 → 답십리 기관사 다이아 정보 (행로표 미리보기용) */
+export interface TrainDiaInfo {
+  /** 기관사 이름 */
+  name: string;
+  /** 다이아 코드 (행로표 이미지 경로 결정) */
+  dia: string;
+  /** 다이아 기준 날짜 (야간 근무는 어제 날짜) */
+  date: Date;
+}
+// buildTrainDriverMap와 동일 캐시 키 공유 — 동일 분 내 재계산 없음
+let cachedDiaMap: Map<string, TrainDiaInfo> | null = null;
+
 /**
  * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
  * - 현재 시간 기준으로 각 기관사의 활성 구간(segment)에 포함된 열차번호를 수집
@@ -525,6 +537,9 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   // 2) marginMap — 전환 마진(교대 직전/직후) — strict에 없을 때만 채움
   const strictMap = new Map<string, string>();
   const marginMap = new Map<string, string>();
+  // 행로표 미리보기용 다이아 정보 (이름과 동일 키로 매핑)
+  const strictDiaMap = new Map<string, TrainDiaInfo>();
+  const marginDiaMap = new Map<string, TrainDiaInfo>();
 
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -590,12 +605,16 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
 
         if (isStrict) {
           for (const trainNo of seg.n) {
-            strictMap.set(String(trainNo), person.n);
+            const key = String(trainNo);
+            strictMap.set(key, person.n);
+            strictDiaMap.set(key, { name: person.n, dia, date });
           }
         } else if (isMargin) {
           for (const trainNo of seg.n) {
-            if (!marginMap.has(String(trainNo))) {
-              marginMap.set(String(trainNo), person.n);
+            const key = String(trainNo);
+            if (!marginMap.has(key)) {
+              marginMap.set(key, person.n);
+              marginDiaMap.set(key, { name: person.n, dia, date });
             }
           }
         }
@@ -606,10 +625,25 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   // strict 우선 — strict에 있는 열차는 margin이 덮어쓰지 못함
   const finalMap = new Map<string, string>(marginMap);
   strictMap.forEach((v, k) => finalMap.set(k, v));
+  const finalDiaMap = new Map<string, TrainDiaInfo>(marginDiaMap);
+  strictDiaMap.forEach((v, k) => finalDiaMap.set(k, v));
 
   cachedMinute = currentMinute;
   cachedMap = finalMap;
+  cachedDiaMap = finalDiaMap;
   return finalMap;
+}
+
+/**
+ * 현재 운행 중인 열차번호 → 답십리 기관사 다이아 정보 매핑 (행로표 미리보기용)
+ * buildTrainDriverMap()와 동일한 분 단위 캐시를 공유 — 동일 분 내 재계산 없음.
+ */
+export function buildTrainDiaMap(now: Date): Map<string, TrainDiaInfo> {
+  const currentMinute = now.getHours() * 60 + now.getMinutes();
+  if (cachedDiaMap === null || cachedMinute !== currentMinute) {
+    buildTrainDriverMap(now);
+  }
+  return cachedDiaMap ?? new Map();
 }
 
 // ===== 교대 방향 =====

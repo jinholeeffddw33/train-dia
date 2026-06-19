@@ -665,12 +665,15 @@
 .tkTrainBox {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 4px 8px;
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
   white-space: nowrap;
+  /* 행선+기관사 이름이 길어도 화면 밖으로 잘리지 않게 — 열(column) 폭 내에서 줄바꿈 */
+  flex-wrap: wrap;
+  max-width: 100%;
   animation: trainPulse 2s ease-in-out infinite;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -685,6 +688,8 @@
   background: rgba(211, 47, 47, 0.1);
   color: var(--dia-track-down);
   border: 1px solid rgba(211, 47, 47, 0.2);
+  /* 좌측 박스 — 줄바꿈 시 중앙 레일 쪽(오른쪽)으로 정렬 */
+  justify-content: flex-end;
 }
 
 @keyframes trainPulse {
@@ -712,26 +717,6 @@
   color: var(--dia-blue);
   opacity: 0.9;
   letter-spacing: -0.3px;
-  /* 클릭 가능한 버튼 — native button 스타일 제거 */
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  margin: 0;
-  cursor: pointer;
-  border-radius: 4px;
-  text-decoration: underline;
-  text-decoration-color: rgba(59, 130, 246, 0.35);
-  text-underline-offset: 2px;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.12s ease;
-}
-.tkDriverName:active {
-  transform: scale(0.94);
-  background: rgba(59, 130, 246, 0.12);
-}
-.tkDriverName:focus-visible {
-  outline: 2px solid var(--dia-blue);
-  outline-offset: 1px;
 }
 
 .tkDest {

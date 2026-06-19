@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
@@ -49,16 +49,6 @@ export default function AppShell({ children, onBack }: AppShellProps) {
     setActiveTab(tab);
     window.scrollTo({ top: 0 });
   }, [triggerScroll]);
-
-  // 외부에서 홈 탭으로 이동 요청 (예: 5호선 근무중 화면에서 기관사 클릭)
-  useEffect(() => {
-    const handler = () => {
-      setActiveTab('home');
-      window.scrollTo({ top: 0 });
-    };
-    window.addEventListener('dia:navigate-home', handler);
-    return () => window.removeEventListener('dia:navigate-home', handler);
-  }, []);
 
 
   return (

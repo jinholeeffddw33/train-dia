@@ -1978,3 +1978,171 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* ── Weather Widget ── */
+.weatherCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  margin: 0 var(--dia-space-3) var(--dia-space-3);
+  background: var(--dia-bg-card);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-sm);
+  min-height: 64px;
+}
+.weatherLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  min-width: 0;
+}
+.weatherIcon {
+  color: var(--dia-sky);
+  flex-shrink: 0;
+}
+.weatherTempWrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+.weatherTemp {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.5px;
+}
+.weatherDesc {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+.weatherRight {
+  display: flex;
+  gap: var(--dia-space-3);
+  align-items: center;
+  flex-shrink: 0;
+}
+.weatherStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+.weatherStatLabel {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+}
+.weatherStatValue {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-primary);
+}
+.weatherSkeleton {
+  width: 100%;
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-2) 0;
+}
+
+/* ── Real-time Info ── */
+.realtimeCard {
+  margin: 0 var(--dia-space-3) var(--dia-space-3);
+  background: var(--dia-bg-card);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-sm);
+  overflow: hidden;
+}
+.realtimeHeader {
+  padding: var(--dia-space-3) var(--dia-space-4) var(--dia-space-2);
+}
+.realtimeTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  margin: 0;
+}
+.realtimeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.realtimeList > li + li {
+  border-top: 1px solid var(--dia-border-light);
+}
+.realtimeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--dia-text-primary);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.12s ease;
+  min-height: 48px;
+}
+.realtimeItem:active {
+  transform: scale(0.985);
+  background: var(--dia-bg-surface);
+}
+.realtimeItem:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: -2px;
+}
+.realtimeIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.realtimeIcon_red {
+  background: rgba(239, 68, 68, 0.14);
+  color: var(--dia-red);
+}
+.realtimeIcon_amber {
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--dia-amber);
+}
+.realtimeIcon_sky {
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--dia-sky);
+}
+.realtimeLabel {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.realtimeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--dia-red);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.realtimeChevron {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}

@@ -174,12 +174,30 @@ export const useCompareStore = create<CompareState>()(
       },
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        const raw = state as unknown as { activeGroup: number; groups: PersistedGroup[] };
-        const hydratedGroups = raw.groups.map((g) => ({
-          memo: g.memo,
-          count: g.count,
-          persons: g.personIds.map((id) => findById(id)),
-        })) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
+        // 첫 실행(저장 데이터 없음): 그대로 두면 default 유지
+        // persisted 데이터 있음: groups[i]가 personIds를 가지므로 fresh Person으로 복원
+        const raw = state as unknown as { activeGroup: number; groups: (PersistedGroup | CompareGroup)[] };
+        const hydratedGroups = raw.groups.map((g): CompareGroup => {
+          if (g && typeof g === 'object' && 'personIds' in g && Array.isArray((g as PersistedGroup).personIds)) {
+            const pg = g as PersistedGroup;
+            return {
+              memo: pg.memo ?? '',
+              count: pg.count ?? 2,
+              persons: pg.personIds.map((id) => findById(id)),
+            };
+          }
+          // 이미 live 상태(또는 default) — 인원 객체만 fresh로 갱신
+          const cg = g as CompareGroup;
+          return {
+            memo: cg?.memo ?? '',
+            count: cg?.count ?? 2,
+            persons: (cg?.persons ?? [null, null]).map((p) => (p ? findById(p.I) : null)),
+          };
+        }) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
+        // 4개 미만이면 빈 그룹으로 채움
+        while (hydratedGroups.length < 4) {
+          hydratedGroups.push({ memo: '', count: 2, persons: [null, null] });
+        }
         state.groups = hydratedGroups;
         const active = hydratedGroups[raw.activeGroup] ?? hydratedGroups[0];
         state.count = active.count;

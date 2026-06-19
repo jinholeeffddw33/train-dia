@@ -2,12 +2,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
 import { P } from '@/data/cycle';
-import { EXTRA_USERS } from '@/lib/auth';
+import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 
-const ALL_PEOPLE = [...P, ...EXTRA_USERS];
+// 내근직·인턴은 I('순번')가 전원 '0' → 고유값인 사번(s)을 우선 키로 사용
+const ALL_PEOPLE = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 function findById(id: string | null | undefined): Person | null {
-  if (!id) return null;
+  if (!id || id === '0') return null;
   return ALL_PEOPLE.find((p) => p.I === id) ?? null;
+}
+function findBySabun(sabun: string | null | undefined): Person | null {
+  if (!sabun) return null;
+  return ALL_PEOPLE.find((p) => p.s === sabun) ?? null;
+}
+/** 사번 우선 → 순번 순으로 fresh Person 해석 */
+function resolvePerson(sabun: string | null | undefined, id: string | null | undefined): Person | null {
+  return findBySabun(sabun) ?? findById(id);
 }
 
 interface CompareGroup {
@@ -20,6 +29,7 @@ interface PersistedGroup {
   memo: string;
   count: number;
   personIds: (string | null)[];
+  personSabuns?: (string | null)[];
 }
 
 interface CompareState {
@@ -148,14 +158,16 @@ export const useCompareStore = create<CompareState>()(
     }),
     {
       name: 'dia-compare',
-      version: 2,
-      // Person 객체는 휘발 — ID만 저장하고 로드시 cycle.ts에서 fresh 조회
+      version: 3,
+      // Person 객체는 휘발 — 식별자(사번+ID)만 저장하고 로드시 fresh 조회.
+      // 사번 우선 — I='0'인 내근직/인턴이 서로 뒤바뀌지 않도록.
       partialize: (state) => ({
         activeGroup: state.activeGroup,
         groups: state.groups.map((g) => ({
           memo: g.memo,
           count: g.count,
           personIds: g.persons.map((p) => p?.I ?? null),
+          personSabuns: g.persons.map((p) => p?.s ?? null),
         })) as [PersistedGroup, PersistedGroup, PersistedGroup, PersistedGroup],
       }) as unknown as { activeGroup: number; groups: PersistedGroup[] },
       migrate: (persisted: unknown, version: number) => {
@@ -166,10 +178,12 @@ export const useCompareStore = create<CompareState>()(
             memo: g.memo ?? '',
             count: g.count ?? 2,
             personIds: (g.persons ?? []).map((p) => p?.I ?? null),
+            personSabuns: (g.persons ?? []).map((p) => p?.s ?? null),
           }));
-          while (groups.length < 4) groups.push({ memo: '', count: 2, personIds: [null, null] });
+          while (groups.length < 4) groups.push({ memo: '', count: 2, personIds: [null, null], personSabuns: [null, null] });
           return { activeGroup: old.activeGroup ?? 0, groups };
         }
+        // v2: personIds만 존재 (사번 없음) — 그대로 두면 rehydrate가 ID로만 해석
         return persisted;
       },
       onRehydrateStorage: () => (state) => {
@@ -183,7 +197,7 @@ export const useCompareStore = create<CompareState>()(
             return {
               memo: pg.memo ?? '',
               count: pg.count ?? 2,
-              persons: pg.personIds.map((id) => findById(id)),
+              persons: pg.personIds.map((id, i) => resolvePerson(pg.personSabuns?.[i], id)),
             };
           }
           // 이미 live 상태(또는 default) — 인원 객체만 fresh로 갱신
@@ -191,7 +205,7 @@ export const useCompareStore = create<CompareState>()(
           return {
             memo: cg?.memo ?? '',
             count: cg?.count ?? 2,
-            persons: (cg?.persons ?? [null, null]).map((p) => (p ? findById(p.I) : null)),
+            persons: (cg?.persons ?? [null, null]).map((p) => (p ? resolvePerson(p.s, p.I) : null)),
           };
         }) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
         // 4개 미만이면 빈 그룹으로 채움

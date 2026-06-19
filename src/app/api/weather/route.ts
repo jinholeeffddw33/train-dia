@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-// 답십리 승무사업소 좌표 (기상청 격자 변환: 동대문구)
-const NX = 62;
+// 답십리 승무사업소 좌표 (기상청 격자 — 서울 동대문구)
+const NX = 61;
 const NY = 127;
 
 interface WeatherData {

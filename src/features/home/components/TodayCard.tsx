@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { TrainFront } from 'lucide-react';
+import { TrainFront, ChevronRight } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice } from '@/lib/auth';
@@ -113,47 +113,49 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     : `${td.getMonth() + 1}월 ${td.getDate()}일 교번`;
 
   return (
-    <section className={styles.todayCard}>
-      {/* 교번 + 근무시간 헤더 */}
-      <div className={styles.diaHeader}>
-        <span className={styles.cardLabel}>{dateLabel}</span>
-        {schedule && !specialRest && (
-          <div className={styles.workTimeWrap}>
-            <span className={styles.workTimeLabel}>근무시간</span>
-            <span className={styles.workTime}>{getWorkTime(schedule)}</span>
+    <section className={`${styles.todayCard} ${styles[`todayCard_${effectiveType}`] ?? ''}`}>
+      {/* Hero — 오늘 근무 + 큰 교번 + 4분할 stats (모킹업 스타일) */}
+      <div className={`${styles.heroBlock} ${typeClass}`}>
+        <div className={styles.heroLabelRow}>
+          <span className={styles.heroLabel}>{dateLabel}</span>
+          {depotStart && <span className={styles.heroDepotBadge}>기지 출근</span>}
+        </div>
+        <div className={styles.heroCenter}>
+          <div className={styles.heroIcon}>
+            <TrainFront size={28} strokeWidth={2.2} />
           </div>
+          <div className={styles.heroNumberWrap}>
+            <span className={styles.heroNumber}>
+              {specialRest ? specialRestLabel : getDiaDisplay(dia)}
+            </span>
+            <span className={styles.heroNumberSuffix}>
+              {specialRest ? '' : effectiveType === 'rest' ? '휴무' : effectiveType === 'standby' ? '대기' : '다이아'}
+            </span>
+          </div>
+        </div>
+        <div className={styles.heroStats}>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatLabel}>유형</span>
+            <span className={styles.heroStatValue}>{specialRest ? specialRestLabel : getLabel(dia)}</span>
+          </div>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatLabel}>출근</span>
+            <span className={styles.heroStatValue}>{specialRest || !schedule ? '-' : schedule.s}</span>
+          </div>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatLabel}>퇴근</span>
+            <span className={styles.heroStatValue}>{specialRest || !schedule ? '-' : schedule.e}</span>
+          </div>
+          <div className={styles.heroStat}>
+            <span className={styles.heroStatLabel}>근무</span>
+            <span className={styles.heroStatValue}>{schedule && !specialRest ? getWorkTime(schedule) : '-'}</span>
+          </div>
+        </div>
+        {schedule && !specialRest && (
+          <button type="button" className={styles.heroDetailBtn} aria-label="근무 정보 상세보기">
+            근무 정보 상세보기 <ChevronRight size={16} />
+          </button>
         )}
-      </div>
-
-      <div className={styles.diaMain}>
-        <div className={`${styles.diaBadge} ${typeClass}`}>
-          <span className={styles.diaBadgeText}>
-            {specialRest ? specialRestLabel : getDiaDisplay(dia)}
-          </span>
-        </div>
-        <div className={styles.diaInfo}>
-          {effectiveType !== 'rest' && (
-            <span className={styles.diaTypeLabel}>
-              {getLabel(dia)}
-              {depotStart && (
-                <span className={styles.depotBadge}>기지 출근</span>
-              )}
-            </span>
-          )}
-          {specialRest && (
-            <span className={styles.diaTypeLabel}>
-              {specialRestLabel}
-              <span className={styles.diaTypeSub}>{schedule?.s}</span>
-            </span>
-          )}
-          {schedule && !specialRest && (
-            <span className={styles.diaTime}>
-              <span className={styles.diaTimeStart}>{schedule.s}</span>
-              {' ~ '}
-              {schedule.e}
-            </span>
-          )}
-        </div>
       </div>
 
       {/* 방향 배너 — 구간별 전환 */}

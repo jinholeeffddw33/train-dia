@@ -12,7 +12,7 @@ import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector, WeatherWidget, RealTimeInfo } from '@/features/home';
+import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
 import { CalendarTab, ExchangeRequest } from '@/features/calendar';
 import { DutyTab } from '@/features/duty';
 import { MoreTab } from '@/features/more';
@@ -53,14 +53,12 @@ function HomeTab() {
     <>
       <HomeHeader onDriverClick={() => setDriverOpen(true)} />
       <HomeNotice />
-      <WeatherWidget />
       <WeekStrip
         selectedDate={selectedDate}
         onSelectDate={(date) => setSelectedDate(date || undefined)}
       />
       <TodayCard selectedDate={selectedDate} onEmptyClick={() => setDriverOpen(true)} />
       <StatusCards baseDate={selectedDate} />
-      <RealTimeInfo />
       <HomeTipsQuiz />
       <DriverSelector open={driverOpen} onClose={() => setDriverOpen(false)} />
     </>

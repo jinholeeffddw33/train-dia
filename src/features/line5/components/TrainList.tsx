@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useCallback } from 'react';
 import { useTrainStore } from '@/stores/train';
-import { buildTrainDriverMap } from '@/lib/schedule';
+import { useDriverStore } from '@/stores/driver';
+import { buildTrainPersonMap } from '@/lib/schedule';
+import type { Person } from '@/lib/types';
 import {
   LINE5_MAIN,
   LINE5_MACHEON,
@@ -33,8 +35,18 @@ export default function TrainList() {
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
-  // 열차번호 → 답십리 기관사 이름 매핑 (data 변경 시에만 재계산)
-  const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);
+  // 열차번호 → 답십리 기관사 Person 매핑 (data 변경 시에만 재계산)
+  const driverMap = useMemo(() => buildTrainPersonMap(new Date()), [data]);
+  const pickDriver = useDriverStore((s) => s.pick);
+
+  // 기관사 이름 탭 → 해당 기관사로 전환 + 홈 탭으로 이동
+  const handleDriverClick = useCallback((person: Person) => {
+    if (!person.I || person.I === '0') return;
+    pickDriver(person.I);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('dia:navigate-home'));
+    }
+  }, [pickDriver]);
 
   const trainsByStation = useMemo(() => {
     const map = new Map<string, { trainNo: string; direction: string; status: string; dest: string }[]>();
@@ -134,7 +146,17 @@ export default function TrainList() {
                     className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
                   >
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
-                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    {driver && (
+                      <button
+                        type="button"
+                        className={styles.tkDriverName}
+                        onClick={() => handleDriverClick(driver)}
+                        aria-label={`${driver.n} 기관사 근무표 보기`}
+                        title={`${driver.n} 기관사 근무표 보기`}
+                      >
+                        {driver.n}
+                      </button>
+                    )}
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
                   </div>
@@ -180,7 +202,17 @@ export default function TrainList() {
                   >
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                    {driver && <span className={styles.tkDriverName}>{driver}</span>}
+                    {driver && (
+                      <button
+                        type="button"
+                        className={styles.tkDriverName}
+                        onClick={() => handleDriverClick(driver)}
+                        aria-label={`${driver.n} 기관사 근무표 보기`}
+                        title={`${driver.n} 기관사 근무표 보기`}
+                      >
+                        {driver.n}
+                      </button>
+                    )}
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
                   </div>
                 );

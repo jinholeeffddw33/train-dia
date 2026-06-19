@@ -505,6 +505,8 @@ export function findExchangePartners(
 // 분 단위 캐시: 같은 분(minute)이면 이전 결과 재사용
 let cachedMinute = -1;
 let cachedMap: Map<string, string> | null = null;
+// 동일 캐시 키로 Person 객체 매핑도 함께 캐싱 (driver 클릭 → 근무표 진입에 사용)
+let cachedPersonMap: Map<string, Person> | null = null;
 
 /**
  * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
@@ -525,6 +527,9 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   // 2) marginMap — 전환 마진(교대 직전/직후) — strict에 없을 때만 채움
   const strictMap = new Map<string, string>();
   const marginMap = new Map<string, string>();
+  // Person 객체 매핑 (driver 클릭 시 근무표 진입용)
+  const strictPersonMap = new Map<string, Person>();
+  const marginPersonMap = new Map<string, Person>();
 
   const nowMins = now.getHours() * 60 + now.getMinutes();
   const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -590,12 +595,16 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
 
         if (isStrict) {
           for (const trainNo of seg.n) {
-            strictMap.set(String(trainNo), person.n);
+            const key = String(trainNo);
+            strictMap.set(key, person.n);
+            strictPersonMap.set(key, person);
           }
         } else if (isMargin) {
           for (const trainNo of seg.n) {
-            if (!marginMap.has(String(trainNo))) {
-              marginMap.set(String(trainNo), person.n);
+            const key = String(trainNo);
+            if (!marginMap.has(key)) {
+              marginMap.set(key, person.n);
+              marginPersonMap.set(key, person);
             }
           }
         }
@@ -606,10 +615,30 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   // strict 우선 — strict에 있는 열차는 margin이 덮어쓰지 못함
   const finalMap = new Map<string, string>(marginMap);
   strictMap.forEach((v, k) => finalMap.set(k, v));
+  const finalPersonMap = new Map<string, Person>(marginPersonMap);
+  strictPersonMap.forEach((v, k) => finalPersonMap.set(k, v));
 
   cachedMinute = currentMinute;
   cachedMap = finalMap;
+  cachedPersonMap = finalPersonMap;
   return finalMap;
+}
+
+/**
+ * 현재 운행 중인 열차번호 → 답십리 기관사 Person 객체 매핑
+ * buildTrainDriverMap()와 동일한 시간 캐시를 공유 — 동일 분 내 재계산 없음.
+ */
+export function buildTrainPersonMap(now: Date): Map<string, Person> {
+  // driver map 빌드 시 personMap도 함께 캐싱 → 동기 보장
+  if (cachedPersonMap === null) {
+    buildTrainDriverMap(now);
+  } else {
+    const currentMinute = now.getHours() * 60 + now.getMinutes();
+    if (cachedMinute !== currentMinute) {
+      buildTrainDriverMap(now);
+    }
+  }
+  return cachedPersonMap ?? new Map();
 }
 
 // ===== 교대 방향 =====

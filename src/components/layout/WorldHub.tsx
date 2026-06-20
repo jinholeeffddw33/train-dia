@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -14,7 +14,7 @@ import styles from './WorldHub.module.css';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
-export type WorldId = 'duty' | 'edu' | 'safety' | 'life';
+export type WorldId = 'duty' | 'edu' | 'safety' | 'life' | 'standby';
 
 interface WorldHubProps {
   onEnter: (world: WorldId) => void;
@@ -128,6 +128,23 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           })}
         </div>
       </section>
+
+      {/* ── 대기충당확인 ── */}
+      <button
+        type="button"
+        className={styles.standbyCard}
+        onClick={() => handleClick('standby')}
+        aria-label="대기충당확인 — 최근 3일치 기록부 확인"
+      >
+        <span className={styles.standbyIcon}>
+          <ClipboardCheck size={22} strokeWidth={2.2} />
+        </span>
+        <span className={styles.standbyText}>
+          <span className={styles.standbyLabel}>대기충당확인</span>
+          <span className={styles.standbyDesc}>최근 3일 기록부 · 확인 기록</span>
+        </span>
+        <ChevronRight size={18} className={styles.standbyChevron} aria-hidden />
+      </button>
 
       <InstallCard />
 

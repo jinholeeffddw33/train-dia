@@ -812,6 +812,65 @@
   );
 }
 
+/* ── 대기충당확인 카드 (서비스 그리드 아래) ── */
+.standbyCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  padding: 14px 16px;
+  background: var(--dia-bg-card);
+  border: 1px solid var(--dia-border-light);
+  border-radius: 16px;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, background 0.15s ease;
+  box-shadow: var(--dia-shadow-sm);
+  min-height: 56px;
+}
+.standbyCard:active {
+  transform: scale(0.985);
+  background: var(--dia-bg-surface);
+}
+.standbyCard:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+.standbyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.14);
+  color: #6366F1;
+  flex-shrink: 0;
+}
+.standbyText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.standbyLabel {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.2px;
+}
+.standbyDesc {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+}
+.standbyChevron {
+  color: var(--dia-text-tertiary);
+  flex-shrink: 0;
+}
+
 /* ── Version footer — 하단 중앙 ── */
 .footer {
   position: absolute;

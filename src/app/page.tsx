@@ -20,6 +20,7 @@ import { Line5Tab } from '@/features/line5';
 import { EduTab } from '@/features/edu';
 import SafetyWorld from '@/features/safety/SafetyWorld';
 import { LifeWorld } from '@/features/life';
+import { StandbyCoverageView } from '@/features/standby';
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -99,6 +100,8 @@ export default function HomePage() {
           <SafetyWorld onBack={handleBack} />
         ) : world === 'life' ? (
           <LifeWorld onBack={handleBack} />
+        ) : world === 'standby' ? (
+          <StandbyCoverageView onBack={handleBack} />
         ) : (
           <ComingSoon worldId={world} onBack={handleBack} />
         )}

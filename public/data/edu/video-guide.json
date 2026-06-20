@@ -81,8 +81,16 @@
       "source": "youtube"
     },
     {
-      "id": "rescue-coupling",
+      "id": "safety-driving-10-commandments",
       "order": 9,
+      "category": "daily",
+      "title": "안전운행 메뉴얼 10계명",
+      "url": "https://youtu.be/M08xU9uEz3g",
+      "source": "youtube"
+    },
+    {
+      "id": "rescue-coupling",
+      "order": 10,
       "category": "trouble",
       "title": "5호선 구원연결 이해하기",
       "url": "https://youtu.be/zzBidwDgTnE",
@@ -91,7 +99,7 @@
     },
     {
       "id": "train-radio-lte-r",
-      "order": 10,
+      "order": 11,
       "category": "trouble",
       "title": "열차무전기 LTE-R 사용법",
       "url": "https://youtu.be/jLYTowSIQeg",
@@ -100,7 +108,7 @@
     },
     {
       "id": "uninterruptible-announce",
-      "order": 11,
+      "order": 12,
       "category": "trouble",
       "title": "무정전방송장치 사용법",
       "url": "https://youtu.be/PfCDzaQnOJs",
@@ -109,7 +117,7 @@
     },
     {
       "id": "newcomer-vacation-guide",
-      "order": 12,
+      "order": 13,
       "category": "hr",
       "title": "새내기를 위한 휴가 가이드",
       "url": "https://youtu.be/vt1YYw9SYPo",
@@ -118,7 +126,7 @@
     },
     {
       "id": "promotion-guide",
-      "order": 13,
+      "order": 14,
       "category": "hr",
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",

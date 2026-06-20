@@ -225,7 +225,7 @@ export default function TrainList() {
         open={selectedDia !== null}
         dia={selectedDia?.dia ?? null}
         date={selectedDia?.date ?? new Date()}
-        diaLabel={selectedDia ? `${selectedDia.name} 기사` : undefined}
+        diaLabel={selectedDia ? `${selectedDia.name} 기관사` : undefined}
         compact
         onClose={() => setSelectedDia(null)}
       />

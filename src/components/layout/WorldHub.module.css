@@ -124,7 +124,7 @@
 }
 .bellBtn:active {
   transform: scale(0.92);
-  background: var(--dia-bg-surface, var(--dia-surface));
+  background: var(--dia-surface);
 }
 .bellBtn:focus-visible {
   outline: 2px solid var(--dia-blue);
@@ -855,7 +855,7 @@
   max-width: 480px;
   margin: 2px auto 0;
   padding: 8px 12px 8px 10px;
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: 1px dashed var(--dia-border);
   border-radius: 999px;
   color: var(--dia-text-primary);
@@ -866,7 +866,7 @@
 }
 .standbyCard:active {
   transform: scale(0.98);
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border-style: solid;
   border-color: rgba(99, 102, 241, 0.4);
 }

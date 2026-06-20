@@ -13,7 +13,7 @@
   align-items: center;
   gap: var(--dia-space-3);
   padding: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px)) var(--dia-space-3) var(--dia-space-3);
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border-bottom: 1px solid var(--dia-border-light);
   position: sticky;
   top: 0;
@@ -27,7 +27,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
   cursor: pointer;
@@ -124,7 +124,7 @@
 }
 
 .card {
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border: 1px solid var(--dia-border-light);
   border-radius: 16px;
   overflow: hidden;
@@ -165,7 +165,7 @@
   display: block;
   width: 100%;
   padding: 0;
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -231,7 +231,7 @@
 
 .readersBlock {
   padding: var(--dia-space-3);
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border-top: 1px solid var(--dia-border-light);
 }
 .readersHead {
@@ -270,7 +270,7 @@
   padding: 4px 8px;
   border-radius: 8px;
   font-size: var(--dia-text-sm);
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border: 1px solid var(--dia-border-light);
 }
 .readerItemMine {
@@ -342,7 +342,7 @@
 .formCard {
   width: 100%;
   max-width: 480px;
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border-radius: 20px 20px 0 0;
   overflow: hidden;
   display: flex;
@@ -374,7 +374,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
   cursor: pointer;
@@ -442,7 +442,7 @@
 
 /* ── 한 달 달력 날짜 선택기 ── */
 .mdp {
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: 1px solid var(--dia-border);
   border-radius: 14px;
   padding: 10px;
@@ -468,7 +468,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
   cursor: pointer;
@@ -509,7 +509,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: var(--dia-bg-card);
+  background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
@@ -560,7 +560,7 @@
   gap: 6px;
   width: 100%;
   padding: var(--dia-space-6) var(--dia-space-4);
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   border: 2px dashed var(--dia-border);
   border-radius: 14px;
   color: var(--dia-text-secondary);
@@ -634,7 +634,7 @@
   border: none;
 }
 .formBtnSecondary {
-  background: var(--dia-bg-surface);
+  background: var(--dia-surface-hover);
   color: var(--dia-text-secondary);
   border: 1px solid var(--dia-border);
 }

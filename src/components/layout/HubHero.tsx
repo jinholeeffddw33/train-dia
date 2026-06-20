@@ -191,19 +191,12 @@ export default function HubHero({ onClick }: HubHeroProps) {
         </div>
 
         {isWorking && (
-          <div className={styles.heroStats}>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>출근</span>
-              <span className={styles.statValue}>{info.schedule?.s ?? '-'}</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>퇴근</span>
-              <span className={styles.statValue}>{info.schedule?.e ?? '-'}</span>
-            </div>
-            <div className={styles.stat}>
-              <span className={styles.statLabel}>근무시간</span>
-              <span className={styles.statValue}>{info.workTime || '-'}</span>
-            </div>
+          <div className={styles.heroStatsLine}>
+            <span className={styles.statTimeStart}>{info.schedule?.s ?? '-'}</span>
+            <span className={styles.statTimeSep}>~</span>
+            <span className={styles.statTimeEnd}>{info.schedule?.e ?? '-'}</span>
+            <span className={styles.statWorkLabel}>근무시간</span>
+            <span className={styles.statWorkValue}>{info.workTime || '-'}</span>
           </div>
         )}
 

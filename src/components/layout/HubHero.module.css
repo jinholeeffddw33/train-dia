@@ -196,6 +196,61 @@
   white-space: nowrap;
 }
 
+/* ── 한 줄 stats — "출근 ~ 퇴근 근무시간 N:NN" ── */
+.heroStatsLine {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 8px var(--dia-space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 출근 — 가장 강조 (큰 크기 + 흰색 + 텍스트 섀도우) */
+.statTimeStart {
+  font-size: clamp(20px, 5.5vw, 24px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.5px;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 0 14px rgba(255, 255, 255, 0.18);
+}
+
+.statTimeSep {
+  font-size: var(--dia-text-base);
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+/* 퇴근 — 보조 강조 (조금 작게, 살짝 옅게) */
+.statTimeEnd {
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: -0.3px;
+}
+
+.statWorkLabel {
+  font-size: var(--dia-text-meta);
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.statWorkValue {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
 .heroFoot {
   display: flex;
   align-items: center;

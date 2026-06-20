@@ -846,6 +846,16 @@
   );
 }
 
+/* ── 미니 액션 그룹 (대기충당확인 + 카페 바로가기) ── */
+.miniActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 2px auto 0;
+}
+
 /* ── 대기충당확인 카드 — 컴팩트 (label만 노출) ── */
 /* .hub > *의 width:100%를 override해 fit-content로 중앙 정렬 */
 .standbyCard {
@@ -907,6 +917,29 @@
   flex-shrink: 0;
   width: 12px;
   height: 12px;
+}
+
+/* ── 카페 바로가기 — 그린 톤으로 차별화 ── */
+.cafeCard {
+  background:
+    linear-gradient(rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.12)),
+    var(--dia-surface);
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 1px 4px rgba(34, 197, 94, 0.12);
+  text-decoration: none;
+}
+.cafeCard:active {
+  background:
+    linear-gradient(rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.2)),
+    var(--dia-surface);
+  border-color: rgba(34, 197, 94, 0.6);
+}
+.cafeCard:focus-visible {
+  outline-color: var(--dia-green);
+}
+.cafeIcon {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--dia-green);
 }
 
 /* ── Version footer — 하단 중앙 ── */

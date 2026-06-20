@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight, Coffee } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -126,19 +126,35 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
         </div>
       </section>
 
-      {/* ── 대기충당확인 ── */}
-      <button
-        type="button"
-        className={styles.standbyCard}
-        onClick={() => handleClick('standby')}
-        aria-label="대기충당확인"
-      >
-        <span className={styles.standbyIcon}>
-          <ClipboardCheck size={14} strokeWidth={2.4} />
-        </span>
-        <span className={styles.standbyLabel}>대기충당확인</span>
-        <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
-      </button>
+      {/* ── 미니 액션 — 대기충당확인 + 카페 바로가기 ── */}
+      <div className={styles.miniActions}>
+        <button
+          type="button"
+          className={styles.standbyCard}
+          onClick={() => handleClick('standby')}
+          aria-label="대기충당확인"
+        >
+          <span className={styles.standbyIcon}>
+            <ClipboardCheck size={14} strokeWidth={2.4} />
+          </span>
+          <span className={styles.standbyLabel}>대기충당확인</span>
+          <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
+        </button>
+
+        <a
+          href="https://cafe.naver.com/smrthink"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`${styles.standbyCard} ${styles.cafeCard}`}
+          aria-label="네이버 카페 바로가기 (새 창)"
+        >
+          <span className={`${styles.standbyIcon} ${styles.cafeIcon}`}>
+            <Coffee size={14} strokeWidth={2.4} />
+          </span>
+          <span className={styles.standbyLabel}>카페 바로가기</span>
+          <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
+        </a>
+      </div>
 
       {/* ── Weather (대기충당확인 아래로 이동) ── */}
       <HubWeather />

@@ -90,9 +90,6 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
         </button>
       </header>
 
-      {/* ── Weather ── */}
-      <HubWeather />
-
       {/* ── Today's Duty Hero ── */}
       <HubHero onClick={() => onEnter('duty')} />
 
@@ -145,6 +142,9 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
         </span>
         <ChevronRight size={18} className={styles.standbyChevron} aria-hidden />
       </button>
+
+      {/* ── Weather (대기충당확인 아래로 이동) ── */}
+      <HubWeather />
 
       <InstallCard />
 

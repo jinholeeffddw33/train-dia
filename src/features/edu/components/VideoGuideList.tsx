@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, Play } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { ArrowLeft, ExternalLink, Play, Plus } from 'lucide-react';
 import { useBonsaiStore } from '@/stores/bonsai';
+import VideoRegisterModal from './VideoRegisterModal';
 import styles from '../styles/edu.module.css';
 
 interface VideoItem {
@@ -47,6 +48,9 @@ function getYouTubeThumbnail(url: string): string | null {
 export default function VideoGuideList({ onBack }: VideoGuideListProps) {
   const [data, setData] = useState<VideoGuideData | null>(null);
   const [loading, setLoading] = useState(true);
+  // 사용자가 등록한 영상 (공용 DB) — 기본 영상 뒤에 영역별로 이어붙임
+  const [extraVideos, setExtraVideos] = useState<VideoItem[]>([]);
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   useEffect(() => {
     fetch('/data/edu/video-guide.json')
@@ -55,7 +59,27 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
       .catch(() => setLoading(false));
   }, []);
 
-  const sortedVideos = (data?.videos ?? []).slice().sort((a, b) => a.order - b.order);
+  // 등록된 영상 불러오기 (DB)
+  useEffect(() => {
+    fetch('/api/edu/videos')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (json?.videos) {
+          setExtraVideos(
+            (json.videos as Omit<VideoItem, 'order'>[]).map((v, i) => ({ ...v, order: 9000 + i })),
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleRegistered = useCallback((video: Omit<VideoItem, 'order'>) => {
+    setExtraVideos((prev) => [...prev, { ...video, order: 9000 + prev.length }]);
+  }, []);
+
+  const sortedVideos = [...(data?.videos ?? []), ...extraVideos]
+    .slice()
+    .sort((a, b) => a.order - b.order);
   const categories = data?.categories ?? [];
   // 카테고리별로 그룹화 — 카테고리 없는 영상은 마지막에 "기타"로
   const groupedVideos: { category: VideoCategory; items: VideoItem[] }[] = (() => {
@@ -102,6 +126,17 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.topTitle}>눈으로 보는 영상 가이드</h1>
+        {!loading && categories.length > 0 && (
+          <button
+            type="button"
+            className={styles.videoRegisterBtn}
+            onClick={() => setRegisterOpen(true)}
+            aria-label="영상 등록"
+          >
+            <Plus size={18} strokeWidth={2.6} aria-hidden />
+            <span>등록</span>
+          </button>
+        )}
       </div>
 
       <div className={styles.newcomerBody}>
@@ -243,6 +278,13 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
           </div>
         )}
       </div>
+
+      <VideoRegisterModal
+        open={registerOpen}
+        categories={categories}
+        onClose={() => setRegisterOpen(false)}
+        onRegistered={handleRegistered}
+      />
     </div>
   );
 }

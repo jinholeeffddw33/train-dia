@@ -76,6 +76,51 @@
   align-self: flex-start;
 }
 
+/* 오늘/내일 토글 행 — 배지(좌) + 토글(우) */
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.heroTopRow .heroBadge {
+  align-self: center;
+}
+
+.heroDayToggle {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  flex-shrink: 0;
+}
+.heroDayBtn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.heroDayBtn:active { transform: scale(0.94); }
+.heroDayBtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.heroDayBtnActive {
+  background: #fff;
+  color: #1e293b;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
 .heroMain {
   display: flex;
   align-items: center;

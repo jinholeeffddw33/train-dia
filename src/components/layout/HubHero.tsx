@@ -21,6 +21,8 @@ interface HubHeroProps {
 
 export default function HubHero({ onClick }: HubHeroProps) {
   const [chartOpen, setChartOpen] = useState(false);
+  // 0 = 오늘, 1 = 내일
+  const [dayOffset, setDayOffset] = useState<0 | 1>(0);
   const driver = useDriverStore((s) => s.current);
   const getSwappedDia = useGetSwappedDia();
   const clock = useClock();
@@ -31,14 +33,21 @@ export default function HubHero({ onClick }: HubHeroProps) {
     return d;
   }, [clock.hours, clock.minutes, clock.seconds]);
 
+  // 선택된 근무일 (오늘/내일)
+  const targetDate = useMemo(() => {
+    const d = new Date(now);
+    d.setDate(d.getDate() + dayOffset);
+    return d;
+  }, [now, dayOffset]);
+
   // 기관사 외 직원 (소장·부소장·부장·인턴·내근직) 판별
   const isOfficeStaff = !!driver && driver.I === '0';
 
   const info = useMemo(() => {
     if (!driver || isOfficeStaff) return null;
-    const dia = getSwappedDia(driver, now);
+    const dia = getSwappedDia(driver, targetDate);
     if (!dia) return null;
-    const schedule = getSchedule(dia, now);
+    const schedule = getSchedule(dia, targetDate);
     const diaType = getType(dia);
     const specialRest = isSpecialRest(schedule);
     const restLabel = specialRest ? getSpecialRestLabel(schedule) : '';
@@ -53,7 +62,7 @@ export default function HubHero({ onClick }: HubHeroProps) {
       schedule,
       workTime: schedule ? getWorkTime(schedule) : '',
     };
-  }, [driver, isOfficeStaff, getSwappedDia, now]);
+  }, [driver, isOfficeStaff, getSwappedDia, targetDate]);
 
   const enterDuty = () => { onClick?.(); };
   const openChart = (e: React.MouseEvent) => {
@@ -149,7 +158,31 @@ export default function HubHero({ onClick }: HubHeroProps) {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); enterDuty(); }
         }}
       >
-        <div className={styles.heroBadge}>오늘 근무</div>
+        <div className={styles.heroTopRow}>
+          <div className={styles.heroBadge}>{dayOffset === 0 ? '오늘 근무' : '내일 근무'}</div>
+          {driver && (
+            <div className={styles.heroDayToggle} role="tablist" aria-label="근무일 선택">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={dayOffset === 0}
+                className={`${styles.heroDayBtn} ${dayOffset === 0 ? styles.heroDayBtnActive : ''}`}
+                onClick={(e) => { e.stopPropagation(); setDayOffset(0); }}
+              >
+                오늘
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={dayOffset === 1}
+                className={`${styles.heroDayBtn} ${dayOffset === 1 ? styles.heroDayBtnActive : ''}`}
+                onClick={(e) => { e.stopPropagation(); setDayOffset(1); }}
+              >
+                내일
+              </button>
+            </div>
+          )}
+        </div>
         <div className={styles.heroMain}>
           <div className={styles.heroIconWrap}>
             <TrainFront size={28} strokeWidth={2} />
@@ -193,7 +226,7 @@ export default function HubHero({ onClick }: HubHeroProps) {
         <DiaChartModal
           open={chartOpen}
           dia={info.dia}
-          date={now}
+          date={targetDate}
           diaLabel={info.diaLabel}
           onClose={() => setChartOpen(false)}
         />

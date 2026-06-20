@@ -192,15 +192,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   flex-shrink: 0;
+  position: relative;
+  color: #fff;
+  /* 3D 입체감 — 인셋 하이라이트(상단) + 외곽 그림자(하단) + 내부 깊이 */
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.22),
+    0 4px 10px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(0, 0, 0, 0.06);
 }
-.iconDuty { background: rgba(59, 130, 246, 0.14); color: var(--dia-blue); }
-.iconEdu  { background: rgba(139, 92, 246, 0.14); color: var(--dia-purple); }
-.iconSafety { background: rgba(56, 189, 248, 0.14); color: var(--dia-sky); }
-.iconLife { background: rgba(34, 197, 94, 0.14);  color: var(--dia-green); }
+/* 상단 specular highlight (반짝임) */
+.serviceIcon::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 22%;
+  width: 42%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+.serviceCard:active .serviceIcon {
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.iconDuty {
+  background: radial-gradient(circle at 32% 28%, #93C5FD 0%, #3B82F6 50%, #1D4ED8 100%);
+}
+.iconEdu {
+  background: radial-gradient(circle at 32% 28%, #C4B5FD 0%, #8B5CF6 50%, #6D28D9 100%);
+}
+.iconSafety {
+  background: radial-gradient(circle at 32% 28%, #7DD3FC 0%, #38BDF8 50%, #0284C7 100%);
+}
+.iconLife {
+  background: radial-gradient(circle at 32% 28%, #86EFAC 0%, #22C55E 50%, #15803D 100%);
+}
 
 .serviceText {
   display: flex;
@@ -812,52 +846,59 @@
   );
 }
 
-/* ── 대기충당확인 카드 (서비스 그리드 아래) ── */
+/* ── 대기충당확인 카드 — 보조 액션 (주요서비스보다 작고 구별) ── */
 .standbyCard {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   max-width: 480px;
-  padding: 14px 16px;
-  background: var(--dia-bg-card);
-  border: 1px solid var(--dia-border-light);
-  border-radius: 16px;
+  margin: 2px auto 0;
+  padding: 8px 12px 8px 10px;
+  background: var(--dia-bg-surface);
+  border: 1px dashed var(--dia-border);
+  border-radius: 999px;
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, background 0.15s ease;
-  box-shadow: var(--dia-shadow-sm);
-  min-height: 56px;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  min-height: 40px;
 }
 .standbyCard:active {
-  transform: scale(0.985);
-  background: var(--dia-bg-surface);
+  transform: scale(0.98);
+  background: var(--dia-bg-card);
+  border-style: solid;
+  border-color: rgba(99, 102, 241, 0.4);
 }
 .standbyCard:focus-visible {
-  outline: 2px solid var(--dia-blue);
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
 }
 .standbyIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(99, 102, 241, 0.14);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.16);
   color: #6366F1;
   flex-shrink: 0;
 }
+.standbyIcon svg {
+  width: 14px;
+  height: 14px;
+}
 .standbyText {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   min-width: 0;
-  gap: 2px;
+  flex-wrap: wrap;
 }
 .standbyLabel {
-  font-size: var(--dia-text-base);
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   color: var(--dia-text-primary);
   letter-spacing: -0.2px;
@@ -865,10 +906,13 @@
 .standbyDesc {
   font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
+  font-weight: 500;
 }
 .standbyChevron {
   color: var(--dia-text-tertiary);
   flex-shrink: 0;
+  width: 14px;
+  height: 14px;
 }
 
 /* ── Version footer — 하단 중앙 ── */

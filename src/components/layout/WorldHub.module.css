@@ -6,8 +6,8 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--dia-space-4);
-  padding-top: calc(var(--dia-space-4) + env(safe-area-inset-top, 0px));
+  gap: var(--dia-space-3);
+  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
   padding-bottom: calc(var(--dia-space-16, 64px) + env(safe-area-inset-bottom, 0px));
   padding-left: max(var(--dia-space-4), env(safe-area-inset-left, 0px));
   padding-right: max(var(--dia-space-4), env(safe-area-inset-right, 0px));
@@ -75,7 +75,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--dia-space-3);
-  margin-bottom: var(--dia-space-1);
+  margin-bottom: 0;
   z-index: 1;
   animation: fadeSlideUp 0.6s var(--dia-ease) both;
 }
@@ -146,20 +146,20 @@
 .servicesWrap {
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
 }
 
 .servicesTitle {
   font-size: var(--dia-text-base);
   font-weight: 700;
   color: var(--dia-text-primary);
-  margin: var(--dia-space-2) 0 0;
+  margin: 0;
 }
 
 .servicesGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
 }
 
 .serviceCard {
@@ -167,7 +167,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
-  padding: var(--dia-space-4);
+  padding: var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
@@ -176,7 +176,7 @@
   -webkit-user-select: none;
   user-select: none;
   text-align: left;
-  min-height: 76px;
+  min-height: 66px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--dia-shadow-sm);
 }
@@ -855,20 +855,25 @@
   max-width: 480px;
   margin: 2px auto 0;
   padding: 8px 12px 8px 10px;
-  background: var(--dia-surface-hover);
-  border: 1px dashed var(--dia-border);
+  /* 메인 배경과 확실히 구분되는 인디고 톤 카드 (라이트/다크 공통) */
+  background:
+    linear-gradient(rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.12)),
+    var(--dia-surface);
+  border: 1.5px solid rgba(99, 102, 241, 0.45);
   border-radius: 999px;
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
   min-height: 40px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
 }
 .standbyCard:active {
   transform: scale(0.98);
-  background: var(--dia-surface);
-  border-style: solid;
-  border-color: rgba(99, 102, 241, 0.4);
+  background:
+    linear-gradient(rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.2)),
+    var(--dia-surface);
+  border-color: rgba(99, 102, 241, 0.6);
 }
 .standbyCard:focus-visible {
   outline: 2px solid #6366F1;

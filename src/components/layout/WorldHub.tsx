@@ -131,16 +131,13 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
         type="button"
         className={styles.standbyCard}
         onClick={() => handleClick('standby')}
-        aria-label="대기충당확인 — 최근 3일치 기록부 확인"
+        aria-label="대기충당확인"
       >
         <span className={styles.standbyIcon}>
-          <ClipboardCheck size={22} strokeWidth={2.2} />
+          <ClipboardCheck size={14} strokeWidth={2.4} />
         </span>
-        <span className={styles.standbyText}>
-          <span className={styles.standbyLabel}>대기충당확인</span>
-          <span className={styles.standbyDesc}>최근 3일 기록부 · 확인 기록</span>
-        </span>
-        <ChevronRight size={18} className={styles.standbyChevron} aria-hidden />
+        <span className={styles.standbyLabel}>대기충당확인</span>
+        <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
       </button>
 
       {/* ── Weather (대기충당확인 아래로 이동) ── */}

@@ -1,18 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Plus, Check, X, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, X, ImageIcon, ExternalLink } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { DOW } from '@/lib/constants';
 import StandbyCoverageForm from './StandbyCoverageForm';
 import styles from './StandbyCoverage.module.css';
-
-interface CoverageRead {
-  sabun: string;
-  name: string;
-  readAt: string;
-}
 
 interface Coverage {
   id: string;
@@ -20,7 +14,8 @@ interface Coverage {
   imageUrl: string;
   uploadedBy: { sabun: string; name: string };
   createdAt: string;
-  reads: CoverageRead[];
+  // reads는 서버에서 계속 내려오지만 현재 UI에서는 비표시 (재활성화 대비 유지)
+  reads: { sabun: string; name: string; readAt: string }[];
 }
 
 function formatTitle(targetDate: string): string {
@@ -28,12 +23,6 @@ function formatTitle(targetDate: string): string {
   const dt = new Date(y, m - 1, d);
   const dow = DOW[dt.getDay()];
   return `${m}월 ${d}일(${dow}) 대기충당현황`;
-}
-
-function formatReadTime(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
 interface Props {
@@ -66,18 +55,6 @@ export default function StandbyCoverageView({ onBack }: Props) {
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
-  const handleConfirm = useCallback(async (id: string) => {
-    if (!sabun || !name) return;
-    try {
-      const res = await fetch(`/api/standby-coverage/${id}/read`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sabun, name }),
-      });
-      if (res.ok) fetchItems();
-    } catch { /* ignore */ }
-  }, [sabun, name, fetchItems]);
-
   return (
     <div className={styles.wrap}>
       <header className={styles.header}>
@@ -107,73 +84,35 @@ export default function StandbyCoverageView({ onBack }: Props) {
           <div className={styles.emptyState}>
             <ImageIcon size={48} className={styles.emptyIcon} aria-hidden />
             <p className={styles.emptyText}>최근 3일 안에 등록된 기록이 없어요</p>
-            <p className={styles.emptyHint}>"+ 등록" 버튼으로 대기충당기록부 사진을 올려주세요</p>
+            <p className={styles.emptyHint}>&quot;+ 등록&quot; 버튼으로 대기충당기록부 사진을 올려주세요</p>
           </div>
         ) : (
           <ul className={styles.list}>
-            {items.map((it) => {
-              const confirmed = it.reads.some((r) => r.sabun === sabun);
-              return (
-                <li key={it.id} className={styles.card}>
-                  <div className={styles.cardHead}>
-                    <h2 className={styles.cardTitle}>{formatTitle(it.targetDate)}</h2>
-                    {confirmed && (
-                      <span className={styles.cardConfirmBadge}>
-                        <Check size={12} strokeWidth={3} /> 확인 완료
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.cardImageBtn}
-                    onClick={() => setZoomImage(it.imageUrl)}
-                    aria-label="사진 크게 보기"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={it.imageUrl} alt={formatTitle(it.targetDate)} className={styles.cardImage} />
-                  </button>
-                  <div className={styles.cardFoot}>
-                    <span className={styles.cardUploadedBy}>
-                      등록 · {it.uploadedBy.name}
-                    </span>
-                    {!confirmed && (
-                      <button
-                        type="button"
-                        className={styles.confirmBtn}
-                        onClick={() => handleConfirm(it.id)}
-                      >
-                        <Check size={14} strokeWidth={2.5} /> 확인했어요
-                      </button>
-                    )}
-                  </div>
-                  <div className={styles.readersBlock}>
-                    <div className={styles.readersHead}>
-                      <span className={styles.readersLabel}>확인한 기관사</span>
-                      <span className={styles.readersCount}>{it.reads.length}명</span>
-                    </div>
-                    {it.reads.length === 0 ? (
-                      <p className={styles.readersEmpty}>아직 확인한 사람이 없어요</p>
-                    ) : (
-                      <ul className={styles.readersList}>
-                        {it.reads
-                          .slice()
-                          .sort((a, b) => b.readAt.localeCompare(a.readAt))
-                          .map((r) => (
-                            <li
-                              key={r.sabun}
-                              className={`${styles.readerItem} ${r.sabun === sabun ? styles.readerItemMine : ''}`}
-                            >
-                              <Check size={12} strokeWidth={3} className={styles.readerCheck} />
-                              <span className={styles.readerName}>{r.name}</span>
-                              <span className={styles.readerTime}>{formatReadTime(r.readAt)}</span>
-                            </li>
-                          ))}
-                      </ul>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
+            {items.map((it) => (
+              <li key={it.id} className={styles.card}>
+                <div className={styles.cardHead}>
+                  <h2 className={styles.cardTitle}>{formatTitle(it.targetDate)}</h2>
+                </div>
+                <button
+                  type="button"
+                  className={styles.cardImageBtn}
+                  onClick={() => setZoomImage(it.imageUrl)}
+                  aria-label="사진 크게 보기"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={it.imageUrl} alt={formatTitle(it.targetDate)} className={styles.cardImage} />
+                </button>
+                <div className={styles.cardFoot}>
+                  <span className={styles.cardUploadedBy}>
+                    등록 · {it.uploadedBy.name}
+                  </span>
+                </div>
+                <div className={styles.cafeNotice}>
+                  <ExternalLink size={14} strokeWidth={2.4} aria-hidden />
+                  <span>대기충당 확인 기록은 카페에 등록하세요</span>
+                </div>
+              </li>
+            ))}
           </ul>
         )}
       </main>

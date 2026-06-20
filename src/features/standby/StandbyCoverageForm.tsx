@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { X, Camera, Calendar } from 'lucide-react';
+import { DOW } from '@/lib/constants';
 import styles from './StandbyCoverage.module.css';
 
 interface Props {
@@ -11,13 +12,39 @@ interface Props {
   onSuccess: () => void;
 }
 
-function todayStr(): string {
-  const d = new Date();
+function dateToStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function todayStr(): string {
+  return dateToStr(new Date());
+}
+
+/** 선택 가능한 날짜: 어제·오늘·내일·모레·글피 */
+function buildDateOptions(): Array<{ value: string; label: string; sub: string; isRecommended: boolean; isToday: boolean }> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const offsets = [-1, 0, 1, 2, 3];
+  const labelMap: Record<number, string> = { '-1': '어제', '0': '오늘', '1': '내일', '2': '모레', '3': '글피' };
+  return offsets.map((off) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + off);
+    const dow = DOW[d.getDay()];
+    return {
+      value: dateToStr(d),
+      label: labelMap[off],
+      sub: `${d.getMonth() + 1}/${d.getDate()} (${dow})`,
+      isRecommended: off === 1, // 내일 — 대기충당은 주로 전일 업로드
+      isToday: off === 0,
+    };
+  });
+}
+
 export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }: Props) {
-  const [targetDate, setTargetDate] = useState(todayStr());
+  const dateOptions = useMemo(buildDateOptions, []);
+  // 기본 선택: 내일 (대기충당은 주로 전일 업로드)
+  const recommended = dateOptions.find((o) => o.isRecommended) ?? dateOptions[0];
+  const [targetDate, setTargetDate] = useState(recommended.value);
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -84,18 +111,36 @@ export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }:
         </div>
 
         <div className={styles.formBody}>
-          <label className={styles.formField}>
+          <div className={styles.formField}>
             <span className={styles.formLabel}>
               <Calendar size={14} strokeWidth={2.4} /> 해당 날짜
+              <span className={styles.formLabelHint}>대기충당은 주로 전일 업로드 — 내일이 추천</span>
             </span>
-            <input
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-              className={styles.formDateInput}
-              max={todayStr()}
-            />
-          </label>
+            <div className={styles.dateOptions} role="radiogroup" aria-label="해당 날짜 선택">
+              {dateOptions.map((opt) => {
+                const selected = opt.value === targetDate;
+                const classes = [
+                  styles.dateOption,
+                  selected ? styles.dateOptionSelected : '',
+                  opt.isRecommended ? styles.dateOptionRecommended : '',
+                  opt.isToday ? styles.dateOptionToday : '',
+                ].filter(Boolean).join(' ');
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    className={classes}
+                    onClick={() => setTargetDate(opt.value)}
+                  >
+                    <span className={styles.dateOptionLabel}>{opt.label}</span>
+                    <span className={styles.dateOptionSub}>{opt.sub}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           <div className={styles.formField}>
             <span className={styles.formLabel}>

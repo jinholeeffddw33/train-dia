@@ -408,6 +408,106 @@
   outline-offset: 1px;
 }
 
+.formLabelHint {
+  font-size: var(--dia-text-meta);
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+  margin-left: auto;
+}
+
+/* ── 날짜 선택 버튼 (어제/오늘/내일★/모레/글피) ── */
+.dateOptions {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.dateOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 60px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: var(--dia-bg-surface);
+  border: 1.5px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.dateOption:active {
+  transform: scale(0.95);
+}
+.dateOptionLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.dateOptionSub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 오늘 표시 — 미세 강조 */
+.dateOptionToday {
+  border-color: var(--dia-border-strong, var(--dia-border));
+}
+.dateOptionToday .dateOptionSub {
+  color: var(--dia-text-secondary);
+}
+
+/* 내일 — 추천 (다른 색으로 강조) */
+.dateOptionRecommended {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: #6366F1;
+  color: #6366F1;
+  position: relative;
+}
+.dateOptionRecommended .dateOptionLabel {
+  color: #6366F1;
+}
+.dateOptionRecommended .dateOptionSub {
+  color: rgba(99, 102, 241, 0.85);
+}
+.dateOptionRecommended::after {
+  content: '추천';
+  position: absolute;
+  top: -8px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: #6366F1;
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0;
+}
+
+/* 선택됨 — 최우선 강조 */
+.dateOptionSelected {
+  background: var(--dia-blue);
+  border-color: var(--dia-blue);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+.dateOptionSelected .dateOptionLabel,
+.dateOptionSelected .dateOptionSub {
+  color: #fff;
+}
+.dateOptionSelected.dateOptionRecommended {
+  background: #6366F1;
+  border-color: #6366F1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+.dateOptionSelected.dateOptionRecommended::after {
+  background: #fff;
+  color: #6366F1;
+}
+
 .photoPicker {
   display: flex;
   flex-direction: column;

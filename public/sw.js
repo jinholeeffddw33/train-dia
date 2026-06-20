@@ -29,6 +29,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Cache API는 http(s)만 지원 — chrome-extension:// 등은 즉시 통과
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    return;
+  }
+
   // API 요청은 네트워크 only (실시간 데이터)
   if (url.pathname.startsWith('/api/')) {
     return;
@@ -37,10 +42,12 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // 성공하면 캐시 업데이트
+        // 성공하면 캐시 업데이트 (오류는 무시 — 캐시 실패가 응답을 막지 않도록)
         if (response.ok && request.method === 'GET') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          caches.open(CACHE_NAME)
+            .then((cache) => cache.put(request, clone))
+            .catch(() => { /* ignore — chrome-extension·partial response 등 */ });
         }
         return response;
       })

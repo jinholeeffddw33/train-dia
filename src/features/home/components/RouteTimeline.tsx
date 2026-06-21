@@ -180,10 +180,10 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                   <div className={styles.rtGap}>
                     <span>{formatDuration(wait)} 대기</span>
                   </div>
-                  {/* 알람 토글 버튼 */}
+                  {/* 알람 토글 버튼 — 버튼 4법: 분리 상태선택(미선택=② 무색 솟음 / 선택=③ 3D 채움) */}
                   <button
                     type="button"
-                    className={`${styles.alarmToggle} ${hasAlarm ? styles.alarmToggleOn : ''}`}
+                    className={`${hasAlarm ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.alarmToggle} ${hasAlarm ? styles.alarmToggleOn : ''}`}
                     onClick={() => setAlarmOpenIdx(isOpen ? null : nextIdx)}
                     aria-label={`${nextIdx + 1}근무 알람 설정`}
                   >
@@ -208,7 +208,7 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                             <button
                               key={t}
                               type="button"
-                              className={`${styles.alarmChip} ${fixedTimes.includes(t) ? styles.alarmChipOn : ''}`}
+                              className={`${fixedTimes.includes(t) ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.alarmChip} ${fixedTimes.includes(t) ? styles.alarmChipOn : ''}`}
                               onClick={() => toggleFixed(t)}
                             >
                               {t}
@@ -222,7 +222,7 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                             <button
                               key={m}
                               type="button"
-                              className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                              className={`${alarmSelected.includes(m) ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
                               onClick={() => toggleAlarm(m)}
                             >
                               {ALARM_LABELS[m]}
@@ -236,7 +236,7 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                               <button
                                 key={m}
                                 type="button"
-                                className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                                className={`${alarmSelected.includes(m) ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
                                 onClick={() => toggleAlarm(m)}
                               >
                                 {ALARM_LABELS[m]}
@@ -251,7 +251,7 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                                   <button
                                     key={m}
                                     type="button"
-                                    className={`${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
+                                    className={`${alarmSelected.includes(m) ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.alarmChip} ${alarmSelected.includes(m) ? styles.alarmChipOn : ''}`}
                                     onClick={() => toggleAlarm(m)}
                                   >
                                     {ALARM_LABELS[m]}

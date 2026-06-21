@@ -44,39 +44,15 @@
   color: var(--dia-text-primary);
 }
 
+/* 트랙 룩(배경/그림자/패딩/라운딩)은 전역 .z-segment 가 담당, 여기선 바깥 여백만 */
 .tabs {
-  display: flex;
-  gap: var(--dia-space-2);
-  padding: var(--dia-space-3) var(--dia-space-4) 0;
+  margin: var(--dia-space-3) var(--dia-space-4) 0;
 }
 
+/* 아이템 룩(배경/테두리/색/flex/min-height)은 전역 .z-segment-item 이 담당, 여기선 폰트만 */
 .tab {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: var(--dia-space-2) var(--dia-space-3);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-tertiary);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-md);
-  cursor: pointer;
-  min-height: 44px;
-  transition: all var(--dia-transition-fast);
-}
-
-.tab:active {
-  transform: scale(0.95);
-  transition: transform 0.12s ease;
-}
-
-.tabActive {
-  color: #fff;
-  background: var(--dia-blue);
-  border-color: var(--dia-blue);
 }
 
 .body {

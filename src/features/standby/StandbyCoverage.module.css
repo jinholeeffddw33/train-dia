@@ -45,24 +45,17 @@
   margin: 0;
 }
 
+/* 법② 분리 chip — 배경/색/테두리/라운딩/섀도우/:active 는 전역 .z-glass-pill 가 담당 */
 .addBtn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 8px 14px;
-  background: var(--dia-blue);
-  color: #fff;
-  border: none;
-  border-radius: 999px;
   font-size: var(--dia-text-sm);
   font-weight: 700;
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, filter 0.15s ease;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
   min-height: 36px;
 }
-.addBtn:active { transform: scale(0.95); filter: brightness(0.95); }
 
 .content {
   flex: 1;
@@ -552,6 +545,7 @@
   background: var(--dia-blue);
 }
 
+/* 법② 분리 chip — 배경/테두리/라운딩/색/:active 는 전역 .z-glass-pill 가 담당 */
 .photoPicker {
   display: flex;
   flex-direction: column;
@@ -560,15 +554,8 @@
   gap: 6px;
   width: 100%;
   padding: var(--dia-space-6) var(--dia-space-4);
-  background: var(--dia-surface-hover);
-  border: 2px dashed var(--dia-border);
-  border-radius: 14px;
-  color: var(--dia-text-secondary);
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease;
 }
-.photoPicker:active { background: var(--dia-bg); }
 .photoHint {
   font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
@@ -621,33 +608,17 @@
   padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-3) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--dia-border-light);
 }
+/* 취소=법② (.z-glass-pill) / 등록=법③ (.z-cta) — 배경/색/테두리/라운딩/섀도우/:active 는 전역이 담당.
+   여기선 레이아웃(flex/padding/높이/폰트)만 남긴다. */
 .formBtnSecondary, .formBtnPrimary {
   flex: 1;
   padding: 12px;
-  border-radius: 12px;
   font-size: var(--dia-text-base);
   font-weight: 700;
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, filter 0.15s ease;
   min-height: 48px;
-  border: none;
-}
-.formBtnSecondary {
-  background: var(--dia-surface-hover);
-  color: var(--dia-text-secondary);
-  border: 1px solid var(--dia-border);
-}
-.formBtnPrimary {
-  background: var(--dia-blue);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 }
 .formBtnPrimary:disabled, .formBtnSecondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-.formBtnSecondary:active, .formBtnPrimary:active {
-  transform: scale(0.98);
-  filter: brightness(0.95);
 }

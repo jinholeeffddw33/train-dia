@@ -314,7 +314,7 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
                 <span>최고 기록: {best} 라운드</span>
               </div>
             )}
-            <button type="button" className={styles.startBtn} onClick={handleStart}>
+            <button type="button" className={`z-cta ${styles.startBtn}`} onClick={handleStart}>
               시작하기
             </button>
             <GameRanking game="simon" scoreLabel="라운드" scoreUnit="라운드" />
@@ -370,7 +370,7 @@ export default function SimonSays({ onBack }: SimonSaysProps) {
                 <span>최고 기록: {best} 라운드</span>
               </div>
             )}
-            <button type="button" className={styles.retryBtn} onClick={handleStart}>
+            <button type="button" className={`z-cta ${styles.retryBtn}`} onClick={handleStart}>
               다시 하기
             </button>
             <GameRanking game="simon" scoreLabel="라운드" scoreUnit="라운드" />

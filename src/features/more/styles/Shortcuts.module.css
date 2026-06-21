@@ -59,42 +59,17 @@
   border-top: 1px solid var(--dia-border);
 }
 
-/* ── Filter Tab Bar ── */
+/* ── Filter Tab Bar (법① z-segment) — 트랙/thumb 표면은 글로벌. 외부 여백만 유지 ── */
 .filterBar {
-  display: flex;
-  gap: var(--dia-space-1);
-  padding: var(--dia-space-3) var(--dia-space-4);
-  border-bottom: 1px solid var(--dia-border);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  margin: var(--dia-space-3) var(--dia-space-4);
 }
 
+/* 세그먼트 아이템 — 표면/색은 글로벌(.z-segment-item). 칩 내부 여백/간격만 유지 */
 .filterTab {
-  display: flex;
-  align-items: center;
   gap: var(--dia-space-1);
   padding: var(--dia-space-2) var(--dia-space-3);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  color: var(--dia-text-tertiary);
-  background: none;
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-full);
   white-space: nowrap;
-  min-height: 36px;
-  cursor: pointer;
-  transition: background var(--dia-transition-fast), color var(--dia-transition-fast);
-}
-
-.filterTab:active {
-  background: var(--dia-surface-hover);
-}
-
-.filterTabActive {
-  background: var(--dia-blue);
-  border-color: var(--dia-blue);
-  color: white;
-  font-weight: var(--dia-weight-semibold);
 }
 
 .filterCount {
@@ -355,21 +330,15 @@
   border-color: var(--dia-blue);
 }
 
+/* 법② z-glass-pill — 표면(배경/테두리/라운딩)은 글로벌. 레이아웃만 유지 */
 .filePickBtn {
   width: 100%;
   padding: var(--dia-space-3);
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
-  background: var(--dia-surface);
-  border: 1px dashed var(--dia-border-strong);
-  border-radius: var(--dia-radius-md);
   min-height: 44px;
   cursor: pointer;
   text-align: center;
-}
-
-.filePickBtn:active {
-  background: var(--dia-surface-hover);
 }
 
 /* modal actions */
@@ -396,6 +365,7 @@
   background: var(--dia-surface-hover);
 }
 
+/* 법③ z-cta — 표면(배경/색/라운딩)은 글로벌. 레이아웃만 유지 */
 .modalSubmit {
   flex: 1;
   display: flex;
@@ -404,17 +374,8 @@
   gap: var(--dia-space-1);
   padding: var(--dia-space-3);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: white;
-  background: var(--dia-blue);
-  border: none;
-  border-radius: var(--dia-radius-md);
   min-height: 44px;
   cursor: pointer;
-}
-
-.modalSubmit:active {
-  opacity: 0.85;
 }
 
 .modalSubmit:disabled {

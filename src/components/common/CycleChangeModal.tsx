@@ -89,8 +89,9 @@ export default function CycleChangeModal() {
         <div className={styles.footer}>
           <button
             type="button"
-            className={styles.btnPrimary}
+            className={`z-cta ${styles.btnPrimary}`}
             onClick={handleDismissToday}
+            data-press
           >
             확인
           </button>

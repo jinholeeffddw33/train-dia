@@ -93,60 +93,14 @@
 
 .refreshSpin { animation: spin 0.8s linear; }
 
-/* ── Branch Tabs (v1 pill style) ── */
+/* ── Branch Tabs (법① 세그먼트 레이아웃 — 룩은 globals .z-segment) ── */
 .branchTabs {
-  display: flex;
-  gap: var(--dia-space-2);
-  padding-bottom: var(--dia-space-3);
+  margin-bottom: var(--dia-space-3);
 }
 
-.branchTab {
-  padding: var(--dia-space-2) var(--dia-space-5);
-  border-radius: var(--dia-radius-full);
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  background: var(--dia-surface);
-  border: 2px solid transparent;
-  color: var(--dia-text-tertiary);
-  min-height: 44px;
-  transition: all var(--dia-transition-fast);
-}
-
-.branchTabActive {
-  background: var(--dia-purple-dim);
-  color: var(--dia-purple);
-  border-color: var(--dia-purple);
-}
-
-.branchTab:active { transform: scale(0.96); }
-
-/* ── View Toggle ── */
+/* ── View Toggle (법① 세그먼트 레이아웃 — 룩은 globals .z-segment) ── */
 .viewToggle {
-  display: flex;
-  gap: 2px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
-  padding: 2px;
   margin-bottom: var(--dia-space-4);
-}
-
-.viewBtn {
-  flex: 1;
-  padding: var(--dia-space-2);
-  border-radius: var(--dia-radius-md);
-  background: transparent;
-  color: var(--dia-text-secondary);
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  min-height: 40px;
-  transition: all var(--dia-transition-fast);
-}
-
-.viewBtnActive {
-  background: var(--dia-bg);
-  color: var(--dia-text-primary);
-  box-shadow: var(--dia-shadow-sm);
 }
 
 /* ── Error Banner ── */
@@ -165,12 +119,8 @@
 }
 
 .errorRetry {
-  padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-red);
-  color: white;
-  border-radius: var(--dia-radius-md);
+  padding: var(--dia-space-2) var(--dia-space-4);
   font-size: var(--dia-text-xs);
-  font-weight: var(--dia-weight-semibold);
   white-space: nowrap;
   min-height: 44px;
 }
@@ -951,10 +901,7 @@
 .mapFooterBtn {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-purple);
-  padding: var(--dia-space-2) var(--dia-space-3);
-  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  padding: var(--dia-space-2) var(--dia-space-4);
   min-height: 44px;
 }
-
-.mapFooterBtn:active { background: var(--dia-purple-dim); }

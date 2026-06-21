@@ -386,46 +386,29 @@
   border-radius: var(--dia-radius-lg);
 }
 
+/* 법① 세그먼트 — 전역 .z-segment 가 트랙·슬라이딩 thumb 담당. 여기선 여백만 */
 .readStatusTabs {
-  display: flex;
-  gap: 6px;
   margin-bottom: var(--dia-space-3);
 }
 
+/* 전역 .z-segment-item 이 레이아웃·thumb 위 텍스트색 담당. 여기선 본문 폰트 크기만 보강 */
 .readStatusTab {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   gap: 6px;
-  padding: 8px 12px;
-  background: var(--dia-bg);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-md);
-  color: var(--dia-text-secondary);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  cursor: pointer;
-  min-height: 36px;
-}
-.readStatusTab:active { transform: scale(0.97); }
-
-.readStatusTabActive {
-  background: var(--dia-blue);
-  border-color: var(--dia-blue);
-  color: #fff;
 }
 
 .readStatusTabNum {
   font-size: var(--dia-text-meta);
   padding: 1px 6px;
   border-radius: var(--dia-radius-full);
-  background: rgba(255, 255, 255, 0.18);
-  font-weight: var(--dia-weight-bold);
-}
-.readStatusTab:not(.readStatusTabActive) .readStatusTabNum {
   background: var(--dia-border);
   color: var(--dia-text-secondary);
+  font-weight: var(--dia-weight-bold);
+}
+/* 활성 탭(thumb 위) 카운트 배지 — 대비 확보 */
+:global(.z-segment-item.is-on) .readStatusTabNum {
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-primary);
 }
 
 .readStatusEmpty {

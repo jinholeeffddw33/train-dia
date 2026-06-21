@@ -150,13 +150,20 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
           </div>
         </div>
 
-        {/* 시간 모드 */}
-        <div className={styles.modeRow}>
+        {/* 시간 모드 — 법① connected segment */}
+        <div
+          className={`z-segment ${styles.modeRow}`}
+          data-no-press
+          style={{
+            '--seg-count': TIME_MODES.length,
+            '--seg-idx': TIME_MODES.findIndex((m) => m.key === mode),
+          } as React.CSSProperties}
+        >
           {TIME_MODES.map((m) => (
             <button
               key={m.key}
               type="button"
-              className={`${styles.modeBtn} ${mode === m.key ? styles.modeBtnActive : ''}`}
+              className={`z-segment-item ${mode === m.key ? 'is-on' : ''}`}
               onClick={() => setMode(m.key)}
             >
               {m.label}
@@ -164,10 +171,11 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
           ))}
         </div>
 
-        {/* 검색 버튼 */}
+        {/* 검색 버튼 — 법③ main CTA */}
         <button
           type="button"
-          className={styles.searchBtn}
+          className={`z-cta ${styles.searchBtn}`}
+          data-press
           onClick={searchRoute}
           disabled={loading || !from.trim() || !to.trim()}
         >

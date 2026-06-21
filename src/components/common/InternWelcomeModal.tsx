@@ -94,15 +94,17 @@ export default function InternWelcomeModal() {
         <div className={styles.footer}>
           <button
             type="button"
-            className={styles.btnSecondary}
+            className={`z-glass-pill ${styles.btnSecondary}`}
             onClick={handleDismissToday}
+            data-press
           >
             오늘 그만 보기
           </button>
           <button
             type="button"
-            className={styles.btnPrimary}
+            className={`z-cta ${styles.btnPrimary}`}
             onClick={handleClose}
+            data-press
           >
             확인
           </button>

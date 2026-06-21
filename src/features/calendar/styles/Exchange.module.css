@@ -242,7 +242,7 @@
   margin-bottom: var(--dia-space-5);
 }
 
-/* ── Open Post Button ── */
+/* ── Open Post Button — 액션 상태 look 은 버튼 4법 ③ .z-cta, 완료 상태는 아래 done 색 유지 ── */
 .openPostBtn {
   display: flex;
   align-items: center;
@@ -250,25 +250,21 @@
   gap: var(--dia-space-2);
   width: 100%;
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-surface);
-  color: var(--dia-text-primary);
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
-  border-radius: var(--dia-radius-lg);
-  border: 1px solid var(--dia-border-strong);
   min-height: 48px;
-  transition: all var(--dia-transition-fast);
 }
-.openPostBtn:active { opacity: 0.85; }
 
+/* 완료 상태(.z-cta 미적용)는 의미색(초록) 유지 — 입체 채움 done 표시 */
 .openPostBtnDone {
   background: var(--dia-green-dim);
   color: var(--dia-green);
-  border-color: var(--dia-green);
+  border: 1px solid var(--dia-green);
+  border-radius: var(--dia-radius-lg);
   opacity: 0.8;
 }
 
-/* ── Search Button ── */
+/* ── Search Button — look 은 버튼 4법 ③ .z-cta 가 담당, 여기선 레이아웃만 ── */
 .searchBtn {
   display: flex;
   align-items: center;
@@ -276,15 +272,9 @@
   gap: var(--dia-space-2);
   width: 100%;
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
-  border-radius: var(--dia-radius-lg);
   min-height: 48px;
-  transition: opacity var(--dia-transition-fast);
 }
-.searchBtn:active { opacity: 0.85; }
 
 /* ── Result Section ── */
 .resultSection {
@@ -489,36 +479,17 @@
   color: var(--dia-text-tertiary);
 }
 
-/* ── Sub Tabs ── */
+/* ── Sub Tabs — 버튼 4법 ① 세그먼트 (look 은 globals .z-segment / .z-segment-item, 여기선 레이아웃만) ── */
 .subTabs {
-  display: flex;
-  gap: var(--dia-space-2);
+  /* 트랙 look(배경/보더/패딩/라운딩)은 .z-segment 가 담당 — 여기선 외부 여백만 */
   margin-bottom: var(--dia-space-5);
-  background: var(--dia-surface);
-  border-radius: var(--dia-radius-lg);
-  padding: 4px;
-  border: 1px solid var(--dia-border);
 }
 
 .subTab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* 항목 look(배경/색/thumb)은 .z-segment-item / .is-on 가 담당 — 여기선 타이포/배지 기준점만 */
   gap: 6px;
-  padding: var(--dia-space-2) var(--dia-space-3);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-tertiary);
-  border-radius: var(--dia-radius-md);
-  min-height: 44px;
-  transition: all var(--dia-transition-fast);
-  position: relative;
-}
-
-.subTabActive {
-  background: var(--dia-blue);
-  color: white;
 }
 
 .subTabBadge {
@@ -768,6 +739,7 @@
   border-top: 1px solid var(--dia-border-light);
 }
 
+/* 수락 — 버튼 4법 ③ .z-cta(look), 여기선 레이아웃만 */
 .acceptBtn {
   flex: 1;
   display: flex;
@@ -775,16 +747,11 @@
   justify-content: center;
   gap: 4px;
   padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-blue);
-  color: white;
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  border-radius: var(--dia-radius-md);
   min-height: 44px;
-  transition: opacity var(--dia-transition-fast);
 }
-.acceptBtn:active { opacity: 0.85; }
 
+/* 거절 — 버튼 4법 ② .z-glass-pill(무색 솟음, look), 여기선 레이아웃/글자색만 */
 .declineBtn {
   flex: 1;
   display: flex;
@@ -792,15 +759,11 @@
   justify-content: center;
   gap: 4px;
   padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-surface-hover);
   color: var(--dia-text-secondary);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  border-radius: var(--dia-radius-md);
   min-height: 44px;
-  transition: opacity var(--dia-transition-fast);
 }
-.declineBtn:active { opacity: 0.85; }
 
 /* ── Status Badge ── */
 .statusBadge {
@@ -996,18 +959,15 @@
   gap: var(--dia-space-2);
 }
 
+/* 돌아가기 — 버튼 4법 ② .z-glass-pill(look), 여기선 레이아웃/글자색만 */
 .confirmCancelBtn {
   flex: 1;
   padding: var(--dia-space-3);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-secondary);
-  background: var(--dia-surface-hover);
-  border-radius: var(--dia-radius-md);
   min-height: 44px;
-  transition: opacity var(--dia-transition-fast);
 }
-.confirmCancelBtn:active { opacity: 0.85; }
 
 .confirmOkBtn {
   flex: 1;

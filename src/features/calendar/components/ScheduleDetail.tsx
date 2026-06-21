@@ -83,11 +83,11 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
         )}
       </div>
 
-      {/* 교번 변경 취소 버튼 */}
+      {/* 교번 변경 취소 버튼 — 버튼 4법 ② 무색 3D 솟음(되돌리기=보조 단발 액션) */}
       {info.isSwapped && (
         <button
           type="button"
-          className={styles.detailRevertBtn}
+          className={`z-glass-pill ${styles.detailRevertBtn}`}
           onClick={() => removeSwap(dateStr)}
         >
           원래 교번으로 되돌리기

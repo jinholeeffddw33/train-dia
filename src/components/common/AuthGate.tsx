@@ -145,7 +145,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
-            className={styles.btn}
+            className={`z-cta ${styles.btn}`}
+            data-press
             onClick={handleNext}
             disabled={loading || !sabun.trim()}
           >
@@ -195,7 +196,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
-            className={styles.btn}
+            className={`z-cta ${styles.btn}`}
+            data-press
             onClick={handleStart}
             disabled={loading}
           >
@@ -249,7 +251,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
             <button
               type="button"
-              className={styles.btn}
+              className={`z-cta ${styles.btn}`}
+            data-press
               onClick={handleNameLogin}
               disabled={loading || !name.trim()}
             >
@@ -317,7 +320,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
-            className={styles.btn}
+            className={`z-cta ${styles.btn}`}
+            data-press
             onClick={handlePinLogin}
             disabled={loading || !pin}
           >
@@ -411,7 +415,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
-            className={styles.btn}
+            className={`z-cta ${styles.btn}`}
+            data-press
             onClick={handleSetPin}
             disabled={loading}
           >

@@ -27,12 +27,12 @@ export default function ContactsTab() {
               <span className={styles.urgentName}>{c.n}</span>
             </div>
             <div className={styles.urgentPhones}>
-              <a href={`tel:${c.a.replace(/-/g, '')}`} className={styles.urgentBtn} aria-label={`${c.n} ${c.a} 전화`}>
+              <a href={`tel:${c.a.replace(/-/g, '')}`} className={`z-glass-pill ${styles.urgentBtn}`} data-press aria-label={`${c.n} ${c.a} 전화`}>
                 <Phone size={18} className={styles.urgentPhoneIcon} />
                 <span className={styles.urgentPhoneNum}>{c.a}</span>
               </a>
               {c.b && (
-                <a href={`tel:${c.b.replace(/-/g, '')}`} className={styles.urgentBtn} aria-label={`${c.n} ${c.b} 전화`}>
+                <a href={`tel:${c.b.replace(/-/g, '')}`} className={`z-glass-pill ${styles.urgentBtn}`} data-press aria-label={`${c.n} ${c.b} 전화`}>
                   <Phone size={18} className={styles.urgentPhoneIcon} />
                   <span className={styles.urgentPhoneNum}>{c.b}</span>
                 </a>
@@ -53,11 +53,11 @@ export default function ContactsTab() {
             <div key={c.n} className={styles.card}>
               <span className={styles.cardName}>{c.n}</span>
               <div className={styles.phones}>
-                <a href={`tel:${c.a.replace(/-/g, '')}`} className={styles.phoneChip} aria-label={`${c.n} ${c.a} 전화`}>
+                <a href={`tel:${c.a.replace(/-/g, '')}`} className={`z-glass-pill ${styles.phoneChip}`} data-press aria-label={`${c.n} ${c.a} 전화`}>
                   {c.a}
                 </a>
                 {c.b && (
-                  <a href={`tel:${c.b.replace(/-/g, '')}`} className={styles.phoneChip} aria-label={`${c.n} ${c.b} 전화`}>
+                  <a href={`tel:${c.b.replace(/-/g, '')}`} className={`z-glass-pill ${styles.phoneChip}`} data-press aria-label={`${c.n} ${c.b} 전화`}>
                     {c.b}
                   </a>
                 )}

@@ -160,7 +160,7 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
           {existingSwap && (
             <button
               type="button"
-              className={styles.swapRemoveBtn}
+              className={`z-glass-pill ${styles.swapRemoveBtn}`}
               onClick={handleRemove}
             >
               원래대로

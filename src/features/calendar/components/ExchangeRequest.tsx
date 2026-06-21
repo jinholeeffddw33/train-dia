@@ -201,13 +201,19 @@ export default function ExchangeRequest() {
     <div className={styles.container}>
       <h2 className={styles.pageTitle}>교번 교체</h2>
 
-      {/* 서브 탭 */}
-      <div className={styles.subTabs} role="tablist" aria-label="교체 탭">
+      {/* 서브 탭 — 버튼 4법 ① 이어진 세그먼트(상태선택, 슬라이딩 thumb) */}
+      <div
+        className={`z-segment ${styles.subTabs}`}
+        role="tablist"
+        aria-label="교체 탭"
+        data-no-press
+        style={{ '--seg-count': 2, '--seg-idx': subTab === 'search' ? 0 : 1 } as React.CSSProperties}
+      >
         <button
           type="button"
           role="tab"
           aria-selected={subTab === 'search'}
-          className={`${styles.subTab} ${subTab === 'search' ? styles.subTabActive : ''}`}
+          className={`z-segment-item ${styles.subTab} ${subTab === 'search' ? 'is-on' : ''}`}
           onClick={() => setSubTab('search')}
         >
           <Search size={16} />
@@ -217,7 +223,7 @@ export default function ExchangeRequest() {
           type="button"
           role="tab"
           aria-selected={subTab === 'board'}
-          className={`${styles.subTab} ${subTab === 'board' ? styles.subTabActive : ''}`}
+          className={`z-segment-item ${styles.subTab} ${subTab === 'board' ? 'is-on' : ''}`}
           onClick={() => setSubTab('board')}
         >
           <Bell size={16} />
@@ -448,10 +454,10 @@ function SearchView({
       {/* 액션 버튼 영역 */}
       {dateRange.length > 0 && driver && (
         <div className={styles.actionBtns}>
-          {/* 전체 공지 올리기 */}
+          {/* 전체 공지 올리기 — 버튼 4법 ③ CTA(완료 시엔 done 상태 색 유지) */}
           <button
             type="button"
-            className={`${styles.openPostBtn} ${isOpenDone ? styles.openPostBtnDone : ''}`}
+            className={`${isOpenDone ? '' : 'z-cta'} ${styles.openPostBtn} ${isOpenDone ? styles.openPostBtnDone : ''}`}
             onClick={handleOpenPost}
             disabled={isOpenDone}
           >
@@ -468,11 +474,11 @@ function SearchView({
             )}
           </button>
 
-          {/* 매칭 검색 */}
+          {/* 매칭 검색 — 버튼 4법 ③ CTA */}
           {wishCount > 0 && (
             <button
               type="button"
-              className={styles.searchBtn}
+              className={`z-cta ${styles.searchBtn}`}
               onClick={handleSearch}
             >
               <Search size={18} />
@@ -798,7 +804,7 @@ function BoardView({ driver }: { driver: Person | null }) {
                 <div className={styles.postActions}>
                   <button
                     type="button"
-                    className={styles.acceptBtn}
+                    className={`z-cta ${styles.acceptBtn}`}
                     onClick={() => setConfirm({ type: 'accept', postId: post.id, requesterName: post.requesterName })}
                     aria-label="수락"
                   >
@@ -807,7 +813,7 @@ function BoardView({ driver }: { driver: Person | null }) {
                   </button>
                   <button
                     type="button"
-                    className={styles.declineBtn}
+                    className={`z-glass-pill ${styles.declineBtn}`}
                     onClick={() => {
                       setConfirm({ type: 'decline', postId: post.id, requesterName: post.requesterName });
                       setShowDeclineForm(true);
@@ -1020,7 +1026,7 @@ function BoardView({ driver }: { driver: Person | null }) {
             <div className={styles.confirmActions}>
               <button
                 type="button"
-                className={styles.confirmCancelBtn}
+                className={`z-glass-pill ${styles.confirmCancelBtn}`}
                 onClick={handleCancelConfirm}
               >
                 돌아가기

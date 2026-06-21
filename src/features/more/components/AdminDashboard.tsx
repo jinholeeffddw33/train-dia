@@ -94,7 +94,8 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
           {pinError && <p className={styles.adminPinError}>{pinError}</p>}
           <button
             type="button"
-            className={styles.adminPinSubmit}
+            className={`z-cta ${styles.adminPinSubmit}`}
+            data-press
             onClick={handlePinSubmit}
             disabled={pin.length < 4}
           >

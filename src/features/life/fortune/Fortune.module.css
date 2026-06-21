@@ -242,24 +242,16 @@
   gap: 8px;
 }
 
+/* 법② 분리 단발 칩 — 룩(배경/보더/라운드/섀도우)은 전역 .z-glass-pill 이 담당, 여기선 레이아웃만 */
 .actionBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  border: 1px solid var(--dia-border);
-  border-radius: 999px;
-  background: var(--dia-surface);
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.12s ease, background var(--dia-transition-fast);
-}
-
-.actionBtn:active {
-  transform: scale(0.96);
-  background: var(--dia-surface-hover);
 }
 
 .footnote {

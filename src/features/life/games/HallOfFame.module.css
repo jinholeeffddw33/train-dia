@@ -82,18 +82,13 @@
   font-size: var(--dia-text-sm);
 }
 
+/* 룩은 전역 .z-cta 가 담당, 여기선 레이아웃만 */
 .retryBtn {
   min-height: 40px;
   padding: var(--dia-space-2) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
-  border: none;
-  border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  transition: transform 0.12s ease, filter var(--dia-transition-fast);
 }
-.retryBtn:active { transform: scale(0.95); filter: brightness(0.92); }
 
 .monthList {
   display: flex;

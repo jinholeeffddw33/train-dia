@@ -721,12 +721,17 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
           {readStatusExpanded && readStatus && (
             <div className={styles.readStatusBody}>
-              <div className={styles.readStatusTabs} role="tablist">
+              <div
+                className={`z-segment ${styles.readStatusTabs}`}
+                role="tablist"
+                data-no-press
+                style={{ '--seg-count': 2, '--seg-idx': readStatusTab === 'unread' ? 0 : 1 } as React.CSSProperties}
+              >
                 <button
                   type="button"
                   role="tab"
                   aria-selected={readStatusTab === 'unread'}
-                  className={`${styles.readStatusTab} ${readStatusTab === 'unread' ? styles.readStatusTabActive : ''}`}
+                  className={`z-segment-item ${styles.readStatusTab} ${readStatusTab === 'unread' ? 'is-on' : ''}`}
                   onClick={() => setReadStatusTab('unread')}
                 >
                   안 읽음 <span className={styles.readStatusTabNum}>{readStatus.nonReaders.length}</span>
@@ -735,7 +740,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   type="button"
                   role="tab"
                   aria-selected={readStatusTab === 'read'}
-                  className={`${styles.readStatusTab} ${readStatusTab === 'read' ? styles.readStatusTabActive : ''}`}
+                  className={`z-segment-item ${styles.readStatusTab} ${readStatusTab === 'read' ? 'is-on' : ''}`}
                   onClick={() => setReadStatusTab('read')}
                 >
                   읽음 <span className={styles.readStatusTabNum}>{readStatus.readers.length}</span>

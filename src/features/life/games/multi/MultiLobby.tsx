@@ -119,7 +119,7 @@ export default function MultiLobby({ onBack }: { onBack: () => void }) {
             autoFocus
           />
           {error && <p className={styles.errorText}>{error}</p>}
-          <button type="button" className={styles.primaryBtn} onClick={handleJoinSubmit}>
+          <button type="button" className={`z-cta ${styles.primaryBtn}`} onClick={handleJoinSubmit}>
             <LogIn size={18} /> 입장
           </button>
         </div>

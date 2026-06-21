@@ -63,7 +63,7 @@ export default function HomeTipsQuiz() {
             <button
               ref={nextBtnRef}
               type="button"
-              className={styles.quizNext}
+              className={`z-cta ${styles.quizNext}`}
               onClick={() => { setQuizIdx((i) => i + 1); setQuizAnswer(null); }}
             >
               다음 문제

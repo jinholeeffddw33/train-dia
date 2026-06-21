@@ -158,28 +158,17 @@
   flex-shrink: 0;
 }
 
-.fontBtn {
+/* 법① 세그먼트 레이아웃 — 글자 크기(작게/보통/크게). 룩은 전역 .z-segment 가 책임 */
+.fontSegment {
   flex: 1;
-  height: 32px;
-  border-radius: var(--dia-radius-md);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  color: var(--dia-text-secondary);
+}
+/* 툴바 높이 유지를 위해 항목 높이 축소(전역 44px → 32px) */
+.fontSegment :global(.z-segment-item) {
+  min-height: 32px;
   font-size: var(--dia-text-meta);
-  font-weight: 600;
-  transition: transform 0.12s ease, background var(--dia-transition-fast);
 }
 
-.fontBtn:active {
-  transform: scale(0.95);
-}
-
-.fontBtnActive {
-  background: var(--dia-blue, #3B82F6);
-  border-color: var(--dia-blue, #3B82F6);
-  color: #fff;
-}
-
+/* 법② 분리 단발(네비 — 원본 PDF·내 메모 열기) — 무색 3D 솟음 */
 .pdfBtn {
   display: inline-flex;
   align-items: center;
@@ -188,8 +177,9 @@
   padding: 0 12px;
   height: 32px;
   border-radius: var(--dia-radius-md);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
   color: var(--dia-text-primary);
   font-size: var(--dia-text-meta);
   font-weight: 600;

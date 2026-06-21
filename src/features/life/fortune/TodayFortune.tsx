@@ -124,7 +124,7 @@ export default function TodayFortune({ onBack }: Props) {
         </div>
 
         <div className={styles.actions}>
-          <button type="button" className={styles.actionBtn} onClick={handleShare}>
+          <button type="button" className={`z-glass-pill ${styles.actionBtn}`} data-press onClick={handleShare}>
             <Share2 size={16} />
             <span>공유하기</span>
           </button>

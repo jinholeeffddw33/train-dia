@@ -57,47 +57,25 @@
   z-index: 1;
 }
 
-/* ── Mode Row ── */
+/* ── Mode Row (법① z-segment) ── */
+/* 시각(배경/테두리/라운딩/섀도우/슬라이딩 thumb)은 전역 .z-segment 가 소유.
+   여기선 외부 여백만 남긴다. */
 .modeRow {
-  display: flex;
-  gap: var(--dia-space-2);
   margin-bottom: var(--dia-space-3);
 }
 
-.modeBtn {
-  flex: 1;
-  padding: var(--dia-space-2);
-  border-radius: var(--dia-radius-md);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  color: var(--dia-text-secondary);
-  font-size: var(--dia-text-sm);
-  min-height: 40px;
-  transition: all var(--dia-transition-fast);
-}
-
-.modeBtnActive {
-  background: var(--dia-blue);
-  border-color: var(--dia-blue);
-  color: white;
-}
-
-/* ── Search Button ── */
+/* ── Search Button (법③ z-cta) ── */
+/* 채움/색/테두리/라운딩/섀도우/굵기는 전역 .z-cta 가 소유.
+   여기선 레이아웃(폭/패딩/최소높이/외부여백)만 남긴다. */
 .searchBtn {
   width: 100%;
   padding: var(--dia-space-3);
-  background: var(--dia-blue);
-  color: white;
-  border-radius: var(--dia-radius-lg);
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-semibold);
   min-height: 48px;
   margin-bottom: var(--dia-space-4);
-  transition: opacity var(--dia-transition-fast);
 }
 
 .searchBtn:disabled { opacity: 0.5; }
-.searchBtn:active:not(:disabled) { opacity: 0.8; }
 
 .searchError {
   text-align: center;

@@ -239,7 +239,7 @@ export default function ReactionTest({ onBack }: ReactionTestProps) {
                 <span>최고 기록: {best}ms</span>
               </div>
             )}
-            <button type="button" className={styles.startBtn} onClick={handleStart}>
+            <button type="button" className={`z-cta ${styles.startBtn}`} onClick={handleStart}>
               시작하기
             </button>
             <GameRanking game="reaction" scoreLabel="평균" scoreUnit="ms" />
@@ -369,7 +369,7 @@ function FinalResult({
         ))}
       </div>
 
-      <button type="button" className={styles.retryBtn} onClick={onRetry}>
+      <button type="button" className={`z-cta ${styles.retryBtn}`} onClick={onRetry}>
         다시 하기
       </button>
 

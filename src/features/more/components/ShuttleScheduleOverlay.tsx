@@ -41,12 +41,17 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
       </div>
 
       <div className={styles.shuttleBody}>
-        <div className={styles.tabBar} role="tablist">
+        <div
+          className={`z-segment ${styles.tabBar}`}
+          role="tablist"
+          data-no-press
+          style={{ '--seg-count': 2, '--seg-idx': tab === 'shuttle' ? 0 : 1 } as React.CSSProperties}
+        >
           <button
             type="button"
             role="tab"
             aria-selected={tab === 'shuttle'}
-            className={`${styles.tabBtn} ${tab === 'shuttle' ? styles.tabBtnActive : ''}`}
+            className={`z-segment-item ${styles.tabBtn} ${tab === 'shuttle' ? 'is-on' : ''}`}
             onClick={() => setTab('shuttle')}
           >
             승용차 운행시간표
@@ -55,7 +60,7 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
             type="button"
             role="tab"
             aria-selected={tab === 'depot'}
-            className={`${styles.tabBtn} ${tab === 'depot' ? styles.tabBtnActive : ''}`}
+            className={`z-segment-item ${styles.tabBtn} ${tab === 'depot' ? 'is-on' : ''}`}
             onClick={() => setTab('depot')}
           >
             고덕기지 입고열차

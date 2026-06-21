@@ -81,13 +81,13 @@ export default function CalendarTab() {
 
   return (
     <div className={styles.container}>
-      {/* 월 네비게이션 */}
+      {/* 월 네비게이션 — 좌우 화살표는 버튼 4법 ② 무색 3D 솟음 알약(아이콘만 → data-press 금지) */}
       <div className={styles.nav}>
-        <button type="button" className={styles.navBtn} onClick={prevMonth} aria-label="이전 달">‹</button>
+        <button type="button" className={`z-glass-pill ${styles.navBtn}`} onClick={prevMonth} aria-label="이전 달">‹</button>
         <button type="button" className={styles.navTitle} onClick={goToday}>
           {year}년 <span className={styles.navMonth}>{month}월</span>
         </button>
-        <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
+        <button type="button" className={`z-glass-pill ${styles.navBtn}`} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
 
       {/* 기관사/내근직 이름 + 임무카드 진입 (우측) */}

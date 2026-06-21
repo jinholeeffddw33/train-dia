@@ -425,7 +425,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
             <p>🎮 방향 버튼이나 스와이프로 조종</p>
           </div>
           {best > 0 && <p className={styles.bestText}>최고 기록: <strong>{best}점</strong></p>}
-          <button type="button" className={styles.startBtn} onClick={startGame}>시작하기</button>
+          <button type="button" className={`z-cta ${styles.startBtn}`} onClick={startGame}>시작하기</button>
           <GameRanking game="snake" />
         </div>
       </div>
@@ -465,7 +465,7 @@ export default function SnakeGame({ onBack }: SnakeGameProps) {
           <p className={styles.bigScore}>{score}<span className={styles.bigScoreUnit}>점</span></p>
           {isNewRecord && <p className={styles.newRecord}>🏆 새로운 기록!</p>}
           <p className={styles.bestText}>최고 기록: <strong>{best}점</strong></p>
-          <button type="button" className={styles.startBtn} onClick={startGame}>다시 하기</button>
+          <button type="button" className={`z-cta ${styles.startBtn}`} onClick={startGame}>다시 하기</button>
           <GameRanking game="snake" />
         </div>
       </div>

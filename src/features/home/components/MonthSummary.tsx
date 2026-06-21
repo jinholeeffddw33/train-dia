@@ -29,7 +29,7 @@ export default function MonthSummary() {
       <div className={styles.monthHeader}>
         <button
           type="button"
-          className={styles.monthNav}
+          className={`z-glass-pill ${styles.monthNav}`}
           onClick={() => setOffset((o) => o - 1)}
           aria-label="이전 달"
         >
@@ -40,7 +40,7 @@ export default function MonthSummary() {
         </h3>
         <button
           type="button"
-          className={styles.monthNav}
+          className={`z-glass-pill ${styles.monthNav}`}
           onClick={() => setOffset((o) => o + 1)}
           aria-label="다음 달"
         >

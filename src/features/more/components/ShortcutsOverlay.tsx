@@ -23,6 +23,8 @@ const FILTER_LABELS: Record<FilterTab, string> = {
   file: '파일',
 };
 
+const FILTER_KEYS: FilterTab[] = ['all', 'web', 'image', 'file'];
+
 const TYPE_ICONS: Record<ShortcutType, typeof Globe> = {
   web: Globe,
   image: ImageIcon,
@@ -141,7 +143,8 @@ function AddModal({ onClose, onAdd }: {
                 </label>
                 <button
                   type="button"
-                  className={styles.filePickBtn}
+                  className={`z-glass-pill ${styles.filePickBtn}`}
+                  data-press
                   onClick={() => fileRef.current?.click()}
                 >
                   {fileName || '파일을 선택하세요'}
@@ -162,7 +165,8 @@ function AddModal({ onClose, onAdd }: {
               </button>
               <button
                 type="button"
-                className={styles.modalSubmit}
+                className={`z-cta ${styles.modalSubmit}`}
+                data-press
                 disabled={!canSubmit}
                 onClick={submit}
               >
@@ -313,7 +317,7 @@ function EditModal({ item, onClose, onSave }: {
 
         <div className={styles.modalActions}>
           <button type="button" className={styles.modalCancel} onClick={onClose}>취소</button>
-          <button type="button" className={styles.modalSubmit} disabled={!title.trim()} onClick={submit}>
+          <button type="button" className={`z-cta ${styles.modalSubmit}`} data-press disabled={!title.trim()} onClick={submit}>
             <Check size={16} /> 저장
           </button>
         </div>
@@ -412,9 +416,18 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
         </div>
       </div>
 
-      {/* 필터 탭 */}
-      <div className={styles.filterBar} role="tablist" aria-label="바로가기 필터">
-        {(Object.keys(FILTER_LABELS) as FilterTab[]).map((tab) => {
+      {/* 필터 탭 (법① z-segment) */}
+      <div
+        className={`z-segment ${styles.filterBar}`}
+        role="tablist"
+        aria-label="바로가기 필터"
+        data-no-press
+        style={{
+          '--seg-count': FILTER_KEYS.length,
+          '--seg-idx': FILTER_KEYS.indexOf(filter),
+        } as React.CSSProperties}
+      >
+        {FILTER_KEYS.map((tab) => {
           const count = tab === 'all' ? items.length : items.filter((it) => it.type === tab).length;
           return (
             <button
@@ -422,7 +435,7 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
               type="button"
               role="tab"
               aria-selected={filter === tab}
-              className={`${styles.filterTab} ${filter === tab ? styles.filterTabActive : ''}`}
+              className={`z-segment-item ${styles.filterTab} ${filter === tab ? 'is-on' : ''}`}
               onClick={() => setFilter(tab)}
             >
               {FILTER_LABELS[tab]}

@@ -5,35 +5,15 @@
   width: 100%;
 }
 
-/* ── Tabs ── */
+/* ── Tabs (법① 세그먼트) — 룩은 전역 .z-segment / .z-segment-item 가 담당, 여기선 레이아웃만 ── */
 .tabs {
-  display: flex;
-  gap: var(--dia-space-1);
   margin-bottom: var(--dia-space-3);
 }
 
 .tab {
-  flex: 1;
   padding: var(--dia-space-2) var(--dia-space-3);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-tertiary);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-md);
-  cursor: pointer;
-  min-height: 40px;
-  transition: all var(--dia-transition-fast);
-}
-
-.tab:active {
-  transform: scale(0.98);
-}
-
-.tabActive {
-  color: #fff;
-  background: var(--dia-blue);
-  border-color: var(--dia-blue);
 }
 
 /* ── List ── */

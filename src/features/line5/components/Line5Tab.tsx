@@ -56,15 +56,20 @@ export default function Line5Tab() {
         <h2 className={styles.title}>5호선 실시간</h2>
       </div>
 
-      {/* 지선 탭 */}
-      <div className={styles.branchTabs} role="tablist">
+      {/* 지선 탭 — 법① 세그먼트 */}
+      <div
+        className={`z-segment ${styles.branchTabs}`}
+        role="tablist"
+        data-no-press
+        style={{ '--seg-count': BRANCHES.length, '--seg-idx': BRANCHES.findIndex((b) => b.key === branch) } as React.CSSProperties}
+      >
         {BRANCHES.map((b) => (
           <button
             key={b.key}
             type="button"
             role="tab"
             aria-selected={branch === b.key}
-            className={`${styles.branchTab} ${branch === b.key ? styles.branchTabActive : ''}`}
+            className={`z-segment-item ${branch === b.key ? 'is-on' : ''}`}
             onClick={() => setBranch(b.key)}
           >
             {b.label}
@@ -72,18 +77,22 @@ export default function Line5Tab() {
         ))}
       </div>
 
-      {/* 보기 모드 토글 */}
-      <div className={styles.viewToggle}>
+      {/* 보기 모드 토글 — 법① 세그먼트 */}
+      <div
+        className={`z-segment ${styles.viewToggle}`}
+        data-no-press
+        style={{ '--seg-count': 2, '--seg-idx': viewMode === 'map' ? 1 : 0 } as React.CSSProperties}
+      >
         <button
           type="button"
-          className={`${styles.viewBtn} ${viewMode === 'list' ? styles.viewBtnActive : ''}`}
+          className={`z-segment-item ${viewMode === 'list' ? 'is-on' : ''}`}
           onClick={() => setViewMode('list')}
         >
           리스트
         </button>
         <button
           type="button"
-          className={`${styles.viewBtn} ${viewMode === 'map' ? styles.viewBtnActive : ''}`}
+          className={`z-segment-item ${viewMode === 'map' ? 'is-on' : ''}`}
           onClick={() => setViewMode('map')}
         >
           노선도
@@ -94,7 +103,7 @@ export default function Line5Tab() {
       {error && (
         <div className={styles.errorBanner}>
           <span>{error}</span>
-          <button type="button" className={styles.errorRetry} onClick={refresh}>
+          <button type="button" className={`z-cta ${styles.errorRetry}`} onClick={refresh} data-press>
             다시 시도해볼게요
           </button>
         </div>

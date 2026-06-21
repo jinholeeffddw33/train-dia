@@ -64,7 +64,8 @@ export default function StandbyCoverageView({ onBack }: Props) {
         <h1 className={styles.title}>대기충당확인</h1>
         <button
           type="button"
-          className={styles.addBtn}
+          className={`z-glass-pill ${styles.addBtn}`}
+          data-press
           onClick={() => setShowForm(true)}
           aria-label="대기충당현황 등록"
         >

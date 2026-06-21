@@ -164,14 +164,11 @@
   min-height: 44px;
 }
 
+/* 법③ z-cta — 표면(배경/색/라운딩)은 글로벌 클래스가 담당. 레이아웃만 유지 */
 .formSubmit {
   flex: 1;
   padding: var(--dia-space-3);
-  background: var(--dia-blue);
-  border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: white;
   min-height: 44px;
 }
 
@@ -179,11 +176,7 @@
   opacity: 0.4;
 }
 
-.formSubmit:active:not(:disabled) {
-  opacity: 0.8;
-}
-
-/* ── Add Button ── */
+/* ── Add Button (법③ z-cta) — 표면은 글로벌 클래스. 레이아웃만 유지 ── */
 .addBtn {
   display: flex;
   align-items: center;
@@ -191,21 +184,9 @@
   gap: var(--dia-space-2);
   width: 100%;
   padding: var(--dia-space-4);
-  background: var(--dia-blue-dim);
-  border: 1px dashed var(--dia-blue);
-  border-radius: var(--dia-radius-lg);
-  color: var(--dia-blue);
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-semibold);
   margin-bottom: var(--dia-space-4);
   min-height: 52px;
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
-}
-
-.addBtn:active {
-  box-shadow: var(--dia-3d-pressed);
-  background: var(--dia-blue);
-  color: white;
 }
 
 /* ── History ── */

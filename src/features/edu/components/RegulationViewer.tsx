@@ -709,27 +709,38 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
       <div className={styles.fontControls}>
         <span className={styles.fontLabel}>글자</span>
-        <button
-          type="button"
-          className={`${styles.fontBtn} ${fontSize === 'small' ? styles.fontBtnActive : ''}`}
-          onClick={() => setFontSize('small')}
+        {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게 */}
+        <div
+          className={`z-segment ${styles.fontSegment}`}
+          data-no-press
+          /* STYLE-EXCEPTION: 세그먼트 활성 인덱스/개수 런타임 주입 */
+          style={{ '--seg-count': 3, '--seg-idx': fontSize === 'small' ? 0 : fontSize === 'normal' ? 1 : 2 } as React.CSSProperties}
         >
-          작게
-        </button>
-        <button
-          type="button"
-          className={`${styles.fontBtn} ${fontSize === 'normal' ? styles.fontBtnActive : ''}`}
-          onClick={() => setFontSize('normal')}
-        >
-          보통
-        </button>
-        <button
-          type="button"
-          className={`${styles.fontBtn} ${fontSize === 'large' ? styles.fontBtnActive : ''}`}
-          onClick={() => setFontSize('large')}
-        >
-          크게
-        </button>
+          <button
+            type="button"
+            className={`z-segment-item ${fontSize === 'small' ? 'is-on' : ''}`}
+            aria-pressed={fontSize === 'small'}
+            onClick={() => setFontSize('small')}
+          >
+            작게
+          </button>
+          <button
+            type="button"
+            className={`z-segment-item ${fontSize === 'normal' ? 'is-on' : ''}`}
+            aria-pressed={fontSize === 'normal'}
+            onClick={() => setFontSize('normal')}
+          >
+            보통
+          </button>
+          <button
+            type="button"
+            className={`z-segment-item ${fontSize === 'large' ? 'is-on' : ''}`}
+            aria-pressed={fontSize === 'large'}
+            onClick={() => setFontSize('large')}
+          >
+            크게
+          </button>
+        </div>
         {pdfUrl && (
           <button type="button" className={styles.pdfBtn} onClick={() => setPdfOpen(true)}>
             <FileText size={14} />

@@ -138,22 +138,15 @@
   gap: var(--dia-space-2);
 }
 
+/* 법② z-glass-pill 가 background/border/border-radius/box-shadow + 눌림 제공.
+   여기선 레이아웃만 유지 (전역 클래스가 시각을 가져감) */
 .urgentBtn {
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: var(--dia-radius-lg);
   text-decoration: none;
   min-height: 52px;
-  transition: all var(--dia-transition-fast);
-}
-
-.urgentBtn:active {
-  transform: scale(0.98);
-  background: rgba(239, 68, 68, 0.18);
 }
 
 .urgentPhoneIcon {
@@ -236,13 +229,12 @@
 }
 
 /* ── Phone number chips ── */
+/* 법② z-glass-pill 가 background/border/border-radius/box-shadow + 눌림 제공.
+   여기선 레이아웃·타이포만 유지 */
 .phoneChip {
   display: inline-flex;
   align-items: center;
   padding: var(--dia-space-2) var(--dia-space-3);
-  background: rgba(56, 189, 248, 0.08);
-  border: 1px solid rgba(56, 189, 248, 0.15);
-  border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   color: var(--dia-sky);
   font-weight: var(--dia-weight-semibold);
@@ -250,11 +242,4 @@
   text-decoration: none;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.3px;
-  transition: all var(--dia-transition-fast);
-}
-
-.phoneChip:active {
-  transform: scale(0.96);
-  background: rgba(56, 189, 248, 0.15);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
 }

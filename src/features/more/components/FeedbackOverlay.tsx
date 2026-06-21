@@ -78,12 +78,17 @@ export default function FeedbackOverlay({ onClose }: Props) {
       </div>
 
       {!openThread && (
-        <div className={styles.feedbackTabs} role="tablist">
+        <div
+          className={`z-segment ${styles.feedbackTabs}`}
+          data-no-press
+          role="tablist"
+          style={{ '--seg-count': 2, '--seg-idx': tab === 'write' ? 0 : 1 } as React.CSSProperties}
+        >
           <button
             type="button"
             role="tab"
             aria-selected={tab === 'write'}
-            className={`${styles.feedbackTab} ${tab === 'write' ? styles.feedbackTabActive : ''}`}
+            className={`z-segment-item ${styles.feedbackTab} ${tab === 'write' ? 'is-on' : ''}`}
             onClick={() => setTab('write')}
           >
             새 제보
@@ -92,7 +97,7 @@ export default function FeedbackOverlay({ onClose }: Props) {
             type="button"
             role="tab"
             aria-selected={tab === 'mine'}
-            className={`${styles.feedbackTab} ${tab === 'mine' ? styles.feedbackTabActive : ''}`}
+            className={`z-segment-item ${styles.feedbackTab} ${tab === 'mine' ? 'is-on' : ''}`}
             onClick={() => setTab('mine')}
           >
             내 대화
@@ -160,7 +165,7 @@ function WriteView({ anonId, onSubmitted }: { anonId: string; onSubmitted: () =>
         <CheckCircle size={48} className={styles.feedbackDoneIcon} />
         <p className={styles.feedbackDoneTitle}>익명으로 전달됐어요</p>
         <p className={styles.feedbackDoneDesc}>확인 후 답변해 드릴게요. &apos;내 대화&apos; 탭에서 답글을 볼 수 있어요.</p>
-        <button type="button" className={styles.feedbackSubmitBtn} onClick={onSubmitted}>
+        <button type="button" className={`z-cta ${styles.feedbackSubmitBtn}`} data-press onClick={onSubmitted}>
           내 대화 보기
         </button>
       </div>
@@ -195,7 +200,8 @@ function WriteView({ anonId, onSubmitted }: { anonId: string; onSubmitted: () =>
 
       <button
         type="button"
-        className={styles.feedbackSubmitBtn}
+        className={`z-cta ${styles.feedbackSubmitBtn}`}
+        data-press
         onClick={handleSubmit}
         disabled={!canSubmit}
       >

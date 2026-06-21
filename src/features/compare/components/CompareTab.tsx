@@ -116,13 +116,17 @@ export default function CompareTab() {
 
   return (
     <div className={styles.container}>
-      {/* 그룹 선택 탭 */}
-      <div className={styles.groupTabs}>
+      {/* 그룹 선택 탭 — 법① 세그먼트 */}
+      <div
+        className={`z-segment ${styles.groupTabs}`}
+        data-no-press
+        style={{ '--seg-count': groups.length, '--seg-idx': activeGroup } as React.CSSProperties}
+      >
         {groups.map((g, i) => (
           <button
             key={i}
             type="button"
-            className={`${styles.groupTab} ${activeGroup === i ? styles.groupTabActive : ''}`}
+            className={`z-segment-item ${styles.groupTab} ${activeGroup === i ? 'is-on' : ''}`}
             onClick={() => setActiveGroup(i)}
             aria-pressed={activeGroup === i}
           >
@@ -150,7 +154,7 @@ export default function CompareTab() {
           />
         </div>
         {hasAnyPerson && (
-          <button type="button" className={styles.resetBtn} onClick={resetGroup} aria-label="현재 그룹 초기화">
+          <button type="button" className={`z-glass-pill ${styles.resetBtn}`} onClick={resetGroup} aria-label="현재 그룹 초기화" data-press>
             <RotateCcw size={14} />
             <span>초기화</span>
           </button>
@@ -172,7 +176,7 @@ export default function CompareTab() {
             </span>
           ))}
         </div>
-        <button type="button" className={styles.addPersonBtn} onClick={openSelector}>
+        <button type="button" className={`z-cta ${styles.addPersonBtn}`} onClick={openSelector} data-press>
           <UserPlus size={16} />
           <span>기관사 선택</span>
         </button>
@@ -279,7 +283,7 @@ export default function CompareTab() {
           )}
         </div>
         <div className={styles.modalFooter}>
-          <button type="button" className={styles.confirmBtn} onClick={confirmSelection}>
+          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection} data-press>
             {multiSelected.length}명 선택 완료
           </button>
         </div>

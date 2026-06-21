@@ -878,6 +878,7 @@
   text-align: center;
 }
 
+/* 법③ CTA — 전역 .z-cta 가 배경/색/라운딩/섀도우 소유. 여기선 레이아웃만 */
 .feedbackSubmitBtn {
   width: 100%;
   display: flex;
@@ -885,16 +886,10 @@
   justify-content: center;
   gap: var(--dia-space-2);
   padding: var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
-  border-radius: var(--dia-radius-lg);
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-semibold);
   min-height: 52px;
-  transition: opacity var(--dia-transition-fast);
 }
 
-.feedbackSubmitBtn:active { opacity: 0.8; }
 .feedbackSubmitBtn:disabled { opacity: 0.4; }
 
 
@@ -1252,14 +1247,10 @@
   color: var(--dia-red);
 }
 
+/* 법③ CTA — 전역 .z-cta 가 배경/색/라운딩/섀도우 소유. 여기선 크기/패딩만 */
 .adminPinSubmit {
   padding: var(--dia-space-3) var(--dia-space-6);
-  background: var(--dia-blue);
-  border: none;
-  border-radius: var(--dia-radius-md);
-  color: #fff;
   font-size: var(--dia-text-base);
-  font-weight: 600;
   cursor: pointer;
   min-height: 48px;
   min-width: 160px;
@@ -1436,33 +1427,17 @@
  * 의견/버그 제보 — 탭 + 대화창
  * ═══════════════════════════════════════════ */
 
-/* 탭 */
+/* 탭 — 버튼 4법 ① z-segment (전역). 컨테이너 자체 배경/보더/디스플레이는 전역이 소유, 여기선 외부 여백만 */
 .feedbackTabs {
-  display: flex;
-  gap: 0;
-  padding: 0 var(--dia-space-4);
-  border-bottom: 1px solid var(--dia-border-light);
-  background: var(--dia-bg);
+  margin: var(--dia-space-3) var(--dia-space-4);
 }
 
+/* 세그먼트 아이템 — 전역 .z-segment-item 이 배경/슬라이딩 thumb/색 소유. 폰트만 보강 */
 .feedbackTab {
   position: relative;
-  flex: 1;
-  padding: var(--dia-space-3) var(--dia-space-2);
-  background: none;
-  border: none;
-  color: var(--dia-text-secondary);
+  padding: var(--dia-space-2) var(--dia-space-2);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.feedbackTabActive {
-  color: var(--dia-blue);
-  border-bottom-color: var(--dia-blue);
 }
 
 .feedbackTabDot {

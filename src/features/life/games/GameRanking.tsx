@@ -49,18 +49,22 @@ export default function GameRanking({ game, scoreLabel = '점수', scoreUnit = '
 
   return (
     <div className={styles.wrap}>
-      {/* 탭 */}
-      <div className={styles.tabs}>
+      {/* 탭 — 법① 세그먼트 (슬라이딩 thumb) */}
+      <div
+        className={`z-segment ${styles.tabs}`}
+        data-no-press
+        style={{ '--seg-count': 2, '--seg-idx': period === 'all' ? 0 : 1 } as React.CSSProperties}
+      >
         <button
           type="button"
-          className={`${styles.tab} ${period === 'all' ? styles.tabActive : ''}`}
+          className={`z-segment-item ${styles.tab} ${period === 'all' ? 'is-on' : ''}`}
           onClick={() => setPeriod('all')}
         >
           전체 랭킹
         </button>
         <button
           type="button"
-          className={`${styles.tab} ${period === 'month' ? styles.tabActive : ''}`}
+          className={`z-segment-item ${styles.tab} ${period === 'month' ? 'is-on' : ''}`}
           onClick={() => setPeriod('month')}
         >
           이번 달

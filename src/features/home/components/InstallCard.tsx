@@ -63,7 +63,7 @@ export default function InstallCard() {
           </p>
           <button
             type="button"
-            className={styles.installCardBtn}
+            className={`z-cta ${styles.installCardBtn}`}
             onClick={handleInstall}
           >
             홈 화면에 추가하기
@@ -155,7 +155,7 @@ export default function InstallCard() {
                 </ol>
                 <button
                   type="button"
-                  className={styles.installChromeBtn}
+                  className={`z-cta z-cta-sky ${styles.installChromeBtn}`}
                   onClick={openInChrome}
                 >
                   Chrome으로 열기

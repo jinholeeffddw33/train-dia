@@ -159,9 +159,9 @@ export default function DutyTab() {
         </div>
       )}
 
-      {/* 날짜 선택 */}
+      {/* 날짜 선택 — 좌우 화살표는 버튼 4법 ② 무색 3D 솟음 알약(아이콘만 → data-press 금지) */}
       <div className={styles.dateSelector}>
-        <button type="button" onClick={prevDay} className={styles.dateArrow} aria-label="이전 날짜">
+        <button type="button" onClick={prevDay} className={`z-glass-pill ${styles.dateArrow}`} aria-label="이전 날짜">
           <ChevronLeft size={20} />
         </button>
         <button type="button" onClick={goToday} className={styles.dateDisplay}>
@@ -170,13 +170,17 @@ export default function DutyTab() {
             ({dow}) {isHol ? '· 휴일' : '· 평일'}
           </span>
         </button>
-        <button type="button" onClick={nextDay} className={styles.dateArrow} aria-label="다음 날짜">
+        <button type="button" onClick={nextDay} className={`z-glass-pill ${styles.dateArrow}`} aria-label="다음 날짜">
           <ChevronRight size={20} />
         </button>
       </div>
 
-      {/* 필터 탭 */}
-      <div className={styles.filterTabs}>
+      {/* 필터 탭 — 버튼 4법 ① 이어진 세그먼트 (상태선택, 슬라이딩 thumb) */}
+      <div
+        className={`z-segment ${styles.filterTabs}`}
+        data-no-press
+        style={{ '--seg-count': 4, '--seg-idx': (['all', 'day', 'night', 'standby'] as FilterType[]).indexOf(filter) } as React.CSSProperties}
+      >
         {([
           { key: 'all' as FilterType, label: `전체 ${entries.length}` },
           { key: 'day' as FilterType, label: `주간 ${dayCnt}` },
@@ -186,7 +190,7 @@ export default function DutyTab() {
           <button
             key={f.key}
             type="button"
-            className={`${styles.filterTab} ${filter === f.key ? styles.filterTabActive : ''}`}
+            className={`z-segment-item ${styles.filterTab} ${filter === f.key ? 'is-on' : ''}`}
             onClick={() => setFilter(f.key)}
             aria-pressed={filter === f.key}
           >

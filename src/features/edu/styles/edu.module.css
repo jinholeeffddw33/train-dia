@@ -2691,9 +2691,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 법② 분리 단발(미선택/보조) — 무색 3D 솟음 (외곽선 색칠/평면 단색 금지) */
 .resultBtnOutline {
-  background: rgba(30, 58, 100, 0.2);
-  border: 1px solid rgba(96, 165, 250, 0.2);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
   color: var(--dia-text-primary);
 }
 
@@ -2705,8 +2707,10 @@
 }
 
 :root.light .resultBtnOutline {
-  background: #ffffff;
-  border: 1.5px solid #cbd5e1;
+  /* 법② 무색 3D 솟음 — 라이트 뉴모피즘은 --z-* 토큰이 자동 처리 */
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
 }
 
 :root.light .resultBtnPrimary {
@@ -6434,12 +6438,16 @@
 .vregArea_green { --vreg-accent: var(--dia-green); --vreg-accent-dim: var(--dia-green-dim); }
 .vregArea_amber { --vreg-accent: var(--dia-amber); --vreg-accent-dim: var(--dia-amber-dim); }
 .vregArea_purple { --vreg-accent: var(--dia-purple); --vreg-accent-dim: var(--dia-purple-dim); }
+/* 법③ 분리 상태선택 — 선택됨 = 3D 컬러 채움(외곽선 색칠 금지, area 액센트로 fill) */
 .vregAreaOn {
-  border-color: var(--vreg-accent, var(--dia-blue));
-  background: var(--vreg-accent-dim, var(--dia-blue-dim));
-  color: var(--dia-text-primary);
+  border-color: transparent;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--vreg-accent, var(--dia-blue)), color-mix(in srgb, var(--vreg-accent, var(--dia-blue)) 78%, #000 22%));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  color: #fff;
 }
-.vregAreaOn .vregAreaName { color: var(--vreg-accent, var(--dia-blue)); }
+.vregAreaOn .vregAreaName { color: #fff; }
 
 /* 입력 필드 */
 .vregInput {

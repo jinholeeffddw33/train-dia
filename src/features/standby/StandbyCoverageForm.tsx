@@ -130,7 +130,8 @@ export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }:
             ) : (
               <button
                 type="button"
-                className={styles.photoPicker}
+                className={`z-glass-pill ${styles.photoPicker}`}
+                data-press
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Camera size={28} strokeWidth={2} />
@@ -154,12 +155,13 @@ export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }:
         </div>
 
         <div className={styles.formFoot}>
-          <button type="button" className={styles.formBtnSecondary} onClick={onClose} disabled={submitting}>
+          <button type="button" className={`z-glass-pill ${styles.formBtnSecondary}`} data-press onClick={onClose} disabled={submitting}>
             취소
           </button>
           <button
             type="button"
-            className={styles.formBtnPrimary}
+            className={`z-cta ${styles.formBtnPrimary}`}
+            data-press
             onClick={handleSubmit}
             disabled={submitting || !photo}
           >

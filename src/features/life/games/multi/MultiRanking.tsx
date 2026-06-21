@@ -62,11 +62,15 @@ export default function MultiRanking({ onBack }: Props) {
         </h2>
       </div>
 
-      {/* 게임 선택 탭 */}
-      <div className={styles.tabs}>
+      {/* 게임 선택 탭 — 법① 세그먼트(슬라이딩 thumb) */}
+      <div
+        className={`z-segment ${styles.tabs}`}
+        data-no-press
+        style={{ '--seg-count': 2, '--seg-idx': game === 'omok' ? 0 : 1 } as React.CSSProperties}
+      >
         <button
           type="button"
-          className={`${styles.tab} ${game === 'omok' ? styles.tabActive : ''}`}
+          className={`z-segment-item ${styles.tab} ${game === 'omok' ? 'is-on' : ''}`}
           onClick={() => setGame('omok')}
           aria-pressed={game === 'omok'}
         >
@@ -74,7 +78,7 @@ export default function MultiRanking({ onBack }: Props) {
         </button>
         <button
           type="button"
-          className={`${styles.tab} ${game === 'reversi' ? styles.tabActive : ''}`}
+          className={`z-segment-item ${styles.tab} ${game === 'reversi' ? 'is-on' : ''}`}
           onClick={() => setGame('reversi')}
           aria-pressed={game === 'reversi'}
         >

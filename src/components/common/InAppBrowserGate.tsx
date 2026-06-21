@@ -102,8 +102,9 @@ export default function InAppBrowserGate() {
           <>
             <button
               type="button"
-              className={styles.cta}
+              className={`z-cta ${styles.cta}`}
               onClick={handleOpenChrome}
+              data-press
             >
               <ExternalLink size={22} strokeWidth={2.4} />
               {isIOS ? 'Chrome 앱으로 열기' : 'Chrome으로 바로 열기'}
@@ -135,7 +136,7 @@ export default function InAppBrowserGate() {
 
             <div className={styles.urlBox}>
               <span className={styles.urlText}>{currentUrl}</span>
-              <button type="button" className={styles.copyBtn} onClick={handleCopy}>
+              <button type="button" className={`z-glass-pill ${styles.copyBtn}`} onClick={handleCopy} data-press>
                 {copied ? '복사됨' : '복사'}
               </button>
             </div>

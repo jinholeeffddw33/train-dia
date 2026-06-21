@@ -221,6 +221,7 @@
   word-break: keep-all;
 }
 
+/* 법② 분리 단발(네비 — 본문 보기) — 무색 3D 솟음 알약 */
 .bodyRefBtn {
   align-self: flex-start;
   display: inline-flex;
@@ -229,8 +230,9 @@
   padding: 10px 16px;
   height: 40px;
   border-radius: var(--dia-radius-full);
-  background: var(--dia-surface-hover);
-  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
   color: var(--dia-text-primary);
   font-size: var(--dia-text-meta);
   font-weight: 600;
@@ -330,10 +332,12 @@
   transition: transform 0.12s ease;
 }
 
+/* 법② 분리 단발(보조 — 나가기) — 무색 3D 솟음 */
 .btnSecondary {
-  background: var(--dia-surface-hover);
-  color: var(--dia-text-secondary);
-  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  color: var(--dia-text-primary);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
 }
 
 .btnSecondary:active {

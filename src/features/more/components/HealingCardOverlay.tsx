@@ -138,7 +138,8 @@ export default function HealingCardOverlay({ open, onClose }: Props) {
               <span className={styles.formUnit}>원</span>
               <button
                 type="button"
-                className={styles.formSubmit}
+                className={`z-cta ${styles.formSubmit}`}
+                data-press
                 onClick={handleLimitSave}
               >
                 저장
@@ -151,7 +152,8 @@ export default function HealingCardOverlay({ open, onClose }: Props) {
         {!showAddForm ? (
           <button
             type="button"
-            className={styles.addBtn}
+            className={`z-cta ${styles.addBtn}`}
+            data-press
             onClick={() => setShowAddForm(true)}
           >
             <Plus size={18} />
@@ -190,7 +192,8 @@ export default function HealingCardOverlay({ open, onClose }: Props) {
               </button>
               <button
                 type="button"
-                className={styles.formSubmit}
+                className={`z-cta ${styles.formSubmit}`}
+                data-press
                 onClick={handleAddEntry}
                 disabled={!amount}
               >

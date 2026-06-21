@@ -365,8 +365,9 @@ export default function RouteMap() {
           <span className={styles.mapFooterText}>{trainCount}편성 운행중</span>
           <button
             type="button"
-            className={styles.mapFooterBtn}
+            className={`z-glass-pill ${styles.mapFooterBtn}`}
             onClick={toggleFullscreen}
+            data-press
           >
             크게 보기
           </button>

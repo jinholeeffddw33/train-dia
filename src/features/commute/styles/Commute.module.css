@@ -145,12 +145,9 @@
 }
 
 .errorRetryBtn {
+  /* 법③ z-cta(globals)가 background/color/border-radius/box-shadow 담당 — 여기선 레이아웃만 */
   padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-surface);
-  border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
   min-height: 44px;
 }
 

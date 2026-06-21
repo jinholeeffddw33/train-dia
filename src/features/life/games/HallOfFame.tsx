@@ -102,7 +102,7 @@ export default function HallOfFame({ onBack }: HallOfFameProps) {
       {!loading && error && (
         <div className={styles.errorBox}>
           <p>{error}</p>
-          <button type="button" className={styles.retryBtn} onClick={() => window.location.reload()}>
+          <button type="button" className={`z-cta ${styles.retryBtn}`} onClick={() => window.location.reload()}>
             다시 시도
           </button>
         </div>

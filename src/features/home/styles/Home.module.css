@@ -753,6 +753,7 @@
   margin-bottom: var(--dia-space-2);
 }
 
+/* look(배경/보더/라운딩/그림자)은 버튼 4법 ② .z-glass-pill 가 담당 — 여기선 크기/심볼 색만 */
 .monthNav {
   width: 44px;
   height: 44px;
@@ -760,16 +761,10 @@
   align-items: center;
   justify-content: center;
   font-size: var(--dia-text-xl);
-  color: var(--dia-text-tertiary);
-  border-radius: var(--dia-radius-full);
-  transition: background var(--dia-transition-fast);
+  color: var(--dia-text-secondary);
 }
 
-@media (hover: hover) {
-.monthNav:hover {
-  background: var(--dia-surface-hover);
-}
-}
+.monthNav:active { transform: scale(0.96); }
 
 .monthTitle {
   font-size: var(--dia-text-base);
@@ -1240,29 +1235,25 @@
   padding: 2px 0;
 }
 
+/* look(배경/보더/라운딩)은 버튼 4법 ②.z-glass-pill(off) / ③.z-cta-sky(on) 가 담당 — 여기선 레이아웃/타이포만 */
 .alarmToggle {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 4px 12px;
-  border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   font-weight: 500;
-  color: var(--dia-text-tertiary);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  transition: all var(--dia-transition-fast);
   cursor: pointer;
 }
 
-.alarmToggle:active {
-  background: var(--dia-surface-hover);
+/* off 상태 글자색만(on 은 .z-cta-sky 가 색까지 담당) */
+.alarmToggle:not(.alarmToggleOn) {
+  color: var(--dia-text-secondary);
 }
 
+/* on 상태 look 은 전역 .z-cta-sky 가 담당 — 마커 클래스로만 유지 */
 .alarmToggleOn {
-  color: var(--dia-blue);
-  border-color: var(--dia-blue);
-  background: var(--dia-blue-dim);
+  font-weight: var(--dia-weight-bold);
 }
 
 .alarmNextDay {
@@ -1297,26 +1288,22 @@
   gap: 6px;
 }
 
+/* look(배경/보더/라운딩)은 버튼 4법 ②.z-glass-pill(off) / ③.z-cta-sky(on) 가 담당 — 여기선 레이아웃/타이포만 */
 .alarmChip {
   padding: 5px 12px;
-  border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-meta);
   font-weight: 500;
-  color: var(--dia-text-secondary);
-  background: var(--dia-bg);
-  border: 1px solid var(--dia-border);
-  transition: all var(--dia-transition-fast);
   cursor: pointer;
 }
 
-.alarmChip:active {
-  background: var(--dia-surface-hover);
+/* off 상태 글자색만(on 은 .z-cta-sky 가 색까지 담당) */
+.alarmChip:not(.alarmChipOn) {
+  color: var(--dia-text-secondary);
 }
 
+/* on 상태 look 은 전역 .z-cta-sky 가 담당 — 마커 클래스로만 유지 */
 .alarmChipOn {
-  background: var(--dia-blue);
-  color: white;
-  border-color: var(--dia-blue);
+  font-weight: var(--dia-weight-bold);
 }
 
 /* ── WeekStrip 선택 상태 (3D 꽉 채움) ── */
@@ -1523,18 +1510,13 @@
   line-height: var(--dia-leading-relaxed);
 }
 
+/* look(배경/색/그림자)은 버튼 4법 ③ .z-cta 가 담당 — 여기선 레이아웃/타이포만 */
 .quizNext {
   margin-top: var(--dia-space-3);
   padding: var(--dia-space-2) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
-  border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
   min-height: 44px;
 }
-
-.quizNext:active { opacity: 0.8; }
 
 /* ── 교번변경 표시 ── */
 .weekDaySwapped {
@@ -1827,14 +1809,10 @@
   line-height: 1.5;
 }
 
+/* look(배경/색/그림자/라운딩)은 버튼 4법 ③ .z-cta 가 담당 — 여기선 레이아웃만 */
 .installCardBtn {
   padding: var(--dia-space-2) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: #fff;
   font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  border: none;
-  border-radius: var(--dia-radius-md);
   cursor: pointer;
   min-height: 44px;
   -webkit-tap-highlight-color: transparent;
@@ -1975,15 +1953,11 @@
   line-height: 1.5;
 }
 
+/* look(배경/색/그림자/라운딩)은 버튼 4법 ③ .z-cta.z-cta-sky 가 담당(코피 "파란 버튼" 유지) — 여기선 레이아웃만 */
 .installChromeBtn {
   width: 100%;
   padding: var(--dia-space-3);
-  background: var(--dia-blue);
-  color: #fff;
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
-  border: none;
-  border-radius: var(--dia-radius-md);
   cursor: pointer;
   min-height: 48px;
   margin-bottom: var(--dia-space-4);

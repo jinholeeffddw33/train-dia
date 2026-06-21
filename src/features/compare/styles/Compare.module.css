@@ -2,34 +2,16 @@
 
 .container { padding: var(--dia-space-4); }
 
-/* ── Group Tabs ── */
+/* ── Group Tabs (법① 세그먼트 — 룩은 globals .z-segment) ── */
 .groupTabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--dia-space-2);
   margin-bottom: var(--dia-space-4);
 }
 
+/* 세그먼트 아이템 내부 레이아웃(점+라벨+배지). 룩/색은 globals 가 가름 */
 .groupTab {
-  display: flex;
-  align-items: center;
   gap: var(--dia-space-1);
   padding: var(--dia-space-2) var(--dia-space-2);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
-  cursor: pointer;
-  min-height: 44px;
-  -webkit-tap-highlight-color: transparent;
-  transition: border-color var(--dia-transition-fast), background var(--dia-transition-fast);
-}
-
-.groupTab:active { transform: scale(0.97); }
-
-.groupTabActive {
-  border-color: var(--dia-blue);
-  background: var(--dia-surface-elevated);
-  box-shadow: 0 0 0 1px var(--dia-blue);
+  min-width: 0;
 }
 
 .groupDot {
@@ -48,10 +30,6 @@
   text-overflow: ellipsis;
   min-width: 0;
   flex: 1;
-}
-
-.groupTabActive .groupLabel {
-  color: var(--dia-blue);
 }
 
 .groupBadge {
@@ -113,10 +91,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-1);
-  padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-lg);
+  padding: var(--dia-space-2) var(--dia-space-4);
   color: var(--dia-red);
   font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
@@ -125,8 +100,6 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-
-.resetBtn:active { opacity: 0.7; }
 
 /* ── Person Card Wrap (카드 + 삭제버튼) ── */
 .personCardWrap {
@@ -492,15 +465,9 @@
 .confirmBtn {
   width: 100%;
   padding: var(--dia-space-3);
-  background: var(--dia-blue);
-  color: #fff;
-  border-radius: var(--dia-radius-lg);
   font-size: var(--dia-text-base);
-  font-weight: var(--dia-weight-bold);
   min-height: 48px;
 }
-
-.confirmBtn:active { opacity: 0.85; }
 
 /* ── 선택된 기관사 칩 ── */
 .selectedRow {
@@ -545,15 +512,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: var(--dia-space-2) var(--dia-space-3);
-  border: 1px dashed var(--dia-blue);
-  border-radius: var(--dia-radius-lg);
-  color: var(--dia-blue);
+  padding: var(--dia-space-2) var(--dia-space-4);
   font-size: var(--dia-text-sm);
-  font-weight: 600;
-  background: none;
   cursor: pointer;
   min-height: 40px;
 }
-
-.addPersonBtn:active { background: var(--dia-blue-dim); }

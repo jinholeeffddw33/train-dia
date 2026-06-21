@@ -42,9 +42,9 @@
   transform: scale(0.95);
 }
 
-/* 활성 탭 — 단일 브랜드 색상 */
+/* 활성 탭 — 네온 라임(주얼과 통일, ZINOSB 4법) */
 .tabActive {
-  color: var(--dia-blue);
+  color: var(--z-accent);
 }
 
 /* 아이콘 */
@@ -60,16 +60,21 @@
   white-space: nowrap;
 }
 
-/* 활성 인디케이터 바 */
-.tabIndicator {
+/* 슬라이딩 주얼 구슬 (네온 라임) — 활성 탭 위로 left calc 슬라이드.
+   ★ left calc(translateX% 모호성 회피, good-bad Case 50). --tab-idx/--tab-count 는 TabBar.tsx 주입 */
+.tabJewel {
   position: absolute;
-  top: 0;
-  left: 25%;
-  right: 25%;
-  height: 2px;
-  background: var(--dia-blue);
-  border-radius: 0 0 var(--dia-radius-full) var(--dia-radius-full);
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  top: 6px;
+  z-index: 0;
+  width: 26px;
+  height: 5px;
+  left: calc(var(--tab-idx, 0) * (100% / var(--tab-count, 6)) + (100% / var(--tab-count, 6) - 26px) / 2);
+  border-radius: var(--dia-radius-full);
+  background: var(--z-jewel-lime-fill);
+  box-shadow: var(--z-jewel-lime-shadow);
+  border: 1px solid var(--z-jewel-lime-edge);
+  transition: left 0.34s cubic-bezier(0.34, 1.3, 0.42, 1);
+  pointer-events: none;
 }
 
 /* 알림 배지 */

@@ -215,3 +215,107 @@ input, textarea, select {
     padding-right: env(safe-area-inset-right);
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   ZINOSB 버튼 4법 클래스 (UI-SURFACE-3D-001 이식) — 전역 SSOT
+   값은 tokens.css 가 다크(fake glass)/라이트(뉴모피즘)로 가름.
+   ① 이어진 세그먼트(상태선택) → .z-segment + .z-segment-item (슬라이딩 thumb)
+   ② 분리 네비/단발/미선택 → .z-glass-pill (무색 3D 솟음)
+   ③ CTA/선택됨 → .z-cta(.z-cta-sky/.z-cta-violet) (3D 컬러 채움)
+   카드(큰 표면) → .z-glass-surface
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* 카드(큰 표면) */
+.z-glass-surface {
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  border-radius: var(--z-radius-xl);
+  box-shadow: var(--z-card-shadow);
+}
+
+/* 법② 무색 3D 솟음 알약/칩 (분리 네비·단발·미선택). data-press 로 눌림 sweep opt-in */
+.z-glass-pill {
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  border-radius: var(--z-radius-full);
+  box-shadow: var(--z-pill-shadow);
+}
+
+@media (hover: hover) {
+  .z-glass-surface:hover,
+  .z-glass-pill:hover { background: var(--z-card-fill-strong); }
+}
+
+/* 법① 세그먼트 — 슬라이딩 thumb. 활성 인덱스 --seg-idx / 개수 --seg-count (React 주입).
+   ★ left calc 슬라이드(translateX% 모호성 회피, good-bad Case 50). data-no-press(슬라이드가 곧 press) */
+.z-segment {
+  --seg-count: 2;
+  --seg-idx: 0;
+  position: relative;
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  border-radius: var(--z-radius-full);
+  background: var(--z-seg-track-fill);
+  box-shadow: var(--z-seg-track-shadow);
+}
+.z-segment::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: calc(4px + var(--seg-idx) * ((100% - 8px) / var(--seg-count)));
+  width: calc((100% - 8px) / var(--seg-count));
+  border-radius: var(--z-radius-full);
+  background: var(--z-seg-on-fill);
+  box-shadow: var(--z-seg-on-shadow);
+  transition: left 0.34s cubic-bezier(0.34, 1.3, 0.42, 1);
+  pointer-events: none;
+}
+.z-segment-item {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: var(--z-radius-full);
+  color: var(--z-text-tertiary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color var(--z-transition-fast);
+}
+.z-segment-item.is-on,
+.z-segment-item[aria-selected="true"] { color: var(--z-text-primary); }
+
+/* 법③ CTA — 3D 컬러 채움(메인=네온 라임 / sky·violet 보조). ★색은 채움(외곽선 색칠 금지) */
+.z-cta {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-lime-start), var(--z-3d-lime-end));
+  color: var(--z-3d-lime-text);
+  border: none;
+  border-radius: var(--z-radius-full);
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-lime-glow);
+  font-weight: 700;
+}
+.z-cta:active { box-shadow: var(--z-3d-pressed); }
+.z-cta-sky {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-sky-start), var(--z-3d-sky-end));
+  color: var(--z-3d-sky-text);
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-sky-glow);
+}
+.z-cta-violet {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-violet-start), var(--z-3d-violet-end));
+  color: var(--z-3d-violet-text);
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-violet-glow);
+}

@@ -29,8 +29,17 @@ interface TabBarProps {
 }
 
 export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchangeCount = 0 }: TabBarProps) {
+  // 주얼 구슬 위치 = 활성 인덱스 (prop 기반 → SSR/클라 동일, 로딩 깜빡 0)
+  const activeIdx = Math.max(0, TABS.findIndex((t) => t.id === activeTab));
   return (
-    <nav className={styles.tabBar} role="tablist" aria-label="메인 내비게이션">
+    <nav
+      className={styles.tabBar}
+      role="tablist"
+      aria-label="메인 내비게이션"
+      style={{ '--tab-idx': activeIdx, '--tab-count': TABS.length } as React.CSSProperties}
+    >
+      {/* 슬라이딩 주얼 구슬 (네온 라임) — 활성 탭 위로 이동 */}
+      <span className={styles.tabJewel} aria-hidden />
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
@@ -55,7 +64,6 @@ export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchang
                 {exchangeCount > 9 ? '9+' : exchangeCount}
               </span>
             )}
-            {isActive && <span className={styles.tabIndicator} />}
           </button>
         );
       })}

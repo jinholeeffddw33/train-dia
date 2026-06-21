@@ -318,7 +318,11 @@ export default function MoreTab() {
             <span className={styles.settingIcon}>🔤</span>
             <span className={styles.settingLabel}>글자 크기</span>
           </div>
-          <div className={styles.fontSizeBtnGroup}>
+          <div
+            className="z-segment"
+            data-no-press
+            style={{ '--seg-count': 3, '--seg-idx': (['small', 'normal', 'large'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
+          >
             {([
               { key: 'small' as FontSize, label: '작게', cls: styles.fontSizeBtnSmall },
               { key: 'normal' as FontSize, label: '보통', cls: styles.fontSizeBtnNormal },
@@ -327,7 +331,7 @@ export default function MoreTab() {
               <button
                 key={opt.key}
                 type="button"
-                className={`${styles.fontSizeBtn} ${opt.cls} ${fontSize === opt.key ? styles.fontSizeBtnActive : ''}`}
+                className={`z-segment-item ${opt.cls} ${fontSize === opt.key ? 'is-on' : ''}`}
                 onClick={() => setFontSize(opt.key)}
                 aria-pressed={fontSize === opt.key}
                 aria-label={`글자 크기 ${opt.label}`}

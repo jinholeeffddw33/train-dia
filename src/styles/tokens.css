@@ -244,6 +244,61 @@
   --dia-transition-fast: 150ms var(--dia-ease);
   --dia-transition-normal: 250ms var(--dia-ease);
   --dia-transition-slow: 350ms var(--dia-ease);
+
+  /* ════════════════════════════════════════════════════════════════
+     ZINOSB 버튼 4법 토큰 (UI-SURFACE-3D-001 이식) — 다크
+     표면/세그/주얼 = premium-fake-glass --zg-* 리다이렉트(한 블록=전 화면).
+     구조 토큰(radius/text/transition/surface)은 train-dia --dia-* 별칭.
+     ════════════════════════════════════════════════════════════════ */
+  /* 구조 별칭 (4법 클래스가 참조) */
+  --z-radius-xl: var(--dia-radius-2xl);
+  --z-radius-full: var(--dia-radius-full);
+  --z-text-primary: var(--dia-text-primary);
+  --z-text-tertiary: var(--dia-text-tertiary);
+  --z-transition-fast: var(--dia-transition-fast);
+  --z-surface: var(--dia-bg-elevated);          /* @supports 불투명 폴백 (솔리드) */
+  --z-border: var(--dia-border);
+  --z-space-3: var(--dia-space-3);
+  /* 법②③ 표면 = 다크 fake glass */
+  --z-surface-blur: none;
+  --z-surface-edge: var(--zg-edge-strong);
+  --z-card-fill: var(--zg-card-fill);
+  --z-card-fill-strong: var(--zg-control-fill-hover);
+  --z-card-shadow: var(--zg-card-shadow);
+  --z-pill-shadow: var(--zg-control-shadow);
+  /* 법① 세그먼트 = 다크 트랙 raised + 활성 raised 알약 (슬라이딩 thumb) */
+  --z-seg-track-fill: rgba(255, 255, 255, 0.05);
+  --z-seg-track-shadow: var(--zg-control-shadow);
+  --z-seg-on-fill: var(--zg-control-fill-active);
+  --z-seg-on-shadow: var(--zg-control-shadow);
+  /* 법③ CTA 3D 컬러 — 네온 라임(메인) / sky·violet(보조). 색은 채움(외곽선 금지) */
+  --z-accent: #B6FF2A;
+  --z-3d-bloom: 0.2;
+  --z-3d-inset: inset 1px 1px 2px rgba(255,255,255,0.15), inset -1px -1px 3px rgba(0,0,0,0.25);
+  --z-3d-depth: 0 2px 6px rgba(0,0,0,0.3);
+  --z-3d-pressed: inset 2px 2px 4px rgba(0,0,0,0.35), inset -1px -1px 2px rgba(255,255,255,0.05);
+  --z-3d-lime-start: #B6FF2A;
+  --z-3d-lime-end: #9FE022;
+  --z-3d-lime-text: #000000;
+  --z-3d-lime-glow: 0 0 12px rgba(182,255,42,0.12);
+  --z-3d-sky-start: #38BDF8;
+  --z-3d-sky-end: #0369a1;
+  --z-3d-sky-text: #ffffff;
+  --z-3d-sky-glow: 0 0 12px rgba(56,189,248,0.12);
+  --z-3d-violet-start: #A78BFA;
+  --z-3d-violet-end: #5b21b6;
+  --z-3d-violet-text: #ffffff;
+  --z-3d-violet-glow: 0 0 12px rgba(167,139,250,0.12);
+  /* 주얼 (바텀네비 활성 = "앱의 얼굴") — 다크 = 솟은 컬러 글래스 + 라임 글로우 */
+  --z-jewel-lime-fill:
+    radial-gradient(115% 80% at 50% -12%, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0) 48%),
+    radial-gradient(100% 120% at 50% 118%, rgba(182,255,42,0.50) 0%, rgba(182,255,42,0) 60%),
+    linear-gradient(165deg, color-mix(in srgb, var(--z-accent) 78%, #ffffff) 0%, color-mix(in srgb, var(--z-accent) 55%, #122000) 100%);
+  --z-jewel-lime-shadow:
+    0 8px 20px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.35), 0 0 20px rgba(182,255,42,0.45),
+    inset 0 2px 1px rgba(255,255,255,0.85), inset 0 -9px 15px -7px rgba(120,180,20,0.55);
+  --z-jewel-lime-edge: rgba(200, 255, 130, 0.5);
+  --z-jewel-lime-text: #0a1400;
 }
 
 /* ==========================================
@@ -376,4 +431,37 @@
   --dia-rail-down-glow: rgba(211, 47, 47, 0.12);
   --dia-rail-up: rgba(13, 148, 82, 0.50);
   --dia-rail-up-glow: rgba(13, 148, 82, 0.12);
+
+  /* ════ ZINOSB 버튼 4법 토큰 — 라이트 = 클린 뉴모피즘 (위계 반전: 트랙 raised / 활성 inset) ════ */
+  --z-surface: var(--dia-bg-elevated);
+  --z-surface-blur: blur(0px) saturate(112%);
+  --z-surface-edge: rgba(184, 202, 223, 0.55);
+  --z-card-fill: var(--zg-card-fill);            /* --zg 가 라이트 값 자동 적용 */
+  --z-card-fill-strong: var(--zg-control-fill-hover);
+  --z-card-shadow: var(--zg-card-shadow);
+  --z-pill-shadow: var(--zg-control-shadow);
+  --z-seg-track-fill: #e9edf4;
+  --z-seg-track-shadow: 5px 5px 13px rgba(190,204,222,0.8), -5px -5px 11px rgba(255,255,255,1);
+  --z-seg-on-fill: #e9edf4;                       /* 활성 = 같은 표면, 눌림(inset)으로만 구분 */
+  --z-seg-on-shadow: inset 5px 5px 11px rgba(166,184,212,0.95), inset -4px -4px 9px rgba(255,255,255,1);
+  --z-accent: #7BC800;
+  --z-3d-bloom: 0.28;
+  --z-3d-inset: inset 1px 1px 2px rgba(255,255,255,0.25), inset -1px -1px 3px rgba(0,0,0,0.15);
+  --z-3d-depth: 0 2px 8px rgba(0,0,0,0.12);
+  --z-3d-lime-start: #B6FF2A;
+  --z-3d-lime-end: #9FE022;
+  --z-3d-lime-text: #000000;
+  --z-3d-lime-glow: 0 0 0 transparent;
+  --z-3d-sky-start: #38BDF8;
+  --z-3d-sky-end: #0369a1;
+  --z-3d-sky-glow: 0 0 0 transparent;
+  --z-3d-violet-start: #A78BFA;
+  --z-3d-violet-end: #5b21b6;
+  --z-3d-violet-glow: 0 0 0 transparent;
+  --z-jewel-lime-fill:
+    linear-gradient(160deg, color-mix(in srgb, var(--z-accent) 32%, #ffffff) 0%, color-mix(in srgb, var(--z-accent) 24%, #eef7df) 100%);
+  --z-jewel-lime-shadow:
+    inset 4px 4px 9px rgba(120,150,70,0.45), inset -4px -4px 8px rgba(255,255,255,0.95);
+  --z-jewel-lime-edge: rgba(150,190,90,0.45);
+  --z-jewel-lime-text: #1a2e00;
 }

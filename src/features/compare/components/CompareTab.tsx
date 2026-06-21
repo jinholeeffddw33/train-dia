@@ -17,17 +17,43 @@ const MAX_COUNT = 20;
 
 const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
 
+// 그룹 정규화 — 어떤 입력이 와도 안전한 4그룹 배열로 변환
+function safeGroup(g: unknown): { memo: string; count: number; persons: (Person | null)[] } {
+  if (!g || typeof g !== 'object') return { memo: '', count: 2, persons: [null, null] };
+  const obj = g as { memo?: unknown; count?: unknown; persons?: unknown };
+  const memo = typeof obj.memo === 'string' ? obj.memo : '';
+  const count = typeof obj.count === 'number' && obj.count >= 2 ? obj.count : 2;
+  const persons: (Person | null)[] = Array.isArray(obj.persons)
+    ? obj.persons.map((p) => {
+        if (!p || typeof p !== 'object') return null;
+        const pp = p as Person;
+        if (typeof pp.I === 'string' && typeof pp.n === 'string') return pp;
+        return null;
+      })
+    : [null, null];
+  return { memo, count, persons };
+}
+
+function safeGroupsArray(input: unknown): { memo: string; count: number; persons: (Person | null)[] }[] {
+  const arr = Array.isArray(input) ? input : [];
+  const normalized = arr.map(safeGroup);
+  while (normalized.length < 4) normalized.push({ memo: '', count: 2, persons: [null, null] });
+  return normalized.slice(0, 4);
+}
+
 export default function CompareTab() {
   const store = useCompareStore();
-  // 방어적 destructure — 손상된 persist로 undefined인 경우 default fallback
-  const count = typeof store.count === 'number' ? store.count : 2;
-  const persons = Array.isArray(store.persons) ? store.persons : [null, null];
+  // 방어적 destructure — 손상된 persist로 어떤 필드가 undefined여도 안전한 default
+  const count = typeof store.count === 'number' && store.count >= 2 ? store.count : 2;
   const year = typeof store.year === 'number' ? store.year : new Date().getFullYear();
   const month = typeof store.month === 'number' ? store.month : new Date().getMonth() + 1;
-  const activeGroup = typeof store.activeGroup === 'number' ? store.activeGroup : 0;
-  const groups = Array.isArray(store.groups) && store.groups.length === 4
-    ? store.groups
-    : [{ memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }] as const;
+  const activeGroupRaw = typeof store.activeGroup === 'number' ? store.activeGroup : 0;
+  const activeGroup = activeGroupRaw >= 0 && activeGroupRaw < 4 ? activeGroupRaw : 0;
+  const groups = useMemo(() => safeGroupsArray(store.groups), [store.groups]);
+  // persons는 현재 활성 그룹의 persons 우선, store.persons 보조
+  const persons: (Person | null)[] = Array.isArray(store.persons)
+    ? store.persons.map((p) => (p && typeof p === 'object' && typeof (p as Person).I === 'string' ? (p as Person) : null))
+    : groups[activeGroup].persons;
   const { setCount, setPerson, removePerson, setPersonsBatch, resetGroup, prevMonth, nextMonth, resetMonth, setActiveGroup, setGroupMemo } = store;
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [multiSelected, setMultiSelected] = useState<Person[]>([]);

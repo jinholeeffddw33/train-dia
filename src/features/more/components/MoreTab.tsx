@@ -13,7 +13,7 @@ import { useNotification } from '@/hooks/useNotification';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
 import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
-import { CompareTab } from '@/features/compare';
+import { CompareTab, CompareErrorBoundary } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 // DriverSelector 제거됨 — 기관사 변경은 인증으로 고정
 import HealingCardOverlay from './HealingCardOverlay';
@@ -773,7 +773,9 @@ export default function MoreTab() {
             <h2 className={styles.overlayTitle}>교번 비교</h2>
           </div>
           <div className={styles.overlayBody}>
-            <CompareTab />
+            <CompareErrorBoundary onReset={() => setCompareOpen(false)}>
+              <CompareTab />
+            </CompareErrorBoundary>
           </div>
         </div>
       )}

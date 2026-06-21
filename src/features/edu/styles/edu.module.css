@@ -5053,8 +5053,10 @@
   outline-offset: 2px;
 }
 
+@media (hover: hover) {
 .simChoiceBtn:hover {
   border-color: var(--dia-blue);
+}
 }
 
 .simChoiceNum {

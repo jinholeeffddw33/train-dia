@@ -215,8 +215,10 @@
   transition: border-color var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .card:hover {
   border-color: var(--dia-border-strong);
+}
 }
 
 .cardName {

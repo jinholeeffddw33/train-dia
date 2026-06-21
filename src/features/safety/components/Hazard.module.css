@@ -203,7 +203,9 @@
   transition: background var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .detailBackBtn:hover { background: var(--dia-surface-hover); }
+}
 .detailBackBtn:active { transform: scale(0.95); }
 
 .detailTitle {
@@ -1447,7 +1449,9 @@
   transition: background var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .menuBtn:hover { background: var(--dia-surface-hover); }
+}
 
 .menuDropdown {
   position: absolute;
@@ -1475,7 +1479,9 @@
   transition: background var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .menuItem:hover { background: var(--dia-surface-hover); }
+}
 
 .menuItemDanger { color: var(--dia-red); }
 
@@ -1517,7 +1523,9 @@
   color: var(--dia-text-secondary);
 }
 
+@media (hover: hover) {
 .editCancelBtn:hover { background: var(--dia-surface-hover); }
+}
 
 .editSaveBtn {
   background: var(--dia-purple);
@@ -1529,7 +1537,9 @@
   cursor: not-allowed;
 }
 
+@media (hover: hover) {
 .editSaveBtn:hover:not(:disabled) { opacity: 0.9; }
+}
 
 /* ── Like Section ── */
 .likeSection {
@@ -1567,7 +1577,9 @@
   box-shadow: var(--dia-3d-inset);
 }
 
+@media (hover: hover) {
 .readersBtn:hover { background: var(--dia-surface-hover); }
+}
 
 .readersBtnActive {
   border-color: var(--dia-blue);
@@ -1639,7 +1651,9 @@
   cursor: pointer;
   transition: background 0.15s ease;
 }
+@media (hover: hover) {
 .lightboxClose:hover { background: rgba(255, 255, 255, 0.28); }
+}
 .lightboxClose:active { transform: scale(0.95); }
 
 .lightboxFile {
@@ -1728,7 +1742,9 @@
   box-shadow: var(--dia-3d-inset);
 }
 
+@media (hover: hover) {
 .likeBtn:hover { background: var(--dia-surface-hover); }
+}
 .likeBtn:active { transform: scale(0.95); }
 
 .likeBtnActive {
@@ -1765,7 +1781,9 @@
   transition: background var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .commentMenuBtn:hover { background: var(--dia-surface-hover); }
+}
 
 .commentMenuDropdown {
   position: absolute;
@@ -1830,7 +1848,9 @@
   color: var(--dia-text-secondary);
 }
 
+@media (hover: hover) {
 .commentEditCancel:hover { background: var(--dia-surface-hover); }
+}
 
 .commentEditSave {
   background: var(--dia-purple);

@@ -1,0 +1,551 @@
+/* =========================================================
+   ZINOSB Premium Fake Liquid Glass — UI-GLASS-TIER-001
+   리퀴드글래스를 "뛰어넘는" WebView-safe 글래스.
+   - 기본 backdrop-filter 금지 (타일 무효화/합성 불안정 소스 제거)
+   - 강제 GPU 레이어 승격 금지 (translateZ/will-change → 드리프트 방지)
+   - 얇은 1px 크리스프 rim 금지 → 넓고 부드러운 sheen 그라데이션으로 빛 표현
+   - 단일 저대비 edge 1개만
+   - 다크 우선
+
+   근거: S25(Xclipse GPU)는 비정수 DPR 아니어도(3.0에서도) 스크롤 중 반투명 표면
+   재합성으로 외곽선이 떨림 — DPR/blur/edge 튜닝 전부 실패(9가지 검증). 그래서
+   "깜빡임과 싸우지 않고" 떨릴 소스(크리스프 선·blur·transform)를 설계에서 제거한
+   프리미엄 fake glass 로 전환. (팀원 설계 + 5갈래 리서치 합의)
+   ========================================================= */
+
+/* ---------- 0. Root variables ---------- */
+:root {
+  /* --dpr 는 layout.tsx 첫-페인트 스크립트가 주입 */
+  --z-glass-hairline: 1px; /* round() 미지원 WebView 폴백 */
+  --z-glass-radius-control: 999px;
+  --z-glass-radius-card: 24px;
+  --z-glass-radius-hero: 30px;
+  --z-glass-speed: 160ms;
+}
+
+/* 최신 WebView 에서만 device-pixel snap 시도 */
+@supports (width: round(1px, 1px)) {
+  :root {
+    --z-glass-hairline: round(1px, calc(1px / var(--dpr, 1)));
+  }
+}
+
+/* ---------- 1. Dark theme tokens (ZINOSB 기본) ---------- */
+:root,
+html[data-theme='dark'] {
+  --zg-fg: rgba(244, 247, 255, 0.96);
+  --zg-fg-muted: rgba(226, 232, 245, 0.72);
+
+  --zg-edge: rgba(255, 255, 255, 0.145);
+  --zg-edge-strong: rgba(218, 230, 255, 0.235);
+
+  --zg-control-fill:
+    radial-gradient(58% 66% at 15% 2%, rgba(255, 255, 255, 0.187) 0%, rgba(255, 255, 255, 0.068) 38%, rgba(255, 255, 255, 0.017) 62%, transparent 84%),
+    radial-gradient(132% 115% at 33% -21%, rgba(255, 255, 255, 0.217) 0%, rgba(255, 255, 255, 0.089) 34%, rgba(255, 255, 255, 0.03) 57%, transparent 74%),
+    linear-gradient(158deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.061) 42%, rgba(92, 111, 172, 0.095) 100%);
+  --zg-control-fill-hover:
+    radial-gradient(135% 108% at 50% -24%, rgba(255, 255, 255, 0.315) 0%, rgba(255, 255, 255, 0.13) 38%, rgba(255, 255, 255, 0.045) 62%, transparent 78%),
+    linear-gradient(158deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.085) 46%, rgba(108, 128, 205, 0.12) 100%);
+  --zg-control-fill-active:
+    radial-gradient(140% 112% at 50% -24%, rgba(255, 255, 255, 0.36) 0%, rgba(190, 210, 255, 0.19) 40%, rgba(116, 142, 255, 0.105) 68%, transparent 82%),
+    linear-gradient(154deg, rgba(196, 214, 255, 0.22) 0%, rgba(130, 154, 255, 0.135) 52%, rgba(80, 103, 188, 0.15) 100%);
+
+  --zg-card-fill:
+    radial-gradient(56% 60% at 13% 2%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.038) 40%, rgba(255, 255, 255, 0.01) 64%, transparent 86%),
+    radial-gradient(90% 70% at 18% -5%, rgba(255, 255, 255, 0.153) 0%, rgba(255, 255, 255, 0.06) 42%, transparent 68%),
+    radial-gradient(70% 70% at 100% 0%, rgba(118, 145, 255, 0.115) 0%, transparent 62%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.089) 0%, rgba(255, 255, 255, 0.044) 56%, rgba(76, 91, 146, 0.085) 100%);
+
+  --zg-hero-fill:
+    radial-gradient(54% 56% at 12% 3%, rgba(255, 255, 255, 0.128) 0%, rgba(255, 255, 255, 0.043) 40%, rgba(255, 255, 255, 0.011) 64%, transparent 84%),
+    radial-gradient(105% 82% at 15% -12%, rgba(255, 255, 255, 0.191) 0%, rgba(255, 255, 255, 0.07) 42%, transparent 70%),
+    radial-gradient(90% 75% at 100% 10%, rgba(123, 150, 255, 0.145) 0%, transparent 66%),
+    radial-gradient(80% 72% at 50% 110%, rgba(12, 17, 32, 0.48) 0%, transparent 64%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.095) 0%, rgba(255, 255, 255, 0.044) 58%, rgba(80, 96, 160, 0.105) 100%);
+
+  --zg-sheen:
+    radial-gradient(85% 70% at 50% 0%, rgba(255, 255, 255, 0.213) 0%, rgba(255, 255, 255, 0.089) 30%, transparent 68%);
+  --zg-depth:
+    radial-gradient(100% 80% at 50% 115%, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.12) 44%, transparent 72%);
+
+  --zg-control-shadow:
+    0 9px 22px rgba(0, 0, 0, 0.235), 0 2px 6px rgba(0, 0, 0, 0.18), inset 2px 3px 7px -2px rgba(255, 255, 255, 0.595), inset 6px 10px 21px -13px rgba(255, 255, 255, 0.153), inset 0 -8px 16px -12px rgba(0, 0, 0, 0.4);
+  --zg-control-shadow-hover:
+    0 12px 28px rgba(0, 0, 0, 0.275), 0 3px 8px rgba(0, 0, 0, 0.2), inset 0 -14px 24px -20px rgba(0, 0, 0, 0.58);
+  --zg-control-shadow-pressed:
+    0 5px 14px rgba(0, 0, 0, 0.215), 0 1px 4px rgba(0, 0, 0, 0.18), inset 0 8px 16px -16px rgba(0, 0, 0, 0.85);
+  --zg-card-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.265), 0 5px 14px rgba(0, 0, 0, 0.18), inset 2px 3px 8px -2px rgba(255, 255, 255, 0.476), inset 8px 10px 25px -15px rgba(255, 255, 255, 0.11), inset 0 -14px 28px -22px rgba(0, 0, 0, 0.4);
+  --zg-hero-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.32), 0 8px 22px rgba(0, 0, 0, 0.21), inset 3px 3px 9px -3px rgba(255, 255, 255, 0.425), inset 11px 11px 30px -17px rgba(255, 255, 255, 0.11), inset 0 -20px 36px -30px rgba(0, 0, 0, 0.4);
+}
+
+/* ---------- 2. Light theme tokens ---------- */
+/* train-dia 는 라이트를 :root.light 클래스로 토글(stores/theme.ts). ZINOSB data-theme 도 함께 매칭. */
+:root.light,
+html[data-theme='light'] {
+  --zg-fg: rgba(17, 24, 39, 0.94);
+  --zg-fg-muted: rgba(51, 65, 85, 0.72);
+
+  --zg-edge: rgba(186, 202, 223, 0.6);
+  --zg-edge-strong: rgba(160, 182, 214, 0.78);
+
+  --zg-control-fill:
+    radial-gradient(130% 105% at 50% -22%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.74) 36%, rgba(255, 255, 255, 0.36) 62%, transparent 78%),
+    linear-gradient(158deg, rgba(255, 255, 255, 0.76) 0%, rgba(248, 252, 255, 0.54) 48%, rgba(215, 226, 255, 0.36) 100%);
+  --zg-control-fill-hover:
+    radial-gradient(135% 108% at 50% -24%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.82) 42%, rgba(255, 255, 255, 0.42) 66%, transparent 82%),
+    linear-gradient(158deg, rgba(255, 255, 255, 0.84) 0%, rgba(247, 251, 255, 0.62) 50%, rgba(212, 224, 255, 0.42) 100%);
+  --zg-control-fill-active:
+    radial-gradient(140% 112% at 50% -24%, rgba(255, 255, 255, 1) 0%, rgba(233, 241, 255, 0.86) 42%, rgba(188, 207, 255, 0.48) 72%, transparent 86%),
+    linear-gradient(154deg, rgba(255, 255, 255, 0.88) 0%, rgba(224, 236, 255, 0.66) 52%, rgba(187, 205, 255, 0.48) 100%);
+
+  --zg-card-fill:
+    radial-gradient(90% 70% at 18% -5%, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.62) 44%, transparent 70%),
+    radial-gradient(70% 70% at 100% 0%, rgba(180, 200, 255, 0.32) 0%, transparent 64%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.68) 0%, rgba(248, 251, 255, 0.46) 56%, rgba(218, 228, 255, 0.34) 100%);
+
+  --zg-hero-fill:
+    radial-gradient(105% 82% at 15% -12%, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.66) 42%, transparent 70%),
+    radial-gradient(90% 75% at 100% 10%, rgba(186, 205, 255, 0.38) 0%, transparent 66%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.72) 0%, rgba(248, 251, 255, 0.52) 58%, rgba(220, 230, 255, 0.38) 100%);
+
+  --zg-sheen:
+    radial-gradient(85% 70% at 50% 0%, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.38) 36%, transparent 72%);
+  --zg-depth:
+    radial-gradient(100% 80% at 50% 115%, rgba(120, 135, 170, 0.16) 0%, rgba(120, 135, 170, 0.06) 46%, transparent 76%);
+
+  --zg-control-shadow:
+    0 9px 22px rgba(80, 95, 130, 0.16), 0 2px 6px rgba(80, 95, 130, 0.08), inset 0 -14px 24px -20px rgba(90, 110, 150, 0.22);
+  --zg-control-shadow-hover:
+    0 12px 28px rgba(80, 95, 130, 0.2), 0 3px 8px rgba(80, 95, 130, 0.1), inset 0 -14px 24px -20px rgba(90, 110, 150, 0.18);
+  --zg-control-shadow-pressed:
+    0 5px 14px rgba(80, 95, 130, 0.14), 0 1px 4px rgba(80, 95, 130, 0.08), inset 0 8px 16px -16px rgba(90, 110, 150, 0.24);
+  --zg-card-shadow:
+    0 18px 44px rgba(80, 95, 130, 0.16), 0 5px 14px rgba(80, 95, 130, 0.08), inset 0 -24px 36px -30px rgba(90, 110, 150, 0.18);
+  --zg-hero-shadow:
+    0 24px 58px rgba(80, 95, 130, 0.18), 0 8px 22px rgba(80, 95, 130, 0.1), inset 0 -30px 46px -36px rgba(90, 110, 150, 0.2);
+}
+
+/* ---------- 3. Base primitive ---------- */
+.z-glass {
+  position: relative;
+  isolation: isolate;
+  color: var(--zg-fg);
+  border: var(--z-glass-hairline) solid var(--zg-edge);
+  backdrop-filter: none; /* 기본 fake glass: blur 금지 */
+  -webkit-backdrop-filter: none;
+  transform: none; /* 스크롤 드리프트 방지 */
+  will-change: auto;
+  transition:
+    background var(--z-glass-speed) ease,
+    border-color var(--z-glass-speed) ease,
+    box-shadow var(--z-glass-speed) ease,
+    filter var(--z-glass-speed) ease;
+}
+
+/* 넓고 부드러운 빛(sheen) — 얇은 1px 선이 아니라 면(面) */
+.z-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--zg-sheen);
+  opacity: 0.82;
+}
+/* 아래쪽 깊이 */
+.z-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--zg-depth);
+  opacity: 0.7;
+}
+.z-glass > :where(*) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 4. Tiers ---------- */
+.z-glass-control {
+  border-radius: var(--z-glass-radius-control);
+  background: var(--zg-control-fill);
+  box-shadow: var(--zg-control-shadow);
+}
+.z-glass-control-active,
+.z-glass-control[aria-pressed='true'],
+.z-glass-control[aria-selected='true'],
+.z-glass-control.is-active {
+  background: var(--zg-control-fill-active);
+  border-color: var(--zg-edge-strong);
+  box-shadow: 0 12px 30px rgba(92, 122, 255, 0.17), var(--zg-control-shadow-hover);
+}
+.z-glass-card {
+  border-radius: var(--z-glass-radius-card);
+  background: var(--zg-card-fill);
+  box-shadow: var(--zg-card-shadow);
+}
+.z-glass-hero {
+  border-radius: var(--z-glass-radius-hero);
+  background: var(--zg-hero-fill);
+  box-shadow: var(--zg-hero-shadow);
+}
+.z-glass-floating {
+  border-radius: var(--z-glass-radius-card);
+  background: var(--zg-card-fill);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.34), 0 6px 18px rgba(0, 0, 0, 0.2), inset 0 -24px 34px -30px rgba(0, 0, 0, 0.62);
+}
+
+/* ---------- 5. Interaction ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .z-glass-pressable:hover {
+    background: var(--zg-control-fill-hover);
+    border-color: var(--zg-edge-strong);
+    box-shadow: var(--zg-control-shadow-hover);
+  }
+  .z-glass-card.z-glass-pressable:hover,
+  .z-glass-hero.z-glass-pressable:hover {
+    border-color: var(--zg-edge-strong);
+    filter: brightness(1.035);
+  }
+}
+/* 눌림감 = transform 아니라 빛/그림자 */
+.z-glass-pressable:active {
+  background: var(--zg-control-fill);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: var(--zg-control-shadow-pressed);
+  filter: brightness(0.955);
+}
+.z-glass-pressable:focus-visible {
+  outline: 2px solid rgba(143, 171, 255, 0.8);
+  outline-offset: 3px;
+}
+
+/* ---------- 6. Safe glass mode (Android·비정수 DPR 자동) ---------- */
+html[data-safe-glass='true'] .z-glass,
+html[data-safe-glass='true'] .z-glass::before,
+html[data-safe-glass='true'] .z-glass::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+html[data-safe-glass='true'] .z-glass {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+html[data-safe-glass='true'] .z-glass-control,
+html[data-safe-glass='true'] .z-glass-control-active {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22), 0 2px 5px rgba(0, 0, 0, 0.16);
+}
+html[data-safe-glass='true'] .z-glass-card,
+html[data-safe-glass='true'] .z-glass-hero,
+html[data-safe-glass='true'] .z-glass-floating {
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24), 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+/* ---------- 7. 접근성 ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  .z-glass,
+  .z-glass::before,
+  .z-glass::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .z-glass-control,
+  .z-glass-card,
+  .z-glass-hero,
+  .z-glass-floating {
+    background: rgba(18, 23, 36, 0.92);
+  }
+  :root.light .z-glass-control,
+  :root.light .z-glass-card,
+  :root.light .z-glass-hero,
+  :root.light .z-glass-floating,
+  html[data-theme='light'] .z-glass-control,
+  html[data-theme='light'] .z-glass-card,
+  html[data-theme='light'] .z-glass-hero,
+  html[data-theme='light'] .z-glass-floating {
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
+/* (reduce-motion @media 미사용 — MOTION-RESPECT-001: 전역 §26.1이 처리) */
+
+/* =========================================================
+   Jewel Fake Glass — 핵심 액션/대표 표면용 (smoked crystal + 네온 rim)
+   팀원 설계. backdrop-filter 0 / transform 0 / 크리스프 1px선 0 (윗 하이라이트는
+   소프트 분산으로 변환 — "절대 옛 방식 금지" 반영). 넓은 ::after 네온 glow 가 주역.
+   ※ 남발 금지: 핵심 버튼·바텀네비·대표 카드에만. 스크롤 리스트엔 z-glass-control 사용.
+   ========================================================= */
+:root,
+html[data-theme='dark'] {
+  --zg-jewel-radius: 28px;
+  --zg-jewel-edge: rgba(218, 226, 255, 0.22);
+  --zg-jewel-edge-strong: rgba(244, 238, 255, 0.42);
+  --zg-jewel-text: rgba(248, 244, 255, 0.94);
+  --zg-violet: 170, 93, 255;
+  --zg-pink: 255, 116, 218;
+  --zg-cyan: 104, 219, 255;
+
+  --zg-jewel-fill:
+    radial-gradient(130% 105% at 50% -20%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.105) 32%, rgba(255, 255, 255, 0.035) 58%, transparent 78%),
+    radial-gradient(95% 90% at 100% 0%, rgba(var(--zg-cyan), 0.14) 0%, transparent 60%),
+    radial-gradient(100% 90% at 0% 100%, rgba(var(--zg-violet), 0.18) 0%, transparent 62%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.115) 0%, rgba(35, 31, 55, 0.34) 48%, rgba(12, 13, 24, 0.58) 100%);
+  --zg-jewel-fill-active:
+    radial-gradient(135% 110% at 50% -22%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.15) 34%, rgba(var(--zg-pink), 0.13) 62%, transparent 82%),
+    radial-gradient(95% 90% at 100% 0%, rgba(var(--zg-cyan), 0.22) 0%, transparent 62%),
+    radial-gradient(100% 90% at 0% 100%, rgba(var(--zg-violet), 0.28) 0%, transparent 64%),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.15) 0%, rgba(65, 43, 92, 0.38) 48%, rgba(15, 14, 30, 0.64) 100%);
+}
+
+.z-glass-jewel {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  color: var(--zg-jewel-text);
+  border-radius: var(--zg-jewel-radius);
+  border: 1px solid var(--zg-jewel-edge);
+  background: var(--zg-jewel-fill);
+  /* 소프트 윗 하이라이트(크리스프 1px선 X) + 깊이 + 외부 네온 glow */
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.36),
+    0 7px 16px rgba(0, 0, 0, 0.28),
+    0 14px 28px rgba(var(--zg-violet), 0.16),
+    0 20px 42px rgba(var(--zg-pink), 0.08),
+    inset 0 2px 4px -1px rgba(255, 255, 255, 0.32),
+    inset 0 -18px 28px -24px rgba(0, 0, 0, 0.82),
+    inset 0 0 28px rgba(var(--zg-cyan), 0.045);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: none;
+  will-change: auto;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+/* 위쪽 흰 반사광 (넓은 면, 1px선 아님) */
+.z-glass-jewel::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  left: 10%;
+  right: 10%;
+  top: 7px;
+  height: 34%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 14%, rgba(255, 255, 255, 0.2) 42%, transparent 72%);
+  opacity: 0.72;
+}
+/* 아래쪽 보라/핑크 네온 빛 (주역) */
+.z-glass-jewel::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  left: 10%;
+  right: 10%;
+  bottom: -2px;
+  height: 32%;
+  border-radius: 999px;
+  background: radial-gradient(80% 120% at 50% 100%, rgba(var(--zg-pink), 0.54) 0%, rgba(var(--zg-violet), 0.32) 38%, rgba(var(--zg-cyan), 0.15) 70%, transparent 100%);
+  opacity: 0.86;
+  filter: blur(6px);
+}
+.z-glass-jewel > * {
+  position: relative;
+  z-index: 1;
+}
+.z-glass-jewel svg {
+  filter: drop-shadow(0 0 7px rgba(var(--zg-pink), 0.34)) drop-shadow(0 0 14px rgba(var(--zg-violet), 0.18));
+}
+.z-glass-jewel.is-active,
+.z-glass-jewel[aria-pressed='true'],
+.z-glass-jewel[aria-selected='true'] {
+  background: var(--zg-jewel-fill-active);
+  border-color: var(--zg-jewel-edge-strong);
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(var(--zg-violet), 0.32),
+    0 0 34px rgba(var(--zg-pink), 0.2),
+    0 18px 38px rgba(var(--zg-violet), 0.2),
+    inset 0 2px 4px -1px rgba(255, 255, 255, 0.4),
+    inset 0 -18px 28px -24px rgba(0, 0, 0, 0.82),
+    inset 0 0 30px rgba(var(--zg-pink), 0.09);
+}
+@media (hover: hover) and (pointer: fine) {
+  .z-glass-jewel:hover {
+    border-color: var(--zg-jewel-edge-strong);
+    filter: brightness(1.05);
+  }
+}
+/* jewel 기본 눌림 = 진호 선택(Sink) 기본값. sweep 은 GlassTapSweep 가 .tap-flash 주입+발동 */
+.z-glass-jewel:active {
+  transform: translateY(2px);
+  filter: brightness(0.93);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.34),
+    inset 0 12px 20px -14px rgba(0, 0, 0, 0.95),
+    inset 0 2px 5px -1px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(var(--zg-violet), 0.16);
+}
+html[data-safe-glass='true'] .z-glass-jewel:active { transform: translateY(1px); }
+/* safe mode: glow 살짝 줄여 떨림 가능성 완화 */
+html[data-safe-glass='true'] .z-glass-jewel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+  will-change: auto !important;
+  border-color: rgba(255, 255, 255, 0.13);
+}
+html[data-safe-glass='true'] .z-glass-jewel::after {
+  opacity: 0.62;
+  filter: blur(5px);
+}
+
+/* =========================================================
+   Jewel Press 후보 (팀원 제안 5종 + 레전드 조합) — UI-GLASS-TIER-001
+   .z-glass-jewel 위에 얹는 opt-in 모디파이어. 미적용 시 0 비용.
+   쇼케이스(/dev/glass-buttons)에서 진호가 1종 선택 → 전역 표준화 예정.
+   transform 금지 원칙: 후보2(sink)만 :active 순간 translateY(1px),
+   safe-glass(S25류 비정수 DPR)에서 자동 제거.
+   ========================================================= */
+
+/* 후보1 · Soft Press Inset (팀원 1순위) — 유리 안쪽 빛이 꺼지고 아래 그림자 깊어짐 */
+.z-glass-jewel.z-press-soft:active {
+  filter: brightness(0.93) saturate(0.96);
+  border-color: rgba(255, 255, 255, 0.11);
+  box-shadow:
+    0 7px 18px rgba(0, 0, 0, 0.28),
+    0 3px 8px rgba(0, 0, 0, 0.22),
+    inset 0 10px 18px -16px rgba(0, 0, 0, 0.95),
+    inset 0 -8px 16px -16px rgba(255, 255, 255, 0.08),
+    0 0 10px rgba(var(--zg-violet), 0.13);
+}
+.z-glass-jewel.z-press-soft:active::before { opacity: 0.34; }
+.z-glass-jewel.z-press-soft:active::after { opacity: 0.45; filter: blur(4px); }
+
+/* 후보2 · Micro Sink — 진짜 눌림(살짝 더 깊게). safe-glass(S25)도 tap 순간 1px 만 허용
+   — translateY 는 transient tap 변위라 스크롤 재합성(떨림 진범)과 무관. */
+.z-glass-jewel.z-press-sink {
+  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.z-glass-jewel.z-press-sink:active {
+  transform: translateY(2px);
+  filter: brightness(0.93);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.34),
+    inset 0 12px 20px -14px rgba(0, 0, 0, 0.95),
+    inset 0 2px 5px -1px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(var(--zg-violet), 0.14);
+}
+html[data-safe-glass='true'] .z-glass-jewel.z-press-sink:active { transform: translateY(1px); }
+
+/* 후보3 · Neon Compression — 보라/핑크 네온이 눌려 퍼짐 (핵심 CTA용) */
+.z-glass-jewel.z-press-neon:active {
+  filter: brightness(0.96) saturate(1.08);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.32),
+    0 0 18px rgba(var(--zg-violet), 0.22),
+    0 0 26px rgba(var(--zg-pink), 0.13),
+    inset 0 8px 18px -18px rgba(0, 0, 0, 0.88);
+}
+.z-glass-jewel.z-press-neon:active::after { opacity: 0.95; height: 38%; bottom: -5px; filter: blur(7px); }
+.z-glass-jewel.z-press-neon:active::before { opacity: 0.42; }
+
+/* 후보4 · Glass Tap Flash — 빛이 왼→오로 쓱 지나감 (내부 .tap-flash span 1개 필요)
+   .tap-flash = 버튼 모양으로 클립하는 프레임 / ::before = 좌→우로 흐르는 광띠 */
+.tap-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.tap-flash::before {
+  content: '';
+  position: absolute;
+  top: -12%;
+  bottom: -12%;
+  left: -50%;
+  width: 48%;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0) 16%, rgba(255, 255, 255, 0.58) 50%, rgba(255, 255, 255, 0) 84%, transparent 100%);
+  opacity: 0;
+  transform: translateX(0);
+}
+/* sweep 트리거 = .z-sweeping (JS 가 pointerdown 에 1회 부여 → 탭 한 번에 끝까지 재생).
+   :active 가 아님 — 손 떼도 광띠가 좌→우 끝까지 지나감(모바일 톡 탭 대응). */
+/* 전역: .z-sweeping 가 붙은 어떤 요소든 내부 .tap-flash 가 좌→오 sweep (GlassTapSweep 가 부여/주입) */
+.z-sweeping > .tap-flash::before,
+.z-sweeping .tap-flash::before {
+  animation: z-tap-sweep 460ms ease-out;
+}
+@keyframes z-tap-sweep {
+  0% { transform: translateX(0); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translateX(360%); opacity: 0; }
+}
+
+/* =========================================================
+   전역 통일 눌림 — 모든 버튼 (2026-06-21 진호: "모든 버튼은 싹다 눌리는 느낌").
+   GlassTapSweep 가 pointerdown 에 .z-pressing 부여 → 살짝 가라앉고 어두워짐.
+   transform/filter 는 버튼 자체 :active(더 구체적)가 있으면 그쪽이 이김(충돌 0).
+   ========================================================= */
+.z-pressing {
+  transform: translateY(1px);
+  filter: brightness(0.93);
+}
+html[data-safe-glass='true'] .z-pressing {
+  transform: translateY(1px);
+}
+
+/* ⭐ 후보 2+4 합본 · Sink + Sweep (진호 선택) — 더 깊게 눌리며 빛이 왼→오로 지나감 */
+.z-glass-jewel.z-press-sink-flash {
+  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.z-glass-jewel.z-press-sink-flash:active {
+  transform: translateY(2px);
+  filter: brightness(0.93);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.34),
+    inset 0 12px 20px -14px rgba(0, 0, 0, 0.95),
+    inset 0 2px 5px -1px rgba(0, 0, 0, 0.5),
+    0 0 12px rgba(var(--zg-violet), 0.16);
+}
+html[data-safe-glass='true'] .z-glass-jewel.z-press-sink-flash:active { transform: translateY(1px); }
+
+/* 후보5 · Icon Glow Response — 아이콘이 반응 (기본 동시적용 가능) */
+.z-glass-jewel.z-press-icon:active svg,
+.z-glass-jewel.z-press-icon:active .icon {
+  filter: drop-shadow(0 0 9px rgba(var(--zg-pink), 0.48)) drop-shadow(0 0 18px rgba(var(--zg-violet), 0.26));
+  opacity: 0.96;
+}
+
+/* 레전드 조합 (soft + 약 neon + icon glow) — 팀원 최종 1픽 */
+.z-glass-jewel.z-press-legend:active {
+  filter: brightness(0.94) saturate(1.02);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 7px 18px rgba(0, 0, 0, 0.3),
+    0 3px 8px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(var(--zg-violet), 0.16),
+    inset 0 10px 18px -16px rgba(0, 0, 0, 0.96),
+    inset 0 -8px 16px -16px rgba(255, 255, 255, 0.08);
+}
+.z-glass-jewel.z-press-legend:active::before { opacity: 0.36; }
+.z-glass-jewel.z-press-legend:active::after { opacity: 0.82; height: 36%; bottom: -4px; filter: blur(6px); }
+.z-glass-jewel.z-press-legend:active svg,
+.z-glass-jewel.z-press-legend:active .icon {
+  filter: drop-shadow(0 0 8px rgba(var(--zg-pink), 0.42)) drop-shadow(0 0 16px rgba(var(--zg-violet), 0.24));
+}
+html[data-safe-glass='true'] .z-glass-jewel.z-press-legend:active { transform: none !important; will-change: auto !important; }

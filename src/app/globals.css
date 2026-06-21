@@ -1,4 +1,5 @@
 @import '../styles/tokens.css';
+@import '../styles/premium-fake-glass.css'; /* --zg-* fake glass 토큰+클래스 (ZINOSB UI-GLASS-TIER-001 이식) */
 
 /* ===== Global Reset ===== */
 *, *::before, *::after {
@@ -41,6 +42,15 @@ body::before {
   background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.04) 0%, transparent 70%);
 }
 
+/* ===== Fake glass 교리: backdrop-filter 전역 무력화 (ZINOSB UI-GLASS-TIER-001).
+   S25(Xclipse GPU)는 스크롤 중 반투명 표면 재합성으로 떨림 → 떨릴 소스(blur)를 설계에서 제거.
+   train-dia 의 모든 backdrop-filter 사용처는 이미 배경색 폴백이 있어 blur 만 사라짐(투명화 없음).
+   글래스 룩은 --zg-* fake glass fill(반투명 그라데이션)이 blur 없이 대체. ===== */
+*, *::before, *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 /* ===== 스크롤바 ===== */
 ::-webkit-scrollbar {
   width: 3px;
@@ -80,6 +90,15 @@ button {
 
 button:active:not(:disabled) {
   transform: translateY(1px) scale(0.97);
+}
+
+/* ===== 롱프레스 콜아웃/선택 차단 (ZINOSB UI-GLASS-TIER-001 — "버튼 꾹 누르면 링크/메뉴 떠서 없어보임").
+   인터랙티브 요소만 — 본문 텍스트/입력(input·textarea)은 선택·복사 통과.
+   contextmenu preventDefault 는 GlassTapSweep 가 JS 로 담당. ===== */
+a, button, [role="button"], [role="tab"], [role="menuitem"], [role="link"], nav, label, summary {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 input, textarea, select {

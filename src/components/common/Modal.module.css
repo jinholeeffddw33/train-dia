@@ -50,8 +50,10 @@
   transition: background var(--dia-transition-fast);
 }
 
+@media (hover: hover) {
 .closeBtn:hover {
   background: var(--dia-surface-hover);
+}
 }
 
 .body {

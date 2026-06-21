@@ -30,8 +30,10 @@
      ======================================== */
   --dia-bg: #0F172A;
   --dia-bg-elevated: #131B2E;
-  --dia-surface: #1E293B;
-  --dia-surface-elevated: #273549;
+  /* ZINOSB fake glass 리다이렉트 — 카드/패널 표면 = 반투명 글래스 fill (한 줄=전 화면).
+     캔버스 --dia-bg 는 솔리드 유지해 글래스가 그 위로 비침. */
+  --dia-surface: var(--zg-card-fill);
+  --dia-surface-elevated: var(--zg-card-fill);
   --dia-surface-hover: #334155;
   --dia-surface-active: #3B4A63;
 
@@ -46,8 +48,9 @@
   /* ========================================
      Border
      ======================================== */
-  --dia-border: rgba(255, 255, 255, 0.08);
-  --dia-border-strong: rgba(255, 255, 255, 0.15);
+  /* ZINOSB fake glass 리다이렉트 — 단일 저대비 소프트 edge */
+  --dia-border: var(--zg-edge);
+  --dia-border-strong: var(--zg-edge-strong);
   --dia-border-light: rgba(255, 255, 255, 0.04);
   --dia-border-dim: rgba(255, 255, 255, 0.03);
 
@@ -90,8 +93,8 @@
   --dia-shadow-glow-sky: 0 0 20px rgba(56, 189, 248, 0.2);
 
   /* Card depth & Ambient (ZINOSB-grade) */
-  --dia-card-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --dia-card-depth: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
+  --dia-card-inset: none; /* 크리스프 1px 윗림 제거 — 글래스 shadow 에 소프트 inset 내장 */
+  --dia-card-depth: var(--zg-card-shadow);
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(139, 92, 246, 0.03) 100%);
   --dia-border-glow: rgba(255, 255, 255, 0.06);
 
@@ -282,8 +285,9 @@
   --dia-green-text: #16a34a;    /* light bg 위 텍스트 (4.6:1 on white) */
   --dia-bg: #F0F4F8;
   --dia-bg-elevated: #F8FAFC;
-  --dia-surface: #FFFFFF;
-  --dia-surface-elevated: #FFFFFF;
+  /* ZINOSB fake glass 리다이렉트 (라이트 --zg-* 값 자동 적용) */
+  --dia-surface: var(--zg-card-fill);
+  --dia-surface-elevated: var(--zg-card-fill);
   --dia-surface-hover: #F1F5F9;
   --dia-surface-active: #E2E8F0;
 
@@ -292,8 +296,8 @@
   --dia-text-tertiary: #94A3B8;
   --dia-text-inverse: #F1F5F9;
 
-  --dia-border: rgba(0, 0, 0, 0.08);
-  --dia-border-strong: rgba(0, 0, 0, 0.15);
+  --dia-border: var(--zg-edge);
+  --dia-border-strong: var(--zg-edge-strong);
   --dia-border-light: rgba(0, 0, 0, 0.04);
   --dia-border-dim: rgba(0, 0, 0, 0.03);
 
@@ -308,7 +312,7 @@
 
   /* Card depth & Ambient (ZINOSB-grade) */
   --dia-card-inset: none;
-  --dia-card-depth: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --dia-card-depth: var(--zg-card-shadow);
   --dia-surface-ambient: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.02) 100%);
   --dia-border-glow: rgba(0, 0, 0, 0.06);
 

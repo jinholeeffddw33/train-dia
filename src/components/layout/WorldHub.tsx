@@ -107,6 +107,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
                 className={styles.serviceCard}
                 onClick={() => handleClick(s.id)}
                 aria-label={`${s.label} — ${s.desc}`}
+                data-press
               >
                 <span className={`${styles.serviceIcon} ${styles[s.iconClass]}`}>
                   <Icon size={22} strokeWidth={2.2} />
@@ -133,6 +134,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           className={styles.standbyCard}
           onClick={() => handleClick('standby')}
           aria-label="대기충당확인"
+          data-press
         >
           <span className={styles.standbyIcon}>
             <ClipboardCheck size={14} strokeWidth={2.4} />
@@ -147,6 +149,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           rel="noopener noreferrer"
           className={`${styles.standbyCard} ${styles.cafeCard}`}
           aria-label="네이버 카페 바로가기 (새 창)"
+          data-press
         >
           <span className={`${styles.standbyIcon} ${styles.cafeIcon}`}>
             <Coffee size={14} strokeWidth={2.4} />

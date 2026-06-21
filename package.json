@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:hover": "node scripts/check-no-raw-hover.cjs src"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",

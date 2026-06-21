@@ -102,6 +102,7 @@ export default function MoreTab() {
         type="button"
         className={styles.feedbackBanner}
         onClick={() => setFeedbackOpen(true)}
+        data-press
       >
         <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
           <MessageSquarePlus size={20} />
@@ -159,6 +160,7 @@ export default function MoreTab() {
           type="button"
           className={`${styles.toolBtn} ${styles.toolBtnHighlight}`}
           onClick={() => setCompareOpen(true)}
+          data-press
         >
           <div className={styles.settingInfo}>
             <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
@@ -171,7 +173,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setShuttleOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -185,7 +187,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setJubakOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -199,7 +201,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setShortcutsOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -213,7 +215,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setContactsOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -227,7 +229,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setSubwayOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -241,7 +243,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setCommuteOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -255,7 +257,7 @@ export default function MoreTab() {
 
         <button
           type="button"
-          className={styles.toolBtn}
+          className={styles.toolBtn} data-press
           onClick={() => setHealingOpen(true)}
         >
           <div className={styles.settingInfo}>
@@ -271,7 +273,7 @@ export default function MoreTab() {
         {!isInstalled && (canInstall || isIOS || isAndroid) && (
           <button
             type="button"
-            className={styles.toolBtn}
+            className={styles.toolBtn} data-press
             onClick={() => {
               if (canInstall) install();
               else setInstallGuideOpen(true);
@@ -461,7 +463,7 @@ export default function MoreTab() {
           <h3 className={styles.sectionTitle}>관리자</h3>
           <button
             type="button"
-            className={styles.toolBtn}
+            className={styles.toolBtn} data-press
             onClick={() => setAdminDashOpen(true)}
           >
             <div className={styles.settingInfo}>
@@ -474,7 +476,7 @@ export default function MoreTab() {
           </button>
           <button
             type="button"
-            className={styles.toolBtn}
+            className={styles.toolBtn} data-press
             onClick={() => setAdminFeedbackOpen(true)}
           >
             <div className={styles.settingInfo}>
@@ -494,7 +496,7 @@ export default function MoreTab() {
           <h3 className={styles.sectionTitle}>교육 관리</h3>
           <button
             type="button"
-            className={styles.toolBtn}
+            className={styles.toolBtn} data-press
             onClick={() => setLevelRecordsOpen(true)}
           >
             <div className={styles.settingInfo}>

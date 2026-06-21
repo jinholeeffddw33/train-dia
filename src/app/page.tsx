@@ -8,6 +8,7 @@ import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
 import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
+import WhatsNewModal from '@/components/common/WhatsNewModal';
 import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
@@ -88,6 +89,7 @@ export default function HomePage() {
         <CycleChangeModal />
         <InternWelcomeModal />
         <KimMinkyungAwardModal />
+        <WhatsNewModal />
         {world === null ? (
           <WorldHub onEnter={handleEnter} />
         ) : world === 'duty' ? (

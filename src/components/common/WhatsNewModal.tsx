@@ -89,7 +89,7 @@ export default function WhatsNewModal() {
                 <Moon size={18} strokeWidth={2.2} />
               </span>
               <div className={styles.featureText}>
-                <strong>다크 모드</strong>
+                <strong>다크 모드를 사용해 보세요</strong>
                 <span>설정에서 활성화 가능</span>
               </div>
             </li>

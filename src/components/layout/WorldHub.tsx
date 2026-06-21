@@ -107,6 +107,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
                 className={styles.serviceCard}
                 onClick={() => handleClick(s.id)}
                 aria-label={`${s.label} — ${s.desc}`}
+                data-tone={s.id}
                 data-press
               >
                 <span className={`${styles.serviceIcon} ${styles[s.iconClass]}`}>

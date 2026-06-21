@@ -36,7 +36,7 @@ export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchang
       className={styles.tabBar}
       role="tablist"
       aria-label="메인 내비게이션"
-      style={{ '--tab-idx': activeIdx, '--tab-count': TABS.length } as React.CSSProperties}
+      style={{ '--bn-i': activeIdx, '--bn-n': TABS.length } as React.CSSProperties}
     >
       {/* 슬라이딩 주얼 구슬 (네온 라임) — 활성 탭 위로 이동 */}
       <span className={styles.tabJewel} aria-hidden />

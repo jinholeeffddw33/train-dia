@@ -187,35 +187,54 @@ export const useCompareStore = create<CompareState>()(
         return persisted;
       },
       onRehydrateStorage: () => (state) => {
-        if (!state) return;
-        // 첫 실행(저장 데이터 없음): 그대로 두면 default 유지
-        // persisted 데이터 있음: groups[i]가 personIds를 가지므로 fresh Person으로 복원
-        const raw = state as unknown as { activeGroup: number; groups: (PersistedGroup | CompareGroup)[] };
-        const hydratedGroups = raw.groups.map((g): CompareGroup => {
-          if (g && typeof g === 'object' && 'personIds' in g && Array.isArray((g as PersistedGroup).personIds)) {
-            const pg = g as PersistedGroup;
+        // 어떤 단계에서도 throw하지 않도록 전체를 try/catch로 감쌈
+        // — Samsung Internet 등 오래된 단말에서 손상된 persist로 인한 화이트 화면 방지
+        try {
+          if (!state) return;
+          const raw = state as unknown as { activeGroup?: number; groups?: (PersistedGroup | CompareGroup | null | undefined)[] };
+          const groupsArr = Array.isArray(raw.groups) ? raw.groups : [];
+          const hydratedGroups: CompareGroup[] = groupsArr.map((g): CompareGroup => {
+            if (!g || typeof g !== 'object') return emptyGroup();
+            // persisted 형태 (personIds 보유)
+            if ('personIds' in g && Array.isArray((g as PersistedGroup).personIds)) {
+              const pg = g as PersistedGroup;
+              const sabuns = Array.isArray(pg.personSabuns) ? pg.personSabuns : [];
+              return {
+                memo: typeof pg.memo === 'string' ? pg.memo : '',
+                count: typeof pg.count === 'number' && pg.count >= 2 ? pg.count : 2,
+                persons: pg.personIds.map((id, i) => {
+                  try { return resolvePerson(sabuns[i] ?? null, id); } catch { return null; }
+                }),
+              };
+            }
+            // live/default 형태 — 인원 객체만 fresh로 갱신
+            const cg = g as CompareGroup;
+            const personsArr = Array.isArray(cg.persons) ? cg.persons : [null, null];
             return {
-              memo: pg.memo ?? '',
-              count: pg.count ?? 2,
-              persons: pg.personIds.map((id, i) => resolvePerson(pg.personSabuns?.[i], id)),
+              memo: typeof cg.memo === 'string' ? cg.memo : '',
+              count: typeof cg.count === 'number' && cg.count >= 2 ? cg.count : 2,
+              persons: personsArr.map((p) => {
+                try { return p ? resolvePerson(p.s, p.I) : null; } catch { return null; }
+              }),
             };
+          });
+          // 4개 미만이면 빈 그룹으로 채움
+          while (hydratedGroups.length < 4) hydratedGroups.push(emptyGroup());
+          const fixedGroups = hydratedGroups.slice(0, 4) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
+          state.groups = fixedGroups;
+          const activeIdx = typeof raw.activeGroup === 'number' && raw.activeGroup >= 0 && raw.activeGroup < 4 ? raw.activeGroup : 0;
+          const active = fixedGroups[activeIdx] ?? fixedGroups[0];
+          state.count = active.count;
+          state.persons = active.persons;
+        } catch {
+          // 복원 실패 시 default로 초기화 — 절대 화이트 화면 X
+          if (state) {
+            state.groups = [emptyGroup(), emptyGroup(), emptyGroup(), emptyGroup()];
+            state.count = 2;
+            state.persons = [null, null];
+            state.activeGroup = 0;
           }
-          // 이미 live 상태(또는 default) — 인원 객체만 fresh로 갱신
-          const cg = g as CompareGroup;
-          return {
-            memo: cg?.memo ?? '',
-            count: cg?.count ?? 2,
-            persons: (cg?.persons ?? [null, null]).map((p) => (p ? resolvePerson(p.s, p.I) : null)),
-          };
-        }) as [CompareGroup, CompareGroup, CompareGroup, CompareGroup];
-        // 4개 미만이면 빈 그룹으로 채움
-        while (hydratedGroups.length < 4) {
-          hydratedGroups.push({ memo: '', count: 2, persons: [null, null] });
         }
-        state.groups = hydratedGroups;
-        const active = hydratedGroups[raw.activeGroup] ?? hydratedGroups[0];
-        state.count = active.count;
-        state.persons = active.persons;
       },
     },
   ),

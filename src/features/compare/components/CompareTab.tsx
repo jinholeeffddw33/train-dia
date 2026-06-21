@@ -18,7 +18,17 @@ const MAX_COUNT = 20;
 const GROUP_COLORS = ['#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'] as const;
 
 export default function CompareTab() {
-  const { count, persons, year, month, setCount, setPerson, removePerson, setPersonsBatch, resetGroup, prevMonth, nextMonth, resetMonth, activeGroup, groups, setActiveGroup, setGroupMemo } = useCompareStore();
+  const store = useCompareStore();
+  // 방어적 destructure — 손상된 persist로 undefined인 경우 default fallback
+  const count = typeof store.count === 'number' ? store.count : 2;
+  const persons = Array.isArray(store.persons) ? store.persons : [null, null];
+  const year = typeof store.year === 'number' ? store.year : new Date().getFullYear();
+  const month = typeof store.month === 'number' ? store.month : new Date().getMonth() + 1;
+  const activeGroup = typeof store.activeGroup === 'number' ? store.activeGroup : 0;
+  const groups = Array.isArray(store.groups) && store.groups.length === 4
+    ? store.groups
+    : [{ memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }, { memo: '', count: 2, persons: [null, null] }] as const;
+  const { setCount, setPerson, removePerson, setPersonsBatch, resetGroup, prevMonth, nextMonth, resetMonth, setActiveGroup, setGroupMemo } = store;
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [multiSelected, setMultiSelected] = useState<Person[]>([]);
   const [searchQuery, setSearchQuery] = useState('');

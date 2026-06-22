@@ -128,15 +128,17 @@ git commit -m "..."                            # pre-commit 통과해야 함
 
 - [x] 2026-06-23 — `.claude/hooks/pre-git-stage-check.mjs` 이식(generic 복사). (ZINOSB 세션)
 - [x] 2026-06-23 — 이 명령서 작성. (ZINOSB 세션)
-- [ ] registry.json + registry.schema.json (적응)
-- [ ] scripts/ensure-hooks.mjs + install-hooks.mjs (복사)
-- [ ] .githooks/pre-commit (적응)
-- [ ] package.json check:* + install:hooks + quality-gates
-- [ ] check-surface-3d.mjs (이식)
-- [ ] check-theme-override.mjs (이식+:root.light 적응)
-- [ ] check-card-rhythm.mjs (이식)
-- [ ] docs/rules/ui/design-system.md (해당 룰 적응 작성)
-- [ ] CLAUDE.md bootstrap 섹션 + AGENTS.md 단일화
+- [x] 2026-06-23 — registry.json(v1.0.0 적응) + registry.schema.json(복사). (커밋 7e4b058)
+- [x] 2026-06-23 — scripts/ensure-hooks.mjs + install-hooks.mjs(복사) + core.hooksPath=.githooks 설치.
+- [x] 2026-06-23 — .githooks/pre-commit(적응: hover+surface-3d:staged+theme-override:staged+card-rhythm:staged). ★실제 commit 시 작동 확인.
+- [x] 2026-06-23 — package.json check:* + install:hooks + check:quality-gates(:full) 배선.
+- [x] 2026-06-23 — check-surface-3d.mjs(이식, 경로 src/). 레거시 5건 검출(변경 라인만이라 무해).
+- [x] 2026-06-23 — check-theme-override.mjs(이식 + :root.light 클래스 스코프 적응). 위반 0.
+- [x] 2026-06-23 — check-card-rhythm.mjs(이식, --dia-space-3/6 권장). WARN 8건.
+- [x] 2026-06-23 — docs/rules/ui/design-system.md(4개 가드 룰 적응 작성).
+- [x] 2026-06-23 — CLAUDE.md bootstrap(RULE PREFLIGHT + 참조표) 섹션 추가.
+- [ ] AGENTS.md 단일화(CLAUDE.md 중복 제거 — 미처리, 후속)
 - [ ] (보류) bleed / sheet-handle / double-padding — train-dia 게터·시트 SSOT 도입 후
-- [ ] ai-rule-guard.mjs (최대 난제, 마지막)
-- [ ] check:docs 용 docs-validate(경량) 이식
+- [ ] ai-rule-guard.mjs (최대 난제 — F1 inline/F2 as any/F4 typo/F8 hover 등, 후속)
+- [ ] check:docs 용 docs-validate(경량) 이식 — registry 무결성 검사용 (후속)
+- [ ] ★ .claude/settings.json 에 pre-git-stage-check 를 PreToolUse 훅으로 등록(현재 파일만 존재, 다른 train-dia 세션에서 발동하려면 등록 필요)

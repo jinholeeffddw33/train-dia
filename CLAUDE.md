@@ -1,11 +1,22 @@
-# Train-DIA UI/UX 규칙 (v3.0)
+# Train-DIA UI/UX 규칙 (v3.1 — ZINOSB registry 시스템 이식 2026-06-23)
 > 기관사 근무표 앱 — **50-60대 사용자 대상**, 모바일 퍼스트, 다크 퍼스트
-> 이 문서는 **UI/UX 디자인 규칙만** 포함하며, 매 대화에서 자동으로 읽힌다.
+> 이 문서는 **UI/UX 디자인 규칙**을 담고, 이제 **룰 registry 의 bootstrap** 역할도 한다.
+
+## 🚨 RULE PREFLIGHT — 모든 Edit/Write 전 (ZINOSB 이식)
+1. **registry 읽기**: `docs/rules/registry.json` (도메인/파일패턴→mustRead/룰 매핑 SSOT).
+2. 작업이 건드릴 파일 경로 → `domains.*.filePatterns` 매칭 → `mustRead` Read.
+3. 코드 수정 후 검증: `npm run check:quality-gates` (hooks·hover·surface-3d·theme-override·card-rhythm 변경 라인).
+4. **commit 게이트(QG-HOOK-001)**: `npm run check:hooks` 통과 필수 — 비활성 시 `npm run install:hooks` 먼저. `--no-verify` 금지.
+5. **git stage(GIT-SCOPE-001)**: `git add -A`/`.`/`commit -a` 금지 — 내가 만진 파일만 명시 stage.
+> 자동 가드/룰 본문: [docs/rules/ui/design-system.md](docs/rules/ui/design-system.md) · 이식 전체 명세·진행: [docs/ZINOSB_SYSTEM_PORT.md](docs/ZINOSB_SYSTEM_PORT.md). 아래 §1~ 의 UI 산문 규칙은 유지(가드로 승격된 건 design-system.md 가 SSOT).
 
 ### 참조 문서
 | 문서 | 역할 |
 |------|------|
-| **이 파일 (CLAUDE.md)** | UI/UX 디자인 규칙 — 매 대화 자동 참조 |
+| **이 파일 (CLAUDE.md)** | UI/UX 규칙 + registry bootstrap — 매 대화 자동 참조 |
+| **[docs/rules/registry.json](docs/rules/registry.json)** | 룰 registry SSOT (도메인·룰ID·가드 매핑) |
+| **[docs/rules/ui/design-system.md](docs/rules/ui/design-system.md)** | 가드 룰 본문(surface-3d/theme-override/card-rhythm/hover) |
+| **[docs/ZINOSB_SYSTEM_PORT.md](docs/ZINOSB_SYSTEM_PORT.md)** | ZINOSB 시스템 이식 명세·진행 로그(다른 세션용 명령 포함) |
 | **[docs/DESIGN_AUDIT.md](docs/DESIGN_AUDIT.md)** | 다크/라이트 감사, 대비, 크로스 브라우저 |
 | **[docs/PARTNER_MATCHING.md](docs/PARTNER_MATCHING.md)** | 교대자 매칭 알고리즘 |
 | **[docs/DOMAIN_RULES.md](docs/DOMAIN_RULES.md)** | 열차번호/행로/교대자/스케줄/데이터 규칙 |

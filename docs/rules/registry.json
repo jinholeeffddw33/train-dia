@@ -1,0 +1,133 @@
+{
+  "$schema": "./registry.schema.json",
+  "version": "1.0.0",
+  "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
+  "lastUpdated": "2026-06-23",
+  "verificationCommands": {
+    "preCommit": "npm run check:quality-gates",
+    "hooks": "npm run check:hooks",
+    "typecheck": "npm run typecheck"
+  },
+  "domains": {
+    "ui": {
+      "description": "UI 컴포넌트/CSS/디자인 — 50~60대 기관사 대상 다크-퍼스트",
+      "mustRead": [
+        "docs/rules/ui/design-system.md",
+        "CLAUDE.md"
+      ],
+      "filePatterns": [
+        "src/**/*.tsx",
+        "src/**/*.module.css",
+        "src/components/**/*.tsx"
+      ],
+      "verification": ["check:surface-3d:changed", "check:theme-override:changed", "check:hover"]
+    },
+    "design-system": {
+      "description": "토큰 SSOT(--dia-*, 이식된 --z-* 버튼4법/글래스), 색상, 간격, 폰트",
+      "mustRead": [
+        "docs/rules/ui/design-system.md",
+        "src/styles/tokens.css"
+      ],
+      "filePatterns": [
+        "src/**/*.module.css",
+        "src/styles/**/*.css"
+      ],
+      "verification": ["check:surface-3d:changed", "check:card-rhythm:changed"]
+    },
+    "mobile-integrity": {
+      "description": "모바일 무결성 — 320~430 폭, safe-area, 터치 44px, 다크/라이트 양면",
+      "mustRead": [
+        "CLAUDE.md",
+        "docs/DESIGN_AUDIT.md"
+      ],
+      "filePatterns": [
+        "src/**/*.tsx",
+        "src/**/*.module.css"
+      ],
+      "verification": ["check:hover"]
+    },
+    "quality": {
+      "description": "테스트/검증/quality gate/hook",
+      "mustRead": [
+        "docs/ZINOSB_SYSTEM_PORT.md"
+      ],
+      "filePatterns": [
+        "scripts/check-*.mjs",
+        "scripts/check-*.cjs",
+        ".githooks/**"
+      ],
+      "verification": ["check:hooks", "check:quality-gates"]
+    },
+    "domain-data": {
+      "description": "열차번호/행로/교번/교대자/스케줄 — train 도메인 데이터 규칙",
+      "mustRead": [
+        "docs/DOMAIN_RULES.md",
+        "docs/PROCESS_RULES.md"
+      ],
+      "filePatterns": [
+        "src/features/**/*.ts*",
+        "scripts/*.js",
+        "supabase/migrations/**/*.sql"
+      ],
+      "verification": []
+    }
+  },
+  "ruleIds": {
+    "UI-SURFACE-3D-001": {
+      "description": "칩/버튼/카드/세그먼트는 입체 표면 — 평면 단색 채움(AP2)·테두리만 색칠한 hollow outline(AP1) 금지. 다크=리퀴드 글래스(raised), 라이트=클린 뉴모피즘. 정답=--z-card-fill/--z-seg-*/--z-3d-* 또는 .z-glass-surface/.z-segment(ZINOSB 버튼4법 이식됨). 변경 라인만 fail, SURFACE-EXCEPTION 면제.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.module.css"],
+      "exceptions": ["클래스 직전 줄 /* SURFACE-EXCEPTION: 사유 */", "읽기전용 배지/점/바/구분선/토글 손잡이", "기존 평면 칩 점진 마이그레이션(변경 전까지 통과)"],
+      "autoCheck": "scripts/check-surface-3d.mjs (check:surface-3d)",
+      "severity": "fail"
+    },
+    "CSS-THEME-OVERRIDE-001": {
+      "description": "테마 오버라이드는 background-color 로 다크 gradient/이미지를 못 지운다. 베이스가 background:(shorthand)/background-image: 로 gradient/url 을 깔았으면 반대 테마(:root.light / [data-theme=light]) 오버라이드도 background:(shorthand) 로 이미지째 교체하거나 테마 토큰 사용. 변경 라인만 FAIL, THEME-EXCEPTION 면제.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.module.css", "src/app/globals.css"],
+      "exceptions": ["레거시(변경 전까지 보호)", "규칙 직전 줄 /* THEME-EXCEPTION: 사유 */"],
+      "autoCheck": "scripts/check-theme-override.mjs (check:theme-override)",
+      "severity": "fail"
+    },
+    "UI-RHYTHM-001": {
+      "description": "카드/섹션 리듬 토큰 권장(WARN) — 카드 리스트/그리드 컨테이너 gap 은 var(--dia-space-3)(12, 카드)/var(--dia-space-6)(24, 섹션) 또는 --dia-space-* 스케일. 1~3px 타이트 그리드 제외. 변경 라인만, RHYTHM-EXCEPTION 면제.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.module.css"],
+      "exceptions": ["1~3px 타이트 그리드", "컨테이너 이름 아님", "규칙 직전 줄 /* RHYTHM-EXCEPTION: 사유 */"],
+      "autoCheck": "scripts/check-card-rhythm.mjs (check:card-rhythm)",
+      "severity": "warn"
+    },
+    "CSS-HOVER-001": {
+      "description": "터치 우선 앱 — raw :hover 금지. :hover 는 @media (hover: hover) 로 감싸거나 제거(터치 sticky hover 방지). 자동 변환 scripts/wrap-hover-media.cjs.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.css", "src/**/*.module.css"],
+      "exceptions": ["@media (hover: hover) 가드 내부", "premium-fake-glass.css(이미 가드됨)"],
+      "autoCheck": "scripts/check-no-raw-hover.cjs (check:hover)",
+      "severity": "fail"
+    },
+    "GIT-SCOPE-001": {
+      "description": "광역 git stage 금지 — git add -A/--all/./:/, git commit -a/--all. 다중 대화창 환경에서 다른 세션의 미커밋 변경이 묻히는 사고 방지. 명시적 경로만 stage.",
+      "canonical": "docs/ZINOSB_SYSTEM_PORT.md",
+      "scope": ["Bash", "PowerShell"],
+      "exceptions": ["진호 명시 승인 — 명령 끝에 ' # GIT-SCOPE-OVERRIDE'"],
+      "autoCheck": ".claude/hooks/pre-git-stage-check.mjs (PreToolUse) — ★ .claude/settings.json 에 PreToolUse 훅으로 등록 필요",
+      "severity": "fail"
+    },
+    "QG-HOOK-001": {
+      "description": "pre-commit hook 의무 — core.hooksPath=.githooks 활성 + --no-verify 금지. 비활성 시 commit 금지 → npm run install:hooks 먼저.",
+      "canonical": "docs/ZINOSB_SYSTEM_PORT.md",
+      "scope": [".githooks/**", "scripts/install-hooks.mjs", "scripts/ensure-hooks.mjs"],
+      "exceptions": ["진호가 명시적으로 임시 우회를 승인한 경우만"],
+      "autoCheck": "scripts/ensure-hooks.mjs (check:hooks)",
+      "severity": "fail"
+    }
+  },
+  "decisionQueue": {
+    "path": "docs/ZINOSB_SYSTEM_PORT.md",
+    "description": "이식 진행/보류 항목은 ZINOSB_SYSTEM_PORT.md §진행 로그 참조 (bleed/sheet-handle/double-padding/ai-rule-guard 보류)."
+  },
+  "tooling": {
+    "ci": "GitHub Actions 에서 check:quality-gates 권장",
+    "editor": "AI는 매 작업 전 이 registry를 Read"
+  }
+}

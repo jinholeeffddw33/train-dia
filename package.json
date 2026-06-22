@@ -11,7 +11,20 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "next lint",
-    "check:hover": "node scripts/check-no-raw-hover.cjs src"
+    "check:hover": "node scripts/check-no-raw-hover.cjs src",
+    "check:surface-3d": "node scripts/check-surface-3d.mjs",
+    "check:surface-3d:staged": "node scripts/check-surface-3d.mjs --staged",
+    "check:surface-3d:changed": "node scripts/check-surface-3d.mjs --changed",
+    "check:theme-override": "node scripts/check-theme-override.mjs",
+    "check:theme-override:staged": "node scripts/check-theme-override.mjs --staged",
+    "check:theme-override:changed": "node scripts/check-theme-override.mjs --changed",
+    "check:card-rhythm": "node scripts/check-card-rhythm.mjs",
+    "check:card-rhythm:staged": "node scripts/check-card-rhythm.mjs --staged",
+    "check:card-rhythm:changed": "node scripts/check-card-rhythm.mjs --changed",
+    "check:hooks": "node scripts/ensure-hooks.mjs",
+    "install:hooks": "node scripts/install-hooks.mjs",
+    "check:quality-gates": "npm run check:hooks && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed",
+    "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",

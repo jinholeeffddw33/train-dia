@@ -1,0 +1,55 @@
+#!/usr/bin/env sh
+# ----------------------------------------------------------------------------
+# train-dia pre-commit — MANDATORY 게이트 (ZINOSB 시스템 이식 2026-06-23)
+#
+# 빠른 검사만 (변경/스테이지 라인 위주 → 레거시 마비 방지):
+#   - check:hover            (CSS-HOVER-001 — raw :hover 금지, 전체 src · 현재 클린)
+#   - check:surface-3d:staged(UI-SURFACE-3D-001 — 평면 단색칩/테두리만 버튼 금지)
+#   - check:theme-override:staged (CSS-THEME-OVERRIDE-001 — 라이트가 다크 gradient 못지움)
+#   - check:card-rhythm:staged    (UI-RHYTHM-001 — 카드 gap 토큰 권장, WARN)
+#
+# 제외 (느림 → check:quality-gates:full 또는 CI): typecheck / lint / test
+#
+# 활성화:   npm run install:hooks (한 번)
+# 상태확인: npm run check:hooks
+# 우회금지: git commit --no-verify  (QG-HOOK-001 위반)
+# 명세: docs/ZINOSB_SYSTEM_PORT.md
+# ----------------------------------------------------------------------------
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "[pre-commit] check:hover"
+npm run --silent check:hover || {
+  echo ""
+  echo "❌ pre-commit blocked: raw :hover (CSS-HOVER-001)."
+  echo "   터치 기기 sticky hover 방지 — @media (hover: hover) 로 감싸라."
+  echo "   자동 변환: node scripts/wrap-hover-media.cjs <file>"
+  exit 1
+}
+
+echo "[pre-commit] check:surface-3d (staged — 변경 라인만)"
+npm run --silent check:surface-3d:staged || {
+  echo ""
+  echo "❌ pre-commit blocked: 칩/버튼 표면 안티패턴 (UI-SURFACE-3D-001)."
+  echo "   평면 단색칩 / 테두리만 색칠한 버튼 금지. 3D 표면(--z-card-fill/--z-seg-*/--z-3d-*) 사용."
+  echo "   의도된 예외는 클래스 직전 줄 /* SURFACE-EXCEPTION: 사유 */."
+  exit 1
+}
+
+echo "[pre-commit] check:theme-override (staged — 변경 라인만)"
+npm run --silent check:theme-override:staged || {
+  echo ""
+  echo "❌ pre-commit blocked: 테마 오버라이드가 다크 이미지를 못 지움 (CSS-THEME-OVERRIDE-001)."
+  echo "   background-color 는 background-image(gradient)를 못 지운다 → 라이트인데 시커멓게."
+  echo "   해법: 오버라이드를 background:(shorthand) 풀세팅 또는 테마 토큰 사용."
+  echo "   의도된 예외는 규칙 직전 줄 /* THEME-EXCEPTION: 사유 */."
+  exit 1
+}
+
+# WARN 전용 (빌드 안 막음 — 리듬 토큰 넛지). 가드 버그가 commit 막지 않게 || true.
+echo "[pre-commit] check:card-rhythm (staged · WARN)"
+npm run --silent check:card-rhythm:staged || true
+
+echo "✅ pre-commit passed."

@@ -1,0 +1,142 @@
+# train-dia ← ZINOSB 룰/문서/훅/가드 시스템 이식 명령서
+
+> **목적**: zinosb-marketplace 에서 2026-06 구축한 "룰 registry + 자동 가드 + pre-commit 훅 + 디자인 시스템 문서" 인프라를 **train-dia 에 그대로 이식**한다. train-dia 의 *ad-hoc 룰 접근(CLAUDE.md 산문만)* 은 이 registry 기반 시스템으로 **supersede**(대체) 한다.
+> **★ 무조건 복사 아님 — 적응 이식**: train-dia 는 토큰이 `--dia-*`(일부 `--z-*` 별칭 이식됨), 소스가 `src/`(monorepo 아님), 테마가 `:root.light` 클래스 + `html[data-theme]` 둘 다, **페이지 게터/BottomSheetShell 없음**. zinosb 는 `apps/web/app/`, `--z-*`, `[data-theme]`, `#main-content` 게터. → 경로/토큰/테마 스코프를 train-dia 에 맞게 바꿔야 한다.
+> **두 repo 같은 PC**: 원본 = `C:\Users\smrt2\zinosb-marketplace`, 대상 = `C:\Users\smrt2\train-dia`.
+
+작성: 2026-06-23 (ZINOSB 세션이 train-dia 용으로 발주). 진행 상태는 맨 아래 §진행 로그 갱신.
+
+---
+
+## 0) 복붙용 세션 명령 (다른 세션에 그대로 주면 됨)
+
+```
+train-dia 프로젝트(C:\Users\smrt2\train-dia)에 ZINOSB 의 룰/가드/훅/문서 시스템을 이식한다.
+명세는 docs/ZINOSB_SYSTEM_PORT.md 에 전부 있다. 그걸 먼저 Read 하고 §진행 로그에서
+다음 미완 항목을 골라 실행해라. 원본 시스템은 C:\Users\smrt2\zinosb-marketplace 에 있다.
+
+핵심 원칙:
+- 무조건 복사 금지 — train-dia 는 --dia-*/일부 --z-* 토큰, src/ 경로, :root.light + data-theme
+  테마, 페이지게터/BottomSheetShell 없음. §3 차이표대로 경로·토큰·테마 스코프를 적응시켜라.
+- 가드는 전부 "변경 라인만(--staged/--changed)" 모드라 레거시는 안 건드린다. 새 코드만 강제.
+- train-dia 앱 코드/CSS 는 건드리지 말 것. 이식은 *인프라 파일 추가/문서*만 (가드가 깨도 앱 안 깨짐).
+- git: 광역 stage 금지(이미 이식된 .claude/hooks/pre-git-stage-check.mjs 가 막음). 내가 만든 파일만 add.
+- 각 항목 끝나면 §진행 로그에 [x] + 커밋 해시 기록. 검증(§7) 통과 후 커밋.
+- 모르면 추측 말고 원본 파일을 Read 해서 패턴을 그대로 따와라.
+```
+
+---
+
+## 1) 한눈 상태표
+
+| 영역 | zinosb 원본 | train-dia 상태 | 이식 액션 |
+|---|---|---|---|
+| git-scope 훅 | `.claude/hooks/pre-git-stage-check.mjs` | ✅ **이식 완료(2026-06-23)** | 완료 |
+| 이식 명령서(이 문서) | — | ✅ **작성 완료** | 완료 |
+| 룰 registry | `docs/rules/registry.json`(+schema) | ❌ 없음 | **신규 적응 작성** |
+| pre-commit 훅 | `.githooks/pre-commit` | ❌ 없음 | **신규(train-dia 스크립트로)** |
+| 훅 설치/검사 | `scripts/{install-hooks,ensure-hooks}.mjs` | ❌ 없음 | **복사(거의 generic)** |
+| package.json check:* | 다수 | `check:hover` 1개만 | **check:* + install:hooks + quality-gates 추가** |
+| 디자인시스템 문서 | `docs/rules/ui/design-system.md` | ❌ (CLAUDE.md 산문만) | **적응 작성(해당 룰만)** |
+| CLAUDE.md | registry bootstrap | UI/UX 산문 345줄 | **bootstrap 섹션 추가 + registry 링크** |
+| hover 가드 | ai-rule-guard F8 | ✅ `scripts/check-no-raw-hover.cjs` 존재 | **유지**(동등) — registry 에 등록만 |
+| surface-3d 가드 | `scripts/check-surface-3d.mjs` | ❌ | **이식(경로 src/, 토큰 --z-* 이미 있음)** |
+| theme-override 가드 | `scripts/check-theme-override.mjs` | ❌ | **이식+적응(:root.light 스코프 추가)** |
+| card-rhythm 가드 | `scripts/check-card-rhythm.mjs` | ❌ | **이식(경로 src/, 토큰 확인)** |
+| bleed 가드 | `scripts/check-bleed.mjs` | ❌ | **보류** — train-dia 에 페이지게터(--z-page-pad/#main-content) 없음. 게터 도입 시 이식 |
+| sheet-handle 가드 | `scripts/check-sheet-handle.mjs` | ❌ | **보류** — train-dia 에 BottomSheetShell 없음. 시트 SSOT 도입 시 이식 |
+| double-padding 가드 | `scripts/check-double-padding.mjs` | ❌ | **보류/적응** — train-dia 레이아웃(AppShell)이 #main-content 게터와 다름. 구조 확인 후 |
+| ai-rule-guard(다중 P0) | `scripts/ai-rule-guard.mjs` | ❌ | **이식+적응(F1 inline/F2 as any/F4 typo/F8 hover…, 경로 src/)** — 가장 큼, 마지막 |
+| ADR | `docs/architecture/adr/` | ❌ | (선택) 큰 결정 생기면 |
+
+---
+
+## 2) train-dia 토큰/구조 사실 (이식 시 기준)
+
+- **간격**: `--dia-space-0..16` (4px 그리드, zinosb `--z-space-*` 와 값 동일). `--z-space-3: var(--dia-space-3)` 같은 별칭 일부 존재.
+- **버튼 4법 + 글래스**: `--z-seg-*` / `--z-card-fill` / `--z-3d-*` / `--z-accent`(네온 라임) / `--zg-*` **이미 이식됨**(tokens.css + premium-fake-glass.css, 153곳). → surface-3d 가드는 토큰이 이미 있어 거의 그대로 작동.
+- **테마**: 라이트 = `:root.light` **클래스**(stores/theme.ts 토글) + `html[data-theme='light']` **둘 다** 매칭(premium-fake-glass 가 그렇게 작성됨). 다크 = 기본 + `html[data-theme='dark']`.
+- **페이지 게터 없음**: zinosb 의 `#main-content { padding-inline: var(--z-page-pad) }` + `.z-bleed` 풀블리드 SSOT 가 train-dia 엔 없음 → **bleed 가드/UI-BLEED-001 보류**.
+- **시트 SSOT 없음**: BottomSheetShell 없음 → **sheet-handle 가드/UI-SHEET-003 보류**.
+- **소스 루트**: `src/` (app/, features/, components/, styles/, stores/, hooks/, lib/). CSS Modules.
+- **package.json scripts(현재)**: dev/build/start/test/test:watch/typecheck/lint/check:hover.
+- **타깃 사용자**: 50~60대 기관사 → 폰트 하한이 zinosb(13px)보다 **클 수 있음**(train-dia CLAUDE.md 확인: 14px 최소, 13px 메타 예외). typo 룰은 train-dia 값으로.
+
+---
+
+## 3) zinosb ↔ train-dia 적응 치환표 (가드/문서 이식 시 일괄 적용)
+
+| zinosb | → train-dia |
+|---|---|
+| 경로 `apps/web/app/**` | `src/**` |
+| `REPO_ROOT = path.resolve(__dirname,'../../..')` (monorepo) | `path.resolve(__dirname,'..')` (단일앱, scripts/ 가 루트 바로 아래) |
+| `f.startsWith('apps/web/app/')` 필터 | `f.startsWith('src/')` |
+| `WEB_APP = .../apps/web/app` | `SRC = .../src` |
+| 테마 스코프 `[data-theme="light"]` 만 | `:root.light` **또는** `[data-theme="light"]` 둘 다 |
+| `--z-page-pad` | (없음 — bleed 보류) |
+| `--z-space-4` | `--dia-space-4`(또는 `--z-space-*` 별칭) |
+| `--z-card-gap`/`--z-section-gap` | train-dia 에 없으면 `--dia-space-3`/`--dia-space-6` 또는 새 별칭 정의 |
+| `check:* = node scripts/check-x.mjs` (cwd apps/web) | `node scripts/check-x.mjs` (cwd train-dia 루트) |
+| `node ../../scripts/ensure-hooks.mjs` | `node scripts/ensure-hooks.mjs` |
+
+---
+
+## 4) 가드별 이식 상세
+
+> 모든 가드는 zinosb 원본을 Read → §3 치환 적용 → train-dia `scripts/` 에 저장 → package.json 에 `check:x`/`:staged`/`:changed` 등록 → pre-commit + quality-gates 배선. **전부 "변경 라인만" 모드(레거시 보호)**.
+
+1. **check-surface-3d** (`scripts/check-surface-3d.mjs`): 가장 쉬움. train-dia 에 `--z-card-fill/--z-seg-*` 이미 존재. 경로만 `src/` 로. UI-SURFACE-3D-001 룰. 평면 단색칩/테두리만 버튼 차단.
+2. **check-theme-override** (`scripts/check-theme-override.mjs`): `themeScope()` 함수에 **`:root.light` 클래스** 매칭 추가(현재 `[data-theme=light]`만). train-dia 가 다크 베이스 + `:root.light` 오버라이드라 그대로 들어맞음. CSS-THEME-OVERRIDE-001.
+3. **check-card-rhythm** (`scripts/check-card-rhythm.mjs`): 경로 `src/`. gap 권장 토큰을 train-dia `--dia-space-3`(카드)/`--dia-space-6`(섹션) 또는 `--z-card-gap` 별칭 정의 후로. UI-RHYTHM-001(WARN).
+4. **check-no-raw-hover** (이미 있음, `scripts/check-no-raw-hover.cjs`): **유지**. registry 에 CSS-HOVER-001 로 등록만. pre-commit 에 `check:hover` 추가.
+5. **ai-rule-guard** (`scripts/ai-rule-guard.mjs`): 마지막. F1 inline style/F2 as any/F4 typo(≥train-dia 하한)/F8 hover 등 다중 P0. 경로 `src/`, 토큰명 치환, train-dia 폰트 하한 반영. **가장 크므로 신중**.
+6. **bleed / sheet-handle / double-padding**: §1 사유로 **보류**. train-dia 가 페이지게터·BottomSheetShell·#main-content 패턴을 도입하면 그때 이식.
+
+---
+
+## 5) registry.json (신규 적응 작성)
+
+- 원본 `docs/rules/registry.json`(v2.8.0) 구조를 따르되 train-dia 용으로:
+  - `domains`: train-dia 도메인(ui / mobile-integrity / design-system / quality / feature 별 — home/calendar/duty/line5/edu/life/safety 등) + `filePatterns` 를 `src/**` 로.
+  - `ruleIds`: train-dia 에 실제 가드/문서가 있는 룰만 등록 — UI-SURFACE-3D-001 / CSS-THEME-OVERRIDE-001 / UI-RHYTHM-001 / CSS-HOVER-001 / UI-TYPO-* / TS-ANY-001 / CSS-INLINE-001 / GIT-SCOPE-001 / QG-HOOK-001 / MOTION-RESPECT-001 등. **bleed/sheet 룰은 보류라 미등록**.
+  - `canonical` 경로 = `docs/rules/ui/design-system.md` 등 train-dia 실제 파일.
+- `registry.schema.json` 은 원본 복사(generic JSON schema).
+- 검증: train-dia 에도 `docs-validate.mjs`(zinosb `scripts/docs-validate.mjs`) 를 이식해야 `check:docs` 가 registry 무결성 검사. 또는 최소한 JSON parse + 링크 존재만 확인하는 경량 버전.
+
+## 6) CLAUDE.md / pre-commit / package.json / 폐기
+
+- **CLAUDE.md**: 현재 UI/UX 산문은 **유지하되**, 최상단에 "registry bootstrap" 섹션 추가 — "작업 전 docs/rules/registry.json Read → 도메인 매칭 → mustRead → Rule Read Receipt" + pre-commit 의무(QG-HOOK-001). zinosb CLAUDE.md §MANDATORY RULE PREFLIGHT 를 train-dia 에 맞게 축약 이식. **AGENTS.md 는 CLAUDE.md 와 중복 → CLAUDE.md 로 단일화하고 AGENTS.md 는 심볼릭/포인터만**.
+- **.githooks/pre-commit**: zinosb 원본을 train-dia 스크립트로: `check:hover`(있음) + 이식한 `check:surface-3d:staged`/`check:theme-override:staged`/`check:card-rhythm:staged`(warn) + `typecheck`(선택). `core.hooksPath=.githooks` 필수.
+- **scripts/ensure-hooks.mjs + install-hooks.mjs**: zinosb 원본 복사(generic). `check:hooks` = `node scripts/ensure-hooks.mjs`.
+- **package.json**: `check:surface-3d(+:staged/:changed)`, `check:theme-override(...)`, `check:card-rhythm(...)`, `check:hooks`, `install:hooks`, `check:quality-gates`(= hooks && hover && surface-3d:changed && theme-override:changed && card-rhythm:changed && typecheck) 추가.
+- **폐기(supersede) 대상 — 신중**: train-dia 의 *도메인 지식 문서*(DOMAIN_RULES.md/PARTNER_MATCHING.md/PROCESS_RULES.md/ARCHITECTURE.md/DESIGN_AUDIT.md)는 **삭제 금지**(귀중한 train 도메인 지식). "폐기"는 **ad-hoc 룰 강제 방식**(가드 없이 산문에만 의존)을 registry+가드 시스템으로 대체한다는 의미. 산문 룰 중 가드로 승격된 건 design-system.md 로 옮기고 원본엔 포인터만 남긴다. **어떤 파일이든 지우기 전 진호 확인**.
+
+## 7) 검증 절차 (각 항목 커밋 전)
+
+```
+cd C:\Users\smrt2\train-dia
+node scripts/check-<that-guard>.mjs            # 전체 스캔 — 오발동 0/합리적 분포 확인
+node scripts/check-<that-guard>.mjs --changed  # 작업 트리 — 새로 깬 거 0 확인
+npm run typecheck                              # tsc 0
+npm run check:hooks                            # core.hooksPath=.githooks 활성
+git add <만든 파일들만>                          # 광역 stage 금지(훅이 막음)
+git commit -m "..."                            # pre-commit 통과해야 함
+```
+- ★ PowerShell 커밋 함정(zinosb 경험): here-string 본문이 가끔 git 에 pathspec 으로 오인 + git-scope 훅이 `| Select-Object -Last` 의 `-Last` 를 commit 세그먼트 안 `-a` 클러스터로 오탐(단일 `|` 미분리). → **`git commit -F .git/임시.txt` (파이프 없이)** 가 안전.
+
+## 8) 진행 로그 (실행 세션이 갱신)
+
+- [x] 2026-06-23 — `.claude/hooks/pre-git-stage-check.mjs` 이식(generic 복사). (ZINOSB 세션)
+- [x] 2026-06-23 — 이 명령서 작성. (ZINOSB 세션)
+- [ ] registry.json + registry.schema.json (적응)
+- [ ] scripts/ensure-hooks.mjs + install-hooks.mjs (복사)
+- [ ] .githooks/pre-commit (적응)
+- [ ] package.json check:* + install:hooks + quality-gates
+- [ ] check-surface-3d.mjs (이식)
+- [ ] check-theme-override.mjs (이식+:root.light 적응)
+- [ ] check-card-rhythm.mjs (이식)
+- [ ] docs/rules/ui/design-system.md (해당 룰 적응 작성)
+- [ ] CLAUDE.md bootstrap 섹션 + AGENTS.md 단일화
+- [ ] (보류) bleed / sheet-handle / double-padding — train-dia 게터·시트 SSOT 도입 후
+- [ ] ai-rule-guard.mjs (최대 난제, 마지막)
+- [ ] check:docs 용 docs-validate(경량) 이식

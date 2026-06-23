@@ -169,5 +169,5 @@ git commit -m "..."                            # pre-commit 통과해야 함
 - [x] **home 헤더** — `.headerSection` sticky + `z-app-header`(transform-hide). ★dev 라이브 검증: 스크롤다운 시 헤더 translateY(-117px) 상승 + TabBar translateY(하강) 동시 = 작동 확인. 자체 gradient bg+노치라 frost 불요.
 - [x] **TabBar 바텀 숨김** — dev 라이브 검증(translateY 하강).
 - [x] **more(설정) 헤더** — `.pageTitle` full-width frost sticky(margin-inline 음수 상쇄 + padding-inline 재정렬 + --sat). `.z-app-header-frost` 에서 padding-top 제거(헤더별 노치 자체처리). tsc0/게이트0. ★브라우저 탭 about:blank 플레이크로 시각 최종확인은 진호 폰 권장.
-- [ ] line(.header)·exchange(.pageTitle)·calendar(.nav) — more 와 동일 full-width-frost 패턴. 단 exchange/calendar 는 컨테이너에 safe-area-top 있음 → 헤더로 옮기고 컨테이너 것 제거(이중 노치 방지). 각 dev 시각검증 필요.
-- [ ] duty — 헤더 요소 없음(배너만). 필요 시 타이틀 헤더 추가.
+- [x] **line(.header)·exchange(.pageTitle)·calendar(.nav)** — more 와 동일 full-width-frost sticky 패턴 적용 완료. 각 탭 타이틀 폰트(위계)는 보존, 헤더 거동·패딩·여백만 통일. calendar 는 컨테이너 `padding-top: calc(space-4 + safe-area-top)` → `.nav` 헤더 `--sat` 로 이전(이중 노치 방지). calendar nav 는 44px 컨트롤 포함이라 vertical padding=space-2(나머지 space-3). tsc0/changed게이트0(hover/surface-3d/theme-override/card-rhythm). ★dev :3002 라이브 측정 검증: **근무(calendar)** sticky/top0/z30/full-width(-16px), 스크롤다운 transform translateY(-69.6px) 숨음 + frost opacity 0→1, chrome-hidden/frosted=true ✅ / **5호선(line)** translateY(-55.7px) 숨음 + frost 0→1 ✅ / **교체(exchange)** sticky/frost/full-width 배선 정상, 콘텐츠 짧아 스크롤-숨김 미발동(line 과 동일 엔진). ★스크린샷은 검정-페인트 플레이크(DOM computed-style 측정은 정상) → 폰 최종확인 권장.
+- [ ] duty — 헤더 요소 없음(배너만). 필요 시 타이틀 헤더 추가(후속).

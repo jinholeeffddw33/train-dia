@@ -82,7 +82,7 @@ export default function CalendarTab() {
   return (
     <div className={styles.container}>
       {/* 월 네비게이션 — 좌우 화살표는 버튼 4법 ② 무색 3D 솟음 알약(아이콘만 → data-press 금지) */}
-      <div className={styles.nav}>
+      <div className={`${styles.nav} z-app-header z-app-header-frost`}>
         <button type="button" className={`z-glass-pill ${styles.navBtn}`} onClick={prevMonth} aria-label="이전 달">‹</button>
         <button type="button" className={styles.navTitle} onClick={goToday}>
           {year}년 <span className={styles.navMonth}>{month}월</span>

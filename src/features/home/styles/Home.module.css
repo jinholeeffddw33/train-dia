@@ -5,7 +5,11 @@
   background: var(--dia-hero-gradient);
   color: #fff;
   padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
-  position: relative;
+  /* ZINOSB 헤더 통일 — sticky + 스크롤-숨김(.z-app-header transform). 자체 gradient bg/노치 보유라 frost 불필요.
+     모듈에서 직접 sticky 선언(글로벌 .z-app-header position 과 소스순서 충돌 회피). */
+  position: sticky;
+  top: 0;
+  z-index: var(--dia-layer-fixed);
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;

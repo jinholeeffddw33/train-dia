@@ -95,7 +95,7 @@ export default function MoreTab() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.pageTitle}>설정</h2>
+      <h2 className={`${styles.pageTitle} z-app-header z-app-header-frost`}>설정</h2>
 
       {/* 의견 / 버그 제보 버튼 */}
       <button

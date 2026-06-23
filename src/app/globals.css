@@ -337,9 +337,8 @@ input, textarea, select {
 [data-chrome-hidden] .z-app-header {
   transform: translateY(-100%);
 }
-.z-app-header-frost {
-  padding-top: var(--sat);
-}
+/* frost 변형 — 헤더 뒤 반투명 솔리드 배경(스크롤 후 등장). 노치/패딩/full-width(음수 margin)는
+   헤더별 모듈에서 처리(탭마다 컨테이너 패딩이 달라 이중 방지). 여기선 frost 레이어만. */
 .z-app-header-frost::before {
   content: '';
   position: absolute;

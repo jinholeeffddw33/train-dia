@@ -37,7 +37,7 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
   };
 
   return (
-    <header className={styles.headerSection}>
+    <header className={`${styles.headerSection} z-app-header`}>
       <button
         type="button"
         className={styles.refreshBtn}

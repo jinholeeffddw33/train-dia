@@ -164,3 +164,10 @@ git commit -m "..."                            # pre-commit 통과해야 함
 
 - [x] 2026-06-23 — 헤더 토큰/훅/AppShell/TabBar-hide/.z-app-header 시스템 (ZINOSB 세션). 커밋 <hash>
 - [ ] 6개 탭 헤더 .z-app-header 적용 — train-dia dev 시각 검증하며 (후속)
+
+### 진행 (2026-06-23, ZINOSB 세션 — train-dia dev :3002 검증)
+- [x] **home 헤더** — `.headerSection` sticky + `z-app-header`(transform-hide). ★dev 라이브 검증: 스크롤다운 시 헤더 translateY(-117px) 상승 + TabBar translateY(하강) 동시 = 작동 확인. 자체 gradient bg+노치라 frost 불요.
+- [x] **TabBar 바텀 숨김** — dev 라이브 검증(translateY 하강).
+- [x] **more(설정) 헤더** — `.pageTitle` full-width frost sticky(margin-inline 음수 상쇄 + padding-inline 재정렬 + --sat). `.z-app-header-frost` 에서 padding-top 제거(헤더별 노치 자체처리). tsc0/게이트0. ★브라우저 탭 about:blank 플레이크로 시각 최종확인은 진호 폰 권장.
+- [ ] line(.header)·exchange(.pageTitle)·calendar(.nav) — more 와 동일 full-width-frost 패턴. 단 exchange/calendar 는 컨테이너에 safe-area-top 있음 → 헤더로 옮기고 컨테이너 것 제거(이중 노치 방지). 각 dev 시각검증 필요.
+- [ ] duty — 헤더 요소 없음(배너만). 필요 시 타이틀 헤더 추가.

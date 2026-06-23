@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { X } from 'lucide-react';
+import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -24,7 +25,7 @@ interface ModalProps {
 export default function Modal({ open, onClose, title, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const [closing, setClosing] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -75,6 +76,28 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
 
   useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
+  // 핸들 잡고 아래로 드래그 → 닫기. 드래그 중 dim 을 시트 위치에 실시간 동기(끄는 만큼 뒤 화면 밝아짐).
+  const { handleRef, sheetRef } = useSheetDragDismiss({
+    onDismiss: onClose,
+    onDragMove: (dy, h) => {
+      const d = dimRef.current;
+      if (!d) return;
+      d.style.transition = 'none';
+      d.style.opacity = String(Math.max(0, 1 - dy / h));
+    },
+    onSettle: (dismissing) => {
+      const d = dimRef.current;
+      if (!d) return;
+      if (dismissing) {
+        d.style.transition = 'opacity 0.2s cubic-bezier(0.4, 0, 1, 1)';
+        d.style.opacity = '0';
+      } else {
+        d.style.transition = 'opacity 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+        d.style.opacity = '';
+      }
+    },
+  });
+
   if (!open) return null;
 
   return (
@@ -90,9 +113,12 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     >
       {/* dim — 시트의 형제 레이어. 닫힘 시 이것만 페이드(시트는 항상 불투명) */}
       <div ref={dimRef} className={`${styles.dim} ${closing ? styles.dimClosing : ''}`} aria-hidden />
-      <div ref={contentRef} className={`${styles.content} ${closing ? styles.closing : ''}`}>
-        {/* 상단 핸들 — 바텀시트 시그니처 (스크롤 본문 밖이라 고정) */}
-        <div className={styles.handle} aria-hidden />
+      <div
+        ref={(el) => { contentRef.current = el; sheetRef.current = el; }}
+        className={`${styles.content} ${closing ? styles.closing : ''}`}
+      >
+        {/* 상단 핸들 — 잡고 아래로 끌어 닫기(드래그 소스). 스크롤 본문 밖이라 고정. */}
+        <div ref={handleRef} className={styles.handle} role="button" tabIndex={-1} aria-label="아래로 끌어 닫기" />
         {title && (
           <div className={styles.headerArea}>
             <h2 className={styles.title}>{title}</h2>

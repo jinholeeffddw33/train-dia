@@ -568,13 +568,24 @@
   to { transform: translateY(0); }
 }
 
-/* 핸들 — 36×4 바 (Modal 핸들과 동일 토큰). */
+/* 핸들 — Modal 핸들과 동일: full-width 28px 히트영역 + ::before 36×4 바(드래그 타깃 확보). */
 .swapHandle {
+  width: 100%;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--dia-space-2);
+  cursor: grab;
+  touch-action: none;
+}
+.swapHandle:active { cursor: grabbing; }
+.swapHandle::before {
+  content: '';
   width: 36px;
   height: 4px;
-  background: var(--dia-border-strong);
   border-radius: var(--dia-radius-full);
-  margin: 0 auto var(--dia-space-4);
+  background: var(--dia-border-strong);
 }
 
 .swapHeader {

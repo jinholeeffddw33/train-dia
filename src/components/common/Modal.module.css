@@ -47,7 +47,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: grab;
+  touch-action: none; /* 핸들 드래그 중 스크롤/바운스 차단 (useSheetDragDismiss) */
 }
+.handle:active { cursor: grabbing; }
 .handle::before {
   content: '';
   width: 36px;

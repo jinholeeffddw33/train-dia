@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useSwapStore } from '@/stores/swap';
+import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
 import { getDia, getType, getSchedule, getLabel, getDiaDisplay } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Calendar.module.css';
@@ -17,7 +18,8 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
   const { getSwap, setSwap, removeSwap } = useSwapStore();
   const [inputDia, setInputDia] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const dimRef = useRef<HTMLDivElement | null>(null);
   const [closing, setClosing] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -30,6 +32,28 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
     });
   }, [onClose]);
   useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
+  // 핸들 잡고 아래로 드래그 → 닫기 (드래그 중 dim 실시간 동기).
+  const { handleRef, sheetRef: dragSheetRef } = useSheetDragDismiss({
+    onDismiss: onClose,
+    onDragMove: (dy, h) => {
+      const d = dimRef.current;
+      if (!d) return;
+      d.style.transition = 'none';
+      d.style.opacity = String(Math.max(0, 1 - dy / h));
+    },
+    onSettle: (dismissing) => {
+      const d = dimRef.current;
+      if (!d) return;
+      if (dismissing) {
+        d.style.transition = 'opacity 0.2s cubic-bezier(0.4, 0, 1, 1)';
+        d.style.opacity = '0';
+      } else {
+        d.style.transition = 'opacity 0.22s cubic-bezier(0.32, 0.72, 0, 1)';
+        d.style.opacity = '';
+      }
+    },
+  });
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -102,10 +126,13 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
       aria-modal="true"
       aria-label="교번 변경"
     >
-      <div className={`${styles.swapDim} ${closing ? styles.swapDimClosing : ''}`} aria-hidden />
-      <div className={`${styles.swapSheet} ${closing ? styles.swapSheetClosing : ''}`} ref={sheetRef}>
-        {/* 핸들바 */}
-        <div className={styles.swapHandle} />
+      <div ref={dimRef} className={`${styles.swapDim} ${closing ? styles.swapDimClosing : ''}`} aria-hidden />
+      <div
+        ref={(el) => { sheetRef.current = el; dragSheetRef.current = el; }}
+        className={`${styles.swapSheet} ${closing ? styles.swapSheetClosing : ''}`}
+      >
+        {/* 핸들바 — 잡고 아래로 끌어 닫기 */}
+        <div ref={handleRef} className={styles.swapHandle} role="button" tabIndex={-1} aria-label="아래로 끌어 닫기" />
 
         {/* 헤더 */}
         <div className={styles.swapHeader}>

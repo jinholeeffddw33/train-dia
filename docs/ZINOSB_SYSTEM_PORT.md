@@ -181,7 +181,8 @@ backdrop-filter 전역 무력화(UI-GLASS-TIER-001)와 겹쳐 blur 없이 *반�
 
 **수정**:
 - [x] **토큰** `--dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated)` (글래스 위 솔리드 = 불투명+글래스룩) + `--dia-overlay-bg`(dim) 추가, 다크/라이트 양면. 떠있는 표면 전용.
-- [x] **공용 Modal**(Modal.tsx/.module.css) — ZINOSB BottomSheetShell 거동 이식: 상단핸들(28px 히트+::before 36×4) + dim *형제* 레이어(부모 opacity 페이드 시 시트까지 투명해지는 버그 회피) + 진입 slideUp 240ms / 닫힘 translateY(110%)+dim 동기 페이드(330ms 후 unmount). 표면 `--dia-sheet-fill` 불투명. ESC/스크롤락/포커스 유지. (드래그닫기/포털/햅틱 훅은 미이식 — 유저 요청 범위 밖)
+- [x] **공용 Modal**(Modal.tsx/.module.css) — ZINOSB BottomSheetShell 거동 이식: 상단핸들(28px 히트+::before 36×4) + dim *형제* 레이어(부모 opacity 페이드 시 시트까지 투명해지는 버그 회피) + 진입 slideUp 240ms / 닫힘 translateY(110%)+dim 동기 페이드(330ms 후 unmount). 표면 `--dia-sheet-fill` 불투명. ESC/스크롤락/포커스 유지.
+- [x] **드래그-닫기**(`src/hooks/useSheetDragDismiss.ts`, ZINOSB SSOT 이식) — 핸들 잡고 아래로 끌면 시트가 따라 내려오고(translateY=dy), 임계 80px 초과 시 닫힘·미만 시 스냅백. 드래그 중 dim 실시간 동기(끄는 만큼 뒤 밝아짐). 핸들=full-width 28px 히트영역+::before 36×4 바, `touch-action:none`. Modal + SwapBottomSheet 양쪽 배선. 터치+마우스(데스크톱 디버그) 지원. (포털/햅틱은 미이식 — 범위 밖) ★dev 마우스 드래그 실측: 130px=닫힘✅ / 40px=스냅백✅ / 드래그중 dim 동기(0.85)✅.
 - [x] **SwapBottomSheet**(교번변경) — 동일 패턴 인라인 적용(closing state + dim 형제 + 불투명 + 핸들 토큰 통일).
 - [x] **센터 공지모달 5종**(CycleChange/RefreshGuide/Relogin/InternWelcome+KimMinkyung재사용/InternIntro) + **MissionCard** + **Toast.info** — `.content`/박스 bg `var(--dia-surface)` → `var(--dia-sheet-fill)` 불투명 스왑(비침 버그만, 센터는 핸들 없이 popIn 유지).
 - 자동 수혜: SubwaySearchOverlay(공용 Modal 경유).

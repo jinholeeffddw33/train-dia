@@ -171,3 +171,20 @@ git commit -m "..."                            # pre-commit 통과해야 함
 - [x] **more(설정) 헤더** — `.pageTitle` full-width frost sticky(margin-inline 음수 상쇄 + padding-inline 재정렬 + --sat). `.z-app-header-frost` 에서 padding-top 제거(헤더별 노치 자체처리). tsc0/게이트0. ★브라우저 탭 about:blank 플레이크로 시각 최종확인은 진호 폰 권장.
 - [x] **line(.header)·exchange(.pageTitle)·calendar(.nav)** — more 와 동일 full-width-frost sticky 패턴 적용 완료. 각 탭 타이틀 폰트(위계)는 보존, 헤더 거동·패딩·여백만 통일. calendar 는 컨테이너 `padding-top: calc(space-4 + safe-area-top)` → `.nav` 헤더 `--sat` 로 이전(이중 노치 방지). calendar nav 는 44px 컨트롤 포함이라 vertical padding=space-2(나머지 space-3). tsc0/changed게이트0(hover/surface-3d/theme-override/card-rhythm). ★dev :3002 라이브 측정 검증: **근무(calendar)** sticky/top0/z30/full-width(-16px), 스크롤다운 transform translateY(-69.6px) 숨음 + frost opacity 0→1, chrome-hidden/frosted=true ✅ / **5호선(line)** translateY(-55.7px) 숨음 + frost 0→1 ✅ / **교체(exchange)** sticky/frost/full-width 배선 정상, 콘텐츠 짧아 스크롤-숨김 미발동(line 과 동일 엔진). ★스크린샷은 검정-페인트 플레이크(DOM computed-style 측정은 정상) → 폰 최종확인 권장.
 - [ ] duty — 헤더 요소 없음(배너만). 필요 시 타이틀 헤더 추가(후속).
+
+### §10 바텀시트/모달 전역 통일 (2026-06-23, ZINOSB 세션 — train-dia dev :3002 검증)
+> 진호 제보: 바텀모달이 *비쳐* 보임(뒤 캘린더 노출). ZINOSB 처럼 불투명+상단핸들+업/다운 통일 요청.
+
+**진범**: `--dia-surface = var(--zg-card-fill)` = 솔리드 베이스 없는 반투명 글래스 그라디언트 스택.
+ZINOSB 에선 솔리드 페이지 bg 위 카드로 글래스처럼 보이지만, 모달/시트는 다른 콘텐츠 위에 떠서
+backdrop-filter 전역 무력화(UI-GLASS-TIER-001)와 겹쳐 blur 없이 *반투명만* 남아 비침.
+
+**수정**:
+- [x] **토큰** `--dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated)` (글래스 위 솔리드 = 불투명+글래스룩) + `--dia-overlay-bg`(dim) 추가, 다크/라이트 양면. 떠있는 표면 전용.
+- [x] **공용 Modal**(Modal.tsx/.module.css) — ZINOSB BottomSheetShell 거동 이식: 상단핸들(28px 히트+::before 36×4) + dim *형제* 레이어(부모 opacity 페이드 시 시트까지 투명해지는 버그 회피) + 진입 slideUp 240ms / 닫힘 translateY(110%)+dim 동기 페이드(330ms 후 unmount). 표면 `--dia-sheet-fill` 불투명. ESC/스크롤락/포커스 유지. (드래그닫기/포털/햅틱 훅은 미이식 — 유저 요청 범위 밖)
+- [x] **SwapBottomSheet**(교번변경) — 동일 패턴 인라인 적용(closing state + dim 형제 + 불투명 + 핸들 토큰 통일).
+- [x] **센터 공지모달 5종**(CycleChange/RefreshGuide/Relogin/InternWelcome+KimMinkyung재사용/InternIntro) + **MissionCard** + **Toast.info** — `.content`/박스 bg `var(--dia-surface)` → `var(--dia-sheet-fill)` 불투명 스왑(비침 버그만, 센터는 핸들 없이 popIn 유지).
+- 자동 수혜: SubwaySearchOverlay(공용 Modal 경유).
+- 손 안 댐: WhatsNewModal(이미 솔리드 hex)/DiaChartModal(#fff)/AttachmentLightbox(검정)/풀스크린오버레이4(--dia-bg 솔리드).
+- tsc0 · changed게이트0(hover/surface-3d/theme-override/card-rhythm).
+- ★dev :3002 라이브 실측(교번비교→기관사선택 시트): sheet bg `rgb(19,27,46)` **솔리드 불투명** ✅ + 글래스 그라디언트 레이어 유지 + dim `rgba(0,0,0,0.6)` + 핸들바 36×4px ✅. 닫힘: `closing` 발동 → transform translateY(+205px) 하강 + dim opacity 1→0.73 동기 → 330ms 후 unmount ✅. 스크린샷도 불투명 확인.

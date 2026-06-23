@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { X } from 'lucide-react';
 import styles from './Modal.module.css';
 
@@ -11,16 +11,39 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
+/**
+ * Modal — train-dia 바텀시트 단일 SSOT (ZINOSB BottomSheetShell 거동 이식, 진호 2026-06-23 전역 통일).
+ *
+ * 보장:
+ *  1) 상단 핸들 바 — 모든 바텀시트 공통 시그니처(28px 히트 + 36×4 바)
+ *  2) 업/다운 애니메이션 — 진입 slideUp, 닫힘은 시트가 아래로 슬라이드 + dim 동기 페이드(iOS 정석)
+ *  3) 불투명 표면 — --dia-sheet-fill(글래스 위 솔리드). 반투명 --dia-surface 금지(뒤 콘텐츠 비침)
+ *  4) dim 은 시트의 *형제* 레이어 — 부모 opacity 페이드 시 시트까지 투명해지는 버그 회피
+ *  5) ESC/배경탭/스크롤락/포커스 유지
+ */
 export default function Modal({ open, onClose, title, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const dimRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [closing, setClosing] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 닫기 = 아래로 스륵 슬라이드 + dim 페이드 → 끝난 뒤 onClose (X·배경탭·ESC 공통).
+  // 330ms = .closing/.dimClosing transition(0.3s) + 30ms 버퍼(잔여 dim snap 방지).
+  const requestClose = useCallback(() => {
+    setClosing((prev) => {
+      if (prev) return prev;
+      closeTimer.current = setTimeout(() => onClose(), 330);
+      return true;
+    });
+  }, [onClose]);
 
   // ESC 닫기
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') requestClose();
     },
-    [onClose],
+    [requestClose],
   );
 
   // 포커스 트랩 + 스크롤 잠금
@@ -31,7 +54,6 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
 
-    // 포커스 모달 내부로
     const firstFocusable = contentRef.current?.querySelector<HTMLElement>(
       'button, input, [tabindex]:not([tabindex="-1"])',
     );
@@ -43,6 +65,16 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     };
   }, [open, handleKeyDown]);
 
+  // 외부에서 open=false 로 닫힌 경우 closing 상태 리셋 (다음 오픈 때 내려간 채로 뜨는 것 방지)
+  useEffect(() => {
+    if (!open && (closeTimer.current || closing)) {
+      if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+      setClosing(false);
+    }
+  }, [open, closing]);
+
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
   if (!open) return null;
 
   return (
@@ -53,17 +85,21 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
       aria-modal="true"
       aria-label={title ?? '모달'}
       onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
+        if (e.target === overlayRef.current || e.target === dimRef.current) requestClose();
       }}
     >
-      <div ref={contentRef} className={styles.content}>
+      {/* dim — 시트의 형제 레이어. 닫힘 시 이것만 페이드(시트는 항상 불투명) */}
+      <div ref={dimRef} className={`${styles.dim} ${closing ? styles.dimClosing : ''}`} aria-hidden />
+      <div ref={contentRef} className={`${styles.content} ${closing ? styles.closing : ''}`}>
+        {/* 상단 핸들 — 바텀시트 시그니처 (스크롤 본문 밖이라 고정) */}
+        <div className={styles.handle} aria-hidden />
         {title && (
           <div className={styles.headerArea}>
             <h2 className={styles.title}>{title}</h2>
             <button
               type="button"
               className={styles.closeBtn}
-              onClick={onClose}
+              onClick={requestClose}
               aria-label="닫기"
             >
               <X size={18} strokeWidth={2.5} />

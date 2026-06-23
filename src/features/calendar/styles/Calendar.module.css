@@ -521,27 +521,42 @@
   transform: scale(0.98);
 }
 
-/* ===== 바텀시트 오버레이 ===== */
+/* ===== 바텀시트 오버레이 (Modal SSOT 와 동일 거동: dim 형제 + 불투명 + 업/다운) ===== */
 .swapOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
   z-index: var(--dia-layer-modal);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: fadeIn 150ms var(--dia-ease);
 }
 
+/* dim — 시트의 형제 레이어. 닫힘 시 이것만 페이드(시트는 항상 불투명). */
+.swapDim {
+  position: absolute;
+  inset: 0;
+  background: var(--dia-overlay-bg);
+  animation: fadeIn 160ms ease-out;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+.swapDimClosing { animation: none; opacity: 0; }
+
 .swapSheet {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 480px;
-  background: var(--dia-surface);
+  /* ★ 불투명 시트필 — 반투명 --dia-surface 금지(뒤 콘텐츠 비침, 진호 2026-06-23). */
+  background: var(--dia-sheet-fill);
+  border-top: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
   padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-6);
   padding-bottom: calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
-  animation: sheetUp 250ms var(--dia-ease);
+  animation: sheetUp 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
 }
+.swapSheetClosing { animation: none; transform: translateY(110%); }
 
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -553,13 +568,13 @@
   to { transform: translateY(0); }
 }
 
+/* 핸들 — 36×4 바 (Modal 핸들과 동일 토큰). */
 .swapHandle {
   width: 36px;
   height: 4px;
-  background: var(--dia-text-tertiary);
+  background: var(--dia-border-strong);
   border-radius: var(--dia-radius-full);
   margin: 0 auto var(--dia-space-4);
-  opacity: 0.4;
 }
 
 .swapHeader {

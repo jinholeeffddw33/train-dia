@@ -18,6 +18,18 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
   const [inputDia, setInputDia] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const [closing, setClosing] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 닫기 = 아래로 슬라이드 + dim 페이드 → 끝난 뒤 onClose (Modal SSOT 와 동일 거동).
+  const requestClose = useCallback(() => {
+    setClosing((prev) => {
+      if (prev) return prev;
+      closeTimer.current = setTimeout(() => onClose(), 330);
+      return true;
+    });
+  }, [onClose]);
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -52,29 +64,29 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        requestClose();
       }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [requestClose]);
 
   // 바깥 클릭
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
-      onClose();
+      requestClose();
     }
-  }, [onClose]);
+  }, [requestClose]);
 
   const handleSave = () => {
     if (!isValid || !driver) return;
     setSwap(dateStr, previewDia, driver.I);
-    onClose();
+    requestClose();
   };
 
   const handleRemove = () => {
     removeSwap(dateStr);
-    onClose();
+    requestClose();
   };
 
   const typeColorClass = (type: string | null) => {
@@ -90,7 +102,8 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
       aria-modal="true"
       aria-label="교번 변경"
     >
-      <div className={styles.swapSheet} ref={sheetRef}>
+      <div className={`${styles.swapDim} ${closing ? styles.swapDimClosing : ''}`} aria-hidden />
+      <div className={`${styles.swapSheet} ${closing ? styles.swapSheetClosing : ''}`} ref={sheetRef}>
         {/* 핸들바 */}
         <div className={styles.swapHandle} />
 

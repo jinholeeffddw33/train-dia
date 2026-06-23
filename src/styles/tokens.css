@@ -36,6 +36,11 @@
   --dia-surface-elevated: var(--zg-card-fill);
   --dia-surface-hover: #334155;
   --dia-surface-active: #3B4A63;
+  /* 모달/시트 표면 — 떠있는 표면은 반드시 *불투명*(글래스 fill 위 솔리드 베이스 한 겹).
+     --dia-surface(반투명 글래스)는 솔리드 페이지 bg 위 카드 전용 — 모달/시트에 쓰면 backdrop-filter
+     전역 무력화라 blur 없이 반투명만 남아 뒤 콘텐츠가 비친다(진호 2026-06-23 제보). */
+  --dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated);
+  --dia-overlay-bg: rgba(0, 0, 0, 0.6);
 
   /* ========================================
      Text (다크 배경용)
@@ -353,6 +358,9 @@
   --dia-surface-elevated: var(--zg-card-fill);
   --dia-surface-hover: #F1F5F9;
   --dia-surface-active: #E2E8F0;
+  /* 모달/시트 불투명 표면 (라이트) + dim — 다크 동일 사유 */
+  --dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated);
+  --dia-overlay-bg: rgba(15, 23, 42, 0.42);
 
   --dia-text-primary: #0F172A;
   --dia-text-secondary: #475569;

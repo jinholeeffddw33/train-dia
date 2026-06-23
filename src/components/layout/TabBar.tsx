@@ -26,14 +26,16 @@ interface TabBarProps {
   onTabChange: (tab: TabId) => void;
   alertCount?: number;
   exchangeCount?: number;
+  /** 아래로 스크롤 시 true → 바가 아래로 슬라이드되어 숨음 (ZINOSB 바텀네비 통일). */
+  hidden?: boolean;
 }
 
-export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchangeCount = 0 }: TabBarProps) {
+export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchangeCount = 0, hidden = false }: TabBarProps) {
   // 주얼 구슬 위치 = 활성 인덱스 (prop 기반 → SSR/클라 동일, 로딩 깜빡 0)
   const activeIdx = Math.max(0, TABS.findIndex((t) => t.id === activeTab));
   return (
     <nav
-      className={styles.tabBar}
+      className={`${styles.tabBar} ${hidden ? styles.tabBarHidden : ''}`}
       role="tablist"
       aria-label="메인 내비게이션"
       style={{ '--bn-i': activeIdx, '--bn-n': TABS.length } as React.CSSProperties}

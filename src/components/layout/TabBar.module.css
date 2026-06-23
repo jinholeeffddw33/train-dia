@@ -17,6 +17,14 @@
   border-radius: 28px 28px 0 0;
   box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.22), 0 -1px 4px rgba(0, 0, 0, 0.1);
   z-index: var(--dia-layer-fixed);
+  /* 스크롤 숨김 — transform 만(컴포지터). 아래로 스크롤 시 .tabBarHidden 으로 아래로 슬라이드. */
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+
+/* 아래로 스크롤 → 바가 자기 높이만큼 아래로 사라짐 (ZINOSB 바텀네비 통일 2026-06-23). */
+.tabBarHidden {
+  transform: translate3d(0, 100%, 0);
 }
 
 :global(:root.light) .tabBar {

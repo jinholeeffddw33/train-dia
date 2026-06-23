@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import ToastContainer from '../common/Toast';
@@ -22,6 +23,9 @@ interface AppShellProps {
 export default function AppShell({ children, onBack }: AppShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const { updateAvailable, applyUpdate } = useServiceWorker();
+  // ZINOSB 헤더 통일 이식 — window 스크롤 모델. 아래로 스크롤 시 헤더(.z-app-header)·TabBar 슬라이드 숨김,
+  // 위로 올리면 복귀 + topZone 통과 후 frosted. data-attr 로 후손 헤더/탭바에 전파.
+  const { hidden: chromeHidden, frosted: chromeFrosted } = useHeaderScroll();
 
 
   const triggerScroll = useTrainStore((s) => s.triggerScroll);
@@ -52,7 +56,12 @@ export default function AppShell({ children, onBack }: AppShellProps) {
 
 
   return (
-    <div className={styles.shell} data-has-back={onBack ? '' : undefined}>
+    <div
+      className={styles.shell}
+      data-has-back={onBack ? '' : undefined}
+      data-chrome-hidden={chromeHidden ? '' : undefined}
+      data-chrome-frosted={chromeFrosted ? '' : undefined}
+    >
       {/* 업데이트 배너 */}
       {updateAvailable && (
         <div className={styles.updateBanner}>
@@ -83,6 +92,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
         activeTab={activeTab}
         onTabChange={handleTabChange}
         exchangeCount={exchangeCount}
+        hidden={chromeHidden}
       />
       <ToastContainer />
       <InternIntroModal />

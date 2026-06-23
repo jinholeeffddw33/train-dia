@@ -216,6 +216,14 @@
   --dia-tab-height-safe: calc(64px + env(safe-area-inset-bottom, 0px));
 
   /* ========================================
+     상단 헤더 / 노치 (ZINOSB 헤더 통일 이식 2026-06-23)
+     --sat = 상단 safe-area(노치/상태바). 테마 무관(env=기기값). 헤더 padding-top SSOT.
+     --dia-header-h = 스크롤-숨김 헤더 행 높이(슬라이드 거리/콘텐츠 오프셋 계산용).
+     ======================================== */
+  --sat: env(safe-area-inset-top, 0px);
+  --dia-header-h: 56px;
+
+  /* ========================================
      Tab Accent Colors
      ======================================== */
   --dia-tab-home: var(--dia-blue);

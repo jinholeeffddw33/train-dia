@@ -142,3 +142,25 @@ git commit -m "..."                            # pre-commit 통과해야 함
 - [ ] ai-rule-guard.mjs (최대 난제 — F1 inline/F2 as any/F4 typo/F8 hover 등, 후속)
 - [ ] check:docs 용 docs-validate(경량) 이식 — registry 무결성 검사용 (후속)
 - [ ] ★ .claude/settings.json 에 pre-git-stage-check 를 PreToolUse 훅으로 등록(현재 파일만 존재, 다른 train-dia 세션에서 발동하려면 등록 필요)
+
+---
+
+## 9) 상단 헤더 통일 (ZINOSB AppPageHeader scroll-hide 엔진 이식, 2026-06-23)
+
+> 진호 발주: "zinosb 처럼 상단 헤더 통일도 그대로 — 노치, 바텀(TabBar) 스크롤 숨김 동일하게."
+> train-dia 는 **탭 기반**(home/calendar/duty/exchange/line/more), 헤더가 탭마다 제각각(공유 컴포넌트 없음), **window 스크롤**, 토큰 `--dia-*`, 테마 `:root.light`, backdrop 전역 무력화(frost=반투명 fill).
+
+### 완료 (안전·tsc0, 커밋 예정)
+- `--sat` + `--dia-header-h:56px` 토큰(tokens.css). 노치 SSOT.
+- `useHeaderScroll` 훅 이식(src/hooks, window 스크롤, `target` 옵션 추가).
+- AppShell: `useHeaderScroll` 마운트 → shell 에 `data-chrome-hidden`/`data-chrome-frosted` 전파.
+- **TabBar 바텀 스크롤-숨김 완료**: `hidden` prop → `.tabBarHidden{translate3d(0,100%,0)}` (아래로 스크롤 시 바 하강). transform-only(컴포지터). ★ZINOSB "바텀 숨김" 동일.
+- 공유 `.z-app-header`(sticky+hide) + `.z-app-header-frost`(노치 패딩 + frosted 배경 레이어) globals.css. AppShell data-attr 로 발동.
+
+### 미완 (★train-dia dev 시각 검증 필요 — 블라인드 금지)
+- **6개 탭 헤더에 `.z-app-header` 적용**: home(.headerSection, 자체 gradient bg+노치 → bare 가능) / line(.header) / calendar(.nav) / more·exchange(.pageTitle h2) / duty(헤더 없음).
+- ★함정: 타이틀 헤더들은 **padded `.container` 안 transparent** → sticky 만 걸면 스크롤 시 콘텐츠가 헤더 뒤로 비침. **frost 배경 full-width(컨테이너 좌우 패딩 음수 margin 상쇄) + 컨테이너 safe-area-top 제거(이중 패딩 방지)** 가 탭마다 필요. 각 탭 구조가 달라 **dev 에서 눈으로 보며 조정**해야 안 깨짐.
+- 권장: 가장 깔끔한 타이틀 탭 1개(more) 파일럿 → dev 검증 → 동일 패턴 나머지 확대. home 은 tall 배너라 sticky-hide 체감 별도 확인.
+
+- [x] 2026-06-23 — 헤더 토큰/훅/AppShell/TabBar-hide/.z-app-header 시스템 (ZINOSB 세션). 커밋 <hash>
+- [ ] 6개 탭 헤더 .z-app-header 적용 — train-dia dev 시각 검증하며 (후속)

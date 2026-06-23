@@ -319,3 +319,38 @@ input, textarea, select {
   color: var(--z-3d-violet-text);
   box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-violet-glow);
 }
+
+/* ════════ 상단 헤더 통일 — ZINOSB AppPageHeader 스크롤 엔진 이식 (2026-06-23) ════════
+   탭 헤더 요소에 .z-app-header 를 붙이면 sticky + 아래로 스크롤 시 위로 슬라이드 숨김.
+   AppShell 이 useHeaderScroll → shell[data-chrome-hidden]/[data-chrome-frosted] 로 후손에 전파.
+   기하 불변(transform/opacity 만) → reflow 0. backdrop 전역 무력화라 frost=반투명 솔리드 fill.
+   - .z-app-header        : sticky top + 스크롤 숨김 (모든 탭 헤더 공통)
+   - .z-app-header-frost  : + 상단 노치(--sat) 패딩 + frosted 배경(투명 타이틀 헤더용 — 컨테이너에
+                            이미 safe-area-top 이 있으면 그쪽을 빼고 이걸 쓴다, 이중 패딩 방지) */
+.z-app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--dia-layer-fixed);
+  transition: transform 0.3s ease-out;
+  will-change: transform;
+}
+[data-chrome-hidden] .z-app-header {
+  transform: translateY(-100%);
+}
+.z-app-header-frost {
+  padding-top: var(--sat);
+}
+.z-app-header-frost::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--dia-bg);
+  border-bottom: 1px solid var(--dia-border);
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
+}
+[data-chrome-frosted] .z-app-header-frost::before {
+  opacity: 1;
+}

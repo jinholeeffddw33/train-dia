@@ -34,10 +34,16 @@ export default function TrainList() {
   const listRef = useRef<HTMLDivElement>(null);
   const stations = BRANCH_STATIONS[branch] ?? LINE5_MAIN;
 
-  // 열차번호 → 답십리 기관사 이름 매핑 (data 변경 시에만 재계산)
-  const driverMap = useMemo(() => buildTrainDriverMap(new Date()), [data]);
+  // 실시간 열차 위치 (열차번호 → 현재역/방향) — 답십리 위치 기반 교대용
+  const livePos = useMemo(() => {
+    const m = new Map<string, { station: string; dir: string }>();
+    for (const t of data) m.set(String(t.trainNo), { station: t.statnNm, dir: t.updnLine });
+    return m;
+  }, [data]);
+  // 열차번호 → 답십리 기관사 이름 매핑 (위치 기반 교대 — data 변경 시 재계산)
+  const driverMap = useMemo(() => buildTrainDriverMap(new Date(), livePos), [livePos]);
   // 열차번호 → 기관사 다이아 정보 (이름 탭 → 행로표 미리보기)
-  const diaMap = useMemo(() => buildTrainDiaMap(new Date()), [data]);
+  const diaMap = useMemo(() => buildTrainDiaMap(new Date(), livePos), [livePos]);
 
   // 기관사 이름 탭 → 해당 기관사 행로표 모달 열기
   const [selectedDia, setSelectedDia] = useState<TrainDiaInfo | null>(null);

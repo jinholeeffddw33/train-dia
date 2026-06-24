@@ -6,6 +6,7 @@ import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 import { TRANSITION_MAY_2026 } from '@/data/transition';
+import { LINE5_MAIN, LINE5_MACHEON, LINE5_HANAM } from '@/data/line5';
 
 // ===== 날짜 유틸 =====
 
@@ -518,6 +519,32 @@ export interface TrainDiaInfo {
 // buildTrainDriverMap와 동일 캐시 키 공유 — 동일 분 내 재계산 없음
 let cachedDiaMap: Map<string, TrainDiaInfo> | null = null;
 
+// ===== 답십리 위치 기반 교대 (실시간 열차 위치) =====
+/** 답십리의 본선 인덱스 (서쪽=작음 ··· 동쪽=큼). 방화=0 ··· 답십리 ··· 강동=끝 */
+const DAP_IDX = (LINE5_MAIN as readonly string[]).indexOf('답십리');
+/** 지선(둔촌동~마천/하남)은 모두 강동 동쪽 → 답십리보다 동쪽 */
+const EAST_OF_DAP = LINE5_MAIN.length + 1;
+
+/** 현재역 이름 → 답십리 기준 동서 위치 인덱스 (못 찾으면 null) */
+function stationPosIndex(station: string | undefined): number | null {
+  if (!station) return null;
+  const s = station.replace(/역$/, '').replace(/\(.*\)/, '').trim();
+  const mi = (LINE5_MAIN as readonly string[]).indexOf(s);
+  if (mi >= 0) return mi;
+  if ((LINE5_MACHEON as readonly string[]).includes(s) || (LINE5_HANAM as readonly string[]).includes(s)) {
+    return EAST_OF_DAP;
+  }
+  return null;
+}
+
+/** 실시간 열차 위치 (열차번호 → 현재역/방향) */
+export interface LiveTrainPos {
+  /** 현재역 이름 (statnNm) */
+  station?: string;
+  /** 방향 (상행/하행) — 현재는 위치(역)만으로 판정, 향후 확장용 */
+  dir?: string;
+}
+
 /**
  * 현재 운행 중인 열차번호 → 답십리 기관사 이름 매핑
  * - 현재 시간 기준으로 각 기관사의 활성 구간(segment)에 포함된 열차번호를 수집
@@ -525,10 +552,17 @@ let cachedDiaMap: Map<string, TrainDiaInfo> | null = null;
  * - 야간 근무(자정 넘김) 대응: 오늘 + 어제 스케줄 모두 탐색
  * - 매칭 안 되면 영등포 기관사 → 표시하지 않음
  * - 분 단위 캐싱: 같은 분이면 이전 결과 재사용
+ *
+ * ★ livePos 전달 시 — 답십리 위치 기반 교대:
+ *   행로의 첫 열차(답십리에서 영등포→답십리 인수)·마지막 열차(답십리에서 답십리→영등포 인계)는
+ *   같은 열차번호가 답십리 양쪽에 모두 존재하므로, 실제 열차가 "답십리 기관사 담당 구간"에
+ *   있을 때만 이름을 표시한다(위치 우선). 중간 열차번호는 답십리 기관사 전담 → 항상 표시.
+ *   livePos 있으면 위치 기준이라 분 캐시를 쓰지 않는다.
  */
-export function buildTrainDriverMap(now: Date): Map<string, string> {
+export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPos>): Map<string, string> {
   const currentMinute = now.getHours() * 60 + now.getMinutes();
-  if (cachedMap !== null && cachedMinute === currentMinute) {
+  // livePos 있으면 위치 기준이라 분 캐시 미사용 (위치는 분 안에도 바뀜)
+  if (!livePos && cachedMap !== null && cachedMinute === currentMinute) {
     return cachedMap;
   }
 
@@ -603,15 +637,43 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
           if (nowMins >= arrMins && nowMins < arrMins + 5) isMargin = true;
         }
 
+        // 답십리 위치 게이팅 준비 — 이 구간의 행로 파트(m)에서 경계(첫·끝) 열차 판정
+        const routePart = (sc.m ?? '').split(',')[si]?.trim() ?? '';
+        const entryAtDap = routePart.startsWith('답');          // 첫 열차를 답십리에서 인수
+        const exitAtDap = routePart.length >= 2 && routePart.endsWith('답'); // 끝 열차를 답십리에서 인계
+        /**
+         * 경계 열차번호(영등포와 답십리 양쪽에 같은 번호 존재)면 위치로 게이팅.
+         * - 첫 열차(답X…): X 방면 쪽이 답십리 기관사 담당 구간
+         * - 끝 열차(…X답): X 방면 쪽이 답십리 기관사 담당 구간
+         * 담당 구간 밖(=영등포 구간)이거나 위치 불명이면 표시 안 함(위치 우선).
+         * 중간 열차/기지출고·입고 행로는 전담 → 게이팅 없음.
+         */
+        const gatedOut = (k: number): boolean => {
+          if (!livePos) return false;
+          const isFirst = k === 0;
+          const isLast = k === seg.n!.length - 1;
+          let sideChar = '';
+          if (isFirst && entryAtDap) sideChar = routePart[1] ?? '';
+          else if (isLast && exitAtDap) sideChar = routePart[routePart.length - 2] ?? '';
+          else return false; // 경계 아님 → 게이팅 없음
+          const lp = livePos.get(String(seg.n![k]));
+          const pos = stationPosIndex(lp?.station);
+          if (pos === null) return true; // 위치 모름 → 표시 안 함
+          // UP_CHARS(방·왕·영…)=서쪽 담당 → pos ≤ 답십리, DOWN_CHARS(군·마·하…)=동쪽 담당 → pos ≥ 답십리
+          return UP_CHARS.has(sideChar) ? pos > DAP_IDX : pos < DAP_IDX;
+        };
+
         if (isStrict) {
-          for (const trainNo of seg.n) {
-            const key = String(trainNo);
+          for (let k = 0; k < seg.n.length; k++) {
+            if (gatedOut(k)) continue;
+            const key = String(seg.n[k]);
             strictMap.set(key, person.n);
             strictDiaMap.set(key, { name: person.n, dia, date });
           }
         } else if (isMargin) {
-          for (const trainNo of seg.n) {
-            const key = String(trainNo);
+          for (let k = 0; k < seg.n.length; k++) {
+            if (gatedOut(k)) continue;
+            const key = String(seg.n[k]);
             if (!marginMap.has(key)) {
               marginMap.set(key, person.n);
               marginDiaMap.set(key, { name: person.n, dia, date });
@@ -628,7 +690,9 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
   const finalDiaMap = new Map<string, TrainDiaInfo>(marginDiaMap);
   strictDiaMap.forEach((v, k) => finalDiaMap.set(k, v));
 
-  cachedMinute = currentMinute;
+  // livePos 결과는 위치 기반 → 분 캐시 키를 갱신하지 않음(다음 무-livePos 호출이 재계산하도록).
+  // 단 cachedDiaMap은 즉시 buildTrainDiaMap(now, livePos)가 읽도록 항상 갱신.
+  if (!livePos) cachedMinute = currentMinute;
   cachedMap = finalMap;
   cachedDiaMap = finalDiaMap;
   return finalMap;
@@ -638,10 +702,11 @@ export function buildTrainDriverMap(now: Date): Map<string, string> {
  * 현재 운행 중인 열차번호 → 답십리 기관사 다이아 정보 매핑 (행로표 미리보기용)
  * buildTrainDriverMap()와 동일한 분 단위 캐시를 공유 — 동일 분 내 재계산 없음.
  */
-export function buildTrainDiaMap(now: Date): Map<string, TrainDiaInfo> {
+export function buildTrainDiaMap(now: Date, livePos?: Map<string, LiveTrainPos>): Map<string, TrainDiaInfo> {
   const currentMinute = now.getHours() * 60 + now.getMinutes();
-  if (cachedDiaMap === null || cachedMinute !== currentMinute) {
-    buildTrainDriverMap(now);
+  // livePos 있으면 위치 기준이라 항상 재계산해 동일 게이팅 결과 공유
+  if (livePos || cachedDiaMap === null || cachedMinute !== currentMinute) {
+    buildTrainDriverMap(now, livePos);
   }
   return cachedDiaMap ?? new Map();
 }

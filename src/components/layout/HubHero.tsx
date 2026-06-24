@@ -136,7 +136,8 @@ export default function HubHero({ onClick }: HubHeroProps) {
   let titleNode: React.ReactNode;
   if (!driver) titleNode = <span className={styles.heroTitle}>기관사 선택</span>;
   else if (!info) titleNode = <span className={styles.heroTitle}>정보 없음</span>;
-  else if (info.isRest) titleNode = <span className={styles.heroTitle}>{info.restLabel || '휴무'}</span>;
+  // 비번(교번 '~'로 끝남)과 휴무('휴'로 시작)를 구분 — getDiaDisplay가 '비번'/'휴무' 반환
+  else if (info.isRest) titleNode = <span className={styles.heroTitle}>{info.restLabel || info.diaLabel}</span>;
   else titleNode = (
     <span className={styles.heroTitle}>
       <span className={styles.bigNumber}>{info.diaLabel}</span>

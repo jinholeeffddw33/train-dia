@@ -2,6 +2,49 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 
 const KEEP_DAYS = 3;
+const BUCKET = 'standby-coverage';
+
+type Supa = NonNullable<typeof serverSupabase>;
+
+/** public URL → 버킷 내부 경로 추출 (저장 파일 삭제용) */
+function extractStoragePath(imageUrl: string): string | null {
+  const marker = `/${BUCKET}/`;
+  const i = imageUrl.indexOf(marker);
+  if (i < 0) return null;
+  try {
+    return decodeURIComponent(imageUrl.slice(i + marker.length));
+  } catch {
+    return imageUrl.slice(i + marker.length);
+  }
+}
+
+/**
+ * 보관일(KEEP_DAYS)이 지난 대기충당현황을 사진+DB까지 실제 삭제.
+ * - cutoff(오늘-2일)보다 오래된 target_date 행 대상
+ * - 확인기록(standby_coverage_reads)은 FK on delete cascade 로 함께 삭제
+ * 조회 요청마다 호출(가볍고 멱등) + 매일 도는 스케줄에서도 호출.
+ */
+async function cleanupExpired(supabase: Supa, cutoffStr: string): Promise<number> {
+  const { data: oldRows } = await supabase
+    .from('standby_coverage')
+    .select('id, image_url')
+    .lt('target_date', cutoffStr);
+
+  if (!oldRows || oldRows.length === 0) return 0;
+
+  // 1) 저장된 사진 삭제
+  const paths = (oldRows as { id: string; image_url: string }[])
+    .map((r) => extractStoragePath(r.image_url))
+    .filter((p): p is string => !!p);
+  if (paths.length > 0) {
+    await supabase.storage.from(BUCKET).remove(paths);
+  }
+
+  // 2) DB 행 삭제 (확인기록은 cascade)
+  await supabase.from('standby_coverage').delete().lt('target_date', cutoffStr);
+
+  return oldRows.length;
+}
 
 interface ReadRow { user_sabun: string; user_name: string; read_at: string }
 interface CoverageRow {
@@ -23,6 +66,13 @@ export async function GET() {
   const today = new Date();
   const cutoff = new Date(today.getFullYear(), today.getMonth(), today.getDate() - KEEP_DAYS + 1);
   const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, '0')}-${String(cutoff.getDate()).padStart(2, '0')}`;
+
+  // 보관일 지난 기록 자동 삭제 (사진+DB) — 실패해도 조회는 계속
+  try {
+    await cleanupExpired(serverSupabase, cutoffStr);
+  } catch {
+    /* 정리 실패는 조회를 막지 않음 */
+  }
 
   const { data, error } = await serverSupabase
     .from('standby_coverage')

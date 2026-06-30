@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ArrowLeft, AlertTriangle, TrainFront, Train, ShieldAlert,
-  Megaphone, ChevronRight, Bell, Check, X,
+  Megaphone, ChevronRight, Bell, Check, X, BookOpen,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
 
@@ -62,7 +62,7 @@ function saveDashboardReadIds(ids: Set<string>) {
 
 interface Props {
   onBack: () => void;
-  onOpenCategory: (id: 'incident' | 'driving' | 'train' | 'hazard') => void;
+  onOpenCategory: (id: 'incident' | 'driving' | 'train' | 'hazard' | 'tips') => void;
   onOpenNotice?: () => void;
   /** 카드 클릭 시 해당 리포트 상세보기로 직접 진입 (요약 모달 대신) */
   onOpenReport?: (reportId: string, cardKey: 'incident' | 'driving' | 'train' | 'hazard') => void;
@@ -183,6 +183,7 @@ const CATEGORIES = [
   { id: 'driving'  as const, label: '운전정보',  icon: TrainFront,    tone: 'blue'  as const },
   { id: 'train'    as const, label: '열차정보',  icon: Train,         tone: 'green' as const },
   { id: 'hazard'   as const, label: '위험개소',   icon: ShieldAlert,   tone: 'red'   as const },
+  { id: 'tips'     as const, label: '안전상식',   icon: BookOpen,      tone: 'purple' as const },
 ];
 
 // 사고사례 vs 운전정보 — 가장 최근 업로드 비교

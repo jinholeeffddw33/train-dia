@@ -15,6 +15,7 @@ import HazardForm from './components/HazardForm';
 import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
 import SafetyDashboard from './components/SafetyDashboard';
+import SafetyTipsView from './components/SafetyTipsView';
 import { isAdmin, getUserRole } from '@/lib/auth';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
@@ -65,6 +66,7 @@ type CardKey = 'incident' | 'driving' | 'train' | 'hazard' | 'notice';
 type SafetyView =
   | 'home'
   | 'alert'
+  | 'tips'
   | { type: 'list'; category: SafetyCategory; cardKey: CardKey }
   | { type: 'detail'; category: SafetyCategory; cardKey: CardKey; id: string };
 
@@ -221,6 +223,11 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   useHistoryBack('safety-l2', goToList, isDetail);
 
 
+  // ── 안전상식 화면 ──
+  if (view === 'tips') {
+    return <SafetyTipsView onBack={goHome} />;
+  }
+
   // ── 장애 리스트 화면 ──
   if (view === 'alert') {
     return (
@@ -285,7 +292,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   // ── 메인 화면 (프로토타입 대시보드) ──
   const totalUnread = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
 
-  const handleDashboardCategory = (id: 'incident' | 'driving' | 'train' | 'hazard') => {
+  const handleDashboardCategory = (id: 'incident' | 'driving' | 'train' | 'hazard' | 'tips') => {
     if (id === 'hazard') {
       setView({ type: 'list', category: 'hazard', cardKey: 'hazard' });
     } else if (id === 'incident') {
@@ -294,6 +301,8 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
       setView({ type: 'list', category: 'inspect', cardKey: 'driving' });
     } else if (id === 'train') {
       setView({ type: 'list', category: 'inspect', cardKey: 'train' });
+    } else if (id === 'tips') {
+      setView('tips');
     }
   };
 

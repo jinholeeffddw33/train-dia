@@ -426,7 +426,7 @@
 /* ── 4 카테고리 가로 1줄 ── */
 .categoryRow {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   /* 글래스 카드 — 4 카테고리 묶음 */
   padding: var(--dia-space-3);
@@ -474,6 +474,7 @@
 .catTone_blue  { --jw: 96, 165, 250; }
 .catTone_green { --jw: 52, 211, 153; }
 .catTone_red   { --jw: 248, 113, 113; }
+.catTone_purple{ --jw: 167, 139, 250; }
 
 .catIconWrap {
   position: relative;

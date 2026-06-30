@@ -116,8 +116,16 @@
       "source": "youtube"
     },
     {
-      "id": "newcomer-vacation-guide",
+      "id": "emergency-brake-release",
       "order": 13,
+      "category": "trouble",
+      "title": "비상제동 완해 불능 조치 메뉴얼",
+      "url": "https://youtu.be/PpK9VvtZabs",
+      "source": "youtube"
+    },
+    {
+      "id": "newcomer-vacation-guide",
+      "order": 14,
       "category": "hr",
       "title": "새내기를 위한 휴가 가이드",
       "url": "https://youtu.be/vt1YYw9SYPo",
@@ -126,7 +134,7 @@
     },
     {
       "id": "promotion-guide",
-      "order": 14,
+      "order": 15,
       "category": "hr",
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",

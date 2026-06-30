@@ -132,8 +132,16 @@
       "source": "youtube"
     },
     {
-      "id": "newcomer-vacation-guide",
+      "id": "train-radio-lte-r-2",
       "order": 15,
+      "category": "trouble",
+      "title": "열차무전기(LTE-R) 사용법 2",
+      "url": "https://youtu.be/N_K68sAsoDw",
+      "source": "youtube"
+    },
+    {
+      "id": "newcomer-vacation-guide",
+      "order": 16,
       "category": "hr",
       "title": "새내기를 위한 휴가 가이드",
       "url": "https://youtu.be/vt1YYw9SYPo",
@@ -142,7 +150,7 @@
     },
     {
       "id": "promotion-guide",
-      "order": 16,
+      "order": 17,
       "category": "hr",
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",

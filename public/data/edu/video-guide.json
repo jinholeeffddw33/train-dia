@@ -98,8 +98,16 @@
       "source": "youtube"
     },
     {
-      "id": "train-radio-lte-r",
+      "id": "rescue-coupling-2",
       "order": 11,
+      "category": "trouble",
+      "title": "5호선 구원연결 방법 2",
+      "url": "https://youtu.be/g_s_W3bpieM",
+      "source": "youtube"
+    },
+    {
+      "id": "train-radio-lte-r",
+      "order": 12,
       "category": "trouble",
       "title": "열차무전기 LTE-R 사용법",
       "url": "https://youtu.be/jLYTowSIQeg",
@@ -107,8 +115,16 @@
       "source": "youtube"
     },
     {
+      "id": "train-radio-lte-r-2",
+      "order": 13,
+      "category": "trouble",
+      "title": "열차무전기(LTE-R) 사용법 2",
+      "url": "https://youtu.be/N_K68sAsoDw",
+      "source": "youtube"
+    },
+    {
       "id": "uninterruptible-announce",
-      "order": 12,
+      "order": 14,
       "category": "trouble",
       "title": "무정전방송장치 사용법",
       "url": "https://youtu.be/PfCDzaQnOJs",
@@ -117,7 +133,7 @@
     },
     {
       "id": "emergency-brake-release",
-      "order": 13,
+      "order": 15,
       "category": "trouble",
       "title": "비상제동 완해 불능 조치 메뉴얼",
       "url": "https://youtu.be/PpK9VvtZabs",
@@ -125,26 +141,10 @@
     },
     {
       "id": "brake-release-failure",
-      "order": 14,
+      "order": 16,
       "category": "trouble",
       "title": "제동 불완해 (상용, 비상)",
       "url": "https://youtu.be/spOl6e0iRWw",
-      "source": "youtube"
-    },
-    {
-      "id": "train-radio-lte-r-2",
-      "order": 15,
-      "category": "trouble",
-      "title": "열차무전기(LTE-R) 사용법 2",
-      "url": "https://youtu.be/N_K68sAsoDw",
-      "source": "youtube"
-    },
-    {
-      "id": "rescue-coupling-2",
-      "order": 16,
-      "category": "trouble",
-      "title": "5호선 구원연결 방법 2",
-      "url": "https://youtu.be/g_s_W3bpieM",
       "source": "youtube"
     },
     {

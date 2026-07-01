@@ -156,8 +156,16 @@
       "source": "youtube"
     },
     {
-      "id": "newcomer-vacation-guide",
+      "id": "eo-mode-guide",
       "order": 18,
+      "category": "trouble",
+      "title": "EO모드(비상역행) 완벽 가이드",
+      "url": "https://youtu.be/A9QgWma6YLw",
+      "source": "youtube"
+    },
+    {
+      "id": "newcomer-vacation-guide",
+      "order": 19,
       "category": "hr",
       "title": "새내기를 위한 휴가 가이드",
       "url": "https://youtu.be/vt1YYw9SYPo",
@@ -166,7 +174,7 @@
     },
     {
       "id": "promotion-guide",
-      "order": 19,
+      "order": 20,
       "category": "hr",
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",

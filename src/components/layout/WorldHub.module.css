@@ -554,7 +554,7 @@
 }
 
 .smallTitle {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   text-align: center;
@@ -979,7 +979,7 @@
 }
 
 .footerBrand {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: 800;
   letter-spacing: 0.5px;
   background: linear-gradient(135deg, #60A5FA, #8B5CF6 50%, #38BDF8);
@@ -993,7 +993,7 @@
   display: inline-flex;
   align-items: center;
   padding: 2px 9px;
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
   font-weight: 700;
   letter-spacing: 0.3px;
   color: #fff;

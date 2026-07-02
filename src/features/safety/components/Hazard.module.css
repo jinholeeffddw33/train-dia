@@ -42,7 +42,7 @@
 
 .cardLocation {
   font-size: var(--dia-text-xs);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-weight: var(--dia-weight-medium);
   white-space: nowrap;
   overflow: hidden;
@@ -237,7 +237,7 @@
 .detailLocation {
   display: inline-block;
   font-size: var(--dia-text-sm);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-weight: var(--dia-weight-medium);
   background: var(--dia-amber-dim);
   padding: var(--dia-space-1) var(--dia-space-3);
@@ -821,7 +821,7 @@
 
 /* 비활성 — 톤별 외곽선 색만 살짝 */
 .severity_red    { border-color: rgba(239, 68, 68, 0.4); color: var(--dia-red); }
-.severity_amber  { border-color: rgba(245, 158, 11, 0.4); color: var(--dia-amber); }
+.severity_amber  { border-color: rgba(245, 158, 11, 0.4); color: var(--dia-amber-text); }
 .severity_blue   { border-color: rgba(59, 130, 246, 0.4); color: var(--dia-blue); }
 
 /* 활성(선택) — 채워진 톤 */
@@ -1146,7 +1146,7 @@
 }
 
 .noticeDateDay {
-  font-size: 18px;
+  font-size: var(--dia-text-lg);
   font-weight: 800;
   color: var(--dia-text-primary);
   line-height: 1;

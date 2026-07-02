@@ -82,7 +82,7 @@
   background: transparent;
   border: none;
   color: var(--dia-text-primary);
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   outline: none;
 }
 
@@ -203,7 +203,7 @@
   padding: var(--dia-space-10) var(--dia-space-4);
   text-align: center;
   color: var(--dia-text-tertiary);
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
 }
 
 .page {
@@ -273,7 +273,7 @@
     var(--dia-surface);
   border: none;
   color: var(--dia-text-primary);
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -334,14 +334,14 @@
 .tocBtnChapter {
   padding: 10px var(--dia-space-4) 10px var(--dia-space-4);
   color: var(--dia-text-primary);
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: 700;
 }
 
 .tocBtnSection {
   padding: 7px var(--dia-space-4) 7px calc(var(--dia-space-4) + 20px);
   color: var(--dia-text-secondary);
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   font-weight: 500;
 }
 
@@ -429,7 +429,7 @@
 }
 
 .chapterBadge {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   background: rgba(59, 130, 246, 0.18);
   border: 1px solid rgba(59, 130, 246, 0.4);
 }
@@ -446,11 +446,11 @@
 }
 
 .chapterMark .markTitle {
-  font-size: 20px;
+  font-size: var(--dia-text-xl);
 }
 
 .sectionMark .markTitle {
-  font-size: 17px;
+  font-size: var(--dia-text-lg);
 }
 
 /* ── 본문 내 "제N조(제목)" 마커 — 자체 줄로 분리·강조 ── */
@@ -588,7 +588,7 @@
 
 .annotationMemoBadge {
   margin-left: 2px;
-  font-size: 11px;
+  font-size: var(--dia-text-meta);
   vertical-align: super;
 }
 
@@ -639,7 +639,7 @@
   border: none;
   color: var(--dia-text-primary, #fff);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
 }
 .annoMemoBtn:active,
 .annoCloseBtn:active { transform: scale(0.9); }
@@ -688,7 +688,7 @@
   background: transparent;
   color: var(--dia-text-tertiary);
   border-radius: var(--dia-radius-full);
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   cursor: pointer;
 }
 .memoClose:active { background: var(--dia-surface-hover); transform: scale(0.92); }
@@ -797,7 +797,7 @@
   padding: 2px 8px;
   font-size: var(--dia-text-meta);
   background: var(--dia-amber-dim, var(--dia-surface-hover));
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   border-radius: 999px;
   font-weight: 700;
 }
@@ -850,7 +850,7 @@
 }
 
 .notesItemMemoBadge {
-  font-size: 12px;
+  font-size: var(--dia-text-meta);
 }
 
 .notesItemText {

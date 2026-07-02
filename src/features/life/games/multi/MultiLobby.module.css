@@ -153,7 +153,7 @@
 .codeInput {
   width: 100%;
   height: 80px;
-  font-size: 36px;
+  font-size: var(--dia-text-4xl);
   font-weight: var(--dia-weight-bold);
   text-align: center;
   letter-spacing: 0.5em;
@@ -166,13 +166,13 @@
 }
 
 .codeInput:focus-visible {
-  outline: 2px solid var(--dia-accent-blue, #3B82F6);
+  outline: 2px solid var(--dia-blue);
   outline-offset: 2px;
 }
 
 .errorText {
   font-size: var(--dia-text-sm);
-  color: var(--dia-accent-red, #EF4444);
+  color: var(--dia-red);
   text-align: center;
 }
 

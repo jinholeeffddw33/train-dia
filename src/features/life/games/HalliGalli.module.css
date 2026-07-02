@@ -315,7 +315,7 @@
 }
 
 .tapHint strong {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-weight: var(--dia-weight-bold);
 }
 
@@ -355,7 +355,7 @@
 }
 
 .introDesc strong {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-weight: var(--dia-weight-bold);
 }
 
@@ -386,7 +386,7 @@
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-medium);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   align-self: center;
 }
 
@@ -464,6 +464,6 @@
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   align-self: center;
 }

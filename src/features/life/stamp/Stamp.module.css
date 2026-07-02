@@ -74,7 +74,7 @@
 }
 
 .statValue {
-  font-size: 28px;
+  font-size: var(--dia-text-2xl);
   font-weight: 800;
   color: var(--dia-text-primary);
   line-height: 1;
@@ -104,7 +104,7 @@
     radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.3), transparent 55%),
     linear-gradient(145deg, #F97316, #C2410C);
   color: #fff;
-  font-size: 17px;
+  font-size: var(--dia-text-lg);
   font-weight: 800;
   letter-spacing: 0.5px;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
@@ -216,7 +216,7 @@
 .calendarCellStampMark {
   position: absolute;
   bottom: 2px;
-  font-size: 9px;
+  font-size: var(--dia-text-meta);
   font-weight: 800;
   color: #F43F5E;
   letter-spacing: -0.3px;
@@ -291,7 +291,7 @@
 .milestoneCheck {
   font-size: 22px;
   font-weight: 800;
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .footnote {
@@ -342,9 +342,9 @@
 
 .celebLabel {
   margin: 0;
-  font-size: 22px;
+  font-size: var(--dia-text-xl);
   font-weight: 800;
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .celebMsg {

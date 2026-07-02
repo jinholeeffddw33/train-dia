@@ -44,7 +44,7 @@
 
 .warning {
   background: var(--dia-amber-dim);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 

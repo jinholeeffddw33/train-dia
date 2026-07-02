@@ -46,13 +46,13 @@
 
 .heroDesc {
   position: relative;
-  font-size: 14px; font-weight: 500;
+  font-size: var(--dia-text-xs); font-weight: 500;
   color: var(--dia-text-tertiary);
 }
 
 .heroTitle {
   position: relative;
-  font-size: 28px; font-weight: 800;
+  font-size: var(--dia-text-2xl); font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--dia-text-primary);
   margin-top: 2px;
@@ -127,7 +127,7 @@
 }
 
 .menuLabel {
-  font-size: 16px; font-weight: 700;
+  font-size: var(--dia-text-base); font-weight: 700;
   color: var(--dia-text-primary);
 }
 
@@ -423,7 +423,7 @@
 
 .headerTitle {
   flex: 1;
-  font-size: 18px; font-weight: 700;
+  font-size: var(--dia-text-lg); font-weight: 700;
   color: var(--dia-text-primary);
 }
 
@@ -435,7 +435,7 @@
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
   color: #fff;
   border-radius: var(--dia-radius-lg);
-  font-size: 14px; font-weight: 600;
+  font-size: var(--dia-text-xs); font-weight: 600;
   min-height: 36px;
 }
 
@@ -445,7 +445,7 @@
 .deleteBtn {
   padding: var(--dia-space-2) var(--dia-space-3);
   color: var(--dia-red);
-  font-size: 14px; font-weight: 600;
+  font-size: var(--dia-text-xs); font-weight: 600;
   background: none; border: none;
 }
 
@@ -463,8 +463,8 @@
 }
 
 .emptyIcon { font-size: 40px; }
-.emptyText { font-size: 16px; font-weight: 600; color: var(--dia-text-secondary); }
-.emptyHint { font-size: 14px; color: var(--dia-text-tertiary); }
+.emptyText { font-size: var(--dia-text-base); font-weight: 600; color: var(--dia-text-secondary); }
+.emptyHint { font-size: var(--dia-text-xs); color: var(--dia-text-tertiary); }
 
 /* ── 포스트 리스트 ── */
 .postList {
@@ -537,14 +537,14 @@
 }
 
 .postTitle {
-  font-size: 16px; font-weight: 700;
+  font-size: var(--dia-text-base); font-weight: 700;
   color: var(--dia-text-primary);
   margin-bottom: var(--dia-space-2);
   line-height: var(--dia-leading-normal);
 }
 
 .postBody {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-secondary);
   line-height: var(--dia-leading-relaxed);
   margin-bottom: var(--dia-space-3);
@@ -571,7 +571,7 @@
 }
 
 .detailTitle {
-  font-size: 20px; font-weight: 700;
+  font-size: var(--dia-text-xl); font-weight: 700;
   color: var(--dia-text-primary);
   margin-bottom: var(--dia-space-3);
   line-height: var(--dia-leading-normal);
@@ -584,7 +584,7 @@
 }
 
 .detailContent {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   color: var(--dia-text-primary);
   line-height: var(--dia-leading-relaxed);
   white-space: pre-wrap;
@@ -596,7 +596,7 @@
   padding: var(--dia-space-2) var(--dia-space-3);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-full);
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-secondary);
   background: none;
   cursor: pointer;
@@ -614,7 +614,7 @@
 }
 
 .commentTitle {
-  font-size: 16px; font-weight: 700;
+  font-size: var(--dia-text-base); font-weight: 700;
   color: var(--dia-text-primary);
   margin-bottom: var(--dia-space-3);
 }
@@ -640,7 +640,7 @@
 }
 
 .commentText {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   color: var(--dia-text-primary);
   line-height: var(--dia-leading-normal);
 }
@@ -664,7 +664,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl);
   color: var(--dia-text-primary);
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   min-height: 44px;
   min-width: 0;
 }
@@ -692,7 +692,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl);
   color: var(--dia-text-primary);
-  font-size: 18px; font-weight: 600;
+  font-size: var(--dia-text-lg); font-weight: 600;
   min-height: 48px;
 }
 
@@ -702,20 +702,20 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-xl);
   color: var(--dia-text-primary);
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   line-height: var(--dia-leading-relaxed);
   resize: vertical;
   min-height: 200px;
 }
 
 .errorText {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-red);
   text-align: center;
 }
 
 .writeInfo {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   text-align: center;
 }
@@ -769,7 +769,7 @@
   flex: 1;
   border: none;
   background: none;
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-primary);
   outline: none;
   min-width: 0;
@@ -832,7 +832,7 @@
 }
 
 .detailMeta {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
 
@@ -879,7 +879,7 @@
 
 .dabTitle {
   position: relative;
-  font-size: 28px;
+  font-size: var(--dia-text-2xl);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.3px;
@@ -889,7 +889,7 @@
 
 .dabSub {
   position: relative;
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: 500;
   color: var(--dab-hero-sub);
   margin: 0;

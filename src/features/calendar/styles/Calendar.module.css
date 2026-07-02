@@ -119,7 +119,7 @@
 }
 
 .cellDate {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   line-height: 1;
@@ -136,7 +136,7 @@
 
 /* 교번 아래 출근시각 (소형) — 교번 색과 동일 톤 */
 .cellStartTime {
-  font-size: 10px;
+  font-size: var(--dia-text-meta);
   font-weight: 600;
   line-height: 1;
   color: var(--dia-text-tertiary);
@@ -147,13 +147,13 @@
 
 .cellType_day { color: var(--dia-blue); }
 .cellType_night { color: var(--dia-purple); }
-.cellType_standby { color: var(--dia-amber); }
+.cellType_standby { color: var(--dia-amber-text); }
 .cellType_rest { color: var(--dia-gray); }
 
 /* 출근시각 — 교번 type별 색상 매칭 */
 .cellStartTime_day { color: var(--dia-blue); }
 .cellStartTime_night { color: var(--dia-purple); }
-.cellStartTime_standby { color: var(--dia-amber); }
+.cellStartTime_standby { color: var(--dia-amber-text); }
 .cellStartTime_rest { color: var(--dia-gray); }
 
 /* ── 기지 출근 강조 (실수 방지) ── */
@@ -163,7 +163,7 @@
 
 /* 기지 출근일 때 시간 줄 — 앰버 톤으로 type 색 덮어씀 */
 .cellStartTimeDepot {
-  color: var(--dia-amber) !important;
+  color: var(--dia-amber-text) !important;
   font-weight: 700;
 }
 
@@ -193,14 +193,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 12px;
-  height: 12px;
+  min-width: 18px;
+  height: 18px;
   padding: 0 3px;
   border-radius: 3px;
   background: rgba(245, 158, 11, 0.2);
   border: 1px solid rgba(245, 158, 11, 0.5);
-  color: var(--dia-amber);
-  font-size: 9px;
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-meta);
   font-weight: 800;
   line-height: 1;
 }
@@ -228,7 +228,7 @@
 }
 
 .cellOffice_standby {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   background: var(--dia-amber-dim, var(--dia-type-rest-bg));
 }
 

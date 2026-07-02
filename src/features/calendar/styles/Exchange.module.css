@@ -188,7 +188,7 @@
 /* DiaType 색상 */
 .dia_day { color: var(--dia-blue); }
 .dia_night { color: var(--dia-purple); }
-.dia_standby { color: var(--dia-amber); }
+.dia_standby { color: var(--dia-amber-text); }
 .dia_rest { color: var(--dia-gray); }
 
 /* ── Wish Buttons ── */
@@ -784,7 +784,7 @@
 
 .status_pending {
   background: var(--dia-amber-dim);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .status_accepted {
@@ -817,7 +817,7 @@
 .openLabel {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   background: var(--dia-amber-dim);
   padding: 2px 8px;
   border-radius: var(--dia-radius-sm);
@@ -851,7 +851,7 @@
 .volunteerCount {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   white-space: nowrap;
   flex-shrink: 0;
 }

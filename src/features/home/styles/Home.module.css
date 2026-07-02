@@ -150,7 +150,7 @@
 }
 
 .headerRole {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.5);
   margin-left: 4px;
@@ -173,12 +173,12 @@
 }
 
 .viewModeBadge:active {
-  background: var(--dia-blue-dark, #2563eb);
+  background: var(--dia-3d-blue-end);
   transform: scale(0.97);
 }
 
 .clockAmPm {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.6);
   margin-right: 6px;
@@ -217,7 +217,7 @@
   color: #fff;
   padding: 12px 24px;
   border-radius: 14px;
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: 600;
   margin-top: 4px;
   transition: background var(--dia-transition-fast), transform var(--dia-transition-fast);
@@ -230,7 +230,7 @@
 }
 
 .driverBtnText {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: 600;
   color: #fff;
 }
@@ -272,7 +272,7 @@
 }
 
 .quickLabel {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   font-weight: 600;
   color: #fff;
 }
@@ -365,7 +365,7 @@
 }
 
 .depotBadge {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   color: #ff4444;
 }
@@ -476,7 +476,7 @@
 
 .banner_preparing {
   background: var(--dia-amber-dim);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .banner_idle {
@@ -611,7 +611,7 @@
 /* 주간 스트립 타입별 색상 */
 .weekType_day .weekDia { color: var(--dia-blue); }
 .weekType_night .weekDia { color: var(--dia-purple); }
-.weekType_standby .weekDia { color: var(--dia-amber); }
+.weekType_standby .weekDia { color: var(--dia-amber-text); }
 .weekType_rest .weekDia { color: var(--dia-gray); }
 
 /* ── Status Cards (내일/모레) ── */
@@ -671,7 +671,7 @@
 }
 
 .statusCardDia {
-  font-size: 39px;
+  font-size: var(--dia-text-4xl);
   font-weight: 800;
   color: var(--dia-text-primary);
   letter-spacing: -0.5px;
@@ -737,7 +737,7 @@
 /* 내일/모레 교번 숫자 타입별 색상 */
 .type_day .statusCardDia { color: var(--dia-blue); }
 .type_night .statusCardDia { color: var(--dia-purple); }
-.type_standby .statusCardDia { color: var(--dia-amber); }
+.type_standby .statusCardDia { color: var(--dia-amber-text); }
 
 /* ── Month Summary ── */
 .monthSection {
@@ -845,7 +845,7 @@
 
 .monthLabelDay { color: var(--dia-blue); }
 .monthLabelNight { color: var(--dia-purple); }
-.monthLabelStandby { color: var(--dia-amber); }
+.monthLabelStandby { color: var(--dia-amber-text); }
 
 /* ── Driver Selector Modal ── */
 .selectorSearch {

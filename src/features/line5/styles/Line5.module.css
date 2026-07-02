@@ -259,7 +259,7 @@
 }
 
 .fabTime_stale {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .fabTime_idle {
@@ -522,7 +522,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   font-weight: 900;
   background: var(--dia-bg);
   z-index: 3;
@@ -803,7 +803,7 @@
   background: var(--dia-bg);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-primary);
-  font-size: 18px;
+  font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-bold);
   box-shadow: var(--dia-shadow-sm);
 }
@@ -867,7 +867,7 @@
 .mapSvg {
   width: 100%;
   height: auto;
-  min-width: 600px;
+  min-width: 700px; /* 노안 가독 — SVG fontSize 18 × (700/960) ≈ 13px 실효 보장 */
   transition: transform 0.2s ease;
 }
 

@@ -156,7 +156,7 @@
 .rating {
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-variant-numeric: tabular-nums;
 }
 

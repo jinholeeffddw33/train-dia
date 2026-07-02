@@ -226,7 +226,7 @@
 }
 
 .personCardName {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   letter-spacing: 0.01em;
@@ -348,7 +348,7 @@
 
 .cmpType_day { color: var(--dia-blue); }
 .cmpType_night { color: var(--dia-purple); }
-.cmpType_standby { color: var(--dia-amber); }
+.cmpType_standby { color: var(--dia-amber-text); }
 .cmpType_rest { color: var(--dia-gray); }
 
 /* ── Search ── */

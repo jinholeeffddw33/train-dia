@@ -79,7 +79,7 @@
 }
 
 .message {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   line-height: 1.65;
   color: var(--dia-text-primary);
   margin: 0;

@@ -193,13 +193,13 @@
 }
 
 .bestText strong {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .newRecord {
   font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   margin: 0;
 }
 

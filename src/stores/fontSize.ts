@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type FontSize = 'small' | 'normal' | 'large';
+export type FontSize = 'small' | 'normal' | 'large' | 'xlarge';
 
 interface FontSizeState {
   size: FontSize;
@@ -12,13 +12,14 @@ const FONT_SIZE_CLASS_MAP: Record<FontSize, string> = {
   small: 'font-small',
   normal: '',
   large: 'font-large',
+  xlarge: 'font-xlarge',
 };
 
 function applyFontSize(size: FontSize) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   // 이전 클래스 제거
-  root.classList.remove('font-small', 'font-large');
+  root.classList.remove('font-small', 'font-large', 'font-xlarge');
   // 새 클래스 추가 (normal은 기본이므로 클래스 없음)
   const cls = FONT_SIZE_CLASS_MAP[size];
   if (cls) {

@@ -193,8 +193,8 @@
 }
 
 .diaBadge_standby {
-  background: var(--dia-orange-dim);
-  color: var(--dia-orange);
+  background: var(--dia-type-standby-bg);
+  color: var(--dia-type-standby-text);
 }
 
 /* ── Driver & Info ── */
@@ -228,8 +228,8 @@
 }
 
 .diaType_standby {
-  background: var(--dia-orange-dim);
-  color: var(--dia-orange);
+  background: var(--dia-type-standby-bg);
+  color: var(--dia-type-standby-text);
 }
 
 .diaTime {
@@ -346,7 +346,7 @@
 
 .routeBarFill_day { background: var(--dia-blue); }
 .routeBarFill_night { background: var(--dia-purple); }
-.routeBarFill_standby { background: var(--dia-orange); }
+.routeBarFill_standby { background: var(--dia-type-standby); }
 
 .routeStations {
   display: flex;

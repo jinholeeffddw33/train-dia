@@ -31,7 +31,7 @@
 
 .label {
   flex-shrink: 0;
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
   letter-spacing: 0.02em;
   color: var(--dia-text-primary);
@@ -40,7 +40,7 @@
 }
 
 .value {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   white-space: nowrap;
@@ -94,7 +94,7 @@
 }
 
 .wCity {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-secondary);
   letter-spacing: 0.02em;
@@ -104,13 +104,13 @@
 }
 
 .wTemp {
-  font-size: 16px;
+  font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
 }
 
 .wCond {
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-secondary);
 }
 
@@ -128,7 +128,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-primary);
   padding: 3px 10px;
@@ -169,7 +169,7 @@
 /* 나쁨 — 앰버 */
 .dust_bad {
   background: rgba(245, 158, 11, 0.18);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.4);
 }
 .dust_bad .dustDot { background: var(--dia-amber); box-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }

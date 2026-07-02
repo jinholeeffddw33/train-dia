@@ -33,7 +33,7 @@
   padding: var(--dia-space-4) var(--dia-space-5);
   border-bottom: 1px solid var(--dia-border);
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--dia-surface), var(--dia-surface-elev, var(--dia-surface)));
+  background: linear-gradient(135deg, var(--dia-surface), var(--dia-surface-elevated));
 }
 
 .titleArea {
@@ -43,7 +43,7 @@
 }
 
 .titleIcon {
-  color: var(--dia-accent-amber, #F59E0B);
+  color: var(--dia-amber-text);
 }
 
 .title {

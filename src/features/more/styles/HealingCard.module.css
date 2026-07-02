@@ -56,14 +56,14 @@
 }
 
 .balanceValue {
-  font-size: 28px;
+  font-size: var(--dia-text-2xl);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-blue);
   font-variant-numeric: tabular-nums;
 }
 
 .balanceNegative {
-  font-size: 28px;
+  font-size: var(--dia-text-2xl);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-red);
   font-variant-numeric: tabular-nums;

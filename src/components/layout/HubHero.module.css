@@ -144,7 +144,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  font-size: 24px;
+  font-size: var(--dia-text-2xl);
   font-weight: 700;
   color: #fff;
   line-height: 1;
@@ -152,14 +152,14 @@
 }
 
 .bigNumber {
-  font-size: 36px;
+  font-size: var(--dia-text-4xl);
   font-weight: 800;
   letter-spacing: -1.2px;
   line-height: 1;
 }
 
 .titleSuffix {
-  font-size: 18px;
+  font-size: var(--dia-text-lg);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.85);
 }
@@ -317,7 +317,7 @@
 
 /* ── 내근직 카드 전용 ── */
 .officeName {
-  font-size: 28px;
+  font-size: var(--dia-text-2xl);
   font-weight: 800;
   letter-spacing: -0.5px;
   line-height: 1;

@@ -6,17 +6,28 @@ import { buildTrainDriverMap } from '@/lib/schedule';
 import { LINE5_MAP, LINE5_ROUTES, LINE5_TRANSFERS } from '@/data/line5';
 import styles from '../styles/Line5.module.css';
 
-const ROUTE_COLOR = '#996CAC';
-const COLOR_UP = '#0D9452';    // 상행(짝수) — 초록
-const COLOR_DOWN = '#D32F2F';  // 하행(홀수) — 빨강
-const COLOR_ARRIVING = '#22C55E'; // 도착 중
-const DAPSIMNI_COLOR = '#3B82F6';
+/* 색상 = CSS 변수 (SVG 에서 var() 동작) — 라이트 모드 다크색 잔존 버그 방지 */
+const ROUTE_COLOR = 'var(--dia-track-line)';
+const COLOR_UP = 'var(--dia-track-up)';      // 상행(짝수) — 초록
+const COLOR_DOWN = 'var(--dia-track-down)';  // 하행(홀수) — 빨강
+const COLOR_ARRIVING = 'var(--dia-green)';   // 도착 중
+const DAPSIMNI_COLOR = 'var(--dia-blue)';
+
+/* 노안 가독 — SVG 렌더 최소폭 700px 기준 실효 스케일 ≈0.73.
+   역명/열차번호 18(≈13px), 답십리 20 — 라벨 겹침은 2단 스태거로 회피 */
+const FS_STATION = 18;
+const FS_STATION_MAIN = 20;
+const FS_TRAIN = 18;
+/* 역명 라벨 2단 스태거 — x 격자(70 간격) 홀짝으로 위/아래 단 분리 (긴 역명 겹침 방지) */
+function labelTier(x: number): 0 | 1 {
+  return (Math.round((x - 50) / 70) % 2 === 0 ? 0 : 1) as 0 | 1;
+}
 
 /** 열차번호로 방향 색상 결정 (홀수=하선 빨강, 짝수=상선 초록) */
 function getTrainColor(trainNo: string, status: string): string {
   if (status === '0') return COLOR_ARRIVING;
   const num = parseInt(trainNo);
-  if (isNaN(num)) return '#F59E0B';
+  if (isNaN(num)) return 'var(--dia-amber)';
   return num % 2 === 0 ? COLOR_UP : COLOR_DOWN;
 }
 
@@ -228,7 +239,7 @@ export default function RouteMap() {
 
                 {/* 선택 시 하이라이트 링 */}
                 {isSelected && (
-                  <circle cx={x} cy={y} r={16} fill="none" stroke="#F59E0B" strokeWidth={2} opacity={0.7} />
+                  <circle cx={x} cy={y} r={16} fill="none" stroke="var(--dia-amber)" strokeWidth={2} opacity={0.7} />
                 )}
 
                 {/* 역 원 */}
@@ -236,8 +247,8 @@ export default function RouteMap() {
                   cx={x}
                   cy={y}
                   r={isDapsimni ? 9 : isTransfer ? 8 : 5}
-                  fill={isDapsimni ? 'rgba(59,130,246,0.2)' : hasTrain ? '#F59E0B' : '#1E293B'}
-                  stroke={isDapsimni ? DAPSIMNI_COLOR : isTransfer ? '#ffffff' : ROUTE_COLOR}
+                  fill={isDapsimni ? 'var(--dia-blue-dim)' : hasTrain ? 'var(--dia-amber)' : 'var(--dia-bg-elevated)'}
+                  stroke={isDapsimni ? DAPSIMNI_COLOR : isTransfer ? 'var(--dia-text-primary)' : ROUTE_COLOR}
                   strokeWidth={isDapsimni ? 3 : isTransfer ? 2.5 : 2}
                 />
 
@@ -248,21 +259,21 @@ export default function RouteMap() {
                     cy={y}
                     r={12}
                     fill="none"
-                    stroke="#F59E0B"
+                    stroke="var(--dia-amber)"
                     strokeWidth={1.5}
                     opacity={0.5}
                     className={styles.mapPulse}
                   />
                 )}
 
-                {/* 역명 */}
+                {/* 역명 — 2단 스태거로 인접 라벨 겹침 회피 */}
                 <text
                   x={x}
-                  y={y - (isDapsimni ? 16 : 12)}
+                  y={y - (isDapsimni ? 16 : labelTier(x) === 0 ? 12 : 32)}
                   textAnchor="middle"
                   className={styles.mapStationName}
-                  fontSize={isDapsimni ? 12 : 10}
-                  fill={isDapsimni ? DAPSIMNI_COLOR : hasTrain ? '#F59E0B' : '#94A3B8'}
+                  fontSize={isDapsimni ? FS_STATION_MAIN : FS_STATION}
+                  fill={isDapsimni ? 'var(--dia-blue-text)' : hasTrain ? 'var(--dia-amber-text)' : 'var(--dia-text-secondary)'}
                   fontWeight={isDapsimni ? 'bold' : 'normal'}
                 >
                   {name}{isDapsimni ? ' ★' : ''}
@@ -274,10 +285,10 @@ export default function RouteMap() {
                   return (
                     <g key={t.trainNo}>
                       <text
-                        x={x - 22}
-                        y={y + 18 + ti * 24}
+                        x={x - 26}
+                        y={y + 24 + ti * 44}
                         textAnchor="middle"
-                        fontSize={9}
+                        fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                         fontWeight="bold"
                       >
@@ -285,11 +296,11 @@ export default function RouteMap() {
                       </text>
                       {driver && (
                         <text
-                          x={x - 22}
-                          y={y + 27 + ti * 24}
+                          x={x - 26}
+                          y={y + 42 + ti * 44}
                           textAnchor="middle"
-                          fontSize={7}
-                          fill="#3B82F6"
+                          fontSize={FS_TRAIN}
+                          fill="var(--dia-blue-text)"
                         >
                           {driver}
                         </text>
@@ -302,10 +313,10 @@ export default function RouteMap() {
                   return (
                     <g key={t.trainNo}>
                       <text
-                        x={x + 22}
-                        y={y + 18 + ti * 24}
+                        x={x + 26}
+                        y={y + 24 + ti * 44}
                         textAnchor="middle"
-                        fontSize={9}
+                        fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                         fontWeight="bold"
                       >
@@ -313,11 +324,11 @@ export default function RouteMap() {
                       </text>
                       {driver && (
                         <text
-                          x={x + 22}
-                          y={y + 27 + ti * 24}
+                          x={x + 26}
+                          y={y + 42 + ti * 44}
                           textAnchor="middle"
-                          fontSize={7}
-                          fill="#3B82F6"
+                          fontSize={FS_TRAIN}
+                          fill="var(--dia-blue-text)"
                         >
                           {driver}
                         </text>
@@ -330,22 +341,24 @@ export default function RouteMap() {
                 {isSelected && trains && trains.length > 0 && (
                   <g>
                     <rect
-                      x={x - 60}
-                      y={y + 22 + Math.max(upTrains.length, downTrains.length) * 24}
-                      width={120}
-                      height={6 + trains.length * 14}
-                      rx={4}
-                      fill="rgba(15,23,42,0.9)"
-                      stroke="rgba(148,163,184,0.3)"
+                      x={x - 95}
+                      y={y + 30 + Math.max(upTrains.length, downTrains.length) * 44}
+                      width={190}
+                      height={10 + trains.length * 24}
+                      rx={6}
+                      fill="var(--dia-bg-elevated)"
+                      fillOpacity={0.96}
+                      stroke="var(--dia-gray)"
+                      strokeOpacity={0.4}
                       strokeWidth={1}
                     />
                     {trains.map((t, ti) => (
                       <text
                         key={`info-${t.trainNo}`}
                         x={x}
-                        y={y + 34 + Math.max(upTrains.length, downTrains.length) * 24 + ti * 14}
+                        y={y + 52 + Math.max(upTrains.length, downTrains.length) * 44 + ti * 24}
                         textAnchor="middle"
-                        fontSize={9}
+                        fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                       >
                         {t.trainNo} → {t.dest}

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } fro
 import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
+import { useFontSizeStore } from '@/stores/fontSize';
 import styles from './RegulationViewer.module.css';
 
 /** url에서 regulationId 추출 (예: /data/edu/regulations/operation-rules-search.json → operation-rules) */
@@ -24,12 +25,13 @@ interface Props {
   onClose: () => void;
 }
 
-type FontSize = 'small' | 'normal' | 'large';
+type FontSize = 'small' | 'normal' | 'large' | 'xlarge';
 
 const FONT_SIZE_MAP: Record<FontSize, string> = {
   small: '14px',
   normal: '16px',
   large: '20px',
+  xlarge: '24px',
 };
 
 interface TocEntry {
@@ -157,7 +159,9 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [activeMatchIdx, setActiveMatchIdx] = useState(0);
-  const [fontSize, setFontSize] = useState<FontSize>('normal');
+  // 전역 글자 크기 설정을 초기값으로 시드 — "크게" 유저가 열 때마다 재조절하던 문제 해소
+  const globalFontSize = useFontSizeStore((s) => s.size);
+  const [fontSize, setFontSize] = useState<FontSize>(globalFontSize);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [tocOpen, setTocOpen] = useState(true);
   const [visiblePage, setVisiblePage] = useState<number>(1);
@@ -709,37 +713,29 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
 
       <div className={styles.fontControls}>
         <span className={styles.fontLabel}>글자</span>
-        {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게 */}
+        {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게/특대 */}
         <div
           className={`z-segment ${styles.fontSegment}`}
           data-no-press
           /* STYLE-EXCEPTION: 세그먼트 활성 인덱스/개수 런타임 주입 */
-          style={{ '--seg-count': 3, '--seg-idx': fontSize === 'small' ? 0 : fontSize === 'normal' ? 1 : 2 } as React.CSSProperties}
+          style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
         >
-          <button
-            type="button"
-            className={`z-segment-item ${fontSize === 'small' ? 'is-on' : ''}`}
-            aria-pressed={fontSize === 'small'}
-            onClick={() => setFontSize('small')}
-          >
-            작게
-          </button>
-          <button
-            type="button"
-            className={`z-segment-item ${fontSize === 'normal' ? 'is-on' : ''}`}
-            aria-pressed={fontSize === 'normal'}
-            onClick={() => setFontSize('normal')}
-          >
-            보통
-          </button>
-          <button
-            type="button"
-            className={`z-segment-item ${fontSize === 'large' ? 'is-on' : ''}`}
-            aria-pressed={fontSize === 'large'}
-            onClick={() => setFontSize('large')}
-          >
-            크게
-          </button>
+          {([
+            { key: 'small' as FontSize, label: '작게' },
+            { key: 'normal' as FontSize, label: '보통' },
+            { key: 'large' as FontSize, label: '크게' },
+            { key: 'xlarge' as FontSize, label: '특대' },
+          ]).map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              className={`z-segment-item ${fontSize === opt.key ? 'is-on' : ''}`}
+              aria-pressed={fontSize === opt.key}
+              onClick={() => setFontSize(opt.key)}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
         {pdfUrl && (
           <button type="button" className={styles.pdfBtn} onClick={() => setPdfOpen(true)}>

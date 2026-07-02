@@ -67,7 +67,7 @@ export default function RouteResult({ route, index }: { route: Route; index: num
             );
           }
 
-          const color = seg.laneId ? lineColor(seg.laneId) : '#996CAC';
+          const color = seg.laneId ? lineColor(seg.laneId) : 'var(--dia-track-line)';
           const name = seg.laneId ? lineName(seg.laneId) : '';
 
           return (

@@ -33,7 +33,7 @@
 }
 
 .temp {
-  font-size: 24px;
+  font-size: var(--dia-text-2xl);
   font-weight: 700;
   color: var(--dia-text-primary);
   letter-spacing: -0.5px;

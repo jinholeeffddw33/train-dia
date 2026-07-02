@@ -182,7 +182,7 @@
 
 .severityBadge_medium {
   background: var(--dia-amber-dim);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .severityBadge_low {
@@ -307,7 +307,7 @@
 .severityOption_medium {
   background: var(--dia-amber-dim);
   border-color: var(--dia-amber);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
 }
 
 .severityOption_low {
@@ -571,7 +571,7 @@
   background: var(--dia-amber-dim);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   margin-bottom: var(--dia-space-3);
   text-align: center;
   font-weight: var(--dia-weight-medium);

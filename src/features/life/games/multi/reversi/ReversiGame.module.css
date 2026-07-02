@@ -97,7 +97,7 @@
 
 .playerChipActive {
   opacity: 1;
-  border-color: var(--dia-accent-blue, #3B82F6);
+  border-color: var(--dia-blue);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }
 
@@ -120,7 +120,7 @@
 }
 
 .scoreNum {
-  font-size: 15px;
+  font-size: var(--dia-text-sm);
   font-weight: 800;
   color: var(--dia-text-primary);
   font-variant-numeric: tabular-nums;
@@ -186,7 +186,7 @@
 }
 
 .cell:focus-visible {
-  outline: 2px solid var(--dia-accent-blue, #3B82F6);
+  outline: 2px solid var(--dia-blue);
   outline-offset: -2px;
 }
 
@@ -223,7 +223,7 @@
   position: absolute;
   inset: 30%;
   border-radius: 50%;
-  border: 2px solid var(--dia-accent-red, #EF4444);
+  border: 2px solid var(--dia-red);
   pointer-events: none;
 }
 

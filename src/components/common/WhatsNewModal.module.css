@@ -111,7 +111,7 @@
   height: 36px;
   border-radius: 50%;
   background: rgba(56, 189, 248, 0.18);
-  color: var(--dia-sky);
+  color: var(--dia-sky-text);
   flex-shrink: 0;
 }
 .featureIconIndigo {

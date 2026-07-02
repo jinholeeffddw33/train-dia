@@ -176,7 +176,7 @@ export function getColor(t: DiaType): string {
     day: 'var(--dia-blue)',
     night: 'var(--dia-purple)',
     rest: 'var(--dia-gray)',
-    standby: 'var(--dia-orange)',
+    standby: 'var(--dia-type-standby)',
   } as Record<string, string>)[t] || 'var(--dia-gray)';
 }
 

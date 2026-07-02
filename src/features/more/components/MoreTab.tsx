@@ -321,12 +321,13 @@ export default function MoreTab() {
           <div
             className="z-segment"
             data-no-press
-            style={{ '--seg-count': 3, '--seg-idx': (['small', 'normal', 'large'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
+            style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
           >
             {([
               { key: 'small' as FontSize, label: '작게', cls: styles.fontSizeBtnSmall },
               { key: 'normal' as FontSize, label: '보통', cls: styles.fontSizeBtnNormal },
               { key: 'large' as FontSize, label: '크게', cls: styles.fontSizeBtnLarge },
+              { key: 'xlarge' as FontSize, label: '특대', cls: styles.fontSizeBtnLarge },
             ]).map((opt) => (
               <button
                 key={opt.key}

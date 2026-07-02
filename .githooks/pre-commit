@@ -52,4 +52,13 @@ npm run --silent check:theme-override:staged || {
 echo "[pre-commit] check:card-rhythm (staged · WARN)"
 npm run --silent check:card-rhythm:staged || true
 
+echo "[pre-commit] check:text-size (staged — 변경 라인만)"
+npm run --silent check:text-size:staged || {
+  echo ""
+  echo "❌ pre-commit blocked: 13px 미만 텍스트 (UI-TEXT-SIZE-001)."
+  echo "   50-60대 가독 하한 — 메타/배지도 var(--dia-text-meta)(13px) 이상."
+  echo "   raw px font-size 는 글자 크기 설정(작게/보통/크게/특대)을 우회한다 → var(--dia-text-*)."
+  exit 1
+}
+
 echo "✅ pre-commit passed."

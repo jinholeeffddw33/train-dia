@@ -97,6 +97,14 @@
       "autoCheck": "scripts/check-card-rhythm.mjs (check:card-rhythm)",
       "severity": "warn"
     },
+    "UI-TEXT-SIZE-001": {
+      "description": "텍스트 하한 + 글자 설정 우회 방지 — font-size 13px 미만 raw px 는 FAIL(50-60대 가독 하한). 13px 이상 raw px 는 WARN(font-small/large/xlarge 설정을 우회 → var(--dia-text-*) 토큰). 버튼성 셀렉터 min-height<40px 는 WARN(터치 44px 권장). 변경 라인만, TEXT-EXCEPTION 면제, components/dev 제외.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.module.css", "src/app/globals.css"],
+      "exceptions": ["직전 줄 /* TEXT-EXCEPTION: 사유 */ (장식/dev 전용만)", "components/dev/** 자동 제외"],
+      "autoCheck": "scripts/check-text-size.mjs (check:text-size)",
+      "severity": "fail"
+    },
     "CSS-HOVER-001": {
       "description": "터치 우선 앱 — raw :hover 금지. :hover 는 @media (hover: hover) 로 감싸거나 제거(터치 sticky hover 방지). 자동 변환 scripts/wrap-hover-media.cjs.",
       "canonical": "docs/rules/ui/design-system.md",

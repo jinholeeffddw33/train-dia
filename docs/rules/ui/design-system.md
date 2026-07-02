@@ -33,6 +33,16 @@
 - 예외: 규칙 직전 줄 `/* RHYTHM-EXCEPTION: 사유 */`.
 - 가드: `scripts/check-card-rhythm.mjs` (`check:card-rhythm`) · severity **warn** (변경 라인만). 향후 fail 승격 후보.
 
+## UI-TEXT-SIZE-001 — 텍스트 하한 + 글자 설정 우회 방지
+
+50-60대 사용자 가독 하한 가드 (2026-07-02 대개편 감사에서 신설 — 달력 출근시각 10px 사고 재발 방지):
+- **[FAIL]** `font-size` 13px 미만 raw px — 어떤 경우에도 불허 (CLAUDE.md §1.1)
+- **[WARN]** `font-size` 13px 이상 raw px — raw px 는 글자 크기 설정(`font-small/large/xlarge`)을 우회하므로 `var(--dia-text-*)` 토큰 사용
+- **[WARN]** 버튼성 셀렉터(btn/button/chip/tab/fab)의 `min-height|height` 40px 미만 — 터치 타겟 44px 권장
+
+- 예외: 직전 줄 `/* TEXT-EXCEPTION: 사유 */`(장식·dev 전용만), `components/dev/` 자동 제외.
+- 가드: `scripts/check-text-size.mjs` (`check:text-size`) · FAIL은 severity **fail** (변경 라인만).
+
 ## CSS-HOVER-001 — raw :hover 금지
 
 터치 우선 앱 — raw `:hover` 금지(터치 기기 sticky hover 방지). `@media (hover: hover)` 로 감싸거나 제거.

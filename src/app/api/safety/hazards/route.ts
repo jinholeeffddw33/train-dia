@@ -203,13 +203,40 @@ export async function POST(req: NextRequest) {
     attachmentName = attachment.name.slice(0, 200);
   }
 
+  // 운전정보(inspect + [시설물]/[열차]/[신호] 태그) 자동 번호 부여
+  // - 사용자가 별도로 location을 지정하지 않은 경우에만 자동 부여
+  // - 기존 최고 호수 + 1 로 부여 (예: 10호 다음은 11호)
+  let finalLocation = location;
+  if (category === 'inspect' && !location) {
+    const drivingTagMatch = /^\[(시설물|열차|신호)\]/.test(description);
+    if (drivingTagMatch) {
+      const { data: existing } = await serverSupabase
+        .from('hazard_reports')
+        .select('location, description')
+        .eq('category', 'inspect')
+        .not('location', 'is', null)
+        .neq('location', '');
+      let maxNo = 0;
+      for (const row of (existing ?? [])) {
+        const r = row as { location: string; description: string };
+        if (!/^\[(시설물|열차|신호)\]/.test(r.description || '')) continue;
+        const m = /(\d+)/.exec(r.location || '');
+        if (m) {
+          const n = parseInt(m[1], 10);
+          if (n > maxNo) maxNo = n;
+        }
+      }
+      finalLocation = `${maxNo + 1}호`;
+    }
+  }
+
   // DB 삽입 (category 포함)
   const insertData: Record<string, string> = {
     photo_url: publicUrl,
     attachment_url: attachmentUrl,
     attachment_name: attachmentName,
     description,
-    location,
+    location: finalLocation,
     created_by: verified.n,
     category,
   };

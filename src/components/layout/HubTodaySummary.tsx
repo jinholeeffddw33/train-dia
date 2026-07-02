@@ -7,14 +7,15 @@ import {
   getType, getSchedule, getDiaDisplay, getBannerState, getNextShift,
   formatTimeUntil, isSpecialRest, getSpecialRestLabel,
 } from '@/lib/schedule';
-import { useClock } from '@/features/home/hooks/useClock';
+import { useClockMinute } from '@/features/home/hooks/useClock';
 import { useSeoulWeather } from '@/features/home/hooks/useWeather';
 import styles from './HubTodaySummary.module.css';
 
 export default function HubTodaySummary() {
   const driver = useDriverStore((s) => s.current);
   const getSwappedDia = useGetSwappedDia();
-  const clock = useClock();
+  // 초 미표시 — 분 단위 시계로 매초 재렌더 방지
+  const clock = useClockMinute();
   const weather = useSeoulWeather();
 
   const now = useMemo(() => {

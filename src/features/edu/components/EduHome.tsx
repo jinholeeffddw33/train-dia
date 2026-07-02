@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
-import trainBgAnimation from '@/assets/animations/train-background.json';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
@@ -71,6 +70,17 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
+  // Lottie 배경 JSON 지연 로드 (164KB) — 번들 인라인 대신 public에서 fetch
+  const [trainBgAnimation, setTrainBgAnimation] = useState<Record<string, unknown> | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch('/lottie/train-background.json')
+      .then((r) => r.json())
+      .then((data) => { if (alive) setTrainBgAnimation(data); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
   // prefers-reduced-motion 존중 — 모션 줄임 설정 시 애니메이션 정지
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
@@ -114,17 +124,19 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
     <div className={`${styles.screen} ${styles.screenHome}`}>
       {/* ── 풀스크린 Lottie 배경 (기차 애니메이션) ── */}
       <div className={styles.lottieBgLayer} aria-hidden="true">
-        <Lottie
-          lottieRef={lottieRef}
-          animationData={trainBgAnimation}
-          loop
-          autoplay={!reducedMotion}
-          rendererSettings={{ preserveAspectRatio: 'xMidYMid slice' }}
-          style={{ width: '100%', height: '100%' }}
-          onDOMLoaded={() => {
-            if (lottieRef.current) lottieRef.current.setSpeed(0.5);
-          }}
-        />
+        {trainBgAnimation && (
+          <Lottie
+            lottieRef={lottieRef}
+            animationData={trainBgAnimation}
+            loop
+            autoplay={!reducedMotion}
+            rendererSettings={{ preserveAspectRatio: 'xMidYMid slice' }}
+            style={{ width: '100%', height: '100%' }}
+            onDOMLoaded={() => {
+              if (lottieRef.current) lottieRef.current.setSpeed(0.5);
+            }}
+          />
+        )}
       </div>
       {/* 가독성 오버레이 — 본문 텍스트 가독성 확보 */}
       <div className={styles.lottieBgOverlay} aria-hidden="true" />

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { supabase } from '@/lib/supabase';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabase } from '@/lib/supabase-lazy';
 
 export interface ExchangePost {
   id: string;
@@ -86,11 +87,12 @@ export const useExchangeStore = create<ExchangeStore>()(
       loading: false,
 
       fetchPosts: async () => {
-        if (!supabase) return;
+        const sb = await getSupabase();
+        if (!sb) return;
         set({ loading: true });
         try {
           // 게시글 로드
-          const { data: rows, error } = await supabase
+          const { data: rows, error } = await sb
             .from('exchange_posts')
             .select('*')
             .order('created_at', { ascending: false });
@@ -103,7 +105,7 @@ export const useExchangeStore = create<ExchangeStore>()(
 
           // 지원자 로드
           const postIds = rows.map((r) => r.id);
-          const { data: volRows } = await supabase
+          const { data: volRows } = await sb
             .from('exchange_volunteers')
             .select('*')
             .in('post_id', postIds);
@@ -124,7 +126,8 @@ export const useExchangeStore = create<ExchangeStore>()(
       },
 
       addPost: async (data) => {
-        if (!supabase) {
+        const sb = await getSupabase();
+        if (!sb) {
           // localStorage 폴백
           const post: ExchangePost = {
             ...data,
@@ -137,7 +140,7 @@ export const useExchangeStore = create<ExchangeStore>()(
           return;
         }
 
-        const { data: row, error } = await supabase
+        const { data: row, error } = await sb
           .from('exchange_posts')
           .insert({
             type: data.type,
@@ -166,8 +169,9 @@ export const useExchangeStore = create<ExchangeStore>()(
           ),
         }));
 
-        if (supabase) {
-          await supabase
+        const sb = await getSupabase();
+        if (sb) {
+          await sb
             .from('exchange_posts')
             .update({ status: 'accepted' })
             .eq('id', id);
@@ -181,8 +185,9 @@ export const useExchangeStore = create<ExchangeStore>()(
           ),
         }));
 
-        if (supabase) {
-          await supabase
+        const sb = await getSupabase();
+        if (sb) {
+          await sb
             .from('exchange_posts')
             .update({ status: 'declined', decline_reason: reason || null })
             .eq('id', id);
@@ -192,8 +197,9 @@ export const useExchangeStore = create<ExchangeStore>()(
       remove: async (id) => {
         set((s) => ({ posts: s.posts.filter((p) => p.id !== id) }));
 
-        if (supabase) {
-          await supabase.from('exchange_posts').delete().eq('id', id);
+        const sb = await getSupabase();
+        if (sb) {
+          await sb.from('exchange_posts').delete().eq('id', id);
         }
       },
 
@@ -207,8 +213,9 @@ export const useExchangeStore = create<ExchangeStore>()(
           }),
         }));
 
-        if (supabase) {
-          await supabase
+        const sb = await getSupabase();
+        if (sb) {
+          await sb
             .from('exchange_volunteers')
             .insert({
               post_id: postId,
@@ -227,8 +234,9 @@ export const useExchangeStore = create<ExchangeStore>()(
           ),
         }));
 
-        if (supabase) {
-          await supabase
+        const sb = await getSupabase();
+        if (sb) {
+          await sb
             .from('exchange_posts')
             .update({ status: 'accepted', accepted_volunteer_id: volunteerId })
             .eq('id', postId);
@@ -242,30 +250,39 @@ export const useExchangeStore = create<ExchangeStore>()(
       },
 
       subscribe: () => {
-        if (!supabase) return () => {};
+        // supabase-js 지연 로드 — 구독은 클라이언트 준비 후 비동기로 연결
+        let channel: RealtimeChannel | null = null;
+        let cancelled = false;
 
-        // exchange_posts 변경 구독
-        const channel = supabase
-          .channel('exchange-realtime')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'exchange_posts' },
-            () => {
-              // 변경 시 전체 리페치 (단순하고 안전)
-              get().fetchPosts();
-            },
-          )
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'exchange_volunteers' },
-            () => {
-              get().fetchPosts();
-            },
-          )
-          .subscribe();
+        getSupabase().then((sb) => {
+          if (!sb || cancelled) return;
+          // exchange_posts 변경 구독
+          channel = sb
+            .channel('exchange-realtime')
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'exchange_posts' },
+              () => {
+                // 변경 시 전체 리페치 (단순하고 안전)
+                get().fetchPosts();
+              },
+            )
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'exchange_volunteers' },
+              () => {
+                get().fetchPosts();
+              },
+            )
+            .subscribe();
+        });
 
         return () => {
-          supabase!.removeChannel(channel);
+          cancelled = true;
+          if (channel) {
+            const ch = channel;
+            getSupabase().then((sb) => { sb?.removeChannel(ch); });
+          }
         };
       },
     }),

@@ -8,7 +8,7 @@ import {
   getType, getSchedule, getDiaDisplay, getWorkTime,
   isSpecialRest, getSpecialRestLabel, isHoliday,
 } from '@/lib/schedule';
-import { useClock } from '@/features/home/hooks/useClock';
+import { useClockMinute } from '@/features/home/hooks/useClock';
 import { getUserRole, isRegularDayOffice } from '@/lib/auth';
 import { DOW } from '@/lib/constants';
 import DiaChartModal from './DiaChartModal';
@@ -25,7 +25,8 @@ export default function HubHero({ onClick }: HubHeroProps) {
   const [dayOffset, setDayOffset] = useState<0 | 1>(0);
   const driver = useDriverStore((s) => s.current);
   const getSwappedDia = useGetSwappedDia();
-  const clock = useClock();
+  // 초 미표시 — 분 단위 시계로 매초 재렌더 방지
+  const clock = useClockMinute();
 
   const now = useMemo(() => {
     const d = new Date();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useCallback, useState } from 'react';
+import { memo, useMemo, useRef, useEffect, useCallback, useState } from 'react';
 import { useTrainStore } from '@/stores/train';
 import { buildTrainDriverMap } from '@/lib/schedule';
 import { LINE5_MAP, LINE5_ROUTES, LINE5_TRANSFERS } from '@/data/line5';
@@ -37,7 +37,7 @@ function getTrainDir(trainNo: string): 'up' | 'down' {
   return num % 2 === 0 ? 'up' : 'down';
 }
 
-export default function RouteMap() {
+function RouteMap() {
   const data = useTrainStore((s) => s.data);
   const branch = useTrainStore((s) => s.branch);
   const mapZoom = useTrainStore((s) => s.mapZoom);
@@ -389,3 +389,6 @@ export default function RouteMap() {
     </div>
   );
 }
+
+/** 매초 라벨 tick 등 부모 재렌더에서 격리 — props 없음, 스토어 구독으로만 갱신 */
+export default memo(RouteMap);

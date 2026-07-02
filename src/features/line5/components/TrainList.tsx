@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { memo, useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { useTrainStore } from '@/stores/train';
 import { buildTrainDriverMap, buildTrainDiaMap, type TrainDiaInfo } from '@/lib/schedule';
 import DiaChartModal from '@/components/layout/DiaChartModal';
@@ -27,7 +27,7 @@ function shortDest(dest: string): string {
     .replace('강일', '하남검단');
 }
 
-export default function TrainList() {
+function TrainList() {
   const data = useTrainStore((s) => s.data);
   const branch = useTrainStore((s) => s.branch);
   const scrollTrigger = useTrainStore((s) => s.scrollTrigger);
@@ -238,3 +238,6 @@ export default function TrainList() {
     </div>
   );
 }
+
+/** 매초 라벨 tick 등 부모 재렌더에서 격리 — props 없음, 스토어 구독으로만 갱신 */
+export default memo(TrainList);

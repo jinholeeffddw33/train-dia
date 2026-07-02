@@ -16,7 +16,7 @@ import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import { useSegmentAlarm } from '@/hooks/useSegmentAlarm';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
-import { useClock } from '../hooks/useClock';
+import { useClockMinute } from '../hooks/useClock';
 import RouteTimeline from './RouteTimeline';
 import DutyInfoCard from './DutyInfoCard';
 import styles from '../styles/Home.module.css';
@@ -30,7 +30,8 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   const driver = useDriverStore((s) => s.current);
   const authUser = useAuthStore((s) => s.user);
   const getSwappedDia = useGetSwappedDia();
-  const clock = useClock();
+  // 초 미표시 — 분 단위 시계로 매초 재렌더 방지 (초 표시는 HeaderClock leaf 만 1초 tick)
+  const clock = useClockMinute();
   const now = useMemo(() => {
     const d = new Date();
     d.setHours(parseInt(clock.hours), parseInt(clock.minutes), parseInt(clock.seconds));

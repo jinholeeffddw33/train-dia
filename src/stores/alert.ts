@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { supabase } from '@/lib/supabase';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabase } from '@/lib/supabase-lazy';
 
 /** DB 알림 행 타입 */
 interface DbAlert {
@@ -70,9 +71,10 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
   loading: false,
 
   fetch: async () => {
-    if (!supabase) return;
+    const sb = await getSupabase();
+    if (!sb) return;
     set({ loading: true });
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('alerts')
       .select('id,station_from,station_to,direction,message,severity,created_by,created_at,is_active,expires_at')
       .eq('is_active', true)
@@ -129,21 +131,30 @@ export const useAlertStore = create<AlertState>()((set, get) => ({
   },
 
   subscribe: () => {
-    if (!supabase) return () => {};
+    // supabase-js 지연 로드 — 구독은 클라이언트 준비 후 비동기로 연결
+    let channel: RealtimeChannel | null = null;
+    let cancelled = false;
 
-    const channel = supabase
-      .channel('alerts-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'alerts' },
-        () => {
-          get().fetch();
-        },
-      )
-      .subscribe();
+    getSupabase().then((sb) => {
+      if (!sb || cancelled) return;
+      channel = sb
+        .channel('alerts-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'alerts' },
+          () => {
+            get().fetch();
+          },
+        )
+        .subscribe();
+    });
 
     return () => {
-      supabase!.removeChannel(channel);
+      cancelled = true;
+      if (channel) {
+        const ch = channel;
+        getSupabase().then((sb) => { sb?.removeChannel(ch); });
+      }
     };
   },
 }));

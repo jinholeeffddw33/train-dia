@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import AuthGate from '@/components/common/AuthGate';
 import InAppBrowserGate from '@/components/common/InAppBrowserGate';
@@ -9,19 +10,25 @@ import CycleChangeModal from '@/components/common/CycleChangeModal';
 import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
 import WhatsNewModal from '@/components/common/WhatsNewModal';
+import WorldLoading from '@/components/common/WorldLoading';
 import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
-import { CalendarTab, ExchangeRequest } from '@/features/calendar';
-import { DutyTab } from '@/features/duty';
-import { MoreTab } from '@/features/more';
-import { Line5Tab } from '@/features/line5';
-import { EduTab } from '@/features/edu';
-import SafetyWorld from '@/features/safety/SafetyWorld';
-import { LifeWorld } from '@/features/life';
-import { StandbyCoverageView } from '@/features/standby';
+
+// ── 코드 스플리팅 — 첫 화면(WorldHub + 근무 홈 탭)만 정적, 나머지 월드/탭은 지연 로드
+//    앱이 사실상 CSR(AuthGate 뒤)이라 ssr:false 무방 — 초기 청크에서 각 월드가 빠짐
+const loading = () => <WorldLoading />;
+const CalendarTab = dynamic(() => import('@/features/calendar/components/CalendarTab'), { ssr: false, loading });
+const ExchangeRequest = dynamic(() => import('@/features/calendar/components/ExchangeRequest'), { ssr: false, loading });
+const DutyTab = dynamic(() => import('@/features/duty/components/DutyTab'), { ssr: false, loading });
+const MoreTab = dynamic(() => import('@/features/more/components/MoreTab'), { ssr: false, loading });
+const Line5Tab = dynamic(() => import('@/features/line5/components/Line5Tab'), { ssr: false, loading });
+const EduTab = dynamic(() => import('@/features/edu/components/EduTab'), { ssr: false, loading });
+const SafetyWorld = dynamic(() => import('@/features/safety/SafetyWorld'), { ssr: false, loading });
+const LifeWorld = dynamic(() => import('@/features/life/LifeWorld'), { ssr: false, loading });
+const StandbyCoverageView = dynamic(() => import('@/features/standby/StandbyCoverageView'), { ssr: false, loading });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {

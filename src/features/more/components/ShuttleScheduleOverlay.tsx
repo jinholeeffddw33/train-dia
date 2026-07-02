@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { X } from 'lucide-react';
 import moreStyles from '../styles/More.module.css';
 import styles from '../styles/ShuttleSchedule.module.css';
@@ -12,19 +13,29 @@ interface Props {
 
 type Tab = 'shuttle' | 'depot';
 
+// 원본 픽셀 크기 — next/image 레이아웃 예약용 (CSS width:100%/height:auto 가 실제 비율 유지)
+const IMG_META: Record<Tab, { src: string; width: number; height: number; alt: string }> = {
+  shuttle: {
+    src: '/images/shuttle-schedule.jpg',
+    width: 2481,
+    height: 3508,
+    alt: '2026년 고덕기지 승용차 운행 시간표',
+  },
+  depot: {
+    src: '/images/depot-schedule.jpg',
+    width: 1959,
+    height: 1080,
+    alt: '2026년 고덕기지 입고열차',
+  },
+};
+
 export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('shuttle');
-  const [zoomed, setZoomed] = useState<string | null>(null);
+  const [zoomed, setZoomed] = useState(false);
 
   if (!open) return null;
 
-  const imgSrc = tab === 'shuttle'
-    ? '/images/shuttle-schedule.jpg'
-    : '/images/depot-schedule.jpg';
-
-  const imgAlt = tab === 'shuttle'
-    ? '2026년 고덕기지 승용차 운행 시간표'
-    : '2026년 고덕기지 입고열차';
+  const meta = IMG_META[tab];
 
   return (
     <div className={moreStyles.fullOverlay}>
@@ -70,14 +81,17 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
         <button
           type="button"
           className={styles.imgBtn}
-          onClick={() => setZoomed(imgSrc)}
+          onClick={() => setZoomed(true)}
           aria-label="확대"
         >
-          <img
-            src={imgSrc}
-            alt={imgAlt}
+          <Image
+            src={meta.src}
+            alt={meta.alt}
+            width={meta.width}
+            height={meta.height}
             className={styles.scheduleImg}
-            loading="eager"
+            sizes="100vw"
+            priority
           />
         </button>
       </div>
@@ -85,15 +99,17 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
       {zoomed && (
         <div
           className={styles.zoomOverlay}
-          onClick={() => setZoomed(null)}
+          onClick={() => setZoomed(false)}
           role="button"
           tabIndex={0}
           aria-label="닫기"
-          onKeyDown={(e) => e.key === 'Escape' && setZoomed(null)}
+          onKeyDown={(e) => e.key === 'Escape' && setZoomed(false)}
         >
+          {/* 확대 뷰 — 세밀한 시간표 판독용이라 원본 해상도 유지 (핀치줌 가독성) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={zoomed}
-            alt={imgAlt}
+            src={meta.src}
+            alt={meta.alt}
             className={styles.zoomImg}
           />
         </div>

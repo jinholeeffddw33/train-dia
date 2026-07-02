@@ -39,10 +39,20 @@ function useUpdateCounter(lastFetch: number | null) {
   return { label, dotState };
 }
 
+/** "N초 전 갱신" 라벨 leaf — 1초 tick 재렌더를 이 컴포넌트 안에 격리 (탭 전체 매초 재렌더 방지) */
+function UpdatedAgoLabel({ lastFetch, loading }: { lastFetch: number | null; loading: boolean }) {
+  const { label, dotState } = useUpdateCounter(lastFetch);
+  return (
+    <span className={`${styles.fabTime} ${styles[`fabTime_${loading ? 'loading' : dotState}`]}`}>
+      <span className={`${styles.fabDot} ${styles[`dot_${loading ? 'loading' : dotState}`]}`} />
+      {loading ? '갱신중' : label}
+    </span>
+  );
+}
+
 export default function Line5Tab() {
   const { branch, viewMode, loading, error, lastFetch, setBranch, setViewMode, triggerScroll } = useTrainStore();
   const { refresh } = useTrainPolling();
-  const { label: updateLabel, dotState } = useUpdateCounter(lastFetch);
 
   const handleRefresh = () => {
     refresh();
@@ -131,10 +141,7 @@ export default function Line5Tab() {
         >
           <RefreshCw size={20} strokeWidth={2.5} />
         </button>
-        <span className={`${styles.fabTime} ${styles[`fabTime_${loading ? 'loading' : dotState}`]}`}>
-          <span className={`${styles.fabDot} ${styles[`dot_${loading ? 'loading' : dotState}`]}`} />
-          {loading ? '갱신중' : updateLabel}
-        </span>
+        <UpdatedAgoLabel lastFetch={lastFetch} loading={loading} />
       </div>
     </div>
   );

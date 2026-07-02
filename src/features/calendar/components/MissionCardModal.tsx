@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { X, ShieldAlert } from 'lucide-react';
 import { getMissionCardKind, MISSION_CARD_META } from '@/lib/auth';
 import styles from '../styles/MissionCard.module.css';
@@ -63,12 +64,16 @@ export default function MissionCardModal({ sabun, name, onClose }: Props) {
 
         <div className={styles.body}>
           <div className={styles.photoWrap}>
-            {/* 일반 <img> 사용 — Next/Image는 외부 host 설정 필요. 로컬 자산이므로 img로 충분 */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            {/* next/image 최적화 — 원본 700KB+ jpg 를 뷰포트 크기로 리사이즈 전송.
+                width/height 는 대표 비율(레이아웃 예약용) — CSS width:100%/height:auto 가 실제 비율 유지 */}
+            <Image
               src={meta.image}
               alt={`${meta.label} 임무카드`}
+              width={1969}
+              height={2908}
               className={styles.photo}
+              sizes="(max-width: 720px) 100vw, 720px"
+              priority
             />
           </div>
         </div>

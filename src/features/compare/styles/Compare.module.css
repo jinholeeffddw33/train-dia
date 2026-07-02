@@ -96,7 +96,7 @@
   font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-semibold);
   white-space: nowrap;
-  min-height: 40px;
+  min-height: 44px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -128,9 +128,16 @@
   transition: background var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
+/* 시각 20px 유지 + 히트영역 44px 확장 (조밀한 카드 코너라 레이아웃 확장 불가 → 오버레이 패턴) */
+.personRemoveBtn::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+}
+
 .personRemoveBtn:active {
   background: rgba(239, 68, 68, 0.3);
-  transform: scale(0.85);
+  transform: scale(0.9);
 }
 
 /* ── Count Selector (Stepper) ── */
@@ -159,8 +166,8 @@
 }
 
 .countStepBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -496,6 +503,7 @@
 }
 
 .chipRemove {
+  position: relative;
   display: flex;
   background: none;
   border: none;
@@ -503,9 +511,17 @@
   cursor: pointer;
   padding: 0;
   opacity: 0.6;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.chipRemove:active { opacity: 1; }
+/* 조밀한 칩 안이라 레이아웃 유지 + 히트영역 44px 오버레이 확장 */
+.chipRemove::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+}
+
+.chipRemove:active { opacity: 1; transform: scale(0.9); }
 
 .addPersonBtn {
   display: flex;

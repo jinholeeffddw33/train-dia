@@ -134,6 +134,9 @@ function AddModal({ onClose, onAdd }: {
                   onChange={(e) => setUrl(e.target.value)}
                   type="url"
                   inputMode="url"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                 />
               </>
             ) : (
@@ -311,6 +314,9 @@ function EditModal({ item, onClose, onSave }: {
               onChange={(e) => setUrl(e.target.value)}
               type="url"
               inputMode="url"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </>
         )}

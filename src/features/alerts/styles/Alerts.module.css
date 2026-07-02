@@ -18,7 +18,7 @@
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.fab:active { transform: scale(0.9); }
+.fab:active { transform: scale(0.95); }
 
 .fabHidden {
   transform: translateY(calc(100% + var(--dia-space-4) + 20px));
@@ -408,7 +408,7 @@
 .stationGrid {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--dia-space-1);
+  gap: var(--dia-space-2);
   max-height: 160px;
   overflow-y: auto;
 }
@@ -420,13 +420,13 @@
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-xs);
   color: var(--dia-text-primary);
-  min-height: 36px;
+  min-height: 44px;
   transition: all var(--dia-transition-fast);
 }
 
 .stationChip:active {
   background: var(--dia-surface-hover);
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 .moreHint {

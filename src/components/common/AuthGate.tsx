@@ -106,6 +106,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // ── 1단계: 사번 입력 ──
   if (screen === 'sabun') {
     const handleNext = async () => {
+      if (loading) return; // Enter 연타 중복 요청 가드
       if (!sabun.trim()) return;
       const status = await checkSabun(sabun.trim());
       if (!status) return;
@@ -128,8 +129,10 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             <label htmlFor="auth-sabun" className={styles.label}>사번</label>
             <input
               id="auth-sabun"
-              type="number"
+              type="text"
               inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={8}
               className={styles.input}
               placeholder="21700000"
               value={sabun}
@@ -219,6 +222,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     // ── 일반 기관사: 이름만 입력 ──
     if (!isAdminUser) {
       const handleNameLogin = async () => {
+        if (loading) return; // Enter 연타 중복 로그인 가드
         if (!name.trim()) return;
         await loginWithName(sabun, name.trim());
       };
@@ -277,6 +281,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     // ── 관리자: PIN 입력 ──
     const handlePinLogin = async () => {
+      if (loading) return; // Enter 연타 중복 로그인 가드
       if (!pin) return;
       await loginWithPin(sabun, pin);
     };

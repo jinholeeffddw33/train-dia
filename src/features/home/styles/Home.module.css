@@ -20,8 +20,8 @@
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 6px);
   right: 8px;
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -36,7 +36,7 @@
 }
 
 .refreshBtn:active {
-  transform: scale(0.88) rotate(180deg);
+  transform: scale(0.9);
   background: rgba(255, 255, 255, 0.25);
 }
 
@@ -174,7 +174,7 @@
 
 .viewModeBadge:active {
   background: var(--dia-3d-blue-end);
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
 .clockAmPm {
@@ -268,7 +268,7 @@
 
 .quickBtn:active {
   background: rgba(255, 255, 255, 0.2);
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
 .quickLabel {
@@ -499,10 +499,12 @@
   text-align: center;
   box-shadow: var(--dia-card-depth);
   cursor: pointer;
+  transition: transform var(--dia-transition-fast), opacity var(--dia-transition-fast);
 }
 
 .emptyCard:active {
   opacity: 0.8;
+  transform: scale(0.98);
 }
 
 .emptyIcon {
@@ -768,7 +770,7 @@
   color: var(--dia-text-secondary);
 }
 
-.monthNav:active { transform: scale(0.96); }
+.monthNav:active { transform: scale(0.95); }
 
 .monthTitle {
   font-size: var(--dia-text-base);
@@ -1369,7 +1371,7 @@
 
 .quickBtnBottom:active {
   background: var(--dia-surface-hover);
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
 /* ── Home Tips & Quiz ── */
@@ -1823,7 +1825,7 @@
 }
 
 .installCardBtn:active {
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
 /* ── 설치 안내 모달 ── */
@@ -1888,7 +1890,7 @@
 }
 
 .installGuideClose:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .installGuideBody {

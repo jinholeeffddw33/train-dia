@@ -69,6 +69,7 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
           placeholder="이름 또는 번호로 검색"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          enterKeyHint="search"
           aria-label="기관사 검색"
         />
         {query && (

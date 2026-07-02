@@ -33,7 +33,7 @@
 .backBtn:active,
 .iconBtn:active {
   background: var(--dia-surface-hover);
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .title {
@@ -83,6 +83,15 @@
   border: none;
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
+}
+
+/* 포커스 링 — 인풋 자체 outline 은 래퍼 안이라 어색 → 래퍼 하이라이트 */
+.searchWrap:focus-within {
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 2px var(--dia-blue-dim);
+}
+
+.searchInput:focus-visible {
   outline: none;
 }
 
@@ -133,7 +142,7 @@
 }
 
 .navBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   background: var(--dia-surface-hover);
 }
 
@@ -514,7 +523,7 @@
 }
 
 .tocFab:active {
-  transform: scale(0.94);
+  transform: scale(0.95);
   box-shadow: var(--dia-3d-pressed);
 }
 
@@ -614,8 +623,8 @@
 }
 
 .annoColorBtn {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.85);
   cursor: pointer;
@@ -629,8 +638,8 @@
 
 .annoMemoBtn,
 .annoCloseBtn {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -691,7 +700,7 @@
   font-size: var(--dia-text-base);
   cursor: pointer;
 }
-.memoClose:active { background: var(--dia-surface-hover); transform: scale(0.92); }
+.memoClose:active { background: var(--dia-surface-hover); transform: scale(0.9); }
 
 .memoQuote {
   margin: 0;
@@ -744,14 +753,14 @@
   color: var(--dia-red);
   border: 1px solid rgba(239, 68, 68, 0.4);
 }
-.memoDelete:active { background: rgba(239, 68, 68, 0.1); transform: scale(0.97); }
+.memoDelete:active { background: rgba(239, 68, 68, 0.1); transform: scale(0.95); }
 
 .memoSave {
   flex: 1;
   background: linear-gradient(145deg, #60A5FA, #2563EB);
   color: #fff;
 }
-.memoSave:active { transform: scale(0.97); filter: brightness(0.95); }
+.memoSave:active { transform: scale(0.95); filter: brightness(0.95); }
 
 /* 내 메모 목록 시트 */
 .notesOverlay {

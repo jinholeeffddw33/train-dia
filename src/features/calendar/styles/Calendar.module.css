@@ -31,7 +31,7 @@
   color: var(--dia-text-secondary);
 }
 
-.navBtn:active { transform: scale(0.96); }
+.navBtn:active { transform: scale(0.95); }
 
 .navTitle {
   font-size: var(--dia-text-2xl);

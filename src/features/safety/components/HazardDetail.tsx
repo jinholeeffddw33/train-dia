@@ -170,7 +170,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   }, [showMenu, commentMenuId]);
 
   const handleSend = async () => {
-    if (!commentText.trim()) return;
+    // Enter 연타 중복 전송 가드 — 전송 중이면 무시 (P0-13)
+    if (submitting || !commentText.trim()) return;
     if (!name || !sabun) { setError('기관사 정보를 먼저 설정해주세요'); return; }
 
     setSubmitting(true);
@@ -435,7 +436,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                         maxLength={200}
                       />
                       {editItems.length > 1 && (
-                        <button type="button" className={styles.noticeItemDel} onClick={() => setEditItems(editItems.filter((_, j) => j !== i))}>
+                        <button type="button" className={styles.noticeItemDel} aria-label={`${i + 1}번 항목 제거`} onClick={() => setEditItems(editItems.filter((_, j) => j !== i))}>
                           <X size={14} />
                         </button>
                       )}

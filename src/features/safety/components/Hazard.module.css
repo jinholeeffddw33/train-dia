@@ -1015,8 +1015,14 @@
   border: none;
   font-size: var(--dia-text-sm);
   color: var(--dia-text-primary);
-  outline: none;
   min-width: 0;
+}
+
+/* 포커스 링 부활 — base outline:none 이 전역 :focus-visible 링을 죽이던 문제 */
+.noticeItemInput:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--dia-blue-dim);
+  border-radius: var(--dia-radius-sm);
 }
 
 .noticeItemInput::placeholder {
@@ -1325,7 +1331,7 @@
 
 .noticeReactions {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .reactionBtn {
@@ -1341,7 +1347,7 @@
   border: 1px solid var(--dia-border);
   cursor: pointer;
   transition: all var(--dia-transition-fast);
-  min-height: 28px;
+  min-height: 40px;
   box-shadow: var(--dia-3d-inset);
 }
 
@@ -1754,8 +1760,8 @@
 }
 
 .commentMenuBtn {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--dia-radius-full);
   display: flex;
   align-items: center;

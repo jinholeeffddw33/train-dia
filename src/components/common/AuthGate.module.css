@@ -252,6 +252,8 @@
 
 .pinToggle:active {
   color: var(--dia-text-secondary);
+  /* 기본 transform(translateY 센터링) 유지하며 press scale 병행 */
+  transform: translateY(-50%) scale(0.95);
 }
 
 .error {
@@ -336,6 +338,7 @@
 
 .btnSecondary:active {
   color: var(--dia-text-secondary);
+  transform: scale(0.95);
 }
 
 /* ── 로딩 ── */

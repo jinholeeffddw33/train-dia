@@ -28,8 +28,8 @@
 }
 
 .limitEditBtn {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -264,7 +264,7 @@
   border-radius: var(--dia-radius-md);
   color: var(--dia-text-tertiary);
   background: transparent;
-  transition: background var(--dia-transition-fast), color var(--dia-transition-fast);
+  transition: background var(--dia-transition-fast), color var(--dia-transition-fast), opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
 .historyDelete:active {
@@ -279,6 +279,7 @@
 
 .historyDeleteConfirm:active {
   opacity: 0.8;
+  transform: scale(0.95);
 }
 
 /* ── Reset Notice ── */

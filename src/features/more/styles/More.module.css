@@ -189,6 +189,13 @@
   cursor: pointer;
 }
 
+/* 시각 52×28 유지 + 히트영역 44px 확장 (설정 행 레이아웃 유지 — 오버레이 패턴) */
+.toggle::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
 .toggleOn {
   background: var(--dia-blue);
   border-color: var(--dia-blue);
@@ -419,9 +426,10 @@
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   min-height: 44px;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.quizNext:active { opacity: 0.8; }
+.quizNext:active { opacity: 0.8; transform: scale(0.95); }
 
 /* ── Tool Buttons ── */
 .toolBtn {
@@ -515,9 +523,10 @@
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   min-height: 44px;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.notifBtn:active { opacity: 0.8; }
+.notifBtn:active { opacity: 0.8; transform: scale(0.95); }
 
 /* ── Full-screen Overlay ── */
 .fullOverlay {
@@ -719,9 +728,10 @@
   font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-semibold);
   min-height: 48px;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.pinSubmit:active { opacity: 0.8; }
+.pinSubmit:active { opacity: 0.8; transform: scale(0.95); }
 .pinSubmit:disabled { opacity: 0.5; }
 
 /* ── iOS 홈 화면 추가 안내 ── */
@@ -801,10 +811,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity var(--dia-transition-fast);
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
 
-.openInChromeBtn:active { opacity: 0.8; }
+.openInChromeBtn:active { opacity: 0.8; transform: scale(0.95); }
 
 /* ══════════════════════════════════════
    익명 제보 (FeedbackOverlay)
@@ -1633,7 +1643,7 @@
 }
 
 .chatSendBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .chatSendBtn:disabled {

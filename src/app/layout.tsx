@@ -30,6 +30,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   themeColor: '#0F172A',
+  // 키보드가 뜨면 뷰포트를 리사이즈 — sticky 입력바/CTA 가 키보드 뒤에 깔리는 것 방지
+  interactiveWidget: 'resizes-content',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

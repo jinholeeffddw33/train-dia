@@ -35,7 +35,7 @@
 }
 
 .asmrBackBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   background: var(--dia-surface-hover);
 }
 
@@ -287,7 +287,7 @@
 
 .bonsaiBackBtn:active,
 .bonsaiResetBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .bonsaiHeaderCenter {
@@ -781,7 +781,7 @@
 }
 
 .collectionCard:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 .collectionCard:disabled {

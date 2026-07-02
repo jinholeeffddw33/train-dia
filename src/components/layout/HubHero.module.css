@@ -19,7 +19,7 @@
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.18);
 }
 .heroCard:active {
-  transform: scale(0.985);
+  transform: scale(0.98);
 }
 .heroCard:focus-visible {
   outline: 2px solid #fff;
@@ -110,7 +110,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
-.heroDayBtn:active { transform: scale(0.94); }
+.heroDayBtn:active { transform: scale(0.95); }
 .heroDayBtn:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
@@ -289,7 +289,7 @@
 }
 }
 .detailBtn:active {
-  transform: scale(0.97);
+  transform: scale(0.95);
   background: rgba(255, 255, 255, 0.32);
 }
 .detailBtn:focus-visible {

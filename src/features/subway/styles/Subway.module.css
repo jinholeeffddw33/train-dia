@@ -34,7 +34,13 @@
   border: none;
   color: var(--dia-text-primary);
   font-size: var(--dia-text-base);
+}
+
+/* 포커스 링 부활 — base outline:none 이 전역 :focus-visible 링을 죽이던 문제 */
+.stationInput:focus-visible {
   outline: none;
+  box-shadow: 0 0 0 2px var(--dia-blue-dim);
+  border-radius: var(--dia-radius-sm);
 }
 
 .stationInput::placeholder { color: var(--dia-text-tertiary); }

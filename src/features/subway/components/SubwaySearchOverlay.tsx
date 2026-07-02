@@ -54,6 +54,7 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
   const [error, setError] = useState<string | null>(null);
 
   const searchRoute = useCallback(async () => {
+    if (loading) return; // Enter 연타 중복 검색 가드
     if (!from.trim() || !to.trim()) return;
 
     setLoading(true);
@@ -111,7 +112,15 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
     } finally {
       setLoading(false);
     }
-  }, [from, to, mode]);
+  }, [from, to, mode, loading]);
+
+  // 두 필드가 다 찼을 때 Enter → 검색 실행
+  const handleEnterSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && from.trim() && to.trim()) {
+      e.preventDefault();
+      searchRoute();
+    }
+  };
 
   return (
     <Modal open={open} onClose={onClose} title="지하철 경로검색">
@@ -126,6 +135,8 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
               placeholder="출발역"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
+              onKeyDown={handleEnterSearch}
+              enterKeyHint="search"
               aria-label="출발역"
             />
           </div>
@@ -145,6 +156,8 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
               placeholder="도착역"
               value={to}
               onChange={(e) => setTo(e.target.value)}
+              onKeyDown={handleEnterSearch}
+              enterKeyHint="search"
               aria-label="도착역"
             />
           </div>
@@ -187,7 +200,11 @@ export default function SubwaySearchOverlay({ open, onClose }: { open: boolean; 
 
         {/* 결과 */}
         {results && results.map((route, i) => (
-          <RouteResult key={i} route={route} index={i} />
+          <RouteResult
+            key={`${route.departure}_${route.arrival}_${route.segments.map((s) => s.laneId ?? 'w').join('.')}`}
+            route={route}
+            index={i}
+          />
         ))}
       </div>
     </Modal>

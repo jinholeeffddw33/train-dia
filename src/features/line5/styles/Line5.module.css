@@ -96,7 +96,7 @@
   flex-shrink: 0;
 }
 
-.refreshBtn:active { transform: scale(0.9); }
+.refreshBtn:active { transform: scale(0.95); }
 
 .refreshSpin { animation: spin 0.8s linear; }
 
@@ -211,7 +211,7 @@
 }
 
 .fab:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
 }
 
 .fab:disabled {
@@ -688,7 +688,7 @@
   transition: transform 0.12s ease, opacity 0.12s ease;
 }
 .tkDriverName:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   opacity: 1;
 }
 .tkDriverName:focus-visible {

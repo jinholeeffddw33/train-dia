@@ -59,9 +59,9 @@
 
 .backBtn,
 .bellBtn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   border-radius: var(--dia-radius-full);
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -74,6 +74,13 @@
   box-shadow: none;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+}
+
+/* bellBtn 은 44px 터치 타겟 (알림 진입 — 자주 누르는 버튼) */
+.bellBtn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
 }
 
 .backBtn:active,

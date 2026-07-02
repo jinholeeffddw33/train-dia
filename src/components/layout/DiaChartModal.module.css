@@ -75,7 +75,7 @@
   transition: background 0.15s ease, transform 0.12s ease;
 }
 .closeBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   background: rgba(15, 23, 42, 0.06);
 }
 .closeBtn:focus-visible {

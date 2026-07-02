@@ -88,8 +88,10 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
-button:active:not(:disabled) {
-  transform: translateY(1px) scale(0.97);
+/* 전역 press 폴백 — :where()로 특이도 0 강등: 모듈 CSS의 .xxx:active(0,2,0)가 항상 이긴다.
+   (기존 button:active:not(:disabled) 특이도 (0,2,1)가 press 3티어 전체를 무력화하던 P0-3 수정) */
+:where(button:active:not(:disabled)) {
+  transform: translateY(1px) scale(0.95);
 }
 
 /* ===== 롱프레스 콜아웃/선택 차단 (ZINOSB UI-GLASS-TIER-001 — "버튼 꾹 누르면 링크/메뉴 떠서 없어보임").
@@ -104,6 +106,10 @@ a, button, [role="button"], [role="tab"], [role="menuitem"], [role="link"], nav,
 input, textarea, select {
   font: inherit;
   color: inherit;
+  /* iOS 자동 줌 원천 차단 — 16px 미만 인풋 포커스 시 사파리가 강제 줌 (P0-5).
+     !important 사유: 모듈 CSS 클래스(0,1,0)가 이 element 셀렉터(0,0,1)를 이겨
+     14px대 토큰 인풋이 줌을 재발시키므로, 접근성 가드로서 최종 하한을 강제한다. */
+  font-size: max(16px, 1em) !important;
 }
 
 /* ===== 모바일 선택 색상 ===== */

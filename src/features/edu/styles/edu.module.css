@@ -445,7 +445,7 @@
 }
 
 .subMenuItem:active .menuGridIcon {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .subMenuLabel {
@@ -628,8 +628,9 @@
   text-align: left;
   -webkit-tap-highlight-color: transparent;
   min-height: 44px;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
-.wrongReviewCard:active { opacity: 0.8; }
+.wrongReviewCard:active { opacity: 0.8; transform: scale(0.98); }
 
 /* 바로가기 그리드 */
 .quickGrid {
@@ -1197,15 +1198,15 @@
 
 .broadcastVerTabs {
   display: inline-flex;
-  gap: 4px;
+  gap: 8px;
   padding: 2px;
   background: var(--dia-surface-hover);
   border-radius: 999px;
 }
 
 .broadcastVerTab {
-  min-width: 28px;
-  height: 26px;
+  min-width: 36px;
+  height: 36px;
   padding: 0 9px;
   border: none;
   background: transparent;
@@ -2811,10 +2812,16 @@
   border-radius: var(--dia-radius-full);
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
-  outline: none;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 포커스 링 부활 — base outline:none 이 전역 :focus-visible 링을 죽이던 문제 */
+.searchInput:focus-visible {
+  outline: none;
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 2px var(--dia-blue-dim);
 }
 
 .searchResults {

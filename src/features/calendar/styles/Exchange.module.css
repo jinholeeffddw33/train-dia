@@ -194,7 +194,7 @@
 /* ── Wish Buttons ── */
 .wishBtns {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -207,7 +207,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-sm);
   transition: all var(--dia-transition-fast);
-  min-height: 32px;
+  min-height: 44px;
 }
 .wishBtn:active { background: var(--dia-surface-hover); }
 
@@ -385,7 +385,7 @@
 }
 
 .matchDiaBtn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   background: var(--dia-bg);
 }
 
@@ -450,7 +450,7 @@
 }
 
 .routeClose:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .routeBody {
@@ -529,10 +529,10 @@
   color: white;
   background: var(--dia-blue);
   border-radius: var(--dia-radius-md);
-  min-height: 36px;
+  min-height: 44px;
   transition: all var(--dia-transition-fast);
 }
-.sendBtn:active { opacity: 0.85; }
+.sendBtn:active { opacity: 0.85; transform: scale(0.95); }
 
 .sendBtnSent {
   background: var(--dia-green);
@@ -798,8 +798,8 @@
 }
 
 .removeBtn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -838,9 +838,9 @@
   font-weight: var(--dia-weight-bold);
   border-radius: var(--dia-radius-md);
   min-height: 44px;
-  transition: opacity var(--dia-transition-fast);
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
-.volunteerBtn:active { opacity: 0.85; }
+.volunteerBtn:active { opacity: 0.85; transform: scale(0.95); }
 
 .volunteerBtnDone {
   background: var(--dia-green);
@@ -882,10 +882,10 @@
   color: white;
   background: var(--dia-blue);
   border-radius: var(--dia-radius-md);
-  min-height: 32px;
-  transition: opacity var(--dia-transition-fast);
+  min-height: 44px;
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
-.volunteerSelectBtn:active { opacity: 0.85; }
+.volunteerSelectBtn:active { opacity: 0.85; transform: scale(0.95); }
 
 /* ── Cancel Button (outgoing pending) ── */
 .cancelBtn {
@@ -899,10 +899,10 @@
   background: var(--dia-red-dim);
   border: 1px solid transparent;
   border-radius: var(--dia-radius-md);
-  min-height: 32px;
+  min-height: 44px;
   transition: all var(--dia-transition-fast);
 }
-.cancelBtn:active { opacity: 0.85; }
+.cancelBtn:active { opacity: 0.85; transform: scale(0.95); }
 
 /* ── Guidance Text (after accepted) ── */
 .guidanceText {
@@ -985,9 +985,9 @@
   background: var(--dia-blue);
   border-radius: var(--dia-radius-md);
   min-height: 44px;
-  transition: opacity var(--dia-transition-fast);
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
 }
-.confirmOkBtn:active { opacity: 0.85; }
+.confirmOkBtn:active { opacity: 0.85; transform: scale(0.95); }
 
 .confirmOkBtnDanger {
   background: var(--dia-red);
@@ -1020,7 +1020,7 @@
   background: var(--dia-bg);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-sm);
-  min-height: 32px;
+  min-height: 44px;
   transition: all var(--dia-transition-fast);
 }
 .declineReasonBtn:active { background: var(--dia-surface-hover); }

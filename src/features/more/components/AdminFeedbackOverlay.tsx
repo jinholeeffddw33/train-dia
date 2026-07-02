@@ -223,6 +223,7 @@ function AdminThreadView({ feedback, onReplied }: { feedback: FeedbackItem; onRe
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, 1000))}
           rows={2}
+          enterKeyHint="send"
           aria-label="답글 입력"
         />
         <button

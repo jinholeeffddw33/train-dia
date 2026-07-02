@@ -34,7 +34,7 @@
 @media (hover: hover) {
 .toggle:hover { opacity: 1; }
 }
-.toggle:active { transform: scale(0.94); }
+.toggle:active { transform: scale(0.95); }
 .toggle:focus-visible {
   outline: 2px solid #A855F7;
   outline-offset: 2px;

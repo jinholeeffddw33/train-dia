@@ -24,9 +24,9 @@
 }
 
 .backBtn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
   border-radius: var(--dia-radius-full);
   background: var(--dia-surface-elevated);
   border: none;
@@ -251,7 +251,7 @@
 }
 
 .dpadBtn:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
   box-shadow: var(--dia-3d-pressed);
 }
 

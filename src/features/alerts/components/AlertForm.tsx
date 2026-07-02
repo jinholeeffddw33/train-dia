@@ -206,6 +206,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
                   placeholder={`${activeField === 'from' ? '시작' : '끝'}역 검색...`}
                   value={stationSearch}
                   onChange={(e) => setStationSearch(e.target.value)}
+                  enterKeyHint="search"
                   aria-label={`${activeField === 'from' ? '시작' : '끝'}역 검색`}
                 />
                 <div className={styles.stationGrid}>

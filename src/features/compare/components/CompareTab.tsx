@@ -203,7 +203,7 @@ export default function CompareTab() {
           {persons.filter((p): p is Person => p !== null).map((person) => (
             <span key={person.I} className={styles.selectedChip}>
               {person.n}
-              <button type="button" className={styles.chipRemove} onClick={() => {
+              <button type="button" className={styles.chipRemove} aria-label={`${person.n} 제거`} onClick={() => {
                 const idx = persons.findIndex((p) => p?.I === person.I);
                 if (idx >= 0) removePerson(idx);
               }}>
@@ -279,6 +279,7 @@ export default function CompareTab() {
             placeholder="이름 또는 번호로 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            enterKeyHint="search"
             autoFocus
           />
           {searchQuery && (

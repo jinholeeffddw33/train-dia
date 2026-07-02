@@ -47,7 +47,7 @@
 }
 
 .stationBtn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
   border-color: var(--card-accent, #60A5FA);
   box-shadow: 0 0 0 2px var(--card-tint, rgba(96, 165, 250, 0.18));
 }

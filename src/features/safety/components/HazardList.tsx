@@ -172,6 +172,8 @@ export default function HazardList({ onSelect, category, cardKey }: HazardListPr
                   <button
                     type="button"
                     className={`${styles.reactionBtn} ${r.likedByMe ? styles.reactionBtnActive : ''}`}
+                    aria-label="공감"
+                    aria-pressed={r.likedByMe}
                     onClick={(e) => { e.stopPropagation(); if (name && sabun) toggleLike(r.id, name, sabun); }}
                   >
                     <ThumbsUp size={14} fill={r.likedByMe ? 'currentColor' : 'none'} /> <span>{r.likeCount}</span>

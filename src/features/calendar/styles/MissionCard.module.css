@@ -179,7 +179,7 @@
 }
 
 .entryBtn:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
   box-shadow: var(--dia-3d-pressed);
 }
 

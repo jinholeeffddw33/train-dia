@@ -333,6 +333,7 @@ function ThreadView({ feedback, anonId, onReplied }: {
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, 1000))}
           rows={2}
+          enterKeyHint="send"
           aria-label="메시지 입력"
         />
         <button

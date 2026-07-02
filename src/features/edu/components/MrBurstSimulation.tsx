@@ -475,7 +475,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
             ) : perfectCount >= TOTAL_ROUNDS * 0.7 ? (
               <>
                 <div className={styles.simSuccessIcon}><CheckCircle2 size={56} /></div>
-                <h2 className={styles.simSuccessTitle}>잘했습니다!</h2>
+                <h2 className={styles.simSuccessTitle}>잘했어요!</h2>
                 <p className={styles.simSuccessMsg}>
                   대부분 한 번에 맞혔지만, 재시도한 문제를 복습하세요.
                 </p>

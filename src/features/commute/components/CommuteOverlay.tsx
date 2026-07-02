@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { Star } from 'lucide-react';
 import { useCommuteStore } from '@/stores/commute';
 import Modal from '@/components/common/Modal';
+import { showToast } from '@/components/common/Toast';
 import StationArrivals from './StationArrivals';
 import styles from '../styles/Commute.module.css';
 
@@ -45,8 +46,10 @@ export default function CommuteOverlay({ open, onClose }: { open: boolean; onClo
             onToggleFavorite={() => {
               if (favorites.includes(selectedStation)) {
                 removeFavorite(selectedStation);
+                showToast('즐겨찾기에서 뺐어요', 'info');
               } else {
                 addFavorite(selectedStation);
+                showToast('즐겨찾기에 추가했어요', 'success');
               }
             }}
           />

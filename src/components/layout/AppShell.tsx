@@ -5,7 +5,6 @@ import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
-import ToastContainer from '../common/Toast';
 import InternIntroModal from '../common/InternIntroModal';
 
 import { useTrainStore } from '@/stores/train';
@@ -84,7 +83,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
         exchangeCount={exchangeCount}
         hidden={chromeHidden}
       />
-      <ToastContainer />
+      {/* ToastContainer — 루트 layout 으로 이동 (전 월드 공용, 2026-07-02 R4) */}
       <InternIntroModal />
     </div>
   );

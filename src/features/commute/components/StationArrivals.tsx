@@ -53,7 +53,7 @@ export default function StationArrivals({
       const data = await res.json();
       setArrivals(data.arrivals ?? []);
     } catch {
-      setError('네트워크 연결을 확인해주세요');
+      setError('인터넷 연결을 확인해주세요');
     } finally {
       setLoading(false);
     }

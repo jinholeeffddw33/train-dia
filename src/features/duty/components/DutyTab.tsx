@@ -150,7 +150,7 @@ export default function DutyTab() {
             <Megaphone size={18} className={styles.noticeIcon} />
             <div className={styles.noticeText}>
               <strong>새 기능 — 익명 제보</strong>
-              <span>버그·오류·아이디어를 익명으로 제보할 수 있어요.<br />설정 탭 상단에서 바로 작성할 수 있습니다.</span>
+              <span>버그·오류·아이디어를 익명으로 제보할 수 있어요.<br />설정 탭 상단에서 바로 작성할 수 있어요.</span>
             </div>
           </div>
           <button type="button" className={styles.noticeClose} onClick={dismissAnnounce} aria-label="닫기">

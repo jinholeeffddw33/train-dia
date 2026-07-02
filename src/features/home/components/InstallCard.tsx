@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Smartphone, X, Share, Plus } from 'lucide-react';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { openInChrome } from '@/hooks/useInAppBrowser';
 import styles from '../styles/Home.module.css';
 
@@ -13,6 +14,9 @@ export default function InstallCard() {
   const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
   const [dismissed, setDismissed] = useState(true); // 초기 true로 깜빡임 방지
   const [guideOpen, setGuideOpen] = useState(false);
+
+  // ESC 로 설치 안내 모달 닫기
+  useEscapeClose(guideOpen, () => setGuideOpen(false));
 
   useEffect(() => {
     if (isInstalled) return;

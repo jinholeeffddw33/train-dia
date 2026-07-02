@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, Users, Clock, UserX, Activity } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/More.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -37,17 +38,20 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       setAuthenticated(true);
       setPinError('');
     } else {
-      setPinError('비밀번호가 올바르지 않습니다');
+      setPinError('비밀번호가 올바르지 않아요');
       setPin('');
     }
   }, [pin]);
+
+  // ESC 로 닫기
+  useEscapeClose(true, onClose);
 
   useEffect(() => {
     if (!authenticated) return;
     setLoading(true);
     fetch('/api/admin/dashboard')
       .then(r => {
-        if (!r.ok) throw new Error('권한이 없습니다');
+        if (!r.ok) throw new Error('권한이 없어요');
         return r.json();
       })
       .then(setData)
@@ -68,7 +72,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   // PIN 게이트
   if (!authenticated) {
     return (
-      <div className={styles.fullOverlay}>
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
         <div className={styles.overlayHeader}>
           <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
             <ArrowLeft size={20} />
@@ -109,7 +113,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   // 로딩/에러
   if (loading) {
     return (
-      <div className={styles.fullOverlay}>
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
         <div className={styles.overlayHeader}>
           <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
             <ArrowLeft size={20} />
@@ -123,14 +127,14 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
   if (error || !data) {
     return (
-      <div className={styles.fullOverlay}>
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
         <div className={styles.overlayHeader}>
           <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
             <ArrowLeft size={20} />
           </button>
           <h2 className={styles.overlayTitle}>관리자 현황판</h2>
         </div>
-        <div className={styles.adminEmpty}>{error || '데이터를 불러올 수 없습니다'}</div>
+        <div className={styles.adminEmpty}>{error || '데이터를 불러올 수 없어요'}</div>
       </div>
     );
   }
@@ -138,7 +142,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const maxDaily = Math.max(...data.dailyStats.map(d => d.count), 1);
 
   return (
-    <div className={styles.fullOverlay}>
+    <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
       <div className={styles.overlayHeader}>
         <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
           <ArrowLeft size={20} />
@@ -172,7 +176,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
             <Clock size={16} /> 오늘 접속자 ({data.today.uniqueCount}명)
           </h3>
           {data.today.users.length === 0 ? (
-            <p className={styles.adminEmptyText}>오늘 접속자가 없습니다</p>
+            <p className={styles.adminEmptyText}>오늘 접속자가 없어요</p>
           ) : (
             <div className={styles.adminList}>
               {data.today.users.map((u, i) => (

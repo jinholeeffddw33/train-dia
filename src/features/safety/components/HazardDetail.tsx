@@ -7,6 +7,7 @@ import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isAdmin } from '@/lib/auth';
 import AttachmentLightbox from './AttachmentLightbox';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import styles from './Hazard.module.css';
 
 // Stable empty array — prevents useSyncExternalStore from triggering infinite re-renders
@@ -43,6 +44,12 @@ interface HazardDetailProps {
   onBack: () => void;
 }
 
+/** window.confirm 대체 — 공용 ConfirmDialog 로 띄울 대기 액션 */
+type PendingConfirm =
+  | { kind: 'deleteReport' }
+  | { kind: 'toggleResolved'; next: boolean }
+  | { kind: 'deleteComment'; commentId: string };
+
 export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [commentText, setCommentText] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -55,6 +62,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [readStatus, setReadStatus] = useState<ReadStatusResponse | null>(null);
   const [readStatusExpanded, setReadStatusExpanded] = useState(false);
   const [readStatusTab, setReadStatusTab] = useState<'unread' | 'read'>('unread');
@@ -181,38 +189,40 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       setCommentText('');
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '댓글 등록에 실패했습니다');
+      setError(e instanceof Error ? e.message : '댓글을 등록하지 못했어요');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!name || !sabun) return;
-    if (!window.confirm('정말 삭제하시겠습니까? 댓글과 사진도 모두 삭제됩니다.')) return;
+    setShowMenu(false);
+    setPendingConfirm({ kind: 'deleteReport' });
+  };
 
+  const doDeleteReport = async () => {
     setError('');
     try {
       await deleteReport(reportId, name, sabun);
       onBack();
     } catch (e) {
-      setError(e instanceof Error ? e.message : '삭제에 실패했습니다');
+      setError(e instanceof Error ? e.message : '삭제하지 못했어요');
     }
   };
 
-  const handleToggleResolved = async () => {
+  const handleToggleResolved = () => {
     if (!name || !sabun || !report) return;
-    const nextResolved = !report.resolved;
-    const msg = nextResolved
-      ? '조치완료로 표시하시겠습니까?'
-      : '조치완료 표시를 해제하시겠습니까?';
-    if (!window.confirm(msg)) return;
     setShowMenu(false);
+    setPendingConfirm({ kind: 'toggleResolved', next: !report.resolved });
+  };
+
+  const doToggleResolved = async (nextResolved: boolean) => {
     setError('');
     try {
       await toggleResolved(reportId, nextResolved, name, sabun);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '조치완료 처리에 실패했습니다');
+      setError(e instanceof Error ? e.message : '조치완료 처리를 하지 못했어요');
     }
   };
 
@@ -272,7 +282,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       setEditMode(false);
       setRemoveFile(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '수정에 실패했습니다');
+      setError(e instanceof Error ? e.message : '수정하지 못했어요');
     }
   };
 
@@ -282,19 +292,22 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     try {
       await toggleLike(reportId, name, sabun);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '좋아요에 실패했습니다');
+      setError(e instanceof Error ? e.message : '좋아요를 반영하지 못했어요');
     }
   };
 
-  const handleCommentDelete = async (commentId: string) => {
+  const handleCommentDelete = (commentId: string) => {
     if (!name || !sabun) return;
-    if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
-    setError('');
     setCommentMenuId(null);
+    setPendingConfirm({ kind: 'deleteComment', commentId });
+  };
+
+  const doDeleteComment = async (commentId: string) => {
+    setError('');
     try {
       await deleteComment(reportId, commentId, name, sabun);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '댓글 삭제에 실패했습니다');
+      setError(e instanceof Error ? e.message : '댓글을 삭제하지 못했어요');
     }
   };
 
@@ -312,7 +325,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       setEditingCommentId(null);
       setEditCommentText('');
     } catch (e) {
-      setError(e instanceof Error ? e.message : '댓글 수정에 실패했습니다');
+      setError(e instanceof Error ? e.message : '댓글을 수정하지 못했어요');
     }
   };
 
@@ -750,7 +763,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
 
               {readStatusTab === 'unread' ? (
                 readStatus.nonReaders.length === 0 ? (
-                  <p className={styles.readStatusEmpty}>모두 읽었습니다 🎉</p>
+                  <p className={styles.readStatusEmpty}>모두 읽었어요 🎉</p>
                 ) : (
                   <div className={styles.readStatusChips}>
                     {readStatus.nonReaders.map((p) => (
@@ -761,7 +774,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   </div>
                 )
               ) : readStatus.readers.length === 0 ? (
-                <p className={styles.readStatusEmpty}>아직 읽은 사람이 없습니다</p>
+                <p className={styles.readStatusEmpty}>아직 읽은 사람이 없어요</p>
               ) : (
                 <div className={styles.readStatusChips}>
                   {readStatus.readers.map((p) => (
@@ -907,6 +920,40 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       {lightboxOpen && report.photoUrl && (
         <AttachmentLightbox url={report.photoUrl} onClose={() => setLightboxOpen(false)} />
       )}
+
+      {/* 삭제/조치완료 확인 — window.confirm 대체 */}
+      <ConfirmDialog
+        open={!!pendingConfirm}
+        title={
+          pendingConfirm?.kind === 'deleteReport' ? '게시물 삭제'
+            : pendingConfirm?.kind === 'deleteComment' ? '댓글 삭제'
+            : pendingConfirm?.next ? '조치완료 표시' : '조치완료 해제'
+        }
+        message={
+          pendingConfirm?.kind === 'deleteReport'
+            ? '정말 삭제할까요? 댓글과 사진도 모두 삭제돼요.'
+            : pendingConfirm?.kind === 'deleteComment'
+              ? '이 댓글을 삭제할까요?'
+              : pendingConfirm?.next
+                ? '이 게시물을 조치완료로 표시할까요?'
+                : '조치완료 표시를 해제할까요?'
+        }
+        confirmLabel={
+          pendingConfirm?.kind === 'deleteReport' || pendingConfirm?.kind === 'deleteComment'
+            ? '삭제하기'
+            : pendingConfirm?.next ? '표시하기' : '해제하기'
+        }
+        variant={pendingConfirm?.kind === 'toggleResolved' ? 'default' : 'danger'}
+        onConfirm={() => {
+          const action = pendingConfirm;
+          setPendingConfirm(null);
+          if (!action) return;
+          if (action.kind === 'deleteReport') doDeleteReport();
+          else if (action.kind === 'deleteComment') doDeleteComment(action.commentId);
+          else doToggleResolved(action.next);
+        }}
+        onClose={() => setPendingConfirm(null)}
+      />
     </div>
   );
 }

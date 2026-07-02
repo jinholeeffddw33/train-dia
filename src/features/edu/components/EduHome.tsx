@@ -227,7 +227,7 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
       {/* 고장조치 서브메뉴 */}
       {repairOpen && (
         <div className={styles.subMenuOverlay} onClick={() => setRepairOpen(false)}>
-          <div className={styles.subMenuPanel} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.subMenuPanel} role="dialog" aria-modal="true" aria-label="고장조치 메뉴" onClick={(e) => e.stopPropagation()}>
             <div className={styles.subMenuHeader}>
               <Wrench size={20} className={styles.quickIconRed} />
               <h3 className={styles.subMenuTitle}>고장조치</h3>

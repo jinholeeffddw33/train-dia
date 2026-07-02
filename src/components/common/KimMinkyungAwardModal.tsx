@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { X, Trophy } from 'lucide-react';
+import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './InternWelcomeModal.module.css';
 
 const STORAGE_KEY = 'kim-minkyung-award-2026-05-dismiss';
@@ -29,7 +30,8 @@ export default function KimMinkyungAwardModal() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldShow()) setOpen(true);
+    // 진입 모달 스택 정리 — 세션당 1개만 (우선순위 게이트)
+    if (shouldShow()) requestEntryModal('kim-minkyung-award', () => setOpen(true));
   }, []);
 
   const handleClose = useCallback(() => setOpen(false), []);

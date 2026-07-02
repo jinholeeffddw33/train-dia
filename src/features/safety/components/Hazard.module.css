@@ -1615,6 +1615,18 @@
            max(env(safe-area-inset-left, 0px), 16px);
 }
 
+/* 사진을 감싸는 버튼 — 키보드 접근용 (탭/Enter = 닫기), 시각적으론 투명 래퍼 */
+.lightboxImageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
 .lightboxImage {
   max-width: 100%;
   max-height: 100%;

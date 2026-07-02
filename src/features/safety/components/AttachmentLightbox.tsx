@@ -45,15 +45,18 @@ export default function AttachmentLightbox({ url, onClose }: Props) {
         <X size={22} strokeWidth={2.4} />
       </button>
       {image ? (
-        <img
-          src={url}
-          alt="첨부 파일"
-          className={styles.lightboxImage}
-          onClick={(e) => e.stopPropagation()}
-        />
+        /* 사진을 버튼으로 감싸 키보드 접근 보장 — 탭/Enter 시 닫기 */
+        <button
+          type="button"
+          className={styles.lightboxImageBtn}
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          aria-label="사진 닫기"
+        >
+          <img src={url} alt="첨부 파일" className={styles.lightboxImage} />
+        </button>
       ) : (
         <div className={styles.lightboxFile} onClick={(e) => e.stopPropagation()}>
-          <p className={styles.lightboxFileText}>이 파일은 미리보기를 지원하지 않습니다.</p>
+          <p className={styles.lightboxFileText}>이 파일은 미리보기를 지원하지 않아요</p>
           <a
             href={url}
             download

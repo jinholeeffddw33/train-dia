@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Plus, X, ImageIcon, ExternalLink, WifiOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
+import { showToast } from '@/components/common/Toast';
 import { DOW } from '@/lib/constants';
 import StandbyCoverageForm from './StandbyCoverageForm';
 import styles from './StandbyCoverage.module.css';
@@ -58,6 +60,9 @@ export default function StandbyCoverageView({ onBack }: Props) {
   }, []);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  // ESC 로 이미지 줌 닫기
+  useEscapeClose(!!zoomImage, () => setZoomImage(null));
 
   return (
     <div className={styles.wrap}>
@@ -139,7 +144,11 @@ export default function StandbyCoverageView({ onBack }: Props) {
       {showForm && (
         <StandbyCoverageForm
           onClose={() => setShowForm(false)}
-          onSuccess={() => { setShowForm(false); fetchItems(); }}
+          onSuccess={() => {
+            setShowForm(false);
+            showToast('등록했어요', 'success');
+            fetchItems();
+          }}
           sabun={sabun}
           name={name}
         />
@@ -155,8 +164,16 @@ export default function StandbyCoverageView({ onBack }: Props) {
           >
             <X size={22} strokeWidth={2.4} />
           </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={zoomImage} alt="대기충당현황 크게 보기" className={styles.zoomImage} onClick={(e) => e.stopPropagation()} />
+          {/* 사진을 버튼으로 감싸 키보드 접근 보장 — 탭/Enter 시 닫기 */}
+          <button
+            type="button"
+            className={styles.zoomImageBtn}
+            onClick={(e) => { e.stopPropagation(); setZoomImage(null); }}
+            aria-label="사진 닫기"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={zoomImage} alt="대기충당현황 크게 보기" className={styles.zoomImage} />
+          </button>
         </div>
       )}
     </div>

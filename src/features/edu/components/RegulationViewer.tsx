@@ -187,6 +187,20 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
   useHistoryBack('regulation-memo', () => setMemoEditor(null), !!memoEditor);
   useHistoryBack('regulation-notes', () => setNotesOpen(false), notesOpen);
 
+  // ESC — 최상단 오버레이부터 역순으로 닫기 (메모목록 > 메모 > 형광 팝오버 > PDF > 뷰어 본체)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (notesOpen) setNotesOpen(false);
+      else if (memoEditor) setMemoEditor(null);
+      else if (selPopover) setSelPopover(null);
+      else if (pdfOpen) setPdfOpen(false);
+      else onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [notesOpen, memoEditor, selPopover, pdfOpen, onClose]);
+
   useEffect(() => {
     let active = true;
     setLoading(true);

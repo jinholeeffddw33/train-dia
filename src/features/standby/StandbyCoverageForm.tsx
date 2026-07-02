@@ -88,7 +88,16 @@ export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }:
   }, [photo, targetDate, sabun, name, onSuccess]);
 
   return (
-    <div className={styles.formOverlay} role="dialog" aria-modal="true">
+    <div
+      className={styles.formOverlay}
+      role="dialog"
+      aria-modal="true"
+      aria-label="대기충당현황 등록"
+      onClick={(e) => {
+        // 배경(dim)탭 닫기 — 카드 안 클릭은 통과
+        if (e.target === e.currentTarget && !submitting) onClose();
+      }}
+    >
       <div className={styles.formCard}>
         <div className={styles.formHead}>
           <h2 className={styles.formTitle}>대기충당현황 등록</h2>

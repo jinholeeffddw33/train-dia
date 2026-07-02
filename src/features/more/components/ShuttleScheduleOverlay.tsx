@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import moreStyles from '../styles/More.module.css';
 import styles from '../styles/ShuttleSchedule.module.css';
 
@@ -33,12 +34,18 @@ export default function ShuttleScheduleOverlay({ open, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('shuttle');
   const [zoomed, setZoomed] = useState(false);
 
+  // ESC — 확대 상태면 확대 해제, 아니면 닫기
+  useEscapeClose(open, () => {
+    if (zoomed) setZoomed(false);
+    else onClose();
+  });
+
   if (!open) return null;
 
   const meta = IMG_META[tab];
 
   return (
-    <div className={moreStyles.fullOverlay}>
+    <div className={moreStyles.fullOverlay} role="dialog" aria-modal="true" aria-label="승용차 운행 시간표">
       <div className={moreStyles.overlayHeader}>
         <button
           type="button"

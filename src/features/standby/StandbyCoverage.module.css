@@ -316,6 +316,17 @@
   justify-content: center;
   padding: var(--dia-space-3);
 }
+/* 사진을 감싸는 버튼 — 키보드 접근용 (탭/Enter = 닫기), 시각적으론 투명 래퍼 */
+.zoomImageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
 .zoomImage {
   max-width: 100%;
   max-height: 100%;

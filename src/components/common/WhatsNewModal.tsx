@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, Sparkles, Moon, ClipboardCheck } from 'lucide-react';
 import { APP_VERSION } from '@/lib/constants';
+import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './WhatsNewModal.module.css';
 
 const STORAGE_KEY = 'whats-new-2026-06-22-dismiss';
@@ -29,7 +30,8 @@ export default function WhatsNewModal() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldShow()) setOpen(true);
+    // 진입 모달 스택 정리 — 세션당 1개만 (우선순위 게이트)
+    if (shouldShow()) requestEntryModal('whats-new', () => setOpen(true));
   }, []);
 
   const handleClose = useCallback(() => setOpen(false), []);

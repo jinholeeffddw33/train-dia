@@ -3,6 +3,7 @@
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
 import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
 
 const ReactionTest = lazy(() => import('./games/ReactionTest'));
@@ -16,6 +17,15 @@ const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 const TodayFortune = lazy(() => import('./fortune/TodayFortune'));
 const AttendanceStamp = lazy(() => import('./stamp/AttendanceStamp'));
+
+/** 지연 로드 청크 공통 폴백 — 점 3개 로딩 (문구 통일: "불러오고 있어요") */
+const lifeLoading = (
+  <div className={styles.wrap}>
+    <div className={styles.emptyWrap}>
+      <LoadingDots label="불러오고 있어요" />
+    </div>
+  </div>
+);
 
 class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => void }, { hasError: boolean }> {
   constructor(props: { children: ReactNode; onBack: () => void }) { super(props); this.state = { hasError: false }; }
@@ -220,7 +230,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     const goBack = () => setView('games');
     return (
       <LifeErrorBoundary onBack={goBack}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           {view.gameId === 'reaction' && <ReactionTest onBack={goBack} />}
           {view.gameId === 'snake' && <SnakeGame onBack={goBack} />}
           {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
@@ -237,7 +247,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     const goBack = () => setView('games');
     return (
       <LifeErrorBoundary onBack={goBack}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           <HallOfFame onBack={goBack} />
         </Suspense>
       </LifeErrorBoundary>
@@ -248,7 +258,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   if (view === 'bonsai') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           <ZenBonsai onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
@@ -259,7 +269,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   if (view === 'asmr') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           <AsmrTherapy onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
@@ -270,7 +280,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   if (view === 'fortune') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           <TodayFortune onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
@@ -281,7 +291,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
   if (view === 'stamp') {
     return (
       <LifeErrorBoundary onBack={goLifeHome}>
-        <Suspense fallback={<div className={styles.wrap}><div className={styles.emptyWrap}><span className={styles.emptyText}>로딩 중...</span></div></div>}>
+        <Suspense fallback={lifeLoading}>
           <AttendanceStamp onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { APP_VERSION } from '@/lib/constants';
+import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './CycleChangeModal.module.css';
 
 const STORAGE_KEY = 'cycle-change-2026-05-15-dismiss';
@@ -29,7 +30,8 @@ export default function CycleChangeModal() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldShow()) setOpen(true);
+    // 진입 모달 스택 정리 — 세션당 1개만 (우선순위 게이트)
+    if (shouldShow()) requestEntryModal('cycle-change', () => setOpen(true));
   }, []);
 
   const handleDismissToday = useCallback(() => {

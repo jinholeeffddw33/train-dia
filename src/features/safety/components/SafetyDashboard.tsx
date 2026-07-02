@@ -417,8 +417,8 @@ export default function SafetyDashboard({
             </ul>
           ) : (
             <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
-              <p className={styles.noticeEmptyText}>등록된 공지사항이 없습니다</p>
-              <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시됩니다</p>
+              <p className={styles.noticeEmptyText}>등록된 공지사항이 없어요</p>
+              <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시돼요</p>
             </button>
           )}
         </section>

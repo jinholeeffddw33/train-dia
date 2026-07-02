@@ -128,7 +128,7 @@ function CategoryListView({
         </button>
       </header>
       {showAdminAlert && (
-        <div className={styles.adminAlert}>관리자만 등록할 수 있습니다</div>
+        <div className={styles.adminAlert}>관리자만 등록할 수 있어요</div>
       )}
       <main className={styles.content}>
         {loading && reports.length === 0 ? (

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Lock, Send, CheckCircle, MessageSquare, ChevronLeft, Inbox } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { getAnonymousId } from '@/lib/anonymousId';
 import styles from '../styles/More.module.css';
 
@@ -60,8 +61,14 @@ export default function FeedbackOverlay({ onClose }: Props) {
     if (tab === 'mine' && anonId) loadMyList();
   }, [tab, anonId, loadMyList]);
 
+  // ESC — 대화 스레드가 열려 있으면 스레드만 닫고, 아니면 오버레이 닫기
+  useEscapeClose(true, () => {
+    if (openThread) setOpenThread(null);
+    else onClose();
+  });
+
   return (
-    <div className={styles.fullOverlay}>
+    <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="의견 / 버그 제보">
       <div className={styles.overlayHeader}>
         {openThread ? (
           <button type="button" className={styles.overlayClose} onClick={() => setOpenThread(null)} aria-label="뒤로">
@@ -149,7 +156,7 @@ function WriteView({ anonId, onSubmitted }: { anonId: string; onSubmitted: () =>
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.message ?? '제보 전송에 실패했습니다');
+        throw new Error(data.message ?? '제보를 보내지 못했어요');
       }
       setDone(true);
     } catch (e) {
@@ -176,7 +183,7 @@ function WriteView({ anonId, onSubmitted }: { anonId: string; onSubmitted: () =>
     <div className={styles.feedbackForm}>
       <div className={styles.feedbackAnonBadge}>
         <Lock size={14} />
-        <span>이름·사번·기기 정보를 일절 수집하지 않습니다</span>
+        <span>이름·사번·기기 정보를 일절 수집하지 않아요</span>
       </div>
 
       <p className={styles.feedbackGuide}>

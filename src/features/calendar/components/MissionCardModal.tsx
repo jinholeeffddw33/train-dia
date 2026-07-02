@@ -80,7 +80,7 @@ export default function MissionCardModal({ sabun, name, onClose }: Props) {
 
         <div className={styles.footer}>
           <button type="button" className={styles.btnPrimary} onClick={handleClose}>
-            확인
+            다 읽었어요
           </button>
         </div>
       </div>

@@ -247,6 +247,18 @@
   background: var(--dia-amber);
 }
 
+/* 야간 근무 비색상 마커 — 색(보라)으로만 구분되던 주/야를 형태로도 구분 (우상단 작은 달) */
+.nightMark {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: inline-flex;
+  line-height: 0;
+  color: var(--dia-purple);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
 /* ── Detail ── */
 .detail {
   background: var(--dia-surface);

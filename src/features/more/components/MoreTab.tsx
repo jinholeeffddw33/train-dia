@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
 import { openInChrome } from '@/hooks/useInAppBrowser';
 import { useDriverStore } from '@/stores/driver';
@@ -24,6 +25,8 @@ import FeedbackOverlay from './FeedbackOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminDashboard from './AdminDashboard';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
+import { showToast } from '@/components/common/Toast';
 import { APP_VERSION } from '@/lib/constants';
 import styles from '../styles/More.module.css';
 
@@ -63,6 +66,7 @@ export default function MoreTab() {
   const [newPinConfirm, setNewPinConfirm] = useState('');
   const [pinError, setPinError] = useState('');
   const [pinLoading, setPinLoading] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // 오버레이 뒤로가기 지원
   const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen
@@ -86,6 +90,13 @@ export default function MoreTab() {
       shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
       adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen]);
   useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
+
+  // ESC 닫기 — MoreTab 인라인 fullOverlay(PIN 변경/설치 안내/연락처/교번 비교).
+  // Commute/Subway 는 공용 Modal 이 자체 ESC 처리하므로 제외 (이중 닫힘 방지).
+  useEscapeClose(
+    pinChangeOpen || installGuideOpen || contactsOpen || compareOpen,
+    closeActiveOverlay,
+  );
 
   // 오늘 통계
   const [stats, setStats] = useState({ todayVisitors: 0, todayPosts: 0 });
@@ -408,12 +419,7 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.logoutBtn}
-          onClick={async () => {
-            if (window.confirm('로그아웃 하시겠습니까?')) {
-              await authLogout();
-              driverLogout();
-            }
-          }}
+          onClick={() => setLogoutConfirmOpen(true)}
         >
           <LogOut size={18} />
           <span>{authUser ? `${authUser.name} 로그아웃` : '로그아웃'}</span>
@@ -515,9 +521,9 @@ export default function MoreTab() {
         </section>
       )}
 
-      {/* PIN 변경 모달 */}
+      {/* PIN 변경 모달 — 폼 입력 중 실수 방지로 배경탭 닫기는 제외 (ESC/X 만) */}
       {pinChangeOpen && (
-        <div className={styles.fullOverlay}>
+        <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="PIN 변경">
           <div className={styles.overlayHeader}>
             <button
               type="button"
@@ -575,8 +581,8 @@ export default function MoreTab() {
                 disabled={pinLoading}
                 onClick={async () => {
                   if (!curPin) { setPinError('현재 PIN을 입력해주세요'); return; }
-                  if (newPin.length < 4) { setPinError('새 PIN은 4자리 이상이어야 합니다'); return; }
-                  if (newPin !== newPinConfirm) { setPinError('새 PIN이 일치하지 않습니다'); return; }
+                  if (newPin.length < 4) { setPinError('새 PIN은 4자리 이상이어야 해요'); return; }
+                  if (newPin !== newPinConfirm) { setPinError('새 PIN이 서로 달라요. 다시 확인해주세요'); return; }
                   setPinLoading(true);
                   const res = await fetch('/api/auth/pin/change', {
                     method: 'POST',
@@ -585,9 +591,9 @@ export default function MoreTab() {
                   });
                   const data = await res.json();
                   setPinLoading(false);
-                  if (!res.ok) { setPinError(data.message || 'PIN 변경에 실패했습니다'); return; }
+                  if (!res.ok) { setPinError(data.message || 'PIN을 변경하지 못했어요'); return; }
                   setPinChangeOpen(false);
-                  alert('PIN이 변경되었습니다');
+                  showToast('PIN을 변경했어요', 'success');
                 }}
               >
                 {pinLoading ? '변경 중...' : 'PIN 변경'}
@@ -599,7 +605,7 @@ export default function MoreTab() {
 
       {/* iOS 홈 화면 추가 안내 모달 */}
       {installGuideOpen && (
-        <div className={styles.fullOverlay}>
+        <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="홈 화면에 추가 안내">
           <div className={styles.overlayHeader}>
             <button
               type="button"
@@ -699,7 +705,7 @@ export default function MoreTab() {
 
       {/* 연락처 오버레이 */}
       {contactsOpen && (
-        <div className={styles.fullOverlay}>
+        <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="비상 연락처">
           <div className={styles.overlayHeader}>
             <button
               type="button"
@@ -761,7 +767,7 @@ export default function MoreTab() {
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (
-        <div className={styles.fullOverlay}>
+        <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="교번 비교">
           <div className={styles.overlayHeader}>
             <button
               type="button"
@@ -780,6 +786,21 @@ export default function MoreTab() {
           </div>
         </div>
       )}
+
+      {/* 로그아웃 확인 */}
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        title="로그아웃"
+        message="로그아웃할까요? 다시 이용하려면 로그인이 필요해요."
+        confirmLabel="로그아웃하기"
+        variant="danger"
+        onConfirm={async () => {
+          setLogoutConfirmOpen(false);
+          await authLogout();
+          driverLogout();
+        }}
+        onClose={() => setLogoutConfirmOpen(false)}
+      />
     </div>
   );
 }

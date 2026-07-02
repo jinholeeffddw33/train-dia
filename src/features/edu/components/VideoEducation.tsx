@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, X, Play, Calendar } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/edu.module.css';
 
 interface VideoItem {
@@ -27,6 +28,7 @@ export default function VideoEducation({ onBack }: VideoEducationProps) {
   const closePlayer = useCallback(() => setActiveVideo(null), []);
 
   useHistoryBack('video-player', closePlayer, !!activeVideo);
+  useEscapeClose(!!activeVideo, closePlayer);
 
   useEffect(() => {
     fetch('/data/edu/videos.json')

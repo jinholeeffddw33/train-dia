@@ -6,6 +6,9 @@ import {
   ExternalLink, Download, Upload, ChevronDown, ChevronUp, Pencil, Check,
 } from 'lucide-react';
 import { useShortcutsStore, type ShortcutType, type Shortcut } from '@/stores/shortcuts';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
+import { showToast } from '@/components/common/Toast';
 import styles from '../styles/Shortcuts.module.css';
 import moreStyles from '../styles/More.module.css';
 
@@ -63,7 +66,7 @@ function AddModal({ onClose, onAdd }: {
     if (!file) return;
     // 10MB 제한
     if (file.size > 10 * 1024 * 1024) {
-      alert('10MB 이하 파일만 저장할 수 있습니다.');
+      showToast('10MB 이하 파일만 저장할 수 있어요', 'warning');
       return;
     }
     const dataUrl = await readFileAsDataURL(file);
@@ -87,7 +90,7 @@ function AddModal({ onClose, onAdd }: {
 
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-label="바로가기 추가" onClick={(e) => e.stopPropagation()}>
         {step === 'type' ? (
           <>
             <h3 className={styles.modalTitle}>바로가기 추가</h3>
@@ -294,7 +297,7 @@ function EditModal({ item, onClose, onSave }: {
 
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.modal} role="dialog" aria-modal="true" aria-label="바로가기 수정" onClick={(e) => e.stopPropagation()}>
         <h3 className={styles.modalTitle}>바로가기 수정</h3>
 
         <label className={styles.fieldLabel}>제목</label>
@@ -338,8 +341,14 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
   const [filter, setFilter] = useState<FilterTab>('all');
   const [addOpen, setAddOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Shortcut | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Shortcut | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
+
+  // ESC — 내부 모달(추가/수정/삭제 확인)이 떠 있으면 그쪽 우선, 없으면 오버레이 닫기
+  useEscapeClose(open && !addOpen && !editTarget && !deleteTarget, onClose);
+  useEscapeClose(addOpen, () => setAddOpen(false));
+  useEscapeClose(!!editTarget, () => setEditTarget(null));
 
   const filtered = items
     .filter((it) => filter === 'all' || it.type === filter)
@@ -368,9 +377,14 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
     const text = await file.text();
     try {
       const result = useShortcutsStore.getState().importData(text);
-      alert(`${result.added}개 추가됨 (${result.skipped}개 중복 건너뜀)`);
+      showToast(
+        result.skipped > 0
+          ? `${result.added}개를 추가했어요 (겹치는 ${result.skipped}개는 뺐어요)`
+          : `${result.added}개를 추가했어요`,
+        'success',
+      );
     } catch {
-      alert('파일 형식이 올바르지 않습니다.');
+      showToast('파일 형식이 올바르지 않아요', 'error');
     }
     // reset input
     e.target.value = '';
@@ -380,7 +394,7 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
   if (!open) return null;
 
   return (
-    <div className={moreStyles.fullOverlay}>
+    <div className={moreStyles.fullOverlay} role="dialog" aria-modal="true" aria-label="내 바로가기">
       <div className={moreStyles.overlayHeader}>
         <button
           type="button"
@@ -456,8 +470,8 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
         {filtered.length === 0 ? (
           <div className={styles.empty}>
             {items.length === 0
-              ? '바로가기가 없습니다.\n자주 쓰는 사이트나 파일을 추가하세요.'
-              : '이 카테고리에 저장된 항목이 없습니다.'}
+              ? '바로가기가 없어요.\n자주 쓰는 사이트나 파일을 추가해보세요.'
+              : '이 카테고리에 저장된 항목이 없어요.'}
           </div>
         ) : (
           filtered.map((item, idx) => {
@@ -467,11 +481,7 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
                 key={item.id}
                 item={item}
                 onEdit={() => setEditTarget(item)}
-                onDelete={() => {
-                  if (confirm(`"${item.title}" 바로가기를 삭제할까요?`)) {
-                    remove(item.id);
-                  }
-                }}
+                onDelete={() => setDeleteTarget(item)}
                 onTogglePin={() => update(item.id, { pinned: !item.pinned })}
                 onMoveUp={realIdx > 0 ? () => reorder(realIdx, realIdx - 1) : null}
                 onMoveDown={realIdx < items.length - 1 ? () => reorder(realIdx, realIdx + 1) : null}
@@ -507,6 +517,20 @@ export default function ShortcutsOverlay({ open, onClose }: ShortcutsOverlayProp
           }}
         />
       )}
+
+      {/* 삭제 확인 */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="바로가기 삭제"
+        message={deleteTarget ? `"${deleteTarget.title}" 바로가기를 삭제할까요?` : ''}
+        confirmLabel="삭제하기"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) remove(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

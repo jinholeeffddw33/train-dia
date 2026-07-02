@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, BookOpen, Play, X, FileText, HelpCircle, Train, Users, UserCheck, Award, Warehouse, ChevronRight, FileCog, UserCog, Briefcase } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/edu.module.css';
 import RegulationViewer from './RegulationViewer';
 import QuizPlayer from './QuizPlayer';
@@ -71,6 +72,10 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
 
   const closeQuiz = useCallback(() => setActiveQuiz(null), []);
   useHistoryBack('training-quiz', closeQuiz, !!activeQuiz);
+
+  // ESC 닫기 — 동영상/문제 오버레이. 문제 위에 본문 뷰어가 떠 있으면 뷰어(자체 ESC)가 우선.
+  useEscapeClose(!!activeVideo, closePlayer);
+  useEscapeClose(!!activeQuiz && !activeDoc && !activeVideo, closeQuiz);
 
   useEffect(() => {
     fetch('/data/edu/training.json')

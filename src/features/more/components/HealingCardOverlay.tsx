@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Settings } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useHealingCardStore, type HealingCardEntry } from '@/stores/healingCard';
 import styles from '../styles/HealingCard.module.css';
 import moreStyles from '../styles/More.module.css';
@@ -30,6 +31,9 @@ export default function HealingCardOverlay({ open, onClose }: Props) {
   useEffect(() => {
     if (open) checkMonthlyReset();
   }, [open, checkMonthlyReset]);
+
+  // ESC 로 닫기
+  useEscapeClose(open, onClose);
 
   if (!open) return null;
 
@@ -76,7 +80,7 @@ export default function HealingCardOverlay({ open, onClose }: Props) {
   })();
 
   return (
-    <div className={moreStyles.fullOverlay}>
+    <div className={moreStyles.fullOverlay} role="dialog" aria-modal="true" aria-label="힐링카드 잔액">
       <div className={moreStyles.overlayHeader}>
         <button
           type="button"

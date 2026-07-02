@@ -48,7 +48,7 @@ export default function JubakLocationOverlay({ open, onClose }: Props) {
   const activeLabel = STATIONS.find((s) => s.slug === activeSlug)?.label;
 
   return (
-    <div className={moreStyles.fullOverlay}>
+    <div className={moreStyles.fullOverlay} role="dialog" aria-modal="true" aria-label="5호선 주박위치">
       <div className={moreStyles.overlayHeader}>
         <button
           type="button"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Trophy, XCircle, RefreshCw } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/More.module.css';
 
 interface LevelRecord {
@@ -63,6 +64,9 @@ export default function LevelRecordsOverlay({ open, onClose }: LevelRecordsOverl
     if (open) fetchRecords();
   }, [open]);
 
+  // ESC 로 닫기
+  useEscapeClose(open, onClose);
+
   if (!open) return null;
 
   // 기관사별 최고 등급 요약
@@ -90,7 +94,7 @@ export default function LevelRecordsOverlay({ open, onClose }: LevelRecordsOverl
     .sort((a, b) => b.maxLevel - a.maxLevel || a.name.localeCompare(b.name));
 
   return (
-    <div className={styles.fullOverlay}>
+    <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="등급도전 현황">
       <div className={styles.overlayHeader}>
         <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
           <X size={20} />

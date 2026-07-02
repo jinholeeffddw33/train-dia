@@ -1,0 +1,28 @@
+/* EmptyState — 빈 상태 표준 (safety emptyState 패턴 추출) */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-8) var(--dia-space-4);
+  text-align: center;
+}
+
+.icon {
+  font-size: 32px;
+  line-height: 1;
+  opacity: 0.6;
+  color: var(--dia-text-tertiary);
+}
+
+.text {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-medium);
+}
+
+.hint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+}

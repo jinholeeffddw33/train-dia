@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { Moon } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useSwapStore } from '@/stores/swap';
@@ -173,9 +174,15 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             type="button"
             className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''} ${swapMode ? styles.cellSwapMode : ''} ${cell.isSwapped ? styles.cellSwapped : ''} ${cell.depotStart ? styles.cellDepotStart : ''}`}
             onClick={() => onSelectDate(cell.dateStr)}
-            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.depotStart ? ' 기지 출근' : ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
+            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.type === 'night' ? ' 야간' : ''}${cell.depotStart ? ' 기지 출근' : ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
             aria-current={cell.isToday ? 'date' : undefined}
           >
+            {/* 야간 비색상 마커 — 색약/흑백에서도 주간(파랑)과 구분되도록 우상단 작은 달 */}
+            {cell.type === 'night' && (
+              <span className={styles.nightMark} aria-hidden>
+                <Moon size={10} strokeWidth={2.4} />
+              </span>
+            )}
             <span className={`${styles.cellDate} ${cell.isSun || cell.hol ? styles.cellDateSun : ''} ${cell.isSat ? styles.cellDateSat : ''}`}>
               {cell.d}
             </span>

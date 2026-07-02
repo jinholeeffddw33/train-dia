@@ -22,7 +22,7 @@ export function useTrainPolling() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ message: '서버 오류' }));
-        setError(err.message ?? '열차 정보를 가져올 수 없습니다.');
+        setError(err.message ?? '열차 정보를 가져올 수 없어요');
         return;
       }
       const data = await res.json();

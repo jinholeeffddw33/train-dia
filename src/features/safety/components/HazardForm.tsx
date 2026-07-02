@@ -5,6 +5,7 @@ import { Siren, AlertTriangle, Info } from 'lucide-react';
 import { useHazardStore } from '@/stores/hazard';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
+import { showToast } from '@/components/common/Toast';
 import styles from './Hazard.module.css';
 
 async function compressImage(file: File): Promise<File> {
@@ -195,9 +196,10 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         category: variant.dataCategory,
       });
       if (preview) URL.revokeObjectURL(preview);
+      showToast('등록했어요', 'success');
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : '등록에 실패했습니다');
+      setError(e instanceof Error ? e.message : '등록하지 못했어요');
     } finally {
       setSubmitting(false);
     }

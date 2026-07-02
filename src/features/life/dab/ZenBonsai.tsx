@@ -7,6 +7,7 @@ import { getPlant, currentSeason, seasonLabel, stageFromLevel, plantImagePath, t
 import { useBonsaiStore, POINTS_PER_LEVEL, MAX_LEVEL } from '@/stores/bonsai';
 import { useSeoulWeather } from '@/features/home/hooks/useWeather';
 import BonsaiCollection from './BonsaiCollection';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import styles from './dab.module.css';
 
 interface ZenBonsaiProps { onBack: () => void }
@@ -418,10 +419,8 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [breathing, completeBreathing]);
 
-  const handleReset = useCallback(() => {
-    if (!confirm('현재 분재를 씨앗 상태로 되돌릴까요? (도감은 유지)')) return;
-    resetCurrent();
-  }, [resetCurrent]);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const handleReset = useCallback(() => setResetConfirmOpen(true), []);
 
   const handleSelectPlant = useCallback((id: typeof currentPlantId) => {
     switchPlant(id);
@@ -540,7 +539,7 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
               transition={{ duration: 0.5 }}>
               <Sparkles size={24} />
               <span className={styles.bonsaiMilestoneTitle}>
-                {milestonePopup === 'lv3' ? '어린 나무 달성!' : '꽃이 피었습니다!'}
+                {milestonePopup === 'lv3' ? '어린 나무 달성!' : '꽃이 피었어요!'}
               </span>
               <span className={styles.bonsaiMilestoneSub}>
                 {milestonePopup === 'lv3' ? '잎사귀가 무성해졌어요' : '이제 꽃이 맺히기 시작해요'}
@@ -606,6 +605,20 @@ export default function ZenBonsai({ onBack }: ZenBonsaiProps) {
           </button>
         </div>
       </div>
+
+      {/* 분재 리셋 확인 — window.confirm 대체 */}
+      <ConfirmDialog
+        open={resetConfirmOpen}
+        title="분재 되돌리기"
+        message="현재 분재를 씨앗 상태로 되돌릴까요? (도감은 유지돼요)"
+        confirmLabel="되돌리기"
+        variant="danger"
+        onConfirm={() => {
+          setResetConfirmOpen(false);
+          resetCurrent();
+        }}
+        onClose={() => setResetConfirmOpen(false)}
+      />
     </div>
   );
 }

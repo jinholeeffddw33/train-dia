@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Stamp, Trophy, CalendarCheck, Flame } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from './Stamp.module.css';
 
 interface Props {
@@ -88,6 +89,9 @@ export default function AttendanceStamp({ onBack }: Props) {
   const [stamps, setStamps] = useState<Set<string>>(new Set());
   const [stampedToday, setStampedToday] = useState(false);
   const [celebratingMilestone, setCelebratingMilestone] = useState<typeof MILESTONES[number] | null>(null);
+
+  // ESC 로 축하 모달 닫기
+  useEscapeClose(!!celebratingMilestone, () => setCelebratingMilestone(null));
 
   useEffect(() => {
     const s = loadStamps(sabun);
@@ -211,7 +215,7 @@ export default function AttendanceStamp({ onBack }: Props) {
 
       {/* 마일스톤 달성 축하 모달 */}
       {celebratingMilestone && (
-        <div className={styles.celebOverlay} role="dialog" aria-modal="true" onClick={() => setCelebratingMilestone(null)}>
+        <div className={styles.celebOverlay} role="dialog" aria-modal="true" aria-label="마일스톤 달성 축하" onClick={() => setCelebratingMilestone(null)}>
           <div className={styles.celebCard}>
             <span className={styles.celebEmoji}>{celebratingMilestone.emoji}</span>
             <h2 className={styles.celebLabel}>{celebratingMilestone.label} 달성!</h2>

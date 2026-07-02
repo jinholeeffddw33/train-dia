@@ -87,7 +87,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
     if (!canSubmit || submitting) return;
 
     if (!driverSabun) {
-      setSubmitError('사번 정보가 없습니다. 다시 로그인해주세요.');
+      setSubmitError('사번 정보가 없어요. 다시 로그인해주세요');
       return;
     }
 
@@ -107,7 +107,7 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
       });
       onClose();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : '등록에 실패했습니다');
+      setSubmitError(err instanceof Error ? err.message : '등록하지 못했어요');
     } finally {
       setSubmitting(false);
     }
@@ -260,14 +260,14 @@ export default function AlertForm({ onClose }: { onClose: () => void }) {
             min={getLocalDateStr()}
             aria-label="알림 종료 날짜"
           />
-          <span className={styles.dateHint}>선택한 날짜 자정에 자동 해제됩니다</span>
+          <span className={styles.dateHint}>선택한 날짜 자정에 자동으로 해제돼요</span>
         </div>
       )}
 
       {/* 이례사항: 자동 만료 안내 */}
       {severity === 'medium' && (
         <div className={styles.autoExpireNote}>
-          오늘 자정(24:00)에 자동 해제됩니다
+          오늘 자정(24:00)에 자동으로 해제돼요
         </div>
       )}
 

@@ -7,6 +7,8 @@ import { P as P_RAW } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
+import EmptyState from '@/components/common/EmptyState';
+import { showToast } from '@/components/common/Toast';
 import type { Person } from '@/lib/types';
 import styles from '../styles/Compare.module.css';
 
@@ -138,6 +140,11 @@ export default function CompareTab() {
     setPersonsBatch(multiSelected);
     setSelectorOpen(false);
     setSearchQuery('');
+    // 성공 피드백 — 선택 결과를 토스트로 알림
+    showToast(
+      multiSelected.length > 0 ? `${multiSelected.length}명을 선택했어요` : '선택을 모두 비웠어요',
+      'success',
+    );
   };
 
   const handleModalClose = useCallback(() => {
@@ -190,7 +197,13 @@ export default function CompareTab() {
           />
         </div>
         {hasAnyPerson && (
-          <button type="button" className={`z-glass-pill ${styles.resetBtn}`} onClick={resetGroup} aria-label="현재 그룹 초기화" data-press>
+          <button
+            type="button"
+            className={`z-glass-pill ${styles.resetBtn}`}
+            onClick={() => { resetGroup(); showToast('그룹을 초기화했어요', 'info'); }}
+            aria-label="현재 그룹 초기화"
+            data-press
+          >
             <RotateCcw size={14} />
             <span>초기화</span>
           </button>
@@ -232,6 +245,15 @@ export default function CompareTab() {
         </button>
         <button type="button" className={styles.navBtn} onClick={nextMonth} aria-label="다음 달">›</button>
       </div>
+
+      {/* 미선택 빈 상태 — 무엇을 해야 하는지 안내 */}
+      {!hasAnyPerson && (
+        <EmptyState
+          icon="👥"
+          text="아직 비교할 기관사가 없어요"
+          hint="위 기관사 선택 버튼으로 추가해보세요"
+        />
+      )}
 
       {/* 비교 테이블 — 가로 스크롤 */}
       {hasAnyPerson && (
@@ -298,7 +320,7 @@ export default function CompareTab() {
         </div>
         <div className={styles.modalList}>
           {filteredPersons.length === 0 ? (
-            <div className={styles.searchEmpty}>검색 결과가 없습니다</div>
+            <div className={styles.searchEmpty}>검색 결과가 없어요</div>
           ) : (
             filteredPersons.map((p) => {
               const isChecked = multiSelected.some((s) => s.I === p.I);

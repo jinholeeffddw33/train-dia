@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, Train, Users, Coffee, Sparkles, Share2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
+import { showToast } from '@/components/common/Toast';
 import { pickFortune, todayKey, type FortuneCard } from './fortuneData';
 import styles from './Fortune.module.css';
 
@@ -53,7 +54,7 @@ export default function TodayFortune({ onBack }: Props) {
     } else if (nav.clipboard) {
       try {
         await nav.clipboard.writeText(shareText);
-        alert('운세가 복사되었어요. 카톡 등에 붙여넣어 보세요.');
+        showToast('운세를 복사했어요. 카톡 등에 붙여넣어 보세요', 'success');
       } catch { /* ignore */ }
     }
   };

@@ -8,6 +8,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import LoadingDots from '@/components/common/LoadingDots';
 import ContentRenderer from './ContentRenderer';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -355,7 +356,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
           </button>
           <h1 className={styles.topTitle}>교재 학습</h1>
         </div>
-        <div className={styles.emptyState}>로딩 중...</div>
+        <div className={styles.emptyState}><LoadingDots label="불러오고 있어요" /></div>
       </div>
     );
   }

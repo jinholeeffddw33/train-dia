@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, MessageSquare, Inbox, Trash2, ChevronLeft, Send, ChevronRight } from 'lucide-react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/More.module.css';
 
 interface FeedbackItem {
@@ -38,7 +39,7 @@ export default function AdminFeedbackOverlay({ onClose }: Props) {
   const loadList = useCallback(async () => {
     try {
       const res = await fetch('/api/feedback');
-      if (!res.ok) throw new Error('조회 권한이 없습니다');
+      if (!res.ok) throw new Error('조회 권한이 없어요');
       const data = await res.json();
       setItems(data.data ?? []);
       setLoading(false);
@@ -65,8 +66,14 @@ export default function AdminFeedbackOverlay({ onClose }: Props) {
     }
   }
 
+  // ESC — 대화 스레드가 열려 있으면 스레드만 닫고, 아니면 오버레이 닫기
+  useEscapeClose(true, () => {
+    if (openThread) setOpenThread(null);
+    else onClose();
+  });
+
   return (
-    <div className={styles.fullOverlay}>
+    <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="제보 목록">
       <div className={styles.overlayHeader}>
         {openThread ? (
           <button type="button" className={styles.overlayClose} onClick={() => setOpenThread(null)} aria-label="뒤로">

@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Calendar, Search, Send, Check, X, Trash2, Bell, Megaphone, Hand, Info } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
 import { getDia, getType, getDiaDisplay, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
@@ -532,6 +533,9 @@ function MatchCard({
   const [sent, setSent] = useState(false);
   const [routePreview, setRoutePreview] = useState<{ dia: string; date: Date; imgPath: string } | null>(null);
 
+  // ESC 로 행로 미리보기 닫기
+  useEscapeClose(!!routePreview, () => setRoutePreview(null));
+
   const alreadySent = useMemo(() => {
     if (!driver) return false;
     const dateKeys = dateRange.map(toISODate);
@@ -630,7 +634,13 @@ function MatchCard({
       {/* 행로 이미지 미리보기 */}
       {routePreview && (
         <div className={styles.routeOverlay} onClick={() => setRoutePreview(null)}>
-          <div className={styles.routePanel} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.routePanel}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${getDiaDisplay(routePreview.dia)}번 행로 미리보기`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.routeHeader}>
               <h3 className={styles.routeTitle}>
                 {person.n} · {getDiaDisplay(routePreview.dia)}번 근무
@@ -729,6 +739,9 @@ function BoardView({ driver }: { driver: Person | null }) {
     setCustomReason('');
     setShowDeclineForm(false);
   }, []);
+
+  // ESC 로 확인 다이얼로그 닫기
+  useEscapeClose(!!confirm, handleCancelConfirm);
 
   const handleVolunteer = useCallback((postId: string) => {
     if (!driver) return;

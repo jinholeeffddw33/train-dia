@@ -95,7 +95,7 @@ export default function HallOfFame({ onBack }: HallOfFameProps) {
         </h2>
       </div>
 
-      <p className={styles.subtitle}>매월 1·2·3등의 기록이 영원히 남습니다</p>
+      <p className={styles.subtitle}>매월 1·2·3등의 기록이 영원히 남아요</p>
 
       {loading && <p className={styles.empty}>불러오는 중...</p>}
 

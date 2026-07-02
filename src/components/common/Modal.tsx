@@ -26,6 +26,7 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const prevFocusRef = useRef<HTMLElement | null>(null);
   const [closing, setClosing] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -39,13 +40,43 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     });
   }, [onClose]);
 
-  // ESC 닫기
+  // ESC 닫기 + Tab 포커스 트랩 (VideoRegisterModal 완성형 패턴 이식 — 2026-07-02 R4)
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') requestClose();
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        requestClose();
+        return;
+      }
+      if (e.key === 'Tab' && contentRef.current) {
+        const focusables = contentRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     },
     [requestClose],
   );
+
+  // 이전 포커스 저장/복원 — open 에만 의존 (onClose 재생성으로 열림 중 복원되는 것 방지)
+  useEffect(() => {
+    if (!open) return;
+    prevFocusRef.current = document.activeElement as HTMLElement | null;
+    return () => {
+      // 닫힐 때 열기 전 포커스 위치로 복원 (키보드 사용자 문맥 유지)
+      prevFocusRef.current?.focus?.();
+      prevFocusRef.current = null;
+    };
+  }, [open]);
 
   // 포커스 트랩 + 스크롤 잠금
   useEffect(() => {

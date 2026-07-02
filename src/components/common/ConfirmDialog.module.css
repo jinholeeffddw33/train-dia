@@ -1,0 +1,51 @@
+/* ConfirmDialog — window.confirm() 대체 공용 확인 시트 (Modal SSOT 위) */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+  padding: var(--dia-space-2) 0 var(--dia-space-2);
+}
+
+.message {
+  font-size: var(--dia-text-base);
+  line-height: var(--dia-leading-normal);
+  color: var(--dia-text-primary);
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  gap: var(--dia-space-3);
+}
+
+.cancelBtn {
+  flex: 1;
+  min-height: 48px;
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+}
+
+.confirmBtn {
+  flex: 1.4;
+  min-height: 48px;
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+}
+
+/* danger — 파괴적 액션(삭제/초기화)은 빨강 채움 (Exchange confirmOkBtnDanger 톤 통일) */
+.confirmBtnDanger {
+  flex: 1.4;
+  min-height: 48px;
+  padding: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  color: white;
+  background: var(--dia-red);
+  border: none;
+  border-radius: var(--dia-radius-full);
+  transition: opacity var(--dia-transition-fast), transform var(--dia-transition-fast);
+}
+.confirmBtnDanger:active { opacity: 0.85; transform: scale(0.95); }

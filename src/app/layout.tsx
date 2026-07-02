@@ -4,6 +4,7 @@ import './globals.css';
 import DevThemeToggle from '@/components/dev/DevThemeToggle';
 import GlassTapSweep from '@/components/common/GlassTapSweep';
 import ServiceWorkerRegistrar from '@/components/common/ServiceWorkerRegistrar';
+import ToastContainer from '@/components/common/Toast';
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
@@ -50,6 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ServiceWorkerRegistrar />
         <GlassTapSweep />
         <DevThemeToggle />
+        {/* 전역 토스트 — AppShell(근무 월드) 밖 안전/생활/대기 월드에서도 showToast 동작 */}
+        <ToastContainer />
       </body>
     </html>
   );

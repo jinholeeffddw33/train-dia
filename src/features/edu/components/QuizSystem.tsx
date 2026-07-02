@@ -357,21 +357,21 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
 
   const resultMessage = useMemo(() => {
     if (quizMode === 'wrong-only') {
-      if (score100 === 100) return '오답을 모두 정복했습니다.';
-      if (score100 >= 80) return '대부분 보완되었습니다.';
+      if (score100 === 100) return '오답을 모두 정복했어요.';
+      if (score100 >= 80) return '대부분 보완됐어요.';
       return '오답 교재를 다시 확인하고 재도전하세요.';
     }
     if (quizMode === 'level' && quizLevelId) {
       const level = levels.find(l => l.id === quizLevelId);
       if (level && score100 >= level.passScore) {
-        if (quizLevelId < 4) return `${level.name} 등급 통과! 다음 등급이 해금되었습니다.`;
-        return '마스터기관사 등급 달성! 축하합니다.';
+        if (quizLevelId < 4) return `${level.name} 등급 통과! 다음 등급이 열렸어요.`;
+        return '마스터기관사 등급 달성! 축하해요.';
       }
-      if (level) return `${level.passScore}점 이상이 필요합니다. 다시 도전하세요.`;
+      if (level) return `${level.passScore}점 이상이 필요해요. 다시 도전하세요.`;
     }
-    if (score100 >= 90) return '충분히 숙달되었습니다.';
-    if (score100 >= 80) return '양호합니다. 취약 부분만 보완하세요.';
-    if (score100 >= 70) return '복습이 필요합니다.';
+    if (score100 >= 90) return '충분히 숙달됐어요.';
+    if (score100 >= 80) return '양호해요. 취약 부분만 보완하세요.';
+    if (score100 >= 70) return '복습이 필요해요.';
     return '관련 교재를 다시 학습하세요.';
   }, [score100, quizMode, quizLevelId, levels]);
 
@@ -394,7 +394,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           </button>
           <h1 className={styles.topTitle}>오답 재시험</h1>
         </div>
-        <div className={styles.emptyState}>미해결 오답이 없습니다.</div>
+        <div className={styles.emptyState}>미해결 오답이 없어요</div>
       </div>
     );
   }
@@ -537,7 +537,7 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
           {totalQuizzes > 0 ? (
             <QuizHistory />
           ) : (
-            <div className={styles.emptyHistory}>아직 시험 기록이 없습니다.</div>
+            <div className={styles.emptyHistory}>아직 시험 기록이 없어요</div>
           )}
         </div>
       </div>

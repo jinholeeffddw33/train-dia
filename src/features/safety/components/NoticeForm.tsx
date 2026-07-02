@@ -105,7 +105,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
       if (photoPreview) URL.revokeObjectURL(photoPreview);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : '등록에 실패했습니다');
+      setError(e instanceof Error ? e.message : '등록하지 못했어요');
     } finally {
       setSubmitting(false);
     }

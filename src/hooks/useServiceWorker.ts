@@ -18,7 +18,14 @@ export function useServiceWorker() {
     }
 
     let refreshing = false;
+    // 첫 설치 가드: 등록 시점에 controller가 없었다면(첫 방문) clients.claim()으로
+    // controllerchange가 한 번 발생하는데, 이때는 새 코드가 이미 떠 있으므로 reload 불필요.
+    let hadController = !!navigator.serviceWorker.controller;
     const handleControllerChange = () => {
+      if (!hadController) {
+        hadController = true;
+        return;
+      }
       if (refreshing) return;
       refreshing = true;
       localStorage.setItem(LAST_RELOAD_KEY, String(Date.now()));

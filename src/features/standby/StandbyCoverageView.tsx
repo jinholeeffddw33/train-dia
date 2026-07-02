@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Plus, X, ImageIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Plus, X, ImageIcon, ExternalLink, WifiOff } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { DOW } from '@/lib/constants';
@@ -32,6 +32,7 @@ interface Props {
 export default function StandbyCoverageView({ onBack }: Props) {
   const [items, setItems] = useState<Coverage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
   const authUser = useAuthStore((s) => s.user);
@@ -41,13 +42,16 @@ export default function StandbyCoverageView({ onBack }: Props) {
   const name = authUser?.name || driverName;
 
   const fetchItems = useCallback(async () => {
+    setLoading(true);
+    setError(false);
     try {
       const res = await fetch('/api/standby-coverage', { cache: 'no-store' });
       if (!res.ok) throw new Error(`${res.status}`);
       const json = (await res.json()) as { data: Coverage[] };
       setItems(json.data ?? []);
     } catch {
-      setItems([]);
+      // 실패를 "빈 목록"으로 위장하지 않는다 — 에러 상태로 분리해 재시도 유도
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -80,6 +84,20 @@ export default function StandbyCoverageView({ onBack }: Props) {
             <span className={styles.loadingDot} />
             <span className={styles.loadingDot} />
             <span className={styles.loadingDot} />
+          </div>
+        ) : error ? (
+          <div className={styles.errorState}>
+            <WifiOff size={48} className={styles.emptyIcon} aria-hidden />
+            <p className={styles.emptyText}>목록을 불러오지 못했어요</p>
+            <p className={styles.emptyHint}>인터넷 연결을 확인하고 다시 시도해주세요</p>
+            <button
+              type="button"
+              className={`z-cta ${styles.retryBtn}`}
+              data-press
+              onClick={fetchItems}
+            >
+              다시 시도할게요
+            </button>
           </div>
         ) : items.length === 0 ? (
           <div className={styles.emptyState}>

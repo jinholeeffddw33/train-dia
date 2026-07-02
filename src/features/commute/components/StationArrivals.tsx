@@ -61,9 +61,39 @@ export default function StationArrivals({
 
   useEffect(() => {
     fetchArrivals();
-    // 30초마다 자동 갱신
-    const id = setInterval(fetchArrivals, 30000);
-    return () => clearInterval(id);
+    // 30초마다 자동 갱신 — 화면이 안 보일 땐 폴링 중지 (배터리/데이터 절약, useTrainPolling 패턴)
+    let id: ReturnType<typeof setInterval> | null = setInterval(fetchArrivals, 30000);
+    const stop = () => {
+      if (id) { clearInterval(id); id = null; }
+    };
+    const start = () => {
+      stop();
+      id = setInterval(fetchArrivals, 30000);
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchArrivals();
+        start();
+      } else {
+        stop();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // 오프라인 → 온라인 복귀 시 즉시 갱신
+    const handleOnline = () => {
+      if (document.visibilityState !== 'visible') return;
+      fetchArrivals();
+      start();
+    };
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('online', handleOnline);
+    };
   }, [fetchArrivals]);
 
   // 방향별 그룹핑

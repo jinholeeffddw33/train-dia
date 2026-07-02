@@ -21,27 +21,7 @@
   min-height: 100dvh;
 }
 
-/* ── Update Banner ── */
-.updateBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-blue);
-  color: white;
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-}
-
-.updateBtn {
-  padding: var(--dia-space-2) var(--dia-space-3);
-  background: white;
-  color: var(--dia-blue);
-  border-radius: var(--dia-radius-md);
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-bold);
-  min-height: 44px;
-}
+/* ── Update Banner — ServiceWorkerRegistrar.module.css 로 이동 ── */
 
 /* ── Install Banner ── */
 .installBanner {
@@ -93,7 +73,7 @@
 }
 
 .viewModeText strong {
-  color: var(--dia-amber);
+  color: var(--dia-amber-text);
   font-weight: var(--dia-weight-bold);
 }
 

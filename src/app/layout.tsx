@@ -3,6 +3,7 @@ import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import DevThemeToggle from '@/components/dev/DevThemeToggle';
 import GlassTapSweep from '@/components/common/GlassTapSweep';
+import ServiceWorkerRegistrar from '@/components/common/ServiceWorkerRegistrar';
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
@@ -38,12 +39,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 다크모드 + 글자 크기 FOUC 방지: hydration 전에 즉시 실행 */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('dia-theme');if(t==='light'){d.classList.add('light')}else if(t&&t.charAt(0)==='{'){var p=JSON.parse(t);if(p&&p.state&&p.state.theme==='light'){d.classList.add('light');localStorage.setItem('dia-theme','light')}}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large')}}catch(e){}})()`,
+            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('dia-theme');if(t==='light'){d.classList.add('light')}else if(t&&t.charAt(0)==='{'){var p=JSON.parse(t);if(p&&p.state&&p.state.theme==='light'){d.classList.add('light');localStorage.setItem('dia-theme','light')}}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large');else if(s==='xlarge')d.classList.add('font-xlarge')}}catch(e){}})()`,
           }}
         />
       </head>
       <body className={notoSansKR.className}>
         {children}
+        <ServiceWorkerRegistrar />
         <GlassTapSweep />
         <DevThemeToggle />
       </body>

@@ -26,6 +26,12 @@ export interface SabunStatus {
 interface AuthState {
   /** 로그인된 사용자 (null이면 미인증) */
   user: AuthUser | null;
+  /**
+   * 오프라인 세션 그레이스 — checkSession이 네트워크 실패했을 때
+   * persist된 user를 유지한 채 true. 온라인 복귀 후 재검증 성공 시 해제.
+   * 보안: 서버 API는 어차피 쿠키로 검증하므로 클라이언트 user 유지는 표시용일 뿐.
+   */
+  offlineGrace: boolean;
   /** 이 기기에 생체인증 등록 여부 (서버 기준) */
   hasBiometric: boolean;
   /** 마지막 로그인한 사번 (자동 입력용) */
@@ -60,6 +66,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
+      offlineGrace: false,
       hasBiometric: false,
       lastSabun: '',
       loading: false,
@@ -100,6 +107,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: data.user,
+            offlineGrace: false,
             lastSabun: sabun,
             hasBiometric: data.user.hasBiometric || get().hasBiometric,
             loading: false,
@@ -129,6 +137,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: data.user,
+            offlineGrace: false,
             lastSabun: sabun,
             hasBiometric: data.user.hasBiometric || get().hasBiometric,
             loading: false,
@@ -174,6 +183,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: verifyData.user,
+            offlineGrace: false,
             lastSabun: sabun,
             loading: false,
             error: '',
@@ -240,12 +250,21 @@ export const useAuthStore = create<AuthState>()(
           const res = await fetch('/api/auth/me');
           const data = await res.json();
           if (data.user) {
-            set({ user: data.user });
+            // 재검증 성공 → 그레이스 해제
+            set({ user: data.user, offlineGrace: false });
           } else {
-            set({ user: null });
+            // 서버가 응답했는데 세션 무효(401/403 등) → 진짜 로그아웃
+            set({ user: null, offlineGrace: false });
           }
         } catch {
-          set({ user: null });
+          // 네트워크 실패(오프라인/서버 불통) — 세션 무효와 구분한다.
+          // persist된 user가 있으면 표시용으로 유지(오프라인 그레이스).
+          // 보안: 서버 API는 쿠키를 다시 검증하므로 클라이언트 user 유지는 표시용일 뿐이다.
+          if (get().user) {
+            set({ offlineGrace: true });
+          } else {
+            set({ user: null, offlineGrace: false });
+          }
         }
       },
 
@@ -255,7 +274,7 @@ export const useAuthStore = create<AuthState>()(
         } catch {
           // 네트워크 실패해도 로컬은 정리
         }
-        set({ user: null });
+        set({ user: null, offlineGrace: false });
       },
 
       changePin: async (currentPin, newPin) => {
@@ -290,6 +309,8 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'traindia-auth',
       partialize: (state) => ({
+        // user 포함 — 오프라인 그레이스용 표시 정보. 실제 인가는 서버가 쿠키로 검증한다.
+        user: state.user,
         hasBiometric: state.hasBiometric,
         lastSabun: state.lastSabun,
       }),

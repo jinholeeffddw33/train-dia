@@ -84,9 +84,18 @@ export function useTrainPolling() {
 
     document.addEventListener('visibilitychange', handleVisibility);
 
+    // 오프라인 → 온라인 복귀 시 즉시 갱신 + 폴링 재시작
+    const handleOnline = () => {
+      if (document.visibilityState !== 'visible') return;
+      fetchTrains();
+      startPolling();
+    };
+    window.addEventListener('online', handleOnline);
+
     return () => {
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('online', handleOnline);
     };
   }, [fetchTrains, startPolling, stopPolling]);
 

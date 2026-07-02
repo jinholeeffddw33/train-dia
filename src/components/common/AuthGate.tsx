@@ -43,9 +43,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [newPinConfirm, setNewPinConfirm] = useState('');
   const [pinChangeError, setPinChangeError] = useState('');
 
-  // ── 앱 시작 시 세션 확인 ──
+  // ── 앱 시작 시 세션 확인 + 온라인 복귀 시 재검증(오프라인 그레이스 해제) ──
   useEffect(() => {
     checkSession().then(() => setSessionChecked(true));
+    const handleOnline = () => { checkSession(); };
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
   }, [checkSession]);
 
   // ── 로그인 성공 시 driver store 연동 ──

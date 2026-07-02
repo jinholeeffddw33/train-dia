@@ -11,7 +11,6 @@ import InternIntroModal from '../common/InternIntroModal';
 import { useTrainStore } from '@/stores/train';
 import { useExchangeStore } from '@/stores/exchange';
 import { useDriverStore } from '@/stores/driver';
-import { useServiceWorker } from '@/hooks/useServiceWorker';
 import styles from './AppShell.module.css';
 
 
@@ -22,7 +21,7 @@ interface AppShellProps {
 
 export default function AppShell({ children, onBack }: AppShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>('home');
-  const { updateAvailable, applyUpdate } = useServiceWorker();
+  // SW 등록/업데이트 배너는 루트의 ServiceWorkerRegistrar가 전역 담당 (중복 등록 방지)
   // ZINOSB 헤더 통일 이식 — window 스크롤 모델. 아래로 스크롤 시 헤더(.z-app-header)·TabBar 슬라이드 숨김,
   // 위로 올리면 복귀 + topZone 통과 후 frosted. data-attr 로 후손 헤더/탭바에 전파.
   const { hidden: chromeHidden, frosted: chromeFrosted } = useHeaderScroll();
@@ -62,16 +61,7 @@ export default function AppShell({ children, onBack }: AppShellProps) {
       data-chrome-hidden={chromeHidden ? '' : undefined}
       data-chrome-frosted={chromeFrosted ? '' : undefined}
     >
-      {/* 업데이트 배너 */}
-      {updateAvailable && (
-        <div className={styles.updateBanner}>
-          <span>새 버전이 나왔어요</span>
-          <button type="button" className={styles.updateBtn} onClick={applyUpdate}>
-            업데이트
-          </button>
-        </div>
-      )}
-
+      {/* 업데이트 배너 — 루트 ServiceWorkerRegistrar로 이동 */}
       {/* 조회 모드 배너 — 삭제: HomeHeader 내 돌아가기 버튼으로 통합 */}
 
       {onBack && (

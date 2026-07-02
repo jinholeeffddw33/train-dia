@@ -1,9 +1,11 @@
 {
   "name": "답십리 기관사 DIA",
   "short_name": "기관사DIA",
-  "description": "서울교통공사 5호선 답십리 승무사업소 기관사 교번 조회",
+  "description": "서울교통공사 5호선 답십리 승무사업소 기관사 교번·근무표 조회",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone"],
   "orientation": "portrait",
   "background_color": "#0F172A",
   "theme_color": "#0F172A",
@@ -25,6 +27,23 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "오늘 근무",
+      "url": "/?world=duty&tab=home",
+      "icons": [{ "src": "/icons/dia5-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "근무표",
+      "url": "/?world=duty&tab=calendar",
+      "icons": [{ "src": "/icons/dia5-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "5호선 실시간",
+      "url": "/?world=duty&tab=line",
+      "icons": [{ "src": "/icons/dia5-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

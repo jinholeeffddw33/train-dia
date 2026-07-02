@@ -132,6 +132,9 @@ export default function InstallCard() {
                 <p className={styles.installGuideTip}>
                   설치 후에는 주소창 없이 앱처럼 실행돼요
                 </p>
+                <p className={styles.installGuideTip}>
+                  홈 화면에 추가하면 내 교번·설정이 지워지지 않아요
+                </p>
               </div>
             ) : (
               <div className={styles.installGuideBody}>

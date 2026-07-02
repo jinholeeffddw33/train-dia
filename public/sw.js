@@ -133,12 +133,22 @@ self.addEventListener('push', (event) => {
   const title = payload.title || '기관사 DIA';
   const options = {
     body: payload.body || '',
-    icon: payload.icon || '/favicon.svg',
-    badge: '/favicon.svg',
+    // Android 알림 아이콘 — SVG 는 미렌더라 실물 PNG 로 (badge = 단색 실루엣용)
+    icon: payload.icon || '/icons/dia5-192.png',
+    badge: '/icons/badge-96.png',
     vibrate: [300, 200, 300, 200, 300],
     data: { url: payload.url || '/' },
     requireInteraction: true,
   };
+
+  // App Badging — 홈 화면 아이콘 배지 (iOS 16.4+ 설치 PWA / Android)
+  if (self.navigator.setAppBadge) {
+    const count = Number(payload.badgeCount ?? payload.badge);
+    const badgePromise = Number.isFinite(count) && count > 0
+      ? self.navigator.setAppBadge(count)
+      : self.navigator.setAppBadge();
+    event.waitUntil(badgePromise.catch(() => { /* ignore */ }));
+  }
 
   event.waitUntil(self.registration.showNotification(title, options));
 });
@@ -147,6 +157,11 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
+
+  // 알림을 확인했으니 아이콘 배지 제거
+  if (self.navigator.clearAppBadge) {
+    event.waitUntil(self.navigator.clearAppBadge().catch(() => { /* ignore */ }));
+  }
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {

@@ -319,6 +319,36 @@
   letter-spacing: 0.5px;
 }
 
+/* 헤더 우측 그룹 — 화면 켜두기 토글 + 근무시간 세로 스택 */
+.diaHeaderRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--dia-space-2);
+  min-width: 0;
+}
+
+/* 화면 켜두기 토글 — look 은 전역 z-glass-pill(off)/z-cta-sky(on) 가 담당 */
+.wakeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.wakeToggle:not(.wakeToggleOn) {
+  color: var(--dia-text-secondary);
+}
+
+/* on 상태 색/입체는 전역 .z-cta-sky 가 담당 — 마커 클래스 */
+.wakeToggleOn {
+  font-weight: var(--dia-weight-bold);
+}
+
 .diaMain {
   display: flex;
   align-items: center;
@@ -688,6 +718,19 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+/* 다음 휴무 D-day — 2열 그리드 아래 전폭 카드 */
+.statusRestCard {
+  grid-column: 1 / -1;
+}
+
+.statusRestValue {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-green-text);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
 }
 
 /* 내근직 내일/모레 카드 — 본인 배치 표시 */

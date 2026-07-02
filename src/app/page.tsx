@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { startViewTransition } from '@/lib/viewTransition';
 import AuthGate from '@/components/common/AuthGate';
 import InAppBrowserGate from '@/components/common/InAppBrowserGate';
 import RefreshGuideModal from '@/components/common/RefreshGuideModal';
@@ -74,15 +75,31 @@ function HomeTab() {
   );
 }
 
+const VALID_WORLDS: readonly string[] = ['duty', 'edu', 'safety', 'life', 'standby'];
+const VALID_TABS: readonly string[] = ['home', 'calendar', 'line', 'duty', 'exchange', 'more'];
+
 export default function HomePage() {
   const [world, setWorld] = useState<WorldId | null>(null);
+  const [initialTab, setInitialTab] = useState<TabId>('home');
+
+  // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const w = params.get('world');
+    const t = params.get('tab');
+    if (t && VALID_TABS.includes(t)) setInitialTab(t as TabId);
+    if (w && VALID_WORLDS.includes(w)) setWorld(w as WorldId);
+  }, []);
 
   const handleEnter = useCallback((w: WorldId) => {
-    setWorld(w);
+    // View Transition — 월드 진입 크로스페이드 (미지원/모션 감소 시 즉시 전환)
+    startViewTransition(() => setWorld(w));
   }, []);
 
   const handleBack = useCallback(() => {
-    setWorld(null);
+    startViewTransition(() => setWorld(null));
+    // shortcut 진입 탭은 1회성 — 허브로 나오면 소진
+    setInitialTab('home');
   }, []);
 
   // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
@@ -100,7 +117,7 @@ export default function HomePage() {
         {world === null ? (
           <WorldHub onEnter={handleEnter} />
         ) : world === 'duty' ? (
-          <AppShell onBack={handleBack}>
+          <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}
           </AppShell>
         ) : world === 'edu' ? (

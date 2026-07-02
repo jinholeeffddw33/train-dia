@@ -30,8 +30,8 @@ export function useNotification() {
       if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
         navigator.serviceWorker.ready.then((reg) => {
           reg.showNotification(title, {
-            icon: '/icon-192.png',
-            badge: '/icon-192.png',
+            icon: '/icons/dia5-192.png',
+            badge: '/icons/badge-96.png',
             ...options,
             vibrate: [300, 200, 300, 200, 300],
           } as NotificationOptions);
@@ -41,7 +41,7 @@ export function useNotification() {
 
       // 폴백: 직접 Notification
       return new Notification(title, {
-        icon: '/icon-192.png',
+        icon: '/icons/dia5-192.png',
         ...options,
       });
     },

@@ -26,6 +26,7 @@
   width: 100%;
   max-width: 480px;
   max-height: 85vh;
+  max-height: 85dvh; /* iOS 툴바 수축 대응 — 지원 브라우저는 동적 뷰포트 기준 */
   /* ★ 불투명 시트필(글래스 위 솔리드). 반투명 --dia-surface 금지 — 뒤 콘텐츠 비침(진호 2026-06-23). */
   background: var(--dia-sheet-fill);
   border-top: 1px solid var(--dia-border);

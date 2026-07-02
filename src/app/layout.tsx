@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: '기관사 DIA — 답십리 5호선',
   description: '서울교통공사 5호선 답십리 승무사업소 기관사 교번 조회',
   manifest: '/manifest.json',
-  icons: { icon: '/favicon.ico' },
+  // icons 명시 제거 — src/app/icon.png + apple-icon.png 파일 컨벤션이 자동 처리 (기존 /favicon.ico 는 404였음)
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* 다크모드 + 글자 크기 FOUC 방지: hydration 전에 즉시 실행 */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('dia-theme');if(t==='light'){d.classList.add('light')}else if(t&&t.charAt(0)==='{'){var p=JSON.parse(t);if(p&&p.state&&p.state.theme==='light'){d.classList.add('light');localStorage.setItem('dia-theme','light')}}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large');else if(s==='xlarge')d.classList.add('font-xlarge')}}catch(e){}})()`,
+            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('dia-theme');if(t==='light'){d.classList.add('light')}else if(t&&t.charAt(0)==='{'){var p=JSON.parse(t);if(p&&p.state&&p.state.theme==='light'){d.classList.add('light');localStorage.setItem('dia-theme','light')}}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large');else if(s==='xlarge')d.classList.add('font-xlarge')}if(d.classList.contains('light')){var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#F0F4F8')}}catch(e){}})()`,
           }}
         />
       </head>

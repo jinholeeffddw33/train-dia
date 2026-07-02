@@ -151,6 +151,19 @@ input, textarea, select {
   }
 }
 
+/* ===== View Transitions — 탭/월드 전환 크로스페이드 (미지원 브라우저 무해) ===== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
 /* ===== 유틸리티 클래스 ===== */
 
 /* 텍스트 말줄임 */

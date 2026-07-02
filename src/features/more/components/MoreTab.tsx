@@ -377,7 +377,25 @@ export default function MoreTab() {
           </div>
         )}
 
-        {/* 푸시 알림 (앱 꺼져있어도 수신) */}
+        {/* 푸시 알림 (앱 꺼져있어도 수신) — iOS 미설치는 숨기지 말고 설치 유도 */}
+        {!pushSupported && isIOS && !isInstalled && (
+          <div className={styles.settingRow}>
+            <div className={`${styles.settingInfo} ${styles.settingInfoStack}`}>
+              <span className={styles.settingIcon}>📲</span>
+              <div className={styles.settingLabelCol}>
+                <span className={styles.settingLabel}>푸시 알림</span>
+                <span className={styles.settingHint}>홈 화면에 추가하면 알림을 받을 수 있어요</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              className={styles.notifBtn}
+              onClick={() => setInstallGuideOpen(true)}
+            >
+              설치 안내
+            </button>
+          </div>
+        )}
         {pushSupported && (
           <div className={styles.settingRow}>
             <div className={styles.settingInfo}>
@@ -649,6 +667,9 @@ export default function MoreTab() {
                 </ol>
                 <p className={styles.installGuideTip}>
                   💡 설치 후에는 주소창 없이 앱처럼 실행돼요
+                </p>
+                <p className={styles.installGuideTip}>
+                  💡 홈 화면에 추가하면 내 교번·설정이 지워지지 않고, 알림도 받을 수 있어요
                 </p>
               </div>
             ) : (

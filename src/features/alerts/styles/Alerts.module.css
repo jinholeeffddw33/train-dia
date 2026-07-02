@@ -554,6 +554,11 @@
   transition: border-color var(--dia-transition-fast);
 }
 
+/* 라이트 모드 — 날짜 피커 위젯도 라이트로 (다크 하드코딩 오버라이드) */
+:global(:root.light) .dateInput {
+  color-scheme: light;
+}
+
 .dateInput:focus {
   border-color: var(--dia-purple);
   outline: none;

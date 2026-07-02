@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice, getOfficeName, isRegularDayOffice } from '@/lib/auth';
-import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today, isHoliday } from '@/lib/schedule';
+import { getDia, getType, getSchedule, getLabel, getDiaDisplay, today, isHoliday, getDaysUntilRest } from '@/lib/schedule';
 import { findDutyByName, type MyDuty } from '@/lib/dutySchedule';
 import { useSwapStore } from '@/stores/swap';
 import { DOW } from '@/lib/constants';
@@ -53,6 +53,14 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
       };
     });
   }, [driver, authUser, base]);
+
+  // 다음 휴무 D-day — 오늘이 휴무(비번 포함)면 "오늘은 휴무예요"
+  const restInfo = useMemo(() => {
+    if (!driver || driver.I === '0') return null;
+    if (getType(getDia(driver, base)) === 'rest') return { today: true, days: 0 };
+    const next = getDaysUntilRest(driver, base);
+    return next ? { today: false, days: next.days } : null;
+  }, [driver, base]);
 
   const cards = useMemo(() => {
     if (!driver) return [];
@@ -143,6 +151,20 @@ export default function StatusCards({ baseDate }: StatusCardsProps) {
           </div>
         </div>
       ))}
+
+      {/* 다음 휴무 D-day — 데이터 없으면(10일 내 휴무 없음) 숨김 */}
+      {restInfo && (
+        <div className={`${styles.statusCard} ${styles.type_rest} ${styles.statusRestCard}`}>
+          <div className={styles.statusCardRow}>
+            <div className={styles.statusCardInfo}>
+              <span className={styles.statusCardLabel}>다음 휴무</span>
+            </div>
+            <span className={styles.statusRestValue}>
+              {restInfo.today ? '오늘은 휴무예요' : `${restInfo.days}일 남았어요`}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

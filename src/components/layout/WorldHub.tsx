@@ -65,7 +65,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
   const hasNotice = safetyTotal > 0;
 
   const handleClick = useCallback((worldId: WorldId) => {
-    window.setTimeout(() => onEnter(worldId), 120);
+    window.setTimeout(() => onEnter(worldId), 60);
   }, [onEnter]);
 
   return (

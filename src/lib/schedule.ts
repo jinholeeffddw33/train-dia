@@ -501,6 +501,33 @@ export function findExchangePartners(
   return partners;
 }
 
+/** 하루 교대 요약 — 받음(첫 구간 left) / 넘김(마지막 구간 right) */
+export interface PartnerSummary {
+  /** 근무 시작에 열차를 넘겨주는 상대 (내가 받음) */
+  received?: string;
+  /** 근무 끝에 열차를 받아가는 상대 (내가 넘김) */
+  handedOff?: string;
+}
+
+/**
+ * 오늘 근무의 교대 상대 한 줄 요약 (HubHero 등 상위 노출용).
+ * findExchangePartners 재사용 — 1xxx/2xxx 기지 입출고는 해당 쪽 교대자 없음(이미 처리됨).
+ * 양쪽 다 없으면 null (행 자체 숨김).
+ */
+export function getPartnerSummary(
+  schedule: Schedule,
+  person: Person,
+  date: Date,
+): PartnerSummary | null {
+  const segs = schedule.g;
+  if (!segs || segs.length === 0) return null;
+  const partners = findExchangePartners(schedule, person, date);
+  const received = partners[0]?.left;
+  const handedOff = partners[segs.length - 1]?.right;
+  if (!received && !handedOff) return null;
+  return { received, handedOff };
+}
+
 // ===== 열차번호 → 기관사 매핑 =====
 
 // 분 단위 캐시: 같은 분(minute)이면 이전 결과 재사용

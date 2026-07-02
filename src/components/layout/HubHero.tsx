@@ -6,7 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import {
   getType, getSchedule, getDiaDisplay, getWorkTime,
-  isSpecialRest, getSpecialRestLabel, isHoliday,
+  isSpecialRest, getSpecialRestLabel, isHoliday, getPartnerSummary,
 } from '@/lib/schedule';
 import { useClockMinute } from '@/features/home/hooks/useClock';
 import { getUserRole, isRegularDayOffice } from '@/lib/auth';
@@ -64,6 +64,12 @@ export default function HubHero({ onClick }: HubHeroProps) {
       workTime: schedule ? getWorkTime(schedule) : '',
     };
   }, [driver, isOfficeStaff, getSwappedDia, targetDate]);
+
+  // 교대 상대 요약 — 받음(첫 구간)/넘김(마지막 구간). 기지 입출고(1xxx/2xxx)는 해당 쪽 없음
+  const partnerSummary = useMemo(() => {
+    if (!driver || isOfficeStaff || !info || info.isRest || !info.schedule) return null;
+    return getPartnerSummary(info.schedule, driver, targetDate);
+  }, [driver, isOfficeStaff, info, targetDate]);
 
   const enterDuty = () => { onClick?.(); };
   const openChart = (e: React.MouseEvent) => {
@@ -199,6 +205,27 @@ export default function HubHero({ onClick }: HubHeroProps) {
             <span className={styles.statTimeEnd}>{info.schedule?.e ?? '-'}</span>
             <span className={styles.statWorkLabel}>근무시간</span>
             <span className={styles.statWorkValue}>{info.workTime || '-'}</span>
+          </div>
+        )}
+
+        {/* 교대자 한 줄 — 데이터 없으면 행 자체 숨김 */}
+        {isWorking && partnerSummary && (
+          <div className={styles.heroPartnerRow}>
+            {partnerSummary.received && (
+              <span className={styles.heroPartnerItem}>
+                <span className={styles.heroPartnerLabel}>교대 받음</span>
+                <span className={styles.heroPartnerName}>{partnerSummary.received}</span>
+              </span>
+            )}
+            {partnerSummary.received && partnerSummary.handedOff && (
+              <span className={styles.heroPartnerSep} aria-hidden>·</span>
+            )}
+            {partnerSummary.handedOff && (
+              <span className={styles.heroPartnerItem}>
+                <span className={styles.heroPartnerLabel}>교대 넘김</span>
+                <span className={styles.heroPartnerName}>{partnerSummary.handedOff}</span>
+              </span>
+            )}
           </div>
         )}
 

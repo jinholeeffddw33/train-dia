@@ -5,6 +5,9 @@
    ========================================== */
 
 :root {
+  /* UA 힌트 — 삼성인터넷 등 강제 다크 변환 방어 (다크가 기본임을 브라우저에 선언) */
+  color-scheme: dark;
+
   /* ========================================
      Color Palette — Night Shift
      ======================================== */
@@ -371,6 +374,7 @@
    LIGHT MODE (옵션 — 기본은 다크)
    ========================================== */
 :root.light {
+  color-scheme: light;
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */
   --dia-amber-text: #B45309;    /* light bg 위 텍스트 (4.5:1 on white) */
   --dia-sky-text: #0284C7;      /* light bg 위 텍스트 (4.5:1 on white) */

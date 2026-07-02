@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
+import { startViewTransition } from '@/lib/viewTransition';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
 import InternIntroModal from '../common/InternIntroModal';
@@ -16,10 +17,12 @@ import styles from './AppShell.module.css';
 interface AppShellProps {
   children: (activeTab: TabId) => React.ReactNode;
   onBack?: () => void;
+  /** 초기 탭 — manifest shortcuts URL 파라미터 진입용 (?world=duty&tab=calendar) */
+  initialTab?: TabId;
 }
 
-export default function AppShell({ children, onBack }: AppShellProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('home');
+export default function AppShell({ children, onBack, initialTab }: AppShellProps) {
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'home');
   // SW 등록/업데이트 배너는 루트의 ServiceWorkerRegistrar가 전역 담당 (중복 등록 방지)
   // ZINOSB 헤더 통일 이식 — window 스크롤 모델. 아래로 스크롤 시 헤더(.z-app-header)·TabBar 슬라이드 숨김,
   // 위로 올리면 복귀 + topZone 통과 후 frosted. data-attr 로 후손 헤더/탭바에 전파.
@@ -41,15 +44,20 @@ export default function AppShell({ children, onBack }: AppShellProps) {
       ).length
     : 0;
 
-  const goHomeTab = useCallback(() => setActiveTab('home'), []);
+  const goHomeTab = useCallback(() => {
+    startViewTransition(() => setActiveTab('home'));
+  }, []);
 
   // home 탭이 아닐 때 뒤로가기 → home 탭 복귀
   useHistoryBack(`tab-${activeTab}`, goHomeTab, activeTab !== 'home');
 
   const handleTabChange = useCallback((tab: TabId) => {
     if (tab === 'line') triggerScroll();
-    setActiveTab(tab);
-    window.scrollTo({ top: 0 });
+    // View Transition — 탭 전환 크로스페이드 (미지원/모션 감소 시 즉시 전환)
+    startViewTransition(() => {
+      setActiveTab(tab);
+      window.scrollTo({ top: 0 });
+    });
   }, [triggerScroll]);
 
 

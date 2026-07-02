@@ -14,8 +14,10 @@ export function useInstallPrompt() {
   const [isAndroid, setIsAndroid] = useState(false);
 
   useEffect(() => {
-    const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    const android = /Android/.test(navigator.userAgent);
+    const ua = navigator.userAgent;
+    // iPadOS 13+ 는 UA 가 Mac 으로 위장 — 멀티터치 Mac = iPad 로 판정
+    const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.maxTouchPoints > 1 && /Mac/.test(ua));
+    const android = /Android/.test(ua);
     setIsIOS(ios);
     setIsAndroid(android);
 

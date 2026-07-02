@@ -1,6 +1,7 @@
 .screen {
   display: flex;
   flex-direction: column;
+  min-height: 100vh; /* dvh 미지원(iOS 15.3-) 폴백 */
   min-height: 100dvh;
   background: var(--dia-bg);
 }

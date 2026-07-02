@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { WifiOff } from 'lucide-react';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -14,6 +15,23 @@ import styles from './ServiceWorkerRegistrar.module.css';
 export default function ServiceWorkerRegistrar() {
   const { updateAvailable, applyUpdate } = useServiceWorker();
   const online = useOnlineStatus();
+
+  useEffect(() => {
+    // 영구 스토리지 요청 — 설치 PWA 의 교번/설정이 브라우저 정리로 지워지지 않게 (1회)
+    navigator.storage?.persist?.().catch(() => {});
+
+    // 앱 포그라운드 진입 시 아이콘 배지 클리어 (App Badging)
+    const nav = navigator as Navigator & { clearAppBadge?: () => Promise<void> };
+    const clearBadge = () => {
+      nav.clearAppBadge?.().catch(() => {});
+    };
+    clearBadge();
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') clearBadge();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   if (!updateAvailable && online) return null;
 

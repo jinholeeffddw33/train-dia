@@ -149,6 +149,25 @@
   color: var(--dia-text-tertiary);
 }
 
+/* 라벨 + 힌트 세로 스택 (iOS 미설치 푸시 안내 등) */
+.settingInfoStack {
+  flex: 1;
+  min-width: 0;
+}
+
+.settingLabelCol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settingHint {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  line-height: var(--dia-leading-normal);
+}
+
 /* ── Logout Button ── */
 .logoutBtn {
   display: flex;

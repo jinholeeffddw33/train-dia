@@ -251,6 +251,42 @@
   white-space: nowrap;
 }
 
+/* ── 교대자 한 줄 (받음 · 넘김) — 컬러 히어로 위 흰 텍스트 관례 유지 ── */
+.heroPartnerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding-bottom: 2px;
+}
+
+.heroPartnerItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.heroPartnerLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+.heroPartnerName {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.heroPartnerSep {
+  font-size: var(--dia-text-base);
+  color: rgba(255, 255, 255, 0.5);
+}
+
 .heroFoot {
   display: flex;
   align-items: center;

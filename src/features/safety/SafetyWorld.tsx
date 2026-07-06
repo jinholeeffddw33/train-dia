@@ -178,6 +178,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   const fetchAlerts = useAlertStore((s) => s.fetch);
   const subscribeAlerts = useAlertStore((s) => s.subscribe);
+  const alerts = useAlertStore((s) => s.alerts);
   const fetchHazards = useHazardStore((s) => s.fetchReports);
   const driverSabun = useDriverStore((s) => (s.myDriver)?.s ?? '');
   const driverName = useDriverStore((s) => (s.myDriver)?.n ?? '');
@@ -186,7 +187,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   const sabun = authSabun || driverSabun;
   const userName = authName || driverName;
   const userRole = getUserRole(sabun);
-  const { getUnread, getUnreadIds, unreadAlertIds, alertUnread, markAsRead, fetchCounts } = useSafetyUnread();
+  const { getUnread, getUnreadIds, unreadAlertIds, alertUnread, markAsRead, markAlertAsRead, fetchCounts } = useSafetyUnread();
 
   useEffect(() => {
     fetchAlerts();
@@ -209,6 +210,13 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
   }, [fetchAlerts, fetchHazards, subscribeAlerts, sabun]);
 
   const goHome = useCallback(() => setView('home'), []);
+
+  // 장애 알림 화면 진입 시 현재 모든 알림을 읽음 처리 (종 카운트 남는 버그 방지)
+  useEffect(() => {
+    if (view === 'alert' && alerts.length > 0) {
+      for (const a of alerts) markAlertAsRead(a.id);
+    }
+  }, [view, alerts, markAlertAsRead]);
 
   // 뒤로가기: Level 1 — 비-홈 뷰에서 홈으로
   useHistoryBack('safety-l1', goHome, view !== 'home');

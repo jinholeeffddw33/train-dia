@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * 안내방송 MP3 단일 재생 관리자.
@@ -32,10 +32,32 @@ function stopAll() {
 
 export function useBroadcastAudio() {
   const [playingId, setPlayingId] = useState<string | null>(currentId);
+  // 이 훅 인스턴스가 재생 중인 오디오를 시작했는지 추적 → unmount 시 자기가 시작한 것만 정지
+  const startedByMeRef = useRef(false);
 
   useEffect(() => {
     listeners.add(setPlayingId);
-    return () => { listeners.delete(setPlayingId); };
+    // 탭이 백그라운드로 가면 재생 정지 (사용자가 화면을 벗어난 것과 동일 처리)
+    const onVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        stopAll();
+        startedByMeRef.current = false;
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibility);
+    }
+    return () => {
+      listeners.delete(setPlayingId);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibility);
+      }
+      // 컴포넌트가 언마운트될 때 이 인스턴스가 시작한 재생이 아직 진행 중이면 정지
+      if (startedByMeRef.current) {
+        stopAll();
+        startedByMeRef.current = false;
+      }
+    };
   }, []);
 
   const play = useCallback((id: string, url: string): Promise<boolean> => {
@@ -49,9 +71,15 @@ export function useBroadcastAudio() {
         if (!resolved) { resolved = true; resolve(false); }
       };
       audio.onerror = onErr;
-      audio.onended = () => { if (currentId === id) stopAll(); };
+      audio.onended = () => {
+        if (currentId === id) {
+          stopAll();
+          startedByMeRef.current = false;
+        }
+      };
       currentAudio = audio;
       currentId = id;
+      startedByMeRef.current = true;
       notify();
       audio.play().then(() => {
         if (!resolved) { resolved = true; resolve(true); }
@@ -59,7 +87,10 @@ export function useBroadcastAudio() {
     });
   }, []);
 
-  const stop = useCallback(() => { stopAll(); }, []);
+  const stop = useCallback(() => {
+    stopAll();
+    startedByMeRef.current = false;
+  }, []);
 
   return { play, stop, playingId };
 }

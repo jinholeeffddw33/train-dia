@@ -48,14 +48,15 @@ export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '김민경', s: '22400349' },
 ];
 
-/** 2026년 신규임용 인턴사원 (2026.4.30. 자) — 교번 미배정 상태, 내근직 아님 */
+/** 2026년 신규임용 인턴사원 — 교번 미배정 상태, 내근직 아님 */
 export const INTERN_USERS: Person[] = [
   { I: '0', d: '', n: '김경률', s: '22600439' },
   { I: '0', d: '', n: '최승빈', s: '22600472' },
-  { I: '0', d: '', n: '황정욱', s: '22600491' },
   { I: '0', d: '', n: '박민석', s: '22600519' },
   { I: '0', d: '', n: '한지승', s: '22601004' },
   { I: '0', d: '', n: '강미진', s: '22601008' },
+  { I: '0', d: '', n: '조건희', s: '22601134' },
+  { I: '0', d: '', n: '신석희', s: '22601146' },
 ];
 
 const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
@@ -113,7 +114,7 @@ export function getOfficeName(sabun: string): string | null {
     ?? null;
 }
 
-/** 인턴사원 여부 확인 (2026년 신규임용 6명 — 통상근무 중) */
+/** 인턴사원 여부 확인 (2026년 신규임용 — 통상근무 중) */
 export function isIntern(sabun: string): boolean {
   return INTERN_USERS.some((u) => u.s === sabun);
 }
@@ -145,7 +146,7 @@ export function isManager(sabun: string): boolean {
   return MANAGER_SABUNS.has(sabun);
 }
 
-/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 9명 + 인턴 6명) */
+/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 9명 + 인턴 7명) */
 const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '21704630', // 안성숙
   '21711216', // 이태원
@@ -158,10 +159,11 @@ const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '22400349', // 김민경 (기관사 → 일근 전환)
   '22600439', // 김경률 (인턴)
   '22600472', // 최승빈 (인턴)
-  '22600491', // 황정욱 (인턴)
   '22600519', // 박민석 (인턴)
   '22601004', // 한지승 (인턴)
   '22601008', // 강미진 (인턴)
+  '22601134', // 조건희 (인턴 2026-07-07)
+  '22601146', // 신석희 (인턴 2026-07-07)
 ]);
 export function isRegularDayOffice(sabun: string | undefined | null): boolean {
   if (!sabun) return false;

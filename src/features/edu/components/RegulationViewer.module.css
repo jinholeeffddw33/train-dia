@@ -1,7 +1,9 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  /* 퀴즈(QuizPlayer overlay z-index 1150)에서 "본문 보기"로 열 때 그 위에 떠야 함.
+     .overlay가 stacking context라 내부 레이어(1150~1300)는 이 안에서만 상대적 → 베이스를 퀴즈 위로. */
+  z-index: 1200;
   background: var(--dia-bg);
   display: flex;
   flex-direction: column;

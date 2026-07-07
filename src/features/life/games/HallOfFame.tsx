@@ -21,6 +21,7 @@ interface HallOfFameProps {
 }
 
 const GAME_LABEL: Record<string, string> = {
+  apex: 'APEX RUSH',
   snake: '사과 먹기',
   reaction: '반응속도',
   mental: '암산 스프린트',
@@ -30,7 +31,7 @@ const GAME_LABEL: Record<string, string> = {
   reversi: '오델로',
 };
 
-const GAME_ORDER = ['snake', 'reaction', 'mental', 'simon', 'halli', 'omok', 'reversi'];
+const GAME_ORDER = ['apex', 'snake', 'reaction', 'mental', 'simon', 'halli', 'omok', 'reversi'];
 
 const MEDAL = ['🥇', '🥈', '🥉'];
 

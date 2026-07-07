@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
@@ -13,6 +13,7 @@ const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
 const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
 const HallOfFame = lazy(() => import('./games/HallOfFame'));
+const ApexRush = lazy(() => import('./games/ApexRush'));
 const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 const TodayFortune = lazy(() => import('./fortune/TodayFortune'));
@@ -46,7 +47,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
   }
 }
 
-type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex';
 type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
@@ -195,6 +196,25 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
 
           <div className={styles.sectionLabel}>혼자 즐기기</div>
 
+          {/* APEX RUSH — 3D 게임, 최상단 full 그라데이션 강조 카드 (진호 2026-07-08) */}
+          <button
+            type="button"
+            className={`${styles.gameCard} ${styles.gameCardApex}`}
+            onClick={() => setView({ type: 'game', gameId: 'apex' })}
+          >
+            <div className={styles.gameCardIcon}>
+              <Bike size={24} />
+            </div>
+            <div className={styles.gameCardText}>
+              <span className={styles.gameCardLabel}>
+                APEX RUSH
+                <span className={styles.apexBadge}>3D</span>
+              </span>
+              <span className={styles.gameCardDesc}>3D 다운힐 라이딩 · 트릭 &amp; 슈퍼부스트</span>
+            </div>
+            <ChevronRight size={18} className={styles.gameEntryArrow} />
+          </button>
+
           {GAMES.map((g) => {
             const Icon = g.icon;
             return (
@@ -236,6 +256,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
           {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
           {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
+          {view.gameId === 'apex' && <ApexRush onBack={goBack} />}
           {view.gameId === 'multi' && <MultiLobby onBack={goBack} />}
         </Suspense>
       </LifeErrorBoundary>

@@ -1,0 +1,71 @@
+/* APEX RUSH 랭킹 오버레이 (train-dia) — 게임 위 풀스크린 딤 + 바텀시트 (진호 2026-07-08) */
+
+.rankOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.rankBackdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+
+.rankSheet {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 82vh;
+  overflow-y: auto;
+  background: var(--dia-surface);
+  border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
+  padding: var(--dia-space-4);
+  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.28);
+  animation: apexRankUp 0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes apexRankUp {
+  from { transform: translateY(18px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.rankHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-3);
+}
+
+.rankTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+
+.rankClose {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--dia-surface-hover);
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.rankClose:active {
+  transform: scale(0.94);
+}

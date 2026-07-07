@@ -1,0 +1,1078 @@
+/* ═══════════════════════════════════════════════
+   APEX RUSH — 게임 스타일
+   풀스크린 게임 컨텍스트 (NEONLINE 전례) — 셸/탭바 탈출.
+   게임 고유 네온 무드 색은 테마 무관 고정 (게임 화면은 자체 월드).
+   ═══════════════════════════════════════════════ */
+
+.container {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-layer-overlay, 50);
+  background: #0a0d1e;
+  overflow: hidden;
+  /* 게임 화면은 시스템 제스처 오인 방지 */
+  overscroll-behavior: contain;
+}
+
+/* 세로(portrait) 게임으로 복귀 (진호 2026-07-07 "폰에서 가로 별로, 다시 세로로").
+   가로 강제(90° 회전) 폐기 — 컨테이너는 그냥 풀스크린 세로. 조향은 화면 좌우(clientX) 그대로. */
+
+/* ── 캔버스 ── */
+
+.apexCanvasWrap {
+  position: absolute;
+  inset: 0;
+  /* P0-15: 커스텀 드래그 제스처 — 브라우저 스크롤 제스처 차단 필수 */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.apexCanvasWrap canvas {
+  display: block;
+}
+
+.canvasLoading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--z-space-4);
+  align-items: center;
+  justify-content: center;
+  background: #0a0d1e;
+}
+
+.canvasRetryBtn {
+  min-height: 44px;
+  padding: 10px 28px;
+  border: none;
+  border-radius: var(--z-radius-full);
+  background: linear-gradient(180deg, var(--z-3d-lime-hi) 0%, var(--z-3d-lime-lo) 100%);
+  box-shadow: var(--z-3d-lime-shadow);
+  color: #101408;
+  font-size: var(--z-text-base);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.canvasLoadingText {
+  font-size: var(--z-text-sm);
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.14em;
+  animation: apexPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes apexPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+/* ── HUD ── */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hudTop {
+  position: absolute;
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px);
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.hudScoreBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* R10: 게임 Primary 점수 18px+ */
+.hudScore {
+  font-size: 35px;
+  font-weight: 900;
+  line-height: 1.05;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  /* 진호 2026-07-06 "너무 안보여, 40%↑ 컬러 예쁘게": 크기 26→36 + 어두운 외곽(밝은 산/도로 대비)
+     + 라임 네온 글로우(브랜드 생동감) 이중 섀도우로 어떤 배경에서도 판독 */
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.78), 0 0 20px rgba(182, 255, 42, 0.42);
+  font-variant-numeric: tabular-nums;
+}
+
+.hudDist {
+  /* STAGE(inline-block + scale 팝 애니)와 거리 숫자가 한 줄에 섞여 baseline 이 흔들려
+     "미터 숫자가 지혼자 위아래로 바뀌던" 문제(진호 2026-07-06) — flex baseline 정렬 +
+     line-height 고정으로 못박는다. transform(팝)은 layout 밖이라 라인 높이 불변. */
+  display: flex;
+  align-items: baseline;
+  white-space: pre;
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+.hudStage {
+  display: inline-block;
+  color: #c6ff5c;
+  text-shadow: 0 0 13px rgba(182, 255, 42, 0.6);
+  letter-spacing: 0.08em;
+  animation: stagePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes stagePop {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.hudRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.hudSpeed {
+  margin-top: 6px;
+  font-size: 28px;
+  font-weight: 900;
+  color: #c6ff5c;
+  text-shadow: 0 0 16px rgba(182, 255, 42, 0.55), 0 1px 5px rgba(0, 0, 0, 0.5);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.hudSpeedUnit {
+  font-size: 19px;
+  font-weight: 700;
+  color: rgba(182, 255, 42, 0.75);
+}
+
+/* UI-TAP-001: 44px 터치 타깃 */
+.hudExit {
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--z-radius-full);
+  background: rgba(10, 13, 30, 0.55);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+}
+
+.hudExit:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+/* 게임 중 음소거 토글 — SFX+BGM 함께 on/off (진호 2026-07-06 "음소거 버튼이 게임 화면에 있어야"). */
+.hudMute {
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--z-radius-full);
+  /* 진호 2026-07-06 "블랙이라 안 보임 → 화이트로" — 흰 배경 + 어두운 아이콘으로 어떤 씬에서도 뚜렷 */
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(10, 13, 30, 0.95);
+  cursor: pointer;
+}
+
+.hudMute:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+/* 콤보 배지 — 니어미스마다 팝 */
+.comboBadge {
+  position: absolute;
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 72px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: comboPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.comboMult {
+  font-size: 30px;
+  font-weight: 900;
+  color: #b6ff2a;
+  text-shadow: 0 0 18px rgba(182, 255, 42, 0.65);
+}
+
+.comboLabel {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@keyframes comboPop {
+  0% { transform: translateX(-50%) scale(0.6); }
+  60% { transform: translateX(-50%) scale(1.18); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* 플로팅 메시지 — 화면 좌측 세로 스택 (진호 2026-07-07 "점수가 가운데 도로/링을 가린다").
+   정중앙(bottom:44%)에서 좌측 세로 중앙으로 이관 → 전방 도로·스피드링 시야 확보. 좌측 정렬,
+   위로 흐름. safe-area(가로면 노치 좌측) 반영. 좌상단 점수(hudTop)보다 아래라 겹침 없음. */
+.floatLayer {
+  position: absolute;
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  right: auto;
+  bottom: 38%;
+  max-width: 46%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* 점수 플로팅 — 30% 확대 (진호 2026-07-07 "점수 관련 텍스트 잘 안 보여"). 좌측 정렬 텍스트 */
+.floatMsg {
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: left;
+  animation: floatUp 1.3s ease-out forwards;
+}
+
+.floatTone_lime {
+  color: #b6ff2a;
+  text-shadow: 0 0 16px rgba(182, 255, 42, 0.6);
+}
+
+.floatTone_sky {
+  color: #7dd7ff;
+  text-shadow: 0 0 16px rgba(125, 215, 255, 0.6);
+}
+
+.floatTone_amber {
+  color: #ffc46b;
+  text-shadow: 0 0 16px rgba(255, 196, 107, 0.6);
+}
+
+.floatTone_gold {
+  color: #ffd76b;
+  text-shadow: 0 0 20px rgba(255, 215, 107, 0.75);
+  font-size: 27px;
+}
+
+.floatTone_white {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 34px rgba(182, 255, 42, 0.5);
+  font-size: 27px;
+}
+
+/* 💰 골드 코인 +1000 — 최대형 골드 (진호 "훨씬 잘 보이는 크기랑 컬러") */
+.floatTone_goldBig {
+  color: #ffd24a;
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 26px rgba(255, 210, 74, 0.95),
+    0 0 52px rgba(255, 170, 40, 0.6),
+    0 3px 12px rgba(0, 0, 0, 0.7);
+}
+
+/* 🌈 슈퍼부스트 획득 플로팅 — 라벤더 텍스트 + 핑크 글로우 (인스타 그라데이션 매칭) */
+.floatTone_super {
+  color: #d9b8ff;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 20px rgba(183, 148, 246, 0.85),
+    0 0 34px rgba(255, 95, 158, 0.6),
+    0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(14px) scale(0.9); }
+  15% { opacity: 1; transform: translateY(0) scale(1.05); }
+  70% { opacity: 1; transform: translateY(-18px) scale(1); }
+  100% { opacity: 0; transform: translateY(-34px) scale(0.96); }
+}
+
+/* 부스트 비네트 */
+.boostVignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 50%,
+    transparent 58%,
+    rgba(182, 255, 42, 0.14) 86%,
+    rgba(182, 255, 42, 0.26) 100%
+  );
+}
+
+.boostVignetteOn {
+  opacity: 1;
+}
+
+/* 피버 — 골드 비네트 (부스트보다 강함) */
+.feverVignetteOn {
+  opacity: 1;
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 50%,
+    transparent 52%,
+    rgba(255, 196, 80, 0.18) 82%,
+    rgba(255, 160, 60, 0.34) 100%
+  );
+  animation: feverPulse 0.7s ease-in-out infinite;
+}
+
+@keyframes feverPulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* 🌈 슈퍼부스트 — 라벤더/핫핑크 비네트 (무적 = 가장 강렬, 진호 2026-07-07) */
+.superVignetteOn {
+  opacity: 1;
+  background: radial-gradient(
+    ellipse 78% 72% at 50% 50%,
+    transparent 46%,
+    rgba(183, 148, 246, 0.22) 80%,
+    rgba(255, 95, 158, 0.4) 100%
+  );
+  animation: feverPulse 0.55s ease-in-out infinite;
+}
+
+/* 피버 배너 */
+.feverBanner {
+  position: absolute;
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: comboPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.feverText {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #ffd76b;
+  text-shadow: 0 0 22px rgba(255, 196, 80, 0.8);
+}
+
+.feverBar {
+  width: 120px;
+  height: 5px;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.feverBarFill {
+  display: block;
+  width: var(--pct, 100%);
+  height: 100%;
+  background: linear-gradient(90deg, #ffb84f, #ffd76b);
+  border-radius: var(--z-radius-full);
+  /* setState 140ms 스로틀 사이를 부드럽게 보간 */
+  transition: width 0.15s linear;
+}
+
+/* 🌈 슈퍼부스트 배너 — 인스타 그라데이션(라벤더→핫핑크) 텍스트 (진호 2026-07-07) */
+.superBanner {
+  position: absolute;
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: comboPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.superText {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  background: linear-gradient(90deg, #b794f6, #ff5f9e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(255, 95, 158, 0.7));
+}
+.superBar {
+  /* 진호 2026-07-07 "잘 안 보여" → 130→210 / 5→11 확대 + 핑크 글로우 */
+  width: 210px;
+  height: 11px;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(255, 95, 158, 0.5);
+}
+.superBarFill {
+  display: block;
+  width: var(--pct, 100%);
+  height: 100%;
+  background: linear-gradient(90deg, #b794f6, #ff5f9e);
+  border-radius: var(--z-radius-full);
+  transition: width 0.15s linear;
+}
+
+/* 아이템 게이지 스택 — 화면 중앙 살짝 위 가운데 정렬, 크게 (진호 2026-07-07
+   "위치 이상 + 작아서 안 보여 → 중앙 살짝 위 + 60% 크게 + 진행바 왼쪽에 아이콘"). */
+.itemCenterDock {
+  position: absolute;
+  top: 31%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  animation: comboPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.itemGauge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.itemGaugeIcon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
+}
+.itemGaugeBar {
+  width: 150px;
+  height: 9px;
+  border-radius: var(--z-radius-full);
+  background: rgba(10, 13, 30, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+}
+.itemGaugeFill {
+  display: block;
+  width: var(--pct, 100%);
+  height: 100%;
+  border-radius: var(--z-radius-full);
+  /* setState 140ms 스로틀 사이를 부드럽게 보간 */
+  transition: width 0.15s linear;
+}
+.itemGaugeFillShield {
+  background: linear-gradient(90deg, #5fd0ff, #9be4ff);
+  box-shadow: 0 0 12px rgba(95, 208, 255, 0.75);
+}
+.itemGaugeFillTurbo {
+  background: linear-gradient(90deg, #ffc93c, #ffe28a);
+  box-shadow: 0 0 12px rgba(255, 201, 60, 0.75);
+}
+.itemGaugeFillMagnet {
+  background: linear-gradient(90deg, #ff6f9c, #ffa4c0);
+  box-shadow: 0 0 12px rgba(255, 111, 156, 0.75);
+}
+
+/* 아이템 상태 도크 — 시야 안(우상단, 피버 배너 대역 아래)으로 (진호: "아래는 볼 수가 없어") */
+.itemDock {
+  position: absolute;
+  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 124px);
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.itemChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: var(--z-radius-full);
+  background: rgba(10, 13, 30, 0.62);
+  font-size: 15px;
+  line-height: 1;
+  animation: comboPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.itemChipTurbo { box-shadow: 0 0 12px rgba(212, 255, 79, 0.35); }
+.itemChipMagnet { box-shadow: 0 0 12px rgba(255, 111, 156, 0.35); }
+.itemChipShield { box-shadow: 0 0 12px rgba(95, 208, 255, 0.45); }
+
+/* 실드 라벨 — 아이콘만이면 "먹었는지·시간제한 있는지" 헷갈려서 텍스트 명시(진호 2026-07-06).
+   실드는 시간제한 없는 1회 방어(최대 1개)라 bar 없이 "실드 1" 고정 표시. */
+.itemChipLabel {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.itemBar {
+  width: 46px;
+  height: 4px;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+.itemBarFill {
+  display: block;
+  width: var(--pct, 100%);
+  height: 100%;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.85);
+  /* setState 140ms 스로틀 사이를 부드럽게 보간 */
+  transition: width 0.15s linear;
+}
+
+/* ── 메뉴 오버레이 ── */
+
+/* 쇼케이스(진호 2026-07-07): 중앙은 투명(자전거 무대) + pointer-events 통과 → 캔버스 드래그
+   회전/핀치 줌이 그대로 먹힘. 버튼류만 개별 pointer-events: auto. */
+.menuOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(8, 10, 24, 0.78) 0%, rgba(8, 10, 24, 0.06) 34%, rgba(8, 10, 24, 0.06) 58%, rgba(8, 10, 24, 0.9) 100%);
+  pointer-events: none;
+}
+
+.menuTopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(var(--sat, env(safe-area-inset-top, 0px)) + 10px) 12px 0;
+}
+
+.menuBack,
+.menuMute {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 17px;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.menuBack:focus-visible,
+.menuMute:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+.menuBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 가로 화면 safe-area(노치가 좌/우로 옴) 대응 — 상/하/좌/우 inset 모두 반영 (진호 2026-07-07 가로 전환) */
+  padding:
+    calc(var(--sat, env(safe-area-inset-top, 0px)) + var(--z-space-2))
+    calc(env(safe-area-inset-right, 0px) + var(--z-space-5))
+    calc(var(--sab, env(safe-area-inset-bottom, 0px)) + var(--z-space-4))
+    calc(env(safe-area-inset-left, 0px) + var(--z-space-5));
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+.menuTopBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 중앙 자전거 무대 — 비워두고 드래그/핀치는 캔버스로 통과.
+   min-height 는 낮은 가로 화면(430px 등)에서 하단 액션바/랭킹을 밀어내지 않게 작게 (진호 2026-07-07).
+   자전거는 뒤 캔버스라 스페이서가 작아도 그대로 보인다. */
+.menuSpacer {
+  flex: 1;
+  min-height: 40px;
+  width: 100%;
+}
+
+.menuBottomBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--z-space-3);
+  width: 100%;
+}
+
+/* 가로 액션 바 — 색칩 + START 한 줄 (좁으면 wrap). 세로 스택이 낮은 가로 화면에서 넘쳐
+   START 가 화면 밖으로 밀리던 문제 해결 (진호 2026-07-07 "스타트 버튼이 어디갔노"). */
+.menuControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--z-space-4);
+  width: 100%;
+  flex-wrap: wrap;
+}
+.menuSubRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--z-space-3);
+  flex-wrap: wrap;
+}
+
+/* 컴팩트 점수 한 줄 — 대형 히어로 점수 대체 (자전거를 안 가리게, 진호 2026-07-07) */
+.menuScoreLine {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+.menuScoreLine b {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 18px rgba(182, 255, 42, 0.45), 0 2px 10px rgba(0, 0, 0, 0.6);
+}
+
+.menuKicker {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  color: rgba(182, 255, 42, 0.85);
+}
+
+.menuLogo {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.1;
+  text-shadow:
+    0 0 24px rgba(182, 255, 42, 0.35),
+    0 4px 18px rgba(0, 0, 0, 0.6);
+}
+
+/* 내 최고 점수 = 화면 히어로 (진호 2026-07-05 "제일 중요한 건 내 점수, 크게 잘 보이게") */
+.menuHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: var(--z-space-1) 0;
+}
+.menuHeroLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.6);
+}
+.menuHeroScore {
+  font-size: 68px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 32px rgba(182, 255, 42, 0.5), 0 4px 22px rgba(0, 0, 0, 0.6);
+}
+.menuHeroDist {
+  font-size: 18px;
+  font-weight: 800;
+  color: #b6ff2a;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 12px rgba(182, 255, 42, 0.4);
+}
+
+/* 전체 랭킹 보기 버튼 → 풀스크린 리더보드 오버레이 트리거 */
+.menuRankBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: var(--z-radius-full);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.12s ease;
+  pointer-events: auto;
+}
+.menuRankBtn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* 랭킹 오버레이 — 게임 위 풀스크린으로 기존 Leaderboard 재사용 (진호 2026-07-05 "이미 만들어놨었음").
+   .container 가 #main-content 패딩을 가정하므로 오버레이가 좌우 패딩 + 중앙정렬을 대신 제공. */
+.rankOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: #0a0d1e;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline: 16px;
+  pointer-events: auto; /* 부모 menuOverlay 가 pointer-events:none */
+}
+.rankOverlay > div {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* 컬러 선택 */
+.menuColors {
+  display: flex;
+  gap: var(--z-space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.colorChip {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: var(--z-radius-full);
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.colorChipOn {
+  border-color: var(--chip-color, #b6ff2a);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 14px 0 var(--chip-color, #b6ff2a);
+}
+
+.colorChipLocked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.colorChip:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+.colorDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--chip-color, #b6ff2a);
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 6px 0 var(--chip-color, #b6ff2a);
+}
+
+.menuHint {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+.menuLoginHint {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(125, 215, 255, 0.8);
+  text-align: center;
+}
+
+/* START — UI-CTA-001 라임 시그니처 */
+.startBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  min-width: 200px;
+  flex-shrink: 0;
+  min-height: 52px;
+  pointer-events: auto;
+  padding: 0 var(--z-space-6);
+  margin-top: 0;
+  border-radius: var(--z-radius-lg);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-lime-start), var(--z-3d-lime-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-lime-glow);
+  color: var(--z-3d-lime-text);
+  font-size: var(--z-text-base);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  border: none;
+  cursor: pointer;
+  transform: translateY(0);
+  transition: transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.startBtn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: var(--z-3d-pressed);
+}
+
+.startBtn:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+/* ── 게임오버 ── */
+
+.overOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 가로 화면 safe-area 4방향(노치가 좌/우로 옴) + 짧은 세로 여백 (진호 2026-07-07 가로 전환) */
+  padding:
+    calc(var(--sat, env(safe-area-inset-top, 0px)) + var(--z-space-4))
+    calc(env(safe-area-inset-right, 0px) + var(--z-space-5))
+    calc(var(--sab, env(safe-area-inset-bottom, 0px)) + var(--z-space-4))
+    calc(env(safe-area-inset-left, 0px) + var(--z-space-5));
+  /* 뒤 게임 3D 씬을 블러로 은은히 살려 "배경 살아있게"(진호 2026-07-06) — 딤은 줄이고 blur 로 카드 부각 */
+  background: rgba(6, 8, 18, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: overFadeIn 0.4s ease-out;
+  overflow-y: auto;
+}
+
+@keyframes overFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.overCard {
+  width: 100%;
+  max-width: 380px;
+  /* 카드가 짧은 가로 화면보다 커도 위쪽이 잘리지 않게 — flex 컨테이너 안 margin:auto 는
+     overflow-y:auto 와 함께 위/아래 스크롤을 모두 허용(center + scroll-to-top 동시 성립). */
+  margin: auto;
+  padding: var(--z-space-6) var(--z-space-5);
+  border-radius: 20px;
+  /* 상단 라임 네온 글로우 + 딥 네이비 그라데이션 — 정적 다크 → 살아있는 네온 카드(진호 2026-07-06) */
+  background:
+    radial-gradient(130% 90% at 50% 0%, rgba(182, 255, 42, 0.13), transparent 58%),
+    linear-gradient(180deg, rgba(24, 28, 52, 0.94), rgba(12, 15, 32, 0.96));
+  border: 1px solid rgba(182, 255, 42, 0.24);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 44px rgba(182, 255, 42, 0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--z-space-3);
+  animation: overCardIn 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes overCardIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.overStageBadge {
+  margin: 0 auto 6px;
+  width: fit-content;
+  padding: 4px 14px;
+  border-radius: var(--z-radius-full);
+  background: rgba(182, 255, 42, 0.12);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #b6ff2a;
+  text-shadow: 0 0 12px rgba(182, 255, 42, 0.4);
+}
+
+.overReason {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(255, 128, 128, 0.85);
+  text-transform: uppercase;
+}
+
+/* R10: Primary 점수 */
+.overScore {
+  margin: 0;
+  font-size: 52px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 30px rgba(182, 255, 42, 0.45), 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.overNewBest {
+  margin: 0;
+  font-size: var(--z-text-base);
+  font-weight: 900;
+  color: #b6ff2a;
+  text-shadow: 0 0 14px rgba(182, 255, 42, 0.5);
+}
+
+.overGap {
+  margin: 0;
+  font-size: var(--z-text-sm);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.overGap strong {
+  color: #ffc46b;
+  font-weight: 900;
+}
+
+.overRank {
+  margin: 0;
+  font-size: var(--z-text-sm);
+  font-weight: 800;
+  color: #7dd7ff;
+}
+
+.overGuest {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(125, 215, 255, 0.8);
+}
+
+.overError {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 150, 120, 0.9);
+}
+
+.overStats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--z-space-2);
+  padding: var(--z-space-3) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.overStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.overStatValue {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.overStatLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.overSubRow {
+  display: flex;
+  gap: var(--z-space-3);
+  width: 100%;
+}
+
+.overSubBtn {
+  flex: 1;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--z-radius-lg);
+  font-size: var(--z-text-sm);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-decoration: none;
+  /* 배경/그림자/글자색은 z-3d-sky · z-3d-violet 유틸(3d-utility.css)이 담당 — UI-SURFACE-3D-001 */
+}
+
+.overSubBtn:focus-visible {
+  outline: 2px solid var(--z-accent);
+  outline-offset: 2px;
+}
+
+/* ── 짧은 가로 화면 압축 (안전망) ──
+   게임은 세로 기본(진호 2026-07-07). 어쩌다 폰을 가로로 눕혀 세로 공간이 짧을 때만 게임오버/메뉴를
+   압축해 잘림 방지. 세로 phone·데스크톱 넓은 창에는 적용 안 됨(여유 레이아웃 유지). */
+@media (orientation: landscape) and (max-height: 520px) {
+  /* 게임오버 카드 — 세로 예산 절약 (가로 폭은 넉넉하므로 세로만 압축) */
+  .overCard {
+    padding: var(--z-space-4) var(--z-space-5);
+    gap: var(--z-space-2);
+  }
+  .overScore {
+    font-size: 38px;
+  }
+  .overStats {
+    padding: var(--z-space-2) 0;
+  }
+  .overStageBadge {
+    margin-bottom: 0;
+  }
+  .overCard .startBtn {
+    min-height: 46px;
+  }
+  .overSubBtn {
+    min-height: 42px;
+  }
+
+  /* 시작 메뉴 — 로고/여백 축소로 색칩·START·랭킹이 짧은 세로에서도 다 보이게 */
+  .menuLogo {
+    font-size: 30px;
+  }
+  .menuBottomBlock {
+    gap: var(--z-space-2);
+  }
+  .menuSpacer {
+    min-height: 12px;
+  }
+}

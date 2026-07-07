@@ -30,6 +30,8 @@
     "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.0",
     "@supabase/supabase-js": "^2.47.0",
@@ -41,22 +43,24 @@
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "three": "^0.183.2",
     "web-push": "^3.6.7",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.0.0",
-    "docx": "^9.6.1",
-    "xlsx": "^0.18.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.183.1",
     "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^4.3.0",
+    "docx": "^9.6.1",
     "dotenv": "^17.3.1",
     "pg": "^8.20.0",
     "supabase": "^2.98.2",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "xlsx": "^0.18.5"
   }
 }

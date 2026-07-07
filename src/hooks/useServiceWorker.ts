@@ -13,6 +13,21 @@ export function useServiceWorker() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
 
+    // ── dev 모드: SW 등록 금지 + 기존 SW/캐시 즉시 정리 ──
+    // dev 청크는 파일명이 불변이라 SW cache-first가 옛 JS를 영원히 반환 → 코드 수정이 화면에 반영 안 됨.
+    // 개발자가 과거에 dev에서 설치해둔 SW가 있으면 캐시까지 걷어내야 정상화된다.
+    if (process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker.getRegistrations()
+        .then((regs) => regs.forEach((r) => r.unregister()))
+        .catch(() => {});
+      if (typeof caches !== 'undefined') {
+        caches.keys()
+          .then((keys) => keys.filter((k) => k.startsWith('dia-')).forEach((k) => caches.delete(k)))
+          .catch(() => {});
+      }
+      return;
+    }
+
     if (!localStorage.getItem(LAST_RELOAD_KEY)) {
       localStorage.setItem(LAST_RELOAD_KEY, String(Date.now()));
     }

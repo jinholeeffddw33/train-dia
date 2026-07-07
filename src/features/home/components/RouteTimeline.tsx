@@ -7,6 +7,8 @@ import { findExchangePartners, timeToMins } from '@/lib/schedule';
 import { LABELS } from '@/lib/constants';
 import { useAlarmStore, NORMAL_OPTIONS, DEPOT_OPTIONS, ALARM_LABELS, FIXED_TIME_OPTIONS } from '@/stores/alarm';
 import { useDriverStore } from '@/stores/driver';
+import RouteDiagram from './RouteDiagram';
+import { getRouteDiagram } from '@/data/routeDiagrams';
 import styles from '../styles/Home.module.css';
 
 interface RouteTimelineProps {
@@ -64,6 +66,8 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
   const diaNum = dia ? parseInt(dia.replace(/\D/g, '')) : 0;
   const isDia85to91 = diaNum >= 85 && diaNum <= 91;
   const [alarmOpenIdx, setAlarmOpenIdx] = useState<number | null>(null);
+  // 행로도(노선 축) — 데이터 있는 교번은 근무별 인라인 표시
+  const hasDia = !!getRouteDiagram(dia);
 
   // 야간 여부 (익일 근무 판별)
   const isOvernight = useMemo(() => {
@@ -120,14 +124,18 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                 </div>
               )}
 
-              {/* 구간 실행: 출발 → 열차번호 → 도착 */}
-              <div className={styles.rtRun}>
-                <span className={styles.rtDep}>{seg.d}</span>
-                <div className={styles.rtMid}>
-                  {trains && <span className={styles.rtTn}>{trains}</span>}
+              {/* 구간 실행: 행로도(데이터 있으면 근무별 인라인) 또는 출발→열번→도착 */}
+              {hasDia ? (
+                <RouteDiagram dia={dia!} seg={i} />
+              ) : (
+                <div className={styles.rtRun}>
+                  <span className={styles.rtDep}>{seg.d}</span>
+                  <div className={styles.rtMid}>
+                    {trains && <span className={styles.rtTn}>{trains}</span>}
+                  </div>
+                  <span className={styles.rtArr}>{seg.a || '-'}</span>
                 </div>
-                <span className={styles.rtArr}>{seg.a || '-'}</span>
-              </div>
+              )}
 
               {/* 교대 상대 — 1xxx/2xxx 기지 입출고면 해당 쪽 숨김 */}
               <div className={styles.rtPartnerRow}>
@@ -270,7 +278,6 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
           </div>
         );
       })}
-
     </div>
   );
 }

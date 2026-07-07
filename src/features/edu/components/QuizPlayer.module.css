@@ -76,6 +76,50 @@
   gap: var(--dia-space-4);
 }
 
+/* 이어풀기 안내 배너 */
+.resumeBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  flex-wrap: wrap;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid var(--dia-blue, #3B82F6);
+}
+
+.resumeText {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--dia-text-primary);
+  word-break: keep-all;
+}
+
+.resumeReset {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--dia-radius-full);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.resumeReset:active {
+  transform: scale(0.95);
+}
+
 .questionCard {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);

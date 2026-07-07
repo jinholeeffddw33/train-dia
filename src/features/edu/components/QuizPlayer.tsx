@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ArrowLeft, BookOpen, Trophy, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, Trophy, Sparkles, RotateCcw } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useQuizProgressStore } from '@/stores/quizProgress';
 import styles from './QuizPlayer.module.css';
 
 interface Question {
@@ -43,6 +44,11 @@ export default function QuizPlayer({ title, url, onClose, onViewBody }: Props) {
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [finished, setFinished] = useState(false);
+  // 이어풀기: 재진입 시 저장된 지점부터 시작 → 그 문제에서만 안내 배너 표시
+  const [resumedFrom, setResumedFrom] = useState(0);
+
+  const setProgress = useQuizProgressStore((s) => s.setProgress);
+  const clearProgress = useQuizProgressStore((s) => s.clearProgress);
 
   useHistoryBack('quiz-player', onClose, true);
 
@@ -60,6 +66,12 @@ export default function QuizPlayer({ title, url, onClose, onViewBody }: Props) {
           return { ...q, options: newOptions, answer: newAnswer };
         });
         setQuestions(prepared);
+        // 저장된 진행 위치가 있으면 그 지점부터 이어풀기 (범위 벗어나면 처음부터)
+        const saved = useQuizProgressStore.getState().getProgress(url);
+        if (saved > 0 && saved < prepared.length) {
+          setCurrent(saved);
+          setResumedFrom(saved);
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -81,27 +93,37 @@ export default function QuizPlayer({ title, url, onClose, onViewBody }: Props) {
   const handleNext = useCallback(() => {
     if (!revealed) return;
     if (current + 1 >= total) {
+      // 끝까지 완료 → 저장된 진행 위치 삭제 (다음엔 처음부터)
+      clearProgress(url);
       setFinished(true);
       return;
     }
-    setCurrent((c) => c + 1);
+    const nextIdx = current + 1;
+    // 다음 문제로 이동하며 진행 위치 저장 (중간에 나가도 여기서 이어풀기)
+    setProgress(url, nextIdx);
+    setCurrent(nextIdx);
     setSelected(null);
     setRevealed(false);
-  }, [revealed, current, total]);
+    setResumedFrom(0);
+  }, [revealed, current, total, url, setProgress, clearProgress]);
 
-  const handleRestart = useCallback(() => {
+  // 처음부터 다시 풀기 (저장된 진행 위치 삭제 + 보기 재셔플)
+  const restartFromStart = useCallback(() => {
+    clearProgress(url);
     setCurrent(0);
     setSelected(null);
     setRevealed(false);
     setFinished(false);
-    // 다시 셔플
+    setResumedFrom(0);
     setQuestions((prev) => prev.map((qq) => {
       const order = shuffle(qq.options.map((_, i) => i));
       const newOptions = order.map((i) => qq.options[i]);
       const newAnswer = order.indexOf(qq.answer);
       return { ...qq, options: newOptions, answer: newAnswer };
     }));
-  }, []);
+  }, [url, clearProgress]);
+
+  const handleRestart = restartFromStart;
 
   if (loading) {
     return (
@@ -178,6 +200,22 @@ export default function QuizPlayer({ title, url, onClose, onViewBody }: Props) {
       </div>
 
       <div className={styles.body}>
+        {resumedFrom > 0 && current === resumedFrom && (
+          <div className={styles.resumeBanner}>
+            <span className={styles.resumeText}>
+              지난번에 풀던 {current + 1}번 문제부터 이어서 풀어요
+            </span>
+            <button
+              type="button"
+              className={styles.resumeReset}
+              onClick={restartFromStart}
+            >
+              <RotateCcw size={14} />
+              <span>처음부터</span>
+            </button>
+          </div>
+        )}
+
         <div className={styles.questionCard}>
           <span className={styles.questionLabel}>문제 {current + 1}</span>
           <p className={styles.questionText}>{q.question}</p>

@@ -1,14 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { X, Sparkles, Moon, ClipboardCheck } from 'lucide-react';
-import { APP_VERSION } from '@/lib/constants';
+import { X, PartyPopper } from 'lucide-react';
 import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './WhatsNewModal.module.css';
 
-const STORAGE_KEY = 'whats-new-2026-06-22-dismiss';
-const SHOW_FROM = '2026-06-22';
-const SHOW_UNTIL = '2026-06-24';
+const STORAGE_KEY = 'welcome-interns-2026-07-07-dismiss';
+const SHOW_FROM = '2026-07-07';
+const SHOW_UNTIL = '2026-07-09'; // 3일간 (07/07·07/08·07/09)
 
 function todayStr(): string {
   const d = new Date();
@@ -30,7 +29,6 @@ export default function WhatsNewModal() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 진입 모달 스택 정리 — 세션당 1개만 (우선순위 게이트)
     if (shouldShow()) requestEntryModal('whats-new', () => setOpen(true));
   }, []);
 
@@ -61,14 +59,14 @@ export default function WhatsNewModal() {
       className={styles.overlay}
       role="dialog"
       aria-modal="true"
-      aria-label="새로운 기능 안내"
+      aria-label="신규 인턴 환영"
       onClick={(e) => { if (e.target === overlayRef.current) handleClose(); }}
     >
       <div className={styles.content}>
         <div className={styles.header}>
           <div className={styles.titleArea}>
-            <Sparkles size={20} className={styles.titleIcon} />
-            <h2 className={styles.title}>새로운 기능 안내</h2>
+            <PartyPopper size={20} className={styles.titleIcon} />
+            <h2 className={styles.title}>신규 인턴 환영</h2>
           </div>
           <button
             type="button"
@@ -81,33 +79,43 @@ export default function WhatsNewModal() {
         </div>
 
         <div className={styles.body}>
-          <p className={styles.intro}>
-            <strong>새롭게 디자인과 기능이 추가</strong>되었습니다.
+          <p className={styles.welcomeIntro}>
+            답십리 승무사업소에 새로 오신 <strong>두 분</strong>을 진심으로 환영합니다.
           </p>
 
-          <ul className={styles.featureList}>
-            <li className={styles.featureItem}>
-              <span className={styles.featureIcon}>
-                <Moon size={18} strokeWidth={2.2} />
+          <figure className={styles.photoWrap}>
+            <img
+              src="/welcome/interns-2026-07.jpg"
+              alt="신규 인턴 조건희(왼쪽), 신석희(오른쪽)"
+              className={styles.photo}
+            />
+            <div className={styles.nameOverlay}>
+              <span className={`${styles.nameTag} ${styles.nameTagLeft}`}>
+                <span className={styles.nameLabel}>왼쪽</span>
+                <strong>조건희</strong>
               </span>
-              <div className={styles.featureText}>
-                <strong>다크 모드를 사용해 보세요</strong>
-                <span>설정에서 활성화 가능</span>
-              </div>
+              <span className={`${styles.nameTag} ${styles.nameTagRight}`}>
+                <span className={styles.nameLabel}>오른쪽</span>
+                <strong>신석희</strong>
+              </span>
+            </div>
+          </figure>
+
+          <ul className={styles.internList}>
+            <li className={styles.internItem}>
+              <span className={`${styles.internBadge} ${styles.internBadgeLeft}`}>왼쪽</span>
+              <span className={styles.internName}>조건희</span>
+              <span className={styles.internSabun}>사번 22601134</span>
             </li>
-            <li className={styles.featureItem}>
-              <span className={`${styles.featureIcon} ${styles.featureIconIndigo}`}>
-                <ClipboardCheck size={18} strokeWidth={2.2} />
-              </span>
-              <div className={styles.featureText}>
-                <strong>대기충당기록부 확인</strong>
-                <span>홈 화면에서 최근 3일치 확인</span>
-              </div>
+            <li className={styles.internItem}>
+              <span className={`${styles.internBadge} ${styles.internBadgeRight}`}>오른쪽</span>
+              <span className={styles.internName}>신석희</span>
+              <span className={styles.internSabun}>사번 22601146</span>
             </li>
           </ul>
 
-          <p className={styles.versionLine}>
-            현재 버전 <span className={styles.versionBadge}>{APP_VERSION}</span>
+          <p className={styles.welcomeNote}>
+            마주치시면 반갑게 인사 부탁드립니다.
           </p>
         </div>
 
@@ -124,7 +132,7 @@ export default function WhatsNewModal() {
             className={styles.btnPrimary}
             onClick={handleClose}
           >
-            확인
+            환영합니다
           </button>
         </div>
       </div>

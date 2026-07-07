@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
- * driver_profiles에서 인턴(22600439, 22600472, 22600491, 22600519, 22601004, 22601008) 제외한
- * 활성 전 직원 명단 출력
+ * driver_profiles에서 인턴 제외한 활성 전 직원 명단 출력
  */
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config({ path: '.env.local' });
@@ -12,7 +11,8 @@ const supabase = createClient(
 );
 
 const INTERN_SABUNS = new Set([
-  '22600439', '22600472', '22600491', '22600519', '22601004', '22601008',
+  '22600439', '22600472', '22600519', '22601004', '22601008',
+  '22601134', '22601146', // 조건희, 신석희 (2026-07-07 입사)
 ]);
 
 const CHIEF = '21704630';        // 안성숙

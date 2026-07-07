@@ -47,6 +47,125 @@
 .titleIcon {
   color: #6366F1;
 }
+
+/* 신규 인턴 환영 팝업 — 사진 + 좌우 이름 표시 */
+.welcomeIntro {
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+  margin: 0 0 var(--dia-space-3);
+  line-height: 1.55;
+  text-align: center;
+}
+.welcomeIntro strong {
+  color: #6366F1;
+  font-weight: 800;
+}
+
+.photoWrap {
+  position: relative;
+  margin: 0 0 var(--dia-space-3);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--dia-border-light);
+  aspect-ratio: 1200 / 701;
+  background: var(--dia-surface-hover);
+}
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.nameOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+.nameTag {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.nameTagLeft { border-left: 3px solid #38BDF8; }
+.nameTagRight { border-right: 3px solid #F472B6; }
+.nameLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 1px;
+}
+.nameTag strong {
+  font-size: var(--dia-text-lg);
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
+}
+
+.internList {
+  list-style: none;
+  margin: 0 0 var(--dia-space-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.internItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border-light);
+  border-radius: 12px;
+}
+.internBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+}
+.internBadgeLeft { background: #38BDF8; }
+.internBadgeRight { background: #F472B6; }
+.internName {
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.2px;
+}
+.internSabun {
+  margin-left: auto;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.welcomeNote {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin: 0;
+  text-align: center;
+  padding-top: var(--dia-space-2);
+  border-top: 1px dashed var(--dia-border-light);
+}
 .title {
   font-size: var(--dia-text-lg);
   font-weight: 800;

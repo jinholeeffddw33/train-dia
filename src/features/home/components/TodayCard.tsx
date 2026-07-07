@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
-import { TrainFront, MonitorSmartphone } from 'lucide-react';
+import { useMemo } from 'react';
+import { TrainFront } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice, isIntern, isRegularDayOffice, getUserRole } from '@/lib/auth';
@@ -14,8 +14,6 @@ import {
 } from '@/lib/schedule';
 import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import { useSegmentAlarm } from '@/hooks/useSegmentAlarm';
-import { useWakeLock } from '@/hooks/useWakeLock';
-import { showToast } from '@/components/common/Toast';
 import { LABELS, dirShort } from '@/lib/constants';
 import { STATION_ABBR } from '@/data/station-abbr';
 import { useClockMinute } from '../hooks/useClock';
@@ -64,12 +62,6 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   }, [schedule, segInfo]);
   // 2·3근무 출발 전 알람
   useSegmentAlarm(isToday ? schedule?.g : undefined, schedule?.s);
-  // 화면 계속 켜기 (Screen Wake Lock) — 승무 중 행로 화면 유지, 미지원 브라우저는 버튼 숨김
-  const { supported: wakeSupported, active: wakeActive, toggle: toggleWake } = useWakeLock();
-  const handleWakeToggle = useCallback(async () => {
-    const on = await toggleWake();
-    if (on) showToast('화면이 계속 켜져 있어요', 'success');
-  }, [toggleWake]);
   // preparing/done 상태에서 다음 근무 방향 (banner.next 기준)
   const nextDirection = useMemo(
     () => banner?.next?.schedule?.m
@@ -172,18 +164,6 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
       <div className={styles.diaHeader}>
         <span className={styles.cardLabel}>{dateLabel}</span>
         <div className={styles.diaHeaderRight}>
-          {wakeSupported && (
-            <button
-              type="button"
-              className={`${wakeActive ? 'z-cta z-cta-sky' : 'z-glass-pill'} ${styles.wakeToggle} ${wakeActive ? styles.wakeToggleOn : ''}`}
-              onClick={handleWakeToggle}
-              aria-pressed={wakeActive}
-              aria-label="화면 계속 켜기"
-            >
-              <MonitorSmartphone size={14} aria-hidden />
-              <span>화면 켜두기</span>
-            </button>
-          )}
           {schedule && !specialRest && (
             <div className={styles.workTimeWrap}>
               <span className={styles.workTimeLabel}>근무시간</span>

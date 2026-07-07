@@ -328,27 +328,6 @@
   min-width: 0;
 }
 
-/* 화면 켜두기 토글 — look 은 전역 z-glass-pill(off)/z-cta-sky(on) 가 담당 */
-.wakeToggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 12px;
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-medium);
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.wakeToggle:not(.wakeToggleOn) {
-  color: var(--dia-text-secondary);
-}
-
-/* on 상태 색/입체는 전역 .z-cta-sky 가 담당 — 마커 클래스 */
-.wakeToggleOn {
-  font-weight: var(--dia-weight-bold);
-}
-
 .diaMain {
   display: flex;
   align-items: center;

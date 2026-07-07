@@ -28,6 +28,9 @@ import { ApexHUD, type FloatMsg, type ItemHudState } from './components/ApexHUD'
 import { ApexMenu } from './components/ApexMenu'
 import { ApexGameOver, type RunResult, type SubmitStatus } from './components/ApexGameOver'
 import type { ApexHost } from './host'
+// 자립 전역 CSS — zinosb 디자인 토큰(--z-*)/3D 유틸(z-3d-*)/noselect 를 게임 안에 번들.
+//   게임 코어가 프로젝트 전역 CSS 에 의존하지 않게 해 zinosb·train-dia 에서 UI 100% 동일 (진호 2026-07-08).
+import './styles/apex-globals.css'
 import styles from './styles/apex.module.css'
 
 const orbitron = Orbitron({ subsets: ['latin'], weight: ['700', '900'], display: 'swap' })

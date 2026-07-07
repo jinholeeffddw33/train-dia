@@ -1,0 +1,949 @@
+/* ══════════════════════════════════════════════════════════════
+   APEX 자립 전역 CSS — zinosb 디자인 토큰/3D 유틸/noselect 번들
+   (진호 2026-07-08 'UI 100% 똑같이'). 게임 코어가 프로젝트 전역 CSS 에
+   의존하지 않도록 필요한 zinosb 전역을 여기 자립 정의 → zinosb·train-dia 동일.
+   ★자동 생성물: zinosb tokens.css :root(다크) + 3d-utility.css + globals z-noselect.
+   게임은 다크 무드 고정이라 다크값만. sync 로 train-dia 에 그대로 복사됨.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── zinosb 디자인 토큰 :root (다크) — tokens.css SSOT 그대로 ── */
+:root {
+  /* ========================================
+     iOS Safe Area Insets
+     layout.tsx inline script가 iOS 디바이스에서 실제 값으로 덮어씀.
+     non-iOS / JS 미실행 환경에서는 env() 폴백 사용.
+     ======================================== */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* ========================================
+     Background Layers
+     명도 차이를 키워 카드가 배경에서 "떠" 보이도록
+     bg(L≈4%) → surface(L≈11%) → elevated(L≈16%) → hover(L≈21%)
+     ======================================== */
+  --z-bg: #0B0E17;
+  --z-bg-deep: #07090F;   /* 라임/액센트 배경 위 아이콘에 쓰는 최대 어두운 잉크 색 */
+  --z-bg-rgb: 11, 14, 23;
+  --z-surface: #161B28;
+  --z-surface-elevated: #1E2436;
+  --z-surface-hover: #283044;
+  --z-surface-active: #303850;
+
+  /* 앰비언트 서페이스 (카드 레벨 틴트) */
+  --z-surface-ambient: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(139,92,246,0.03) 100%);
+  --z-surface-warm: linear-gradient(135deg, rgba(182,255,42,0.03) 0%, rgba(56,189,248,0.03) 100%);
+  --z-surface-cool: linear-gradient(135deg, rgba(56,189,248,0.05) 0%, rgba(139,92,246,0.03) 100%);
+
+  /* 앰비언트 배경 (페이지/섹션 레벨 — Tier별)
+     레퍼런스: Apple Sports, Air NZ, Highlight — 상단 집중형 그라디언트 */
+  --z-bg-ambient: radial-gradient(ellipse 80% 45% at 50% 0%, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.07) 35%, transparent 65%);
+  --z-bg-tint: linear-gradient(180deg, rgba(139,92,246,0.12) 0%, transparent 35%);
+  --z-bg-hero: radial-gradient(ellipse 80% 45% at 50% 0%, rgba(99,102,241,0.30) 0%, rgba(139,92,246,0.15) 25%, transparent 55%);
+
+  /* ========================================
+     Border
+     카드 윤곽 — 살짝 더 보이도록 강화
+     ======================================== */
+  --z-border: rgba(255,255,255,0.10);
+  --z-border-light: rgba(255,255,255,0.05);
+  --z-border-strong: rgba(255,255,255,0.18);
+  --z-border-focus: rgba(182,255,42,0.4);
+  --z-border-glow: rgba(99,102,241,0.3);
+
+  /* ========================================
+     Text
+     명확한 계층 (더 부드러운 톤)
+     ======================================== */
+  /* AA 대비 기준 — 어떤 텍스트도 3:1 이하 금지 */
+  --z-text-primary: #F0F0F5;   /* ~16:1 */
+  --z-text-secondary: #B5B5BD; /* ~8:1 */
+  --z-text-tertiary: #8C8C96;  /* ~4.5:1 (AA 본문) */
+  --z-text-muted: #6E6E7A;     /* ~3.3:1 (최하선, AA 큰 텍스트) */
+  --z-text-inverse: #000000;
+
+  /* ========================================
+     Accent - 네온 라임 (브랜드 컬러)
+     메인 CTA에만 사용
+     ======================================== */
+  --z-accent: #B6FF2A;
+  --z-accent-hover: #CAFF5C;
+  --z-accent-pressed: #9FE022;
+  --z-accent-muted: rgba(182,255,42,0.12);
+  --z-accent-subtle: rgba(182,255,42,0.06);
+
+  /* ========================================
+     Color Palette
+     ======================================== */
+  --z-sky: #38BDF8;
+  --z-sky-muted: rgba(56,189,248,0.15);
+  --z-sky-subtle: rgba(56,189,248,0.08);
+
+  --z-violet: #8B5CF6;
+  --z-violet-muted: rgba(139,92,246,0.15);
+  --z-violet-subtle: rgba(139,92,246,0.08);
+
+  /* 라벤더 — violet 보다 연한 보라(나만 보기 톤). 2026-06-19 진호 directive (CSS-TOKEN-001). */
+  --z-lavender: #B9A7F0;
+  --z-lavender-muted: rgba(185,167,240,0.18);
+
+  --z-indigo: #6366F1;
+  --z-indigo-muted: rgba(99,102,241,0.15);
+  --z-indigo-subtle: rgba(99,102,241,0.08);
+
+  --z-rose: #F472B6;
+  --z-rose-muted: rgba(244,114,182,0.15);
+  --z-rose-subtle: rgba(244,114,182,0.08);
+
+  --z-mint: #34D399;
+  --z-mint-muted: rgba(52,211,153,0.15);
+  --z-mint-subtle: rgba(52,211,153,0.08);
+
+  --z-cyan: #22D3EE;
+  --z-cyan-muted: rgba(34,211,238,0.15);
+  --z-cyan-subtle: rgba(34,211,238,0.08);
+
+  /* ========================================
+     Slope 경사도 11구간 (코스 고도 그래프)
+     n=내리막(청록 계열), p=오르막(빨강 계열). 카카오맵 자전거 길찾기 톤.
+     ======================================== */
+  --z-slope-n16: #0EA5B5;
+  --z-slope-n10: #22B5C2;
+  --z-slope-n7:  #4DC9D6;
+  --z-slope-n4:  #7FDDE5;
+  --z-slope-n1:  #B0EBF0;
+  --z-slope-0:   #C8CCD4;
+  --z-slope-p1:  #F4B0A8;
+  --z-slope-p4:  #F08577;
+  --z-slope-p7:  #EA5C4A;
+  --z-slope-p10: #DC3324;
+  --z-slope-p16: #B91D14;
+
+  /* ========================================
+     Semantic Colors — Case 71 #2 (2026-05-22): palette step 9 참조로 분리.
+     "민트 = 항상 success" 식 의미 고착 해소. semantic 의도 변경 시 palette 안 건드림.
+     값은 palette 와 정확히 동일 (시각 변화 0).
+     ======================================== */
+  --z-success: var(--z-mint-9);          /* was #34D399 = mint-9 (다크) */
+  --z-success-muted: rgba(52,211,153,0.15);
+  --z-danger: var(--z-rose-9);           /* was #FB7185 = rose-9 (다크) */
+  --z-danger-muted: rgba(251,113,133,0.15);
+  --z-danger-glow: 0 0 10px rgba(251,113,133,0.2);
+  --z-danger-glow-strong: 0 0 16px rgba(251,113,133,0.35);
+  --z-warning: var(--z-amber-9);         /* was #FBBF24 = amber-9 (다크) */
+  --z-warning-muted: rgba(251,191,36,0.15);
+  --z-star: var(--z-amber-9);            /* was #FBBF24 — semantic star = warning palette 재사용 */
+  --z-info: var(--z-blue-9);             /* was #60A5FA = blue-9 (다크) */
+  --z-info-muted: rgba(96,165,250,0.15);
+
+  /* ========================================
+     Special - 안전거래/시세
+     ======================================== */
+  --z-safe: #34D399;
+  --z-safe-bg: rgba(52,211,153,0.10);
+  --z-hotdeal: #FB7185;
+  --z-hotdeal-bg: rgba(251,113,133,0.10);
+  --z-fair: #FBBF24;
+  --z-fair-bg: rgba(251,191,36,0.10);
+
+  /* Bike ID — 자전거 등록/인증 (sky 계열) */
+  --z-bike-id: var(--z-sky);
+  --z-bike-id-bg: var(--z-sky-subtle);
+
+  /* ========================================
+     Accent Gradients (CTA/버튼 그라데이션 끝점)
+     ======================================== */
+  --z-accent-gradient-end: #A8F218;
+
+  /* ========================================
+     On-surface Text (컬러 배경 위 텍스트)
+     ======================================== */
+  --z-text-on-dark: #ffffff;
+  --z-text-on-accent: #000000;
+
+  /* ========================================
+     Step Progress (create-v2 진행 표시)
+     ======================================== */
+  --z-step-active: #8BC34A;
+  --z-step-complete: #4CAF50;
+
+  /* ========================================
+     Price Evaluation Colors (시세 평가)
+     ======================================== */
+  --z-eval-good: #4CAF50;
+  --z-eval-average: #00BCD4;
+  --z-eval-high: #FF9800;
+  --z-eval-high-dark: #F57C00;
+  --z-eval-hotdeal: #FF5722;
+  --z-eval-hotdeal-dark: #E64A19;
+  --z-eval-veryhigh: #F44336;
+
+  /* ========================================
+     Danger Variants
+     ======================================== */
+  --z-danger-strong: #EF4444;
+
+  /* ========================================
+     OAuth Brand Colors (브랜드 가이드라인 고정)
+     ======================================== */
+  --z-oauth-kakao: #FEE500;
+  --z-oauth-kakao-end: #FFD800;
+  --z-oauth-kakao-text: #191919;
+  --z-oauth-google: #ffffff;
+  --z-oauth-google-end: #f8f8f8;
+  --z-oauth-google-text: #3c4043;
+
+  /* ========================================
+     Alpha Variants (low-opacity backgrounds)
+     ======================================== */
+  --z-accent-10: rgba(182,255,42,0.10);
+  --z-success-10: rgba(52,211,153,0.10);
+  --z-danger-10: rgba(251,113,133,0.10);
+  --z-warning-10: rgba(251,191,36,0.10);
+  --z-info-10: rgba(96,165,250,0.10);
+  --z-sky-10: rgba(56,189,248,0.10);
+  --z-violet-10: rgba(139,92,246,0.10);
+  --z-indigo-10: rgba(99,102,241,0.10);
+  --z-white-5: rgba(255,255,255,0.05);
+  --z-white-10: rgba(255,255,255,0.10);
+  --z-white-15: rgba(255,255,255,0.15);
+  --z-white-20: rgba(255,255,255,0.20);
+  --z-black-50: rgba(0,0,0,0.50);
+  --z-black-70: rgba(0,0,0,0.70);
+
+  /* ========================================
+     Shadows — v3.0: glow 절제 (프리미엄 톤)
+     ======================================== */
+  --z-shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --z-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --z-shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  --z-shadow-glow: 0 0 16px rgba(182,255,42,0.15);
+
+  /* ========================================
+     3D Button — 홈 아이콘 기준 입체 토큰
+     radial-gradient bloom은 CSS 변수 불가 → 패턴 통일:
+     background: radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)),transparent 55%), linear-gradient(145deg, COLOR_START, COLOR_END);
+     ======================================== */
+  --z-3d-bloom: 0.2;
+  --z-3d-inset: inset 1px 1px 2px rgba(255,255,255,0.15), inset -1px -1px 3px rgba(0,0,0,0.25);
+  --z-3d-depth: 0 2px 6px rgba(0,0,0,0.3);
+  --z-3d-pressed: inset 2px 2px 4px rgba(0,0,0,0.35), inset -1px -1px 2px rgba(255,255,255,0.05);
+
+  /* 3D 색상 쌍 — 다크 모드 (섹션별 그라데이션 start/end)
+     Case 71 #4 (2026-05-22): lime start=end 평면 사고 교정.
+     시그니처 #B6FF2A 는 start 유지, end 만 약 12% 어둠 추가 → linear-gradient 입체감 회복. */
+  --z-3d-lime-start: #B6FF2A;
+  --z-3d-lime-end: #9FE022;
+  --z-3d-lime-text: #000000;
+  --z-3d-indigo-start: #818CF8;
+  --z-3d-indigo-end: var(--z-violet);
+  --z-3d-sky-start: var(--z-sky);
+  --z-3d-sky-end: color-mix(in srgb, var(--z-sky) 45%, #021a30);
+  --z-3d-mint-start: var(--z-mint);
+  --z-3d-mint-end: color-mix(in srgb, var(--z-mint) 45%, #011a10);
+  --z-3d-violet-start: var(--z-violet);
+  --z-3d-violet-end: color-mix(in srgb, var(--z-violet) 45%, #0e0330);
+  --z-3d-rose-start: var(--z-rose);
+  /* 2026-05-25 진호 사고: 55% 검정 mix → 다크에서 핑크 사라지고 검정만 보임.
+     라이트 패턴과 동일 톤 (HSL 330° 핑크 유지 + 어둠 살짝). */
+  --z-3d-rose-end: #E11D74;
+  --z-3d-rose-text: #ffffff;
+  --z-3d-gold-start: var(--z-warning);
+  --z-3d-gold-end: color-mix(in srgb, var(--z-warning) 45%, #301a02);
+  --z-3d-cyan-start: var(--z-cyan);
+  --z-3d-cyan-end: color-mix(in srgb, var(--z-cyan) 45%, #021a25);
+
+  /* 3D 색상 쌍 — 다크 glow (12% color bleed) */
+  --z-3d-lime-glow: 0 0 12px color-mix(in srgb, var(--z-accent) 12%, transparent);
+  --z-3d-indigo-glow: 0 0 12px color-mix(in srgb, var(--z-indigo) 12%, transparent);
+  --z-3d-sky-glow: 0 0 12px color-mix(in srgb, var(--z-sky) 12%, transparent);
+  --z-3d-mint-glow: 0 0 12px color-mix(in srgb, var(--z-mint) 12%, transparent);
+  --z-3d-violet-glow: 0 0 12px color-mix(in srgb, var(--z-violet) 12%, transparent);
+  --z-3d-rose-glow: 0 0 12px color-mix(in srgb, var(--z-rose) 12%, transparent);
+  --z-3d-gold-glow: 0 0 12px color-mix(in srgb, var(--z-warning) 12%, transparent);
+  --z-3d-cyan-glow: 0 0 12px color-mix(in srgb, var(--z-cyan) 12%, transparent);
+
+  /* Card depth — 미선택 카드 오브젝트감 */
+  --z-card-inset: inset 0 1px 0 rgba(255,255,255,0.04);
+  --z-card-depth: 0 1px 2px rgba(0,0,0,0.2);
+  --z-card-depth-hover: 0 2px 8px rgba(0,0,0,0.3);
+
+  /* ────────────────────────────────────────────────
+     Card Elevation SSOT (2026-06-10) — MD3 "Elevated Card" 단일 공식.
+     레퍼런스: Material Design 3 / Toss / 당근 / Apple Sports —
+     "border·shadow·contrasting bg 중 하나만 골라라" → elevation 채택.
+     크루(소셜/커뮤니티/피트니스) 카드 전체가 이 토큰 하나만 참조해
+     한 제품처럼 보이도록 통일. 흩어진 box-shadow 직접 정의 대체.
+
+     다크: 그림자 약하게 + inset highlight(윗변 1px) 로 "떠 있는 표면".
+     라이트: 토스/당근식 soft drop shadow 로 분리.
+     border 는 "은은한 윤곽"만 책임(분리는 elevation 이 담당).
+     ──────────────────────────────────────────────── */
+  --z-card-border: 1px solid var(--z-border);
+  --z-card-elev:
+    var(--z-card-inset),
+    0 1px 2px rgba(0,0,0,0.22),
+    0 4px 14px rgba(0,0,0,0.30);
+  --z-card-elev-hover:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 2px 6px rgba(0,0,0,0.28),
+    0 8px 24px rgba(0,0,0,0.40);
+
+  /* ========================================
+     Create Flow 선택 카드 — 3슬롯 그라데이션
+     (CategoryScreen / BikeTypeScreen / PowerTypeScreen /
+      DeliveryScreen / TradeDeliveryScreen 공통 사용)
+     ======================================== */
+  --z-slot-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --z-slot-glow-1: rgba(102,126,234,0.3);
+  --z-slot-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --z-slot-glow-2: rgba(240,147,251,0.3);
+  --z-slot-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --z-slot-glow-3: rgba(79,172,254,0.3);
+
+  /* ========================================
+     Radius — v4.0: 전체 스케일 완성 (2px ~ full)
+     ======================================== */
+  --z-radius-xs: 4px;
+  --z-radius-sm: 6px;
+  --z-radius-sm-md: 8px;
+  --z-radius-md: 10px;
+  --z-radius-md-lg: 12px;
+  --z-radius-lg: 14px;
+  --z-radius-lg-xl: 16px;
+  --z-radius-xl: 20px;
+  --z-radius-button: 10px;
+  --z-radius-full: 9999px;
+
+  /* ========================================
+     Spacing Scale (4px base)
+     ======================================== */
+  --z-space-1: 4px;
+  --z-space-2: 8px;
+  --z-space-3: 12px;
+  --z-space-4: 16px;
+  --z-space-5: 20px;
+  --z-space-6: 24px;
+  --z-space-8: 32px;
+  --z-space-10: 40px;
+  --z-space-12: 48px;
+
+  /* ════════════════════════════════════════════════════════
+     의미(Semantic) 레이아웃 토큰 — 8pt 위에 "의도" 이름 (2026-06-22 진호 전역통일)
+     원시 px / raw --z-space-* 를 페이지 레이아웃에 직접 박지 말고 이 토큰을 써서
+     화면/카드/섹션/헤더 리듬을 전역 일관되게. 가드 check:card-rhythm 가 카드·섹션
+     수직 간격에 이 토큰을 강제. 값은 8pt 그리드에 매핑.  ════════════════════════════ */
+  --z-page-pad: var(--z-space-4);      /* 화면 좌우 게터 16 — #main-content 가 1회 제공(이중금지) */
+  --z-card-gap: var(--z-space-3);      /* 카드 사이 수직 간격 12 (리스트 리듬 SSOT) */
+  --z-section-gap: var(--z-space-6);   /* 섹션 사이 24 */
+  --z-card-pad: var(--z-space-4);      /* 카드 안쪽 패딩 16 (표준) */
+  --z-header-h: 56px;                  /* 페이지 헤더 행 높이 SSOT (safe-area --sat 는 별도 가산) */
+
+  /* ========================================
+     Layout Constraints
+     ======================================== */
+  --z-max-mobile: 480px;
+
+  /* ========================================
+     Typography Scale — v3.1: 미세 보정형 clamp 반응형
+     360px=min, 360~430px=vw 보간, 430px+=max
+     xs~lg: +1px | xl~3xl: +3px (본문 안전 + 제목 시원하게)
+     ======================================== */
+  --z-text-2xs: 13px; /* 12→13 (진호 2026-06-23): 가독성 최소 하한. 전역 ≥13px (legal 포함, 더 작아야 할 곳은 STYLE-EXCEPTION) */
+  --z-text-xs: clamp(13px, 3.61vw, 14px);
+  --z-text-sm: clamp(14px, 3.89vw, 15px);
+  --z-text-base: clamp(15px, 4.17vw, 16px);
+  --z-text-lg: clamp(17px, 4.72vw, 18px);
+  --z-text-xl: clamp(20px, 5.56vw, 23px);
+  --z-text-2xl: clamp(24px, 6.67vw, 27px);
+  --z-text-3xl: clamp(28px, 7.78vw, 31px);
+  /* 메인 spot 제목 (SpotPreview · SpotDetailSpot) — 30px 통일용 */
+  --z-text-spot-title: clamp(26px, 7.5vw, 30px);
+
+  /* ========================================
+     Transitions
+     ======================================== */
+  --z-transition-fast: 0.15s ease;
+  --z-transition-normal: 0.2s ease;
+  --z-transition-slow: 0.3s ease;
+
+  /* ========================================
+     Page Context Accents (페이지별 컬러 전략)
+     홈=accent(lime), 검색=sky, 상세=indigo+success,
+     프로필=violet, 채팅=sky, 커뮤니티=violet+rose
+     ======================================== */
+  --z-ctx-search: linear-gradient(135deg, rgba(56,189,248,0.06) 0%, rgba(99,102,241,0.03) 100%);
+  --z-ctx-detail: linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(52,211,153,0.03) 100%);
+  --z-ctx-profile: linear-gradient(135deg, rgba(139,92,246,0.06) 0%, rgba(244,114,182,0.03) 100%);
+  --z-ctx-chat: linear-gradient(135deg, rgba(56,189,248,0.05) 0%, rgba(99,102,241,0.03) 100%);
+  --z-ctx-community: linear-gradient(135deg, rgba(139,92,246,0.05) 0%, rgba(244,114,182,0.03) 100%);
+
+  /* Glass Surface (프로스티드 글래스 효과) */
+  --z-glass: rgba(21, 24, 33, 0.75);
+  --z-glass-border: rgba(255,255,255,0.08);
+  --z-glass-blur: 12px;
+
+  /* ════════════════════════════════════════════════════════
+     Dimensional Surface System (2026-06-20) — UI-SURFACE-3D-001 SSOT
+     테마별 기법 분기: 다크=리퀴드 글래스(반투명+backdrop blur+컬러메시 굴절+글로시
+     윗림+쿨 베벨), 라이트=클린 뉴모피즘(불투명 순백 카드+쿨 듀얼 그림자+위 bloom, blur0).
+     역할별 토큰 — 같은 이름, 테마(html[data-theme=light])가 값을 가름.
+     ★ 평면 단색 칩·테두리만 색칠한 버튼 금지 → 채울 땐 이 토큰으로.
+     ※ 위 --z-glass(채팅 오버레이/dim)와 목적 다름 — 혼동 금지. */
+  /* ★ 다크 = ZINOSB 프리미엄 fake glass (2026-06-21 진호 directive — 리퀴드글래스 전면 폐기,
+     다크 전역 fake glass 통일). 아래 dimensional-surface 토큰을 premium-fake-glass.css 의
+     --zg-* 로 리다이렉트 → .z-glass-surface/.z-glass-pill/.z-segment + 170+ 소비처가
+     한 번에 fake glass 로 전환. backdrop-filter 0, 크리스프 1px 윗림 0(S25 스크롤 떨림 진범 제거),
+     넓은 sheen + 소프트 그림자. 옛 값은 git 이력 참고. */
+  --z-surface-blur: none;                                /* backdrop blur 폐기 (전역 fake glass) */
+  --z-surface-edge: var(--zg-edge-strong);              /* 소프트 엣지 (크리스프 1px선 폐기) */
+  --z-card-fill: var(--zg-card-fill);                   /* 카드 면 = fake glass card 티어 */
+  --z-card-fill-strong: var(--zg-control-fill-hover);   /* hover/강조/활성 면 */
+  --z-card-shadow: var(--zg-card-shadow);               /* 소프트 카드 입체 (크리스프 윗림 0) */
+  --z-pill-shadow: var(--zg-control-shadow);            /* 소프트 알약/버튼 입체 */
+  /* 세그먼트(선택형 버튼군): 다크=트랙 raised + 활성 raised 알약 (값만 소프트 fake glass 로) */
+  --z-seg-track-fill: rgba(255, 255, 255, 0.05);
+  --z-seg-track-shadow: var(--z-pill-shadow);
+  --z-seg-on-fill: var(--z-card-fill-strong);
+  --z-seg-on-shadow: var(--zg-control-shadow);
+  /* 주얼(유리구슬) — 바텀네비 활성 같은 "앱의 얼굴" 강조. seg-on 보다 색·입체 한 단계 위.
+     다크=솟은 컬러 글래스(스펙큘러 하이라이트+라임 글로우), 라이트=눌린 라임 알약. */
+  --z-jewel-lime-fill:
+    radial-gradient(115% 80% at 50% -12%, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0) 48%),
+    radial-gradient(100% 120% at 50% 118%, rgba(182,255,42,0.50) 0%, rgba(182,255,42,0) 60%),
+    linear-gradient(165deg, color-mix(in srgb, var(--z-accent) 78%, #ffffff) 0%, color-mix(in srgb, var(--z-accent) 55%, #122000) 100%);
+  --z-jewel-lime-shadow:
+    0 8px 20px rgba(0,0,0,0.45),
+    0 2px 6px rgba(0,0,0,0.35),
+    0 0 20px rgba(182,255,42,0.45),
+    inset 0 2px 1px rgba(255,255,255,0.85),
+    inset 0 -9px 15px -7px rgba(120,180,20,0.55);
+  --z-jewel-lime-edge: rgba(210,255,150,0.55);
+  --z-jewel-lime-text: #0a1500;
+  /* 주얼 sky — 커뮤니티 nav 활성(메인 라임과 구분되는 통일 시안). 다크=솟은 시안 글래스. */
+  --z-jewel-sky-fill:
+    radial-gradient(115% 80% at 50% -12%, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0) 48%),
+    radial-gradient(100% 120% at 50% 118%, rgba(56,189,248,0.50) 0%, rgba(56,189,248,0) 60%),
+    linear-gradient(165deg, color-mix(in srgb, #38bdf8 80%, #ffffff) 0%, color-mix(in srgb, #38bdf8 52%, #06121f) 100%);
+  --z-jewel-sky-shadow:
+    0 8px 20px rgba(0,0,0,0.45),
+    0 2px 6px rgba(0,0,0,0.35),
+    0 0 20px rgba(56,189,248,0.50),
+    inset 0 2px 1px rgba(255,255,255,0.85),
+    inset 0 -9px 15px -7px rgba(20,110,170,0.55);
+  --z-jewel-sky-edge: rgba(160,222,255,0.60);
+  --z-jewel-sky-text: #04121f;
+  /* 주얼 map — 지도(앱 메인 기능) 히어로. 라임→틸→스카이→바이올렛 이리데센트 + 이중 글로우 = 확실히 튀는 색. */
+  --z-jewel-map-fill:
+    radial-gradient(115% 80% at 50% -14%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 46%),
+    radial-gradient(130% 150% at 12% 122%, rgba(139,92,246,0.55) 0%, rgba(139,92,246,0) 55%),
+    radial-gradient(130% 150% at 92% 122%, rgba(56,189,248,0.50) 0%, rgba(56,189,248,0) 55%),
+    linear-gradient(120deg, #b6ff2a 0%, #34e3c8 36%, #38bdf8 64%, #8b5cf6 100%);
+  --z-jewel-map-shadow:
+    0 8px 22px rgba(0,0,0,0.50),
+    0 2px 6px rgba(0,0,0,0.35),
+    0 0 22px rgba(139,92,246,0.50),
+    0 0 30px rgba(56,189,248,0.32),
+    inset 0 2px 1px rgba(255,255,255,0.85),
+    inset 0 -9px 16px -7px rgba(80,40,160,0.50);
+  --z-jewel-map-edge: rgba(205,222,255,0.62);
+  --z-jewel-map-text: #0a0a1a;
+  /* 페이지 캔버스 (다크=컬러 메시 굴절 배경 / 라이트=스노우+스카이 생기) */
+  --z-page-canvas-color: #090b13;
+  --z-page-canvas:
+    radial-gradient(58% 42% at 10% 6%, rgba(139, 92, 246, 0.46) 0%, transparent 60%),
+    radial-gradient(54% 40% at 94% 12%, rgba(56, 189, 248, 0.40) 0%, transparent 60%),
+    radial-gradient(70% 52% at 50% 108%, rgba(244, 114, 182, 0.30) 0%, transparent 62%),
+    radial-gradient(48% 40% at 82% 68%, rgba(34, 211, 238, 0.22) 0%, transparent 60%);
+  --z-electric: #0a84ff;                                 /* 전기 블루 액센트 (표면 위 포인트) */
+
+  /* ════════════════════════════════════════════════════════
+     바텀시트 표면 (테마 자동 — UI-SURFACE-3D-001 / CSS-THEME-OVERRIDE-001 SSOT)
+     ★ 모든 바텀시트 배경은 반드시 이 토큰으로. 손제작 per-theme gradient 를 시트마다
+     박으면, 다크 background:(shorthand) gradient 이미지가 라이트 background-color 오버라이드를
+     이겨 "라이트인데 시커멓게" 보이는 버그가 재발한다(지도 시트 2026-06-22 P0).
+     토큰이 테마별 값을 가지므로 소비처는 오버라이드 0 — background: var(--z-sheet-surface) 만.
+     peek=반투명(지도 비침) · fill-full=불투명 색(full 상태 background-color 로 뒤에 깔림) · edge=윗림. */
+  --z-sheet-surface:
+    radial-gradient(120% 88% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 54%),
+    linear-gradient(180deg, rgba(20,25,40,0.9) 0%, rgba(11,14,23,0.94) 100%);
+  --z-sheet-fill-full: rgba(11,14,23,0.88);
+  --z-sheet-edge: var(--zg-edge-strong);
+  --z-sheet-shadow:
+    0 -8px 32px rgba(0,0,0,0.34),
+    inset 0 2px 6px -2px rgba(255,255,255,0.16);
+
+  /* Chat-specific Glass (뉴트럴 글래스모피즘) */
+  --z-chat-glass-bg: rgba(255, 255, 255, 0.06);
+  --z-chat-glass-border: rgba(255, 255, 255, 0.10);
+  --z-chat-glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+  --z-chat-bubble-mine-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 4px 20px rgba(182, 255, 42, 0.10);
+  --z-chat-input-glow: 0 0 0 3px rgba(182, 255, 42, 0.08), 0 0 16px rgba(182, 255, 42, 0.04);
+  --z-chat-header-glass: rgba(11, 14, 23, 0.85);
+
+  /* Chat Avatar & Status */
+  --z-chat-avatar-glow: radial-gradient(circle, rgba(139,92,246,0.20) 0%, transparent 70%);
+  --z-chat-avatar-pulse: rgba(139,92,246,0.12);
+  --z-chat-status-shimmer: linear-gradient(90deg, var(--z-text-tertiary) 0%, var(--z-violet) 50%, var(--z-text-tertiary) 100%);
+  --z-chat-chip-bg: var(--z-surface-elevated);
+  --z-chat-chip-border: var(--z-border);
+  --z-chat-chip-hover-border: var(--z-violet);
+
+  /* Enhanced Shadow Scale */
+  --z-shadow-xs: 0 1px 1px rgba(0,0,0,0.2);
+  --z-shadow-card: 0 2px 10px rgba(0,0,0,0.32), 0 0 2px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.03);
+  --z-shadow-card-hover: 0 4px 18px rgba(0,0,0,0.38), 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+  --z-shadow-float: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+
+  /* ========================================
+     Rank Metallic (인기 순위 · 다크 배경용)
+     채도 높은 메탈릭 + 대각선 광택 그라데이션
+     ======================================== */
+  --z-rank-gold: #F5D442;
+  --z-rank-gold-light: #FFF1A8;
+  --z-rank-gold-dark: #8B6914;
+  --z-rank-gold-bg: linear-gradient(135deg, rgba(245,212,66,0.55) 0%, rgba(255,241,168,0.28) 50%, rgba(200,150,30,0.48) 100%);
+  --z-rank-gold-border: rgba(245,212,66,0.45);
+  --z-rank-gold-glow: 0 0 14px rgba(245,212,66,0.50), 0 0 6px rgba(255,241,168,0.25);
+  --z-rank-silver: #C8D6E5;
+  --z-rank-silver-light: #EEF2F7;
+  --z-rank-silver-dark: #6B7C8D;
+  --z-rank-silver-bg: linear-gradient(135deg, rgba(200,214,229,0.50) 0%, rgba(238,242,247,0.24) 50%, rgba(138,148,166,0.44) 100%);
+  --z-rank-silver-border: rgba(200,214,229,0.40);
+  --z-rank-silver-glow: 0 0 14px rgba(200,214,229,0.45), 0 0 6px rgba(238,242,247,0.22);
+  --z-rank-bronze: #E8A04A;
+  --z-rank-bronze-light: #F5CC8A;
+  --z-rank-bronze-dark: #8B5A1B;
+  --z-rank-bronze-bg: linear-gradient(135deg, rgba(232,160,74,0.55) 0%, rgba(245,204,138,0.28) 50%, rgba(160,96,48,0.48) 100%);
+  --z-rank-bronze-border: rgba(232,160,74,0.45);
+  --z-rank-bronze-glow: 0 0 14px rgba(232,160,74,0.48), 0 0 6px rgba(245,204,138,0.22);
+
+  /* Section Header Accent Bar */
+  --z-section-bar-accent: linear-gradient(90deg, var(--z-accent) 0%, transparent 100%);
+  --z-section-bar-sky: linear-gradient(90deg, var(--z-sky) 0%, transparent 100%);
+  --z-section-bar-violet: linear-gradient(90deg, var(--z-violet) 0%, transparent 100%);
+  --z-section-bar-success: linear-gradient(90deg, var(--z-success) 0%, transparent 100%);
+
+  /* ========================================
+     Accent Glow Tokens — v3.0: 절제된 글로우 (프리미엄)
+     다크/라이트 모두에서 사용 — 라이트에서 오버라이드
+     ======================================== */
+  --z-accent-glow: rgba(182,255,42,0.18);
+  --z-accent-glow-soft: rgba(182,255,42,0.10);
+  --z-accent-glow-strong: rgba(182,255,42,0.22);
+  --z-accent-glow-new: 0 0 6px rgba(182,255,42,0.5);
+  --z-accent-glow-fab: 0 4px 16px rgba(182,255,42,0.25);
+  --z-inset-highlight: rgba(255,255,255,0.04);
+  --z-inset-highlight-hover: rgba(255,255,255,0.05);
+  --z-inset-highlight-subtle: rgba(255,255,255,0.03);
+  --z-inset-highlight-input: rgba(255,255,255,0.02);
+  --z-overlay-bg: rgba(0,0,0,0.80);
+  --z-overlay-heavy: rgba(0,0,0,0.88);
+
+  /* ========================================
+     Z-Index Layer System (SSOT)
+     충돌 방지용 레이어 스케일 — 직접 숫자 사용 금지 권장
+     새 레이어 추가 시 여기에 정의 후 사용
+     ======================================== */
+  --z-layer-base: 0;
+  --z-layer-content: 1;        /* 인라인 콘텐츠 위 (배지, 오버레이 텍스트) */
+  --z-layer-sticky: 10;        /* sticky 헤더, 프로그레스 바 */
+  --z-layer-dropdown: 20;      /* 드롭다운, 프로필 오버레이 */
+  --z-layer-fixed: 30;         /* fixed 배너, FAB */
+  --z-layer-overlay: 50;       /* 모달 오버레이, 바텀시트 dim */
+  --z-layer-modal: 100;        /* 모달/바텀시트 본체 */
+  --z-layer-modal-above: 110;  /* 모달 위 요소 (확인 다이얼로그) */
+  --z-layer-toast: 200;        /* 토스트/스낵바 */
+  --z-layer-critical: 9999;    /* PWA 설치, 긴급 공지 */
+
+  /* ========================================
+     Phantom token aliases (Case 71 — 2026-05-22 진단)
+     코드에서 호출되지만 정의 없었던 토큰을 alias 로 정식화.
+     호출처 ~580건 silent bug (fallback 없는 var() = 브라우저 무시) 박멸.
+     ======================================== */
+  --z-crew: color-mix(in srgb, var(--z-sky) 60%, var(--z-indigo));
+  --z-gold: var(--z-warning);
+  --z-lime: var(--z-accent);
+  --z-surface-2: var(--z-surface-elevated);
+
+  /* ════════════════════════════════════════════════════════
+     ZINOSB DESIGN TOKENS v2 — 12-STEP LUMINOSITY PALETTE
+     (Case 71 #1 — 2026-05-22, Tailwind v3 차용 + ZINOSB 시그니처 보존)
+
+     Radix Colors / Tailwind / Apple HIG / MD3 검증된 원칙:
+       step 1-2  = 배경 (subtle / app-bg)
+       step 3-5  = 컴포넌트 배경 (default / hover / active)
+       step 6-8  = 보더 (subtle / interactive / hover)
+       step 9-10 = 솔리드 (브랜드 / hover) ← 액션 메인
+       step 11-12 = 텍스트 (low contrast / high contrast)
+
+     라이트/다크 별도 큐레이션 (단순 invert 아님 — 진호 directive).
+     기존 --z-sky/--z-violet 등은 변경 X, 신규 step 토큰만 추가.
+     새 UI 부터 사용. 마이그레이션 강제 X (Phase 1 진호 결정).
+
+     소스: Tailwind v3 공식 팔레트 (sky/violet/rose/indigo/emerald/lime).
+     mint = Tailwind emerald 매핑 (mint hue 와 가장 가까운 검증 팔레트).
+     ════════════════════════════════════════════════════════ */
+
+  /* ── sky (Tailwind sky) — 다크 모드 ── */
+  --z-sky-1: #082f49;
+  --z-sky-2: #0c4a6e;
+  --z-sky-3: #075985;
+  --z-sky-4: #0369a1;
+  --z-sky-5: #0284c7;
+  --z-sky-6: #0ea5e9;
+  --z-sky-7: #38bdf8;
+  --z-sky-8: #7dd3fc;
+  --z-sky-9: #38bdf8;
+  --z-sky-10: #7dd3fc;
+  --z-sky-11: #bae6fd;
+  --z-sky-12: #e0f2fe;
+
+  /* ── violet — 다크 모드 ── */
+  --z-violet-1: #2e1065;
+  --z-violet-2: #4c1d95;
+  --z-violet-3: #5b21b6;
+  --z-violet-4: #6d28d9;
+  --z-violet-5: #7c3aed;
+  --z-violet-6: #8b5cf6;
+  --z-violet-7: #a78bfa;
+  --z-violet-8: #c4b5fd;
+  --z-violet-9: #a78bfa;
+  --z-violet-10: #c4b5fd;
+  --z-violet-11: #ddd6fe;
+  --z-violet-12: #ede9fe;
+
+  /* ── rose — 다크 모드 ── */
+  --z-rose-1: #4c0519;
+  --z-rose-2: #881337;
+  --z-rose-3: #9f1239;
+  --z-rose-4: #be123c;
+  --z-rose-5: #e11d48;
+  --z-rose-6: #f43f5e;
+  --z-rose-7: #fb7185;
+  --z-rose-8: #fda4af;
+  --z-rose-9: #fb7185;
+  --z-rose-10: #fda4af;
+  --z-rose-11: #fecdd3;
+  --z-rose-12: #ffe4e6;
+
+  /* ── indigo — 다크 모드 ── */
+  --z-indigo-1: #1e1b4b;
+  --z-indigo-2: #312e81;
+  --z-indigo-3: #3730a3;
+  --z-indigo-4: #4338ca;
+  --z-indigo-5: #4f46e5;
+  --z-indigo-6: #6366f1;
+  --z-indigo-7: #818cf8;
+  --z-indigo-8: #a5b4fc;
+  --z-indigo-9: #818cf8;
+  --z-indigo-10: #a5b4fc;
+  --z-indigo-11: #c7d2fe;
+  --z-indigo-12: #e0e7ff;
+
+  /* ── mint (Tailwind emerald) — 다크 모드 ── */
+  --z-mint-1: #022c22;
+  --z-mint-2: #064e3b;
+  --z-mint-3: #065f46;
+  --z-mint-4: #047857;
+  --z-mint-5: #059669;
+  --z-mint-6: #10b981;
+  --z-mint-7: #34d399;
+  --z-mint-8: #6ee7b7;
+  --z-mint-9: #34d399;
+  --z-mint-10: #6ee7b7;
+  --z-mint-11: #a7f3d0;
+  --z-mint-12: #d1fae5;
+
+  /* ── lime — 다크 모드 (ZINOSB 시그니처 #B6FF2A 보존, step 9 = signature) ── */
+  --z-lime-1: #1a2e05;
+  --z-lime-2: #365314;
+  --z-lime-3: #3f6212;
+  --z-lime-4: #4d7c0f;
+  --z-lime-5: #65a30d;
+  --z-lime-6: #84cc16;
+  --z-lime-7: #a3e635;
+  --z-lime-8: #bef264;
+  --z-lime-9: #B6FF2A;  /* ZINOSB signature — CTA·메인 액션 전용 */
+  --z-lime-10: #CAFF5C;
+  --z-lime-11: #d9f99d;
+  --z-lime-12: #ecfccb;
+
+  /* ── 차트/데이터 시각화 (2026-07-04 진호 "라이트에서 라임 안 보임" — 테마가 값을 가르는 시맨틱) ──
+     다크 = 네온 라임 그대로 / 라이트 = 라임의 어두운 형제(lime-600~700)로 자동 전환.
+     모든 그래프(막대/라인/게이지/잔디/진행바)는 raw lime-9 대신 이 토큰만 쓴다. */
+  --z-chart-stroke: #B6FF2A;                                /* 라인·강조 막대·큰 수치 */
+  --z-chart-fill: #B6FF2A;                                  /* 채움(막대·게이지) */
+  --z-chart-fill-soft: color-mix(in srgb, #B6FF2A 45%, var(--z-surface));
+  --z-chart-tint: color-mix(in srgb, #B6FF2A 12%, transparent); /* 칩/코치 배경 워시 */
+  --z-chart-muted: rgba(255, 255, 255, 0.22);               /* 지난 기간 비교 시리즈 */
+  --z-chart-baseline: rgba(255, 255, 255, 0.35);            /* 평균 점선 */
+  --z-garden-1: color-mix(in srgb, #B6FF2A 32%, var(--z-surface)); /* 잔디 농도 1~3 */
+  --z-garden-2: color-mix(in srgb, #B6FF2A 62%, var(--z-surface));
+  --z-garden-3: #B6FF2A;
+  /* 대시보드 패널 — 다크는 기존 글래스 카드 그대로(alias), 라이트만 3D 순백 패널로 갈림 */
+  --z-panel-fill: var(--z-card-fill);
+  --z-panel-edge: var(--z-surface-edge);
+  --z-panel-shadow: var(--z-card-shadow);
+
+  /* ── amber (Tailwind amber) — 다크, semantic warning palette ── */
+  --z-amber-1: #451a03;
+  --z-amber-2: #78350f;
+  --z-amber-3: #92400e;
+  --z-amber-4: #b45309;
+  --z-amber-5: #d97706;
+  --z-amber-6: #f59e0b;
+  --z-amber-7: #fbbf24;
+  --z-amber-8: #fcd34d;
+  --z-amber-9: #fbbf24;
+  --z-amber-10: #fcd34d;
+  --z-amber-11: #fde68a;
+  --z-amber-12: #fef3c7;
+
+  /* ── blue (Tailwind blue) — 다크, semantic info palette ── */
+  --z-blue-1: #172554;
+  --z-blue-2: #1e3a8a;
+  --z-blue-3: #1e40af;
+  --z-blue-4: #1d4ed8;
+  --z-blue-5: #2563eb;
+  --z-blue-6: #3b82f6;
+  --z-blue-7: #60a5fa;
+  --z-blue-8: #93c5fd;
+  --z-blue-9: #60a5fa;
+  --z-blue-10: #93c5fd;
+  --z-blue-11: #bfdbfe;
+  --z-blue-12: #dbeafe;
+
+  /* ── red (Tailwind red) — 다크, danger 보강 palette ── */
+  --z-red-1: #450a0a;
+  --z-red-2: #7f1d1d;
+  --z-red-3: #991b1b;
+  --z-red-4: #b91c1c;
+  --z-red-5: #dc2626;
+  --z-red-6: #ef4444;
+  --z-red-7: #f87171;
+  --z-red-8: #fca5a5;
+  --z-red-9: #f87171;
+  --z-red-10: #fca5a5;
+  --z-red-11: #fecaca;
+  --z-red-12: #fee2e2;
+
+  /* ════════════════════════════════════════════════════════
+     ON-COLOR + CONTAINER 쌍 패턴 (Phase 2 #3 — MD3 공식, 2026-05-22)
+     각 컬러마다 4쌍:
+       --z-{tone}            = step 9 (솔리드 액션)
+       --z-on-{tone}         = step 9 위 텍스트 (어두운 글씨 또는 흰 글씨)
+       --z-{tone}-container  = step 2~3 (tint 배경)
+       --z-on-{tone}-container = container 위 텍스트 (step 11)
+     라이트/다크 모두 APCA Lc 60+ 보장 (Phase 2 #5 가드로 자동 검증).
+     ════════════════════════════════════════════════════════ */
+
+  /* ── sky ── */
+  --z-on-sky-9: #082f49;                       /* 다크 sky-9 위는 어두운 글씨 */
+  --z-sky-container: var(--z-sky-3);           /* 다크 = step 3 */
+  --z-on-sky-container: var(--z-sky-11);
+
+  /* ── violet ── */
+  --z-on-violet-9: #2e1065;
+  --z-violet-container: var(--z-violet-3);
+  --z-on-violet-container: var(--z-violet-11);
+
+  /* ── rose ── */
+  --z-on-rose-9: #4c0519;
+  --z-rose-container: var(--z-rose-3);
+  --z-on-rose-container: var(--z-rose-11);
+
+  /* ── red ── */
+  --z-on-red-9: #450a0a;
+  --z-red-container: var(--z-red-3);
+  --z-on-red-container: var(--z-red-11);
+
+  /* ── indigo ── */
+  --z-on-indigo-9: #1e1b4b;
+  --z-indigo-container: var(--z-indigo-3);
+  --z-on-indigo-container: var(--z-indigo-11);
+
+  /* ── mint ── */
+  --z-on-mint-9: #022c22;
+  --z-mint-container: var(--z-mint-3);
+  --z-on-mint-container: var(--z-mint-11);
+
+  /* ── lime (ZINOSB 시그니처) ── */
+  --z-on-lime-9: #000000;                      /* 라임 위는 항상 검정 — 시그니처 */
+  --z-lime-container: var(--z-lime-3);
+  --z-on-lime-container: var(--z-lime-11);
+
+  /* ── amber ── */
+  --z-on-amber-9: #451a03;
+  --z-amber-container: var(--z-amber-3);
+  --z-on-amber-container: var(--z-amber-11);
+
+  /* ── blue ── */
+  --z-on-blue-9: #172554;
+  --z-blue-container: var(--z-blue-3);
+  --z-on-blue-container: var(--z-blue-11);
+
+  /* ════════════════════════════════════════════════════════
+     PAGE CONTEXT — 페이지별 시그니처 톤 (Phase 3 — ADR-0006)
+     사용자가 *어떤 화면인지* 직관 인지하도록 page 마다 살짝 다른 톤.
+     palette step 토큰 참조 — 일관성 보장.
+     사용 예: background: var(--z-ctx-search-bg); color: var(--z-ctx-search-text);
+     ════════════════════════════════════════════════════════ */
+
+  /* search — 지도/검색 = sky (탐색 정서) */
+  --z-ctx-search-bg: var(--z-sky-2);
+  --z-ctx-search-text: var(--z-sky-11);
+  --z-ctx-search-accent: var(--z-sky-9);
+
+  /* community — 피드/커뮤니티 = violet (관심/공유 정서) */
+  --z-ctx-community-bg: var(--z-violet-2);
+  --z-ctx-community-text: var(--z-violet-11);
+  --z-ctx-community-accent: var(--z-violet-9);
+
+  /* profile — 프로필/내정보 = mint (개인 정서) */
+  --z-ctx-profile-bg: var(--z-mint-2);
+  --z-ctx-profile-text: var(--z-mint-11);
+  --z-ctx-profile-accent: var(--z-mint-9);
+
+  /* trade — 거래/매물 = amber (거래/돈 정서) */
+  --z-ctx-trade-bg: var(--z-amber-2);
+  --z-ctx-trade-text: var(--z-amber-11);
+  --z-ctx-trade-accent: var(--z-amber-9);
+
+  /* chat — 채팅/대화 = indigo (소통 정서) */
+  --z-ctx-chat-bg: var(--z-indigo-2);
+  --z-ctx-chat-text: var(--z-indigo-11);
+  --z-ctx-chat-accent: var(--z-indigo-9);
+
+  /* riding — 라이딩/지도 활동 = lime (시그니처, 액션 정서) */
+  --z-ctx-riding-bg: var(--z-lime-2);
+  --z-ctx-riding-text: var(--z-lime-11);
+  --z-ctx-riding-accent: var(--z-lime-9);
+}
+
+/* ── zinosb 3D 입체 유틸 (z-3d-lime/sky/violet 등) — 3d-utility.css 그대로 ── */
+/* ════════════════════════════════════════════════════════════
+   ZINOSB 3D 입체감 유틸리티 클래스
+   ════════════════════════════════════════════════════════════
+   목적: 5겹 부품(blooom + gradient + inset + depth + glow)을 매번
+        조합하지 않고 한 클래스로 풀 입체감 적용.
+
+   사용:
+     선택된 칩/버튼/카드에 z-3d-{color} 클래스 추가
+     예) <button class="z-3d-sky">서울</button>
+
+   적용 대상: 진호 홈화면 8종 아이콘 패턴과 시각 동일
+     라임 — CTA, 진행, 포인트
+     인디고 — 브랜드 공간
+     스카이 — 정보, 인증, 선택
+     민트 — 안전, 성공
+     바이올렛 — 커뮤니티, 프리미엄
+     로즈 — 핫딜, 할인, 긴급
+     골드 — 평점, 경고
+     사이안 — 보조 강조
+
+   CSS Modules에서 사용 시:
+     <button className={`${s.chip} z-3d-sky`}>...</button>
+   ──────────────────────────────────────────────────────────── */
+
+.z-3d-lime,
+.z-3d-indigo,
+.z-3d-sky,
+.z-3d-mint,
+.z-3d-violet,
+.z-3d-rose,
+.z-3d-gold,
+.z-3d-cyan {
+  border: none;
+  color: #fff;
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-sky-glow);
+  transition: transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.z-3d-lime {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-lime-start), var(--z-3d-lime-end));
+  color: var(--z-3d-lime-text);
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-lime-glow);
+}
+
+.z-3d-indigo {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-indigo-start), var(--z-3d-indigo-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-indigo-glow);
+}
+
+.z-3d-sky {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-sky-start), var(--z-3d-sky-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-sky-glow);
+}
+
+.z-3d-mint {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-mint-start), var(--z-3d-mint-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-mint-glow);
+}
+
+.z-3d-violet {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-violet-start), var(--z-3d-violet-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-violet-glow);
+}
+
+.z-3d-rose {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-rose-start), var(--z-3d-rose-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-rose-glow);
+}
+
+.z-3d-gold {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-gold-start), var(--z-3d-gold-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-gold-glow);
+}
+
+.z-3d-cyan {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,var(--z-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--z-3d-cyan-start), var(--z-3d-cyan-end));
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-cyan-glow);
+}
+
+/* 눌린 상태 — 깊이감 반전 */
+.z-3d-lime:active,
+.z-3d-indigo:active,
+.z-3d-sky:active,
+.z-3d-mint:active,
+.z-3d-violet:active,
+.z-3d-rose:active,
+.z-3d-gold:active,
+.z-3d-cyan:active {
+  transform: scale(0.96);
+  box-shadow: var(--z-3d-pressed);
+}
+
+/* ── z-noselect (게임 롱프레스 복사 차단) — globals.css 그대로 ── */
+.z-noselect,
+.z-noselect * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+.z-noselect input,
+.z-noselect textarea,
+.z-noselect select,
+.z-noselect [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}

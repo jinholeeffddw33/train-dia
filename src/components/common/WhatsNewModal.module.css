@@ -101,61 +101,11 @@
 }
 .nameTagLeft { border-left: 3px solid #38BDF8; }
 .nameTagRight { border-right: 3px solid #F472B6; }
-.nameLabel {
-  font-size: var(--dia-text-meta);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 1px;
-}
 .nameTag strong {
   font-size: var(--dia-text-lg);
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: -0.3px;
-}
-
-.internList {
-  list-style: none;
-  margin: 0 0 var(--dia-space-3);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.internItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--dia-surface-hover);
-  border: 1px solid var(--dia-border-light);
-  border-radius: 12px;
-}
-.internBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: var(--dia-text-meta);
-  font-weight: 800;
-  color: #FFFFFF;
-  letter-spacing: 0.5px;
-}
-.internBadgeLeft { background: #38BDF8; }
-.internBadgeRight { background: #F472B6; }
-.internName {
-  font-size: var(--dia-text-base);
-  font-weight: 800;
-  color: var(--dia-text-primary);
-  letter-spacing: -0.2px;
-}
-.internSabun {
-  margin-left: auto;
-  font-size: var(--dia-text-meta);
-  color: var(--dia-text-secondary);
-  font-variant-numeric: tabular-nums;
 }
 
 .welcomeNote {

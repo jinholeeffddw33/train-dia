@@ -91,28 +91,13 @@ export default function WhatsNewModal() {
             />
             <div className={styles.nameOverlay}>
               <span className={`${styles.nameTag} ${styles.nameTagLeft}`}>
-                <span className={styles.nameLabel}>왼쪽</span>
                 <strong>조건희</strong>
               </span>
               <span className={`${styles.nameTag} ${styles.nameTagRight}`}>
-                <span className={styles.nameLabel}>오른쪽</span>
                 <strong>신석희</strong>
               </span>
             </div>
           </figure>
-
-          <ul className={styles.internList}>
-            <li className={styles.internItem}>
-              <span className={`${styles.internBadge} ${styles.internBadgeLeft}`}>왼쪽</span>
-              <span className={styles.internName}>조건희</span>
-              <span className={styles.internSabun}>사번 22601134</span>
-            </li>
-            <li className={styles.internItem}>
-              <span className={`${styles.internBadge} ${styles.internBadgeRight}`}>오른쪽</span>
-              <span className={styles.internName}>신석희</span>
-              <span className={styles.internSabun}>사번 22601146</span>
-            </li>
-          </ul>
 
           <p className={styles.welcomeNote}>
             마주치시면 반갑게 인사 부탁드립니다.

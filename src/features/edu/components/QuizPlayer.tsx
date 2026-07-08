@@ -23,10 +23,16 @@ interface Props {
   title: string;
   url: string;
   onClose: () => void;
-  onViewBody: (page: number) => void;
+  onViewBody: (page: number, article?: number) => void;
 }
 
 const LABELS = ['①', '②', '③', '④'];
+
+/** 해설/문제에서 "제N조"를 찾아 조문 번호 추출 (본문에서 정확한 조문으로 점프하기 위함) */
+function articleNoOf(q: { explanation?: string; question?: string }): number | undefined {
+  const m = /제\s*(\d+)\s*조/.exec(q.explanation ?? '') ?? /제\s*(\d+)\s*조/.exec(q.question ?? '');
+  return m ? parseInt(m[1], 10) : undefined;
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const out = arr.slice();
@@ -256,10 +262,10 @@ export default function QuizPlayer({ title, url, onClose, onViewBody }: Props) {
             <button
               type="button"
               className={styles.bodyRefBtn}
-              onClick={() => onViewBody(q.page)}
+              onClick={() => onViewBody(q.page, articleNoOf(q))}
             >
               <BookOpen size={14} />
-              <span>본문 {q.page}쪽 보기</span>
+              <span>{articleNoOf(q) ? `본문 제${articleNoOf(q)}조 보기` : `본문 ${q.page}쪽 보기`}</span>
             </button>
           </div>
         )}

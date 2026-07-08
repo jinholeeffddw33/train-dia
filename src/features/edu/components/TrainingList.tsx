@@ -61,7 +61,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [activeVideo, setActiveVideo] = useState<{ title: string; youtubeId: string } | null>(null);
-  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string; pdfUrl?: string; initialPage?: number } | null>(null);
+  const [activeDoc, setActiveDoc] = useState<{ title: string; url: string; pdfUrl?: string; initialPage?: number; initialArticle?: number } | null>(null);
   const [activeQuiz, setActiveQuiz] = useState<{ title: string; url: string; docUrl?: string; pdfUrl?: string } | null>(null);
 
   const closePlayer = useCallback(() => setActiveVideo(null), []);
@@ -241,6 +241,7 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
           url={activeDoc.url}
           pdfUrl={activeDoc.pdfUrl}
           initialPage={activeDoc.initialPage}
+          initialArticle={activeDoc.initialArticle}
           onClose={closeDoc}
         />
       )}
@@ -251,13 +252,14 @@ export default function TrainingList({ onBack, onSlide }: TrainingListProps) {
           title={activeQuiz.title}
           url={activeQuiz.url}
           onClose={closeQuiz}
-          onViewBody={(page) => {
+          onViewBody={(page, article) => {
             if (activeQuiz.docUrl) {
               setActiveDoc({
                 title: activeQuiz.title,
                 url: activeQuiz.docUrl,
                 pdfUrl: activeQuiz.pdfUrl,
                 initialPage: page,
+                initialArticle: article,
               });
             }
           }}

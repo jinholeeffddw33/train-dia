@@ -22,6 +22,8 @@ interface Props {
   url: string;
   pdfUrl?: string;
   initialPage?: number;
+  /** 문제 해설에서 추출한 조문 번호 — 지정 시 해당 "제N조"로 정확히 스크롤 */
+  initialArticle?: number;
   onClose: () => void;
 }
 
@@ -154,7 +156,7 @@ function parseToc(pages: RegulationPage[]): TocEntry[] {
   return entries.sort((a, b) => (a.page === b.page ? a.startInPage - b.startInPage : a.page - b.page));
 }
 
-export default function RegulationViewer({ title, url, pdfUrl, initialPage, onClose }: Props) {
+export default function RegulationViewer({ title, url, pdfUrl, initialPage, initialArticle, onClose }: Props) {
   const [pages, setPages] = useState<RegulationPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -215,16 +217,35 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
     return () => { active = false; };
   }, [url]);
 
-  // initialPage가 지정되면 해당 페이지로 스크롤
+  // 진입 위치 스크롤 — 조문(제N조)이 지정되면 그 조문으로, 없으면 페이지 최상단으로
   useEffect(() => {
-    if (!initialPage || loading || pages.length === 0) return;
-    const el = pageRefs.current.get(initialPage);
-    if (el) {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: 'auto', block: 'start' });
-      });
+    if (loading || pages.length === 0) return;
+    const scrollToEl = (el: HTMLElement) => {
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: 'auto', block: 'start' }));
+    };
+    // 1) 조문 우선 — 같은 페이지의 조문을 우선 선택(부칙 등 중복 방어), 없으면 첫 매치
+    if (initialArticle && bodyRef.current) {
+      const marks = Array.from(
+        bodyRef.current.querySelectorAll<HTMLElement>(`[data-article="${initialArticle}"]`),
+      );
+      if (marks.length > 0) {
+        let target = marks[0];
+        if (initialPage) {
+          const onPage = marks.find(
+            (m) => m.closest('[data-page]')?.getAttribute('data-page') === String(initialPage),
+          );
+          if (onPage) target = onPage;
+        }
+        scrollToEl(target);
+        return;
+      }
     }
-  }, [initialPage, loading, pages]);
+    // 2) 폴백 — 페이지 최상단
+    if (initialPage) {
+      const el = pageRefs.current.get(initialPage);
+      if (el) scrollToEl(el);
+    }
+  }, [initialArticle, initialPage, loading, pages]);
 
   // 본문 스크롤에 따라 현재 보이는 페이지 추적
   useEffect(() => {
@@ -579,8 +600,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, onCl
           );
           if (countRe) localMatchOffset += (pre.match(countRe) || []).length;
         }
+        const artNumMatch = /제\s*(\d+)\s*조/.exec(m[0]);
         children.push(
-          <span key={`a-${subKey++}`} className={styles.articleMark}>
+          <span
+            key={`a-${subKey++}`}
+            className={styles.articleMark}
+            data-article={artNumMatch ? artNumMatch[1] : undefined}
+          >
             {renderHighlighted(m[0], pageStartIdx + localMatchOffset)}
           </span>,
         );

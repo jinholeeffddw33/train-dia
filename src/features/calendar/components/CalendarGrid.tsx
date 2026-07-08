@@ -106,9 +106,9 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
         isMySwap = !!(swap && driver && swap.driverId === driver.I);
         dia = isMySwap ? swap!.dia : originalDia;
         type = dia ? getType(dia) : null;
-        // 캘린더에서는 휴무 번호 표시 (휴37 등), 비번은 라벨만
+        // 캘린더에서는 휴무 번호 표시 (휴37 등), 비번은 '~' 기호만 (색·글자 혼란 제거)
         display = dia
-          ? (dia.startsWith('휴') ? dia : getDiaDisplay(dia))
+          ? (dia.startsWith('휴') ? dia : dia.endsWith('~') ? '~' : getDiaDisplay(dia))
           : '';
       }
       const hol = isHoliday(date);

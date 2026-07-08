@@ -697,6 +697,15 @@
   border-radius: 3px;
 }
 
+/* 결원 — 담당 미배정. 클릭 불가 회색 라벨(타 소속 기관사 오인 방지) */
+.tkDriverVacant {
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
 .tkDest {
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-semibold);

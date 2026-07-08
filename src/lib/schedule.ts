@@ -612,7 +612,10 @@ export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPo
     const isYesterday = date.getTime() < todayDate.getTime();
 
     for (const person of P) {
-      if (person.n.startsWith('결원')) continue;
+      // 결원은 스킵하지 않고 "결원" 라벨로 표시 — 안 하면 답십리 담당인데도
+      // 이름이 비어 다른 소속(영등포 등) 기관사로 오인됨.
+      const isVacant = person.n.startsWith('결원');
+      const displayName = isVacant ? '결원' : person.n;
       const dia = getDia(person, date);
       if (getType(dia) === 'rest') continue;
 
@@ -620,10 +623,11 @@ export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPo
       if (!sc || !sc.g || sc.g.length === 0) continue;
 
       // 어제 스케줄은 야간(자정 넘김)만 확인
+      let startMinsY = -1;
       if (isYesterday) {
-        const startMins = sc.s ? timeToMins(sc.s) : -1;
+        startMinsY = sc.s ? timeToMins(sc.s) : -1;
         const endMins = sc.e ? timeToMins(sc.e) : -1;
-        if (startMins < 0 || endMins < 0 || endMins >= startMins) continue;
+        if (startMinsY < 0 || endMins < 0 || endMins >= startMinsY) continue;
       }
 
       const segs = sc.g;
@@ -638,7 +642,14 @@ export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPo
         let isMargin = false;
 
         if (arrMins > depMins) {
-          if (!isYesterday && nowMins >= depMins && nowMins < arrMins) isStrict = true;
+          // 자정 안 넘기는 구간
+          if (!isYesterday) {
+            if (nowMins >= depMins && nowMins < arrMins) isStrict = true;
+          } else {
+            // 어제 야간근무의 '자정 이후 이른 아침' 구간 (주박 후 첫차 운행 등).
+            // 출발이 근무 시작시각보다 이르면 = 자정 넘긴 아침 구간 → 저녁 구간은 자동 제외.
+            if (depMins < startMinsY && nowMins >= depMins && nowMins < arrMins) isStrict = true;
+          }
         } else {
           // 자정 넘김
           if (isYesterday) {
@@ -694,16 +705,16 @@ export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPo
           for (let k = 0; k < seg.n.length; k++) {
             if (gatedOut(k)) continue;
             const key = String(seg.n[k]);
-            strictMap.set(key, person.n);
-            strictDiaMap.set(key, { name: person.n, dia, date });
+            strictMap.set(key, displayName);
+            strictDiaMap.set(key, { name: displayName, dia, date });
           }
         } else if (isMargin) {
           for (let k = 0; k < seg.n.length; k++) {
             if (gatedOut(k)) continue;
             const key = String(seg.n[k]);
             if (!marginMap.has(key)) {
-              marginMap.set(key, person.n);
-              marginDiaMap.set(key, { name: person.n, dia, date });
+              marginMap.set(key, displayName);
+              marginDiaMap.set(key, { name: displayName, dia, date });
             }
           }
         }

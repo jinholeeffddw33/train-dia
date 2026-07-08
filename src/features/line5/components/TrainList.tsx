@@ -150,7 +150,9 @@ function TrainList() {
                     className={`${styles.tkTrainBox} ${styles.tkTrainDown} ${t.status === '0' ? styles.tkTrainArriving : ''}`}
                   >
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
-                    {driver && (
+                    {driver && (driver === '결원' ? (
+                      <span className={styles.tkDriverVacant}>결원</span>
+                    ) : (
                       <button
                         type="button"
                         className={styles.tkDriverName}
@@ -160,7 +162,7 @@ function TrainList() {
                       >
                         {driver}
                       </button>
-                    )}
+                    ))}
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleDown}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
                   </div>
@@ -206,7 +208,9 @@ function TrainList() {
                   >
                     <span className={`${styles.tkCapsule} ${styles.tkCapsuleUp}`} />
                     <span className={styles.tkTrainNo}>{t.trainNo}</span>
-                    {driver && (
+                    {driver && (driver === '결원' ? (
+                      <span className={styles.tkDriverVacant}>결원</span>
+                    ) : (
                       <button
                         type="button"
                         className={styles.tkDriverName}
@@ -216,7 +220,7 @@ function TrainList() {
                       >
                         {driver}
                       </button>
-                    )}
+                    ))}
                     {t.dest && <span className={styles.tkDest}>{t.dest}</span>}
                   </div>
                 );

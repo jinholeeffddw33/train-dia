@@ -1,13 +1,15 @@
-/* 근무 1개 행로도 조각 — 역 간격을 압축해 카드 폭에 스크롤 없이 맞춤 */
+/* 근무 1개 행로도 조각 — 원본 실척(1:1) 렌더, 넓으면 칸 안에서 가로 스크롤 */
 .scroll {
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: var(--dia-space-1) 0;
 }
 
 .svg {
   display: block;
-  width: 100%;
   height: auto;
+  max-width: none;
 }
 
 .rdLine {
@@ -66,6 +68,21 @@
   font-size: var(--dia-text-meta); /* 열번 배지 — 13px */
   font-weight: 700;
   fill: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* 회송열차(5900번대) — 야광 라임으로 영업열차와 구분 */
+.rdPillHs {
+  fill: var(--dia-lime-dim);
+  stroke: var(--dia-lime);
+  stroke-width: 1.8;
+}
+
+.rdPillTxHs {
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  fill: var(--dia-lime);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }

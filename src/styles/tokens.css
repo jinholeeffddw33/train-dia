@@ -29,6 +29,8 @@
   --dia-amber-dim: rgba(245, 158, 11, 0.15);
   --dia-red: #EF4444;
   --dia-red-dim: rgba(239, 68, 68, 0.15);
+  --dia-lime: #A3E635;          /* 회송열차 야광 라임 (다크). 라이트는 :root.light 오버라이드 */
+  --dia-lime-dim: rgba(163, 230, 53, 0.14);
   --dia-gray: #6B7280;
   --dia-sky: #38BDF8;
 
@@ -375,6 +377,8 @@
    ========================================== */
 :root.light {
   color-scheme: light;
+  --dia-lime: #4D7C0F;          /* 회송 라임 — 라이트 배경 가독(진한 라임) */
+  --dia-lime-dim: rgba(101, 163, 13, 0.14);
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */
   --dia-amber-text: #B45309;    /* light bg 위 텍스트 (4.5:1 on white) */
   --dia-sky-text: #0284C7;      /* light bg 위 텍스트 (4.5:1 on white) */

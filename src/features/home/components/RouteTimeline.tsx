@@ -7,8 +7,8 @@ import { findExchangePartners, timeToMins } from '@/lib/schedule';
 import { LABELS } from '@/lib/constants';
 import { useAlarmStore, NORMAL_OPTIONS, DEPOT_OPTIONS, ALARM_LABELS, FIXED_TIME_OPTIONS } from '@/stores/alarm';
 import { useDriverStore } from '@/stores/driver';
-import RouteDiagram from './RouteDiagram';
 import { getRouteDiagram } from '@/data/routeDiagrams';
+import RouteDiagram from './RouteDiagram';
 import styles from '../styles/Home.module.css';
 
 interface RouteTimelineProps {
@@ -66,8 +66,6 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
   const diaNum = dia ? parseInt(dia.replace(/\D/g, '')) : 0;
   const isDia85to91 = diaNum >= 85 && diaNum <= 91;
   const [alarmOpenIdx, setAlarmOpenIdx] = useState<number | null>(null);
-  // 행로도(노선 축) — 데이터 있는 교번은 근무별 인라인 표시
-  const hasDia = !!getRouteDiagram(dia);
 
   // 야간 여부 (익일 근무 판별)
   const isOvernight = useMemo(() => {
@@ -79,6 +77,9 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
     () => findExchangePartners(schedule, person, date),
     [schedule, person, date],
   );
+
+  // 행로도(평일 주간근무만) — 있으면 열번 텍스트 대신 노선 축 그림 표시
+  const routeDiagram = useMemo(() => getRouteDiagram(dia, date), [dia, date]);
 
   // 구간별 행로 약호 분리: "답마방기,기방마답" → ["답마방기", "기방마답"]
   const routeParts = useMemo(() => {
@@ -124,9 +125,9 @@ export default function RouteTimeline({ schedule, person, date, dia }: RouteTime
                 </div>
               )}
 
-              {/* 구간 실행: 행로도(데이터 있으면 근무별 인라인) 또는 출발→열번→도착 */}
-              {hasDia ? (
-                <RouteDiagram dia={dia!} seg={i} />
+              {/* 구간 실행: 행로도(평일 주간)가 있으면 노선 축 그림, 없으면 출발→열번→도착 텍스트 */}
+              {routeDiagram?.segs[i] ? (
+                <RouteDiagram dia={dia!} seg={i} date={date} />
               ) : (
                 <div className={styles.rtRun}>
                   <span className={styles.rtDep}>{seg.d}</span>

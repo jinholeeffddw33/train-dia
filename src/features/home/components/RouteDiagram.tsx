@@ -4,18 +4,21 @@ import { getRouteDiagram } from '@/data/routeDiagrams';
 import styles from './RouteDiagram.module.css';
 
 interface Props {
-  /** 교번 (예: "79") */
+  /** 교번 (예: "7") */
   dia: string;
-  /** 근무 index (0 = 1근무, 1 = 2근무) */
+  /** 근무 index (0 = 1근무, 1 = 2근무 …) */
   seg: number;
+  /** 날짜 — 평일/휴일 판별용 */
+  date?: Date;
 }
 
 /**
  * 행로도(노선 축) — 근무 1개 조각을 카드 안에 인라인 표시.
- * 가로 = 노선 위치(왼쪽 방화 / 오른쪽 마천·하남). 출발시각은 크고 진하게 강조.
+ * 가로 = 노선 위치(왼쪽 방화 / 오른쪽 마천·하남). 원본 실척(1:1), 넓으면 좌우 스크롤.
+ * 현재는 평일 주간근무만 데이터 제공(getRouteDiagram이 야간·휴일은 undefined 반환).
  */
-export default function RouteDiagram({ dia, seg }: Props) {
-  const d = getRouteDiagram(dia);
+export default function RouteDiagram({ dia, seg, date }: Props) {
+  const d = getRouteDiagram(dia, date);
   const s = d?.segs[seg];
   if (!s) return null;
 
@@ -26,6 +29,8 @@ export default function RouteDiagram({ dia, seg }: Props) {
       <svg
         className={styles.svg}
         viewBox={`${vx} ${vy} ${vw} ${vh}`}
+        width={vw}
+        height={vh}
         role="img"
         aria-label={`${seg + 1}근무 행로`}
       >
@@ -52,11 +57,23 @@ export default function RouteDiagram({ dia, seg }: Props) {
           </text>
         ))}
 
-        {/* 열차번호 알약 */}
+        {/* 열차번호 알약 — 회송(5900번대)은 야광 라임으로 구분 */}
         {s.pills.map((p, i) => (
           <g key={`pl${i}`}>
-            <rect className={styles.rdPill} x={p.x} y={p.y} width={46} height={22} rx={11} />
-            <text className={styles.rdPillTx} x={p.x + 23} y={p.y + 15} textAnchor="middle">
+            <rect
+              className={p.hs ? styles.rdPillHs : styles.rdPill}
+              x={p.x}
+              y={p.y}
+              width={46}
+              height={22}
+              rx={11}
+            />
+            <text
+              className={p.hs ? styles.rdPillTxHs : styles.rdPillTx}
+              x={p.x + 23}
+              y={p.y + 15}
+              textAnchor="middle"
+            >
               {p.t}
             </text>
           </g>

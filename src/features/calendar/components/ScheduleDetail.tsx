@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Warehouse } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useMemoStore } from '@/stores/memo';
 import { useSwapStore } from '@/stores/swap';
-import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime, isHoliday } from '@/lib/schedule';
+import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime, isHoliday, isDepotStart } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import styles from '../styles/Calendar.module.css';
 
@@ -63,6 +64,7 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
       isSwapped: !!isMySwap,
       originalDia,
       originalDisplay: getDiaDisplay(originalDia),
+      depotStart: isDepotStart(dia, date),  // 기지 출근(잊기 쉬움) 판별
     };
   }, [driver, dateStr, swap]);
 
@@ -72,8 +74,9 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
 
   return (
     <div className={`${styles.detail} ${info.isSwapped ? styles.detailSwapped : ''}`}>
+      {/* 날짜는 모달 제목에 있으므로 헤더엔 요일·교번배지·행로만 (중복 방지) */}
       <div className={styles.detailHeader}>
-        <span className={styles.detailDate}>{month}월 {day}일 ({dow})</span>
+        <span className={styles.detailDow}>{dow}요일</span>
         <span className={`${styles.detailBadge} ${info.isSwapped ? styles.detailTypeSwapped : styles[`detailType_${info.type}`]}`}>
           {info.display}
         </span>
@@ -82,6 +85,15 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
           <span className={styles.detailSwapTag}>변경 (원래: {info.originalDisplay})</span>
         )}
       </div>
+
+      {/* 기지 출근 — 잊기 쉬우니 눈에 띄게 별도 표시 */}
+      {info.depotStart && (
+        <div className={styles.detailDepotBanner}>
+          <Warehouse size={18} className={styles.detailDepotIcon} />
+          <span className={styles.detailDepotText}>기지 출근</span>
+          <span className={styles.detailDepotSub}>기지로 바로 출근하세요</span>
+        </div>
+      )}
 
       {/* 교번 변경 취소 버튼 — 버튼 4법 ② 무색 3D 솟음(되돌리기=보조 단발 액션) */}
       {info.isSwapped && (

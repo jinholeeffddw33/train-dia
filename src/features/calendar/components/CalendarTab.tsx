@@ -9,6 +9,7 @@ import CalendarGrid from './CalendarGrid';
 import ScheduleDetail from './ScheduleDetail';
 import SwapBottomSheet from './SwapBottomSheet';
 import MissionCardModal from './MissionCardModal';
+import Modal from '@/components/common/Modal';
 import { MonthSummary, DutyInfoCard } from '@/features/home';
 import styles from '../styles/Calendar.module.css';
 import missionStyles from '../styles/MissionCard.module.css';
@@ -28,6 +29,7 @@ export default function CalendarTab() {
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(todayStr);
+  const [detailOpen, setDetailOpen] = useState(false); // 날짜 탭 → 근무 상세 팝업
   const [swapMode, setSwapMode] = useState(false);
   const [swapTargetDate, setSwapTargetDate] = useState<string | null>(null);
   const [missionOpen, setMissionOpen] = useState(false);
@@ -61,7 +63,9 @@ export default function CalendarTab() {
       // 교번변경 모드: 날짜 탭 → 바텀시트 열기
       setSwapTargetDate(dateStr);
     } else {
+      // 날짜 탭 → 선택 + 근무 상세 팝업 즉시 표시(아래로 스크롤 불필요)
       setSelectedDate(dateStr);
+      setDetailOpen(true);
     }
   };
 
@@ -138,8 +142,19 @@ export default function CalendarTab() {
         </div>
       )}
 
-      {/* 선택된 날짜 상세 — 기관사만 */}
-      {!officeMode && selectedDate && !swapMode && <ScheduleDetail dateStr={selectedDate} />}
+      {/* 선택된 날짜 상세 — 기관사만. 달력 아래가 아니라 팝업(모달)으로 즉시 표시 */}
+      {!officeMode && selectedDate && (
+        <Modal
+          open={detailOpen && !swapMode}
+          onClose={() => setDetailOpen(false)}
+          title={(() => {
+            const [, m, dd] = selectedDate.split('-');
+            return `${Number(m)}월 ${Number(dd)}일 근무`;
+          })()}
+        >
+          <ScheduleDetail dateStr={selectedDate} />
+        </Modal>
+      )}
 
       {/* 월간 근무 요약 + 내근 근무 */}
       <MonthSummary />

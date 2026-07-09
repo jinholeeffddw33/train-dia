@@ -265,25 +265,23 @@
 }
 
 /* ── Detail ── */
+/* 모달(바텀시트) 내부 — 자체 카드 배경 없이 시트 위에 바로(두 겹 방지) */
 .detail {
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-xl);
-  padding: var(--dia-space-5);
-  animation: slideUp 200ms var(--dia-ease);
+  padding: var(--dia-space-2) var(--dia-space-4) var(--dia-space-5);
 }
 
 .detailHeader {
   display: flex;
   align-items: center;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
   margin-bottom: var(--dia-space-4);
 }
 
-.detailDate {
-  font-size: var(--dia-text-base);
+.detailDow {
+  font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
-  color: var(--dia-text-primary);
+  color: var(--dia-text-secondary);
 }
 
 .detailBadge {
@@ -304,6 +302,35 @@
   color: var(--dia-text-secondary);
 }
 
+/* 기지 출근 — 잊기 쉬우니 빨강 배너로 강조(라이트/다크 공통) */
+.detailDepotBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+  border: 1.5px solid var(--dia-red);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-red-dim);
+}
+
+.detailDepotIcon {
+  color: var(--dia-red);
+  flex-shrink: 0;
+}
+
+.detailDepotText {
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-red);
+}
+
+.detailDepotSub {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
 .detailSchedule {
   padding-top: var(--dia-space-3);
   border-top: 1px solid var(--dia-border-light);
@@ -312,26 +339,35 @@
 
 .detailTimeRow {
   display: flex;
-  gap: var(--dia-space-4);
+  gap: var(--dia-space-3);
   margin-bottom: var(--dia-space-3);
 }
 
+/* 출근·퇴근·근무 — 시트 위에서도 또렷한 칩(라이트/다크 공통) */
 .detailTimeItem {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-4) var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1.5px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-lg);
 }
 
 .detailTimeLabel {
-  font-size: var(--dia-text-xs);
-  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
 }
 
 .detailTimeValue {
-  font-size: var(--dia-text-lg);
-  font-weight: var(--dia-weight-bold);
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
   color: var(--dia-text-primary);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 .detailRoute {

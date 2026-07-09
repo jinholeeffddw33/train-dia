@@ -26,9 +26,8 @@
   width: 100%;
   max-width: 480px;
   max-height: 85vh;
-  max-height: 85dvh; /* iOS 툴바 수축 대응 — 지원 브라우저는 동적 뷰포트 기준 */
-  /* 키보드 열림 시: --sheet-max(visualViewport 높이, Modal.tsx가 주입)로 캡 → 목록이 키보드 뒤로 안 가려짐 */
-  max-height: min(85dvh, var(--sheet-max, 85dvh));
+  max-height: 85dvh; /* iOS 툴바 수축 대응 — 지원 브라우저는 동적 뷰포트 기준.
+                        키보드는 viewport interactiveWidget:resizes-content 가 레이아웃 리사이즈로 처리 */
   /* ★ 불투명 시트필(글래스 위 솔리드). 반투명 --dia-surface 금지 — 뒤 콘텐츠 비침(진호 2026-06-23). */
   background: var(--dia-sheet-fill);
   border-top: 1px solid var(--dia-border);

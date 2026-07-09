@@ -97,28 +97,6 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
     };
   }, [open, handleKeyDown]);
 
-  // 키보드 회피 — visualViewport 로 '키보드 뺀 실제 보이는 영역'에 오버레이를 맞춤.
-  // 시트가 키보드 위로 올라오고, 목록이 키보드 뒤로 가려지지 않는다(입력형 바텀시트 공통).
-  useEffect(() => {
-    if (!open || typeof window === 'undefined') return;
-    const vv = window.visualViewport;
-    const overlay = overlayRef.current;
-    if (!vv || !overlay) return;
-    const apply = () => {
-      overlay.style.top = `${vv.offsetTop}px`;
-      overlay.style.height = `${vv.height}px`;
-      overlay.style.bottom = 'auto';
-      overlay.style.setProperty('--sheet-max', `${Math.round(vv.height)}px`);
-    };
-    apply();
-    vv.addEventListener('resize', apply);
-    vv.addEventListener('scroll', apply);
-    return () => {
-      vv.removeEventListener('resize', apply);
-      vv.removeEventListener('scroll', apply);
-    };
-  }, [open]);
-
   // 외부에서 open=false 로 닫힌 경우 closing 상태 리셋 (다음 오픈 때 내려간 채로 뜨는 것 방지)
   useEffect(() => {
     if (!open && (closeTimer.current || closing)) {

@@ -64,13 +64,22 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
       <div className={styles.selectorSearch}>
         <input
           ref={inputRef}
-          type="text"
+          type="search"
+          inputMode="search"
           className={styles.searchInput}
           placeholder="이름 또는 번호로 검색"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           enterKeyHint="search"
           aria-label="기관사 검색"
+          /* 브라우저 자동완성 액세서리 바(비밀번호·카드·주소 흰 띠) 억제 → 목록 가림 방지 */
+          name="driver-search"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          data-1p-ignore
+          data-lpignore="true"
         />
         {query && (
           <button

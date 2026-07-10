@@ -30,7 +30,7 @@
   font-variant-numeric: tabular-nums;
   /* 연결선 위에 겹쳐도 읽히도록 배경색 테두리(halo) */
   paint-order: stroke;
-  stroke: var(--dia-surface);
+  stroke: var(--dia-bg);
   stroke-width: 3px;
   stroke-linejoin: round;
 }
@@ -42,7 +42,7 @@
   fill: var(--dia-text-primary);
   font-variant-numeric: tabular-nums;
   paint-order: stroke;
-  stroke: var(--dia-surface);
+  stroke: var(--dia-bg);
   stroke-width: 3.5px;
   stroke-linejoin: round;
 }
@@ -52,14 +52,14 @@
   font-weight: 800;
   fill: var(--dia-red);
   paint-order: stroke;
-  stroke: var(--dia-surface);
+  stroke: var(--dia-bg);
   stroke-width: 3px;
   stroke-linejoin: round;
 }
 
 /* 열차번호 알약 — 야간 카드 톤(보라)과 어울리게 */
 .rdPill {
-  fill: var(--dia-surface);
+  fill: var(--dia-bg);
   stroke: var(--dia-purple);
   stroke-width: 1.3;
 }

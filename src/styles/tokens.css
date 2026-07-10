@@ -277,7 +277,9 @@
   --z-radius-xl: var(--dia-radius-2xl);
   --z-radius-full: var(--dia-radius-full);
   --z-text-primary: var(--dia-text-primary);
+  --z-text-secondary: var(--dia-text-secondary); /* 브리지 누락분 — 안 하면 apex 다크값 고정→라이트서 순위 안보임 */
   --z-text-tertiary: var(--dia-text-tertiary);
+  --z-text-muted: var(--dia-text-tertiary);
   --z-transition-fast: var(--dia-transition-fast);
   --z-surface: var(--dia-bg-elevated);          /* @supports 불투명 폴백 (솔리드) */
   --z-border: var(--dia-border);
@@ -377,6 +379,12 @@
    ========================================== */
 :root.light {
   color-scheme: light;
+  /* 게임(apex) 텍스트 토큰 — apex-globals.css 는 :root 다크값 고정이라 지연로드로 :root 브리지를 덮음.
+     :root.light(특이성 0,1,1)로 라이트서만 앱 토큰(어두운 글자)으로 이겨서 순위/이름 가독 확보. */
+  --z-text-primary: var(--dia-text-primary);
+  --z-text-secondary: var(--dia-text-secondary);
+  --z-text-tertiary: var(--dia-text-tertiary);
+  --z-text-muted: var(--dia-text-tertiary);
   --dia-lime: #4D7C0F;          /* 회송 라임 — 라이트 배경 가독(진한 라임) */
   --dia-lime-dim: rgba(101, 163, 13, 0.14);
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */

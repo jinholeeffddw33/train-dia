@@ -1,0 +1,46 @@
+독점 소프트웨어 라이선스 (Proprietary License)
+Train DIA — 답십리승무사업소 기관사 근무표 앱 (dia5.kr)
+
+Copyright (c) 2026 이진호 (Train DIA). All rights reserved. 무단복제 금지.
+
+------------------------------------------------------------------------
+한국어
+------------------------------------------------------------------------
+본 소프트웨어와 그 소스 코드, 데이터(다이아·교번·행로·교대자 매칭 로직 등),
+디자인, 화면 구성은 저작권자(이진호 / Train DIA)의 독점적 저작물입니다.
+
+저작권자의 사전 서면 허락 없이 다음 행위를 금지합니다.
+  1. 소스 코드·빌드 결과물의 전부 또는 일부 복제, 배포, 전송
+  2. 다른 사업소·조직·서비스로의 이식, 재사용, 2차적 저작물 작성
+  3. 디자인·화면 구성만 변경한 사실상 동일 앱의 제작·운영
+  4. 데이터·알고리즘의 추출, 역설계(reverse engineering)
+
+본 저작물에는 원작자 식별을 위한 지문(fingerprint), 미끼 데이터(canary),
+워터마크가 포함되어 있으며, 무단 복제 시 이를 근거로 원작 및 복제 사실을
+입증할 수 있습니다. 최초 저작 시점은 본 저장소의 git 커밋 이력으로 증명됩니다.
+
+무단 사용이 확인될 경우 저작권법에 따른 민·형사상 책임과 소속 상급기관에 대한
+통보가 이루어질 수 있습니다.
+
+------------------------------------------------------------------------
+English
+------------------------------------------------------------------------
+This software, including its source code, data (train diagrams, duty
+numbers, routes, crew-exchange matching logic, etc.), design, and UI
+composition, is the exclusive copyrighted work of the copyright holder
+(Jinho Lee / Train DIA).
+
+Without the prior written permission of the copyright holder, the
+following are prohibited: reproduction, distribution, or transmission of
+the source code or build artifacts in whole or in part; porting, reuse,
+or creation of derivative works for any other office, organization, or
+service; production or operation of a substantially identical app with
+only cosmetic/design changes; and extraction or reverse engineering of
+the data or algorithms.
+
+This work contains fingerprints, canary data, and watermarks for
+authorship identification. Unauthorized copying can be proven on that
+basis, and the original authorship date is evidenced by this
+repository's git commit history.
+
+All rights reserved.

@@ -6,6 +6,7 @@ import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Chevron
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
+import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
 import HubHero from './HubHero';
@@ -168,6 +169,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
       <div className={styles.footer}>
         <span className={styles.footerBrand}>Train DIA</span>
         <span className={styles.footerVersion}>{APP_VERSION}</span>
+        <span className={styles.footerCopyright}>{COPYRIGHT_NOTICE}</span>
       </div>
     </div>
   );

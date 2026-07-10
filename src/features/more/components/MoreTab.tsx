@@ -28,6 +28,7 @@ import LevelRecordsOverlay from './LevelRecordsOverlay';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { showToast } from '@/components/common/Toast';
 import { APP_VERSION } from '@/lib/constants';
+import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import styles from '../styles/More.module.css';
 
 const LEVEL_ADMIN_SABUN = '21711694'; // 이현구
@@ -431,6 +432,14 @@ export default function MoreTab() {
             <span className={styles.settingLabel}>버전</span>
           </div>
           <span className={styles.settingValue}>{APP_VERSION}</span>
+        </div>
+
+        {/* 저작권 — 무단복제 억제 표기 */}
+        <div className={styles.settingRow}>
+          <div className={styles.settingInfo}>
+            <span className={styles.settingIcon}>©</span>
+            <span className={styles.settingLabel}>{COPYRIGHT_NOTICE}</span>
+          </div>
         </div>
 
         {/* 로그아웃 */}

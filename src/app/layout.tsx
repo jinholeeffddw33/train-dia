@@ -5,6 +5,8 @@ import DevThemeToggle from '@/components/dev/DevThemeToggle';
 import GlassTapSweep from '@/components/common/GlassTapSweep';
 import ServiceWorkerRegistrar from '@/components/common/ServiceWorkerRegistrar';
 import ToastContainer from '@/components/common/Toast';
+import Provenance from '@/components/common/Provenance';
+import { COPYRIGHT_NOTICE, COPYRIGHT_OWNER, WATERMARK } from '@/lib/provenance';
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
@@ -22,6 +24,12 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: '기관사DIA',
+  },
+  // 저작권·원작 지문 — 서빙되는 HTML <head> 에 각인(무단복제 판별). @/lib/provenance
+  authors: [{ name: COPYRIGHT_OWNER }],
+  other: {
+    copyright: COPYRIGHT_NOTICE,
+    'x-traindia-wm': WATERMARK,
   },
 };
 
@@ -47,6 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={notoSansKR.className}>
+        {/* 원작 지문 각인 + 무단 호스트 감지(킬 스위치) — @/lib/provenance, @/lib/originGuard */}
+        <Provenance />
         {children}
         <ServiceWorkerRegistrar />
         <GlassTapSweep />

@@ -968,11 +968,21 @@
   left: 0;
   right: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--dia-space-2);
   z-index: 1;
   pointer-events: none;
+}
+
+/* 저작권 — 브랜드/버전 아래 줄로 (무단복제 억제 표기) */
+.footerCopyright {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+  letter-spacing: 0.2px;
 }
 .footer > * {
   pointer-events: auto;

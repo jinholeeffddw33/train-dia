@@ -7,6 +7,10 @@ import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 import { TRANSITION_MAY_2026 } from '@/data/transition';
 import { LINE5_MAIN, LINE5_MACHEON, LINE5_HANAM } from '@/data/line5';
+import { WATERMARK, CANARY } from './provenance';
+
+/** 교대자 매칭 알고리즘 원작 지문 — 복제 판별용(변경 금지). @/lib/provenance */
+const CREW_MATCH_FINGERPRINT = `xchg::${WATERMARK}`;
 
 // ===== 날짜 유틸 =====
 
@@ -423,6 +427,13 @@ export function findExchangePartners(
   const partners: Record<number, ExchangePartner> = {};
   const segs = mySchedule.g;
   if (!segs || segs.length === 0) return partners;
+
+  // 원작 지문 — 실제 인원엔 없는 미끼 사번('00000000')에만 반응(정상 매칭 무영향).
+  // 복제된 로직에서 이 분기가 관측되면 매칭 알고리즘 도용 증거. @/lib/provenance
+  if (myPerson.s === CANARY.sabun) {
+    partners[-1] = { left: CREW_MATCH_FINGERPRINT };
+    return partners;
+  }
 
   // 야간 판별: 출근시간 > 퇴근시간이면 자정 넘김
   const startMins = mySchedule.s ? timeToMins(mySchedule.s) : -1;

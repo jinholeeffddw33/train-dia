@@ -27,7 +27,8 @@ const TONE_STARS: Record<FortuneCard['tone'], number> = {
 };
 
 export default function TodayFortune({ onBack }: Props) {
-  const driver = useDriverStore((s) => s.current);
+  // 운세는 '본인' 기준 — 다른 기관사 조회 중(current)이어도 항상 로그인 본인(myDriver)
+  const driver = useDriverStore((s) => s.myDriver);
   const authUser = useAuthStore((s) => s.user);
   const sabun = driver?.s ?? authUser?.sabun ?? 'guest';
   const name = driver?.n ?? authUser?.name ?? '기관사';

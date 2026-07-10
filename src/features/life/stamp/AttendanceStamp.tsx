@@ -81,7 +81,8 @@ const MILESTONES = [
 ];
 
 export default function AttendanceStamp({ onBack }: Props) {
-  const driver = useDriverStore((s) => s.current);
+  // 도장은 '본인'의 개인 기록 — 다른 기관사 조회 중(current)이어도 항상 로그인 본인(myDriver) 기준
+  const driver = useDriverStore((s) => s.myDriver);
   const authUser = useAuthStore((s) => s.user);
   const sabun = driver?.s ?? authUser?.sabun ?? 'guest';
   const name = driver?.n ?? authUser?.name ?? '기관사';

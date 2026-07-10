@@ -617,7 +617,9 @@
 .viewModeBackBtn {
   padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-amber);
-  color: var(--dia-text-inverse);
+  /* 앰버 위 텍스트는 모드 무관 항상 dark(--dia-on-amber). --dia-text-inverse 는
+     라이트서 near-white 로 뒤집혀 앰버 위 ~1.6:1 → 안보임(2026-07 감사). */
+  color: var(--dia-on-amber);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-xs);
   font-weight: var(--dia-weight-bold);

@@ -80,7 +80,8 @@
 .viewModeBtn {
   padding: var(--dia-space-2) var(--dia-space-4);
   background: var(--dia-amber);
-  color: var(--dia-text-inverse);
+  /* 앰버 위 텍스트는 모드 무관 항상 dark. inverse 는 라이트서 near-white→~1.95:1 안보임 */
+  color: var(--dia-on-amber);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);

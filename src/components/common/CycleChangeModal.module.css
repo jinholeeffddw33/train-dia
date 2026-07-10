@@ -97,6 +97,10 @@
   border: 1px solid rgba(239, 68, 68, 0.35);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
 }
+/* 라이트: 연분홍 칩 위 살몬(#F87171)은 ~2.3:1 → 진한 레드로 대비 확보 */
+:global(:root.light) .highlight {
+  color: #DC2626;
+}
 
 .footer {
   display: flex;

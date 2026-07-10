@@ -385,6 +385,11 @@
   --z-text-secondary: var(--dia-text-secondary);
   --z-text-tertiary: var(--dia-text-tertiary);
   --z-text-muted: var(--dia-text-tertiary);
+  /* 게임 표면/색 토큰도 라이트 브리지 — 텍스트만 밝게 바꾸면 어두운 표면 위 어두운 글자가 됨.
+     리더보드 nearMe 패널(--z-glass)·아바타(--z-surface-elevated)·에러(--z-rose) 라이트 가독. */
+  --z-glass: rgba(255, 255, 255, 0.75);
+  --z-surface-elevated: #E2E8F0;
+  --z-rose: #E11D48;
   --dia-lime: #4D7C0F;          /* 회송 라임 — 라이트 배경 가독(진한 라임) */
   --dia-lime-dim: rgba(101, 163, 13, 0.14);
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */

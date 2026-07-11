@@ -263,7 +263,7 @@ export default function MoreTab() {
           </button>
           <h2 className={styles.overlayTitle}>설정</h2>
         </div>
-        <div className={styles.overlayBody}>
+        <div className={`${styles.overlayBody} ${styles.settingsBody}`}>
 
       {/* 신원 스트립 */}
       <div className={styles.idStrip}>

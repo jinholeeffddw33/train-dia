@@ -776,6 +776,11 @@
   padding-bottom: var(--dia-space-8);
 }
 
+/* 설정 오버레이 본문 — 본문 탭과 동일한 좌우 여백(안쪽 정렬) */
+.settingsBody {
+  padding-inline: var(--dia-space-4);
+}
+
 /* ── View Mode Info ── */
 .viewModeInfo {
   display: flex;

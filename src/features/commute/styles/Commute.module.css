@@ -26,6 +26,12 @@
   letter-spacing: 0.5px;
 }
 
+.searchHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-2) var(--dia-space-1);
+}
+
 .stationList {
   display: flex;
   flex-direction: column;

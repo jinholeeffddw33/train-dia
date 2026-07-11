@@ -112,8 +112,10 @@
 .cell:active { background: var(--dia-surface-hover); }
 
 .cellToday {
-  background: var(--dia-blue-dim);
-  border: 1px solid var(--dia-blue);
+  /* 오늘 = 형광(네온 라임) 테두리 + 글로우 + 라임 틴트. 다크서 네온, 라이트서 가독 라임 */
+  background: var(--dia-lime-dim);
+  border: 1px solid var(--dia-lime);
+  box-shadow: inset 0 0 0 2px var(--dia-lime), 0 0 8px color-mix(in srgb, var(--dia-lime) 55%, transparent);
 }
 
 .cellSelected {
@@ -166,48 +168,17 @@
   box-shadow: inset 3px 0 0 var(--dia-amber);
 }
 
-/* 기지 출근일 때 시간 줄 — 앰버 톤으로 type 색 덮어씀 */
+/* 기지 출근일 때 출근시각 — 앰버 톤 강조 */
 .cellStartTimeDepot {
   color: var(--dia-amber-text) !important;
   font-weight: 700;
 }
 
-/* 시간 앞 작은 "기" 마커 — 칩 형태 */
+/* 기지 출근 "기" — 교번 숫자 앞 작은 앰버 텍스트(칩 아님 → 셀 높이 불변, 크기 통일) */
 .depotMark {
-  display: inline-block;
-  margin-right: 3px;
-  padding: 0 4px;
-  font-size: var(--dia-text-meta);
-  font-weight: 800;
-  background: var(--dia-amber);
-  color: #0F172A;
-  border-radius: 4px;
-  line-height: 1.3;
-  letter-spacing: 0.2px;
-  vertical-align: middle;
-}
-
-/* 기지 출근 — 출근시각에 "기" 마커를 붙여 구분 */
-.cellStartTimeDepot {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.depotMark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 3px;
-  border-radius: 3px;
-  background: rgba(245, 158, 11, 0.2);
-  border: 1px solid rgba(245, 158, 11, 0.5);
   color: var(--dia-amber-text);
-  font-size: var(--dia-text-meta);
   font-weight: 800;
-  line-height: 1;
+  margin-right: 1px;
 }
 
 /* 내근직 배지 — pill 형태로 눈에 띄게 */

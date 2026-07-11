@@ -188,6 +188,8 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             </span>
             {cell.type && (
               <span className={`${styles.cellDia} ${cell.isSwapped ? styles.cellDiaSwapped : styles[officeMode ? `cellOffice_${cell.type}` : `cellType_${cell.type}`]}`}>
+                {/* 기지 출근 표시 — 교번 숫자 앞 작은 텍스트(칩 아님)로 셀 크기 통일 */}
+                {cell.depotStart && <span className={styles.depotMark}>기</span>}
                 {cell.display}
               </span>
             )}
@@ -195,7 +197,6 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
               <span
                 className={`${styles.cellStartTime} ${cell.type ? styles[`cellStartTime_${cell.type}`] || '' : ''} ${cell.depotStart ? styles.cellStartTimeDepot : ''}`}
               >
-                {cell.depotStart && <span className={styles.depotMark}>기</span>}
                 {cell.startTime}
               </span>
             )}

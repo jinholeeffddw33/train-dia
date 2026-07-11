@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrainFront, Search, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin, Settings } from 'lucide-react';
+import { TrainFront, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin, Settings } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -13,7 +13,6 @@ import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
 import { CommuteOverlay } from '@/features/commute';
-import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab, CompareErrorBoundary } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import ExchangeRequest from '@/features/calendar/components/ExchangeRequest';
@@ -49,7 +48,6 @@ export default function MoreTab() {
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushSubscription();
   const [commuteOpen, setCommuteOpen] = useState(false);
-  const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
   const [exchangeOpen, setExchangeOpen] = useState(false);
@@ -73,13 +71,12 @@ export default function MoreTab() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // 오버레이 뒤로가기 지원
-  const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen || exchangeOpen
+  const anyOverlayOpen = commuteOpen || compareOpen || contactsOpen || exchangeOpen
     || healingOpen || shortcutsOpen || shuttleOpen || feedbackOpen
     || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen
     || settingsOpen;
   const closeActiveOverlay = useCallback(() => {
     if (commuteOpen) setCommuteOpen(false);
-    else if (subwayOpen) setSubwayOpen(false);
     else if (compareOpen) setCompareOpen(false);
     else if (contactsOpen) setContactsOpen(false);
     else if (exchangeOpen) setExchangeOpen(false);
@@ -94,7 +91,7 @@ export default function MoreTab() {
     else if (installGuideOpen) setInstallGuideOpen(false);
     // 설정 오버레이는 하위 오버레이가 모두 닫힌 뒤 마지막에 닫힘
     else if (settingsOpen) setSettingsOpen(false);
-  }, [commuteOpen, subwayOpen, compareOpen, contactsOpen, exchangeOpen, healingOpen,
+  }, [commuteOpen, compareOpen, contactsOpen, exchangeOpen, healingOpen,
       shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
       adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen, settingsOpen]);
   useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
@@ -212,20 +209,6 @@ export default function MoreTab() {
               <Phone size={20} />
             </div>
             <span className={styles.settingLabel}>비상 연락처</span>
-          </div>
-          <ChevronRight size={18} className={styles.toolArrow} />
-        </button>
-
-        <button
-          type="button"
-          className={styles.toolBtn} data-press
-          onClick={() => setSubwayOpen(true)}
-        >
-          <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
-              <Search size={20} />
-            </div>
-            <span className={styles.settingLabel}>경로 검색</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -638,10 +621,6 @@ export default function MoreTab() {
       <CommuteOverlay
         open={commuteOpen}
         onClose={() => setCommuteOpen(false)}
-      />
-      <SubwaySearchOverlay
-        open={subwayOpen}
-        onClose={() => setSubwayOpen(false)}
       />
 
       {/* 연락처 오버레이 */}

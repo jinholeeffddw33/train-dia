@@ -5,55 +5,11 @@ import { ArrowLeft, Stamp, Trophy, CalendarCheck, Flame } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
+import { todayKey, loadStamps, saveStamp, calcStreak } from './stampCore';
 import styles from './Stamp.module.css';
 
 interface Props {
   onBack: () => void;
-}
-
-/** localStorage 저장 형식: { sabun: { 'YYYY-MM-DD': true } } */
-const STORAGE_KEY = 'attendance-stamp-v1';
-
-function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function loadStamps(sabun: string): Set<string> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const obj = JSON.parse(raw) as Record<string, Record<string, boolean>>;
-    return new Set(Object.keys(obj[sabun] ?? {}));
-  } catch {
-    return new Set();
-  }
-}
-
-function saveStamp(sabun: string, dayKey: string) {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const obj = raw ? JSON.parse(raw) as Record<string, Record<string, boolean>> : {};
-    if (!obj[sabun]) obj[sabun] = {};
-    obj[sabun][dayKey] = true;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-  } catch { /* ignore */ }
-}
-
-/** 연속 일수 (오늘 또는 어제부터 거꾸로 세기) */
-function calcStreak(stamps: Set<string>): number {
-  let count = 0;
-  const d = new Date();
-  for (;;) {
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    if (stamps.has(key)) {
-      count++;
-      d.setDate(d.getDate() - 1);
-    } else {
-      break;
-    }
-  }
-  return count;
 }
 
 /** 이번 달 일별 도장 여부 */

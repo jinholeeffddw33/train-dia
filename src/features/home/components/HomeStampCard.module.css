@@ -3,9 +3,9 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   width: fit-content;
-  padding: 4px 14px 4px 5px;
+  padding: 3px 11px 3px 4px;
   min-height: 44px;
   border-radius: 999px;
   background: var(--dia-surface);
@@ -27,9 +27,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--dia-radius-md);
+  width: 25px;
+  height: 25px;
+  border-radius: var(--dia-radius-sm);
   flex-shrink: 0;
   color: var(--dia-text-on-color);
   background:
@@ -57,13 +57,6 @@
   color: var(--dia-amber-text);
 }
 .pillDone .label { color: var(--dia-green-text); }
-
-/* 완료 체크 — 찍은 뒤 노출 */
-.doneTick {
-  color: var(--dia-green-text);
-  flex-shrink: 0;
-  margin-left: -1px;
-}
 
 /* 무사고 출근도장 달력 오버레이 (완료 pill 탭 시) */
 .calendarOverlay {

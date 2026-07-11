@@ -142,6 +142,38 @@
   border: 2px solid var(--dia-surface);
 }
 
+/* 헤더 우측 액션 묶음 — 테마 토글 + 알림 벨 */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-shrink: 0;
+}
+
+/* 다크/라이트 전환 버튼 — 벨과 동일 규격 */
+.themeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.themeBtn:active {
+  transform: scale(0.9);
+}
+.themeBtn:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+
 /* ── 주요 서비스 ── */
 .servicesWrap {
   display: flex;

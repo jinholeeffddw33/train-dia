@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight, Coffee } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight, Coffee, Moon, Sun } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
 import { COPYRIGHT_NOTICE } from '@/lib/provenance';
+import { useThemeStore } from '@/stores/theme';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
 import HubHero from './HubHero';
@@ -64,6 +65,7 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
   const { getUnread, alertUnread } = useSafetyUnread();
   const safetyTotal = alertUnread + getUnread('hazard') + getUnread('action') + getUnread('inspect');
   const hasNotice = safetyTotal > 0;
+  const { theme, toggle: toggleTheme } = useThemeStore();
 
   const handleClick = useCallback((worldId: WorldId) => {
     window.setTimeout(() => onEnter(worldId), 60);
@@ -80,15 +82,27 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           <h1 className={styles.title}>답십리 승무사업소</h1>
           <p className={styles.subtitle}>{getSubtitle()}</p>
         </div>
-        <button
-          type="button"
-          className={styles.bellBtn}
-          aria-label="알림"
-          onClick={() => onEnter('safety')}
-        >
-          <Bell size={22} strokeWidth={2.2} />
-          {hasNotice && <span className={styles.bellDot} aria-hidden />}
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={styles.themeBtn}
+            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark'
+              ? <Moon size={22} strokeWidth={2.2} />
+              : <Sun size={22} strokeWidth={2.2} />}
+          </button>
+          <button
+            type="button"
+            className={styles.bellBtn}
+            aria-label="알림"
+            onClick={() => onEnter('safety')}
+          >
+            <Bell size={22} strokeWidth={2.2} />
+            {hasNotice && <span className={styles.bellDot} aria-hidden />}
+          </button>
+        </div>
       </header>
 
       {/* ── Today's Duty Hero ── */}

@@ -12,10 +12,13 @@ interface CommuteState {
   reorder: (from: number, to: number) => void;
 }
 
+/** 사업소 홈 역 — 도착정보 즐겨찾기에 기본 등록 */
+const DEFAULT_FAVORITE = '답십리';
+
 export const useCommuteStore = create<CommuteState>()(
   persist(
     (set) => ({
-      favorites: [],
+      favorites: [DEFAULT_FAVORITE],
 
       addFavorite: (station) =>
         set((state) => {
@@ -39,6 +42,15 @@ export const useCommuteStore = create<CommuteState>()(
     }),
     {
       name: 'cmFavStations',
+      version: 1,
+      // 기존 사용자(v0)도 답십리 기본 즐겨찾기 1회 주입 (없을 때 맨 앞에)
+      migrate: (persisted, version) => {
+        const favs: string[] = (persisted as { favorites?: string[] } | null)?.favorites ?? [];
+        if (version < 1 && !favs.includes(DEFAULT_FAVORITE)) {
+          return { favorites: [DEFAULT_FAVORITE, ...favs].slice(0, 10) };
+        }
+        return { favorites: favs };
+      },
       partialize: (state) => ({ favorites: state.favorites }),
     },
   ),

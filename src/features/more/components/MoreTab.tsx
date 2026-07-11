@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrainFront, Search, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin, Settings } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -70,11 +70,13 @@ export default function MoreTab() {
   const [pinError, setPinError] = useState('');
   const [pinLoading, setPinLoading] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // 오버레이 뒤로가기 지원
   const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen || exchangeOpen
     || healingOpen || shortcutsOpen || shuttleOpen || feedbackOpen
-    || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen;
+    || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen
+    || settingsOpen;
   const closeActiveOverlay = useCallback(() => {
     if (commuteOpen) setCommuteOpen(false);
     else if (subwayOpen) setSubwayOpen(false);
@@ -90,15 +92,17 @@ export default function MoreTab() {
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
+    // 설정 오버레이는 하위 오버레이가 모두 닫힌 뒤 마지막에 닫힘
+    else if (settingsOpen) setSettingsOpen(false);
   }, [commuteOpen, subwayOpen, compareOpen, contactsOpen, exchangeOpen, healingOpen,
       shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
-      adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen]);
+      adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen, settingsOpen]);
   useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
 
   // ESC 닫기 — MoreTab 인라인 fullOverlay(PIN 변경/설치 안내/연락처/교번 비교).
   // Commute/Subway 는 공용 Modal 이 자체 ESC 처리하므로 제외 (이중 닫힘 방지).
   useEscapeClose(
-    pinChangeOpen || installGuideOpen || contactsOpen || compareOpen || exchangeOpen,
+    pinChangeOpen || installGuideOpen || contactsOpen || compareOpen || exchangeOpen || settingsOpen,
     closeActiveOverlay,
   );
 
@@ -110,62 +114,17 @@ export default function MoreTab() {
 
   return (
     <div className={styles.container}>
-      <h2 className={`${styles.pageTitle} z-app-header z-app-header-frost`}>설정</h2>
-
-      {/* 의견 / 버그 제보 버튼 */}
-      <button
-        type="button"
-        className={styles.feedbackBanner}
-        onClick={() => setFeedbackOpen(true)}
-        data-press
-      >
-        <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
-          <MessageSquarePlus size={20} />
-        </div>
-        <div className={styles.feedbackBannerText}>
-          <span className={styles.feedbackBannerTitle}>의견 / 버그 제보</span>
-          <span className={styles.feedbackBannerSub}>
-            <Lock size={10} className={styles.feedbackLockIcon} />
-            완전 익명 · 이름·사번 수집 없음
-          </span>
-        </div>
-        <ChevronRight size={16} className={styles.toolArrow} />
-      </button>
-
-      {/* 오늘의 현황 */}
-      <div className={styles.statsBar}>
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{stats.todayVisitors}</span>
-          <span className={styles.statLabel}>오늘 접속</span>
-        </div>
-        <div className={styles.statDivider} />
-        <div className={styles.statItem}>
-          <span className={styles.statNum}>{stats.todayPosts}</span>
-          <span className={styles.statLabel}>새 소식</span>
-        </div>
-      </div>
-
-      {/* 내 기관사 (인증된 사용자 — 변경 불가) */}
-      <div className={styles.driverCard}>
-        <div className={styles.driverAvatar}>
-          {authUser ? authUser.name[0] : myDriver ? myDriver.n[0] : <UserRoundPen size={20} />}
-        </div>
-        <div className={styles.driverInfo}>
-          <span className={styles.driverNameText}>{authUser?.name ?? myDriver?.n ?? '기관사'}</span>
-          <span className={styles.driverNumText}>답십리 승무사업소 · 인증됨</span>
-        </div>
-        <ShieldCheck size={18} className={styles.toolArrow} />
-      </div>
-
-      {/* 조회 모드 안내 */}
-      {isViewMode && (
-        <div className={styles.viewModeInfo}>
-          <span>현재 <strong>{driver?.n}</strong> 조회 중</span>
-          <button type="button" className={styles.viewModeBackBtn} onClick={backToMe}>
-            내 보기로 돌아가기
-          </button>
-        </div>
-      )}
+      <h2 className={`${styles.pageTitle} z-app-header z-app-header-frost`}>
+        <span>일상생활 서비스</span>
+        <button
+          type="button"
+          className={styles.settingsGearBtn}
+          onClick={() => setSettingsOpen(true)}
+          aria-label="설정 열기"
+        >
+          <Settings size={20} />
+        </button>
+      </h2>
 
       {/* 도구 섹션 */}
       <section className={styles.section}>
@@ -210,7 +169,7 @@ export default function MoreTab() {
             <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
               <Car size={20} />
             </div>
-            <span className={styles.settingLabel}>승용차 운행 시간표(고덕기지 입고열차)</span>
+            <span className={styles.settingLabel}>승용차 운행 시간표</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -232,13 +191,13 @@ export default function MoreTab() {
         <button
           type="button"
           className={styles.toolBtn} data-press
-          onClick={() => setShortcutsOpen(true)}
+          onClick={() => setHealingOpen(true)}
         >
           <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconAmber}`}>
-              <Bookmark size={20} />
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <CreditCard size={20} />
             </div>
-            <span className={styles.settingLabel}>내 바로가기</span>
+            <span className={styles.settingLabel}>힐링카드 잔액조회</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
@@ -285,286 +244,220 @@ export default function MoreTab() {
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
 
+      </section>
+
+      {/* 의견 / 버그 제보 버튼 — 맨 아래 */}
+      <button
+        type="button"
+        className={styles.feedbackBanner}
+        onClick={() => setFeedbackOpen(true)}
+        data-press
+      >
+        <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
+          <MessageSquarePlus size={20} />
+        </div>
+        <div className={styles.feedbackBannerText}>
+          <span className={styles.feedbackBannerTitle}>의견 / 버그 제보</span>
+          <span className={styles.feedbackBannerSub}>
+            <Lock size={10} className={styles.feedbackLockIcon} />
+            완전 익명 · 이름·사번 수집 없음
+          </span>
+        </div>
+        <ChevronRight size={16} className={styles.toolArrow} />
+      </button>
+
+      {/* ===== 설정 오버레이 (우상단 기어) ===== */}
+      {settingsOpen && (
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="설정">
+        <div className={styles.overlayHeader}>
+          <button
+            type="button"
+            className={styles.overlayClose}
+            onClick={() => setSettingsOpen(false)}
+            aria-label="닫기"
+          >
+            <X size={22} />
+          </button>
+          <h2 className={styles.overlayTitle}>설정</h2>
+        </div>
+        <div className={styles.overlayBody}>
+
+      {/* 신원 스트립 */}
+      <div className={styles.idStrip}>
+        <div className={styles.idAvatar}>
+          {authUser ? authUser.name[0] : myDriver ? myDriver.n[0] : <UserRoundPen size={18} />}
+        </div>
+        <div className={styles.idText}>
+          <span className={styles.idName}>{authUser?.name ?? myDriver?.n ?? '기관사'}</span>
+          <span className={styles.idSub}>답십리 승무사업소 · 인증됨</span>
+        </div>
+        {isViewMode ? (
+          <button type="button" className={styles.idBack} onClick={backToMe}>내 보기로</button>
+        ) : (
+          <ShieldCheck size={18} className={styles.idShield} />
+        )}
+      </div>
+      {isViewMode && (
+        <p className={styles.idViewHint}>현재 <strong>{driver?.n}</strong> 조회 중</p>
+      )}
+
+      {/* 오늘의 현황 (한 줄) */}
+      <div className={styles.miniStats}>
+        오늘 접속 <strong>{stats.todayVisitors}</strong> · 새 소식 <strong>{stats.todayPosts}</strong>
+      </div>
+
+      {/* 화면 */}
+      <p className={styles.setGroupTitle}>화면</p>
+      <div className={styles.ctrlRow}>
+        <span className={styles.ctrlLabel}>
+          <span className={styles.ctrlIcon}>{theme === 'dark' ? '🌙' : '☀️'}</span>다크 모드
+        </span>
         <button
           type="button"
-          className={styles.toolBtn} data-press
-          onClick={() => setHealingOpen(true)}
+          className={`${styles.toggle} ${theme === 'dark' ? styles.toggleOn : ''}`}
+          onClick={toggleTheme}
+          role="switch"
+          aria-checked={theme === 'dark'}
+          aria-label="다크 모드 토글"
         >
-          <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
-              <CreditCard size={20} />
-            </div>
-            <span className={styles.settingLabel}>힐링카드 잔액조회</span>
-          </div>
-          <ChevronRight size={18} className={styles.toolArrow} />
+          <span className={styles.toggleKnob} />
         </button>
+      </div>
+      <div className={styles.ctrlRow}>
+        <span className={styles.ctrlLabel}>
+          <span className={styles.ctrlIcon}>🔤</span>글자 크기
+        </span>
+        <div
+          className="z-segment"
+          data-no-press
+          style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
+        >
+          {([
+            { key: 'small' as FontSize, label: '작게', cls: styles.fontSizeBtnSmall },
+            { key: 'normal' as FontSize, label: '보통', cls: styles.fontSizeBtnNormal },
+            { key: 'large' as FontSize, label: '크게', cls: styles.fontSizeBtnLarge },
+            { key: 'xlarge' as FontSize, label: '특대', cls: styles.fontSizeBtnLarge },
+          ]).map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              className={`z-segment-item ${opt.cls} ${fontSize === opt.key ? 'is-on' : ''}`}
+              onClick={() => setFontSize(opt.key)}
+              aria-pressed={fontSize === opt.key}
+              aria-label={`글자 크기 ${opt.label}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* 홈 화면 추가 — 미설치 상태에서만 노출 */}
+      {/* 알림 */}
+      {(notifSupported || pushSupported || (isIOS && !isInstalled)) && (
+        <>
+          <p className={styles.setGroupTitle}>알림</p>
+          {notifSupported && (
+            <div className={styles.ctrlRow}>
+              <span className={styles.ctrlLabel}><span className={styles.ctrlIcon}>🔔</span>알림</span>
+              {notifPerm === 'granted' ? (
+                <span className={styles.settingValue}>허용됨</span>
+              ) : notifPerm === 'denied' ? (
+                <span className={styles.settingValue}>차단됨</span>
+              ) : (
+                <button type="button" className={styles.notifBtn} onClick={requestPermission}>허용할게요</button>
+              )}
+            </div>
+          )}
+          {!pushSupported && isIOS && !isInstalled && (
+            <div className={styles.ctrlRow}>
+              <span className={styles.ctrlLabel}><span className={styles.ctrlIcon}>📲</span>푸시 알림</span>
+              <button type="button" className={styles.notifBtn} onClick={() => setInstallGuideOpen(true)}>설치 안내</button>
+            </div>
+          )}
+          {pushSupported && (
+            <div className={styles.ctrlRow}>
+              <span className={styles.ctrlLabel}><span className={styles.ctrlIcon}>📲</span>푸시 알림</span>
+              {pushSubscribed ? (
+                <button type="button" className={styles.notifBtn} onClick={pushUnsubscribe} disabled={pushLoading}>
+                  {pushLoading ? '처리 중...' : '해제'}
+                </button>
+              ) : (
+                <button type="button" className={styles.notifBtn} onClick={pushSubscribe} disabled={pushLoading}>
+                  {pushLoading ? '처리 중...' : '켜기'}
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* 기능 · 보안 (타일) */}
+      <p className={styles.setGroupTitle}>기능 · 보안</p>
+      <div className={styles.tileGrid}>
+        <button type="button" className={styles.tile} data-press onClick={() => setShortcutsOpen(true)}>
+          <span className={`${styles.tileIcon} ${styles.toolIconAmber}`}><Bookmark size={18} /></span>
+          <span className={styles.tileLabel}>내 바로가기</span>
+        </button>
         {!isInstalled && (canInstall || isIOS || isAndroid) && (
           <button
             type="button"
-            className={styles.toolBtn} data-press
-            onClick={() => {
-              if (canInstall) install();
-              else setInstallGuideOpen(true);
-            }}
+            className={styles.tile}
+            data-press
+            onClick={() => { if (canInstall) install(); else setInstallGuideOpen(true); }}
           >
-            <div className={styles.settingInfo}>
-              <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
-                <Smartphone size={20} />
-              </div>
-              <span className={styles.settingLabel}>홈 화면에 추가</span>
-            </div>
-            <ChevronRight size={18} className={styles.toolArrow} />
+            <span className={`${styles.tileIcon} ${styles.toolIconBlue}`}><Smartphone size={18} /></span>
+            <span className={styles.tileLabel}>홈 화면 추가</span>
           </button>
         )}
-      </section>
-
-      {/* 설정 섹션 */}
-      <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>설정</h3>
-
-        {/* 다크모드 토글 */}
-        <div className={styles.settingRow}>
-          <div className={styles.settingInfo}>
-            <span className={styles.settingIcon}>{theme === 'dark' ? '🌙' : '☀️'}</span>
-            <span className={styles.settingLabel}>다크 모드</span>
-          </div>
-          <button
-            type="button"
-            className={`${styles.toggle} ${theme === 'dark' ? styles.toggleOn : ''}`}
-            onClick={toggleTheme}
-            role="switch"
-            aria-checked={theme === 'dark'}
-            aria-label="다크 모드 토글"
-          >
-            <span className={styles.toggleKnob} />
-          </button>
-        </div>
-
-        {/* 글자 크기 */}
-        <div className={styles.fontSizeRow}>
-          <div className={styles.fontSizeInfo}>
-            <span className={styles.settingIcon}>🔤</span>
-            <span className={styles.settingLabel}>글자 크기</span>
-          </div>
-          <div
-            className="z-segment"
-            data-no-press
-            style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
-          >
-            {([
-              { key: 'small' as FontSize, label: '작게', cls: styles.fontSizeBtnSmall },
-              { key: 'normal' as FontSize, label: '보통', cls: styles.fontSizeBtnNormal },
-              { key: 'large' as FontSize, label: '크게', cls: styles.fontSizeBtnLarge },
-              { key: 'xlarge' as FontSize, label: '특대', cls: styles.fontSizeBtnLarge },
-            ]).map((opt) => (
-              <button
-                key={opt.key}
-                type="button"
-                className={`z-segment-item ${opt.cls} ${fontSize === opt.key ? 'is-on' : ''}`}
-                onClick={() => setFontSize(opt.key)}
-                aria-pressed={fontSize === opt.key}
-                aria-label={`글자 크기 ${opt.label}`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 알림 설정 */}
-        {notifSupported && (
-          <div className={styles.settingRow}>
-            <div className={styles.settingInfo}>
-              <span className={styles.settingIcon}>🔔</span>
-              <span className={styles.settingLabel}>알림</span>
-            </div>
-            {notifPerm === 'granted' ? (
-              <span className={styles.settingValue}>허용되어 있어요</span>
-            ) : notifPerm === 'denied' ? (
-              <span className={styles.settingValue}>차단되어 있어요</span>
-            ) : (
-              <button
-                type="button"
-                className={styles.notifBtn}
-                onClick={requestPermission}
-              >
-                허용할게요
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* 푸시 알림 (앱 꺼져있어도 수신) — iOS 미설치는 숨기지 말고 설치 유도 */}
-        {!pushSupported && isIOS && !isInstalled && (
-          <div className={styles.settingRow}>
-            <div className={`${styles.settingInfo} ${styles.settingInfoStack}`}>
-              <span className={styles.settingIcon}>📲</span>
-              <div className={styles.settingLabelCol}>
-                <span className={styles.settingLabel}>푸시 알림</span>
-                <span className={styles.settingHint}>홈 화면에 추가하면 알림을 받을 수 있어요</span>
-              </div>
-            </div>
-            <button
-              type="button"
-              className={styles.notifBtn}
-              onClick={() => setInstallGuideOpen(true)}
-            >
-              설치 안내
-            </button>
-          </div>
-        )}
-        {pushSupported && (
-          <div className={styles.settingRow}>
-            <div className={styles.settingInfo}>
-              <span className={styles.settingIcon}>📲</span>
-              <span className={styles.settingLabel}>푸시 알림</span>
-            </div>
-            {pushSubscribed ? (
-              <button
-                type="button"
-                className={styles.notifBtn}
-                onClick={pushUnsubscribe}
-                disabled={pushLoading}
-              >
-                {pushLoading ? '처리 중...' : '해제'}
-              </button>
-            ) : (
-              <button
-                type="button"
-                className={styles.notifBtn}
-                onClick={pushSubscribe}
-                disabled={pushLoading}
-              >
-                {pushLoading ? '처리 중...' : '켜기'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* 앱 정보 */}
-        <div className={styles.settingRow}>
-          <div className={styles.settingInfo}>
-            <span className={styles.settingIcon}>ℹ️</span>
-            <span className={styles.settingLabel}>버전</span>
-          </div>
-          <span className={styles.settingValue}>{APP_VERSION}</span>
-        </div>
-
-        {/* 저작권 — 무단복제 억제 표기 */}
-        <div className={styles.settingRow}>
-          <div className={styles.settingInfo}>
-            <span className={styles.settingIcon}>©</span>
-            <span className={styles.settingLabel}>{COPYRIGHT_NOTICE}</span>
-          </div>
-        </div>
-
-        {/* 로그아웃 */}
         <button
           type="button"
-          className={styles.logoutBtn}
-          onClick={() => setLogoutConfirmOpen(true)}
+          className={styles.tile}
+          data-press
+          onClick={() => { if (!hasBiometric) registerBiometric(); }}
         >
-          <LogOut size={18} />
-          <span>{authUser ? `${authUser.name} 로그아웃` : '로그아웃'}</span>
+          <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><Fingerprint size={18} /></span>
+          <span className={styles.tileLabel}>{hasBiometric ? '생체인증 ✓' : '생체인증'}</span>
         </button>
-      </section>
-
-      {/* 보안 섹션 */}
-      <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>보안</h3>
-
-        {/* 생체인증 등록/상태 */}
-        <div className={styles.settingRow}>
-          <div className={styles.settingInfo}>
-            <span className={styles.settingIcon}><Fingerprint size={16} /></span>
-            <span className={styles.settingLabel}>생체인증</span>
-          </div>
-          {hasBiometric ? (
-            <span className={styles.settingValue}>등록됨 ✓</span>
-          ) : (
-            <button
-              type="button"
-              className={styles.notifBtn}
-              onClick={() => registerBiometric()}
-            >
-              등록하기
+        <button
+          type="button"
+          className={styles.tile}
+          data-press
+          onClick={() => { setCurPin(''); setNewPin(''); setNewPinConfirm(''); setPinError(''); setPinChangeOpen(true); }}
+        >
+          <span className={`${styles.tileIcon} ${styles.toolIconBlue}`}><KeyRound size={18} /></span>
+          <span className={styles.tileLabel}>PIN 변경</span>
+        </button>
+        {authUser?.role === 'admin' && (
+          <>
+            <button type="button" className={styles.tile} data-press onClick={() => setAdminDashOpen(true)}>
+              <span className={`${styles.tileIcon} ${styles.toolIconBlue}`}><BarChart3 size={18} /></span>
+              <span className={styles.tileLabel}>접속 현황판</span>
             </button>
-          )}
+            <button type="button" className={styles.tile} data-press onClick={() => setAdminFeedbackOpen(true)}>
+              <span className={`${styles.tileIcon} ${styles.toolIconPurple}`}><ClipboardList size={18} /></span>
+              <span className={styles.tileLabel}>제보 목록</span>
+            </button>
+          </>
+        )}
+        {authUser?.sabun === LEVEL_ADMIN_SABUN && (
+          <button type="button" className={styles.tile} data-press onClick={() => setLevelRecordsOpen(true)}>
+            <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><ShieldCheck size={18} /></span>
+            <span className={styles.tileLabel}>등급도전</span>
+          </button>
+        )}
+      </div>
+
+      {/* 로그아웃 + 앱정보 */}
+      <button type="button" className={styles.logoutBtnCompact} onClick={() => setLogoutConfirmOpen(true)}>
+        <LogOut size={16} />
+        <span>{authUser ? `${authUser.name} 로그아웃` : '로그아웃'}</span>
+      </button>
+      <p className={styles.setFooterText}>{APP_VERSION} · {COPYRIGHT_NOTICE}</p>
+
         </div>
-
-        {/* PIN 변경 */}
-        <div className={styles.settingRow}>
-          <div className={styles.settingInfo}>
-            <span className={styles.settingIcon}><KeyRound size={16} /></span>
-            <span className={styles.settingLabel}>PIN 변경</span>
-          </div>
-          <button
-            type="button"
-            className={styles.notifBtn}
-            onClick={() => {
-              setCurPin(''); setNewPin(''); setNewPinConfirm(''); setPinError('');
-              setPinChangeOpen(true);
-            }}
-          >
-            변경하기
-          </button>
-        </div>
-      </section>
-
-      {/* 관리자 섹션 — admin role만 표시 */}
-      {authUser?.role === 'admin' && (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>관리자</h3>
-          <button
-            type="button"
-            className={styles.toolBtn} data-press
-            onClick={() => setAdminDashOpen(true)}
-          >
-            <div className={styles.settingInfo}>
-              <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
-                <BarChart3 size={20} />
-              </div>
-              <span className={styles.settingLabel}>접속 현황판</span>
-            </div>
-            <ChevronRight size={16} className={styles.toolArrow} />
-          </button>
-          <button
-            type="button"
-            className={styles.toolBtn} data-press
-            onClick={() => setAdminFeedbackOpen(true)}
-          >
-            <div className={styles.settingInfo}>
-              <div className={`${styles.toolIconWrap} ${styles.toolIconPurple}`}>
-                <ClipboardList size={20} />
-              </div>
-              <span className={styles.settingLabel}>제보 목록 보기</span>
-            </div>
-            <ChevronRight size={16} className={styles.toolArrow} />
-          </button>
-        </section>
+      </div>
       )}
-
-      {/* 등급도전 현황 — 이현구만 */}
-      {authUser?.sabun === LEVEL_ADMIN_SABUN && (
-        <section className={styles.section}>
-          <h3 className={styles.sectionTitle}>교육 관리</h3>
-          <button
-            type="button"
-            className={styles.toolBtn} data-press
-            onClick={() => setLevelRecordsOpen(true)}
-          >
-            <div className={styles.settingInfo}>
-              <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
-                <ShieldCheck size={20} />
-              </div>
-              <span className={styles.settingLabel}>등급도전 현황</span>
-            </div>
-            <ChevronRight size={16} className={styles.toolArrow} />
-          </button>
-        </section>
-      )}
+      {/* ===== /설정 오버레이 ===== */}
 
       {/* PIN 변경 모달 — 폼 입력 중 실수 방지로 배경탭 닫기는 제외 (ESC/X 만) */}
       {pinChangeOpen && (

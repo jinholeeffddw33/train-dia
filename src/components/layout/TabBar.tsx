@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, CalendarDays, TrainFront, Briefcase, ClipboardList, Settings } from 'lucide-react';
+import { Home, CalendarDays, TrainFront, Briefcase, ClipboardList, LayoutGrid } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './TabBar.module.css';
 
@@ -18,7 +18,7 @@ const TABS: TabItem[] = [
   { id: 'calendar', label: '달력', Icon: CalendarDays },
   { id: 'duty', label: '교번', Icon: Briefcase },
   { id: 'line', label: '5호선', Icon: TrainFront },
-  { id: 'more', label: '설정', Icon: Settings },       // 교체는 설정 안으로 이동
+  { id: 'more', label: '더보기', Icon: LayoutGrid },   // 더보기(기능 모음) — 설정은 우상단 기어로
 ];
 
 interface TabBarProps {

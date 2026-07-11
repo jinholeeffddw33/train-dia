@@ -32,7 +32,7 @@
   "shortcuts": [
     {
       "name": "오늘 근무",
-      "url": "/?world=duty&tab=home",
+      "url": "/?world=duty&tab=work",
       "icons": [{ "src": "/icons/dia5-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {

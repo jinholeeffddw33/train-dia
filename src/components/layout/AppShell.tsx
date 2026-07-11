@@ -22,7 +22,8 @@ interface AppShellProps {
 }
 
 export default function AppShell({ children, onBack, initialTab }: AppShellProps) {
-  const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'home');
+  // 진입 시 '근무'(대시보드) 탭으로 시작 — '홈' 탭은 맨 앞(WorldHub)으로 나가는 액션
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'work');
   // SW 등록/업데이트 배너는 루트의 ServiceWorkerRegistrar가 전역 담당 (중복 등록 방지)
   // ZINOSB 헤더 통일 이식 — window 스크롤 모델. 아래로 스크롤 시 헤더(.z-app-header)·TabBar 슬라이드 숨김,
   // 위로 올리면 복귀 + topZone 통과 후 frosted. data-attr 로 후손 헤더/탭바에 전파.
@@ -44,21 +45,27 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
       ).length
     : 0;
 
-  const goHomeTab = useCallback(() => {
-    startViewTransition(() => setActiveTab('home'));
+  // 기준 탭 = '근무'(대시보드). 뒤로가기 시 여기로 복귀
+  const goWorkTab = useCallback(() => {
+    startViewTransition(() => setActiveTab('work'));
   }, []);
 
-  // home 탭이 아닐 때 뒤로가기 → home 탭 복귀
-  useHistoryBack(`tab-${activeTab}`, goHomeTab, activeTab !== 'home');
+  // 근무 탭이 아닐 때 뒤로가기 → 근무 탭 복귀
+  useHistoryBack(`tab-${activeTab}`, goWorkTab, activeTab !== 'work');
 
   const handleTabChange = useCallback((tab: TabId) => {
+    // '홈' 탭 = 맨 앞(WorldHub)으로 나가기
+    if (tab === 'home') {
+      onBack?.();
+      return;
+    }
     if (tab === 'line') triggerScroll();
     // View Transition — 탭 전환 크로스페이드 (미지원/모션 감소 시 즉시 전환)
     startViewTransition(() => {
       setActiveTab(tab);
       window.scrollTo({ top: 0 });
     });
-  }, [triggerScroll]);
+  }, [triggerScroll, onBack]);
 
 
   return (

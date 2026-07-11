@@ -1,10 +1,10 @@
 'use client';
 
-import { Home, CalendarDays, TrainFront, Briefcase, RefreshCw, Settings } from 'lucide-react';
+import { Home, CalendarDays, TrainFront, Briefcase, ClipboardList, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './TabBar.module.css';
 
-export type TabId = 'home' | 'calendar' | 'line' | 'duty' | 'exchange' | 'more';
+export type TabId = 'home' | 'work' | 'calendar' | 'line' | 'duty' | 'more';
 
 interface TabItem {
   id: TabId;
@@ -13,12 +13,12 @@ interface TabItem {
 }
 
 const TABS: TabItem[] = [
-  { id: 'home', label: '홈', Icon: Home },
-  { id: 'calendar', label: '근무', Icon: CalendarDays },
+  { id: 'home', label: '홈', Icon: Home },           // 맨 앞(WorldHub)으로 나가기
+  { id: 'work', label: '근무', Icon: ClipboardList }, // 오늘의 교번 대시보드
+  { id: 'calendar', label: '달력', Icon: CalendarDays },
   { id: 'duty', label: '교번', Icon: Briefcase },
-  { id: 'exchange', label: '교체', Icon: RefreshCw },
   { id: 'line', label: '5호선', Icon: TrainFront },
-  { id: 'more', label: '설정', Icon: Settings },
+  { id: 'more', label: '설정', Icon: Settings },       // 교체는 설정 안으로 이동
 ];
 
 interface TabBarProps {
@@ -61,7 +61,8 @@ export default function TabBar({ activeTab, onTabChange, alertCount = 0, exchang
                 {alertCount > 9 ? '9+' : alertCount}
               </span>
             )}
-            {tab.id === 'exchange' && exchangeCount > 0 && (
+            {/* 교체가 설정 안으로 이동 → 교체 요청 배지도 설정 탭에 표시 */}
+            {tab.id === 'more' && exchangeCount > 0 && (
               <span className={styles.badge} aria-label={`교체 요청 ${exchangeCount}개`}>
                 {exchangeCount > 9 ? '9+' : exchangeCount}
               </span>

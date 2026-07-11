@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrainFront, Search, GitCompareArrows, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin } from 'lucide-react';
+import { TrainFront, Search, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -16,6 +16,7 @@ import { CommuteOverlay } from '@/features/commute';
 import { SubwaySearchOverlay } from '@/features/subway';
 import { CompareTab, CompareErrorBoundary } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
+import ExchangeRequest from '@/features/calendar/components/ExchangeRequest';
 // DriverSelector 제거됨 — 기관사 변경은 인증으로 고정
 import HealingCardOverlay from './HealingCardOverlay';
 import ShuttleScheduleOverlay from './ShuttleScheduleOverlay';
@@ -51,6 +52,7 @@ export default function MoreTab() {
   const [subwayOpen, setSubwayOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
+  const [exchangeOpen, setExchangeOpen] = useState(false);
   const [healingOpen, setHealingOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [shuttleOpen, setShuttleOpen] = useState(false);
@@ -70,7 +72,7 @@ export default function MoreTab() {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // 오버레이 뒤로가기 지원
-  const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen
+  const anyOverlayOpen = commuteOpen || subwayOpen || compareOpen || contactsOpen || exchangeOpen
     || healingOpen || shortcutsOpen || shuttleOpen || feedbackOpen
     || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen;
   const closeActiveOverlay = useCallback(() => {
@@ -78,6 +80,7 @@ export default function MoreTab() {
     else if (subwayOpen) setSubwayOpen(false);
     else if (compareOpen) setCompareOpen(false);
     else if (contactsOpen) setContactsOpen(false);
+    else if (exchangeOpen) setExchangeOpen(false);
     else if (healingOpen) setHealingOpen(false);
     else if (shortcutsOpen) setShortcutsOpen(false);
     else if (shuttleOpen) setShuttleOpen(false);
@@ -87,7 +90,7 @@ export default function MoreTab() {
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
-  }, [commuteOpen, subwayOpen, compareOpen, contactsOpen, healingOpen,
+  }, [commuteOpen, subwayOpen, compareOpen, contactsOpen, exchangeOpen, healingOpen,
       shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
       adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen]);
   useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
@@ -95,7 +98,7 @@ export default function MoreTab() {
   // ESC 닫기 — MoreTab 인라인 fullOverlay(PIN 변경/설치 안내/연락처/교번 비교).
   // Commute/Subway 는 공용 Modal 이 자체 ESC 처리하므로 제외 (이중 닫힘 방지).
   useEscapeClose(
-    pinChangeOpen || installGuideOpen || contactsOpen || compareOpen,
+    pinChangeOpen || installGuideOpen || contactsOpen || compareOpen || exchangeOpen,
     closeActiveOverlay,
   );
 
@@ -167,6 +170,21 @@ export default function MoreTab() {
       {/* 도구 섹션 */}
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>도구</h3>
+
+        <button
+          type="button"
+          className={`${styles.toolBtn} ${styles.toolBtnHighlight}`}
+          onClick={() => setExchangeOpen(true)}
+          data-press
+        >
+          <div className={styles.settingInfo}>
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <RefreshCw size={20} />
+            </div>
+            <span className={styles.settingLabel}>근무 교체</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
 
         <button
           type="button"
@@ -794,6 +812,26 @@ export default function MoreTab() {
 
       {/* 등급도전 현황 오버레이 */}
       <LevelRecordsOverlay open={levelRecordsOpen} onClose={() => setLevelRecordsOpen(false)} />
+
+      {/* 근무 교체 오버레이 (탭바에서 설정으로 이동) */}
+      {exchangeOpen && (
+        <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="근무 교체">
+          <div className={styles.overlayHeader}>
+            <button
+              type="button"
+              className={styles.overlayClose}
+              onClick={() => setExchangeOpen(false)}
+              aria-label="닫기"
+            >
+              <X size={22} />
+            </button>
+            <h2 className={styles.overlayTitle}>근무 교체</h2>
+          </div>
+          <div className={styles.overlayBody}>
+            <ExchangeRequest />
+          </div>
+        </div>
+      )}
 
       {/* 교번 비교 오버레이 */}
       {compareOpen && (

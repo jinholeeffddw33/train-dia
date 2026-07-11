@@ -22,7 +22,6 @@ import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice
 //    앱이 사실상 CSR(AuthGate 뒤)이라 ssr:false 무방 — 초기 청크에서 각 월드가 빠짐
 const loading = () => <WorldLoading />;
 const CalendarTab = dynamic(() => import('@/features/calendar/components/CalendarTab'), { ssr: false, loading });
-const ExchangeRequest = dynamic(() => import('@/features/calendar/components/ExchangeRequest'), { ssr: false, loading });
 const DutyTab = dynamic(() => import('@/features/duty/components/DutyTab'), { ssr: false, loading });
 const MoreTab = dynamic(() => import('@/features/more/components/MoreTab'), { ssr: false, loading });
 const Line5Tab = dynamic(() => import('@/features/line5/components/Line5Tab'), { ssr: false, loading });
@@ -33,20 +32,18 @@ const StandbyCoverageView = dynamic(() => import('@/features/standby/StandbyCove
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
-    case 'home':
-      return <HomeTab />;
+    case 'work':
+      return <HomeTab />; // 오늘의 교번 대시보드 (구 '홈' 내용)
     case 'calendar':
-      return <CalendarTab />;
+      return <CalendarTab />; // 달력
     case 'line':
       return <Line5Tab />;
     case 'duty':
       return <DutyTab />;
-    case 'exchange':
-      return <ExchangeRequest />;
     case 'more':
-      return <MoreTab />;
+      return <MoreTab />; // 교체는 이 안에서 진입
     default:
-      return null;
+      return <HomeTab />; // 'home'(나가기 액션)은 콘텐츠 없음 → 대시보드 폴백
   }
 }
 
@@ -76,11 +73,11 @@ function HomeTab() {
 }
 
 const VALID_WORLDS: readonly string[] = ['duty', 'edu', 'safety', 'life', 'standby'];
-const VALID_TABS: readonly string[] = ['home', 'calendar', 'line', 'duty', 'exchange', 'more'];
+const VALID_TABS: readonly string[] = ['work', 'calendar', 'line', 'duty', 'more'];
 
 export default function HomePage() {
   const [world, setWorld] = useState<WorldId | null>(null);
-  const [initialTab, setInitialTab] = useState<TabId>('home');
+  const [initialTab, setInitialTab] = useState<TabId>('work');
 
   // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
   useEffect(() => {
@@ -98,8 +95,8 @@ export default function HomePage() {
 
   const handleBack = useCallback(() => {
     startViewTransition(() => setWorld(null));
-    // shortcut 진입 탭은 1회성 — 허브로 나오면 소진
-    setInitialTab('home');
+    // shortcut 진입 탭은 1회성 — 허브로 나오면 소진 (기준 = 근무 대시보드)
+    setInitialTab('work');
   }, []);
 
   // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀

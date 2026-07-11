@@ -174,11 +174,19 @@
   font-weight: 700;
 }
 
-/* 기지 출근 "기" — 교번 숫자 앞 작은 앰버 텍스트(칩 아님 → 셀 높이 불변, 크기 통일) */
+/* 기지 출근 "기" — 교번 숫자 앞 앰버 배경 배지(숫자와 확실히 구분).
+   line-height:1 + 세로 패딩 0 으로 교번 텍스트와 같은 높이 → 셀 크기 통일 유지 */
 .depotMark {
-  color: var(--dia-amber-text);
+  display: inline-block;
+  margin-right: 2px;
+  padding: 0 3px;
+  background: var(--dia-amber);
+  color: var(--dia-on-amber);
+  border-radius: 3px;
+  font-size: var(--dia-text-meta);
   font-weight: 800;
-  margin-right: 1px;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 /* 내근직 배지 — pill 형태로 눈에 띄게 */

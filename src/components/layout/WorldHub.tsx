@@ -10,6 +10,7 @@ import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import { useThemeStore } from '@/stores/theme';
 import { useSafetyUnread } from '@/features/safety/hooks/useSafetyUnread';
 import { InstallCard } from '@/features/home';
+import HomeStampCard from '@/features/home/components/HomeStampCard';
 import HubHero from './HubHero';
 import HubWeather from './HubWeather';
 import styles from './WorldHub.module.css';
@@ -158,6 +159,9 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           <span className={styles.standbyLabel}>대기충당확인</span>
           <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
         </button>
+
+        {/* 출근 도장 (재미 요소 — 작게) */}
+        <HomeStampCard />
 
         <a
           href="https://cafe.naver.com/smrthink"

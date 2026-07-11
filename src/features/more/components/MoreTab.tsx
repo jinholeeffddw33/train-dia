@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrainFront, GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin, Settings } from 'lucide-react';
+import { GitCompareArrows, RefreshCw, Phone, CreditCard, ChevronRight, X, UserRoundPen, Bookmark, Car, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, MessageSquarePlus, ClipboardList, Lock, BarChart3, MapPin, Settings } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -12,7 +12,6 @@ import { useThemeStore } from '@/stores/theme';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
-import { CommuteOverlay } from '@/features/commute';
 import { CompareTab, CompareErrorBoundary } from '@/features/compare';
 import { ContactsTab } from '@/features/contacts';
 import ExchangeRequest from '@/features/calendar/components/ExchangeRequest';
@@ -47,7 +46,6 @@ export default function MoreTab() {
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushSubscription();
-  const [commuteOpen, setCommuteOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [contactsOpen, setContactsOpen] = useState(false);
   const [exchangeOpen, setExchangeOpen] = useState(false);
@@ -71,13 +69,12 @@ export default function MoreTab() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // 오버레이 뒤로가기 지원
-  const anyOverlayOpen = commuteOpen || compareOpen || contactsOpen || exchangeOpen
+  const anyOverlayOpen = compareOpen || contactsOpen || exchangeOpen
     || healingOpen || shortcutsOpen || shuttleOpen || feedbackOpen
     || adminFeedbackOpen || adminDashOpen || levelRecordsOpen || pinChangeOpen || installGuideOpen
     || settingsOpen;
   const closeActiveOverlay = useCallback(() => {
-    if (commuteOpen) setCommuteOpen(false);
-    else if (compareOpen) setCompareOpen(false);
+    if (compareOpen) setCompareOpen(false);
     else if (contactsOpen) setContactsOpen(false);
     else if (exchangeOpen) setExchangeOpen(false);
     else if (healingOpen) setHealingOpen(false);
@@ -91,13 +88,12 @@ export default function MoreTab() {
     else if (installGuideOpen) setInstallGuideOpen(false);
     // 설정 오버레이는 하위 오버레이가 모두 닫힌 뒤 마지막에 닫힘
     else if (settingsOpen) setSettingsOpen(false);
-  }, [commuteOpen, compareOpen, contactsOpen, exchangeOpen, healingOpen,
+  }, [compareOpen, contactsOpen, exchangeOpen, healingOpen,
       shortcutsOpen, shuttleOpen, feedbackOpen, adminFeedbackOpen,
       adminDashOpen, levelRecordsOpen, pinChangeOpen, installGuideOpen, settingsOpen]);
   useHistoryBack('more-overlay', closeActiveOverlay, anyOverlayOpen);
 
-  // ESC 닫기 — MoreTab 인라인 fullOverlay(PIN 변경/설치 안내/연락처/교번 비교).
-  // Commute/Subway 는 공용 Modal 이 자체 ESC 처리하므로 제외 (이중 닫힘 방지).
+  // ESC 닫기 — MoreTab 인라인 fullOverlay(PIN 변경/설치 안내/연락처/교번 비교/근무 교체).
   useEscapeClose(
     pinChangeOpen || installGuideOpen || contactsOpen || compareOpen || exchangeOpen || settingsOpen,
     closeActiveOverlay,
@@ -213,19 +209,6 @@ export default function MoreTab() {
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>
 
-        <button
-          type="button"
-          className={styles.toolBtn} data-press
-          onClick={() => setCommuteOpen(true)}
-        >
-          <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconBlue}`}>
-              <TrainFront size={20} />
-            </div>
-            <span className={styles.settingLabel}>도착 정보</span>
-          </div>
-          <ChevronRight size={18} className={styles.toolArrow} />
-        </button>
 
       </section>
 
@@ -616,12 +599,6 @@ export default function MoreTab() {
       )}
 
       {/* 기관사 변경 팝업 제거됨 — 인증된 사용자로 고정 */}
-
-      {/* 모달 오버레이 */}
-      <CommuteOverlay
-        open={commuteOpen}
-        onClose={() => setCommuteOpen(false)}
-      />
 
       {/* 연락처 오버레이 */}
       {contactsOpen && (

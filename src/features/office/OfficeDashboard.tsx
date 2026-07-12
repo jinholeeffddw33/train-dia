@@ -12,6 +12,7 @@ import { useThemeStore } from '@/stores/theme';
 import { useOfficeStore } from '@/stores/office';
 import { APP_VERSION } from '@/lib/constants';
 import type { WorldId } from '@/components/layout/WorldHub';
+import ScheduleManager from './ScheduleManager';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -28,6 +29,10 @@ function greeting(): string {
   if (h < 12) return '좋은 아침입니다';
   if (h < 18) return '오후도 힘내세요';
   return '오늘도 수고하셨어요';
+}
+function todayISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 const WORLD_ICONS: { id: WorldId; label: string; Icon: typeof TrainFront; tone: string }[] = [
@@ -50,6 +55,8 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
     addNote, removeNote,
   } = useOfficeStore();
 
+  // 일정관리 전체 화면
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -80,9 +87,13 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   };
   const submitSchedule = () => {
     if (!schTitle.trim() || !schTime) return;
-    addSchedule({ time: schTime, title: schTitle.trim(), place: schPlace.trim() });
+    addSchedule({ date: todayISO(), time: schTime, title: schTitle.trim(), place: schPlace.trim() });
     setSchTime(''); setSchTitle(''); setSchPlace(''); setSchedAddOpen(false);
   };
+  const todaySchedules = useMemo(
+    () => schedules.filter((s) => s.date === todayISO()),
+    [schedules],
+  );
   const submitNote = () => {
     if (!noteText.trim()) return;
     addNote(noteText.trim());
@@ -90,9 +101,9 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   };
 
   const quickIcons = [
-    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => onEnter('duty') },
+    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => setScheduleOpen(true) },
     { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => scrollTo(todoRef.current) },
-    { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => scrollTo(schedRef.current) },
+    { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => setScheduleOpen(true) },
     { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => scrollTo(memoRef.current) },
   ];
 
@@ -183,8 +194,8 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
             </div>
           )}
           <ul className={styles.miniList}>
-            {schedules.length === 0 && <li className={styles.empty}>일정 없음</li>}
-            {schedules.map((s) => (
+            {todaySchedules.length === 0 && <li className={styles.empty}>일정 없음</li>}
+            {todaySchedules.map((s) => (
               <li key={s.id} className={styles.schedItem}>
                 <span className={styles.schedTime}>{s.time}</span>
                 <span className={styles.schedDot} aria-hidden />
@@ -277,6 +288,13 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
         <span className={styles.footerBrand}>Train DIA</span>
         <span className={styles.footerVersion}>{APP_VERSION}</span>
       </div>
+
+      {/* 일정관리 전체 화면 */}
+      {scheduleOpen && (
+        <div className={styles.schedOverlay}>
+          <ScheduleManager onClose={() => setScheduleOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

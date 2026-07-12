@@ -110,6 +110,8 @@ export default function HomePage() {
 
   // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
   useHistoryBack(`world-${world}`, handleBack, world !== null);
+  // 홈 교차(내근직↔월드허브) — 뒤로가기 시 원래 홈으로 복귀(없으면 앱이 튕겨 나감)
+  useHistoryBack('home-override', () => setHomeOverride(null), homeOverride !== null);
 
   return (
     <>

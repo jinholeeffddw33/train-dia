@@ -38,8 +38,9 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
   const [fCat, setFCat] = useState('gray');
   const [fPin, setFPin] = useState(false);
 
+  // 화면 자체는 항상 등록(편집 시트가 열려도 유지) — !open 게이팅은 히스토리 churn/튕김 유발
+  useHistoryBack('note-manager', onClose);
   useHistoryBack('note-edit', () => setOpen(false), open);
-  useHistoryBack('note-manager', onClose, !open);
 
   const pinned = useMemo(() => notes.filter((n) => n.pinned), [notes]);
   const filtered = useMemo(() => {

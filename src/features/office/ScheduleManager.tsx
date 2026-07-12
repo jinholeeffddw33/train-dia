@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Plus, X, Check, CalendarDays, MapPin, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Plus, X, Check, CalendarDays, MapPin, Repeat } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
 import TimeSelect from './TimeSelect';
@@ -15,6 +15,21 @@ function iso(d: Date): string {
 function fromISO(s: string): Date { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 function labelKor(s: string): string { const d = fromISO(s); return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`; }
 function addDays(s: string, n: number): string { const d = fromISO(s); d.setDate(d.getDate() + n); return iso(d); }
+/** 반복 일정 날짜 생성 — 시작~종료(포함), 최대 366개 방어 */
+function repeatDates(startISO: string, untilISO: string, mode: 'daily' | 'weekly' | 'monthly'): string[] {
+  const out: string[] = [];
+  let cur = fromISO(startISO);
+  const until = fromISO(untilISO);
+  let guard = 0;
+  while (cur.getTime() <= until.getTime() && guard < 366) {
+    out.push(iso(cur));
+    if (mode === 'daily') cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 1);
+    else if (mode === 'weekly') cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 7);
+    else cur = new Date(cur.getFullYear(), cur.getMonth() + 1, cur.getDate());
+    guard++;
+  }
+  return out;
+}
 function addMonths(s: string, n: number): string {
   const d = fromISO(s);
   const target = new Date(d.getFullYear(), d.getMonth() + n, 1);
@@ -55,7 +70,7 @@ function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
 }
 
 export default function ScheduleManager({ onClose, startMonth = false, startView = 'day' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list' }) {
-  const { schedules, addSchedule, removeSchedule, todos, toggleTodo } = useOfficeStore();
+  const { schedules, addSchedule, addSchedules, removeSchedule, removeSeries, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
   const [monthAnchor, setMonthAnchor] = useState<string>(iso(new Date())); // 월 달력이 보여줄 달(선택 날짜와 분리)
   const [view, setView] = useState<'day' | 'week' | 'list'>(startView);
@@ -69,9 +84,12 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const [fStart, setFStart] = useState('');
   const [fEnd, setFEnd] = useState('');
   const [fPlace, setFPlace] = useState('');
+  const [fRepeat, setFRepeat] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
+  const [fUntil, setFUntil] = useState('');
 
+  // 화면 자체는 항상 등록(자식 시트가 열려도 유지) — !addOpen 게이팅은 히스토리 churn/튕김 유발
+  useHistoryBack('schedule-manager', onClose);
   useHistoryBack('schedule-add', () => setAddOpen(false), addOpen);
-  useHistoryBack('schedule-manager', onClose, !addOpen);
 
   const todayISO = iso(new Date());
 
@@ -89,10 +107,10 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   );
   // 하루 타임라인 = 등록 일정 + 시간 있는 할 일(오늘만 겹쳐 보임). 단일 소스
   const dayItems = useMemo(() => {
-    const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false }));
+    const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false, repeatId: s.repeatId }));
     if (sel !== todayISO) return ev;
     const td = todos.filter((t) => t.inSchedule ?? !!t.time)
-      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', end: '', title: t.text, place: '', category: 'amber', done: t.done }));
+      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', end: '', title: t.text, place: '', category: 'amber', done: t.done, repeatId: undefined as string | undefined }));
     return [...ev, ...td].sort((a, b) => a.time.localeCompare(b.time));
   }, [dayEvents, todos, sel, todayISO]);
   const upcoming = useMemo(
@@ -156,11 +174,19 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
 
   const openAdd = () => {
     setFTitle(''); setFCat('blue'); setFDate(sel); setFStart(''); setFEnd(''); setFPlace('');
+    setFRepeat('none'); setFUntil(addMonths(sel, 1));
     setAddOpen(true);
   };
   const submit = () => {
     if (!fTitle.trim() || !fStart) return;
-    addSchedule({ date: fDate, time: fStart, end: fEnd, title: fTitle.trim(), place: fPlace.trim(), category: fCat });
+    const base = { time: fStart, end: fEnd, title: fTitle.trim(), place: fPlace.trim(), category: fCat };
+    if (fRepeat === 'none' || !fUntil || fUntil < fDate) {
+      addSchedule({ date: fDate, ...base });
+    } else {
+      const rid = `r${fDate}-${fStart}-${fTitle.length}-${fRepeat}`;
+      const dates = repeatDates(fDate, fUntil, fRepeat);
+      addSchedules(dates.map((d) => ({ date: d, repeatId: rid, ...base })));
+    }
     setAddOpen(false);
     setSel(fDate);
   };
@@ -281,11 +307,14 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                   <div className={styles.ecTitle}>
                     <span className={styles.ecTitleText}>{it.title}</span>
                     {it.kind === 'todo' && <span className={styles.ecChip}>할 일</span>}
+                    {it.repeatId && <Repeat size={12} className={styles.repMark} aria-label="반복 일정" />}
                   </div>
                   {it.kind === 'sched' && it.place && <div className={styles.ecSub}><MapPin size={11} /> {it.place}</div>}
                 </div>
                 {it.kind === 'sched' ? (
-                  <button type="button" className={styles.ecDel} onClick={() => removeSchedule(it.id)} aria-label="삭제"><X size={14} /></button>
+                  <button type="button" className={styles.ecDel}
+                    onClick={() => it.repeatId ? removeSeries(it.repeatId) : removeSchedule(it.id)}
+                    aria-label={it.repeatId ? '반복 일정 전체 삭제' : '삭제'} title={it.repeatId ? '반복 일정 전체 삭제' : '삭제'}><X size={14} /></button>
                 ) : (
                   <button type="button" className={`${styles.ecCheck} ${it.done ? styles.ecCheckOn : ''}`} onClick={() => toggleTodo(it.id)} aria-pressed={it.done} aria-label="완료 토글">
                     {it.done && <Check size={13} strokeWidth={3} />}
@@ -422,7 +451,22 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                 onChange={(e) => setFPlace(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} />
             </div>
 
-            <p className={styles.soon}><Trash2 size={12} /> 반복·미리 알림은 다음 단계에서 추가돼요.</p>
+            <div className={styles.field}>
+              <label className={styles.fLabel}>반복</label>
+              <div className={styles.repeatRow}>
+                {([['none', '없음'], ['daily', '매일'], ['weekly', '매주'], ['monthly', '매월']] as const).map(([k, label]) => (
+                  <button key={k} type="button" className={fRepeat === k ? styles.repOn : styles.rep} onClick={() => setFRepeat(k)}>{label}</button>
+                ))}
+              </div>
+            </div>
+
+            {fRepeat !== 'none' && (
+              <div className={styles.field}>
+                <label className={styles.fLabel}>반복 종료일</label>
+                <input className={styles.fInput} type="date" value={fUntil} min={fDate} onChange={(e) => setFUntil(e.target.value)} />
+                <p className={styles.repHint}>{fDate} 부터 {fUntil || '종료일'} 까지 {fRepeat === 'daily' ? '매일' : fRepeat === 'weekly' ? '매주' : '매월'} 반복 등록됩니다.</p>
+              </div>
+            )}
           </div>
         </div>
       )}

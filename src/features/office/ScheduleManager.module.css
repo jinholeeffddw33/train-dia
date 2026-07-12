@@ -180,3 +180,11 @@
 .wgEvtDone .wgEvtTitle { text-decoration: line-through; color: var(--dia-text-tertiary); }
 .wgNow { position: absolute; left: 0; right: 0; height: 2px; background: var(--dia-red); z-index: 6; pointer-events: none; }
 .wgNowDot { position: absolute; left: -2px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--dia-red); }
+
+/* 반복 일정 */
+.repeatRow { display: flex; gap: 6px; }
+.rep, .repOn { flex: 1; text-align: center; padding: 9px 6px; border-radius: var(--dia-radius-md); border: 1.5px solid var(--dia-border-strong); background: var(--dia-bg); color: var(--dia-text-secondary); font-size: var(--dia-text-sm); font-weight: 700; }
+.rep:active, .repOn:active { transform: scale(0.96); }
+.repOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
+.repHint { margin: 6px 0 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
+.repMark { flex-shrink: 0; color: var(--dia-text-tertiary); margin-left: 4px; }

@@ -38,6 +38,8 @@ export default function TaskBoard({ onBack }: Props) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState<OfficeTodo | null>(null);
 
+  // 화면 자체는 항상 등록(편집 시트가 열려도 유지) — 없거나 !editorOpen 게이팅이면 튕김 유발
+  useHistoryBack('office-taskboard', onBack);
   useHistoryBack('office-taskboard-editor', () => setEditorOpen(false), editorOpen);
   useEscapeClose(editorOpen, () => setEditorOpen(false));
 

@@ -31,6 +31,7 @@ export interface OfficeSchedule {
   title: string;
   place: string;
   category: string;  // OFFICE_CATEGORIES key
+  repeatId?: string; // 반복 일정 그룹 id (같은 시리즈끼리 공유)
 }
 export interface OfficeNote { id: string; title: string; body: string; category: string; pinned: boolean; ts: number }
 
@@ -53,8 +54,10 @@ interface OfficeState {
   updateTodo: (id: string, patch: Partial<Omit<OfficeTodo, 'id'>>) => void;
   removeTodo: (id: string) => void;
   addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string }) => void;
+  addSchedules: (items: { date: string; time: string; end?: string; title: string; place?: string; category?: string; repeatId?: string }[]) => void;
   updateSchedule: (id: string, patch: Partial<Omit<OfficeSchedule, 'id'>>) => void;
   removeSchedule: (id: string) => void;
+  removeSeries: (repeatId: string) => void;
   addNote: (n: { title?: string; body: string; category?: string; pinned?: boolean }) => void;
   updateNote: (id: string, patch: Partial<Omit<OfficeNote, 'id'>>) => void;
   togglePin: (id: string) => void;
@@ -88,9 +91,17 @@ export const useOfficeStore = create<OfficeState>()(
         set((s) => ({
           schedules: [...s.schedules, { id: uid(), date, time, end, title, place, category }].sort(sortSched),
         })),
+      addSchedules: (items) =>
+        set((s) => ({
+          schedules: [
+            ...s.schedules,
+            ...items.map((it) => ({ id: uid(), date: it.date, time: it.time, end: it.end ?? '', title: it.title, place: it.place ?? '', category: it.category ?? 'blue', repeatId: it.repeatId })),
+          ].sort(sortSched),
+        })),
       updateSchedule: (id, patch) =>
         set((s) => ({ schedules: s.schedules.map((x) => (x.id === id ? { ...x, ...patch } : x)).sort(sortSched) })),
       removeSchedule: (id) => set((s) => ({ schedules: s.schedules.filter((x) => x.id !== id) })),
+      removeSeries: (repeatId) => set((s) => ({ schedules: s.schedules.filter((x) => x.repeatId !== repeatId) })),
 
       addNote: ({ title = '', body, category = 'gray', pinned = false }) =>
         set((s) => ({ notes: [{ id: uid(), title, body, category, pinned, ts: Date.now() }, ...s.notes] })),

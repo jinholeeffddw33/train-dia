@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ArrowLeft, Search, Plus, X, Star, Pin, Trash2, PenLine } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import { ArrowLeft, Search, Plus, X, Star, Pin, Trash2, PenLine, Mic } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
 import type { OfficeNote } from '@/stores/office';
 import styles from './NoteManager.module.css';
@@ -37,6 +38,14 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
   const [fBody, setFBody] = useState('');
   const [fCat, setFCat] = useState('gray');
   const [fPin, setFPin] = useState(false);
+
+  // 음성 → 텍스트 (지원 브라우저에서만). 인식된 문장은 내용(body) 뒤에 이어붙임
+  const speech = useSpeechRecognition((t) => {
+    const add = t.trim();
+    if (add) setFBody((prev) => (prev.trim() ? `${prev.trimEnd()} ${add}` : add));
+  });
+  // 시트 닫히면 마이크 정지(권한/녹음 해제)
+  useEffect(() => { if (!open && speech.listening) speech.stop(); }, [open, speech.listening, speech]);
 
   // 화면 자체는 항상 등록(편집 시트가 열려도 유지) — !open 게이팅은 히스토리 churn/튕김 유발
   useHistoryBack('note-manager', onClose);
@@ -145,6 +154,17 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
               onChange={(e) => setFTitle(e.target.value)} aria-label="제목" />
             <textarea className={styles.bodyInput} value={fBody} placeholder="내용을 입력하세요…" rows={6}
               onChange={(e) => setFBody(e.target.value)} aria-label="내용" />
+
+            {/* 음성 입력 (지원 브라우저만 노출) */}
+            {speech.supported && (
+              <div className={styles.sttRow}>
+                <button type="button" className={speech.listening ? styles.micOn : styles.mic}
+                  onClick={speech.toggle} aria-pressed={speech.listening}>
+                  <Mic size={16} /> {speech.listening ? '듣는 중… 탭하여 정지' : '음성으로 입력'}
+                </button>
+                {speech.listening && speech.interim && <span className={styles.sttInterim}>{speech.interim}</span>}
+              </div>
+            )}
 
             <div className={styles.editRow}>
               <span className={styles.editLabel}>카테고리</span>

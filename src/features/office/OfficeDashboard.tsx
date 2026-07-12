@@ -113,7 +113,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   };
 
   const quickIcons = [
-    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => { setSchedStartMonth(false); setScheduleOpen(true); } },
+    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => { setSchedStartMonth(true); setScheduleOpen(true); } },
     { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
     { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => { setSchedStartMonth(false); setScheduleOpen(true); } },
     { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },

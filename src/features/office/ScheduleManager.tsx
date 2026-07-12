@@ -15,11 +15,19 @@ function iso(d: Date): string {
 function fromISO(s: string): Date { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
 function labelKor(s: string): string { const d = fromISO(s); return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`; }
 function addDays(s: string, n: number): string { const d = fromISO(s); d.setDate(d.getDate() + n); return iso(d); }
+function addMonths(s: string, n: number): string {
+  const d = fromISO(s);
+  const target = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  target.setDate(Math.min(d.getDate(), lastDay));
+  return iso(target);
+}
 
 /* ── 주간 시간표 뷰 ── */
 const HOUR_PX = 56; // ScheduleManager.module.css 의 --wg-hour(56px) 과 동일해야 함
 const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 const fmtMin = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+const catDot = (k: string) => OFFICE_CATEGORIES.find((c) => c.key === k)?.dot ?? '#94a3b8';
 
 interface WEvt { id: string; kind: 'sched' | 'todo'; title: string; category: string; startM: number; endM: number; done: boolean; lane: number; cols: number; }
 
@@ -47,7 +55,7 @@ function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
   return out;
 }
 
-export default function ScheduleManager({ onClose, startMonth = false, startView = 'day', title = '일정 관리' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list'; title?: string }) {
+export default function ScheduleManager({ onClose, startMonth = false, startView = 'day' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list' }) {
   const { schedules, addSchedule, removeSchedule, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
   const [view, setView] = useState<'day' | 'week' | 'list'>(startView);
@@ -131,12 +139,18 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     for (let n = 1; n <= daysIn; n++) cells.push(iso(new Date(d.getFullYear(), d.getMonth(), n)));
     return cells;
   }, [sel]);
-  // 날짜별 일정 개수 — 월 그리드에서 바쁜/한가한 날 점 개수로 표시
-  const countByDate = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const s of schedules) m.set(s.date, (m.get(s.date) ?? 0) + 1);
+  // 날짜별 일정 목록 — 월 그리드 칸에 제목 미리보기
+  const eventsByDate = useMemo(() => {
+    const m = new Map<string, typeof schedules>();
+    for (const s of schedules) {
+      const arr = m.get(s.date) ?? [];
+      arr.push(s);
+      m.set(s.date, arr);
+    }
+    for (const arr of m.values()) arr.sort((a, b) => a.time.localeCompare(b.time));
     return m;
   }, [schedules]);
+  const [monthFilter, setMonthFilter] = useState<string>('all'); // 카테고리 범례 필터
 
   const openAdd = () => {
     setFTitle(''); setFCat('blue'); setFDate(sel); setFStart(''); setFEnd(''); setFPlace('');
@@ -154,48 +168,69 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
       {/* 헤더 */}
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onClose} aria-label="닫기"><ArrowLeft size={20} /></button>
-        <h1 className={styles.title}>{title}</h1>
+        <h1 className={styles.title}>{view === 'week' ? '주별 일정' : view === 'list' ? '일정 목록' : monthOpen ? '월별 일정' : '일별 일정'}</h1>
         <span className={styles.headSpacer} />
       </header>
 
       {/* 날짜 + 오늘 */}
       <div className={styles.dateRow}>
-        <button type="button" className={styles.datePick} onClick={() => setMonthOpen((v) => !v)}
-          aria-expanded={monthOpen} aria-label={monthOpen ? '월 달력 접기' : '월 달력 열기'}>
+        <button type="button" className={styles.datePick} onClick={() => { setView('day'); setMonthOpen((v) => !v); }}
+          aria-expanded={monthOpen && view === 'day'} aria-label={monthOpen && view === 'day' ? '월 달력 접기' : '월 달력 열기'}>
           <span className={styles.dateChip}><CalendarDays size={16} /></span>
           <span className={styles.dateLabel}>{labelKor(sel)}</span>
           <span className={styles.toggleHint}>
-            {monthOpen ? '접기' : '월 달력'}
-            <ChevronDown size={14} className={monthOpen ? styles.chevOpen : styles.chev} />
+            {monthOpen && view === 'day' ? '접기' : '월 달력'}
+            <ChevronDown size={14} className={monthOpen && view === 'day' ? styles.chevOpen : styles.chev} />
           </span>
         </button>
         <button type="button" className={styles.todayBtn} onClick={() => { setSel(todayISO); setMonthOpen(false); }}>오늘</button>
       </div>
 
-      {/* 월 그리드(점프) */}
-      {monthOpen && (
+      {/* 월 달력 — 칸마다 일정 제목 미리보기 (하루 뷰에서만) */}
+      {monthOpen && view === 'day' && (
         <div className={styles.monthCard}>
           <div className={styles.monthNav}>
-            <button type="button" onClick={() => setSel(addDays(sel, -30))} aria-label="이전 달"><ChevronLeft size={18} /></button>
+            <button type="button" className={styles.monthNavBtn} onClick={() => setSel(addMonths(sel, -1))} aria-label="이전 달"><ChevronLeft size={20} /></button>
             <span>{fromISO(sel).getFullYear()}년 {fromISO(sel).getMonth() + 1}월</span>
-            <button type="button" onClick={() => setSel(addDays(sel, 30))} aria-label="다음 달"><ChevronRight size={18} /></button>
+            <button type="button" className={styles.monthNavBtn} onClick={() => setSel(addMonths(sel, 1))} aria-label="다음 달"><ChevronRight size={20} /></button>
           </div>
+
+          {/* 카테고리 범례 필터 */}
+          <div className={styles.legend}>
+            <button type="button" className={monthFilter === 'all' ? styles.legOn : styles.leg} onClick={() => setMonthFilter('all')}>
+              <span className={`${styles.legDot} ${styles.legDotAll}`} />전체
+            </button>
+            {OFFICE_CATEGORIES.map((c) => (
+              <button key={c.key} type="button" className={monthFilter === c.key ? styles.legOn : styles.leg}
+                onClick={() => setMonthFilter(monthFilter === c.key ? 'all' : c.key)}>
+                <span className={`${styles.legDot} ${styles[`p_${c.key}`]}`} />{c.label}
+              </button>
+            ))}
+          </div>
+
           <div className={styles.monthDow}>{DOW.map((w, i) => <span key={w} className={i === 0 ? styles.sun : i === 6 ? styles.sat : ''}>{w}</span>)}</div>
           <div className={styles.monthGrid}>
             {monthGrid.map((c, i) => {
-              if (c === null) return <span key={`e${i}`} />;
-              const cnt = countByDate.get(c) ?? 0;
+              if (c === null) return <span key={`e${i}`} className={styles.mEmpty} />;
+              const dd = fromISO(c);
+              const dow = dd.getDay();
+              const all = eventsByDate.get(c) ?? [];
+              const evs = monthFilter === 'all' ? all : all.filter((e) => e.category === monthFilter);
               return (
                 <button key={c} type="button"
-                  className={`${styles.mCell} ${c === sel ? styles.mSel : ''} ${c === todayISO ? styles.mToday : ''}`}
+                  className={`${styles.mCell} ${c === sel ? styles.mSel : ''}`}
                   onClick={() => setSel(c)}
-                  aria-label={`${fromISO(c).getMonth() + 1}월 ${fromISO(c).getDate()}일${cnt ? `, 일정 ${cnt}건` : ''}`}>
-                  {fromISO(c).getDate()}
-                  {cnt > 0 && (
-                    <span className={styles.mDots} aria-hidden>
-                      {Array.from({ length: Math.min(cnt, 3) }).map((_, k) => <span key={k} className={styles.mDot} />)}
-                    </span>
-                  )}
+                  aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일${evs.length ? `, 일정 ${evs.length}건` : ''}`}>
+                  <span className={`${styles.mNum} ${dow === 0 ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
+                  <span className={styles.mChips}>
+                    {evs.slice(0, 2).map((e) => (
+                      <span key={e.id} className={styles.mChip}>
+                        <span className={`${styles.mChipDot} ${styles[`p_${e.category}`]}`} />
+                        <span className={styles.mChipTxt}>{e.title}</span>
+                      </span>
+                    ))}
+                    {evs.length > 2 && <span className={styles.mMore}>+{evs.length - 2}</span>}
+                  </span>
                 </button>
               );
             })}
@@ -203,8 +238,8 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
         </div>
       )}
 
-      {/* 주간 스트립 (주간 시간표 뷰에선 자체 헤더가 대신함) */}
-      {view !== 'week' && (
+      {/* 주간 스트립 (주간 뷰·월 달력 열림 시엔 숨김 — 그쪽에서 날짜 선택) */}
+      {view !== 'week' && !monthOpen && (
       <div className={styles.week}>
         <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, -7))} aria-label="이전 주"><ChevronLeft size={16} /></button>
         <div className={styles.weekDays}>

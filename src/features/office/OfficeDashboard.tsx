@@ -314,7 +314,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
       {/* 일정관리 전체 화면 */}
       {scheduleOpen && (
         <div className={styles.schedOverlay}>
-          <ScheduleManager onClose={() => setScheduleOpen(false)} startMonth={schedStartMonth} startView={schedStartView} title={schedStartView === 'week' ? '주간일정' : '일정 관리'} />
+          <ScheduleManager onClose={() => setScheduleOpen(false)} startMonth={schedStartMonth} startView={schedStartView} />
         </div>
       )}
       {/* 메모 전체 화면 */}

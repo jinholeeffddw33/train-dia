@@ -27,23 +27,39 @@
 .todayBtn { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-secondary); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md); padding: 6px 12px; }
 .todayBtn:active { transform: scale(0.95); }
 
-/* 월 그리드 */
-.monthCard { background: var(--dia-surface); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-lg); padding: var(--dia-space-3); margin-bottom: var(--dia-space-3); }
-.monthNav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+/* 월 달력 */
+.monthCard { background: var(--dia-surface); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-lg); padding: var(--dia-space-2); margin-bottom: var(--dia-space-3); }
+.monthNav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding: 0 2px; }
 .monthNav span { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
 .monthNav button { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--dia-text-secondary); }
-.monthDow { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 3px; }
-.monthDow span { text-align: center; font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); }
+.monthNavBtn { width: 40px !important; height: 40px !important; border: 1px solid var(--dia-border); background: var(--dia-surface); }
+.monthNavBtn:active { transform: scale(0.9); background: var(--dia-surface-hover); }
+
+/* 카테고리 범례 필터 */
+.legend { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px; -webkit-overflow-scrolling: touch; }
+.leg, .legOn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; font-size: var(--dia-text-meta); font-weight: 800; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-secondary); }
+.legOn { background: var(--dia-blue-dim); color: var(--dia-blue-text); border-color: transparent; }
+.legDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legDotAll { background: var(--dia-text-secondary); }
+
+.monthDow { display: grid; grid-template-columns: repeat(7,1fr); }
+.monthDow span { text-align: center; font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); padding: 4px 0; }
 .sun { color: var(--dia-red) !important; }
 .sat { color: var(--dia-blue) !important; }
-.monthGrid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
-.mCell { position: relative; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary); border-radius: 8px; }
+
+/* 그리드 — 칸 구분선 */
+.monthGrid { display: grid; grid-template-columns: repeat(7,1fr); border-top: 1px solid var(--dia-border-light); border-left: 1px solid var(--dia-border-light); border-radius: 8px; overflow: hidden; }
+.mCell, .mEmpty { min-height: 74px; border-right: 1px solid var(--dia-border-light); border-bottom: 1px solid var(--dia-border-light); box-sizing: border-box; }
+.mCell { display: flex; flex-direction: column; gap: 2px; padding: 3px 3px 4px; text-align: left; overflow: hidden; }
 .mCell:active { background: var(--dia-surface-hover); }
-.mSel { background: var(--dia-blue) !important; color: #fff !important; }
-.mToday { box-shadow: inset 0 0 0 1.5px var(--dia-blue); }
-.mDots { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; }
-.mDot { width: 4px; height: 4px; border-radius: 50%; background: var(--dia-amber); }
-.mSel .mDot { background: #fff; }
+.mSel { background: var(--dia-blue-dim); box-shadow: inset 0 0 0 2px var(--dia-blue); }
+.mNum { align-self: flex-start; font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-primary); min-width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; padding: 0 2px; box-sizing: border-box; }
+.mTodayNum { background: var(--dia-blue); color: #fff !important; }
+.mChips { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mChip { display: flex; align-items: center; gap: 3px; min-width: 0; }
+.mChipDot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.mChipTxt { font-size: var(--dia-text-meta); font-weight: 600; color: var(--dia-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mMore { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); padding-left: 2px; }
 
 /* 주간 스트립 */
 .week { display: flex; align-items: center; gap: 4px; margin-bottom: var(--dia-space-3); }

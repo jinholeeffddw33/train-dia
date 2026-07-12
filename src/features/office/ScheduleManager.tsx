@@ -91,7 +91,8 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const dayItems = useMemo(() => {
     const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false }));
     if (sel !== todayISO) return ev;
-    const td = todos.filter((t) => t.time).map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time, end: '', title: t.text, place: '', category: 'amber', done: t.done }));
+    const td = todos.filter((t) => t.inSchedule ?? !!t.time)
+      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', end: '', title: t.text, place: '', category: 'amber', done: t.done }));
     return [...ev, ...td].sort((a, b) => a.time.localeCompare(b.time));
   }, [dayEvents, todos, sel, todayISO]);
   const upcoming = useMemo(
@@ -107,7 +108,8 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
         startM: toMin(s.time), endM: s.end ? Math.max(toMin(s.end), toMin(s.time) + 30) : toMin(s.time) + 30, done: false,
       }));
       if (d === todayISO) {
-        todos.forEach((t) => { if (t.time) evs.push({ id: t.id, kind: 'todo' as const, title: t.text, category: 'amber', startM: toMin(t.time), endM: toMin(t.time) + 30, done: t.done }); });
+        // 주간 시간표는 시간 위치가 필요 → '일정에 추가'한 할 일 중 시간 있는 것만(종일은 제외)
+        todos.forEach((t) => { if (t.time && (t.inSchedule ?? true)) evs.push({ id: t.id, kind: 'todo' as const, title: t.text, category: 'amber', startM: toMin(t.time), endM: toMin(t.time) + 30, done: t.done }); });
       }
       return layoutDay(evs);
     });
@@ -271,7 +273,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
           {dayItems.map((it) => (
             <div key={`${it.kind}-${it.id}`} className={`${styles.item} ${it.done ? styles.itemDone : ''}`}>
               <div className={styles.itemTime}>
-                <b>{it.time}</b>{it.end && <s>~{it.end}</s>}
+                <b>{it.time || '종일'}</b>{it.end && <s>~{it.end}</s>}
               </div>
               <span className={`${styles.pin} ${styles[`p_${it.category}`]}`} />
               <div className={`${styles.ecard} ${styles[`c_${it.category}`]}`}>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Plus, X, Check, Clock, User, FileText, Trash2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Plus, X, Check, Clock, CalendarPlus, FileText, Trash2, Sparkles } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, todoPriority, type OfficeTodo, type OfficePriority } from '@/stores/office';
@@ -181,7 +181,7 @@ export default function TaskBoard({ onBack }: Props) {
                       )}
                     </div>
                     <div className={styles.cardMeta}>
-                      {t.assignee && <span className={styles.metaItem}><User size={12} />{t.assignee}</span>}
+                      {t.inSchedule && <span className={styles.metaItem}><CalendarPlus size={12} />일정</span>}
                       {t.time && !t.done && <span className={styles.metaItem}><Clock size={12} />마감 {t.time}</span>}
                       {t.memo && <span className={styles.metaItem}><FileText size={12} />메모</span>}
                     </div>
@@ -219,9 +219,9 @@ export default function TaskBoard({ onBack }: Props) {
           onClose={() => setEditorOpen(false)}
           onSave={(v) => {
             if (editing) {
-              updateTodo(editing.id, { text: v.text, priority: v.priority, urgent: v.priority === 'urgent', time: v.time ?? '', assignee: v.assignee, progress: v.progress, memo: v.memo });
+              updateTodo(editing.id, { text: v.text, priority: v.priority, urgent: v.priority === 'urgent', time: v.time ?? '', inSchedule: v.inSchedule, progress: v.progress, memo: v.memo });
             } else {
-              addTodo({ text: v.text, time: v.time, urgent: v.priority === 'urgent', priority: v.priority, progress: v.progress, assignee: v.assignee, memo: v.memo });
+              addTodo({ text: v.text, time: v.time, urgent: v.priority === 'urgent', priority: v.priority, progress: v.progress, inSchedule: v.inSchedule, memo: v.memo });
             }
             setEditorOpen(false);
           }}
@@ -236,7 +236,7 @@ function progWidth(pct: number): React.CSSProperties {
   return { width: `${Math.max(0, Math.min(100, pct))}%` };
 }
 
-interface EditorVals { text: string; priority: OfficePriority; time?: string; assignee?: string; progress?: number; memo?: string }
+interface EditorVals { text: string; priority: OfficePriority; time?: string; inSchedule?: boolean; progress?: number; memo?: string }
 
 function TodoEditor({
   initial, onClose, onSave,
@@ -248,7 +248,7 @@ function TodoEditor({
   const [text, setText] = useState(initial?.text ?? '');
   const [priority, setPriority] = useState<OfficePriority>(initial ? todoPriority(initial) : 'normal');
   const [time, setTime] = useState(initial?.time ?? '');
-  const [assignee, setAssignee] = useState(initial?.assignee ?? '');
+  const [inSchedule, setInSchedule] = useState(initial?.inSchedule ?? !!initial?.time);
   const [memo, setMemo] = useState(initial?.memo ?? '');
   const [progress, setProgress] = useState(initial?.progress ?? 0);
 
@@ -279,14 +279,25 @@ function TodoEditor({
           </div>
 
           <div className={styles.fieldRow}>
-            <label className={styles.field}>
+            <div className={styles.field}>
               <span className={styles.fieldLabel}>마감 시각</span>
-              <TimeSelect value={time} onChange={setTime} ariaLabel="마감 시각" />
-            </label>
-            <label className={styles.field}>
-              <span className={styles.fieldLabel}>담당자</span>
-              <input className={styles.input} value={assignee} onChange={(e) => setAssignee(e.target.value)} placeholder="예) 김대리" maxLength={20} />
-            </label>
+              <button type="button" className={time ? styles.allDay : styles.allDayOn}
+                onClick={() => setTime('')} aria-pressed={!time}>
+                <Clock size={15} /> 하루 종일
+              </button>
+            </div>
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>일정에 추가</span>
+              <button type="button" className={inSchedule ? styles.schedOn : styles.schedOff}
+                onClick={() => setInSchedule((v) => !v)} aria-pressed={inSchedule} aria-label="오늘의 일정에 추가">
+                <CalendarPlus size={16} /> {inSchedule ? '추가함' : '안 함'}
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.field}>
+            <span className={styles.fieldLabel}>시간 지정 <span className={styles.fieldHint}>(선택하면 하루 종일 해제)</span></span>
+            <TimeSelect value={time} onChange={setTime} ariaLabel="마감 시각" />
           </div>
 
           <label className={styles.field}>
@@ -307,7 +318,7 @@ function TodoEditor({
             text: text.trim(),
             priority,
             time: time || undefined,
-            assignee: assignee.trim() || undefined,
+            inSchedule,
             memo: memo.trim() || undefined,
             progress: progress || undefined,
           })}

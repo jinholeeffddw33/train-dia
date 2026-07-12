@@ -102,11 +102,12 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
     () => schedules.filter((s) => s.date === todayISO()),
     [schedules],
   );
-  // 오늘의 일정 = 등록 일정 + 시간 있는 할 일(겹쳐 보이기). 단일 소스, 시간순 정렬
+  // 오늘의 일정 = 등록 일정 + '일정에 추가'한 할 일(종일이면 시간 '' → 맨 위). 단일 소스
   const todayTimeline = useMemo(() => {
     const sched = todaySchedules.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, title: s.title, place: s.place, done: false }));
-    const timed = todos.filter((t) => t.time).map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time, title: t.text, place: '', done: t.done }));
-    return [...sched, ...timed].sort((a, b) => a.time.localeCompare(b.time));
+    const inSched = todos.filter((t) => t.inSchedule ?? !!t.time)
+      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', title: t.text, place: '', done: t.done }));
+    return [...sched, ...inSched].sort((a, b) => a.time.localeCompare(b.time));
   }, [todaySchedules, todos]);
   const submitNote = () => {
     if (!noteText.trim()) return;
@@ -213,7 +214,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
             {todayTimeline.length === 0 && <li className={styles.empty}>일정 없음</li>}
             {todayTimeline.map((it) => (
               <li key={`${it.kind}-${it.id}`} className={`${styles.schedItem} ${it.done ? styles.schedDone : ''}`}>
-                <span className={styles.schedTime}>{it.time}</span>
+                <span className={styles.schedTime}>{it.time || '종일'}</span>
                 <span className={it.kind === 'todo' ? styles.schedDotTodo : styles.schedDot} aria-hidden />
                 <div className={styles.schedBody}>
                   <span className={styles.schedTitleRow}>

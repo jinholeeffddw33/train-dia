@@ -310,3 +310,20 @@
 @media (prefers-reduced-motion: reduce) {
   .ringFg { transition: none; }
 }
+
+/* 하루 종일 / 일정에 추가 토글 (담당자 자리 대체) */
+.allDay, .allDayOn, .schedOff, .schedOn {
+  width: 100%;
+  box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 10px 8px;
+  border-radius: var(--dia-radius-md);
+  border: 1.5px solid var(--dia-border-strong);
+  background: var(--dia-surface);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm); font-weight: 700;
+}
+.allDay:active, .allDayOn:active, .schedOff:active, .schedOn:active { transform: scale(0.97); }
+.allDayOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
+.schedOn { border-color: var(--dia-green, #22c55e); background: color-mix(in srgb, var(--dia-green, #22c55e) 16%, transparent); color: var(--dia-text-primary); }
+.fieldHint { font-weight: 600; color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); }

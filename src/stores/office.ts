@@ -15,6 +15,7 @@ export interface OfficeTodo {
   assignee?: string;
   memo?: string;
   completedAt?: string; // 'HH:MM'
+  inSchedule?: boolean; // '일정에 추가' — 오늘의 일정/시간표에 노출할지 (time 없으면 종일)
 }
 
 /** 기존 urgent 불리언 → 우선순위 해석 (하위호환) */
@@ -47,7 +48,7 @@ interface OfficeState {
   todos: OfficeTodo[];
   schedules: OfficeSchedule[];
   notes: OfficeNote[];
-  addTodo: (t: { text: string; time?: string; urgent?: boolean; priority?: OfficePriority; progress?: number; assignee?: string; memo?: string }) => void;
+  addTodo: (t: { text: string; time?: string; urgent?: boolean; priority?: OfficePriority; progress?: number; assignee?: string; memo?: string; inSchedule?: boolean }) => void;
   toggleTodo: (id: string) => void;
   updateTodo: (id: string, patch: Partial<Omit<OfficeTodo, 'id'>>) => void;
   removeTodo: (id: string) => void;
@@ -75,8 +76,8 @@ export const useOfficeStore = create<OfficeState>()(
       schedules: [],
       notes: [],
 
-      addTodo: ({ text, time = '', urgent = false, priority, progress, assignee, memo }) =>
-        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false, priority, progress, assignee, memo }] })),
+      addTodo: ({ text, time = '', urgent = false, priority, progress, assignee, memo, inSchedule }) =>
+        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false, priority, progress, assignee, memo, inSchedule }] })),
       toggleTodo: (id) =>
         set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done, completedAt: !t.done ? hhmmNow() : undefined } : t)) })),
       updateTodo: (id, patch) =>

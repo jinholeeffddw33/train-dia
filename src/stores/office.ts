@@ -2,7 +2,25 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 /** 내근직 대시보드/일정관리 — 할 일 / 일정 / 메모 (기기 보관) */
-export interface OfficeTodo { id: string; text: string; time: string; urgent: boolean; done: boolean; }
+export type OfficePriority = 'urgent' | 'important' | 'normal';
+export interface OfficeTodo {
+  id: string;
+  text: string;
+  time: string;
+  urgent: boolean;
+  done: boolean;
+  /** 아래는 오늘의 할 일 전체보기(TaskBoard)용 선택 필드 — 없으면 기본값 처리 */
+  priority?: OfficePriority;
+  progress?: number;    // 0~100
+  assignee?: string;
+  memo?: string;
+  completedAt?: string; // 'HH:MM'
+}
+
+/** 기존 urgent 불리언 → 우선순위 해석 (하위호환) */
+export function todoPriority(t: OfficeTodo): OfficePriority {
+  return t.priority ?? (t.urgent ? 'urgent' : 'normal');
+}
 /** 일정 — 날짜(YYYY-MM-DD)·시작/종료·카테고리 포함 */
 export interface OfficeSchedule {
   id: string;
@@ -29,8 +47,9 @@ interface OfficeState {
   todos: OfficeTodo[];
   schedules: OfficeSchedule[];
   notes: OfficeNote[];
-  addTodo: (t: { text: string; time?: string; urgent?: boolean }) => void;
+  addTodo: (t: { text: string; time?: string; urgent?: boolean; priority?: OfficePriority; progress?: number; assignee?: string; memo?: string }) => void;
   toggleTodo: (id: string) => void;
+  updateTodo: (id: string, patch: Partial<Omit<OfficeTodo, 'id'>>) => void;
   removeTodo: (id: string) => void;
   addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string }) => void;
   updateSchedule: (id: string, patch: Partial<Omit<OfficeSchedule, 'id'>>) => void;
@@ -42,6 +61,10 @@ interface OfficeState {
 }
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+const hhmmNow = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
 const sortSched = (a: OfficeSchedule, b: OfficeSchedule) =>
   a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date);
 
@@ -52,10 +75,12 @@ export const useOfficeStore = create<OfficeState>()(
       schedules: [],
       notes: [],
 
-      addTodo: ({ text, time = '', urgent = false }) =>
-        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false }] })),
+      addTodo: ({ text, time = '', urgent = false, priority, progress, assignee, memo }) =>
+        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false, priority, progress, assignee, memo }] })),
       toggleTodo: (id) =>
-        set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)) })),
+        set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done, completedAt: !t.done ? hhmmNow() : undefined } : t)) })),
+      updateTodo: (id, patch) =>
+        set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
       removeTodo: (id) => set((s) => ({ todos: s.todos.filter((t) => t.id !== id) })),
 
       addSchedule: ({ date, time, end = '', title, place = '', category = 'blue' }) =>

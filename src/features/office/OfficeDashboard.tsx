@@ -14,6 +14,7 @@ import { APP_VERSION } from '@/lib/constants';
 import type { WorldId } from '@/components/layout/WorldHub';
 import ScheduleManager from './ScheduleManager';
 import NoteManager from './NoteManager';
+import TaskBoard from './TaskBoard';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -59,6 +60,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   // 일정관리 / 메모 전체 화면
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [noteMgrOpen, setNoteMgrOpen] = useState(false);
+  const [taskBoardOpen, setTaskBoardOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -104,7 +106,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
 
   const quickIcons = [
     { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => setScheduleOpen(true) },
-    { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => scrollTo(todoRef.current) },
+    { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
     { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => setScheduleOpen(true) },
     { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },
   ];
@@ -301,6 +303,12 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
       {noteMgrOpen && (
         <div className={styles.schedOverlay}>
           <NoteManager onClose={() => setNoteMgrOpen(false)} />
+        </div>
+      )}
+      {/* 오늘의 할 일 전체보기 */}
+      {taskBoardOpen && (
+        <div className={styles.schedOverlay}>
+          <TaskBoard onBack={() => setTaskBoardOpen(false)} />
         </div>
       )}
     </div>

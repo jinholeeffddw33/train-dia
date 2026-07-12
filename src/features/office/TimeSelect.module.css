@@ -1,0 +1,20 @@
+.wrap { display: flex; flex: 1 1 130px; align-items: center; gap: 4px; min-width: 0; }
+.sel {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--dia-surface);
+  border: 1.5px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 7px 4px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  text-align-last: center;
+}
+.sel:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 1px; }
+.colon { flex-shrink: 0; font-weight: 800; color: var(--dia-text-tertiary); }

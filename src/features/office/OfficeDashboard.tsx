@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from 'react';
 import {
   Bell, Moon, Sun, CalendarDays, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange, ArrowLeftRight,
-  TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee,
+  TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
@@ -16,6 +16,7 @@ import ScheduleManager from './ScheduleManager';
 import NoteManager from './NoteManager';
 import TaskBoard from './TaskBoard';
 import TimeSelect from './TimeSelect';
+import WeeklyMenu from '@/features/life/menu/WeeklyMenu';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -65,6 +66,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
   const [schedStartView, setSchedStartView] = useState<'day' | 'week'>('day'); // 진입 경로별 초기 뷰
   const [noteMgrOpen, setNoteMgrOpen] = useState(false);
   const [taskBoardOpen, setTaskBoardOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -297,15 +299,15 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
         <section className={styles.miniCard}>
           <div className={styles.miniHead}><h2 className={styles.miniTitle}>자주 보는 기능</h2></div>
           <div className={styles.shortcutCol}>
+            <button type="button" className={styles.shortcut} onClick={() => setMenuOpen(true)} data-press>
+              <UtensilsCrossed size={15} /> 이번주 식당메뉴
+            </button>
             <button type="button" className={styles.shortcut} onClick={() => onEnter('standby')} data-press>
               <ClipboardCheck size={15} /> 대기충당확인
             </button>
             <button type="button" className={styles.shortcut} onClick={() => onEnter('duty')} data-press>
               <CalendarDays size={15} /> 근무표
             </button>
-            <a className={styles.shortcut} href="https://cafe.naver.com/smrthink" target="_blank" rel="noopener noreferrer" data-press>
-              <Coffee size={15} /> 카페 바로가기
-            </a>
           </div>
         </section>
       </div>
@@ -331,6 +333,12 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
       {taskBoardOpen && (
         <div className={styles.schedOverlay}>
           <TaskBoard onBack={() => setTaskBoardOpen(false)} />
+        </div>
+      )}
+      {/* 이번주 식당메뉴 */}
+      {menuOpen && (
+        <div className={styles.schedOverlay}>
+          <WeeklyMenu onBack={() => setMenuOpen(false)} />
         </div>
       )}
     </div>

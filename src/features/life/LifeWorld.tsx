@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
@@ -18,6 +18,7 @@ const ZenBonsai = lazy(() => import('./dab/ZenBonsai'));
 const AsmrTherapy = lazy(() => import('./dab/AsmrTherapy'));
 const TodayFortune = lazy(() => import('./fortune/TodayFortune'));
 const AttendanceStamp = lazy(() => import('./stamp/AttendanceStamp'));
+const WeeklyMenu = lazy(() => import('./menu/WeeklyMenu'));
 
 /** 지연 로드 청크 공통 폴백 — 점 3개 로딩 (문구 통일: "불러오고 있어요") */
 const lifeLoading = (
@@ -48,7 +49,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
 }
 
 type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex';
-type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp';
+type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp' | 'menu';
 
 const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
   { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
@@ -88,6 +89,17 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className={styles.dabCardWrap}>
+          <button type="button" className={`${styles.dabCard} ${styles.dabCardMenu}`} onClick={() => setView('menu')}>
+            <div className={styles.dabCardIcon}>
+              <UtensilsCrossed size={26} strokeWidth={2} />
+            </div>
+            <div className={styles.dabCardText}>
+              <span className={styles.dabCardLabel}>이번주 식당 메뉴 <span className={styles.dabCardNewBadge}>NEW</span></span>
+              <span className={styles.dabCardDesc}>이번주 식단표를 등록하고 함께 확인해요</span>
+            </div>
+            <ChevronRight size={18} className={styles.dabCardArrow} />
+          </button>
+
           <button type="button" className={`${styles.dabCard} ${styles.dabCardSage}`} onClick={() => setView('fortune')}>
             <div className={styles.dabCardIcon}>
               <Sparkles size={26} strokeWidth={2} />
@@ -303,6 +315,17 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
       <LifeErrorBoundary onBack={goLifeHome}>
         <Suspense fallback={lifeLoading}>
           <TodayFortune onBack={goLifeHome} />
+        </Suspense>
+      </LifeErrorBoundary>
+    );
+  }
+
+  // ── 이번주 식당 메뉴 ──
+  if (view === 'menu') {
+    return (
+      <LifeErrorBoundary onBack={goLifeHome}>
+        <Suspense fallback={lifeLoading}>
+          <WeeklyMenu onBack={goLifeHome} />
         </Suspense>
       </LifeErrorBoundary>
     );

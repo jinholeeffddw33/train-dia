@@ -981,6 +981,7 @@
 .dabCardMint     { --_dabCard: var(--dab-card-mint);     --_dabIcon: var(--dab-icon-mint);     --_dabInk: var(--dab-ink-mint); }
 .dabCardLavender { --_dabCard: var(--dab-card-lavender); --_dabIcon: var(--dab-icon-lavender); --_dabInk: var(--dab-ink-lavender); }
 .dabCardPeach    { --_dabCard: var(--dab-card-peach);    --_dabIcon: var(--dab-icon-peach);    --_dabInk: var(--dab-ink-peach); }
+.dabCardMenu     { --_dabCard: var(--dab-card-rose);     --_dabIcon: var(--dab-icon-rose);     --_dabInk: var(--dab-ink-rose); }
 
 .dabCardIcon {
   position: relative;

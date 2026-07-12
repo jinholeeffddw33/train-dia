@@ -145,6 +145,9 @@
   --dab-card-peach:    linear-gradient(135deg, rgba(251, 176, 116, 0.10), rgba(251, 146, 116, 0.03)), var(--dia-surface);
   --dab-icon-peach:    rgba(251, 176, 116, 0.16);
   --dab-ink-peach:     #fcd9b0;
+  --dab-card-rose:     linear-gradient(135deg, rgba(251, 113, 133, 0.12), rgba(251, 113, 133, 0.04)), var(--dia-surface);
+  --dab-icon-rose:     rgba(251, 113, 133, 0.18);
+  --dab-ink-rose:      #fda4af;
   --dab-card-border:   rgba(255, 255, 255, 0.06);
 
   /* ========================================
@@ -459,6 +462,9 @@
   --dab-card-peach:    #fbeee5;
   --dab-icon-peach:    #f6dfd0;
   --dab-ink-peach:     #be7848;
+  --dab-card-rose:     #fceaec;
+  --dab-icon-rose:     #f8d7dc;
+  --dab-ink-rose:      #c2415a;
   --dab-card-border:   rgba(0, 0, 0, 0.05);
 
   /* 3D Icon Tokens — Light mode (채도 유지, 글로우 약화) */

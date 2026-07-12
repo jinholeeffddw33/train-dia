@@ -797,3 +797,19 @@ html[data-theme="light"] .ctaBanner {
 html[data-theme="light"] .retryBtn {
   color: var(--z-text-primary);
 }
+
+/* ── LIGHT MODE (train-dia 는 :root.light 클래스 토글 — data-theme 미사용) ──
+   apex 라이트 규칙 다수가 html[data-theme=light] 라 죽어있어, 내 행(entryMe)이
+   라이트에서 배경/글자 대비를 잃음. 앱 실제 토글(:root.light)로 명시 보정. */
+:global(:root.light) .entryMe {
+  background: var(--dia-lime-dim);
+  border-color: var(--dia-lime);
+}
+:global(:root.light) .entryMe .scoreValue,
+:global(:root.light) .entryMe .nickname,
+:global(:root.light) .entryMe .rank {
+  color: var(--dia-text-primary);
+}
+:global(:root.light) .nearMeEntryMe {
+  background-color: var(--dia-lime-dim);
+}

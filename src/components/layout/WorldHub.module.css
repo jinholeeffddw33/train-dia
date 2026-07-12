@@ -295,7 +295,7 @@
 .iconLife {
   background: radial-gradient(circle at 32% 28%, #86EFAC 0%, #22C55E 50%, #15803D 100%);
 }
-/* 교차 진입 카드 — 내근직 대시보드의 '기관사 일정 보기'와 동일 스타일 */
+/* 교차 진입 카드 — 내근직 대시보드의 '기관사 일정 보기'와 동일 스타일(틸 2밴드) */
 .crossCard {
   flex-shrink: 0;
   align-self: flex-start;

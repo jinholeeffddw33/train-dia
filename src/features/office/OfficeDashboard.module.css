@@ -28,16 +28,24 @@
   flex-direction: column;
   justify-content: center;
 }
-.greetBig {
-  font-size: var(--dia-text-xl);
-  font-weight: 800;
-  color: var(--dia-text-primary);
-  letter-spacing: -0.3px;
-}
-.greetSub {
+/* 월드허브 헤더와 동일 — 인사말 / 사업소 / 시간대 인사 */
+.greeting {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
-  margin-top: 2px;
+  margin: 0 0 6px;
+}
+.hubTitle {
+  font-size: clamp(19px, 5.4vw, 24px);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0;
+}
+.hubSubtitle {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  margin: 6px 0 0;
 }
 .headerActions { display: flex; gap: 8px; flex-shrink: 0; }
 .iconBtn {
@@ -51,9 +59,10 @@
 }
 .iconBtn:active { transform: scale(0.9); }
 
-/* ── 날짜 카드 (사진처럼 인사말 우측, 두 줄 = 두 색 밴드) ── */
+/* ── 교차 진입 카드 (인사말 우측, 두 줄 = 두 색 밴드) — 월드허브와 동일 ── */
 .dateCard {
   flex-shrink: 0;
+  align-self: flex-start;   /* 헤더 높이에 늘어나 빈 밴드 생기지 않게 — 내용 높이만(2밴드) */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -71,7 +80,7 @@
   color: #fff;
 }
 .dateText { font-size: var(--dia-text-sm); font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; }
-/* 아래: 캘린더 보기 (밝은 밴드 — 흰 오버레이로 위와 색 구분) */
+/* 아래: 기관사 일정 보기 (밝은 밴드 — 흰 오버레이로 위와 색 구분) */
 .dateGo {
   display: flex; align-items: center; gap: 3px;
   padding: 6px 14px;

@@ -26,12 +26,13 @@ function todayLabel(): string {
   const dd = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}. ${mm}. ${dd} (${DOW[d.getDay()]})`;
 }
-function greeting(): string {
+// 월드허브와 동일한 시간대별 부제
+function getSubtitle(): string {
   const h = new Date().getHours();
-  if (h < 6) return '편안한 밤 되세요';
-  if (h < 12) return '좋은 아침입니다';
-  if (h < 18) return '오후도 힘내세요';
-  return '오늘도 수고하셨어요';
+  if (h < 6) return '편안한 밤 되세요 🌙';
+  if (h < 12) return '오늘도 안전운행 하세요!';
+  if (h < 18) return '오후도 화이팅 🚇';
+  return '오늘도 고생 많으셨어요';
 }
 function todayISO(): string {
   const d = new Date();
@@ -136,8 +137,9 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
       {/* ── 인사말(좌) + 날짜 카드(우) — 사진과 동일 배치 ── */}
       <div className={styles.headerRow}>
         <div className={styles.greetBlock}>
-          <p className={styles.greetBig}>{greeting()}!</p>
-          {name && <p className={styles.greetSub}>{name} {role}, 환영합니다 👋</p>}
+          {name && <p className={styles.greeting}>안녕하세요, {name} {role}</p>}
+          <h1 className={styles.hubTitle}>답십리 승무사업소</h1>
+          <p className={styles.hubSubtitle}>{getSubtitle()}</p>
         </div>
         <button type="button" className={styles.dateCard} onClick={() => onOpenHub?.()} data-press
           aria-label="기관사 화면으로 이동">

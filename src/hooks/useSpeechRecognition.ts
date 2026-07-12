@@ -14,6 +14,7 @@ export function useSpeechRecognition(onFinal: (text: string) => void, lang = 'ko
   const [interim, setInterim] = useState('');
   const recRef = useRef<any>(null);
   const listeningRef = useRef(false);
+  const appendedRef = useRef<Set<number>>(new Set()); // 이미 반영한 최종결과 인덱스(중복 방지)
   const onFinalRef = useRef(onFinal);
   onFinalRef.current = onFinal;
   useEffect(() => { listeningRef.current = listening; }, [listening]);
@@ -30,10 +31,17 @@ export function useSpeechRecognition(onFinal: (text: string) => void, lang = 'ko
     rec.interimResults = true;
     rec.onresult = (e: any) => {
       let interimStr = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
+      // 전체 결과를 훑되, 각 인덱스의 최종결과는 딱 한 번만 반영(Chrome 중복 이벤트 방지)
+      for (let i = 0; i < e.results.length; i++) {
         const res = e.results[i];
-        if (res.isFinal) onFinalRef.current(res[0].transcript);
-        else interimStr += res[0].transcript;
+        if (res.isFinal) {
+          if (!appendedRef.current.has(i)) {
+            appendedRef.current.add(i);
+            onFinalRef.current(res[0].transcript);
+          }
+        } else {
+          interimStr += res[0].transcript;
+        }
       }
       setInterim(interimStr);
     };
@@ -46,6 +54,7 @@ export function useSpeechRecognition(onFinal: (text: string) => void, lang = 'ko
 
   const start = useCallback(() => {
     if (!recRef.current || listeningRef.current) return;
+    appendedRef.current = new Set(); // 새 세션 → 인덱스 0부터 다시 시작하므로 초기화
     try { recRef.current.start(); setListening(true); } catch { /* 이미 시작됨 */ }
   }, []);
 

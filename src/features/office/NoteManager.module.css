@@ -103,3 +103,7 @@
 .micOn { border-color: var(--dia-red); background: color-mix(in srgb, var(--dia-red) 14%, transparent); color: var(--dia-red); animation: micPulse 1.4s ease-in-out infinite; }
 @keyframes micPulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--dia-red) 45%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
 .sttInterim { flex: 1; min-width: 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 내용 지우기 */
+.clearBtn { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); font-weight: 700; }
+.clearBtn:active { transform: scale(0.96); background: var(--dia-surface-hover); }

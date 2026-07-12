@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowLeft, Search, Plus, X, Star, Pin, Trash2, PenLine, Mic } from 'lucide-react';
+import { ArrowLeft, Search, Plus, X, Star, Pin, Trash2, PenLine, Mic, Eraser } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
@@ -155,14 +155,21 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
             <textarea className={styles.bodyInput} value={fBody} placeholder="내용을 입력하세요…" rows={6}
               onChange={(e) => setFBody(e.target.value)} aria-label="내용" />
 
-            {/* 음성 입력 (지원 브라우저만 노출) */}
-            {speech.supported && (
+            {/* 음성 입력(지원 브라우저) + 내용 지우기 */}
+            {(speech.supported || fBody) && (
               <div className={styles.sttRow}>
-                <button type="button" className={speech.listening ? styles.micOn : styles.mic}
-                  onClick={speech.toggle} aria-pressed={speech.listening}>
-                  <Mic size={16} /> {speech.listening ? '듣는 중… 탭하여 정지' : '음성으로 입력'}
-                </button>
+                {speech.supported && (
+                  <button type="button" className={speech.listening ? styles.micOn : styles.mic}
+                    onClick={speech.toggle} aria-pressed={speech.listening}>
+                    <Mic size={16} /> {speech.listening ? '듣는 중… 탭하여 정지' : '음성으로 입력'}
+                  </button>
+                )}
                 {speech.listening && speech.interim && <span className={styles.sttInterim}>{speech.interim}</span>}
+                {fBody && (
+                  <button type="button" className={styles.clearBtn} onClick={() => { speech.stop(); setFBody(''); }}>
+                    <Eraser size={14} /> 내용 지우기
+                  </button>
+                )}
               </div>
             )}
 

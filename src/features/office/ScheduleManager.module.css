@@ -127,7 +127,7 @@
 .fLabel { display: block; font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-tertiary); margin-bottom: 5px; }
 .fInput { width: 100%; padding: 10px 12px; background: var(--dia-bg); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md); color: var(--dia-text-primary); font-size: var(--dia-text-base); box-sizing: border-box; min-width: 0; }
 .fInput::placeholder { color: var(--dia-text-tertiary); }
-.two { display: flex; align-items: center; gap: 8px; }
+.two { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .tilde { color: var(--dia-text-tertiary); font-weight: 800; }
 .catPick { display: flex; gap: 10px; }
 .cp { width: 30px; height: 30px; border-radius: 50%; }

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, X, Check, CalendarDays, MapPin, Trash2 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
+import TimeSelect from './TimeSelect';
 import styles from './ScheduleManager.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -234,9 +235,9 @@ export default function ScheduleManager({ onClose, startMonth = false }: { onClo
             <div className={styles.field}>
               <label className={styles.fLabel}>시간</label>
               <div className={styles.two}>
-                <input className={styles.fInput} type="time" value={fStart} onChange={(e) => setFStart(e.target.value)} step={600} aria-label="시작(10분 단위)" />
+                <TimeSelect value={fStart} onChange={setFStart} ariaLabel="시작" />
                 <span className={styles.tilde}>~</span>
-                <input className={styles.fInput} type="time" value={fEnd} onChange={(e) => setFEnd(e.target.value)} step={600} aria-label="종료(선택, 10분 단위)" />
+                <TimeSelect value={fEnd} onChange={setFEnd} ariaLabel="종료(선택)" />
               </div>
             </div>
 

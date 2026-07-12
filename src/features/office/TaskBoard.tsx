@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, X, Check, Clock, User, FileText, Trash2, Sparkles } fr
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, todoPriority, type OfficeTodo, type OfficePriority } from '@/stores/office';
+import TimeSelect from './TimeSelect';
 import styles from './TaskBoard.module.css';
 
 interface Props {
@@ -280,7 +281,7 @@ function TodoEditor({
           <div className={styles.fieldRow}>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>마감 시각</span>
-              <input className={styles.input} type="time" value={time} onChange={(e) => setTime(e.target.value)} step={600} />
+              <TimeSelect value={time} onChange={setTime} ariaLabel="마감 시각" />
             </label>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>담당자</span>

@@ -15,6 +15,7 @@ import type { WorldId } from '@/components/layout/WorldHub';
 import ScheduleManager from './ScheduleManager';
 import NoteManager from './NoteManager';
 import TaskBoard from './TaskBoard';
+import TimeSelect from './TimeSelect';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -161,7 +162,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
               <input className={styles.formText} type="text" placeholder="할 일" value={todoText} autoFocus
                 onChange={(e) => setTodoText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitTodo(); }} aria-label="할 일 내용" />
               <div className={styles.formRow}>
-                <input className={styles.formTime} type="time" value={todoTime} onChange={(e) => setTodoTime(e.target.value)} step={600} aria-label="마감시각(10분 단위)" />
+                <TimeSelect value={todoTime} onChange={setTodoTime} ariaLabel="마감시각" />
                 <button type="button" className={`${styles.urgentToggle} ${todoUrgent ? styles.urgentOn : ''}`}
                   onClick={() => setTodoUrgent((v) => !v)} aria-pressed={todoUrgent}>긴급</button>
                 <button type="button" className={styles.formSave} onClick={submitTodo}>추가</button>
@@ -199,7 +200,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
               <input className={styles.formText} type="text" placeholder="장소(선택)" value={schPlace}
                 onChange={(e) => setSchPlace(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') submitSchedule(); }} aria-label="장소" />
               <div className={styles.formRow}>
-                <input className={styles.formTime} type="time" value={schTime} onChange={(e) => setSchTime(e.target.value)} step={600} aria-label="시각(10분 단위)" />
+                <TimeSelect value={schTime} onChange={setSchTime} ariaLabel="시각" />
                 <button type="button" className={styles.formSave} onClick={submitSchedule}>추가</button>
               </div>
             </div>

@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   Bell, Moon, Sun, CalendarDays, ChevronRight, Plus, X, Check,
-  ListChecks, CalendarClock, StickyNote, CalendarRange,
+  ListChecks, CalendarClock, StickyNote, CalendarRange, ArrowLeftRight,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
@@ -45,7 +45,7 @@ const WORLD_ICONS: { id: WorldId; label: string; Icon: typeof TrainFront; tone: 
   { id: 'life',   label: '라이프', Icon: Heart,         tone: 'life' },
 ];
 
-export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => void }) {
+export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: WorldId) => void; onOpenHub?: () => void }) {
   const authUser = useAuthStore((s) => s.user);
   const name = authUser?.name ?? '';
   const role = getUserRole(authUser?.sabun);
@@ -139,12 +139,13 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
           <p className={styles.greetBig}>{greeting()}!</p>
           {name && <p className={styles.greetSub}>{name} {role}, 환영합니다 👋</p>}
         </div>
-        <button type="button" className={styles.dateCard} onClick={() => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); }} data-press>
+        <button type="button" className={styles.dateCard} onClick={() => onOpenHub?.()} data-press
+          aria-label="기관사 화면으로 이동">
           <span className={styles.dateTop}>
-            <CalendarDays size={16} strokeWidth={2.4} />
+            <ArrowLeftRight size={16} strokeWidth={2.4} />
             <span className={styles.dateText}>{todayLabel()}</span>
           </span>
-          <span className={styles.dateGo}>캘린더 보기 <ChevronRight size={13} /></span>
+          <span className={styles.dateGo}>기관사 일정 보기 <ChevronRight size={13} /></span>
         </button>
       </div>
 

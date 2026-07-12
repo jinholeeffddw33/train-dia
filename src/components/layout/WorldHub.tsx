@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, ArrowLeftRight, ChevronRight } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -21,6 +21,8 @@ export type WorldId = 'duty' | 'edu' | 'safety' | 'life' | 'standby';
 
 interface WorldHubProps {
   onEnter: (world: WorldId) => void;
+  /** 일정관리 대시보드로 교차 진입(기관사도 내근직 대시보드 사용) */
+  onOpenSchedule?: () => void;
 }
 
 interface ServiceDef {
@@ -37,6 +39,12 @@ const SERVICES: ServiceDef[] = [
   { id: 'safety', label: '안전',       desc: '점검 · 매뉴얼',   Icon: Shield,        iconClass: 'iconSafety' },
   { id: 'life',   label: '라이프',     desc: '건강 · 힐링',     Icon: Heart,         iconClass: 'iconLife' },
 ];
+
+const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+function todayLabel(): string {
+  const d = new Date();
+  return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
+}
 
 // 시간대별 부제
 function getSubtitle(): string {
@@ -59,7 +67,7 @@ function LottieIcon({ src, width = 24 }: { src: string; width?: number }) {
   return <Lottie animationData={data} loop autoplay style={{ width, height: width }} />;
 }
 
-export default function WorldHub({ onEnter }: WorldHubProps) {
+export default function WorldHub({ onEnter, onOpenSchedule }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
   const role = getUserRole(driver?.s);
@@ -74,7 +82,30 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
 
   return (
     <div className={styles.hub}>
-      {/* ── Header ── */}
+      {/* ── 상단 바 — 테마 토글 + 알림 ── */}
+      <div className={styles.topBar}>
+        <button
+          type="button"
+          className={styles.themeBtn}
+          aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+          onClick={toggleTheme}
+        >
+          {theme === 'dark'
+            ? <Moon size={20} strokeWidth={2.2} />
+            : <Sun size={20} strokeWidth={2.2} />}
+        </button>
+        <button
+          type="button"
+          className={styles.bellBtn}
+          aria-label="알림"
+          onClick={() => onEnter('safety')}
+        >
+          <Bell size={20} strokeWidth={2.2} />
+          {hasNotice && <span className={styles.bellDot} aria-hidden />}
+        </button>
+      </div>
+
+      {/* ── Header — 인사말·소개(좌) + 교차 카드(우, ⇄ 일정관리 보기) 한 줄 ── */}
       <header className={styles.header}>
         <div className={styles.headerText}>
           {name && (
@@ -83,27 +114,14 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
           <h1 className={styles.title}>답십리 승무사업소</h1>
           <p className={styles.subtitle}>{getSubtitle()}</p>
         </div>
-        <div className={styles.headerActions}>
-          <button
-            type="button"
-            className={styles.themeBtn}
-            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-            onClick={toggleTheme}
-          >
-            {theme === 'dark'
-              ? <Moon size={22} strokeWidth={2.2} />
-              : <Sun size={22} strokeWidth={2.2} />}
-          </button>
-          <button
-            type="button"
-            className={styles.bellBtn}
-            aria-label="알림"
-            onClick={() => onEnter('safety')}
-          >
-            <Bell size={22} strokeWidth={2.2} />
-            {hasNotice && <span className={styles.bellDot} aria-hidden />}
-          </button>
-        </div>
+        <button type="button" className={styles.crossCard} onClick={() => onOpenSchedule?.()}
+          aria-label="일정관리 화면으로 이동" data-press>
+          <span className={styles.crossTop}>
+            <ArrowLeftRight size={16} strokeWidth={2.4} />
+            <span className={styles.crossText}>{todayLabel()}</span>
+          </span>
+          <span className={styles.crossGo}>일정관리 보기 <ChevronRight size={13} /></span>
+        </button>
       </header>
 
       {/* ── Today's Duty Hero ── */}

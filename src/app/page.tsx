@@ -84,6 +84,9 @@ export default function HomePage() {
   // 내근직(비승무 직원) 판정 — 로그인 계정 기준(조회 모드 무관). EXTRA/INTERN 사번 = 내근직
   const authUser = useAuthStore((s) => s.user);
   const isOfficeUser = !!authUser && isOffice(authUser.sabun);
+  // 최초 홈은 신분에 따라 다르지만(내근직=일정관리, 기관사=월드허브) 서로 교차 진입 가능
+  const [homeOverride, setHomeOverride] = useState<'office' | 'hub' | null>(null);
+  const home: 'office' | 'hub' = homeOverride ?? (isOfficeUser ? 'office' : 'hub');
 
   // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
   useEffect(() => {
@@ -118,9 +121,9 @@ export default function HomePage() {
         <KimMinkyungAwardModal />
         <WhatsNewModal />
         {world === null ? (
-          isOfficeUser
-            ? <OfficeDashboard onEnter={handleEnter} />
-            : <WorldHub onEnter={handleEnter} />
+          home === 'office'
+            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => setHomeOverride('hub')} />
+            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => setHomeOverride('office')} />
         ) : world === 'duty' ? (
           <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}

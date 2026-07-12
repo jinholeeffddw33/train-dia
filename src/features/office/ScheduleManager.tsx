@@ -47,10 +47,10 @@ function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
   return out;
 }
 
-export default function ScheduleManager({ onClose, startMonth = false }: { onClose: () => void; startMonth?: boolean }) {
+export default function ScheduleManager({ onClose, startMonth = false, startView = 'day', title = '일정 관리' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list'; title?: string }) {
   const { schedules, addSchedule, removeSchedule, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
-  const [view, setView] = useState<'day' | 'week' | 'list'>('day');
+  const [view, setView] = useState<'day' | 'week' | 'list'>(startView);
   const [monthOpen, setMonthOpen] = useState(startMonth);
 
   // 등록 시트
@@ -154,7 +154,7 @@ export default function ScheduleManager({ onClose, startMonth = false }: { onClo
       {/* 헤더 */}
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onClose} aria-label="닫기"><ArrowLeft size={20} /></button>
-        <h1 className={styles.title}>일정 관리</h1>
+        <h1 className={styles.title}>{title}</h1>
         <span className={styles.headSpacer} />
       </header>
 

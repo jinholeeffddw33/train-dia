@@ -17,6 +17,8 @@ import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
 import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
+import { useAuthStore } from '@/stores/auth';
+import { isOffice } from '@/lib/auth';
 
 // ── 코드 스플리팅 — 첫 화면(WorldHub + 근무 홈 탭)만 정적, 나머지 월드/탭은 지연 로드
 //    앱이 사실상 CSR(AuthGate 뒤)이라 ssr:false 무방 — 초기 청크에서 각 월드가 빠짐
@@ -29,6 +31,7 @@ const EduTab = dynamic(() => import('@/features/edu/components/EduTab'), { ssr: 
 const SafetyWorld = dynamic(() => import('@/features/safety/SafetyWorld'), { ssr: false, loading });
 const LifeWorld = dynamic(() => import('@/features/life/LifeWorld'), { ssr: false, loading });
 const StandbyCoverageView = dynamic(() => import('@/features/standby/StandbyCoverageView'), { ssr: false, loading });
+const OfficeDashboard = dynamic(() => import('@/features/office/OfficeDashboard'), { ssr: false, loading });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -78,6 +81,9 @@ const VALID_TABS: readonly string[] = ['work', 'calendar', 'line', 'duty', 'more
 export default function HomePage() {
   const [world, setWorld] = useState<WorldId | null>(null);
   const [initialTab, setInitialTab] = useState<TabId>('work');
+  // 내근직(비승무 직원) 판정 — 로그인 계정 기준(조회 모드 무관). EXTRA/INTERN 사번 = 내근직
+  const authUser = useAuthStore((s) => s.user);
+  const isOfficeUser = !!authUser && isOffice(authUser.sabun);
 
   // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
   useEffect(() => {
@@ -112,7 +118,9 @@ export default function HomePage() {
         <KimMinkyungAwardModal />
         <WhatsNewModal />
         {world === null ? (
-          <WorldHub onEnter={handleEnter} />
+          isOfficeUser
+            ? <OfficeDashboard onEnter={handleEnter} />
+            : <WorldHub onEnter={handleEnter} />
         ) : world === 'duty' ? (
           <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}

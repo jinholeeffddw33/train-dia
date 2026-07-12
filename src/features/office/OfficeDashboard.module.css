@@ -1,0 +1,299 @@
+/* ===== 내근직 대시보드 ===== */
+.dash {
+  padding: calc(var(--sat) + var(--dia-space-4)) var(--dia-space-4)
+           calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ── 상단 액션 바 ── */
+.topBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: var(--dia-space-2);
+}
+
+/* ── 인사말(좌) + 날짜 카드(우) ── */
+.headerRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-4);
+}
+.greetBlock {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.greetBig {
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  letter-spacing: -0.3px;
+}
+.greetSub {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  margin-top: 2px;
+}
+.headerActions { display: flex; gap: 8px; flex-shrink: 0; }
+.iconBtn {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  transition: transform 0.12s ease;
+}
+.iconBtn:active { transform: scale(0.9); }
+
+/* ── 날짜 카드 (사진처럼 인사말 우측, 두 줄 = 두 색 밴드) ── */
+.dateCard {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--dia-hero-gradient);   /* 위 밴드 = 진한 네이비 그라디언트 */
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  overflow: hidden;
+}
+.dateCard:active { transform: scale(0.97); }
+/* 위: 날짜 (진한 밴드) */
+.dateTop {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 14px 7px;
+  color: #fff;
+}
+.dateText { font-size: var(--dia-text-sm); font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; }
+/* 아래: 캘린더 보기 (밝은 밴드 — 흰 오버레이로 위와 색 구분) */
+.dateGo {
+  display: flex; align-items: center; gap: 3px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: var(--dia-text-meta); font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ── 2열 그리드 ── */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-4);
+  align-items: start;
+}
+
+/* ── 미니 카드(2열용) ── */
+.miniCard {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-3);
+  min-width: 0;
+}
+.miniHead {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 4px;
+  margin-bottom: var(--dia-space-2);
+}
+.miniTitle {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  min-width: 0;
+}
+.miniTitle svg { color: var(--dia-blue); flex-shrink: 0; }
+.addMini {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+}
+.addMini:active { transform: scale(0.88); }
+
+/* ── 인라인 추가 폼 ── */
+.addForm { display: flex; flex-direction: column; gap: 5px; margin-bottom: var(--dia-space-2); }
+.formText, .formTime {
+  width: 100%;
+  padding: 7px 9px;
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  box-sizing: border-box;
+  min-width: 0;
+}
+.formText::placeholder { color: var(--dia-text-tertiary); }
+.formRow { display: flex; gap: 5px; }
+.formTime { flex: 1; }
+.urgentToggle {
+  flex-shrink: 0;
+  padding: 0 8px;
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-bg);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+}
+.urgentOn { color: var(--dia-on-amber); background: var(--dia-amber); border-color: transparent; }
+.formSave {
+  flex-shrink: 0;
+  padding: 0 12px;
+  min-height: 34px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+}
+.formSave:active { transform: scale(0.95); }
+
+/* ── 리스트 공통 ── */
+.miniList, .noteList { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+.empty { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); padding: var(--dia-space-2) 0; text-align: center; }
+
+/* 할 일 항목 */
+.todoItem {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 2px;
+  border-bottom: 1px solid var(--dia-border-light);
+}
+.todoItem:last-child { border-bottom: none; }
+.checkBox {
+  flex-shrink: 0;
+  width: 19px; height: 19px;
+  border-radius: 5px;
+  border: 2px solid var(--dia-border-strong);
+  background: transparent;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.todoDone .checkBox { background: var(--dia-blue); border-color: var(--dia-blue); }
+.todoText { flex: 1; min-width: 0; font-size: var(--dia-text-sm); color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.todoDone .todoText { color: var(--dia-text-tertiary); text-decoration: line-through; }
+.urgentBadge { flex-shrink: 0; padding: 0 4px; border-radius: 3px; background: var(--dia-red); color: #fff; font-size: var(--dia-text-meta); font-weight: 800; line-height: 1.6; }
+.itemTime { flex-shrink: 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-variant-numeric: tabular-nums; }
+.delBtn {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  color: var(--dia-text-tertiary);
+}
+.delBtn:active { transform: scale(0.85); background: var(--dia-surface-hover); }
+
+/* 일정 항목 */
+.schedItem { display: flex; align-items: center; gap: 6px; padding: 6px 2px; }
+.schedTime { flex-shrink: 0; width: 38px; font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-blue-text); font-variant-numeric: tabular-nums; }
+.schedDot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--dia-blue); box-shadow: 0 0 0 3px var(--dia-blue-dim); }
+.schedBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.schedTitle { font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schedPlace { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── 진행률(미니 카드) ── */
+.progressRow { display: flex; align-items: center; gap: var(--dia-space-2); }
+.ringWrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+.ring { width: 64px; height: 64px; }
+.ringBg { fill: none; stroke: var(--dia-border); stroke-width: 8; }
+.ringFg { fill: none; stroke: var(--dia-blue); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+.ringPct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: var(--dia-text-base); font-weight: 900; color: var(--dia-text-primary); }
+.progressStats { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.progressStats div { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.progressStats dt { font-size: var(--dia-text-meta); color: var(--dia-text-secondary); }
+.progressStats dd { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
+.stDone { color: var(--dia-green-text) !important; }
+.stLeft { color: var(--dia-amber-text) !important; }
+
+/* ── 자주 보는 기능(미니 카드) ── */
+.shortcutCol { display: flex; flex-direction: column; gap: 6px; }
+.shortcut {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 10px;
+  min-height: 38px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+}
+.shortcut:active { transform: scale(0.96); }
+.shortcut svg { color: var(--dia-blue); flex-shrink: 0; }
+
+/* ── 전체폭 카드(메모) ── */
+.card {
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-xl);
+  padding: var(--dia-space-4);
+  margin-bottom: var(--dia-space-4);
+}
+.cardHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--dia-space-3); }
+.cardTitle { display: inline-flex; align-items: center; gap: 6px; font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
+.cardTitle svg { color: var(--dia-blue); }
+.memoAdd { display: flex; gap: 6px; margin-bottom: var(--dia-space-3); }
+.textInput {
+  flex: 1; min-width: 0;
+  padding: 8px 12px;
+  background: var(--dia-bg);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  box-sizing: border-box;
+}
+.textInput::placeholder { color: var(--dia-text-tertiary); }
+.saveBtn {
+  flex-shrink: 0;
+  padding: 0 16px; min-height: 38px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+.saveBtn:active { transform: scale(0.97); }
+.noteItem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-md);
+}
+.noteText { flex: 1; min-width: 0; font-size: var(--dia-text-sm); color: var(--dia-text-primary); word-break: break-word; }
+
+/* ── 아이콘 2줄 ── */
+.iconGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dia-space-3) var(--dia-space-2); margin-bottom: var(--dia-space-4); }
+.gridBtn { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 44px; }
+.gridBtn:active { transform: scale(0.94); }
+.gridIcon {
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px;
+  background: var(--dia-surface-elevated);
+  border: 1px solid var(--dia-border);
+}
+.gridIconWork { color: var(--dia-blue); background: var(--dia-blue-dim); border-color: transparent; }
+.tone_duty   { color: var(--dia-blue);        background: var(--dia-blue-dim);   border-color: transparent; }
+.tone_edu    { color: var(--dia-green-text);  background: var(--dia-green-dim, var(--dia-surface-elevated));  border-color: transparent; }
+.tone_safety { color: var(--dia-amber-text);  background: var(--dia-amber-dim, var(--dia-surface-elevated));  border-color: transparent; }
+.tone_life   { color: var(--dia-purple);      background: var(--dia-purple-dim, var(--dia-surface-elevated)); border-color: transparent; }
+.gridLabel { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Footer ── */
+.footer { display: flex; align-items: center; justify-content: center; gap: 8px; padding: var(--dia-space-4) 0; }
+.footerBrand { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-blue-text); }
+.footerVersion { font-size: var(--dia-text-meta); font-weight: 800; color: #fff; background: linear-gradient(135deg, #3B82F6, #8B5CF6); padding: 2px 10px; border-radius: 999px; }

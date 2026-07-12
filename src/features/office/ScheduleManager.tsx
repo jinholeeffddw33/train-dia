@@ -234,9 +234,9 @@ export default function ScheduleManager({ onClose, startMonth = false }: { onClo
             <div className={styles.field}>
               <label className={styles.fLabel}>시간</label>
               <div className={styles.two}>
-                <input className={styles.fInput} type="time" value={fStart} onChange={(e) => setFStart(e.target.value)} aria-label="시작" />
+                <input className={styles.fInput} type="time" value={fStart} onChange={(e) => setFStart(e.target.value)} step={600} aria-label="시작(10분 단위)" />
                 <span className={styles.tilde}>~</span>
-                <input className={styles.fInput} type="time" value={fEnd} onChange={(e) => setFEnd(e.target.value)} aria-label="종료(선택)" />
+                <input className={styles.fInput} type="time" value={fEnd} onChange={(e) => setFEnd(e.target.value)} step={600} aria-label="종료(선택, 10분 단위)" />
               </div>
             </div>
 

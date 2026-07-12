@@ -280,7 +280,7 @@ function TodoEditor({
           <div className={styles.fieldRow}>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>마감 시각</span>
-              <input className={styles.input} type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+              <input className={styles.input} type="time" value={time} onChange={(e) => setTime(e.target.value)} step={600} />
             </label>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>담당자</span>

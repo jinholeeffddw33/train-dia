@@ -44,7 +44,7 @@ export default function HomeStampCard() {
             ? <Check size={15} strokeWidth={3} aria-hidden />
             : <Stamp size={15} strokeWidth={2.4} aria-hidden />}
         </span>
-        <span className={styles.label}>{stampedToday ? '출근완료' : '출근도장'}</span>
+        <span className={styles.label}>{stampedToday ? '완료' : '도장꽝'}</span>
 
         {pop && (
           <span className={styles.pop} aria-hidden>

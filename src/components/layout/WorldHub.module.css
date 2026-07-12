@@ -903,7 +903,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   margin: 2px auto 0;
 }
 
@@ -912,11 +912,11 @@
 .standbyCard {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   width: fit-content !important;
   max-width: 100%;
   margin: 2px auto 0;
-  padding: 4px 9px 4px 5px;
+  padding: 3px 9px 3px 5px;
   /* 메인 배경과 구분되는 인디고 톤 (라이트/다크 공통) */
   background:
     linear-gradient(rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.12)),
@@ -945,16 +945,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: rgba(99, 102, 241, 0.2);
   color: #6366F1;
   flex-shrink: 0;
 }
 .standbyIcon svg {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
 }
 .standbyLabel {
   font-size: var(--dia-text-sm);

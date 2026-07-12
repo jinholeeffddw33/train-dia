@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, ChevronRight, Coffee, Moon, Sun } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -157,7 +157,6 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             <ClipboardCheck size={14} strokeWidth={2.4} />
           </span>
           <span className={styles.standbyLabel}>대기충당확인</span>
-          <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
         </button>
 
         {/* 출근 도장 (재미 요소 — 작게) */}
@@ -175,7 +174,6 @@ export default function WorldHub({ onEnter }: WorldHubProps) {
             <Coffee size={14} strokeWidth={2.4} />
           </span>
           <span className={styles.standbyLabel}>카페 바로가기</span>
-          <ChevronRight size={14} className={styles.standbyChevron} aria-hidden />
         </a>
       </div>
 

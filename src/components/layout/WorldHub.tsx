@@ -33,7 +33,7 @@ interface ServiceDef {
 
 const SERVICES: ServiceDef[] = [
   { id: 'duty',   label: '근무',       desc: '교번 · 일정',     Icon: TrainFront,    iconClass: 'iconDuty' },
-  { id: 'edu',    label: '스마트승무원', desc: '규정 · 학습',     Icon: GraduationCap, iconClass: 'iconEdu' },
+  { id: 'edu',    label: '교육', desc: '규정 · 학습',     Icon: GraduationCap, iconClass: 'iconEdu' },
   { id: 'safety', label: '안전',       desc: '점검 · 매뉴얼',   Icon: Shield,        iconClass: 'iconSafety' },
   { id: 'life',   label: '라이프',     desc: '건강 · 힐링',     Icon: Heart,         iconClass: 'iconLife' },
 ];

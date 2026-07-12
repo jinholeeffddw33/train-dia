@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Search, Plus, X, Star, Pin, Trash2, PenLine, Mic, Eraser } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -39,11 +39,17 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
   const [fCat, setFCat] = useState('gray');
   const [fPin, setFPin] = useState(false);
 
-  // 음성 → 텍스트 (지원 브라우저에서만). 인식된 문장은 내용(body) 뒤에 이어붙임
-  const speech = useSpeechRecognition((t) => {
-    const add = t.trim();
-    if (add) setFBody((prev) => (prev.trim() ? `${prev.trimEnd()} ${add}` : add));
+  // 음성 → 텍스트 (지원 브라우저에서만). 듣기 시작 시점의 내용을 base로 잡고
+  // 세션 최종 텍스트를 '설정'만 함 → 안드로이드 크롬 중복 이벤트에도 중복 없음
+  const voiceBaseRef = useRef('');
+  const speech = useSpeechRecognition((sessionFinal) => {
+    setFBody(voiceBaseRef.current + sessionFinal);
   });
+  const startVoice = () => {
+    voiceBaseRef.current = fBody.trim() ? `${fBody.replace(/\s+$/, '')} ` : '';
+    speech.start();
+  };
+  const toggleVoice = () => { if (speech.listening) speech.stop(); else startVoice(); };
   // 시트 닫히면 마이크 정지(권한/녹음 해제)
   useEffect(() => { if (!open && speech.listening) speech.stop(); }, [open, speech.listening, speech]);
 
@@ -160,7 +166,7 @@ export default function NoteManager({ onClose }: { onClose: () => void }) {
               <div className={styles.sttRow}>
                 {speech.supported && (
                   <button type="button" className={speech.listening ? styles.micOn : styles.mic}
-                    onClick={speech.toggle} aria-pressed={speech.listening}>
+                    onClick={toggleVoice} aria-pressed={speech.listening}>
                     <Mic size={16} /> {speech.listening ? '듣는 중… 탭하여 정지' : '음성으로 입력'}
                   </button>
                 )}

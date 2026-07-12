@@ -31,6 +31,7 @@ export interface OfficeSchedule {
   title: string;
   place: string;
   category: string;  // OFFICE_CATEGORIES key
+  memo?: string;     // 간단한 내용(선택)
   repeatId?: string; // 반복 일정 그룹 id (같은 시리즈끼리 공유)
 }
 export interface OfficeNote { id: string; title: string; body: string; category: string; pinned: boolean; ts: number }
@@ -53,8 +54,8 @@ interface OfficeState {
   toggleTodo: (id: string) => void;
   updateTodo: (id: string, patch: Partial<Omit<OfficeTodo, 'id'>>) => void;
   removeTodo: (id: string) => void;
-  addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string }) => void;
-  addSchedules: (items: { date: string; time: string; end?: string; title: string; place?: string; category?: string; repeatId?: string }[]) => void;
+  addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string; memo?: string }) => void;
+  addSchedules: (items: { date: string; time: string; end?: string; title: string; place?: string; category?: string; memo?: string; repeatId?: string }[]) => void;
   updateSchedule: (id: string, patch: Partial<Omit<OfficeSchedule, 'id'>>) => void;
   removeSchedule: (id: string) => void;
   removeSeries: (repeatId: string) => void;
@@ -87,15 +88,15 @@ export const useOfficeStore = create<OfficeState>()(
         set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, ...patch } : t)) })),
       removeTodo: (id) => set((s) => ({ todos: s.todos.filter((t) => t.id !== id) })),
 
-      addSchedule: ({ date, time, end = '', title, place = '', category = 'blue' }) =>
+      addSchedule: ({ date, time, end = '', title, place = '', category = 'blue', memo }) =>
         set((s) => ({
-          schedules: [...s.schedules, { id: uid(), date, time, end, title, place, category }].sort(sortSched),
+          schedules: [...s.schedules, { id: uid(), date, time, end, title, place, category, memo }].sort(sortSched),
         })),
       addSchedules: (items) =>
         set((s) => ({
           schedules: [
             ...s.schedules,
-            ...items.map((it) => ({ id: uid(), date: it.date, time: it.time, end: it.end ?? '', title: it.title, place: it.place ?? '', category: it.category ?? 'blue', repeatId: it.repeatId })),
+            ...items.map((it) => ({ id: uid(), date: it.date, time: it.time, end: it.end ?? '', title: it.title, place: it.place ?? '', category: it.category ?? 'blue', memo: it.memo, repeatId: it.repeatId })),
           ].sort(sortSched),
         })),
       updateSchedule: (id, patch) =>

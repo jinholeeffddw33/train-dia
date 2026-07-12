@@ -188,3 +188,8 @@
 .repOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
 .repHint { margin: 6px 0 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
 .repMark { flex-shrink: 0; color: var(--dia-text-tertiary); margin-left: 4px; }
+
+/* 일정 내용(메모) */
+.fTextarea { width: 100%; box-sizing: border-box; padding: 10px 12px; background: var(--dia-bg); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md); color: var(--dia-text-primary); font-size: var(--dia-text-base); font-family: inherit; line-height: 1.5; resize: vertical; min-width: 0; }
+.fTextarea::placeholder { color: var(--dia-text-tertiary); }
+.ecMemo { margin-top: 3px; font-size: var(--dia-text-meta); color: var(--dia-text-secondary); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }

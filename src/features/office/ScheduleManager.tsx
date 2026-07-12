@@ -84,8 +84,8 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const [fStart, setFStart] = useState('');
   const [fEnd, setFEnd] = useState('');
   const [fPlace, setFPlace] = useState('');
-  const [fRepeat, setFRepeat] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('none');
-  const [fUntil, setFUntil] = useState('');
+  const [fMemo, setFMemo] = useState('');
+  const [fEndDate, setFEndDate] = useState(''); // 종료 날짜(기본=시작=당일). 시작보다 뒤면 그 기간 매일 자동 등록
 
   // 화면 자체는 항상 등록(자식 시트가 열려도 유지) — !addOpen 게이팅은 히스토리 churn/튕김 유발
   useHistoryBack('schedule-manager', onClose);
@@ -107,10 +107,10 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   );
   // 하루 타임라인 = 등록 일정 + 시간 있는 할 일(오늘만 겹쳐 보임). 단일 소스
   const dayItems = useMemo(() => {
-    const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false, repeatId: s.repeatId }));
+    const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false, repeatId: s.repeatId, memo: s.memo }));
     if (sel !== todayISO) return ev;
     const td = todos.filter((t) => t.inSchedule ?? !!t.time)
-      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', end: '', title: t.text, place: '', category: 'amber', done: t.done, repeatId: undefined as string | undefined }));
+      .map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time || '', end: '', title: t.text, place: '', category: 'amber', done: t.done, repeatId: undefined as string | undefined, memo: undefined as string | undefined }));
     return [...ev, ...td].sort((a, b) => a.time.localeCompare(b.time));
   }, [dayEvents, todos, sel, todayISO]);
   const upcoming = useMemo(
@@ -173,18 +173,18 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const [monthFilter, setMonthFilter] = useState<string>('all'); // 카테고리 범례 필터
 
   const openAdd = () => {
-    setFTitle(''); setFCat('blue'); setFDate(sel); setFStart(''); setFEnd(''); setFPlace('');
-    setFRepeat('none'); setFUntil(addMonths(sel, 1));
+    setFTitle(''); setFCat('blue'); setFDate(sel); setFEndDate(sel); setFStart(''); setFEnd(''); setFPlace(''); setFMemo('');
     setAddOpen(true);
   };
   const submit = () => {
     if (!fTitle.trim() || !fStart) return;
-    const base = { time: fStart, end: fEnd, title: fTitle.trim(), place: fPlace.trim(), category: fCat };
-    if (fRepeat === 'none' || !fUntil || fUntil < fDate) {
+    const base = { time: fStart, end: fEnd, title: fTitle.trim(), place: fPlace.trim(), category: fCat, memo: fMemo.trim() || undefined };
+    if (!fEndDate || fEndDate <= fDate) {
       addSchedule({ date: fDate, ...base });
     } else {
-      const rid = `r${fDate}-${fStart}-${fTitle.length}-${fRepeat}`;
-      const dates = repeatDates(fDate, fUntil, fRepeat);
+      // 종료 날짜가 시작보다 뒤 → 그 기간 매일 자동 반복 등록
+      const rid = `r${fDate}-${fEndDate}-${fStart}-${fTitle.length}`;
+      const dates = repeatDates(fDate, fEndDate, 'daily');
       addSchedules(dates.map((d) => ({ date: d, repeatId: rid, ...base })));
     }
     setAddOpen(false);
@@ -310,6 +310,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                     {it.repeatId && <Repeat size={12} className={styles.repMark} aria-label="반복 일정" />}
                   </div>
                   {it.kind === 'sched' && it.place && <div className={styles.ecSub}><MapPin size={11} /> {it.place}</div>}
+                  {it.kind === 'sched' && it.memo && <div className={styles.ecMemo}>{it.memo}</div>}
                 </div>
                 {it.kind === 'sched' ? (
                   <button type="button" className={styles.ecDel}
@@ -432,8 +433,20 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             </div>
 
             <div className={styles.field}>
-              <label className={styles.fLabel}>날짜</label>
-              <input className={styles.fInput} type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
+              <label className={styles.fLabel}>시작 날짜</label>
+              <input className={styles.fInput} type="date" value={fDate}
+                onChange={(e) => { const v = e.target.value; setFDate(v); if (fEndDate < v) setFEndDate(v); }} />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.fLabel}>종료 날짜</label>
+              <input className={styles.fInput} type="date" value={fEndDate} min={fDate}
+                onChange={(e) => setFEndDate(e.target.value)} />
+              <p className={styles.repHint}>
+                {fEndDate > fDate
+                  ? `${fDate} ~ ${fEndDate} 매일 자동 등록돼요`
+                  : '당일 일정 · 종료 날짜를 뒤로 정하면 그 기간 매일 반복됩니다'}
+              </p>
             </div>
 
             <div className={styles.field}>
@@ -452,21 +465,11 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             </div>
 
             <div className={styles.field}>
-              <label className={styles.fLabel}>반복</label>
-              <div className={styles.repeatRow}>
-                {([['none', '없음'], ['daily', '매일'], ['weekly', '매주'], ['monthly', '매월']] as const).map(([k, label]) => (
-                  <button key={k} type="button" className={fRepeat === k ? styles.repOn : styles.rep} onClick={() => setFRepeat(k)}>{label}</button>
-                ))}
-              </div>
+              <label className={styles.fLabel}>내용</label>
+              <textarea className={styles.fTextarea} value={fMemo} placeholder="간단한 내용(선택)" rows={2} maxLength={200}
+                onChange={(e) => setFMemo(e.target.value)} />
             </div>
 
-            {fRepeat !== 'none' && (
-              <div className={styles.field}>
-                <label className={styles.fLabel}>반복 종료일</label>
-                <input className={styles.fInput} type="date" value={fUntil} min={fDate} onChange={(e) => setFUntil(e.target.value)} />
-                <p className={styles.repHint}>{fDate} 부터 {fUntil || '종료일'} 까지 {fRepeat === 'daily' ? '매일' : fRepeat === 'weekly' ? '매주' : '매월'} 반복 등록됩니다.</p>
-              </div>
-            )}
           </div>
         </div>
       )}

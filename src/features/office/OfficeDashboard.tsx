@@ -99,6 +99,12 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
     () => schedules.filter((s) => s.date === todayISO()),
     [schedules],
   );
+  // 오늘의 일정 = 등록 일정 + 시간 있는 할 일(겹쳐 보이기). 단일 소스, 시간순 정렬
+  const todayTimeline = useMemo(() => {
+    const sched = todaySchedules.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, title: s.title, place: s.place, done: false }));
+    const timed = todos.filter((t) => t.time).map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time, title: t.text, place: '', done: t.done }));
+    return [...sched, ...timed].sort((a, b) => a.time.localeCompare(b.time));
+  }, [todaySchedules, todos]);
   const submitNote = () => {
     if (!noteText.trim()) return;
     addNote({ body: noteText.trim() });
@@ -199,16 +205,25 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
             </div>
           )}
           <ul className={styles.miniList}>
-            {todaySchedules.length === 0 && <li className={styles.empty}>일정 없음</li>}
-            {todaySchedules.map((s) => (
-              <li key={s.id} className={styles.schedItem}>
-                <span className={styles.schedTime}>{s.time}</span>
-                <span className={styles.schedDot} aria-hidden />
+            {todayTimeline.length === 0 && <li className={styles.empty}>일정 없음</li>}
+            {todayTimeline.map((it) => (
+              <li key={`${it.kind}-${it.id}`} className={`${styles.schedItem} ${it.done ? styles.schedDone : ''}`}>
+                <span className={styles.schedTime}>{it.time}</span>
+                <span className={it.kind === 'todo' ? styles.schedDotTodo : styles.schedDot} aria-hidden />
                 <div className={styles.schedBody}>
-                  <span className={styles.schedTitle}>{s.title}</span>
-                  {s.place && <span className={styles.schedPlace}>{s.place}</span>}
+                  <span className={styles.schedTitleRow}>
+                    <span className={styles.schedTitle}>{it.title}</span>
+                    {it.kind === 'todo' && <span className={styles.todoChip}>할 일</span>}
+                  </span>
+                  {it.kind === 'sched' && it.place && <span className={styles.schedPlace}>{it.place}</span>}
                 </div>
-                <button type="button" className={styles.delBtn} onClick={() => removeSchedule(s.id)} aria-label="삭제"><X size={13} /></button>
+                {it.kind === 'sched' ? (
+                  <button type="button" className={styles.delBtn} onClick={() => removeSchedule(it.id)} aria-label="삭제"><X size={13} /></button>
+                ) : (
+                  <button type="button" className={`${styles.checkBox} ${styles.schedCheck}`} onClick={() => toggleTodo(it.id)} aria-pressed={it.done} aria-label="완료 토글">
+                    {it.done && <Check size={12} strokeWidth={3} />}
+                  </button>
+                )}
               </li>
             ))}
           </ul>

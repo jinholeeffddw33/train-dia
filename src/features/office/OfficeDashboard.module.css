@@ -199,8 +199,15 @@
 .schedTime { flex-shrink: 0; width: 38px; font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-blue-text); font-variant-numeric: tabular-nums; }
 .schedDot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--dia-blue); box-shadow: 0 0 0 3px var(--dia-blue-dim); }
 .schedBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.schedTitle { font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schedTitleRow { display: flex; align-items: center; gap: 5px; min-width: 0; }
+.schedTitle { flex: 0 1 auto; font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .schedPlace { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 시간 있는 할 일이 일정에 겹쳐 보일 때 */
+.schedDotTodo { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--dia-amber); box-shadow: 0 0 0 3px var(--dia-amber-dim); }
+.todoChip { flex-shrink: 0; padding: 0 6px; border-radius: 999px; background: var(--dia-amber-dim); color: var(--dia-amber-text); font-size: var(--dia-text-meta); font-weight: 800; line-height: 1.7; }
+.schedDone .schedTitle { color: var(--dia-text-tertiary); text-decoration: line-through; }
+.schedCheck { width: 20px; height: 20px; color: var(--dia-on-amber); }
+.schedDone .schedCheck { background: var(--dia-amber); border-color: var(--dia-amber); }
 
 /* ── 진행률(미니 카드) ── */
 .progressRow { display: flex; align-items: center; gap: var(--dia-space-2); }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, X, CalendarDays, MapPin, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, X, Check, CalendarDays, MapPin, Trash2 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
 import styles from './ScheduleManager.module.css';
@@ -16,7 +16,7 @@ function labelKor(s: string): string { const d = fromISO(s); return `${d.getFull
 function addDays(s: string, n: number): string { const d = fromISO(s); d.setDate(d.getDate() + n); return iso(d); }
 
 export default function ScheduleManager({ onClose, startMonth = false }: { onClose: () => void; startMonth?: boolean }) {
-  const { schedules, addSchedule, removeSchedule } = useOfficeStore();
+  const { schedules, addSchedule, removeSchedule, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
   const [view, setView] = useState<'day' | 'list'>('day');
   const [monthOpen, setMonthOpen] = useState(startMonth);
@@ -47,6 +47,13 @@ export default function ScheduleManager({ onClose, startMonth = false }: { onClo
     () => schedules.filter((s) => s.date === sel).sort((a, b) => a.time.localeCompare(b.time)),
     [schedules, sel],
   );
+  // 하루 타임라인 = 등록 일정 + 시간 있는 할 일(오늘만 겹쳐 보임). 단일 소스
+  const dayItems = useMemo(() => {
+    const ev = dayEvents.map((s) => ({ kind: 'sched' as const, id: s.id, time: s.time, end: s.end, title: s.title, place: s.place, category: s.category, done: false }));
+    if (sel !== todayISO) return ev;
+    const td = todos.filter((t) => t.time).map((t) => ({ kind: 'todo' as const, id: t.id, time: t.time, end: '', title: t.text, place: '', category: 'amber', done: t.done }));
+    return [...ev, ...td].sort((a, b) => a.time.localeCompare(b.time));
+  }, [dayEvents, todos, sel, todayISO]);
   const upcoming = useMemo(
     () => schedules.filter((s) => s.date >= todayISO).slice(0, 20),
     [schedules, todayISO],
@@ -145,19 +152,28 @@ export default function ScheduleManager({ onClose, startMonth = false }: { onClo
       {/* 콘텐츠 */}
       {view === 'day' ? (
         <div className={styles.timeline}>
-          {dayEvents.length === 0 && <p className={styles.empty}>이 날 일정이 없어요. 아래 <b>+ 일정 추가</b>로 등록하세요.</p>}
-          {dayEvents.map((s) => (
-            <div key={s.id} className={styles.item}>
+          {dayItems.length === 0 && <p className={styles.empty}>이 날 일정이 없어요. 아래 <b>+ 일정 추가</b>로 등록하세요.</p>}
+          {dayItems.map((it) => (
+            <div key={`${it.kind}-${it.id}`} className={`${styles.item} ${it.done ? styles.itemDone : ''}`}>
               <div className={styles.itemTime}>
-                <b>{s.time}</b>{s.end && <s>~{s.end}</s>}
+                <b>{it.time}</b>{it.end && <s>~{it.end}</s>}
               </div>
-              <span className={`${styles.pin} ${styles[`p_${s.category}`]}`} />
-              <div className={`${styles.ecard} ${styles[`c_${s.category}`]}`}>
+              <span className={`${styles.pin} ${styles[`p_${it.category}`]}`} />
+              <div className={`${styles.ecard} ${styles[`c_${it.category}`]}`}>
                 <div className={styles.ecBody}>
-                  <div className={styles.ecTitle}>{s.title}</div>
-                  {s.place && <div className={styles.ecSub}><MapPin size={11} /> {s.place}</div>}
+                  <div className={styles.ecTitle}>
+                    <span className={styles.ecTitleText}>{it.title}</span>
+                    {it.kind === 'todo' && <span className={styles.ecChip}>할 일</span>}
+                  </div>
+                  {it.kind === 'sched' && it.place && <div className={styles.ecSub}><MapPin size={11} /> {it.place}</div>}
                 </div>
-                <button type="button" className={styles.ecDel} onClick={() => removeSchedule(s.id)} aria-label="삭제"><X size={14} /></button>
+                {it.kind === 'sched' ? (
+                  <button type="button" className={styles.ecDel} onClick={() => removeSchedule(it.id)} aria-label="삭제"><X size={14} /></button>
+                ) : (
+                  <button type="button" className={`${styles.ecCheck} ${it.done ? styles.ecCheckOn : ''}`} onClick={() => toggleTodo(it.id)} aria-pressed={it.done} aria-label="완료 토글">
+                    {it.done && <Check size={13} strokeWidth={3} />}
+                  </button>
+                )}
               </div>
             </div>
           ))}

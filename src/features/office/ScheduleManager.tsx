@@ -15,11 +15,11 @@ function fromISO(s: string): Date { const [y, m, d] = s.split('-').map(Number); 
 function labelKor(s: string): string { const d = fromISO(s); return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`; }
 function addDays(s: string, n: number): string { const d = fromISO(s); d.setDate(d.getDate() + n); return iso(d); }
 
-export default function ScheduleManager({ onClose }: { onClose: () => void }) {
+export default function ScheduleManager({ onClose, startMonth = false }: { onClose: () => void; startMonth?: boolean }) {
   const { schedules, addSchedule, removeSchedule } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
   const [view, setView] = useState<'day' | 'list'>('day');
-  const [monthOpen, setMonthOpen] = useState(false);
+  const [monthOpen, setMonthOpen] = useState(startMonth);
 
   // 등록 시트
   const [addOpen, setAddOpen] = useState(false);

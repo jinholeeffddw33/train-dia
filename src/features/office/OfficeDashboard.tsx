@@ -59,6 +59,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
 
   // 일정관리 / 메모 전체 화면
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [schedStartMonth, setSchedStartMonth] = useState(false); // 캘린더 보기 → 월 그리드 펼침
   const [noteMgrOpen, setNoteMgrOpen] = useState(false);
   const [taskBoardOpen, setTaskBoardOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
@@ -105,9 +106,9 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   };
 
   const quickIcons = [
-    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => setScheduleOpen(true) },
+    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => { setSchedStartMonth(false); setScheduleOpen(true); } },
     { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
-    { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => setScheduleOpen(true) },
+    { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => { setSchedStartMonth(false); setScheduleOpen(true); } },
     { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },
   ];
 
@@ -130,7 +131,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
           <p className={styles.greetBig}>{greeting()}!</p>
           {name && <p className={styles.greetSub}>{name} {role}, 환영합니다 👋</p>}
         </div>
-        <button type="button" className={styles.dateCard} onClick={() => onEnter('duty')} data-press>
+        <button type="button" className={styles.dateCard} onClick={() => { setSchedStartMonth(true); setScheduleOpen(true); }} data-press>
           <span className={styles.dateTop}>
             <CalendarDays size={16} strokeWidth={2.4} />
             <span className={styles.dateText}>{todayLabel()}</span>
@@ -296,7 +297,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
       {/* 일정관리 전체 화면 */}
       {scheduleOpen && (
         <div className={styles.schedOverlay}>
-          <ScheduleManager onClose={() => setScheduleOpen(false)} />
+          <ScheduleManager onClose={() => setScheduleOpen(false)} startMonth={schedStartMonth} />
         </div>
       )}
       {/* 메모 전체 화면 */}

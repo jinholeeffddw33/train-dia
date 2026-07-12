@@ -27,7 +27,6 @@ function addMonths(s: string, n: number): string {
 const HOUR_PX = 56; // ScheduleManager.module.css 의 --wg-hour(56px) 과 동일해야 함
 const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 const fmtMin = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-const catDot = (k: string) => OFFICE_CATEGORIES.find((c) => c.key === k)?.dot ?? '#94a3b8';
 
 interface WEvt { id: string; kind: 'sched' | 'todo'; title: string; category: string; startM: number; endM: number; done: boolean; lane: number; cols: number; }
 
@@ -58,6 +57,7 @@ function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
 export default function ScheduleManager({ onClose, startMonth = false, startView = 'day' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list' }) {
   const { schedules, addSchedule, removeSchedule, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
+  const [monthAnchor, setMonthAnchor] = useState<string>(iso(new Date())); // 월 달력이 보여줄 달(선택 날짜와 분리)
   const [view, setView] = useState<'day' | 'week' | 'list'>(startView);
   const [monthOpen, setMonthOpen] = useState(startMonth);
 
@@ -128,9 +128,9 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const nowTop = ((nowM - week.startHour * 60) / 60) * HOUR_PX;
   const weekRange = weekDays.length ? `${fromISO(weekDays[0]).getMonth() + 1}.${fromISO(weekDays[0]).getDate()} – ${fromISO(weekDays[6]).getMonth() + 1}.${fromISO(weekDays[6]).getDate()}` : '';
 
-  // 월 그리드(점프용)
+  // 월 그리드 — 표시 중인 달(monthAnchor) 기준
   const monthGrid = useMemo(() => {
-    const d = fromISO(sel);
+    const d = fromISO(monthAnchor);
     const first = new Date(d.getFullYear(), d.getMonth(), 1);
     const daysIn = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
     const lead = first.getDay();
@@ -138,7 +138,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     for (let i = 0; i < lead; i++) cells.push(null);
     for (let n = 1; n <= daysIn; n++) cells.push(iso(new Date(d.getFullYear(), d.getMonth(), n)));
     return cells;
-  }, [sel]);
+  }, [monthAnchor]);
   // 날짜별 일정 목록 — 월 그리드 칸에 제목 미리보기
   const eventsByDate = useMemo(() => {
     const m = new Map<string, typeof schedules>();
@@ -174,7 +174,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
 
       {/* 날짜 + 오늘 */}
       <div className={styles.dateRow}>
-        <button type="button" className={styles.datePick} onClick={() => { setView('day'); setMonthOpen((v) => !v); }}
+        <button type="button" className={styles.datePick} onClick={() => { setView('day'); if (!(monthOpen && view === 'day')) setMonthAnchor(sel); setMonthOpen((v) => !v); }}
           aria-expanded={monthOpen && view === 'day'} aria-label={monthOpen && view === 'day' ? '월 달력 접기' : '월 달력 열기'}>
           <span className={styles.dateChip}><CalendarDays size={16} /></span>
           <span className={styles.dateLabel}>{labelKor(sel)}</span>
@@ -183,16 +183,16 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             <ChevronDown size={14} className={monthOpen && view === 'day' ? styles.chevOpen : styles.chev} />
           </span>
         </button>
-        <button type="button" className={styles.todayBtn} onClick={() => { setSel(todayISO); setMonthOpen(false); }}>오늘</button>
+        <button type="button" className={styles.todayBtn} onClick={() => { setSel(todayISO); setMonthAnchor(todayISO); }}>오늘</button>
       </div>
 
       {/* 월 달력 — 칸마다 일정 제목 미리보기 (하루 뷰에서만) */}
       {monthOpen && view === 'day' && (
         <div className={styles.monthCard}>
           <div className={styles.monthNav}>
-            <button type="button" className={styles.monthNavBtn} onClick={() => setSel(addMonths(sel, -1))} aria-label="이전 달"><ChevronLeft size={20} /></button>
-            <span>{fromISO(sel).getFullYear()}년 {fromISO(sel).getMonth() + 1}월</span>
-            <button type="button" className={styles.monthNavBtn} onClick={() => setSel(addMonths(sel, 1))} aria-label="다음 달"><ChevronRight size={20} /></button>
+            <button type="button" className={styles.monthNavBtn} onClick={() => setMonthAnchor(addMonths(monthAnchor, -1))} aria-label="이전 달"><ChevronLeft size={20} /></button>
+            <span>{fromISO(monthAnchor).getFullYear()}년 {fromISO(monthAnchor).getMonth() + 1}월</span>
+            <button type="button" className={styles.monthNavBtn} onClick={() => setMonthAnchor(addMonths(monthAnchor, 1))} aria-label="다음 달"><ChevronRight size={20} /></button>
           </div>
 
           {/* 카테고리 범례 필터 */}

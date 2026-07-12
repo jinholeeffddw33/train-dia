@@ -13,7 +13,7 @@ export interface OfficeSchedule {
   place: string;
   category: string;  // OFFICE_CATEGORIES key
 }
-export interface OfficeNote { id: string; text: string }
+export interface OfficeNote { id: string; title: string; body: string; category: string; pinned: boolean; ts: number }
 
 /** 일정 카테고리 — 색으로 한눈에 구분 (dot 색은 라이트/다크 공통) */
 export const OFFICE_CATEGORIES = [
@@ -35,7 +35,9 @@ interface OfficeState {
   addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string }) => void;
   updateSchedule: (id: string, patch: Partial<Omit<OfficeSchedule, 'id'>>) => void;
   removeSchedule: (id: string) => void;
-  addNote: (text: string) => void;
+  addNote: (n: { title?: string; body: string; category?: string; pinned?: boolean }) => void;
+  updateNote: (id: string, patch: Partial<Omit<OfficeNote, 'id'>>) => void;
+  togglePin: (id: string) => void;
   removeNote: (id: string) => void;
 }
 
@@ -64,24 +66,32 @@ export const useOfficeStore = create<OfficeState>()(
         set((s) => ({ schedules: s.schedules.map((x) => (x.id === id ? { ...x, ...patch } : x)).sort(sortSched) })),
       removeSchedule: (id) => set((s) => ({ schedules: s.schedules.filter((x) => x.id !== id) })),
 
-      addNote: (text) => set((s) => ({ notes: [{ id: uid(), text }, ...s.notes] })),
+      addNote: ({ title = '', body, category = 'gray', pinned = false }) =>
+        set((s) => ({ notes: [{ id: uid(), title, body, category, pinned, ts: Date.now() }, ...s.notes] })),
+      updateNote: (id, patch) =>
+        set((s) => ({ notes: s.notes.map((n) => (n.id === id ? { ...n, ...patch } : n)) })),
+      togglePin: (id) =>
+        set((s) => ({ notes: s.notes.map((n) => (n.id === id ? { ...n, pinned: !n.pinned } : n)) })),
       removeNote: (id) => set((s) => ({ notes: s.notes.filter((n) => n.id !== id) })),
     }),
     {
       name: 'officeDash',
-      version: 2,
-      // v1 일정(날짜·카테고리 없음) → 오늘 날짜·기본 카테고리로 이전
+      version: 3,
+      // v1 일정→날짜·카테고리 / v2 메모(text만)→제목·카테고리·고정 구조로 이전
       migrate: (persisted, version) => {
-        const p = persisted as { todos?: OfficeTodo[]; schedules?: OfficeSchedule[]; notes?: OfficeNote[] } | null;
+        const p = persisted as { todos?: OfficeTodo[]; schedules?: OfficeSchedule[]; notes?: unknown[] } | null;
         if (!p) return p as unknown as OfficeState;
         if (version < 2 && Array.isArray(p.schedules)) {
           const d = new Date();
           const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          p.schedules = p.schedules.map((s) => ({
+          p.schedules = (p.schedules as OfficeSchedule[]).map((s) => ({
             id: s.id, title: s.title, place: s.place ?? '',
-            time: s.time ?? '', end: (s as OfficeSchedule).end ?? '',
-            date: (s as OfficeSchedule).date ?? today,
-            category: (s as OfficeSchedule).category ?? 'blue',
+            time: s.time ?? '', end: s.end ?? '', date: s.date ?? today, category: s.category ?? 'blue',
+          }));
+        }
+        if (version < 3 && Array.isArray(p.notes)) {
+          p.notes = (p.notes as { id: string; text?: string; body?: string }[]).map((n) => ({
+            id: n.id, title: '', body: n.body ?? n.text ?? '', category: 'gray', pinned: false, ts: Date.now(),
           }));
         }
         return p as unknown as OfficeState;

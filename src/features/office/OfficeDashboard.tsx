@@ -13,6 +13,7 @@ import { useOfficeStore } from '@/stores/office';
 import { APP_VERSION } from '@/lib/constants';
 import type { WorldId } from '@/components/layout/WorldHub';
 import ScheduleManager from './ScheduleManager';
+import NoteManager from './NoteManager';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -55,8 +56,9 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
     addNote, removeNote,
   } = useOfficeStore();
 
-  // 일정관리 전체 화면
+  // 일정관리 / 메모 전체 화면
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [noteMgrOpen, setNoteMgrOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -96,7 +98,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
   );
   const submitNote = () => {
     if (!noteText.trim()) return;
-    addNote(noteText.trim());
+    addNote({ body: noteText.trim() });
     setNoteText('');
   };
 
@@ -104,7 +106,7 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
     { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => setScheduleOpen(true) },
     { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => scrollTo(todoRef.current) },
     { key: 'sched', label: '오늘의 일정', Icon: CalendarClock, onClick: () => setScheduleOpen(true) },
-    { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => scrollTo(memoRef.current) },
+    { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },
   ];
 
   return (
@@ -222,9 +224,9 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
           <button type="button" className={styles.saveBtn} onClick={submitNote}>저장</button>
         </div>
         <ul className={styles.noteList}>
-          {notes.map((n) => (
+          {notes.slice(0, 4).map((n) => (
             <li key={n.id} className={styles.noteItem}>
-              <span className={styles.noteText}>{n.text}</span>
+              <span className={styles.noteText}>{n.title ? `${n.title} — ${n.body}` : n.body}</span>
               <button type="button" className={styles.delBtn} onClick={() => removeNote(n.id)} aria-label="삭제"><X size={14} /></button>
             </li>
           ))}
@@ -293,6 +295,12 @@ export default function OfficeDashboard({ onEnter }: { onEnter: (w: WorldId) => 
       {scheduleOpen && (
         <div className={styles.schedOverlay}>
           <ScheduleManager onClose={() => setScheduleOpen(false)} />
+        </div>
+      )}
+      {/* 메모 전체 화면 */}
+      {noteMgrOpen && (
+        <div className={styles.schedOverlay}>
+          <NoteManager onClose={() => setNoteMgrOpen(false)} />
         </div>
       )}
     </div>

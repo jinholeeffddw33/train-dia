@@ -64,14 +64,11 @@ export const INTERN_USERS: Person[] = [
 ];
 
 /**
- * 공로연수 — 근무·스케줄·읽음현황 등 모든 활성 정보에서 제외.
- * 사번·이름만 보관(복귀 시 참조용). ALL_USERS/스케줄에는 포함하지 않는다.
- * 자리는 cycle.ts에서 결원으로 대체됨(이기영→결원22 I:56, 이창훈→결원23 I:111).
+ * 공로연수/퇴직 — 근무·스케줄·읽음현황 등 모든 활성 정보에서 제외.
+ * 2026-07 퇴직 영구삭제: 이기영(→결원22 I:56)·이창훈(→결원23 I:111)·양원석(→결원10 I:97).
+ * 세 명 모두 직원 아님 — cycle.ts 자리는 결원으로 대체, Supabase 계정도 삭제됨.
  */
-export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [
-  { n: '이기영', s: '21707336' }, // 2026-07-08 공로연수 (전 교번 I:56/d:38)
-  { n: '이창훈', s: '21709075' }, // 2026-07-08 공로연수 (전 교번 I:111/d:휴29)
-];
+export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [];
 
 const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 

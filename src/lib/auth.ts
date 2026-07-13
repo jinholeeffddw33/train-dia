@@ -45,6 +45,10 @@ export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '전동규', s: '21711304' },
   { I: '0', d: '', n: '박용덕', s: '21711438' },
   { I: '0', d: '', n: '이태원', s: '21711216' },
+  // 2026-07 신규 내근직 (직함: 과장/부장/대리)
+  { I: '0', d: '', n: '유희종', s: '21715488' }, // 과장
+  { I: '0', d: '', n: '유승용', s: '21706793' }, // 부장
+  { I: '0', d: '', n: '신은미', s: '21717671' }, // 대리
 ];
 
 /** 2026년 신규임용 인턴사원 — 교번 미배정 상태, 내근직 아님 */
@@ -56,6 +60,7 @@ export const INTERN_USERS: Person[] = [
   { I: '0', d: '', n: '강미진', s: '22601008' },
   { I: '0', d: '', n: '조건희', s: '22601134' },
   { I: '0', d: '', n: '신석희', s: '22601146' },
+  { I: '0', d: '', n: '주정재', s: '22000358' }, // 2026-07 신규 인턴
 ];
 
 /**
@@ -138,7 +143,7 @@ export function isViceChief(sabun: string): boolean {
   return sabun === '21711216';
 }
 
-/** 부장 여부 (10명) */
+/** 부장 여부 (11명) */
 const MANAGER_SABUNS: ReadonlySet<string> = new Set([
   '21711197', // 이선길
   '21711694', // 이현구
@@ -150,9 +155,26 @@ const MANAGER_SABUNS: ReadonlySet<string> = new Set([
   '21706208', // 이병홍
   '21707084', // 김재범
   '21709373', // 조재홍
+  '21706793', // 유승용 (2026-07 신규)
 ]);
 export function isManager(sabun: string): boolean {
   return MANAGER_SABUNS.has(sabun);
+}
+
+/** 과장 여부 */
+const GWAJANG_SABUNS: ReadonlySet<string> = new Set([
+  '21715488', // 유희종 (2026-07 신규)
+]);
+export function isGwajang(sabun: string): boolean {
+  return GWAJANG_SABUNS.has(sabun);
+}
+
+/** 대리 여부 */
+const DAERI_SABUNS: ReadonlySet<string> = new Set([
+  '21717671', // 신은미 (2026-07 신규)
+]);
+export function isDaeri(sabun: string): boolean {
+  return DAERI_SABUNS.has(sabun);
 }
 
 /** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 8명 + 인턴 7명) */
@@ -173,18 +195,24 @@ const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '22601008', // 강미진 (인턴)
   '22601134', // 조건희 (인턴 2026-07-07)
   '22601146', // 신석희 (인턴 2026-07-07)
+  '21715488', // 유희종 (과장, 2026-07 신규)
+  '21706793', // 유승용 (부장, 2026-07 신규)
+  '21717671', // 신은미 (대리, 2026-07 신규)
+  '22000358', // 주정재 (인턴, 2026-07 신규)
 ]);
 export function isRegularDayOffice(sabun: string | undefined | null): boolean {
   if (!sabun) return false;
   return REGULAR_DAY_OFFICE_SABUNS.has(sabun);
 }
 
-/** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 인턴 > 기관사 */
+/** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 과장 > 대리 > 인턴 > 기관사 */
 export function getUserRole(sabun: string | undefined | null): string {
   if (!sabun) return '기관사님';
   if (isChief(sabun)) return '소장님';
   if (isViceChief(sabun)) return '부소장님';
   if (isManager(sabun)) return '부장님';
+  if (isGwajang(sabun)) return '과장님';
+  if (isDaeri(sabun)) return '대리님';
   if (isIntern(sabun)) return '인턴님';
   return '기관사님';
 }

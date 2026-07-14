@@ -407,6 +407,9 @@ function isDepotTrain(trainNo: number): boolean {
   return trainNo >= 1000 && trainNo < 3000;
 }
 
+/** 주박 자가교대 표기 — 상대가 아니라 본인이 이어받음(원격 주박) */
+export const JUBAK_SELF = '본인';
+
 /** 교대 상대 탐색 결과 */
 export interface ExchangePartner {
   left?: string;  // 내가 받을 때 상대 이름
@@ -507,6 +510,33 @@ export function findExchangePartners(
     }
 
     if (p.left || p.right) partners[i] = p;
+  }
+
+  // 주박 자가교대 — 야간 근무 중 원격지(여/애/왕/군/화 등)에서 주박:
+  // 밤에 상대에게 넘기는 게 아니라 본인이 숙소에서 자고 아침에 그 열차를 다시 이어받음.
+  // → 밤 도착 구간의 '넘김', 새벽 재출발 구간의 '받음'은 모두 본인.
+  // (기지 1xxx/2xxx 입·출고 유치 경계는 실제 주박 아님 → 제외, 이미 교대 없음 처리됨)
+  if (isNight) {
+    for (let i = 0; i < segs.length - 1; i++) {
+      const cur = segs[i];
+      const nxt = segs[i + 1];
+      if (!cur.n || cur.n.length === 0 || !nxt.n || nxt.n.length === 0) continue;
+      const curLast = cur.n[cur.n.length - 1];
+      const nxtFirst = nxt.n[0];
+      if (isDepotTrain(curLast) || isDepotTrain(nxtFirst)) continue;
+      const aPrev = timeToMins(cur.a);
+      const dPrev = timeToMins(cur.d);
+      const dNext = timeToMins(nxt.d);
+      if (aPrev < 0 || dPrev < 0 || dNext < 0) continue;
+      // 자정 넘겨 새벽 재출발(시각 되감김) + 충분한 휴식 간격(≥120분) = 주박
+      const gap = dNext + 1440 - aPrev;
+      if (dNext < dPrev && gap >= 120) {
+        if (!partners[i]) partners[i] = {};
+        partners[i].right = JUBAK_SELF;      // 밤: 넘김 = 본인
+        if (!partners[i + 1]) partners[i + 1] = {};
+        partners[i + 1].left = JUBAK_SELF;   // 새벽: 받음 = 본인
+      }
+    }
   }
 
   return partners;

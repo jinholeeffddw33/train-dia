@@ -1,7 +1,6 @@
 .card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--dia-space-3);
   width: 100%;
   max-width: 380px;
@@ -11,6 +10,7 @@
   border-radius: var(--dia-radius-lg);
   box-shadow: var(--dia-shadow-sm);
   min-height: 64px;
+  text-align: left;
 }
 
 .left {
@@ -18,6 +18,12 @@
   align-items: center;
   gap: var(--dia-space-3);
   min-width: 0;
+  flex: 1;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--dia-text-tertiary);
 }
 
 .icon {

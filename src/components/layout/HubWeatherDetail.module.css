@@ -1,0 +1,160 @@
+.wrap {
+  padding: var(--dia-space-4) var(--dia-space-5) var(--dia-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+
+/* ── 로딩/에러 상태 ── */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-6) 0;
+}
+.stateText {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--dia-space-4);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+}
+.retryBtn:active { transform: translateY(1px) scale(0.97); }
+
+/* ── 섹션 ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.sectionTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-secondary);
+}
+
+/* ── 시간별 (가로 스크롤) ── */
+.hourScroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+.hourScroll::-webkit-scrollbar { display: none; }
+.hourCell {
+  flex: 0 0 auto;
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--dia-space-2) 0;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border-light);
+}
+.hourNow {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+}
+.hourLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.hourNow .hourLabel { color: var(--dia-blue-text); }
+.hourIcon { font-size: 22px; line-height: 1; }
+.hourTemp {
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.hourRain {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-blue-text);
+  min-height: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 주간 ── */
+.weekList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.dayRow {
+  display: grid;
+  grid-template-columns: 44px 26px 40px 34px 1fr 34px;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) 4px;
+  border-bottom: 1px solid var(--dia-border-light);
+}
+.dayRow:last-child { border-bottom: none; }
+.dayToday {
+  background: var(--dia-blue-dim);
+  border-radius: var(--dia-radius-md);
+  border-bottom-color: transparent;
+}
+.dayName {
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+.dayToday .dayName { color: var(--dia-blue-text); }
+.dayIcon { font-size: 20px; line-height: 1; text-align: center; }
+.dayRain {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-blue-text);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.dayLow {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dayHigh {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.barTrack {
+  position: relative;
+  height: 6px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-border-light);
+}
+.barFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  min-width: 6px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(90deg, var(--dia-blue), var(--dia-amber));
+}
+
+.credit {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+}

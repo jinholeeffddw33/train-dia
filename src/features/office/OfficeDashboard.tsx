@@ -154,8 +154,8 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
         </button>
       </div>
 
-      {/* ── 2열: 오늘의 할 일 | 오늘의 일정 (강화·상단) ── */}
-      <div className={styles.twoCol}>
+      {/* ── 세로: 오늘의 할 일 → 오늘의 일정 (모바일 가독성 우선) ── */}
+      <div className={styles.stackCol}>
         {/* 할 일 */}
         <section ref={todoRef} className={styles.miniCard}>
           <div className={styles.miniHead}>

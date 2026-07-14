@@ -99,6 +99,14 @@
   align-items: start;
 }
 
+/* ── 세로 스택 (할 일 → 일정) — 모바일에서 내용 읽기 편하게 전체폭 ── */
+.stackCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  margin-bottom: var(--dia-space-4);
+}
+
 /* ── 미니 카드(2열용) ── */
 .miniCard {
   background: var(--dia-surface);

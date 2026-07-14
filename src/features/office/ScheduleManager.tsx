@@ -251,13 +251,13 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                   aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일${evs.length ? `, 일정 ${evs.length}건` : ''}`}>
                   <span className={`${styles.mNum} ${dow === 0 ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
                   <span className={styles.mChips}>
-                    {evs.slice(0, 2).map((e) => (
+                    {evs.slice(0, 3).map((e) => (
                       <span key={e.id} className={styles.mChip}>
                         <span className={`${styles.mChipDot} ${styles[`p_${e.category}`]}`} />
                         <span className={styles.mChipTxt}>{e.title}</span>
                       </span>
                     ))}
-                    {evs.length > 2 && <span className={styles.mMore}>+{evs.length - 2}</span>}
+                    {evs.length > 3 && <span className={styles.mMore}>+{evs.length - 3}</span>}
                   </span>
                 </button>
               );

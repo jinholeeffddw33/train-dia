@@ -10,6 +10,7 @@ import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
 import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
+import AnnounceModal from '@/components/common/AnnounceModal';
 import WhatsNewModal from '@/components/common/WhatsNewModal';
 import WorldLoading from '@/components/common/WorldLoading';
 import AppShell from '@/components/layout/AppShell';
@@ -121,6 +122,7 @@ export default function HomePage() {
         <CycleChangeModal />
         <InternWelcomeModal />
         <KimMinkyungAwardModal />
+        <AnnounceModal />
         <WhatsNewModal />
         {world === null ? (
           home === 'office'

@@ -14,6 +14,7 @@ const SESSION_KEY = 'dia-entry-modal-shown';
 const PRIORITY: Record<string, number> = {
   'cycle-change': 5,
   'refresh-guide': 4,
+  'announce-2026-07-14': 4, // 3일 전직원 공지 (whats-new 위)
   'whats-new': 3,
   'intern-welcome': 2,
   'kim-minkyung-award': 1,

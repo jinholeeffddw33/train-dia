@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
-import { TrainFront } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import { TrainFront, Clock, ArrowRight, X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice, isIntern, isRegularDayOffice, getUserRole } from '@/lib/auth';
 import {
-  getDia, getType, getSchedule, getLabel, getDiaDisplay,
+  getDia, getType, getSchedule, getDiaDisplay,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
   getRouteDirection, getSegmentDirection, getCurrentSegmentInfo,
   isSpecialRest, getSpecialRestLabel, isDepotStart, timeToMins,
@@ -19,11 +19,31 @@ import { STATION_ABBR } from '@/data/station-abbr';
 import { useClockMinute } from '../hooks/useClock';
 import RouteTimeline from './RouteTimeline';
 import DutyInfoCard from './DutyInfoCard';
+import HomeMonthCalendar from './HomeMonthCalendar';
+import OfficeMonthCalendar from '@/features/office/OfficeMonthCalendar';
 import styles from '../styles/Home.module.css';
 
 interface TodayCardProps {
   selectedDate?: Date;
   onEmptyClick?: () => void;
+}
+
+/** 교번+날짜 → 행로표 이미지 경로 (public/images/route). 없으면 null */
+function routeImagePath(dia: string, date: Date): string | null {
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+  const h = isHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = isHoliday(tm);
+  const night = getType(dia) === 'night';
+  let prefix: string;
+  if (!night) prefix = h ? 'p_hol' : 'p_ord';
+  else if (h && th) prefix = 'p_hh';
+  else if (h && !th) prefix = 'p_hp';
+  else if (!h && th) prefix = 'p_ph';
+  else prefix = 'p_pp';
+  return `/images/route/${prefix}_${diaNum}.png`;
 }
 
 export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps) {
@@ -84,6 +104,27 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     return false;
   }, [segInfo, schedule, now]);
 
+  // 다음 근무 행로표 보기 — 클릭 시 잠깐 표시 후 자동으로 당일로 복귀
+  const [showNext, setShowNext] = useState(false);
+  useEffect(() => {
+    if (!showNext) return;
+    const t = window.setTimeout(() => setShowNext(false), 12000); // 12초 후 당일 복귀
+    return () => window.clearTimeout(t);
+  }, [showNext]);
+  // 야간 근무: 익일(비번) 새벽 — 근무 종료 시각 전까지 어젯밤 야간 행로 유지
+  const nightHoldImg = useMemo(() => {
+    if (!isToday || !driver || !dia || !dia.endsWith('~')) return null;
+    const y = new Date(td);
+    y.setDate(y.getDate() - 1);
+    const yDia = getSwappedDia(driver, y);
+    if (!yDia || getType(yDia) !== 'night') return null;
+    const ySch = getSchedule(yDia, y);
+    if (!ySch?.e) return null;
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    if (nowMins >= timeToMins(ySch.e)) return null; // 야간 근무 종료 지남
+    return routeImagePath(yDia, y);
+  }, [isToday, driver, dia, td, now, getSwappedDia]);
+
   // 내근직 모드 판정: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
   const officeMode = driver
     ? driver.I === '0'
@@ -131,6 +172,8 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
           </div>
         )}
         <DutyInfoCard selectedDate={selectedDate} hideTitle />
+        {/* 일정관리 월간 달력 — 아래 허전함 해소(날짜 탭 → 그 날 일정 팝업) */}
+        <OfficeMonthCalendar />
       </>
     );
   }
@@ -158,131 +201,158 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
     ? LABELS.TODAY_DIA
     : `${td.getMonth() + 1}월 ${td.getDate()}일 교번`;
 
+  // 당일 근무 행로표 (주간·야간 시작일) — 항상 표시. 야간 익일 새벽은 nightHoldImg 로 유지
+  const autoImg = (schedule && !specialRest ? routeImagePath(dia, td) : null) ?? nightHoldImg;
+  const nextInfo = banner?.next;
+  const nextImg = nextInfo?.dia && nextInfo.schedule
+    ? routeImagePath(nextInfo.dia, (() => { const d = new Date(td); d.setDate(d.getDate() + nextInfo.daysAhead); return d; })())
+    : null;
+  // 다음근무 보기 중이면 다음 이미지로 교체, 아니면 당일
+  const showingNext = showNext && !!nextImg;
+  const panelSrc = showingNext ? nextImg : autoImg;
+
   return (
     <section className={styles.todayCard}>
-      {/* 교번 + 근무시간 헤더 */}
+      {/* 제목 */}
       <div className={styles.diaHeader}>
-        <span className={styles.cardLabel}>{dateLabel}</span>
-        <div className={styles.diaHeaderRight}>
-          {schedule && !specialRest && (
-            <div className={styles.workTimeWrap}>
-              <span className={styles.workTimeLabel}>근무시간</span>
-              <span className={styles.workTime}>{getWorkTime(schedule)}</span>
+        <span className={styles.cardLabel}>{isToday ? '오늘의 근무' : dateLabel}</span>
+      </div>
+
+      {/* 상태 배너 (좌) + 교번 배지 (우) */}
+      <div className={styles.bannerRow}>
+        <div className={styles.bannerCol}>
+          {/* 방향 배너 — 구간별 전환 */}
+          {isToday && banner && banner.state === 'working' && showDirBanner && segInfo && schedule?.g && (
+            segInfo.status === 'after' ? (
+              <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
+                <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
+                <div className={styles.dirBannerSub}>안전하게 마무리했어요</div>
+              </div>
+            ) : currentDirection && (
+              <div className={`${styles.dirBanner} ${styles[`dirBanner_${currentDirection.dir}`]}`}>
+                <div className={styles.dirBannerDir}>{currentDirection.label}</div>
+                <div className={styles.dirBannerSub}>{currentDirection.sub}</div>
+                <div className={styles.dirBannerTime}>
+                  {segInfo.status === 'running'
+                    ? `운행 중 · ${schedule.g[segInfo.idx].d} → ${schedule.g[segInfo.idx].a}`
+                    : segInfo.status === 'waiting'
+                      ? `대기 중 · 다음 ${segInfo.idx + 1}근무 출발 ${schedule.g[segInfo.idx].d}`
+                      : `${segInfo.idx + 1}근무 출발 ${schedule.g[segInfo.idx].d}`}
+                </div>
+              </div>
+            )
+          )}
+
+          {isToday && banner && banner.state === 'done' && (
+            <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
+              <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
+              <div className={styles.dirBannerSub}>편안한 퇴근길 되세요</div>
+              {banner.next && banner.next.schedule && (
+                <div className={styles.dirBannerNext}>
+                  <button
+                    type="button"
+                    className={`${styles.nextDiaChip} ${showNext ? styles.nextDiaChipOn : ''}`}
+                    onClick={() => setShowNext((v) => !v)}
+                    aria-label="다음 근무 행로표 보기"
+                    aria-pressed={showNext}
+                  >
+                    {getDiaDisplay(banner.next.dia)}
+                  </button>
+                  다음근무 {banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} {banner.next.schedule.s} {nextDirection ? dirShort(nextDirection.dir) : ''}
+                  {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
+                </div>
+              )}
+            </div>
+          )}
+
+          {isToday && banner && banner.state === 'idle' && (
+            <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
+              <div className={styles.dirBannerDir}>
+                {effectiveType === 'rest'
+                  ? (isBibeon ? '오늘은 비번이에요' : '오늘은 휴무예요')
+                  : banner.next?.daysAhead === 0
+                    ? '오늘 출근하는 날이에요'
+                    : '오늘 근무가 끝났어요'}
+              </div>
+              {effectiveType === 'rest' && (
+                <div className={styles.dirBannerSub}>
+                  {isBibeon ? '어젯밤 근무 고생했어요. 푹 쉬세요' : '편안한 하루 보내세요'}
+                </div>
+              )}
+              {banner.next?.daysAhead === 0 && diaType !== 'rest' && (
+                <div className={styles.dirBannerSub}>좋은 하루 시작하세요</div>
+              )}
+              {banner.next && banner.next.schedule && (
+                <div className={styles.dirBannerNext}>
+                  <button
+                    type="button"
+                    className={`${styles.nextDiaChip} ${showNext ? styles.nextDiaChipOn : ''}`}
+                    onClick={() => setShowNext((v) => !v)}
+                    aria-label="다음 근무 행로표 보기"
+                    aria-pressed={showNext}
+                  >
+                    {getDiaDisplay(banner.next.dia)}
+                  </button>
+                  {banner.next.daysAhead === 0
+                    ? `오늘 출근 ${banner.next.schedule.s}`
+                    : `다음근무 ${banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} ${banner.next.schedule.s}`}
+                  {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
+                </div>
+              )}
+            </div>
+          )}
+
+          {isToday && banner && banner.state === 'preparing' && (
+            <div className={`${styles.dirBanner} ${styles.dirBanner_prep} ${nextDirection ? styles[`dirBanner_${nextDirection.dir}`] : ''}`}>
+              <div className={styles.dirBannerDir}>
+                {nextDirection ? `다음 근무 · ${nextDirection.label}` : '다음 근무'}
+              </div>
+              {nextDirection && <div className={styles.dirBannerSub}>{nextDirection.sub}</div>}
+              <div className={styles.dirBannerTime}>
+                출근 {banner.next?.schedule?.s || ''} ({formatTimeUntil(banner.minsUntil)})
+              </div>
+            </div>
+          )}
+
+          {isToday && banner && !currentDirection && banner.state === 'working' && !showDirBanner && (
+            <div className={`${styles.statusBanner} ${styles.banner_working}`}>
+              <span className={styles.bannerDot} />지금 근무 중이에요
             </div>
           )}
         </div>
-      </div>
 
-      <div className={styles.diaMain}>
+        {/* 교번 배지 (우) */}
         <div className={`${styles.diaBadge} ${typeClass}`}>
           <span className={styles.diaBadgeText}>
             {specialRest ? specialRestLabel : getDiaDisplay(dia)}
           </span>
         </div>
-        <div className={styles.diaInfo}>
-          {effectiveType !== 'rest' && (
-            <span className={styles.diaTypeLabel}>
-              {getLabel(dia)}
-              {depotStart && (
-                <span className={styles.depotBadge}>기지 출근</span>
-              )}
-            </span>
-          )}
-          {specialRest && (
-            <span className={styles.diaTypeLabel}>
-              {specialRestLabel}
-              <span className={styles.diaTypeSub}>{schedule?.s}</span>
-            </span>
-          )}
-          {schedule && !specialRest && (
-            <span className={styles.diaTime}>
-              <span className={styles.diaTimeStart}>{schedule.s}</span>
-              {' ~ '}
-              {schedule.e}
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* 방향 배너 — 구간별 전환 */}
-      {isToday && banner && banner.state === 'working' && showDirBanner && segInfo && schedule?.g && (
-        segInfo.status === 'after' ? (
-          <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
-            <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
-            <div className={styles.dirBannerSub}>안전하게 마무리했어요</div>
+      {/* 출퇴근 시간 강조 */}
+      {schedule && !specialRest && (
+        <div className={styles.commuteCard}>
+          <div className={styles.commuteItem}>
+            <span className={styles.commuteLabel}>출근 시간</span>
+            <span className={styles.commuteVal}>
+              <span className={`${styles.commuteIcon} ${styles.commuteIconIn}`}><Clock size={16} strokeWidth={2.4} /></span>
+              {schedule.s}
+            </span>
           </div>
-        ) : currentDirection && (
-          <div className={`${styles.dirBanner} ${styles[`dirBanner_${currentDirection.dir}`]}`}>
-            <div className={styles.dirBannerDir}>{currentDirection.label}</div>
-            <div className={styles.dirBannerSub}>{currentDirection.sub}</div>
-            <div className={styles.dirBannerTime}>
-              {segInfo.status === 'running'
-                ? `운행 중 · ${schedule.g[segInfo.idx].d} → ${schedule.g[segInfo.idx].a}`
-                : segInfo.status === 'waiting'
-                  ? `대기 중 · 다음 ${segInfo.idx + 1}근무 출발 ${schedule.g[segInfo.idx].d}`
-                  : `${segInfo.idx + 1}근무 출발 ${schedule.g[segInfo.idx].d}`}
-            </div>
+          <ArrowRight size={18} className={styles.commuteArrow} aria-hidden />
+          <div className={styles.commuteItem}>
+            <span className={styles.commuteLabel}>퇴근 시간</span>
+            <span className={styles.commuteVal}>
+              <span className={`${styles.commuteIcon} ${styles.commuteIconOut}`}><Clock size={16} strokeWidth={2.4} /></span>
+              {schedule.e}
+            </span>
           </div>
-        )
-      )}
-
-      {isToday && banner && banner.state === 'done' && (
-        <div className={`${styles.dirBanner} ${styles.dirBanner_done}`}>
-          <div className={styles.dirBannerDir}>오늘 근무 끝났어요</div>
-          <div className={styles.dirBannerSub}>편안한 퇴근길 되세요</div>
-          {banner.next && banner.next.schedule && (
-            <div className={styles.dirBannerNext}>
-              다음근무 {banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} {banner.next.schedule.s} {nextDirection ? dirShort(nextDirection.dir) : ''}
-              {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
-            </div>
-          )}
+          {depotStart && <span className={styles.commuteDepot}>기지 출근</span>}
         </div>
       )}
-
-      {isToday && banner && banner.state === 'idle' && (
-        <div className={`${styles.dirBanner} ${styles.dirBanner_idle}`}>
-          <div className={styles.dirBannerDir}>
-            {effectiveType === 'rest'
-              ? (isBibeon ? '오늘은 비번이에요' : '오늘은 휴무예요')
-              : banner.next?.daysAhead === 0
-                ? '오늘 출근하는 날이에요'
-                : '오늘 근무가 끝났어요'}
-          </div>
-          {effectiveType === 'rest' && (
-            <div className={styles.dirBannerSub}>
-              {isBibeon ? '어젯밤 근무 고생했어요. 푹 쉬세요' : '편안한 하루 보내세요'}
-            </div>
-          )}
-          {banner.next?.daysAhead === 0 && diaType !== 'rest' && (
-            <div className={styles.dirBannerSub}>좋은 하루 시작하세요</div>
-          )}
-          {banner.next && banner.next.schedule && (
-            <div className={styles.dirBannerNext}>
-              {banner.next.daysAhead === 0
-                ? `오늘 출근 ${banner.next.schedule.s}`
-                : `다음근무 ${banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} ${banner.next.schedule.s}`}
-              {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
-            </div>
-          )}
-        </div>
-      )}
-
-      {isToday && banner && banner.state === 'preparing' && (
-        <div className={`${styles.dirBanner} ${styles.dirBanner_prep} ${nextDirection ? styles[`dirBanner_${nextDirection.dir}`] : ''}`}>
-          <div className={styles.dirBannerDir}>
-            {nextDirection ? `다음 근무 · ${nextDirection.label}` : '다음 근무'}
-          </div>
-          {nextDirection && <div className={styles.dirBannerSub}>{nextDirection.sub}</div>}
-          <div className={styles.dirBannerTime}>
-            출근 {banner.next?.schedule?.s || ''} ({formatTimeUntil(banner.minsUntil)})
-          </div>
-        </div>
-      )}
-
-      {/* 배너 없을 때 (비근무 상태 등) - 간단 상태 표시 */}
-      {isToday && banner && !currentDirection && banner.state === 'working' && !showDirBanner && (
-        <div className={`${styles.statusBanner} ${styles.banner_working}`}>
-          <span className={styles.bannerDot} />지금 근무 중이에요
+      {specialRest && (
+        <div className={styles.commuteCard}>
+          <span className={styles.diaTypeSub}>{specialRestLabel} · {schedule?.s}</span>
         </div>
       )}
 
@@ -290,6 +360,31 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
       {schedule && driver && (
         <RouteTimeline schedule={schedule} person={driver} date={td} dia={dia ?? undefined} />
       )}
+
+      {/* 행로표 — 당일 항상 표시. 다음근무 클릭 시 그 자리에서 다음 행로표로 교체(잠시 후 자동 복귀) */}
+      {panelSrc && (
+        <div className={styles.routePanel}>
+          {showingNext && (
+            <div className={styles.routePanelHead}>
+              <span className={`${styles.routePanelTag} ${styles.routePanelTagNext}`}>다음 근무</span>
+              <button type="button" className={styles.routePanelClose} onClick={() => setShowNext(false)} aria-label="오늘 근무 행로표로">
+                <X size={16} />
+              </button>
+            </div>
+          )}
+          <img
+            key={panelSrc}
+            src={panelSrc}
+            alt={showingNext ? '다음 근무 행로표' : '오늘 근무 행로표'}
+            loading="lazy"
+            className={styles.routePanelImg}
+            onError={(e) => { const p = e.currentTarget.closest(`.${styles.routePanel}`) as HTMLElement | null; if (p) p.hidden = true; }}
+          />
+        </div>
+      )}
+
+      {/* 비번·휴무날 — 아래가 허전하지 않게 이번 달 근무 달력 표시(날짜 탭 → 행로 팝업) */}
+      {isToday && effectiveType === 'rest' && <HomeMonthCalendar />}
     </section>
   );
 }

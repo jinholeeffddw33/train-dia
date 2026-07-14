@@ -89,7 +89,6 @@ export default function HomeHeader({ onDriverClick }: HomeHeaderProps) {
           <div className={styles.clockRow}>
             <HeaderClock />
           </div>
-          <span className={styles.headerOrg}>답십리 승무사업소</span>
         </div>
       </div>
     </header>

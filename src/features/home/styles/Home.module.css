@@ -1,9 +1,10 @@
 /* ===== Home Tab — v1 Night Shift Revival ===== */
 
-/* ── Header Section (v1 파란색 그래디언트) ── */
+/* ── Header Section (페이지 배경과 조화 — 토큰 기반) ── */
 .headerSection {
-  background: var(--dia-hero-gradient);
-  color: #fff;
+  background: var(--dia-bg-elevated);
+  color: var(--dia-text-primary);
+  border-bottom: 1px solid var(--dia-border);
   padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
   /* ZINOSB 헤더 통일 — sticky + 스크롤-숨김(.z-app-header transform). 자체 gradient bg/노치 보유라 frost 불필요.
      모듈에서 직접 sticky 선언(글로벌 .z-app-header position 과 소스순서 충돌 회피). */
@@ -23,9 +24,9 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.85);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,41 +38,12 @@
 
 .refreshBtn:active {
   transform: scale(0.9);
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--dia-surface-hover);
 }
 
 /* 뒤로가기 버튼(32px @ left:8px) 공간 확보 */
 :global([data-has-back]) .headerSection {
   padding-left: 44px;
-}
-
-:global(:root.light) .headerSection {
-  background: var(--dia-hero-gradient);
-}
-
-/* 배경 장식 — 깊이감 (ZINOSB-grade) */
-.headerSection::after {
-  content: '';
-  position: absolute;
-  right: -40px;
-  top: -40px;
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.headerSection::before {
-  content: '';
-  position: absolute;
-  left: -50px;
-  bottom: -50px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 /* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
@@ -90,7 +62,7 @@
 
 .headerGreeting {
   font-size: var(--dia-text-meta);
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--dia-text-secondary);
   margin-bottom: 2px;
 }
 
@@ -104,7 +76,7 @@
 .headerDate {
   font-size: var(--dia-text-meta);
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--dia-text-secondary);
   letter-spacing: 0.3px;
   margin-bottom: 2px;
 }
@@ -112,15 +84,6 @@
 .clockRow {
   display: flex;
   align-items: flex-end;
-}
-
-.headerOrg {
-  font-size: var(--dia-text-meta);
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 1px;
-  margin-top: 2px;
-  text-align: center;
 }
 
 .headerNameBtn {
@@ -137,7 +100,7 @@
 .headerName {
   font-size: clamp(22px, 6vw, 28px);
   font-weight: 800;
-  color: #fff;
+  color: var(--dia-text-primary);
   letter-spacing: -0.3px;
   display: inline-flex;
   align-items: center;
@@ -145,14 +108,14 @@
 }
 
 .headerChevron {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--dia-text-tertiary);
   flex-shrink: 0;
 }
 
 .headerRole {
   font-size: var(--dia-text-sm);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--dia-text-tertiary);
   margin-left: 4px;
 }
 
@@ -180,7 +143,7 @@
 .clockAmPm {
   font-size: var(--dia-text-base);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--dia-text-secondary);
   margin-right: 6px;
   align-self: flex-end;
   margin-bottom: 6px;
@@ -192,14 +155,13 @@
   letter-spacing: -2px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: #fff;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), 0 0 40px rgba(59, 130, 246, 0.15);
+  color: var(--dia-text-primary);
 }
 
 .clockSec {
   font-size: clamp(20px, 5.5vw, 26px);
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--dia-text-tertiary);
   font-variant-numeric: tabular-nums;
   align-self: flex-end;
   margin-bottom: 4px;
@@ -335,6 +297,205 @@
   margin-bottom: var(--dia-space-3);
 }
 
+/* ── 상태 배너 안에 교번 배지(우측)를 자연스럽게 겹쳐 배치 ── */
+.bannerRow {
+  position: relative;
+  margin-bottom: var(--dia-space-2);
+}
+.bannerCol > * { margin-top: 0 !important; width: 100%; }
+.bannerCol .dirBanner,
+.bannerCol .statusBanner {
+  padding-right: 84px;   /* 배지 자리 확보 */
+  min-height: 66px;
+}
+.bannerRow .diaBadge {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  height: 58px;
+  min-width: 58px;
+  padding: 0 10px;
+}
+.bannerRow .diaBadgeText { font-size: 32px; }
+
+/* ── 출퇴근 시간 강조 카드 ── */
+.commuteCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  margin-bottom: var(--dia-space-2);
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+.commuteItem {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+}
+.commuteLabel {
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+}
+.commuteVal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.commuteIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.commuteIconIn { background: var(--dia-blue-dim); color: var(--dia-blue); }
+.commuteIconOut { background: var(--dia-green-dim); color: var(--dia-green); }
+.commuteArrow { color: var(--dia-text-tertiary); flex-shrink: 0; }
+.commuteDepot {
+  flex-shrink: 0;
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  color: var(--dia-red);
+  background: var(--dia-red-dim);
+  border-radius: var(--dia-radius-full);
+  padding: 4px 10px;
+}
+
+/* ── 다음 근무 카드 (좌: 다음 교번 배지) ── */
+.nextCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-blue-dim);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+.nextBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 8px;
+  border-radius: var(--dia-radius-md);
+  flex-shrink: 0;
+  background: var(--dia-type-day);
+}
+.nextBadge.type_day { background: var(--dia-type-day); }
+.nextBadge.type_night { background: var(--dia-type-night); }
+.nextBadge.type_standby { background: var(--dia-type-standby); }
+.nextBadgeText {
+  font-size: var(--dia-text-xl);
+  font-weight: 900;
+  color: white;
+  line-height: 1;
+}
+.nextBadge.type_standby .nextBadgeText { color: var(--dia-on-amber); }
+.nextInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.nextLabel { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); }
+.nextTime {
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.nextUntil {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: var(--dia-blue-text);
+}
+
+/* ── 다음 근무 교번 배지 (배너 안, 클릭 → 행로표) ── */
+.nextDiaChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 7px;
+  margin-right: 6px;
+  border: 1.5px solid currentColor;
+  border-radius: var(--dia-radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: var(--dia-text-meta);
+  font-weight: 900;
+  cursor: pointer;
+  vertical-align: middle;
+  opacity: 0.92;
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+}
+.nextDiaChip:active { transform: scale(0.92); }
+.nextDiaChipOn { opacity: 1; box-shadow: inset 0 0 0 2px currentColor; }
+
+/* ── 행로표 이미지 패널 (구간운행 아래) — 한 페이지에 맞춰 표시(가로 스크롤 없음) ── */
+.routePanel {
+  margin-top: var(--dia-space-3);
+  padding-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border-light);
+}
+.routePanelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-2);
+}
+.routePanelTag {
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  padding: 3px 11px;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-on-color);
+  background: var(--dia-purple);
+}
+.routePanelTagNext { background: var(--dia-purple); }
+.routePanelTitle {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.routePanelClose {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: var(--dia-surface-hover);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+}
+.routePanelClose:active { transform: scale(0.9); }
+.routePanelImg {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-text-on-color);
+}
+
 .diaBadge {
   display: flex;
   align-items: center;
@@ -386,14 +547,15 @@
 }
 
 .diaTime {
-  font-size: var(--dia-text-lg);
+  font-size: var(--dia-text-base);
   font-weight: var(--dia-weight-medium);
   color: var(--dia-text-secondary);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .diaTimeStart {
-  font-size: var(--dia-text-xl);
+  font-size: var(--dia-text-lg);
   font-weight: 800;
   color: var(--dia-text-primary);
 }
@@ -1219,6 +1381,44 @@
   font-weight: 800;
 }
 
+/* ── 근무별 한 줄 리스트 (행로 + 교대) ── */
+.rtList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.rtLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+.rtLineHead {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+.rtLineHead .rtNum { font-size: var(--dia-text-sm); }
+.rtLineHead .rtRoute { font-size: var(--dia-text-sm); font-weight: 800; }
+.rtLinePartners {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px var(--dia-space-3);
+  margin-left: auto;
+}
+.rtLinePartners .rtPartner {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  opacity: 1;
+}
+.rtLinePartners .rtPartner strong { color: var(--dia-text-primary); }
+
 .rtPartnerLeft {}
 .rtPartnerRight { margin-left: auto; }
 
@@ -1994,6 +2194,66 @@
 
 .installChromeBtn:active {
   transform: scale(0.98);
+}
+
+/* ── 비번/휴무 홈 하단 월 근무 달력 ── */
+.homeCal {
+  margin-top: var(--dia-space-3);
+  padding-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.homeCalLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  color: var(--dia-blue);
+  letter-spacing: 0.3px;
+  margin-bottom: var(--dia-space-2);
+}
+
+.homeCalLabelIcon {
+  flex-shrink: 0;
+}
+
+.homeCalNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-2);
+}
+
+.homeCalNavBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.homeCalTitle {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.homeCalMonth {
+  color: var(--dia-blue);
+  font-weight: 800;
 }
 
 /* ── Animations ── */

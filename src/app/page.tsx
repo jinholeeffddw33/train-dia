@@ -17,7 +17,7 @@ import AppShell from '@/components/layout/AppShell';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
-import { HomeHeader, TodayCard, WeekStrip, StatusCards, HomeTipsQuiz, HomeNotice, DriverSelector } from '@/features/home';
+import { HomeHeader, TodayCard, HomeNotice, DriverSelector } from '@/features/home';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice } from '@/lib/auth';
 
@@ -64,13 +64,7 @@ function HomeTab() {
     <>
       <HomeHeader onDriverClick={() => setDriverOpen(true)} />
       <HomeNotice />
-      <WeekStrip
-        selectedDate={selectedDate}
-        onSelectDate={(date) => setSelectedDate(date || undefined)}
-      />
       <TodayCard selectedDate={selectedDate} onEmptyClick={() => setDriverOpen(true)} />
-      <StatusCards baseDate={selectedDate} />
-      <HomeTipsQuiz />
       <DriverSelector open={driverOpen} onClose={() => setDriverOpen(false)} />
     </>
   );

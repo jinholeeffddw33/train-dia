@@ -1,0 +1,79 @@
+/* 내근직 홈 하단 '이번 달 일정' 인라인 달력 */
+.wrap {
+  margin-top: var(--dia-space-3);
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  color: var(--dia-purple);
+  letter-spacing: 0.3px;
+  margin-bottom: var(--dia-space-2);
+}
+
+.labelIcon {
+  flex-shrink: 0;
+}
+
+/* 날짜 탭 → 그 날 일정 목록 팝업 */
+.dayList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.dayEmpty {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+  padding: var(--dia-space-4) 0;
+}
+
+.dayRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+
+.dayDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dayTime {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 44px;
+}
+
+.dayTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dayPlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  flex-shrink: 0;
+}

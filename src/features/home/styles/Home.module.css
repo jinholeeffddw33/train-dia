@@ -2196,6 +2196,44 @@
   transform: scale(0.98);
 }
 
+/* ── 대기(충당) 근무 안내 — 행로표 자리에 표시 ── */
+.standbyNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-3);
+  background: var(--dia-amber-dim);
+  border: 1px solid var(--dia-type-standby);
+  border-radius: var(--dia-radius-md);
+}
+
+.standbyNoteTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+
+.standbyNoteDia {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-type-standby);
+  color: var(--dia-on-amber);
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+}
+
+.standbyNoteText {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+}
+
 /* ── 비번/휴무 홈 하단 월 근무 달력 ── */
 .homeCal {
   margin-top: var(--dia-space-3);

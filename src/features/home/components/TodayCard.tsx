@@ -30,6 +30,10 @@ interface TodayCardProps {
 
 /** 교번+날짜 → 행로표 이미지 경로 (public/images/route). 없으면 null */
 function routeImagePath(dia: string, date: Date): string | null {
+  // 충당(대8)·휴무(휴7) 등은 행로가 없다. 숫자만 뽑으면 "대8"→8 이 되어
+  // 동번호 근무 다이아(8)의 행로표가 잘못 나옴 → 실제 운행 구간(g)이 있는 근무만 허용.
+  const sch = getSchedule(dia, date);
+  if (!sch?.g || sch.g.length === 0) return null;
   const diaNum = parseInt(dia.replace(/\D/g, ''));
   if (isNaN(diaNum)) return null;
   const h = isHoliday(date);
@@ -44,6 +48,12 @@ function routeImagePath(dia: string, date: Date): string | null {
   else if (!h && th) prefix = 'p_ph';
   else prefix = 'p_pp';
   return `/images/route/${prefix}_${diaNum}.png`;
+}
+
+/** 대기(충당) 근무면 안내 문구 — 행로가 없는 이유와 할 일을 알려준다. 아니면 null */
+function standbyNote(dia: string): string | null {
+  if (getType(dia) !== 'standby') return null;
+  return '정해진 행로가 없어요. 충당여부와 출근시각을 확인하세요.';
 }
 
 export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps) {
@@ -207,9 +217,30 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
   const nextImg = nextInfo?.dia && nextInfo.schedule
     ? routeImagePath(nextInfo.dia, (() => { const d = new Date(td); d.setDate(d.getDate() + nextInfo.daysAhead); return d; })())
     : null;
-  // 다음근무 보기 중이면 다음 이미지로 교체, 아니면 당일
-  const showingNext = showNext && !!nextImg;
+  // 대기(충당) 근무는 행로표가 없다 → 대신 "대기 근무예요" 안내를 같은 자리에 표시
+  const autoNote = !autoImg && dia && !specialRest ? standbyNote(dia) : null;
+  const nextNote = nextInfo?.dia ? standbyNote(nextInfo.dia) : null;
+  // 다음근무 보기 중이면 다음(이미지 또는 안내)으로 교체, 아니면 당일
+  const showingNext = showNext && (!!nextImg || !!nextNote);
   const panelSrc = showingNext ? nextImg : autoImg;
+  const panelNote = showingNext ? nextNote : autoNote;
+  const panelDia = showingNext && nextInfo?.dia ? nextInfo.dia : dia;
+  // 다음근무 교번 칩 — 보여줄 게 있는 근무만 누를 수 있게(행로표 또는 대기 안내)
+  const nextChip = nextInfo?.dia ? (
+    nextImg || nextNote ? (
+      <button
+        type="button"
+        className={`${styles.nextDiaChip} ${showNext ? styles.nextDiaChipOn : ''}`}
+        onClick={() => setShowNext((v) => !v)}
+        aria-label="다음 근무 행로표 보기"
+        aria-pressed={showNext}
+      >
+        {getDiaDisplay(nextInfo.dia)}
+      </button>
+    ) : (
+      <span className={styles.nextDiaChip}>{getDiaDisplay(nextInfo.dia)}</span>
+    )
+  ) : null;
 
   return (
     <section className={styles.todayCard}>
@@ -249,15 +280,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
               <div className={styles.dirBannerSub}>편안한 퇴근길 되세요</div>
               {banner.next && banner.next.schedule && (
                 <div className={styles.dirBannerNext}>
-                  <button
-                    type="button"
-                    className={`${styles.nextDiaChip} ${showNext ? styles.nextDiaChipOn : ''}`}
-                    onClick={() => setShowNext((v) => !v)}
-                    aria-label="다음 근무 행로표 보기"
-                    aria-pressed={showNext}
-                  >
-                    {getDiaDisplay(banner.next.dia)}
-                  </button>
+                  {nextChip}
                   다음근무 {banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} {banner.next.schedule.s} {nextDirection ? dirShort(nextDirection.dir) : ''}
                   {banner.minsUntil ? ` (${formatTimeUntil(banner.minsUntil)})` : ''}
                 </div>
@@ -284,15 +307,7 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
               )}
               {banner.next && banner.next.schedule && (
                 <div className={styles.dirBannerNext}>
-                  <button
-                    type="button"
-                    className={`${styles.nextDiaChip} ${showNext ? styles.nextDiaChipOn : ''}`}
-                    onClick={() => setShowNext((v) => !v)}
-                    aria-label="다음 근무 행로표 보기"
-                    aria-pressed={showNext}
-                  >
-                    {getDiaDisplay(banner.next.dia)}
-                  </button>
+                  {nextChip}
                   {banner.next.daysAhead === 0
                     ? `오늘 출근 ${banner.next.schedule.s}`
                     : `다음근무 ${banner.next.daysAhead === 1 ? '내일' : `${banner.next.daysAhead}일 후`} ${banner.next.schedule.s}`}
@@ -361,25 +376,36 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
         <RouteTimeline schedule={schedule} person={driver} date={td} dia={dia ?? undefined} />
       )}
 
-      {/* 행로표 — 당일 항상 표시. 다음근무 클릭 시 그 자리에서 다음 행로표로 교체(잠시 후 자동 복귀) */}
-      {panelSrc && (
+      {/* 행로표 — 당일 항상 표시. 다음근무 클릭 시 그 자리에서 다음 행로표로 교체(잠시 후 자동 복귀).
+          대기(충당) 근무는 행로가 없으므로 같은 자리에 안내를 표시 */}
+      {(panelSrc || panelNote) && (
         <div className={styles.routePanel}>
           {showingNext && (
             <div className={styles.routePanelHead}>
               <span className={`${styles.routePanelTag} ${styles.routePanelTagNext}`}>다음 근무</span>
-              <button type="button" className={styles.routePanelClose} onClick={() => setShowNext(false)} aria-label="오늘 근무 행로표로">
+              <button type="button" className={styles.routePanelClose} onClick={() => setShowNext(false)} aria-label="오늘 근무로 돌아가기">
                 <X size={16} />
               </button>
             </div>
           )}
-          <img
-            key={panelSrc}
-            src={panelSrc}
-            alt={showingNext ? '다음 근무 행로표' : '오늘 근무 행로표'}
-            loading="lazy"
-            className={styles.routePanelImg}
-            onError={(e) => { const p = e.currentTarget.closest(`.${styles.routePanel}`) as HTMLElement | null; if (p) p.hidden = true; }}
-          />
+          {panelSrc ? (
+            <img
+              key={panelSrc}
+              src={panelSrc}
+              alt={showingNext ? '다음 근무 행로표' : '오늘 근무 행로표'}
+              loading="lazy"
+              className={styles.routePanelImg}
+              onError={(e) => { const p = e.currentTarget.closest(`.${styles.routePanel}`) as HTMLElement | null; if (p) p.hidden = true; }}
+            />
+          ) : (
+            <div className={styles.standbyNote}>
+              <span className={styles.standbyNoteTitle}>
+                <span className={styles.standbyNoteDia}>{panelDia}</span>
+                {LABELS.STANDBY_WORK}
+              </span>
+              <span className={styles.standbyNoteText}>{panelNote}</span>
+            </div>
+          )}
         </div>
       )}
 

@@ -11,6 +11,7 @@ import { getUserRole } from '@/lib/auth';
 import { useThemeStore } from '@/stores/theme';
 import { useOfficeStore } from '@/stores/office';
 import { APP_VERSION } from '@/lib/constants';
+import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import type { WorldId } from '@/components/layout/WorldHub';
 import ScheduleManager from './ScheduleManager';
 import NoteManager from './NoteManager';
@@ -315,6 +316,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
       <div className={styles.footer}>
         <span className={styles.footerBrand}>Train DIA</span>
         <span className={styles.footerVersion}>{APP_VERSION}</span>
+        <span className={styles.footerCopyright}>{COPYRIGHT_NOTICE}</span>
       </div>
 
       {/* 일정관리 전체 화면 */}

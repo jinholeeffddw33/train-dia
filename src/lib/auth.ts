@@ -92,9 +92,10 @@ export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [];
 
 const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 
-/** 관리자 사번 목록 (21명) */
+/** 관리자 사번 목록 (22명) — 사업소 관리자. DB driver_profiles.role='admin'(개발/시스템 관리자)과 별개 */
 const ADMIN_SABUNS = new Set([
-  '21704630', // 안성숙
+  '21704630', // 안성숙 — 소장
+  '21711216', // 이태원 — 부소장
   '21711694', // 이현구
   '21711197', // 이선길
   '21714898', // 강병우

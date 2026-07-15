@@ -14,6 +14,9 @@ import styles from './apex/styles/leaderboard.module.css';
 const PERIOD_LABELS = { all: '전체', month: '이번 달' } as const;
 type Period = keyof typeof PERIOD_LABELS;
 
+/** 전체 랭킹 노출 등수 — 오버레이가 스크롤되므로 30등까지 모두 보인다 */
+const TOP_N = 30;
+
 interface Entry {
   rank: number;
   name: string;
@@ -43,10 +46,10 @@ export default function ApexLeaderboard({ onClose }: { onClose: () => void }) {
   const fetchRanking = useCallback((p: Period) => {
     setLoading(true);
     setError(false);
-    fetch(`/api/games/rankings?game=apex&period=${p}`)
+    fetch(`/api/games/rankings?game=apex&period=${p}&limit=${TOP_N}`)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('rank fetch failed'))))
       .then((json) => {
-        setEntries(json.top5 ?? []);
+        setEntries(json.top ?? []);
         setMyRank(json.myRank ?? null);
       })
       .catch(() => setError(true))

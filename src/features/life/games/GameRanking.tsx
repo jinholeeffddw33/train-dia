@@ -17,7 +17,7 @@ interface MyRank {
 }
 
 interface RankingData {
-  top5: RankEntry[];
+  top: RankEntry[];
   myRank: MyRank | null;
   totalPlayers: number;
 }
@@ -73,13 +73,13 @@ export default function GameRanking({ game, scoreLabel = '점수', scoreUnit = '
 
       {loading ? (
         <p className={styles.loading}>불러오는 중...</p>
-      ) : !data || data.top5.length === 0 ? (
+      ) : !data || data.top.length === 0 ? (
         <p className={styles.empty}>아직 기록이 없어요</p>
       ) : (
         <>
-          {/* 탑 5 */}
+          {/* 상위 랭킹 (기본 15등 — APEX RUSH 만 30등) */}
           <div className={styles.list}>
-            {data.top5.map((entry) => (
+            {data.top.map((entry) => (
               <div
                 key={`${entry.rank}-${entry.name}`}
                 className={`${styles.row} ${entry.isMe ? styles.rowMe : ''} ${entry.rank <= 3 ? styles.rowTop3 : ''}`}

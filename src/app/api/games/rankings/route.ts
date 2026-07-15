@@ -3,7 +3,11 @@ import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 import { settleAndResetPastMonths } from '@/lib/games/monthlyReset';
 
-/** GET: 랭킹 조회 — ?game=snake&period=all|month */
+/** 노출 순위 개수 — ?limit 미지정 시 기본값. APEX RUSH 는 30 등까지 요청한다. */
+const DEFAULT_LIMIT = 15;
+const MAX_LIMIT = 100;
+
+/** GET: 랭킹 조회 — ?game=snake&period=all|month&limit=30 */
 export async function GET(req: NextRequest) {
   if (!serverSupabase) {
     return NextResponse.json({ code: 'SERVICE_UNAVAILABLE', message: '서비스 준비 중' }, { status: 503 });
@@ -19,6 +23,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const game = searchParams.get('game') ?? 'snake';
   const period = searchParams.get('period') ?? 'all';
+  const limitRaw = Number(searchParams.get('limit'));
+  const limit = Number.isFinite(limitRaw) && limitRaw > 0
+    ? Math.min(Math.trunc(limitRaw), MAX_LIMIT)
+    : DEFAULT_LIMIT;
 
   // 기간 필터
   let dateFilter: string | null = null;
@@ -27,15 +35,20 @@ export async function GET(req: NextRequest) {
     dateFilter = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   }
 
-  // 탑 5 — 각 유저 최고점만 (중복 제거를 위해 서브쿼리 대신 전체 조회 후 JS에서 처리)
+  // 각 유저 최고점만 (중복 제거를 위해 서브쿼리 대신 전체 조회 후 JS에서 처리)
   // reaction은 낮을수록 좋음 (ASC), snake는 높을수록 좋음 (DESC)
+  //
+  // ⚠️ 이 limit 은 '사람' 이 아니라 '점수 행' 기준이다. 한 사람이 여러 기록을 남기므로
+  //    중복 제거 후 남는 인원은 이보다 적다 → 요청한 순위 수의 20배를 넉넉히 가져온다.
+  //    (limit 만큼만 가져오면 상위권 한 명이 행을 여러 개 차지해 순위가 모자란다)
   const isReaction = game === 'reaction';
+  const rowLimit = Math.min(1000, Math.max(100, limit * 20));
   let query = serverSupabase
     .from('game_scores')
     .select('sabun, name, score, created_at')
     .eq('game', game)
     .order('score', { ascending: isReaction })
-    .limit(100);
+    .limit(rowLimit);
 
   if (dateFilter) {
     query = query.gte('created_at', dateFilter);
@@ -65,8 +78,7 @@ export async function GET(req: NextRequest) {
     isReaction ? a.score - b.score : b.score - a.score,
   );
 
-  // 탑 15
-  const top5 = ranked.slice(0, 15).map((r, i) => ({
+  const top = ranked.slice(0, limit).map((r, i) => ({
     rank: i + 1,
     name: r.name,
     score: r.score,
@@ -82,7 +94,7 @@ export async function GET(req: NextRequest) {
   } : null;
 
   return NextResponse.json({
-    top5,
+    top,
     myRank,
     totalPlayers: ranked.length,
   });

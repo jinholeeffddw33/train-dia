@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore, type SabunStatus } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
+import { getDuplicateNameGroup } from '@/lib/auth';
 import { KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import styles from './AuthGate.module.css';
 
@@ -10,6 +11,7 @@ type Screen =
   | 'loading'
   | 'sabun'
   | 'notice'         // 관리자 첫 방문: PIN 0000 안내
+  | 'name-pick'      // 동명이인(김성준A/B): 사번 확인 후 본인 이름 선택
   | 'login'          // 일반: 이름 입력 / 관리자: PIN 입력
   | 'pin-setup';     // 관리자 PIN 최초 설정
 
@@ -113,6 +115,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
       setSabunStatus(status);
       if (status.isAdmin && status.mustChangePin) {
         setScreen('notice');
+      } else if (!status.isAdmin && getDuplicateNameGroup(sabun.trim())) {
+        // 동명이인 — 이름을 직접 받으면 A/B 중 뭘 쓸지 몰라 로그인 실패 → 선택지로 확인
+        setScreen('name-pick');
       } else {
         setScreen('login');
       }
@@ -209,6 +214,66 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           >
             {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
             <span>{loading ? '잠시만요...' : 'PIN 설정 시작 →'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 2단계(동명이인): 사번 확인 + 본인 이름 선택 ──
+  if (screen === 'name-pick') {
+    const group = getDuplicateNameGroup(sabun.trim());
+    if (!group) {
+      setScreen('login');
+      return null;
+    }
+
+    const handlePick = async (pickedName: string) => {
+      if (loading) return;
+      await loginWithName(sabun.trim(), pickedName);
+    };
+
+    return (
+      <div className={styles.gate}>
+        <div className={styles.card}>
+          <div className={styles.icon}>🚇</div>
+          <h1 className={styles.title}>기관사 DIA</h1>
+          <p className={styles.subtitle}>사번 {sabun}</p>
+
+          <div className={styles.inputGroup}>
+            <span className={styles.label}>이름 선택</span>
+            <div className={styles.pickList}>
+              {group.members.map((m) => (
+                <button
+                  key={m.sabun}
+                  type="button"
+                  className={`z-glass-surface ${styles.pickBtn}`}
+                  data-press
+                  onClick={() => handlePick(m.name)}
+                  disabled={loading}
+                >
+                  <span className={styles.pickName}>{m.name}</span>
+                  <span className={styles.pickMeta}>교번 {m.personId}</span>
+                </button>
+              ))}
+            </div>
+            <div className={styles.hint}>
+              <span className={styles.hintStrong}>{group.base}</span> 님이 두 분 계셔서 이름 뒤에 A·B를 붙여
+              구분합니다.
+              <span className={styles.hintLine}>
+                위 사번이 본인 사번이 맞는지 확인하고, 본인 교번의 이름을 눌러주세요.
+              </span>
+            </div>
+          </div>
+
+          {error && <p className={styles.error}>{error}</p>}
+
+          <button
+            type="button"
+            className={styles.btnSecondary}
+            onClick={() => { clearError(); setSabunStatus(null); setScreen('sabun'); }}
+          >
+            ← 사번 다시 입력
           </button>
         </div>
       </div>

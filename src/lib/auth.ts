@@ -1,6 +1,29 @@
 import { P } from '@/data/cycle';
 import type { Person } from '@/lib/types';
 
+/**
+ * 동명이인 — 같은 이름이 둘 이상이라 사번별로 A/B 를 붙여 각각 별개 인물로 다룬다.
+ * 이 표가 이름 표기의 SSOT: Supabase driver_profiles.name · cycle.ts P · 로그인 이름이 모두 여기에 맞춰져 있다.
+ * 김성준A(21703825, 교번 62) / 김성준B(22300506, 교번 54) — 2026-07-15 확정.
+ */
+export const DUPLICATE_NAME_GROUPS: {
+  base: string;
+  members: { sabun: string; name: string; personId: string }[];
+}[] = [
+  {
+    base: '김성준',
+    members: [
+      { sabun: '21703825', name: '김성준A', personId: '62' },
+      { sabun: '22300506', name: '김성준B', personId: '54' },
+    ],
+  },
+];
+
+/** 이 사번이 동명이인이면 로그인에서 고를 이름 후보 그룹을 반환 (아니면 null) */
+export function getDuplicateNameGroup(sabun: string) {
+  return DUPLICATE_NAME_GROUPS.find((g) => g.members.some((m) => m.sabun === sabun)) ?? null;
+}
+
 export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '이현구', s: '21711694' },
   { I: '0', d: '', n: '강병우', s: '21714898' },
@@ -22,7 +45,6 @@ export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '장진수', s: '21707096' },
   { I: '0', d: '', n: '김봉철', s: '21707406' },
   { I: '0', d: '', n: '김창환', s: '21707420' },
-  { I: '0', d: '', n: '김성준A', s: '21703825' },
   { I: '0', d: '', n: '안성숙', s: '21704630' },
   { I: '0', d: '', n: '최승곤', s: '21706206' },
   { I: '0', d: '', n: '이병홍', s: '21706208' },

@@ -84,6 +84,45 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── 동명이인 이름 선택 (김성준A / 김성준B) ── */
+.pickList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+
+/* 표면은 .z-glass-surface(전역)가 담당 — 여기선 레이아웃/타이포만 */
+.pickBtn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-4);
+  min-height: 64px;
+  text-align: left;
+  transition: transform 0.15s ease;
+}
+
+.pickBtn:active {
+  transform: scale(0.98);
+}
+
+.pickBtn:disabled {
+  opacity: 0.5;
+}
+
+.pickName {
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+
+.pickMeta {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
 /* ── 안내 단계 목록 ── */
 .steps {
   display: flex;

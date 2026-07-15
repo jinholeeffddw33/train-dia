@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, ArrowLeftRight, ChevronRight } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, ArrowLeftRight, ChevronRight, Settings } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -23,6 +23,7 @@ interface WorldHubProps {
   onEnter: (world: WorldId) => void;
   /** 일정관리 대시보드로 교차 진입(기관사도 내근직 대시보드 사용) */
   onOpenSchedule?: () => void;
+  onOpenSettings?: () => void;
 }
 
 interface ServiceDef {
@@ -67,7 +68,7 @@ function LottieIcon({ src, width = 24 }: { src: string; width?: number }) {
   return <Lottie animationData={data} loop autoplay style={{ width, height: width }} />;
 }
 
-export default function WorldHub({ onEnter, onOpenSchedule }: WorldHubProps) {
+export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: WorldHubProps) {
   const driver = useDriverStore((s) => s.current);
   const name = driver?.n ?? '';
   const role = getUserRole(driver?.s);
@@ -93,6 +94,14 @@ export default function WorldHub({ onEnter, onOpenSchedule }: WorldHubProps) {
           {theme === 'dark'
             ? <Moon size={20} strokeWidth={2.2} />
             : <Sun size={20} strokeWidth={2.2} />}
+        </button>
+        <button
+          type="button"
+          className={styles.gearBtn}
+          aria-label="설정 열기"
+          onClick={() => onOpenSettings?.()}
+        >
+          <Settings size={20} strokeWidth={2.2} />
         </button>
         <button
           type="button"

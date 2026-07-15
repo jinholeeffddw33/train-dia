@@ -5,6 +5,7 @@ import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange, ArrowLeftRight,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
+  Settings,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
@@ -48,7 +49,7 @@ const WORLD_ICONS: { id: WorldId; label: string; Icon: typeof TrainFront; tone: 
   { id: 'life',   label: '라이프', Icon: Heart,         tone: 'life' },
 ];
 
-export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: WorldId) => void; onOpenHub?: () => void }) {
+export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: { onEnter: (w: WorldId) => void; onOpenHub?: () => void; onOpenSettings?: () => void }) {
   const authUser = useAuthStore((s) => s.user);
   const name = authUser?.name ?? '';
   const role = getUserRole(authUser?.sabun);
@@ -132,6 +133,9 @@ export default function OfficeDashboard({ onEnter, onOpenHub }: { onEnter: (w: W
         <button type="button" className={styles.iconBtn} onClick={toggleTheme}
           aria-label={theme === 'dark' ? '라이트 모드' : '다크 모드'}>
           {theme === 'dark' ? <Moon size={20} strokeWidth={2.2} /> : <Sun size={20} strokeWidth={2.2} />}
+        </button>
+        <button type="button" className={styles.iconBtn} onClick={() => onOpenSettings?.()} aria-label="설정 열기">
+          <Settings size={20} strokeWidth={2.2} />
         </button>
         <button type="button" className={styles.iconBtn} onClick={() => onEnter('safety')} aria-label="알림">
           <Bell size={20} strokeWidth={2.2} />

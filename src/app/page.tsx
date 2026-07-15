@@ -33,6 +33,7 @@ const SafetyWorld = dynamic(() => import('@/features/safety/SafetyWorld'), { ssr
 const LifeWorld = dynamic(() => import('@/features/life/LifeWorld'), { ssr: false, loading });
 const StandbyCoverageView = dynamic(() => import('@/features/standby/StandbyCoverageView'), { ssr: false, loading });
 const OfficeDashboard = dynamic(() => import('@/features/office/OfficeDashboard'), { ssr: false, loading });
+const SettingsOverlay = dynamic(() => import('@/features/more/components/SettingsOverlay'), { ssr: false });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -81,6 +82,8 @@ export default function HomePage() {
   const isOfficeUser = !!authUser && isOffice(authUser.sabun);
   // 최초 홈은 신분에 따라 다르지만(내근직=일정관리, 기관사=월드허브) 서로 교차 진입 가능
   const [homeOverride, setHomeOverride] = useState<'office' | 'hub' | null>(null);
+  // 설정은 앱 전체에서 단일 인스턴스 — 양쪽 홈 헤더의 기어가 이걸 연다
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const defaultHome: 'office' | 'hub' = isOfficeUser ? 'office' : 'hub';
   const home: 'office' | 'hub' = homeOverride ?? defaultHome;
 
@@ -130,10 +133,11 @@ export default function HomePage() {
         <KimMinkyungAwardModal />
         <AnnounceModal />
         <WhatsNewModal />
+        <SettingsOverlay open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         {world === null ? (
           home === 'office'
-            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => goHome('hub')} />
-            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => goHome('office')} />
+            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => goHome('hub')} onOpenSettings={() => setSettingsOpen(true)} />
+            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => goHome('office')} onOpenSettings={() => setSettingsOpen(true)} />
         ) : world === 'duty' ? (
           <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}

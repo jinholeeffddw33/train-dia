@@ -95,7 +95,16 @@ export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [];
 
 const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
 
-/** 관리자 사번 목록 (22명) — 사업소 관리자. DB driver_profiles.role='admin'(개발/시스템 관리자)과 별개 */
+/**
+ * 사업소 관리자 사번 (22명) — 푸시 발송·안전신고 처리 권한. isAdmin() 이 이 목록으로 판정.
+ *
+ * ★ DB driver_profiles.role='admin' 과 별개의 체계다. 헷갈리지 말 것:
+ *   - 여기(ADMIN_SABUNS)  = 사업소 관리자(소장·부소장·부장). 푸시·안전신고
+ *   - role='admin'        = 개발자 3명(이진호 00000001 · jinho 030827 · 이현구 21711694).
+ *                           관리자 대시보드·의견(피드백) 관리 — 모든 권한
+ *   소장·부소장도 role 은 'driver' 다(의도된 것). 승무원에게 role='admin' 을 주지 말 것
+ *   — 2026-07 조임현(21714375, 순번1 기관사)이 role='admin' 이던 것을 'driver' 로 회수함.
+ */
 const ADMIN_SABUNS = new Set([
   '21704630', // 안성숙 — 소장
   '21711216', // 이태원 — 부소장

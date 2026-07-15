@@ -81,7 +81,19 @@ export default function HomePage() {
   const isOfficeUser = !!authUser && isOffice(authUser.sabun);
   // 최초 홈은 신분에 따라 다르지만(내근직=일정관리, 기관사=월드허브) 서로 교차 진입 가능
   const [homeOverride, setHomeOverride] = useState<'office' | 'hub' | null>(null);
-  const home: 'office' | 'hub' = homeOverride ?? (isOfficeUser ? 'office' : 'hub');
+  const defaultHome: 'office' | 'hub' = isOfficeUser ? 'office' : 'hub';
+  const home: 'office' | 'hub' = homeOverride ?? defaultHome;
+
+  /**
+   * 홈 교차 이동 — 기본 홈으로 되돌아가는 경우엔 override 를 두지 않고 해제한다.
+   * override 를 'hub'→'office' 로 바꾸면 둘 다 null 이 아니라 useHistoryBack 의
+   * key·enabled 가 그대로여서 히스토리가 새로 쌓이지 않는다. 그 상태로 뒤로가기를 누르면
+   * override 만 null 이 되는데 기본 홈과 같은 화면이라 "눌러도 아무 일 없음" 이 되고,
+   * 앱을 나가려면 두 번 눌러야 했다. null 로 해제하면 히스토리 항목도 함께 정리된다.
+   */
+  const goHome = useCallback((target: 'office' | 'hub') => {
+    setHomeOverride(target === defaultHome ? null : target);
+  }, [defaultHome]);
 
   // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
   useEffect(() => {
@@ -120,8 +132,8 @@ export default function HomePage() {
         <WhatsNewModal />
         {world === null ? (
           home === 'office'
-            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => setHomeOverride('hub')} />
-            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => setHomeOverride('office')} />
+            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => goHome('hub')} />
+            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => goHome('office')} />
         ) : world === 'duty' ? (
           <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}

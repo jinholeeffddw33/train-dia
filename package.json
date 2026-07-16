@@ -30,6 +30,7 @@
     "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.111.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@simplewebauthn/browser": "^13.3.0",

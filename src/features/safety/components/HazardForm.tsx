@@ -54,6 +54,8 @@ interface FormVariant {
   severityPicker?: boolean;
   /** 사례교육 호수 입력 노출 (예: 2026-1) */
   caseEduPicker?: boolean;
+  /** 운전정보 호수 입력 노출 + 사진 자동 인식 */
+  drivingHoPicker?: boolean;
   showLocation: boolean;
   dataCategory: DataCategory;
 }
@@ -95,7 +97,7 @@ const STATIONS: readonly string[] = [
 
 const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
   incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, caseEduPicker: true, showLocation: false, dataCategory: 'action'  },
-  driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, showLocation: false, dataCategory: 'inspect' },
+  driving:  { title: '운전 정보 등록', kinds: INCIDENT_KINDS, drivingHoPicker: true, showLocation: false, dataCategory: 'inspect' },
   train:    { title: '열차 정보 등록', trainPicker: true,     showLocation: false, dataCategory: 'inspect' },
   hazard:   { title: '위험개소 등록', stationPicker: true, severityPicker: true, showLocation: false, dataCategory: 'hazard'  },
 };
@@ -121,9 +123,14 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const [station, setStation] = useState<string>(defaultStation);
   const [trainNo, setTrainNo] = useState<string>(defaultTrain);
   const [caseEduNo, setCaseEduNo] = useState<string>('');
+  const [drivingHo, setDrivingHo] = useState<string>('');
   const [severity, setSeverity] = useState<SeverityOption['value']>('주의');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // 사진 자동 인식 — 채워주기만 하고 저장은 사람이 (안전 자료라 오인식이 그대로 올라가면 안 됨)
+  const [scanning, setScanning] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  const [scanNote, setScanNote] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const attachmentRef = useRef<HTMLInputElement>(null);
 
@@ -142,6 +149,38 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
     const compressed = await compressImage(file);
     setPhoto(compressed);
     setPreview(URL.createObjectURL(compressed));
+    if (variant.drivingHoPicker) void scanPhoto(compressed);
+  };
+
+  /** 운전정보 사진에서 제목·분류·호수·내용을 읽어 폼을 미리 채운다 (사람이 확인 후 등록) */
+  const scanPhoto = async (file: File) => {
+    setScanning(true);
+    setScanNote('');
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch('/api/safety/extract-driving-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64, mediaType: file.type }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setScanNote(data.message ?? '자동으로 읽지 못했어요. 직접 입력해주세요.'); return; }
+      // 사용자가 이미 적은 칸은 덮어쓰지 않는다
+      setTitleText((v) => v || data.title || '');
+      setDescription((v) => v || data.description || '');
+      setDrivingHo((v) => v || data.location || '');
+      if (data.kind) setKind(data.kind);
+      setScanned(true);
+    } catch {
+      setScanNote('자동으로 읽지 못했어요. 직접 입력해주세요.');
+    } finally {
+      setScanning(false);
+    }
   };
 
   const handleAttachmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,10 +221,12 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
       else if (variant.severityPicker) tag = severity;
       const headline = tag ? `[${tag}] ${titleText.trim()}` : titleText.trim();
       const finalDescription = `${headline}\n${description.trim()}`;
-      // 사고사례: 호수는 location에 저장 (운전정보와 동일 포맷)
+      // 사고사례·운전정보: 호수는 location 에 저장 (제목 자리에 넣지 말 것 — 2026-12호 사고)
       const finalLocation = variant.caseEduPicker
         ? caseEduNo.trim()
-        : (variant.showLocation ? location.trim() : '');
+        : variant.drivingHoPicker
+          ? drivingHo.trim()
+          : (variant.showLocation ? location.trim() : '');
       await createReport({
         photo,
         attachment,
@@ -236,6 +277,17 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         onChange={handlePhotoChange}
         aria-label="사진 파일 선택"
       />
+
+      {/* 자동 인식 상태 — 채워준 값은 반드시 사람이 확인하고 등록 */}
+      {variant.drivingHoPicker && (scanning || scanned || scanNote) && (
+        <div className={styles.scanBox} role="status" aria-live="polite">
+          {scanning
+            ? '사진에서 제목·내용을 읽고 있어요…'
+            : scanNote
+              ? scanNote
+              : '사진에서 읽어 채웠어요. 맞는지 확인하고 고쳐주세요.'}
+        </div>
+      )}
 
       {/* 파일 첨부 (선택 사항, 사진과 동시 첨부 가능) */}
       <div
@@ -370,6 +422,22 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
               <option key={n} value={n}>{n}편성</option>
             ))}
           </select>
+        </div>
+      )}
+      {variant.drivingHoPicker && (
+        <div className={styles.fieldGroup}>
+          <label className={styles.fieldLabel} htmlFor="hazard-driving-ho">
+            운전정보 호수 (예: 12호)
+          </label>
+          <input
+            id="hazard-driving-ho"
+            type="text"
+            className={styles.textInput}
+            placeholder="예: 12호"
+            value={drivingHo}
+            onChange={(e) => setDrivingHo(e.target.value)}
+            maxLength={20}
+          />
         </div>
       )}
       {variant.caseEduPicker && (

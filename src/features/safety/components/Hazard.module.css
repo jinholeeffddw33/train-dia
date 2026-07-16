@@ -903,6 +903,18 @@
   text-align: center;
 }
 
+/* 사진 자동 인식 상태 — 읽는 중 / 채웠으니 확인하세요 / 못 읽었어요 */
+.scanBox {
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-left: 3px solid var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+}
+
 .submitBtn {
   width: 100%;
   padding: var(--dia-space-3);

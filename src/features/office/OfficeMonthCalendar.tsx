@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, CalendarRange, MapPin } from 'lucide-react';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
+import { isHoliday } from '@/lib/schedule';
 import Modal from '@/components/common/Modal';
 import grid from './ScheduleManager.module.css';
 import styles from './OfficeMonthCalendar.module.css';
@@ -96,7 +97,8 @@ export default function OfficeMonthCalendar() {
                 className={`${grid.mCell} ${c === openDate ? grid.mSel : ''}`}
                 onClick={() => setOpenDate(c)}
                 aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일${evs.length ? `, 일정 ${evs.length}건` : ''}`}>
-                <span className={`${grid.mNum} ${dow === 0 ? grid.sun : dow === 6 ? grid.sat : ''} ${c === todayISO ? grid.mTodayNum : ''}`}>{dd.getDate()}</span>
+                {/* 공휴일도 일요일과 같은 빨강 — 요일만 보면 제헌절 같은 날이 검게 나온다 */}
+                <span className={`${grid.mNum} ${dow === 0 || isHoliday(dd) ? grid.sun : dow === 6 ? grid.sat : ''} ${c === todayISO ? grid.mTodayNum : ''}`}>{dd.getDate()}</span>
                 <span className={grid.mChips}>
                   {evs.slice(0, 3).map((e) => (
                     <span key={e.id} className={grid.mChip}>

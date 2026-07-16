@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Plus, X, Check, CalendarDays, MapPin, Repeat } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
+import { isHoliday } from '@/lib/schedule';
 import TimeSelect from './TimeSelect';
 import styles from './ScheduleManager.module.css';
 
@@ -249,7 +250,8 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                   className={`${styles.mCell} ${c === sel ? styles.mSel : ''}`}
                   onClick={() => setSel(c)}
                   aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일${evs.length ? `, 일정 ${evs.length}건` : ''}`}>
-                  <span className={`${styles.mNum} ${dow === 0 ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
+                  {/* 공휴일도 일요일과 같은 빨강 — 요일만 보면 제헌절 같은 날이 검게 나온다 */}
+                  <span className={`${styles.mNum} ${dow === 0 || isHoliday(dd) ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
                   <span className={styles.mChips}>
                     {evs.slice(0, 3).map((e) => (
                       <span key={e.id} className={styles.mChip}>
@@ -275,7 +277,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             const dd = fromISO(d);
             return (
               <button key={d} type="button" className={`${styles.wd} ${d === sel ? styles.wdSel : ''}`} onClick={() => setSel(d)}>
-                <span className={`${styles.wdName} ${dd.getDay() === 0 ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
+                <span className={`${styles.wdName} ${dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
                 <span className={styles.wdNum}>{dd.getDate()}</span>
               </button>
             );
@@ -342,7 +344,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
               const dd = fromISO(d);
               return (
                 <button key={d} type="button" className={`${styles.wgDayBtn} ${d === sel ? styles.wgDaySel : ''}`} onClick={() => setSel(d)}>
-                  <span className={`${styles.wgDow} ${dd.getDay() === 0 ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
+                  <span className={`${styles.wgDow} ${dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
                   <span className={`${styles.wgDayNum} ${d === todayISO ? styles.wgToday : ''}`}>{dd.getDate()}</span>
                 </button>
               );

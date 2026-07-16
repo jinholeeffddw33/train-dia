@@ -28,6 +28,61 @@
 .back:active { transform: scale(0.92); }
 .title { font-size: var(--dia-text-lg); font-weight: 800; color: var(--dia-text-primary); }
 
+/* ── 이번주 / 다음주 탭 ── */
+.tabs {
+  display: flex;
+  gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-4);
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px; /* 터치 타겟 P0 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--dia-space-2);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-sm);
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.tab:active { transform: scale(0.95); }
+
+.tabOn {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+}
+
+.tabName {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-secondary);
+}
+
+.tabOn .tabName { color: var(--dia-blue-text); }
+
+.tabCheck { color: var(--dia-green); flex-shrink: 0; }
+
+.tabWeek {
+  font-size: var(--dia-text-meta);
+  font-weight: 600;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
 .body {
   flex: 1;
   padding: var(--dia-space-4);

@@ -41,7 +41,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushSubscription();
-  const { canInstall, isInstalled, isIOS, isAndroid, install } = useInstallPrompt();
+  const { canInstall, isInstalled, isIOS, isAndroid, isInApp, install } = useInstallPrompt();
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
@@ -390,8 +390,8 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                   💡 홈 화면에 추가하면 내 교번·설정이 지워지지 않고, 알림도 받을 수 있어요
                 </p>
               </div>
-            ) : (
-              /* ── Android 비크롬 브라우저 안내 ── */
+            ) : isInApp ? (
+              /* ── 인앱 웹뷰(카톡·네이버 등) — 여기서는 설치가 원천적으로 안 된다 ── */
               <div className={styles.installGuide}>
                 <p className={styles.installGuideDesc}>
                   지금 보고 계신 화면(네이버·카톡 등)에서는<br />
@@ -409,8 +409,8 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                   <li className={styles.installStep}>
                     <span className={styles.installStepNum}>2</span>
                     <div className={styles.installStepText}>
-                      화면 아래에 뜨는 <strong>"앱 설치"</strong>를 누르세요<br />
-                      <span className={styles.installStepSub}>"홈 화면에 추가"라고 뜨기도 해요</span>
+                      Chrome에서 다시 <strong>홈 화면 추가</strong>를 누르세요<br />
+                      <span className={styles.installStepSub}>설치 창이 바로 떠요</span>
                     </div>
                   </li>
                 </ol>
@@ -423,6 +423,42 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                 </button>
                 <p className={styles.installGuideTip}>
                   💡 Chrome이 없으면 자동으로 Play 스토어가 열려요
+                </p>
+              </div>
+            ) : (
+              /* ── Android Chrome — 설치는 되는데 신호가 아직 안 온 상태. 메뉴로 안내.
+                   예전엔 이 자리에도 '네이버·카톡' 안내가 떠서 Chrome 사용자가
+                   'Chrome으로 열기'를 눌러도 같은 화면만 다시 뜨고 설치가 안 됐다. ── */
+              <div className={styles.installGuide}>
+                <p className={styles.installGuideDesc}>
+                  Chrome 메뉴에서 <strong>홈 화면에 추가</strong>하면<br />
+                  앱처럼 바로 열 수 있어요.
+                </p>
+                <ol className={styles.installSteps}>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>1</span>
+                    <div className={styles.installStepText}>
+                      오른쪽 위 <strong>⋮ (점 3개)</strong> 탭<br />
+                      <span className={styles.installStepSub}>주소창 오른쪽 끝에 있어요</span>
+                    </div>
+                  </li>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>2</span>
+                    <div className={styles.installStepText}>
+                      <strong>앱 설치</strong> 또는 <strong>홈 화면에 추가</strong> 선택<br />
+                      <span className={styles.installStepSub}>Chrome 버전에 따라 이름이 달라요</span>
+                    </div>
+                  </li>
+                  <li className={styles.installStep}>
+                    <span className={styles.installStepNum}>3</span>
+                    <div className={styles.installStepText}>
+                      <strong>설치</strong> 탭<br />
+                      <span className={styles.installStepSub}>이름은 그대로 두면 돼요</span>
+                    </div>
+                  </li>
+                </ol>
+                <p className={styles.installGuideTip}>
+                  💡 메뉴에 안 보이면 페이지를 새로고침한 뒤 다시 열어보세요
                 </p>
               </div>
             )}

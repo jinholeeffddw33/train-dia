@@ -53,6 +53,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('dia-theme');if(t==='light'){d.classList.add('light')}else if(t&&t.charAt(0)==='{'){var p=JSON.parse(t);if(p&&p.state&&p.state.theme==='light'){d.classList.add('light');localStorage.setItem('dia-theme','light')}}var f=JSON.parse(localStorage.getItem('dia-font-size')||'{}');if(f&&f.state&&f.state.size){var s=f.state.size;if(s==='small')d.classList.add('font-small');else if(s==='large')d.classList.add('font-large');else if(s==='xlarge')d.classList.add('font-xlarge')}if(d.classList.contains('light')){var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#F0F4F8')}}catch(e){}})()`,
           }}
         />
+        {/*
+          설치 신호(beforeinstallprompt) 조기 캡처 — hydration 전에 실행돼야 한다.
+          Chrome 은 이 신호를 딱 한 번 보내는데, useEffect 로 듣기 시작하면 이미 지나간 뒤라
+          영영 놓친다. 놓치면 '홈 화면에 추가하기'가 진짜 설치창 대신 안내 팝업으로 빠졌다.
+          여기서 붙잡아 두면 useInstallPrompt 가 나중에 꺼내 쓸 수 있다.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{window.__diaInstallEvt=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__diaInstallEvt=e;window.dispatchEvent(new Event('dia-install-ready'))});window.addEventListener('appinstalled',function(){window.__diaInstallEvt=null;window.dispatchEvent(new Event('dia-installed'))})}catch(e){}})()`,
+          }}
+        />
       </head>
       <body className={notoSansKR.className}>
         {/* 원작 지문 각인 + 무단 호스트 감지(킬 스위치) — @/lib/provenance, @/lib/originGuard */}

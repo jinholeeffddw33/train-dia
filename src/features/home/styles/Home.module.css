@@ -1799,10 +1799,12 @@
   margin-top: var(--dia-space-1);
 }
 
+/* 카드 표면은 월드허브 기준과 동일 — radius-lg + shadow-sm (OfficeMonthCalendar .card 와 짝) */
 .dutyInfoCard {
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
-  border-radius: var(--dia-radius-xl);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--dia-shadow-sm);
   overflow: hidden;
 }
 

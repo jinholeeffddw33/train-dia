@@ -181,8 +181,9 @@ export default function TodayCard({ selectedDate, onEmptyClick }: TodayCardProps
             {greetSub && <div className={styles.officeGreetSub}>{greetSub}</div>}
           </div>
         )}
-        <DutyInfoCard selectedDate={selectedDate} hideTitle />
-        {/* 일정관리 월간 달력 — 아래 허전함 해소(날짜 탭 → 그 날 일정 팝업) */}
+        {/* 제목을 켜둔다 — 아래 '이번 달 일정'과 같은 구조(제목 + 카드)로 맞춰야 화면이 정돈된다 */}
+        <DutyInfoCard selectedDate={selectedDate} />
+        {/* 이번 달 일정 — 보기 전용 미니 달력(날짜 탭 → 그 날 일정 팝업) */}
         <OfficeMonthCalendar />
       </>
     );

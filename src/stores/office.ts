@@ -9,6 +9,9 @@ export interface OfficeTodo {
   time: string;
   urgent: boolean;
   done: boolean;
+  /** 만든 날(YYYY-MM-DD). 이게 있어야 '오늘 할 일'과 '밀린 일'을 나눌 수 있다.
+   *  v4 이전 데이터엔 없음 → 없으면 오늘 것으로 취급(하위호환). */
+  date?: string;
   /** 아래는 오늘의 할 일 전체보기(TaskBoard)용 선택 필드 — 없으면 기본값 처리 */
   priority?: OfficePriority;
   progress?: number;    // 0~100
@@ -16,6 +19,22 @@ export interface OfficeTodo {
   memo?: string;
   completedAt?: string; // 'HH:MM'
   inSchedule?: boolean; // '일정에 추가' — 오늘의 일정/시간표에 노출할지 (time 없으면 종일)
+}
+
+/** YYYY-MM-DD (로컬 기준 — 서버 UTC 와 섞지 말 것) */
+export function todayISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** 할 일의 날짜 — 옛 데이터(date 없음)는 오늘 것으로 본다 */
+export function todoDate(t: OfficeTodo): string {
+  return t.date ?? todayISO();
+}
+
+/** 밀린 일 = 오늘 이전에 만들어졌는데 아직 안 끝난 것 */
+export function isOverdue(t: OfficeTodo, today = todayISO()): boolean {
+  return !t.done && todoDate(t) < today;
 }
 
 /** 기존 urgent 불리언 → 우선순위 해석 (하위호환) */
@@ -54,6 +73,8 @@ interface OfficeState {
   toggleTodo: (id: string) => void;
   updateTodo: (id: string, patch: Partial<Omit<OfficeTodo, 'id'>>) => void;
   removeTodo: (id: string) => void;
+  /** 밀린 일을 오늘 할 일로 당기기 */
+  pullToToday: (id: string) => void;
   addSchedule: (s: { date: string; time: string; end?: string; title: string; place?: string; category?: string; memo?: string }) => void;
   addSchedules: (items: { date: string; time: string; end?: string; title: string; place?: string; category?: string; memo?: string; repeatId?: string }[]) => void;
   updateSchedule: (id: string, patch: Partial<Omit<OfficeSchedule, 'id'>>) => void;
@@ -81,7 +102,10 @@ export const useOfficeStore = create<OfficeState>()(
       notes: [],
 
       addTodo: ({ text, time = '', urgent = false, priority, progress, assignee, memo, inSchedule }) =>
-        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false, priority, progress, assignee, memo, inSchedule }] })),
+        set((s) => ({ todos: [...s.todos, { id: uid(), text, time, urgent, done: false, date: todayISO(), priority, progress, assignee, memo, inSchedule }] })),
+      /** 밀린 일을 오늘로 당기기 — 날짜만 갱신(내용·진행률 유지) */
+      pullToToday: (id) =>
+        set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, date: todayISO() } : t)) })),
       toggleTodo: (id) =>
         set((s) => ({ todos: s.todos.map((t) => (t.id === id ? { ...t, done: !t.done, completedAt: !t.done ? hhmmNow() : undefined } : t)) })),
       updateTodo: (id, patch) =>
@@ -114,7 +138,7 @@ export const useOfficeStore = create<OfficeState>()(
     }),
     {
       name: 'officeDash',
-      version: 3,
+      version: 4,
       // v1 일정→날짜·카테고리 / v2 메모(text만)→제목·카테고리·고정 구조로 이전
       migrate: (persisted, version) => {
         const p = persisted as { todos?: OfficeTodo[]; schedules?: OfficeSchedule[]; notes?: unknown[] } | null;
@@ -131,6 +155,11 @@ export const useOfficeStore = create<OfficeState>()(
           p.notes = (p.notes as { id: string; text?: string; body?: string }[]).map((n) => ({
             id: n.id, title: '', body: n.body ?? n.text ?? '', category: 'gray', pinned: false, ts: Date.now(),
           }));
+        }
+        // v4: 할 일에 날짜 도입. 기존 할 일에 date 를 안 넣으면 전부 '밀린 일'로 밀려 보인다 → 오늘로 채운다.
+        if (version < 4 && Array.isArray(p.todos)) {
+          const today = todayISO();
+          p.todos = (p.todos as OfficeTodo[]).map((t) => (t.date ? t : { ...t, date: today }));
         }
         return p as unknown as OfficeState;
       },

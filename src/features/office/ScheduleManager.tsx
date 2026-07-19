@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Plus, X, Check, CalendarDays, MapPin, Repeat } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, ChevronDown, Plus, X, Check, CalendarDays, MapPin, Repeat, Pencil, Search } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
-import { useOfficeStore, OFFICE_CATEGORIES } from '@/stores/office';
+import { useOfficeStore, OFFICE_CATEGORIES, type OfficeSchedule } from '@/stores/office';
 import { isHoliday } from '@/lib/schedule';
 import TimeSelect from './TimeSelect';
 import styles from './ScheduleManager.module.css';
@@ -71,7 +71,7 @@ function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
 }
 
 export default function ScheduleManager({ onClose, startMonth = false, startView = 'day' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list' }) {
-  const { schedules, addSchedule, addSchedules, removeSchedule, removeSeries, todos, toggleTodo } = useOfficeStore();
+  const { schedules, addSchedule, addSchedules, updateSchedule, removeSchedule, removeSeries, todos, toggleTodo } = useOfficeStore();
   const [sel, setSel] = useState<string>(iso(new Date()));
   const [monthAnchor, setMonthAnchor] = useState<string>(iso(new Date())); // 월 달력이 보여줄 달(선택 날짜와 분리)
   const [view, setView] = useState<'day' | 'week' | 'list'>(startView);
@@ -86,11 +86,16 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const [fEnd, setFEnd] = useState('');
   const [fPlace, setFPlace] = useState('');
   const [fMemo, setFMemo] = useState('');
-  const [fEndDate, setFEndDate] = useState(''); // 종료 날짜(기본=시작=당일). 시작보다 뒤면 그 기간 매일 자동 등록
+  const [fEndDate, setFEndDate] = useState(''); // 종료 날짜(기본=시작=당일). 시작보다 뒤면 그 기간 자동 등록
+  const [fRepeat, setFRepeat] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [editId, setEditId] = useState<string | null>(null); // null=신규 등록, 값=그 일정 수정
+  const [sheetDate, setSheetDate] = useState<string | null>(null); // 월 달력에서 누른 날 → 하단 시트
+  const [q, setQ] = useState(''); // 일정 검색어(목록 탭)
 
   // 화면 자체는 항상 등록(자식 시트가 열려도 유지) — !addOpen 게이팅은 히스토리 churn/튕김 유발
   useHistoryBack('schedule-manager', onClose);
   useHistoryBack('schedule-add', () => setAddOpen(false), addOpen);
+  useHistoryBack('schedule-day-sheet', () => setSheetDate(null), sheetDate !== null);
 
   const todayISO = iso(new Date());
 
@@ -171,24 +176,59 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     for (const arr of m.values()) arr.sort((a, b) => a.time.localeCompare(b.time));
     return m;
   }, [schedules]);
-  const [monthFilter, setMonthFilter] = useState<string>('all'); // 카테고리 범례 필터
 
-  const openAdd = () => {
-    setFTitle(''); setFCat('blue'); setFDate(sel); setFEndDate(sel); setFStart(''); setFEnd(''); setFPlace(''); setFMemo('');
+  /** 하단 시트에 띄울 그날 일정 (종일이 먼저, 그다음 시간순) */
+  const sheetEvents = useMemo(() => {
+    if (!sheetDate) return [];
+    return (eventsByDate.get(sheetDate) ?? []).slice().sort((a, b) => a.time.localeCompare(b.time));
+  }, [sheetDate, eventsByDate]);
+
+  /** 목록 탭 — 검색어가 있으면 전체에서 찾고, 없으면 예정 일정 20건 */
+  const listItems = useMemo(() => {
+    const kw = q.trim().toLowerCase();
+    if (!kw) return schedules.filter((s) => s.date >= todayISO).slice(0, 20);
+    return schedules.filter((s) =>
+      s.title.toLowerCase().includes(kw)
+      || s.place.toLowerCase().includes(kw)
+      || (s.memo ?? '').toLowerCase().includes(kw),
+    );
+  }, [schedules, q, todayISO]);
+
+  const openAdd = (date?: string) => {
+    const d = date ?? sel;
+    setEditId(null);
+    setFTitle(''); setFCat('blue'); setFDate(d); setFEndDate(d); setFStart(''); setFEnd(''); setFPlace(''); setFMemo('');
+    setFRepeat('daily');
     setAddOpen(true);
   };
+
+  /** 기존 일정 수정 — 시트를 같은 값으로 채워서 연다 */
+  const openEdit = (s: OfficeSchedule) => {
+    setEditId(s.id);
+    setFTitle(s.title); setFCat(s.category); setFDate(s.date); setFEndDate(s.date);
+    setFStart(s.time); setFEnd(s.end); setFPlace(s.place); setFMemo(s.memo ?? '');
+    setFRepeat('daily');
+    setAddOpen(true);
+  };
+
   const submit = () => {
-    if (!fTitle.trim() || !fStart) return;
+    // 시간은 선택 — 비우면 종일 일정(표시는 '종일')
+    if (!fTitle.trim()) return;
     const base = { time: fStart, end: fEnd, title: fTitle.trim(), place: fPlace.trim(), category: fCat, memo: fMemo.trim() || undefined };
-    if (!fEndDate || fEndDate <= fDate) {
+
+    if (editId) {
+      // 수정은 그 일정 하나만 (반복 생성 안 함)
+      updateSchedule(editId, { date: fDate, ...base });
+    } else if (!fEndDate || fEndDate <= fDate) {
       addSchedule({ date: fDate, ...base });
     } else {
-      // 종료 날짜가 시작보다 뒤 → 그 기간 매일 자동 반복 등록
-      const rid = `r${fDate}-${fEndDate}-${fStart}-${fTitle.length}`;
-      const dates = repeatDates(fDate, fEndDate, 'daily');
+      // 종료 날짜가 시작보다 뒤 → 그 기간 동안 선택한 주기로 자동 등록
+      const rid = `r${fDate}-${fEndDate}-${fStart}-${fRepeat}-${fTitle.length}`;
+      const dates = repeatDates(fDate, fEndDate, fRepeat);
       addSchedules(dates.map((d) => ({ date: d, repeatId: rid, ...base })));
     }
     setAddOpen(false);
+    setEditId(null);
     setSel(fDate);
   };
 
@@ -224,31 +264,20 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             <button type="button" className={styles.monthNavBtn} onClick={() => setMonthAnchor(addMonths(monthAnchor, 1))} aria-label="다음 달"><ChevronRight size={20} /></button>
           </div>
 
-          {/* 카테고리 범례 필터 */}
-          <div className={styles.legend}>
-            <button type="button" className={monthFilter === 'all' ? styles.legOn : styles.leg} onClick={() => setMonthFilter('all')}>
-              <span className={`${styles.legDot} ${styles.legDotAll}`} />전체
-            </button>
-            {OFFICE_CATEGORIES.map((c) => (
-              <button key={c.key} type="button" className={monthFilter === c.key ? styles.legOn : styles.leg}
-                onClick={() => setMonthFilter(monthFilter === c.key ? 'all' : c.key)}>
-                <span className={`${styles.legDot} ${styles[`p_${c.key}`]}`} />{c.label}
-              </button>
-            ))}
-          </div>
-
           <div className={styles.monthDow}>{DOW.map((w, i) => <span key={w} className={i === 0 ? styles.sun : i === 6 ? styles.sat : ''}>{w}</span>)}</div>
           <div className={styles.monthGrid}>
             {monthGrid.map((c, i) => {
               if (c === null) return <span key={`e${i}`} className={styles.mEmpty} />;
               const dd = fromISO(c);
               const dow = dd.getDay();
-              const all = eventsByDate.get(c) ?? [];
-              const evs = monthFilter === 'all' ? all : all.filter((e) => e.category === monthFilter);
+              const evs = eventsByDate.get(c) ?? [];
               return (
                 <button key={c} type="button"
                   className={`${styles.mCell} ${c === sel ? styles.mSel : ''}`}
-                  onClick={() => setSel(c)}
+                  /* 날짜를 누르면 하단 시트로 그날 일정을 바로 보여준다.
+                     예전엔 setSel 만 해서 결과가 월 달력(약 668px) 아래로 밀려
+                     "눌러도 아무 반응 없음" 으로 보였다. */
+                  onClick={() => { setSel(c); setSheetDate(c); }}
                   aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일${evs.length ? `, 일정 ${evs.length}건` : ''}`}>
                   {/* 공휴일도 일요일과 같은 빨강 — 요일만 보면 제헌절 같은 날이 검게 나온다 */}
                   <span className={`${styles.mNum} ${dow === 0 || isHoliday(dd) ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
@@ -305,7 +334,14 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
               </div>
               <span className={`${styles.pin} ${styles[`p_${it.category}`]}`} />
               <div className={`${styles.ecard} ${styles[`c_${it.category}`]}`}>
-                <div className={styles.ecBody}>
+                {/* 일정은 탭하면 수정 (할 일은 완료 토글이라 그대로) */}
+                <div
+                  className={it.kind === 'sched' ? styles.ecBodyTap : styles.ecBody}
+                  role={it.kind === 'sched' ? 'button' : undefined}
+                  tabIndex={it.kind === 'sched' ? 0 : undefined}
+                  onClick={it.kind === 'sched' ? () => { const s = schedules.find((x) => x.id === it.id); if (s) openEdit(s); } : undefined}
+                  onKeyDown={it.kind === 'sched' ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const s = schedules.find((x) => x.id === it.id); if (s) openEdit(s); } } : undefined}
+                >
                   <div className={styles.ecTitle}>
                     <span className={styles.ecTitleText}>{it.title}</span>
                     {it.kind === 'todo' && <span className={styles.ecChip}>할 일</span>}
@@ -326,7 +362,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
               </div>
             </div>
           ))}
-          <button type="button" className={styles.addRow} onClick={openAdd}><Plus size={16} /> 일정 추가</button>
+          <button type="button" className={styles.addRow} onClick={() => openAdd()}><Plus size={16} /> 일정 추가</button>
         </div>
       )}
 
@@ -389,12 +425,24 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
       {/* 콘텐츠 — 목록 */}
       {view === 'list' && (
         <div className={styles.list}>
-          {upcoming.length === 0 && <p className={styles.empty}>예정된 일정이 없어요.</p>}
-          {upcoming.map((s) => (
-            <button key={s.id} type="button" className={styles.listItem} onClick={() => { setSel(s.date); setView('day'); }}>
+          <div className={styles.searchBar}>
+            <Search size={16} className={styles.searchIcon} aria-hidden />
+            <input className={styles.searchInput} type="search" value={q} placeholder="제목·장소·내용 검색"
+              onChange={(e) => setQ(e.target.value)} aria-label="일정 검색" />
+            {q && (
+              <button type="button" className={styles.searchClear} onClick={() => setQ('')} aria-label="검색어 지우기">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          {listItems.length === 0 && (
+            <p className={styles.empty}>{q.trim() ? `'${q.trim()}' 검색 결과가 없어요.` : '예정된 일정이 없어요.'}</p>
+          )}
+          {listItems.map((s) => (
+            <button key={s.id} type="button" className={styles.listItem} onClick={() => openEdit(s)}>
               <span className={styles.liDate}>{labelKor(s.date).slice(5)}</span>
               <span className={`${styles.pin} ${styles[`p_${s.category}`]}`} />
-              <span className={styles.liTime}>{s.time}</span>
+              <span className={styles.liTime}>{s.time || '종일'}</span>
               <span className={styles.liTitle}>{s.title}</span>
               {s.place && <span className={styles.liPlace}>{s.place}</span>}
             </button>
@@ -403,17 +451,60 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
       )}
 
       {/* FAB */}
-      <button type="button" className={styles.fab} onClick={openAdd} aria-label="일정 추가"><Plus size={24} /></button>
+      <button type="button" className={styles.fab} onClick={() => openAdd()} aria-label="일정 추가"><Plus size={24} /></button>
+
+      {/* 날짜 탭 → 하단 시트 (그날 일정을 달력 아래로 스크롤하지 않고 바로 확인) */}
+      {sheetDate && (
+        <div className={styles.sheetOverlay} role="dialog" aria-modal="true" aria-label="그날 일정"
+          onClick={(e) => { if (e.target === e.currentTarget) setSheetDate(null); }}>
+          <div className={styles.sheet}>
+            <div className={styles.grab} />
+            <div className={styles.sheetHead}>
+              <button type="button" className={styles.sheetX} onClick={() => setSheetDate(null)} aria-label="닫기"><X size={20} /></button>
+              <b>{labelKor(sheetDate).slice(5)}</b>
+              <button type="button" className={styles.sheetSave} onClick={() => { const d = sheetDate; setSheetDate(null); openAdd(d); }}>추가</button>
+            </div>
+
+            <div className={styles.daySheet}>
+              {sheetEvents.length === 0 ? (
+                <p className={styles.empty}>이 날 일정이 없어요. 위 <b>추가</b>로 등록하세요.</p>
+              ) : (
+                sheetEvents.map((s) => (
+                  <div key={s.id} className={styles.dsRow}>
+                    <button type="button" className={styles.dsMain}
+                      onClick={() => { setSheetDate(null); openEdit(s); }}
+                      aria-label={`${s.title} 수정`}>
+                      <span className={`${styles.pin} ${styles[`p_${s.category}`]}`} />
+                      <span className={styles.dsTime}>{s.time || '종일'}{s.end ? `~${s.end}` : ''}</span>
+                      <span className={styles.dsBody}>
+                        <span className={styles.dsTitle}>
+                          {s.title}
+                          {s.repeatId && <Repeat size={11} className={styles.repMark} aria-label="반복 일정" />}
+                        </span>
+                        {s.place && <span className={styles.dsPlace}><MapPin size={10} /> {s.place}</span>}
+                      </span>
+                      <Pencil size={14} className={styles.dsEdit} aria-hidden />
+                    </button>
+                    <button type="button" className={styles.ecDel}
+                      onClick={() => s.repeatId ? removeSeries(s.repeatId) : removeSchedule(s.id)}
+                      aria-label={s.repeatId ? '반복 일정 전체 삭제' : '삭제'}><X size={14} /></button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 등록 바텀시트 */}
       {addOpen && (
-        <div className={styles.sheetOverlay} role="dialog" aria-modal="true" aria-label="일정 등록"
+        <div className={styles.sheetOverlay} role="dialog" aria-modal="true" aria-label={editId ? '일정 수정' : '일정 등록'}
           onClick={(e) => { if (e.target === e.currentTarget) setAddOpen(false); }}>
           <div className={styles.sheet}>
             <div className={styles.grab} />
             <div className={styles.sheetHead}>
               <button type="button" className={styles.sheetX} onClick={() => setAddOpen(false)} aria-label="취소"><X size={20} /></button>
-              <b>일정 등록</b>
+              <b>{editId ? '일정 수정' : '일정 등록'}</b>
               <button type="button" className={styles.sheetSave} onClick={submit}>저장</button>
             </div>
 
@@ -440,16 +531,30 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                 onChange={(e) => { const v = e.target.value; setFDate(v); if (fEndDate < v) setFEndDate(v); }} />
             </div>
 
-            <div className={styles.field}>
-              <label className={styles.fLabel}>종료 날짜</label>
-              <input className={styles.fInput} type="date" value={fEndDate} min={fDate}
-                onChange={(e) => setFEndDate(e.target.value)} />
-              <p className={styles.repHint}>
-                {fEndDate > fDate
-                  ? `${fDate} ~ ${fEndDate} 매일 자동 등록돼요`
-                  : '당일 일정 · 종료 날짜를 뒤로 정하면 그 기간 매일 반복됩니다'}
-              </p>
-            </div>
+            {/* 반복은 새로 만들 때만 — 수정은 그 일정 하나만 바꾼다 */}
+            {!editId && (
+              <div className={styles.field}>
+                <label className={styles.fLabel}>반복 종료 날짜</label>
+                <input className={styles.fInput} type="date" value={fEndDate} min={fDate}
+                  onChange={(e) => setFEndDate(e.target.value)} />
+                {fEndDate > fDate && (
+                  <div className={styles.repPick}>
+                    {([['daily', '매일'], ['weekly', '매주'], ['monthly', '매월']] as const).map(([k, label]) => (
+                      <button key={k} type="button"
+                        className={fRepeat === k ? styles.repOn : styles.repBtn}
+                        onClick={() => setFRepeat(k)} aria-pressed={fRepeat === k}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className={styles.repHint}>
+                  {fEndDate > fDate
+                    ? `${fDate} ~ ${fEndDate} ${fRepeat === 'daily' ? '매일' : fRepeat === 'weekly' ? '매주 같은 요일' : '매월 같은 날'} 자동 등록돼요`
+                    : '당일 일정 · 종료 날짜를 뒤로 정하면 그 기간 반복됩니다'}
+                </p>
+              </div>
+            )}
 
             <div className={styles.field}>
               <label className={styles.fLabel}>시간</label>
@@ -458,6 +563,9 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                 <span className={styles.tilde}>~</span>
                 <TimeSelect value={fEnd} onChange={setFEnd} ariaLabel="종료(선택)" />
               </div>
+              <p className={styles.repHint}>
+                {fStart ? '시간을 비우면 종일 일정이 돼요' : '시간을 비워두면 종일 일정으로 등록됩니다'}
+              </p>
             </div>
 
             <div className={styles.field}>

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { ArrowLeft, Plus, X, Check, Clock, CalendarPlus, FileText, Trash2, Sparkles } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
-import { useOfficeStore, todoPriority, type OfficeTodo, type OfficePriority } from '@/stores/office';
+import { useOfficeStore, todoPriority, isOverdue, type OfficeTodo, type OfficePriority } from '@/stores/office';
 import TimeSelect from './TimeSelect';
 import styles from './TaskBoard.module.css';
 
@@ -19,7 +19,7 @@ const PRIO: Record<OfficePriority, { label: string; cls: string; rank: number }>
   normal: { label: '일반', cls: styles.prioNormal, rank: 2 },
 };
 
-type Filter = 'all' | OfficePriority | 'done';
+type Filter = 'all' | OfficePriority | 'done' | 'overdue';
 
 function fmtDate(d: Date): string {
   return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
@@ -53,6 +53,7 @@ export default function TaskBoard({ onBack }: Props) {
     important: todos.filter((t) => !t.done && todoPriority(t) === 'important').length,
     normal: todos.filter((t) => !t.done && todoPriority(t) === 'normal').length,
     done: doneCount,
+    overdue: todos.filter((t) => isOverdue(t)).length,
   }), [todos, total, doneCount]);
 
   const priorityTop = useMemo(
@@ -65,6 +66,7 @@ export default function TaskBoard({ onBack }: Props) {
 
   const visible = useMemo(() => {
     const list = filter === 'all' ? todos
+      : filter === 'overdue' ? todos.filter((t) => isOverdue(t))
       : filter === 'done' ? todos.filter((t) => t.done)
       : todos.filter((t) => !t.done && todoPriority(t) === filter);
     return [...list].sort((a, b) =>
@@ -135,6 +137,7 @@ export default function TaskBoard({ onBack }: Props) {
             { key: 'urgent' as Filter, label: '긴급' },
             { key: 'important' as Filter, label: '중요' },
             { key: 'normal' as Filter, label: '일반' },
+            { key: 'overdue' as Filter, label: '밀린 일' },
             { key: 'done' as Filter, label: '완료' },
           ]).map((c) => (
             <button

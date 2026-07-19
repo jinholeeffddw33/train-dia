@@ -5,12 +5,12 @@ import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange, ArrowLeftRight,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
-  Settings,
+  Settings, History,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
 import { useThemeStore } from '@/stores/theme';
-import { useOfficeStore } from '@/stores/office';
+import { useOfficeStore, isOverdue } from '@/stores/office';
 import { APP_VERSION } from '@/lib/constants';
 import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import type { WorldId } from '@/components/layout/WorldHub';
@@ -57,7 +57,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
 
   const {
     todos, schedules, notes,
-    addTodo, toggleTodo, removeTodo,
+    addTodo, toggleTodo, removeTodo, pullToToday,
     addSchedule, removeSchedule,
     addNote, removeNote,
   } = useOfficeStore();
@@ -86,11 +86,21 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   const memoRef = useRef<HTMLElement>(null);
   const scrollTo = (el: HTMLElement | null) => el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  const { done, total, pct } = useMemo(() => {
-    const t = todos.length;
-    const d = todos.filter((x) => x.done).length;
-    return { done: d, total: t, pct: t === 0 ? 0 : Math.round((d / t) * 100) };
+  // 오늘 할 일 / 밀린 일 분리 — 날짜가 없으면(옛 데이터) 오늘 것으로 본다
+  const { todayTodos, overdueTodos } = useMemo(() => {
+    const t = todayISO();
+    return {
+      todayTodos: todos.filter((x) => !isOverdue(x, t)),
+      overdueTodos: todos.filter((x) => isOverdue(x, t)),
+    };
   }, [todos]);
+
+  // 진행률은 '오늘 할 일' 기준 — 전체 누적 기준이면 날이 갈수록 의미가 없어진다
+  const { done, total, pct } = useMemo(() => {
+    const t = todayTodos.length;
+    const d = todayTodos.filter((x) => x.done).length;
+    return { done: d, total: t, pct: t === 0 ? 0 : Math.round((d / t) * 100) };
+  }, [todayTodos]);
 
   const submitTodo = () => {
     if (!todoText.trim()) return;
@@ -183,7 +193,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
           )}
           <ul className={styles.miniList}>
             {todos.length === 0 && <li className={styles.empty}>할 일 없음</li>}
-            {todos.map((t) => (
+            {todayTodos.map((t) => (
               <li key={t.id} className={`${styles.todoItem} ${t.done ? styles.todoDone : ''}`}>
                 <button type="button" className={styles.checkBox} onClick={() => toggleTodo(t.id)} aria-pressed={t.done} aria-label="완료 토글">
                   {t.done && <Check size={12} strokeWidth={3} />}
@@ -191,6 +201,23 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
                 <span className={styles.todoText}>{t.text}</span>
                 {t.urgent && !t.done && <span className={styles.urgentBadge}>긴급</span>}
                 {t.time && <span className={styles.itemTime}>{t.time}</span>}
+                <button type="button" className={styles.delBtn} onClick={() => removeTodo(t.id)} aria-label="삭제"><X size={13} /></button>
+              </li>
+            ))}
+
+            {/* 밀린 일 — 어제 이전에 만들었는데 아직 안 끝난 것. '오늘로' 누르면 오늘 할 일로 옮겨진다 */}
+            {overdueTodos.length > 0 && (
+              <li className={styles.overdueHead}>
+                <History size={13} /> 밀린 일 {overdueTodos.length}
+              </li>
+            )}
+            {overdueTodos.map((t) => (
+              <li key={t.id} className={`${styles.todoItem} ${styles.overdueItem}`}>
+                <button type="button" className={styles.checkBox} onClick={() => toggleTodo(t.id)} aria-pressed={t.done} aria-label="완료 토글">
+                  {t.done && <Check size={12} strokeWidth={3} />}
+                </button>
+                <span className={styles.todoText}>{t.text}</span>
+                <button type="button" className={styles.pullBtn} onClick={() => pullToToday(t.id)} aria-label="오늘 할 일로 옮기기">오늘로</button>
                 <button type="button" className={styles.delBtn} onClick={() => removeTodo(t.id)} aria-label="삭제"><X size={13} /></button>
               </li>
             ))}

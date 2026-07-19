@@ -35,12 +35,8 @@
 .monthNavBtn { width: 40px !important; height: 40px !important; border: 1px solid var(--dia-border); background: var(--dia-surface); }
 .monthNavBtn:active { transform: scale(0.9); background: var(--dia-surface-hover); }
 
-/* 카테고리 범례 필터 */
-.legend { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px; -webkit-overflow-scrolling: touch; }
-.leg, .legOn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; font-size: var(--dia-text-meta); font-weight: 800; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-secondary); }
-.legOn { background: var(--dia-blue-dim); color: var(--dia-blue-text); border-color: transparent; }
-.legDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.legDotAll { background: var(--dia-text-secondary); }
+/* 카테고리 범례 필터 — 2026-07 제거(쓰이지 않음). 색 구분은 칸의 점(p_*)으로 충분하다.
+   가로 스크롤바가 달력 위에 걸쳐 보이던 문제도 함께 해소. */
 
 .monthDow { display: grid; grid-template-columns: repeat(7,1fr); }
 .monthDow span { text-align: center; font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); padding: 4px 0; }
@@ -60,6 +56,66 @@
 .mChipDot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 .mChipTxt { font-size: var(--dia-text-meta); line-height: 1.25; font-weight: 600; color: var(--dia-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mMore { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); padding-left: 2px; }
+
+/* ── 날짜 탭 → 하단 시트(그날 일정) ── */
+.daySheet { display: flex; flex-direction: column; gap: var(--dia-space-2); padding-bottom: var(--dia-space-2); }
+.dsRow { display: flex; align-items: stretch; gap: 4px; }
+.dsMain {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3); text-align: left;
+  background: var(--dia-surface); border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md); min-height: 44px;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.dsMain:active { transform: scale(0.98); background: var(--dia-surface-hover); }
+.dsTime {
+  flex-shrink: 0; min-width: 52px; font-size: var(--dia-text-meta); font-weight: 800;
+  color: var(--dia-text-secondary); font-variant-numeric: tabular-nums;
+}
+.dsBody { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dsTitle {
+  display: flex; align-items: center; gap: 4px; min-width: 0;
+  font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dsPlace { display: inline-flex; align-items: center; gap: 2px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
+.dsEdit { flex-shrink: 0; color: var(--dia-text-tertiary); }
+
+/* 하루 뷰 — 일정 카드 본문을 탭하면 수정 */
+.ecBodyTap { flex: 1; min-width: 0; cursor: pointer; }
+.ecBodyTap:active { opacity: 0.7; }
+
+/* ── 반복 주기 선택 ── */
+.repPick { display: flex; gap: 6px; margin-top: 6px; }
+.repBtn, .repOn {
+  flex: 1; min-height: 44px; padding: var(--dia-space-2);
+  font-size: var(--dia-text-sm); font-weight: 700;
+  border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md);
+  background: var(--dia-surface); color: var(--dia-text-secondary);
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.repBtn:active, .repOn:active { transform: scale(0.95); }
+.repOn { background: var(--dia-blue-dim); color: var(--dia-blue-text); border-color: var(--dia-blue); }
+
+/* ── 일정 검색(목록 탭) ── */
+.searchBar {
+  display: flex; align-items: center; gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-3); margin-bottom: var(--dia-space-3);
+  background: var(--dia-surface); border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+}
+.searchIcon { flex-shrink: 0; color: var(--dia-text-tertiary); }
+.searchInput {
+  flex: 1; min-width: 0; width: 100%; box-sizing: border-box;
+  min-height: 44px; border: none; background: none;
+  font-size: var(--dia-text-base); color: var(--dia-text-primary);
+}
+.searchInput::placeholder { color: var(--dia-text-tertiary); }
+.searchClear {
+  flex-shrink: 0; width: 44px; height: 44px; display: grid; place-items: center;
+  border: none; background: none; color: var(--dia-text-tertiary); border-radius: var(--dia-radius-full);
+}
+.searchClear:active { background: var(--dia-surface-hover); transform: scale(0.9); }
 
 /* 주간 스트립 */
 .week { display: flex; align-items: center; gap: 4px; margin-bottom: var(--dia-space-3); }

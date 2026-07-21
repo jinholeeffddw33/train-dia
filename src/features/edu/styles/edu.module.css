@@ -6074,6 +6074,7 @@
 .videoGuideGroupColor_green  { --vg-accent: var(--dia-green);  --vg-accent-bg: var(--dia-green-dim, var(--dia-surface-hover)); }
 .videoGuideGroupColor_amber  { --vg-accent: var(--dia-amber);  --vg-accent-bg: var(--dia-amber-dim, var(--dia-surface-hover)); }
 .videoGuideGroupColor_purple { --vg-accent: var(--dia-purple); --vg-accent-bg: var(--dia-purple-dim, var(--dia-surface-hover)); }
+.videoGuideGroupColor_sky    { --vg-accent: var(--dia-sky);    --vg-accent-bg: var(--dia-sky-dim, var(--dia-surface-hover)); }
 
 /* ── 영상 가이드 리스트 ── */
 .videoGuideList {

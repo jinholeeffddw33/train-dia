@@ -5,7 +5,8 @@
     { "id": "newcomer", "label": "신규 적응", "emoji": "🎓", "color": "blue" },
     { "id": "daily",    "label": "일상 업무", "emoji": "🚆", "color": "green" },
     { "id": "trouble",  "label": "고장 조치", "emoji": "🛠️", "color": "amber" },
-    { "id": "hr",       "label": "인사·복지", "emoji": "📋", "color": "purple" }
+    { "id": "hr",       "label": "인사·복지", "emoji": "📋", "color": "purple" },
+    { "id": "story",    "label": "지하철 이야기", "emoji": "🚇", "color": "sky" }
   ],
   "videos": [
     {
@@ -179,6 +180,14 @@
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",
       "thumbnail": "/data/edu/thumbnails/promotion-guide.jpg",
+      "source": "youtube"
+    },
+    {
+      "id": "subway-gate-secret",
+      "order": 21,
+      "category": "story",
+      "title": "지하철 개찰구의 비밀",
+      "url": "https://youtu.be/d5Go8yDQPjg",
       "source": "youtube"
     }
   ]

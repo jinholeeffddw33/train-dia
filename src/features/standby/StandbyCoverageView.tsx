@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Plus, X, ImageIcon, ExternalLink, WifiOff } from 'lucide-react';
+import { ArrowLeft, Plus, X, ImageIcon, ExternalLink, WifiOff, Trash2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
+import { canDeleteStandby } from '@/lib/auth';
 import { useDriverStore } from '@/stores/driver';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
@@ -37,6 +38,8 @@ export default function StandbyCoverageView({ onBack }: Props) {
   const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [zoomImage, setZoomImage] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null); // 삭제 확인 중인 항목
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const authUser = useAuthStore((s) => s.user);
   const driverSabun = useDriverStore((s) => s.myDriver?.s ?? '');
   const driverName = useDriverStore((s) => s.myDriver?.n ?? '');
@@ -60,6 +63,24 @@ export default function StandbyCoverageView({ onBack }: Props) {
   }, []);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/standby-coverage?id=${encodeURIComponent(id)}&sabun=${encodeURIComponent(sabun)}`, {
+        method: 'DELETE',
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.message || '삭제하지 못했어요');
+      setItems((prev) => prev.filter((x) => x.id !== id));
+      setConfirmId(null);
+      showToast('삭제했어요', 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : '삭제하지 못했어요. 다시 시도해주세요', 'error');
+    } finally {
+      setDeletingId(null);
+    }
+  }, [sabun]);
 
   // ESC 로 이미지 줌 닫기
   useEscapeClose(!!zoomImage, () => setZoomImage(null));
@@ -130,6 +151,39 @@ export default function StandbyCoverageView({ onBack }: Props) {
                   <span className={styles.cardUploadedBy}>
                     등록 · {it.uploadedBy.name}
                   </span>
+                  {/* 잘못 올렸을 때 지우고 다시 올릴 수 있게 — 올린 본인·지원기관사·관리자 */}
+                  {canDeleteStandby(sabun, it.uploadedBy.sabun) && (
+                    confirmId === it.id ? (
+                      <span className={styles.delConfirm}>
+                        <span className={styles.delAsk}>삭제할까요?</span>
+                        <button
+                          type="button"
+                          className={styles.delYes}
+                          onClick={() => handleDelete(it.id)}
+                          disabled={deletingId === it.id}
+                        >
+                          {deletingId === it.id ? '삭제 중…' : '삭제'}
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.delNo}
+                          onClick={() => setConfirmId(null)}
+                          disabled={deletingId === it.id}
+                        >
+                          취소
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.delBtn}
+                        onClick={() => setConfirmId(it.id)}
+                        aria-label="이 기록 삭제"
+                      >
+                        <Trash2 size={14} strokeWidth={2.2} /> 삭제
+                      </button>
+                    )
+                  )}
                 </div>
                 <div className={styles.cafeNotice}>
                   <ExternalLink size={14} strokeWidth={2.4} aria-hidden />

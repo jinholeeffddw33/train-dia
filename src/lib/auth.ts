@@ -301,6 +301,23 @@ const JIWON_GIGWANSA_SABUNS: ReadonlySet<string> = new Set([
   '21713547', // 한태환
 ]);
 
+/** 지원기관사 여부 (8명) — 대기충당현황 등 지원업무 자료를 관리한다 */
+export function isJiwonGigwansa(sabun: string | undefined | null): boolean {
+  return !!sabun && JIWON_GIGWANSA_SABUNS.has(sabun);
+}
+
+/**
+ * 대기충당현황 삭제 권한 — 올린 본인 · 지원기관사 · 관리자.
+ * API(서버 검증)와 화면(버튼 노출)이 이 함수 하나를 함께 써야 기준이 어긋나지 않는다.
+ */
+export function canDeleteStandby(
+  sabun: string | undefined | null,
+  uploaderSabun: string | undefined | null,
+): boolean {
+  if (!sabun) return false;
+  return sabun === uploaderSabun || isJiwonGigwansa(sabun) || isAdmin(sabun);
+}
+
 // 기지관제원 — 8명
 const KIJI_GWANJEWON_SABUNS: ReadonlySet<string> = new Set([
   '21706327', // 현덕일

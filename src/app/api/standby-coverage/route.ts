@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
+import { canDeleteStandby } from '@/lib/auth';
 
 const KEEP_DAYS = 3;
 const BUCKET = 'standby-coverage';
@@ -158,4 +159,53 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ id: data.id });
+}
+
+/**
+ * DELETE — 잘못 올린 사진 삭제 (?id=…&sabun=…)
+ * 권한: 올린 본인 · 지원기관사 · 관리자. 사진(Storage)과 DB 행을 함께 지운다.
+ * 확인기록(standby_coverage_reads)은 FK on delete cascade 로 같이 삭제된다.
+ */
+export async function DELETE(req: NextRequest) {
+  if (!serverSupabase) {
+    return NextResponse.json({ code: 'DB_NOT_CONFIGURED', message: 'DB 설정이 없습니다' }, { status: 500 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+  const sabun = (searchParams.get('sabun') || '').trim();
+
+  if (!id || !sabun) {
+    return NextResponse.json({ code: 'BAD_REQUEST', message: '잘못된 요청입니다' }, { status: 400 });
+  }
+
+  const { data: row, error: findError } = await serverSupabase
+    .from('standby_coverage')
+    .select('id, image_url, uploaded_by_sabun')
+    .eq('id', id)
+    .single();
+
+  if (findError || !row) {
+    return NextResponse.json({ code: 'NOT_FOUND', message: '이미 삭제되었거나 없는 자료입니다' }, { status: 404 });
+  }
+
+  // 삭제 권한: 올린 본인 · 지원기관사 · 관리자.
+  // 화면에서 버튼을 숨기는 것만으론 부족하니 서버에서도 확인한다.
+  if (!canDeleteStandby(sabun, row.uploaded_by_sabun)) {
+    return NextResponse.json(
+      { code: 'FORBIDDEN', message: '올린 본인과 지원기관사·관리자만 삭제할 수 있어요' },
+      { status: 403 },
+    );
+  }
+
+  const { error: delError } = await serverSupabase.from('standby_coverage').delete().eq('id', id);
+  if (delError) {
+    return NextResponse.json({ code: 'DELETE_FAILED', message: '삭제 실패', detail: delError.message }, { status: 500 });
+  }
+
+  // DB 를 지운 뒤 사진 정리 — 실패해도 목록에선 사라지므로 치명적이지 않다
+  const path = extractStoragePath(row.image_url);
+  if (path) await serverSupabase.storage.from(BUCKET).remove([path]);
+
+  return NextResponse.json({ ok: true });
 }

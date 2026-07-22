@@ -1036,7 +1036,8 @@
 /* ── Driver Selector Modal ── */
 .selectorSearch {
   position: relative;
-  padding: var(--dia-space-4) var(--dia-space-5);
+  /* 제목 헤더 제거 후 위로 올림 — 상단 여백 축소 */
+  padding: var(--dia-space-2) var(--dia-space-5) var(--dia-space-3);
 }
 
 .searchInput {
@@ -1069,14 +1070,33 @@
   border-radius: var(--dia-radius-full);
 }
 
+/* 카운트(좌) + 닫기 X(우) 한 줄 — 제거된 제목 헤더의 X 를 여기서 대체 */
+.selectorCountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--dia-space-3) var(--dia-space-2) var(--dia-space-5);
+}
 .selectorCount {
-  padding: 0 var(--dia-space-5) var(--dia-space-2);
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
 }
+.selectorClose {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-tertiary);
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.selectorClose:active { transform: scale(0.9); background: var(--dia-surface-hover); }
 
 .selectorList {
-  max-height: 50vh;
+  /* 시트(85dvh) 에서 핸들·검색·카운트를 뺀 나머지를 목록이 최대한 차지 → 기관사 많이 보임 */
+  max-height: calc(85dvh - 150px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }

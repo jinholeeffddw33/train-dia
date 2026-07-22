@@ -60,7 +60,8 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="기관사 선택">
+    <Modal open={open} onClose={onClose}>
+      {/* 제목 헤더 제거 — 목록을 위로 최대한 올려 기관사를 더 많이 보이게. 닫기는 아래 X·핸들·배경탭 */}
       <div className={styles.selectorSearch}>
         <input
           ref={inputRef}
@@ -93,8 +94,11 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
         )}
       </div>
 
-      <div className={styles.selectorCount}>
-        {filtered.length}명
+      <div className={styles.selectorCountRow}>
+        <span className={styles.selectorCount}>{filtered.length}명</span>
+        <button type="button" className={styles.selectorClose} onClick={onClose} aria-label="닫기">
+          <X size={20} strokeWidth={2.2} />
+        </button>
       </div>
 
       <div className={styles.selectorList}>

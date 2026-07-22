@@ -3118,7 +3118,16 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.heroBackV3 {
+/* 상단 행 — 뒤로가기(좌) + 홈(우) */
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-5);
+}
+
+.heroBackV3,
+.heroHomeV3 {
   width: 40px;
   height: 40px;
   border-radius: var(--dia-radius-full);
@@ -3130,19 +3139,38 @@
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  margin-bottom: var(--dia-space-5);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.heroBackV3:active {
+.heroBackV3:active,
+.heroHomeV3:active {
   transform: translateY(1px) scale(0.95);
   box-shadow: var(--dia-3d-pressed);
 }
 
-.heroBackV3:active { transform: scale(0.95); }
+/* 제목 행 — 졸업모자 아이콘 타일 + 교육 */
+.heroTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  margin-top: 4px;
+}
+.heroTitleRow .heroTitleV3 { margin: 0; }
+.heroIconTile {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #A855F7, #7C3AED);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+}
 
 .heroTextV3 {
   display: flex;

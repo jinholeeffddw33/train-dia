@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import type { LottieRefCurrentProps } from 'lottie-react';
 import {
-  ArrowLeft, ChevronRight, X,
+  ArrowLeft, ChevronRight, X, Home, GraduationCap,
   Mic, DoorOpen, Wrench,
   Award, User, ClipboardList,
   RotateCcw, GitCompareArrows, Link, Zap, Wind,
@@ -169,16 +169,26 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
 
       {/* ── 절제된 히어로: 단색 배경 + 좌측 정렬 텍스트 + 소형 LINE5 pill ── */}
       <header className={styles.heroV3}>
-        <button type="button" className={styles.heroBackV3} onClick={onBack} aria-label="뒤로가기">
-          <ArrowLeft size={24} strokeWidth={2} />
-        </button>
+        <div className={styles.heroTopRow}>
+          <button type="button" className={styles.heroBackV3} onClick={onBack} aria-label="뒤로가기">
+            <ArrowLeft size={24} strokeWidth={2} />
+          </button>
+          <button type="button" className={styles.heroHomeV3} onClick={onBack} aria-label="홈으로">
+            <Home size={22} strokeWidth={2} />
+          </button>
+        </div>
 
         <div className={styles.heroTextV3}>
           <span className={styles.heroPill} aria-hidden="true">
             <span className={styles.heroPillDot} />
             LINE 5
           </span>
-          <h1 className={styles.heroTitleV3}>교육</h1>
+          <div className={styles.heroTitleRow}>
+            <span className={styles.heroIconTile} aria-hidden="true">
+              <GraduationCap size={26} strokeWidth={2.2} />
+            </span>
+            <h1 className={styles.heroTitleV3}>교육</h1>
+          </div>
           <p className={styles.heroDescV3}>운행 전 필요한 절차와 장애 대응 기준을 확인하세요</p>
         </div>
       </header>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, ArrowLeftRight, ChevronRight, Settings } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarDays, ChevronRight, Settings } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -126,7 +126,7 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
         <button type="button" className={styles.crossCard} onClick={() => onOpenSchedule?.()}
           aria-label="일정관리 화면으로 이동" data-press>
           <span className={styles.crossTop}>
-            <ArrowLeftRight size={16} strokeWidth={2.4} />
+            <CalendarDays size={16} strokeWidth={2.4} />
             <span className={styles.crossText}>{todayLabel()}</span>
           </span>
           <span className={styles.crossGo}>일정관리 보기 <ChevronRight size={13} /></span>

@@ -72,17 +72,10 @@
   background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
 }
 
-/* ── 상단 액션 바 ── */
-.topBar {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* ── 인사말(좌) + 날짜 카드(우) ── */
+/* ── 인사말(좌) + [아이콘 + 날짜 카드](우) ── */
 .headerRow {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;   /* 인사말 첫 줄이 아이콘과 같은 높이에서 시작 → 좌상단 균형 */
   gap: var(--dia-space-3);
 }
 .greetBlock {
@@ -90,7 +83,20 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+}
+/* 우측 세로 묶음: 아이콘 줄(위) + 날짜 카드(아래) */
+.headerRight {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--dia-space-2);
+}
+.topBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 /* 월드허브 헤더와 동일 — 인사말 / 사업소 / 시간대 인사 */
 .greeting {
@@ -99,17 +105,24 @@
   margin: 0 0 6px;
 }
 .hubTitle {
-  font-size: clamp(19px, 5.4vw, 24px);
+  font-size: clamp(22px, 6.4vw, 29px);
   font-weight: 800;
   color: var(--dia-text-primary);
   letter-spacing: -0.03em;
-  line-height: 1.15;
-  margin: 0;
+  line-height: 1.12;
+  margin: 2px 0 0;
+}
+/* 이름 아래 사업소명 (부제) */
+.office {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+  margin: 5px 0 0;
 }
 .hubSubtitle {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
-  margin: 6px 0 0;
+  margin: 3px 0 0;
 }
 .headerActions { display: flex; gap: 8px; flex-shrink: 0; }
 .iconBtn {
@@ -126,7 +139,6 @@
 /* ── 교차 진입 카드 (인사말 우측, 두 줄 = 두 색 밴드) — 월드허브와 동일 ── */
 .dateCard {
   flex-shrink: 0;
-  align-self: flex-start;   /* 헤더 높이에 늘어나 빈 밴드 생기지 않게 — 내용 높이만(2밴드) */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -154,12 +166,16 @@
   white-space: nowrap;
 }
 
-/* ── 2열 그리드 ── */
+/* ── 2열 그리드 — 두 박스 높이를 같게(stretch) ── */
 .twoCol {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--dia-space-3);
-  align-items: start;
+  align-items: stretch;
+}
+.twoCol > section {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── 세로 스택 (할 일 → 일정) — 모바일에서 내용 읽기 편하게 전체폭 ── */
@@ -180,18 +196,29 @@
   min-width: 0;
 }
 .miniHead {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 4px;
+  display: flex; align-items: center;
+  gap: var(--dia-space-2);
   margin-bottom: var(--dia-space-2);
 }
 .miniTitle {
-  display: inline-flex; align-items: center; gap: 5px;
   font-size: var(--dia-text-sm);
   font-weight: 800;
   color: var(--dia-text-primary);
   min-width: 0;
 }
-.miniTitle svg { color: var(--dia-blue); flex-shrink: 0; }
+
+/* ── 카드 좌측 컬러 아이콘 타일 (시안: 할일 파랑 · 일정 보라 · 메모 초록) ── */
+.headIcon {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+}
+.headIconTodo  { background: var(--dia-blue-dim);   color: var(--dia-blue-text); }
+.headIconSched { background: var(--dia-purple-dim); color: var(--dia-purple); }
+.headIconMemo  { background: var(--dia-green-dim);  color: var(--dia-green-text); }
+.headText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.headSub { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
 .addMini {
   flex-shrink: 0;
   width: 26px; height: 26px;
@@ -321,6 +348,18 @@
 .progressStats dd { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
 .stDone { color: var(--dia-green-text) !important; }
 .stLeft { color: var(--dia-amber-text) !important; }
+/* 자세히 보기 — 카드 하단에 붙여 자주 보는 기능 박스와 높이를 맞춘다 */
+.detailBtn {
+  margin-top: auto;
+  padding-top: var(--dia-space-3);
+  min-height: 44px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+  border-top: 1px solid var(--dia-border-light);
+  font-size: var(--dia-text-sm); font-weight: 800;
+  color: var(--dia-blue-text);
+}
+.detailBtn:active { transform: scale(0.97); }
+.detailBtn svg { flex-shrink: 0; }
 
 /* ── 자주 보는 기능(미니 카드) ── */
 .shortcutCol { display: flex; flex-direction: column; gap: 6px; }
@@ -346,9 +385,8 @@
   padding: var(--dia-space-4);
   box-shadow: var(--dia-shadow-sm);
 }
-.cardHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--dia-space-3); }
-.cardTitle { display: inline-flex; align-items: center; gap: 6px; font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
-.cardTitle svg { color: var(--dia-blue); }
+.cardHead { display: flex; align-items: center; gap: var(--dia-space-2); margin-bottom: var(--dia-space-3); }
+.cardTitle { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
 .memoAdd { display: flex; gap: 6px; margin-bottom: var(--dia-space-3); }
 .textInput {
   flex: 1; min-width: 0;
@@ -410,6 +448,20 @@
   animation: schedIn 220ms ease;
 }
 @keyframes schedIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ── 응원 배너 (시안 하단) ── */
+.cheerBanner {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--dia-space-3);
+  padding: var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-blue-dim);
+  border: 1px solid var(--dia-border-light);
+  overflow: hidden;
+}
+.cheerText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cheerText strong { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-blue-text); }
+.cheerText span { font-size: var(--dia-text-sm); color: var(--dia-text-secondary); }
+.cheerIll { flex-shrink: 0; color: var(--dia-blue); opacity: 0.55; }
 
 /* ── Footer ── */
 .footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: var(--dia-space-4) 0; }

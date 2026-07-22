@@ -3,9 +3,9 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
-  ListChecks, CalendarClock, StickyNote, CalendarRange, ArrowLeftRight,
+  ListChecks, CalendarClock, StickyNote, CalendarRange,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
-  Settings, History,
+  Settings, History, CalendarDays, CalendarCheck,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
@@ -138,35 +138,36 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
 
   return (
     <div className={styles.dash}>
-      {/* ── 상단 액션 바 ── */}
-      <div className={styles.topBar}>
-        <button type="button" className={styles.iconBtn} onClick={toggleTheme}
-          aria-label={theme === 'dark' ? '라이트 모드' : '다크 모드'}>
-          {theme === 'dark' ? <Moon size={20} strokeWidth={2.2} /> : <Sun size={20} strokeWidth={2.2} />}
-        </button>
-        <button type="button" className={styles.iconBtn} onClick={() => onOpenSettings?.()} aria-label="설정 열기">
-          <Settings size={20} strokeWidth={2.2} />
-        </button>
-        <button type="button" className={styles.iconBtn} onClick={() => onEnter('safety')} aria-label="알림">
-          <Bell size={20} strokeWidth={2.2} />
-        </button>
-      </div>
-
-      {/* ── 인사말(좌) + 날짜 카드(우) — 사진과 동일 배치 ── */}
+      {/* ── 인사말(좌) + [아이콘 + 날짜 카드](우) — 시안 배치 ── */}
       <div className={styles.headerRow}>
         <div className={styles.greetBlock}>
-          {name && <p className={styles.greeting}>안녕하세요, {name} {role}</p>}
-          <h1 className={styles.hubTitle}>답십리 승무사업소</h1>
+          <p className={styles.greeting}>안녕하세요,</p>
+          <h1 className={styles.hubTitle}>{name ? `${name} ${role}` : '답십리 승무사업소'} 👋</h1>
+          {name && <p className={styles.office}>답십리 승무사업소</p>}
           <p className={styles.hubSubtitle}>{getSubtitle()}</p>
         </div>
-        <button type="button" className={styles.dateCard} onClick={() => onOpenHub?.()} data-press
-          aria-label="기관사 화면으로 이동">
-          <span className={styles.dateTop}>
-            <ArrowLeftRight size={16} strokeWidth={2.4} />
-            <span className={styles.dateText}>{todayLabel()}</span>
-          </span>
-          <span className={styles.dateGo}>기관사 일정 보기 <ChevronRight size={13} /></span>
-        </button>
+        <div className={styles.headerRight}>
+          <div className={styles.topBar}>
+            <button type="button" className={styles.iconBtn} onClick={toggleTheme}
+              aria-label={theme === 'dark' ? '라이트 모드' : '다크 모드'}>
+              {theme === 'dark' ? <Moon size={20} strokeWidth={2.2} /> : <Sun size={20} strokeWidth={2.2} />}
+            </button>
+            <button type="button" className={styles.iconBtn} onClick={() => onOpenSettings?.()} aria-label="설정 열기">
+              <Settings size={20} strokeWidth={2.2} />
+            </button>
+            <button type="button" className={styles.iconBtn} onClick={() => onEnter('safety')} aria-label="알림">
+              <Bell size={20} strokeWidth={2.2} />
+            </button>
+          </div>
+          <button type="button" className={styles.dateCard} onClick={() => onOpenHub?.()} data-press
+            aria-label="기관사 화면으로 이동">
+            <span className={styles.dateTop}>
+              <CalendarDays size={16} strokeWidth={2.4} />
+              <span className={styles.dateText}>{todayLabel()}</span>
+            </span>
+            <span className={styles.dateGo}>기관사 일정 보기 <ChevronRight size={13} /></span>
+          </button>
+        </div>
       </div>
 
       {/* ── 세로: 오늘의 할 일 → 오늘의 일정 (모바일 가독성 우선) ── */}
@@ -174,7 +175,13 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
         {/* 할 일 */}
         <section ref={todoRef} className={styles.miniCard}>
           <div className={styles.miniHead}>
-            <h2 className={styles.miniTitle}><ListChecks size={16} /> 오늘의 할 일</h2>
+            <span className={`${styles.headIcon} ${styles.headIconTodo}`}><ListChecks size={20} /></span>
+            <div className={styles.headText}>
+              <h2 className={styles.miniTitle}>오늘의 할 일</h2>
+              <span className={styles.headSub}>
+                {todos.length === 0 ? '할 일 없음' : `${todayTodos.filter((t) => !t.done).length}개 남음`}
+              </span>
+            </div>
             <button type="button" className={styles.addMini} onClick={() => setTodoAddOpen((v) => !v)} aria-label="할 일 추가">
               <Plus size={16} />
             </button>
@@ -192,7 +199,6 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
             </div>
           )}
           <ul className={styles.miniList}>
-            {todos.length === 0 && <li className={styles.empty}>할 일 없음</li>}
             {todayTodos.map((t) => (
               <li key={t.id} className={`${styles.todoItem} ${t.done ? styles.todoDone : ''}`}>
                 <button type="button" className={styles.checkBox} onClick={() => toggleTodo(t.id)} aria-pressed={t.done} aria-label="완료 토글">
@@ -227,7 +233,13 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
         {/* 일정 */}
         <section ref={schedRef} className={styles.miniCard}>
           <div className={styles.miniHead}>
-            <h2 className={styles.miniTitle}><CalendarClock size={16} /> 오늘의 일정</h2>
+            <span className={`${styles.headIcon} ${styles.headIconSched}`}><CalendarClock size={20} /></span>
+            <div className={styles.headText}>
+              <h2 className={styles.miniTitle}>오늘의 일정</h2>
+              <span className={styles.headSub}>
+                {todayTimeline.length === 0 ? '일정 없음' : `${todayTimeline.length}개`}
+              </span>
+            </div>
             <button type="button" className={styles.addMini} onClick={() => setSchedAddOpen((v) => !v)} aria-label="일정 추가">
               <Plus size={16} />
             </button>
@@ -245,7 +257,6 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
             </div>
           )}
           <ul className={styles.miniList}>
-            {todayTimeline.length === 0 && <li className={styles.empty}>일정 없음</li>}
             {todayTimeline.map((it) => (
               <li key={`${it.kind}-${it.id}`} className={`${styles.schedItem} ${it.done ? styles.schedDone : ''}`}>
                 <span className={styles.schedTime}>{it.time || '종일'}</span>
@@ -273,7 +284,8 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
       {/* ── 빠른 메모 ── */}
       <section ref={memoRef} className={styles.card}>
         <div className={styles.cardHead}>
-          <h2 className={styles.cardTitle}><StickyNote size={18} /> 빠른 메모</h2>
+          <span className={`${styles.headIcon} ${styles.headIconMemo}`}><StickyNote size={20} /></span>
+          <h2 className={styles.cardTitle}>빠른 메모</h2>
         </div>
         <div className={styles.memoAdd}>
           <input className={styles.textInput} type="text" placeholder="기억할 내용을 적어두세요"
@@ -326,6 +338,9 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
               <div><dt>미완료</dt><dd className={styles.stLeft}>{total - done}</dd></div>
             </dl>
           </div>
+          <button type="button" className={styles.detailBtn} onClick={() => setTaskBoardOpen(true)}>
+            자세히 보기 <ChevronRight size={13} />
+          </button>
         </section>
 
         <section className={styles.miniCard}>
@@ -342,6 +357,15 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
             </a>
           </div>
         </section>
+      </div>
+
+      {/* ── 응원 배너 ── */}
+      <div className={styles.cheerBanner}>
+        <div className={styles.cheerText}>
+          <strong>더 효율적인 하루를 응원합니다!</strong>
+          <span>안전하고 즐거운 하루 보내세요.</span>
+        </div>
+        <CalendarCheck size={44} strokeWidth={1.6} className={styles.cheerIll} aria-hidden />
       </div>
 
       <div className={styles.footer}>

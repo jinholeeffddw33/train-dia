@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, ExternalLink, RotateCw, Newspaper } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ExternalLink, RotateCw, Newspaper, ArrowUp } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './NewsOverlay.module.css';
 
@@ -30,8 +30,12 @@ export default function NewsOverlay({ onBack }: { onBack: () => void }) {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showTop, setShowTop] = useState(false); // 스크롤 내려가면 '맨 위로' 버튼 노출
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useHistoryBack('news-overlay', onBack);
+
+  const scrollToTop = () => bodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,7 +65,11 @@ export default function NewsOverlay({ onBack }: { onBack: () => void }) {
         </button>
       </header>
 
-      <div className={styles.body}>
+      <div
+        className={styles.body}
+        ref={bodyRef}
+        onScroll={(e) => setShowTop(e.currentTarget.scrollTop > 300)}
+      >
         {loading ? (
           <ul className={styles.list} aria-label="불러오는 중">
             {Array.from({ length: 6 }).map((_, i) => <li key={i} className={styles.skeleton} />)}
@@ -103,6 +111,13 @@ export default function NewsOverlay({ onBack }: { onBack: () => void }) {
 
         <p className={styles.credit}>구글 뉴스 제공 · 약 10분마다 갱신 · 새 창에서 열려요</p>
       </div>
+
+      {/* 아래로 내려간 뒤 맨 위 기사로 한 번에 올라가기 */}
+      {showTop && (
+        <button type="button" className={styles.scrollTop} onClick={scrollToTop} aria-label="맨 위로">
+          <ArrowUp size={22} strokeWidth={2.4} />
+        </button>
+      )}
     </div>
   );
 }

@@ -1,8 +1,9 @@
 /* 오늘의 헤드라인 뉴스 — 전체화면 오버레이(부모 .schedOverlay 가 고정 위치 담당) */
 .wrap {
-  min-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .header {
@@ -36,6 +37,9 @@
 
 .body {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 0 var(--dia-space-4) calc(var(--dia-space-8) + env(safe-area-inset-bottom, 0px));
   max-width: 560px;
   width: 100%;
@@ -44,15 +48,20 @@
 }
 
 .list {
+  /* ul 기본 불릿(왼쪽 점)·들여쓰기 제거 — 안 하면 각 항목 왼쪽에 점이 찍힌다 */
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--dia-space-2);
 }
+.list > li { list-style: none; }
 
 .item {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   padding: var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
@@ -83,7 +92,7 @@
   flex-shrink: 0;
 }
 .itemTitle {
-  font-size: var(--dia-text-base);
+  font-size: var(--dia-text-sm);
   font-weight: 700;
   color: var(--dia-text-primary);
   line-height: 1.4;
@@ -143,4 +152,28 @@
   text-align: center;
   font-size: var(--dia-text-meta);
   color: var(--dia-text-tertiary);
+}
+
+/* 맨 위로 — 스크롤 내려간 뒤 우하단에 떠서 첫 기사로 즉시 올려준다 */
+.scrollTop {
+  position: absolute;
+  right: var(--dia-space-4);
+  bottom: calc(var(--dia-space-5) + env(safe-area-inset-bottom, 0px));
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue);
+  color: var(--dia-text-on-color);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  z-index: 5;
+  transition: transform 0.12s ease;
+  animation: scrollTopIn 0.2s ease;
+}
+.scrollTop:active { transform: scale(0.9); }
+@keyframes scrollTopIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

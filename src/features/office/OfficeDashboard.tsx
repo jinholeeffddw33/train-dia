@@ -5,7 +5,7 @@ import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
-  Settings, History, CalendarDays, CalendarCheck,
+  Settings, History, CalendarDays, Newspaper,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
@@ -19,6 +19,7 @@ import NoteManager from './NoteManager';
 import TaskBoard from './TaskBoard';
 import TimeSelect from './TimeSelect';
 import WeeklyMenu from '@/features/life/menu/WeeklyMenu';
+import NewsOverlay from './NewsOverlay';
 import styles from './OfficeDashboard.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
@@ -69,6 +70,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   const [noteMgrOpen, setNoteMgrOpen] = useState(false);
   const [taskBoardOpen, setTaskBoardOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [newsOpen, setNewsOpen] = useState(false);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -359,14 +361,15 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
         </section>
       </div>
 
-      {/* ── 응원 배너 ── */}
-      <div className={styles.cheerBanner}>
-        <div className={styles.cheerText}>
-          <strong>더 효율적인 하루를 응원합니다!</strong>
-          <span>안전하고 즐거운 하루 보내세요.</span>
-        </div>
-        <CalendarCheck size={44} strokeWidth={1.6} className={styles.cheerIll} aria-hidden />
-      </div>
+      {/* ── 오늘의 헤드라인 뉴스 (진입 카드) ── */}
+      <button type="button" className={styles.newsCard} onClick={() => setNewsOpen(true)} data-press>
+        <span className={styles.newsIcon}><Newspaper size={22} strokeWidth={2} /></span>
+        <span className={styles.newsText}>
+          <strong>오늘의 헤드라인 뉴스</strong>
+          <span>매일 주요 뉴스를 한눈에 확인하세요</span>
+        </span>
+        <ChevronRight size={18} className={styles.newsArrow} aria-hidden />
+      </button>
 
       <div className={styles.footer}>
         <span className={styles.footerBrand}>Train DIA</span>
@@ -396,6 +399,12 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
       {menuOpen && (
         <div className={styles.schedOverlay}>
           <WeeklyMenu onBack={() => setMenuOpen(false)} />
+        </div>
+      )}
+      {/* 오늘의 헤드라인 뉴스 */}
+      {newsOpen && (
+        <div className={styles.schedOverlay}>
+          <NewsOverlay onBack={() => setNewsOpen(false)} />
         </div>
       )}
     </div>

@@ -449,19 +449,32 @@
 }
 @keyframes schedIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
 
-/* ── 응원 배너 (시안 하단) ── */
-.cheerBanner {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--dia-space-3);
+/* ── 오늘의 헤드라인 뉴스 (진입 카드) ── */
+.newsCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
   padding: var(--dia-space-4);
   border-radius: var(--dia-radius-lg);
-  background: var(--dia-blue-dim);
-  border: 1px solid var(--dia-border-light);
-  overflow: hidden;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  box-shadow: var(--dia-shadow-sm);
+  text-align: left;
+  transition: transform 0.12s ease, background 0.15s ease;
 }
-.cheerText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.cheerText strong { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-blue-text); }
-.cheerText span { font-size: var(--dia-text-sm); color: var(--dia-text-secondary); }
-.cheerIll { flex-shrink: 0; color: var(--dia-blue); opacity: 0.55; }
+.newsCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
+.newsIcon {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+}
+.newsText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.newsText strong { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
+.newsText span { font-size: var(--dia-text-sm); color: var(--dia-text-tertiary); }
+.newsArrow { flex-shrink: 0; color: var(--dia-text-tertiary); }
 
 /* ── Footer ── */
 .footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; padding: var(--dia-space-4) 0; }

@@ -83,54 +83,55 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
 
   return (
     <div className={styles.hub}>
-      {/* ── 상단 바 — 테마 토글 + 알림 ── */}
-      <div className={styles.topBar}>
-        <button
-          type="button"
-          className={styles.themeBtn}
-          aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-          onClick={toggleTheme}
-        >
-          {theme === 'dark'
-            ? <Moon size={20} strokeWidth={2.2} />
-            : <Sun size={20} strokeWidth={2.2} />}
-        </button>
-        <button
-          type="button"
-          className={styles.gearBtn}
-          aria-label="설정 열기"
-          onClick={() => onOpenSettings?.()}
-        >
-          <Settings size={20} strokeWidth={2.2} />
-        </button>
-        <button
-          type="button"
-          className={styles.bellBtn}
-          aria-label="알림"
-          onClick={() => onEnter('safety')}
-        >
-          <Bell size={20} strokeWidth={2.2} />
-          {hasNotice && <span className={styles.bellDot} aria-hidden />}
-        </button>
-      </div>
-
-      {/* ── Header — 인사말·소개(좌) + 교차 카드(우, ⇄ 일정관리 보기) 한 줄 ── */}
+      {/* ── Header — 인사말(좌) + [아이콘 + 교차 카드](우) — 내근직 대시보드와 동일 배치 ──
+           좌상단(인사말)이 아이콘과 같은 높이에서 시작하도록 아이콘을 우측 묶음에 넣는다.
+           두 홈의 좌상단이 같은 위치·문구 → 오가도 안 바뀐 느낌. */}
       <header className={styles.header}>
         <div className={styles.headerText}>
-          {name && (
-            <p className={styles.greeting}>안녕하세요, {name} {role}</p>
-          )}
-          <h1 className={styles.title}>답십리 승무사업소</h1>
+          <p className={styles.greeting}>안녕하세요,</p>
+          <h1 className={styles.title}>{name ? `${name} ${role}` : '답십리 승무사업소'} 👋</h1>
+          {name && <p className={styles.office}>답십리 승무사업소</p>}
           <p className={styles.subtitle}>{getSubtitle()}</p>
         </div>
-        <button type="button" className={styles.crossCard} onClick={() => onOpenSchedule?.()}
-          aria-label="일정관리 화면으로 이동" data-press>
-          <span className={styles.crossTop}>
-            <CalendarDays size={16} strokeWidth={2.4} />
-            <span className={styles.crossText}>{todayLabel()}</span>
-          </span>
-          <span className={styles.crossGo}>일정관리 보기 <ChevronRight size={13} /></span>
-        </button>
+        <div className={styles.headerRight}>
+          <div className={styles.topBar}>
+            <button
+              type="button"
+              className={styles.themeBtn}
+              aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+              onClick={toggleTheme}
+            >
+              {theme === 'dark'
+                ? <Moon size={20} strokeWidth={2.2} />
+                : <Sun size={20} strokeWidth={2.2} />}
+            </button>
+            <button
+              type="button"
+              className={styles.gearBtn}
+              aria-label="설정 열기"
+              onClick={() => onOpenSettings?.()}
+            >
+              <Settings size={20} strokeWidth={2.2} />
+            </button>
+            <button
+              type="button"
+              className={styles.bellBtn}
+              aria-label="알림"
+              onClick={() => onEnter('safety')}
+            >
+              <Bell size={20} strokeWidth={2.2} />
+              {hasNotice && <span className={styles.bellDot} aria-hidden />}
+            </button>
+          </div>
+          <button type="button" className={styles.crossCard} onClick={() => onOpenSchedule?.()}
+            aria-label="일정관리 화면으로 이동" data-press>
+            <span className={styles.crossTop}>
+              <CalendarDays size={16} strokeWidth={2.4} />
+              <span className={styles.crossText}>{todayLabel()}</span>
+            </span>
+            <span className={styles.crossGo}>일정관리 보기 <ChevronRight size={13} /></span>
+          </button>
+        </div>
       </header>
 
       {/* ── Today's Duty Hero ── */}

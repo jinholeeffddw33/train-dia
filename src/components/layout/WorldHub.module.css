@@ -85,34 +85,50 @@
   min-width: 0;
 }
 
+/* ── 좌상단 인사말 — 내근직 대시보드(OfficeDashboard.module.css)와 동일 규격 유지.
+      두 홈을 오가도 위치·크기가 같아 "안 바뀐" 느낌을 준다. 한쪽 바꾸면 저쪽도 맞출 것. ── */
 .greeting {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
-  margin: 0 0 6px;
+  margin: 0;
 }
 
 .title {
-  font-size: clamp(19px, 5.4vw, 24px);
+  font-size: clamp(22px, 6.4vw, 29px);
   font-weight: 800;
   color: var(--dia-text-primary);
   letter-spacing: -0.03em;
-  margin: 0;
-  line-height: 1.15;
+  margin: 2px 0 0;
+  line-height: 1.12;
+}
+
+.office {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+  margin: 5px 0 0;
 }
 
 /* 상단 바 — 테마/알림(우측 정렬) */
+/* 우측 세로 묶음: 아이콘 줄(위) + 교차 카드(아래) — 내근직 대시보드 .headerRight 와 동일 */
+.headerRight {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--dia-space-2);
+}
 .topBar {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: var(--dia-space-2);
-  margin-bottom: calc(-1 * var(--dia-space-2));
 }
 
 .subtitle {
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
-  margin: 6px 0 0;
+  margin: 3px 0 0;
 }
 
 .bellBtn {
@@ -301,7 +317,6 @@
 /* 교차 진입 카드 — 내근직 대시보드의 '기관사 일정 보기'와 동일 스타일(틸 2밴드) */
 .crossCard {
   flex-shrink: 0;
-  align-self: flex-start;
   display: flex;
   flex-direction: column;
   align-items: stretch;

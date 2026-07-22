@@ -885,7 +885,9 @@
   position: relative;
   overflow: hidden;
   min-height: 168px;
-  padding: calc(env(safe-area-inset-top) + var(--dia-space-5)) var(--dia-space-5) var(--dia-space-8);
+  /* 상단 여백에 뒤로가기 버튼(top:space-3 + 40px) 공간을 확보 — 안 그러면 브랜드/제목 글씨가
+     좌상단 화살표 버튼 위에 겹쳐 "화살표 안에 글씨"처럼 보인다. */
+  padding: calc(env(safe-area-inset-top) + var(--dia-space-3) + 48px) var(--dia-space-5) var(--dia-space-8);
   background:
     var(--dab-hero-scrim),
     var(--dab-hero-photo) center / cover no-repeat;

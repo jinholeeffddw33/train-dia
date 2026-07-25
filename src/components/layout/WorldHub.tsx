@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarDays, ChevronRight, Settings } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarDays, ChevronRight, Settings, Star } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -143,24 +143,33 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
         <div className={styles.servicesGrid}>
           {SERVICES.map((s) => {
             const Icon = s.Icon;
+            const isPrimary = s.id === 'duty'; // 근무 = 파란 3D 테두리로 강조
             const showBadge = s.id === 'safety' && safetyTotal > 0;
             return (
               <button
                 key={s.id}
                 type="button"
-                className={styles.serviceCard}
+                className={`${styles.serviceCard} ${isPrimary ? styles.serviceCardPrimary : ''}`}
                 onClick={() => handleClick(s.id)}
                 aria-label={`${s.label} — ${s.desc}`}
                 data-tone={s.id}
                 data-press
               >
+                {isPrimary && (
+                  <span className={styles.svcBadge}>
+                    <Star size={11} fill="currentColor" strokeWidth={0} aria-hidden />안전
+                  </span>
+                )}
                 <span className={`${styles.serviceIcon} ${styles[s.iconClass]}`}>
-                  <Icon size={22} strokeWidth={2.2} />
+                  <Icon size={24} strokeWidth={2.2} />
                 </span>
                 <div className={styles.serviceText}>
                   <span className={styles.serviceLabel}>{s.label}</span>
                   <span className={styles.serviceDesc}>{s.desc}</span>
                 </div>
+                <span className={styles.svcChevron} aria-hidden>
+                  <ChevronRight size={15} />
+                </span>
                 {showBadge && (
                   <span className={styles.serviceBadge}>
                     {safetyTotal > 99 ? '99+' : safetyTotal}

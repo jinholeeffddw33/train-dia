@@ -219,14 +219,14 @@
 .servicesGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--dia-space-2);
+  gap: var(--dia-space-3);
 }
 
 .serviceCard {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
   padding: var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
@@ -236,9 +236,54 @@
   -webkit-user-select: none;
   user-select: none;
   text-align: left;
-  min-height: 66px;
+  min-height: 78px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--dia-shadow-sm);
+}
+
+/* ── 근무 = 파란 3D 테두리로 강조(크기는 동일, 테두리로 우선순위 표현) ── */
+/* ── 근무 = 진한 파랑 3D 테두리로 강조(아이콘은 나머지와 동일하게 유지) ──
+   테두리 링(box-shadow)이 라이트 규칙에 덮이지 않도록 라이트 전용 규칙도 아래에 별도 정의 */
+.serviceCardPrimary {
+  overflow: visible; /* '안전' 배지가 위로 튀어나오게 */
+  border-color: var(--dia-blue);
+  box-shadow:
+    0 0 0 2px var(--dia-blue),                 /* 덜 진한 파랑 테두리 링 */
+    inset 0 2px 1px rgba(255, 255, 255, 0.35), /* 상단 하이라이트 → 3D 볼록 */
+    0 18px 38px rgba(29, 78, 216, 0.52),       /* 더 크게 뜬 그림자 → 3D 부양↑ */
+    0 8px 16px rgba(0, 0, 0, 0.38);
+}
+
+/* '안전' 배지 — 근무 카드 좌상단에 살짝 튀어나오게 */
+.svcBadge {
+  position: absolute;
+  top: -9px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  border-radius: var(--dia-radius-full);
+  background: linear-gradient(135deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  color: var(--dia-text-on-color);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.4);
+  z-index: 2;
+}
+.svcBadge svg { flex-shrink: 0; }
+
+/* 우측 화살표 — 은은한 원형 배경(모든 카드 공통) */
+.svcChevron {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
 }
 .serviceCard:active {
   transform: scale(0.98);
@@ -266,14 +311,23 @@
     0 6px 16px rgba(var(--jw, 148, 163, 184), 0.16),
     0 2px 5px rgba(15, 23, 42, 0.05);
 }
+/* 라이트 전용 — 근무 강조 테두리(위 .serviceCard 규칙보다 뒤라서 box-shadow가 이김) */
+:global(:root.light) .serviceCardPrimary {
+  border-color: var(--dia-blue);
+  box-shadow:
+    0 0 0 2px var(--dia-blue),                 /* 덜 진한 파랑 테두리 링 */
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),   /* 상단 하이라이트 */
+    0 18px 38px rgba(59, 130, 246, 0.42),      /* 더 크게 뜬 그림자 → 3D 부양↑ */
+    0 8px 16px rgba(15, 23, 42, 0.16);
+}
 
 .serviceIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   flex-shrink: 0;
   position: relative;
   color: #fff;
@@ -342,18 +396,25 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
   min-width: 0;
 }
 
 .serviceLabel {
   font-size: var(--dia-text-base);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--dia-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .serviceDesc {
   font-size: var(--dia-text-meta);
   color: var(--dia-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .serviceBadge {

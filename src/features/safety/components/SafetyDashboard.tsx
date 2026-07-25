@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  ArrowLeft, AlertTriangle, TrainFront, Train, ShieldAlert,
-  Megaphone, ChevronRight, Bell, Check, X, BookOpen,
+  ArrowLeft, AlertTriangle, TrainFront, Gauge, GraduationCap,
+  Megaphone, ChevronRight, Bell, Check, X, Lightbulb,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
 
@@ -179,11 +179,11 @@ const HAZARD_ZONES_TOP3 = [...HAZARD_ZONE_SAMPLES_RAW]
   .sort((a, b) => stationOrderKey(a.station) - stationOrderKey(b.station));
 
 const CATEGORIES = [
-  { id: 'incident' as const, label: '사례교육',  icon: AlertTriangle, tone: 'amber' as const },
-  { id: 'driving'  as const, label: '운전정보',  icon: TrainFront,    tone: 'blue'  as const },
-  { id: 'train'    as const, label: '열차정보',  icon: Train,         tone: 'green' as const },
-  { id: 'hazard'   as const, label: '위험개소',   icon: ShieldAlert,   tone: 'red'   as const },
-  { id: 'tips'     as const, label: '안전상식',   icon: BookOpen,      tone: 'purple' as const },
+  { id: 'driving'  as const, label: '운전정보',  icon: Gauge,         tone: 'blue'  as const },
+  { id: 'incident' as const, label: '사례교육',  icon: GraduationCap, tone: 'amber' as const },
+  { id: 'train'    as const, label: '열차정보',  icon: TrainFront,    tone: 'green' as const },
+  { id: 'hazard'   as const, label: '위험개소',   icon: AlertTriangle, tone: 'red'   as const },
+  { id: 'tips'     as const, label: '안전상식',   icon: Lightbulb,     tone: 'purple' as const },
 ];
 
 // 사고사례 vs 운전정보 — 가장 최근 업로드 비교
@@ -435,7 +435,7 @@ export default function SafetyDashboard({
                 onClick={() => onOpenCategory(c.id)}
               >
                 <span className={styles.catIconWrap}>
-                  <Icon size={20} strokeWidth={2.2} />
+                  <Icon size={26} strokeWidth={2.1} />
                 </span>
                 <span className={styles.catLabel}>{c.label}</span>
               </button>

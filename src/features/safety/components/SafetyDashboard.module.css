@@ -5,42 +5,15 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  /* Aurora Mesh — 한 단계 더 진한 보라·인디고·로즈·시안 글로우 (다크) */
-  background:
-    /* 우상단: 보라 메인 글로우 (강) */
-    radial-gradient(60% 50% at 85% 8%, rgba(124, 58, 237, 0.70), transparent 60%),
-    /* 좌상단: 인디고 보조 글로우 */
-    radial-gradient(55% 48% at 8% 6%, rgba(67, 56, 202, 0.62), transparent 65%),
-    /* 우하단: 로즈 액센트 */
-    radial-gradient(50% 42% at 92% 88%, rgba(190, 24, 93, 0.42), transparent 65%),
-    /* 좌하단: 시안 액센트 */
-    radial-gradient(45% 42% at 5% 92%, rgba(8, 145, 178, 0.38), transparent 65%),
-    /* 중앙: 보라 그라데이션 깊이 */
-    radial-gradient(75% 55% at 50% 50%, rgba(76, 29, 149, 0.40), transparent 80%),
-    /* 베이스: 더 깊은 나이트 */
-    linear-gradient(180deg, #050816 0%, #0B1230 45%, #050816 100%);
-  background-attachment: fixed;
+  /* 앱 표준 배경으로 통일 (다른 파트와 동일) */
+  background: var(--dia-bg);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* 라이트 모드: 더 진한 파스텔 — 더 명확한 컬러 톤 */
 :global(.light) .wrap {
-  background:
-    /* 우상단: 라벤더 메인 (강) */
-    radial-gradient(60% 50% at 85% 8%, rgba(167, 139, 250, 0.95), transparent 60%),
-    /* 좌상단: 인디고 */
-    radial-gradient(55% 48% at 8% 6%, rgba(165, 180, 252, 0.90), transparent 65%),
-    /* 우하단: 따뜻한 피치 */
-    radial-gradient(50% 42% at 92% 88%, rgba(251, 146, 168, 0.60), transparent 65%),
-    /* 좌하단: 민트/시안 */
-    radial-gradient(45% 42% at 5% 92%, rgba(125, 211, 200, 0.70), transparent 65%),
-    /* 중앙: 라벤더 깊이 */
-    radial-gradient(75% 55% at 50% 50%, rgba(221, 214, 254, 0.75), transparent 80%),
-    /* 베이스: 라벤더 톤 화이트 */
-    linear-gradient(180deg, #EFEAFF 0%, #E4DCFD 45%, #EFEAFF 100%);
-  background-attachment: fixed;
+  background: var(--dia-bg);
 }
 
 /* ── 헤더 — 완전 투명: wrap 그라데이션 위에 얹혀 경계가 보이지 않음 ── */
@@ -118,13 +91,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.25);
+  /* 표준 배경 위에서 겉돌던 흰 링 제거 — 깔끔한 드롭 그림자만 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
-}
-
-/* 라이트 모드: 흰 링 → 보라 링 (파스텔 배경 위 가시성 확보) */
-:global(.light) .lineBadge {
-  box-shadow: 0 0 0 2px rgba(76, 29, 149, 0.18), 0 2px 4px rgba(76, 29, 149, 0.18);
 }
 
 .headerTitle {
@@ -221,23 +190,14 @@
   flex-direction: column;
   gap: var(--dia-space-2);
   /* 주제별 은은한 글래스 카드 — 그라데이션 배경 위에 부드럽게 떠 있는 느낌 */
-  padding: var(--dia-space-3);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--dia-radius-xl);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 6px 20px rgba(0, 0, 0, 0.18);
+  /* 바깥 박스 제거 — 레이아웃만(배경/테두리/그림자 없음) */
 }
 
 :global(.light) .section {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(76, 29, 149, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 4px 16px rgba(76, 29, 149, 0.06);
+  /* 바깥 박스 제거 — 라이트 모드도 배경/테두리 없음 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .sectionHead {
@@ -301,23 +261,14 @@
   flex-direction: column;
   gap: 6px;
   /* 글래스 카드 — 주제별 묶음 */
-  padding: var(--dia-space-3);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--dia-radius-xl);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 6px 20px rgba(0, 0, 0, 0.18);
+  /* 바깥 박스 제거 — 레이아웃만(배경/테두리/그림자 없음) */
 }
 
 :global(.light) .noticeSection {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(76, 29, 149, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 4px 16px rgba(76, 29, 149, 0.06);
+  /* 바깥 박스 제거 — 라이트 모드도 배경/테두리 없음 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .noticeHead {
@@ -436,96 +387,50 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   /* 글래스 카드 — 4 카테고리 묶음 */
-  padding: var(--dia-space-3);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--dia-radius-xl);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 6px 20px rgba(0, 0, 0, 0.18);
+  /* 바깥 박스 제거 — 레이아웃만(배경/테두리/그림자 없음) */
 }
 
 :global(.light) .categoryRow {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(76, 29, 149, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 4px 16px rgba(76, 29, 149, 0.06);
+  /* 바깥 박스 제거 — 라이트 모드도 배경/테두리 없음 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
+/* ── 일정관리(내근직) 타일과 100% 동일 — .gridBtn/.gridIcon/.gridLabel/.tone_* 그대로 복사 ── */
 .catBtn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 4px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  min-height: 88px;
+  padding: 10px 4px 9px;
   border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border-light);
+  background: var(--dia-surface-elevated);   /* 배경색 없음(플레인) — 색은 글리프에만 */
   cursor: pointer;
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 5px 12px rgba(0, 0, 0, 0.13),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .catBtn:active {
-  transform: scale(0.96);
-  transition: transform 0.12s ease;
-  box-shadow: var(--dia-3d-pressed);
+  transform: scale(0.96) translateY(1px);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* 카테고리 아이콘 — ZINOSB 주얼(스모크 크리스털 + 색별 네온 림/글로우).
-   색은 --jw(RGB) 가 톤별로 가름. 평면 단색 폐기 → 돋보이되 자연스럽게. */
-.catTone_amber { --jw: 251, 191, 36; }
-.catTone_blue  { --jw: 96, 165, 250; }
-.catTone_green { --jw: 52, 211, 153; }
-.catTone_red   { --jw: 248, 113, 113; }
-.catTone_purple{ --jw: 167, 139, 250; }
+/* 색은 글리프(안쪽 그림)에만 — 타일 배경엔 톤색 없음 */
+.catTone_blue   .catIconWrap { color: var(--dia-blue); }
+.catTone_amber  .catIconWrap { color: var(--dia-amber-text); }
+.catTone_green  .catIconWrap { color: var(--dia-green-text); }
+.catTone_red    .catIconWrap { color: var(--dia-red); }
+.catTone_purple .catIconWrap { color: var(--dia-purple); }
 
-.catIconWrap {
-  position: relative;
-  isolation: isolate;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--dia-radius-full);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  border: 1px solid rgba(var(--jw, 148, 163, 184), 0.6);
-  background:
-    radial-gradient(120% 85% at 50% -14%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.12) 36%, transparent 66%),
-    radial-gradient(115% 105% at 50% 125%, rgba(var(--jw, 148, 163, 184), 0.72) 0%, rgba(var(--jw, 148, 163, 184), 0.2) 46%, transparent 76%),
-    linear-gradient(160deg, rgba(48, 52, 78, 0.72) 0%, rgba(14, 16, 28, 0.92) 100%);
-}
-/* 위쪽 넓은 흰 반사 (주얼 sheen — 크리스프 1px선 아님, 넓은 면) */
-.catIconWrap::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  left: 18%;
-  right: 18%;
-  top: 3px;
-  height: 38%;
-  border-radius: var(--dia-radius-full);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55) 45%, transparent);
-  opacity: 0.7;
-  pointer-events: none;
-}
-.catIconWrap svg {
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 0 7px rgba(var(--jw, 148, 163, 184), 0.75));
-}
+.catIconWrap { display: flex; align-items: center; justify-content: center; }
 
-.catLabel {
-  font-size: var(--dia-text-sm);
-  font-weight: var(--dia-weight-semibold);
-  color: var(--dia-text-primary);
-  text-align: center;
-  white-space: nowrap;
-}
+.catLabel { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-primary); text-align: center; line-height: 1.15; max-width: 100%; }
 
 /* ── 좌/우 2단 섹션 ── */
 .dualSection {
@@ -533,23 +438,14 @@
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   /* 글래스 카드 — 사고사례 + 열차정보 dual 묶음 */
-  padding: var(--dia-space-3);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--dia-radius-xl);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 6px 20px rgba(0, 0, 0, 0.18);
+  /* 바깥 박스 제거 — 레이아웃만(배경/테두리/그림자 없음) */
 }
 
 :global(.light) .dualSection {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(76, 29, 149, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 4px 16px rgba(76, 29, 149, 0.06);
+  /* 바깥 박스 제거 — 라이트 모드도 배경/테두리 없음 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .colWrap {
@@ -690,7 +586,7 @@
   align-items: center;
   padding: 2px 10px;
   border-radius: var(--dia-radius-full);
-  background: linear-gradient(145deg, #7c3aed, #5b21b6);
+  background: linear-gradient(145deg, #3B82F6, #1D4ED8);
   color: #fff;
   font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
@@ -705,7 +601,7 @@
   flex-shrink: 0;
   padding: 1px 7px;
   border-radius: var(--dia-radius-full);
-  background: linear-gradient(145deg, #7c3aed, #5b21b6);
+  background: linear-gradient(145deg, #3B82F6, #1D4ED8);
   color: #fff;
   font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
@@ -735,7 +631,7 @@
   font-weight: var(--dia-weight-bold);
   padding: 2px 8px;
   border-radius: var(--dia-radius-md);
-  background: var(--dia-purple, #8B5CF6);
+  background: linear-gradient(145deg, #16A34A, #15803D);
   color: #fff;
 }
 
@@ -827,7 +723,8 @@
   letter-spacing: 0.3px;
 }
 
-.severityBadgeWarn     { background: var(--dia-amber); }
+/* 주의/알림 = 앰버 경고 라벨 — 흰 글씨는 대비가 약해 진한 글씨로 (가독성↑) */
+.severityBadgeWarn     { background: var(--dia-amber); color: #422006; }
 .severityBadgeSevere   { background: var(--dia-red); }
 .severityBadgeInfo     { background: var(--dia-blue); }
 .severityBadgeResolved { background: var(--dia-green, #22C55E); }
@@ -910,6 +807,8 @@
   cursor: pointer;
   font: inherit;
   color: inherit;
+  /* 표준 카드 그림자로 배경 위에서 또렷하게 (다른 파트 카드와 동일 패턴) */
+  box-shadow: var(--dia-shadow-sm);
   transition: transform 0.12s ease, box-shadow 0.15s ease;
 }
 .itemBtn:active { transform: scale(0.98); }
@@ -1188,27 +1087,4 @@
 }
 }
 
-/* 카테고리 주얼 아이콘 — 입체 + 색 네온 글로우 (다크) */
-.catIconWrap {
-  box-shadow:
-    0 7px 18px rgba(0, 0, 0, 0.45),
-    0 0 20px rgba(var(--jw, 148, 163, 184), 0.6),
-    0 0 8px rgba(var(--jw, 148, 163, 184), 0.4),
-    inset 0 2px 3px rgba(255, 255, 255, 0.62),
-    inset 0 -10px 14px -9px rgba(0, 0, 0, 0.78),
-    inset 0 0 15px rgba(var(--jw, 148, 163, 184), 0.28);
-}
-
-/* 라이트 = 비비드 컬러 크리스털 (흰 아이콘 가독 유지) + 색 글로우 */
-:global(.light) .catIconWrap {
-  border: 1px solid rgba(var(--jw, 148, 163, 184), 0.5);
-  background:
-    radial-gradient(120% 85% at 50% -14%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.18) 38%, transparent 66%),
-    radial-gradient(115% 110% at 50% 125%, rgba(var(--jw, 148, 163, 184), 0.95) 0%, rgba(var(--jw, 148, 163, 184), 0.55) 55%, transparent 85%),
-    linear-gradient(160deg, rgba(var(--jw, 148, 163, 184), 0.85), rgba(var(--jw, 148, 163, 184), 0.6));
-  box-shadow:
-    0 5px 14px rgba(var(--jw, 148, 163, 184), 0.35),
-    0 0 12px rgba(var(--jw, 148, 163, 184), 0.25),
-    inset 0 2px 3px rgba(255, 255, 255, 0.7),
-    inset 0 -8px 12px -9px rgba(0, 0, 0, 0.18);
-}
+/* (옛 주얼 아이콘 스타일 제거 — 글리프 뒤 회색 글로우/테두리/배경 잔재였음) */

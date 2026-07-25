@@ -803,16 +803,27 @@ function detectDownBranch(seg?: Segment): string {
   return DIR.DOWN_SUB;
 }
 
-/** 열차번호로 기지 출고 방면 판별 */
+/** 기지 출고 열차번호로 방면(부제) 판별 — 라벨에 이미 기지명이 있으므로 방향만 반환 */
 function detectDepotSub(seg?: Segment): string {
   if (seg?.n) {
     for (const num of seg.n) {
-      if (num >= 1000 && num <= 1499) return '고덕기지 출발 · 상일동 방향';
-      if (num >= 1500 && num <= 1599) return '방화기지 출발';
-      if (num >= 2000 && num <= 2999) return '고덕기지 출발 · 하남검단산 방향';
+      if (num >= 1000 && num <= 1499) return '상일동 방향';
+      if (num >= 1500 && num <= 1599) return '방화 방면';
+      if (num >= 2000 && num <= 2999) return '하남검단산 방향';
     }
   }
   return DIR.DEPOT_SUB;
+}
+
+/** 기지 출고 열차번호로 출발 기지(라벨) 판별 — 15xx=방화기지, 그 외=고덕기지 */
+function detectDepotLabel(seg?: Segment): string {
+  if (seg?.n) {
+    for (const num of seg.n) {
+      if (num >= 1500 && num <= 1599) return '🚇 방화기지 출고';
+      if ((num >= 1000 && num <= 1499) || (num >= 2000 && num <= 2999)) return '🚇 고덕기지 출고';
+    }
+  }
+  return '🚇 기지 출고';
 }
 
 const UP_CHARS = new Set(['방', '왕', '영', '여', '애', '화', '다']);
@@ -822,9 +833,10 @@ const DOWN_CHARS = new Set(['군', '마', '상', '기', '둔', '강', '하']);
 function parseRoutePartDirection(routePart: string, seg?: Segment): DirectionInfo | null {
   const t = routePart.trim();
   if (/^\d{4}$/.test(t) || t.includes('편승')) return null;
-  // 기지 출발 (답 미포함: 순수 기지 이동)
-  if (t[0] === '기' && !t.includes('답')) {
-    return { dir: 'depot', label: dirFull('depot'), sub: detectDepotSub(seg) };
+  // 기지 출고 — '기'로 시작하면 답십리 복귀 행로(기상답 등)라도 출고 근무.
+  // (예전엔 '답' 포함 시 출고 판정을 건너뛰어 '기상답'이 '하선 교대'로 오분류됨)
+  if (t[0] === '기') {
+    return { dir: 'depot', label: detectDepotLabel(seg), sub: detectDepotSub(seg) };
   }
   const dIdx = t.indexOf('답');
   // "답X..." → 답십리에서 X 방향으로 출발

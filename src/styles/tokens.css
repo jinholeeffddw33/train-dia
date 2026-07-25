@@ -25,6 +25,8 @@
   --dia-text-on-color: #FFFFFF; /* 색 배지/필 배경 위 텍스트 — 모드 무관 항상 white */
   --dia-purple: #8B5CF6;
   --dia-purple-dim: rgba(139, 92, 246, 0.15);
+  --dia-pink: #F472B6;
+  --dia-pink-dim: rgba(244, 114, 182, 0.15);
   --dia-amber: #F59E0B;
   --dia-amber-dim: rgba(245, 158, 11, 0.15);
   --dia-red: #EF4444;
@@ -398,6 +400,8 @@
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */
   --dia-amber-text: #B45309;    /* light bg 위 텍스트 (4.5:1 on white) */
   --dia-sky-text: #0284C7;      /* light bg 위 텍스트 (4.5:1 on white) */
+  --dia-pink: #DB2777;          /* 라이트 배경 가독(진한 핑크) */
+  --dia-pink-dim: rgba(219, 39, 119, 0.13);
   --dia-blue-text: #1D4ED8;     /* light bg 위 텍스트 (6.3:1 on white) */
   --dia-blue-glow: rgba(59, 130, 246, 0.15); /* 라이트 글로우 감쇠 (알파 절반) */
   --dia-bg: #F0F4F8;

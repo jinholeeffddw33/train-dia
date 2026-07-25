@@ -189,10 +189,14 @@
 /* 카드 표면은 월드허브 .serviceCard 와 동일 — radius-lg + shadow-sm */
 .miniCard {
   background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  border: 1px solid var(--dia-border-light);
   border-radius: var(--dia-radius-lg);
   padding: var(--dia-space-3);
-  box-shadow: var(--dia-shadow-sm);
+  /* 바로가기 타일과 동일한 3D 입체감(상단 하이라이트 + 부양 그림자) */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 5px 12px rgba(0, 0, 0, 0.13),
+    0 1px 2px rgba(0, 0, 0, 0.05);
   min-width: 0;
 }
 .miniHead {
@@ -380,10 +384,14 @@
 /* ── 전체폭 카드(메모) ── */
 .card {
   background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  border: 1px solid var(--dia-border-light);
   border-radius: var(--dia-radius-lg);
   padding: var(--dia-space-4);
-  box-shadow: var(--dia-shadow-sm);
+  /* 바로가기 타일과 동일한 3D 입체감 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 5px 12px rgba(0, 0, 0, 0.13),
+    0 1px 2px rgba(0, 0, 0, 0.05);
 }
 .cardHead { display: flex; align-items: center; gap: var(--dia-space-2); margin-bottom: var(--dia-space-3); }
 .cardTitle { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
@@ -420,22 +428,46 @@
 .noteText { flex: 1; min-width: 0; font-size: var(--dia-text-sm); color: var(--dia-text-primary); word-break: break-word; }
 
 /* ── 아이콘 2줄 ── */
-.iconGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dia-space-3) var(--dia-space-2); }
-.gridBtn { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 44px; }
-.gridBtn:active { transform: scale(0.94); }
-.gridIcon {
-  width: 52px; height: 52px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 16px;
-  background: var(--dia-surface-elevated);
-  border: 1px solid var(--dia-border);
+.iconGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dia-space-2); }
+
+/* 3D 사각 타일 = 입체 요소는 이것 하나뿐(톤 색으로 은은히 틴트, 볼록) */
+.gridBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 88px;
+  padding: 10px 4px 9px;
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border-light);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),   /* 상단 하이라이트 → 볼록 */
+    0 5px 12px rgba(0, 0, 0, 0.13),           /* 하단 그림자 → 부양 */
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.gridIconWork { color: var(--dia-blue); background: var(--dia-blue-dim); border-color: transparent; }
-.tone_duty   { color: var(--dia-blue);        background: var(--dia-blue-dim);   border-color: transparent; }
-.tone_edu    { color: var(--dia-green-text);  background: var(--dia-green-dim, var(--dia-surface-elevated));  border-color: transparent; }
-.tone_safety { color: var(--dia-amber-text);  background: var(--dia-amber-dim, var(--dia-surface-elevated));  border-color: transparent; }
-.tone_life   { color: var(--dia-purple);      background: var(--dia-purple-dim, var(--dia-surface-elevated)); border-color: transparent; }
-.gridLabel { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gridBtn:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);   /* 누르면 쏙 들어감 */
+}
+
+/* 아이콘 = 글리프만(별도 사각/그림자 없음) → 타일 위에 바둑알처럼 겹쳐 보이지 않음 */
+.gridIcon { display: flex; align-items: center; justify-content: center; }
+
+.gridLabel { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-primary); text-align: center; line-height: 1.15; max-width: 100%; }
+
+/* 톤별 타일 3D 그라데이션(위 밝고 아래 톤색) + 글리프 색 */
+.tone_blue   { background: linear-gradient(160deg, var(--dia-surface-elevated), var(--dia-blue-dim)); }
+.tone_blue   .gridIcon { color: var(--dia-blue); }
+.tone_green  { background: linear-gradient(160deg, var(--dia-surface-elevated), var(--dia-green-dim)); }
+.tone_green  .gridIcon { color: var(--dia-green-text); }
+.tone_amber  { background: linear-gradient(160deg, var(--dia-surface-elevated), var(--dia-amber-dim)); }
+.tone_amber  .gridIcon { color: var(--dia-amber-text); }
+.tone_purple { background: linear-gradient(160deg, var(--dia-surface-elevated), var(--dia-purple-dim)); }
+.tone_purple .gridIcon { color: var(--dia-purple); }
+.tone_pink   { background: linear-gradient(160deg, var(--dia-surface-elevated), var(--dia-pink-dim)); }
+.tone_pink   .gridIcon { color: var(--dia-pink); }
 
 /* ── 일정관리 전체 화면 오버레이 ── */
 .schedOverlay {
@@ -457,12 +489,20 @@
   padding: var(--dia-space-4);
   border-radius: var(--dia-radius-lg);
   background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
-  box-shadow: var(--dia-shadow-sm);
+  border: 1px solid var(--dia-border-light);
+  /* 바로가기 타일·카드와 동일한 3D 입체감 */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 5px 12px rgba(0, 0, 0, 0.13),
+    0 1px 2px rgba(0, 0, 0, 0.05);
   text-align: left;
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
 }
-.newsCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
+.newsCard:active {
+  transform: scale(0.98) translateY(1px);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+  background: var(--dia-surface-hover);
+}
 .newsIcon {
   flex-shrink: 0;
   width: 44px; height: 44px;

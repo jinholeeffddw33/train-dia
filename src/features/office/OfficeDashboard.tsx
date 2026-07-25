@@ -44,10 +44,10 @@ function todayISO(): string {
 }
 
 const WORLD_ICONS: { id: WorldId; label: string; Icon: typeof TrainFront; tone: string }[] = [
-  { id: 'duty',   label: '근무',   Icon: TrainFront,    tone: 'duty' },
-  { id: 'edu',    label: '교육',   Icon: GraduationCap, tone: 'edu' },
-  { id: 'safety', label: '안전',   Icon: Shield,        tone: 'safety' },
-  { id: 'life',   label: '라이프', Icon: Heart,         tone: 'life' },
+  { id: 'duty',   label: '근무',   Icon: TrainFront,    tone: 'blue' },
+  { id: 'edu',    label: '교육',   Icon: GraduationCap, tone: 'green' },
+  { id: 'safety', label: '안전',   Icon: Shield,        tone: 'amber' },
+  { id: 'life',   label: '라이프', Icon: Heart,         tone: 'pink' },
 ];
 
 export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: { onEnter: (w: WorldId) => void; onOpenHub?: () => void; onOpenSettings?: () => void }) {
@@ -132,10 +132,10 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   };
 
   const quickIcons = [
-    { key: 'cal',   label: '일정관리',    Icon: CalendarRange, onClick: () => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); } },
-    { key: 'todo',  label: '오늘의 할일', Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
-    { key: 'sched', label: '이번주 일정', Icon: CalendarClock, onClick: () => { setSchedStartView('week'); setSchedStartMonth(false); setScheduleOpen(true); } },
-    { key: 'memo',  label: '메모',        Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },
+    { key: 'cal',   label: '일정관리',    tone: 'blue',   Icon: CalendarRange, onClick: () => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); } },
+    { key: 'todo',  label: '오늘의 할일', tone: 'blue',   Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
+    { key: 'sched', label: '이번주 일정', tone: 'purple', Icon: CalendarClock, onClick: () => { setSchedStartView('week'); setSchedStartMonth(false); setScheduleOpen(true); } },
+    { key: 'memo',  label: '메모',        tone: 'green',  Icon: StickyNote,    onClick: () => setNoteMgrOpen(true) },
   ];
 
   return (
@@ -308,15 +308,15 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
       {/* ── 아이콘 2줄 ── */}
       <nav className={styles.iconGrid} aria-label="바로가기">
         {quickIcons.map((q) => (
-          <button key={q.key} type="button" className={styles.gridBtn} onClick={q.onClick} data-press>
-            <span className={`${styles.gridIcon} ${styles.gridIconWork}`}><q.Icon size={22} strokeWidth={2} /></span>
+          <button key={q.key} type="button" className={`${styles.gridBtn} ${styles[`tone_${q.tone}`]}`} onClick={q.onClick} data-press>
+            <span className={styles.gridIcon}><q.Icon size={26} strokeWidth={2.1} /></span>
             <span className={styles.gridLabel}>{q.label}</span>
           </button>
         ))}
         {WORLD_ICONS.map((w) => (
-          <button key={w.id} type="button" className={styles.gridBtn}
+          <button key={w.id} type="button" className={`${styles.gridBtn} ${styles[`tone_${w.tone}`]}`}
             onClick={() => window.setTimeout(() => onEnter(w.id), 60)} data-press aria-label={w.label}>
-            <span className={`${styles.gridIcon} ${styles[`tone_${w.tone}`]}`}><w.Icon size={22} strokeWidth={2} /></span>
+            <span className={styles.gridIcon}><w.Icon size={26} strokeWidth={2.1} /></span>
             <span className={styles.gridLabel}>{w.label}</span>
           </button>
         ))}

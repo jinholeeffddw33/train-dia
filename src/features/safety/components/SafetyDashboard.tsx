@@ -435,7 +435,7 @@ export default function SafetyDashboard({
                 onClick={() => onOpenCategory(c.id)}
               >
                 <span className={styles.catIconWrap}>
-                  <Icon size={26} strokeWidth={2.1} />
+                  <Icon size={22} strokeWidth={2.1} />
                 </span>
                 <span className={styles.catLabel}>{c.label}</span>
               </button>

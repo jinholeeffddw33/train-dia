@@ -403,12 +403,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 88px;
-  padding: 10px 4px 9px;
+  gap: 5px;
+  min-height: 74px;             /* 5열이라 폭이 좁아 → 높이 낮춰 비율을 일정관리처럼(덜 빽빽) */
+  padding: 9px 3px 8px;
   border-radius: var(--dia-radius-lg);
   border: 1px solid var(--dia-border-light);
-  background: var(--dia-surface-elevated);   /* 배경색 없음(플레인) — 색은 글리프에만 */
+  /* 색(hue) 없이 중립 그라데이션만 — 위 밝고 아래 살짝 어둡게 → 일정관리와 같은 볼록감 */
+  background: linear-gradient(160deg, var(--dia-surface-elevated), rgba(0, 0, 0, 0.05));
   cursor: pointer;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
@@ -421,12 +422,17 @@
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* 색은 글리프(안쪽 그림)에만 — 타일 배경엔 톤색 없음 */
+/* 글리프 색 + 타일 테두리에 은은한 형광(톤색) + 아주 옅은 글로우 */
 .catTone_blue   .catIconWrap { color: var(--dia-blue); }
+.catTone_blue   { border: 2px solid rgba(59, 130, 246, 0.8); box-shadow: 0 0 10px rgba(59, 130, 246, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.05); }
 .catTone_amber  .catIconWrap { color: var(--dia-amber-text); }
+.catTone_amber  { border: 2px solid rgba(245, 158, 11, 0.85); box-shadow: 0 0 10px rgba(245, 158, 11, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.05); }
 .catTone_green  .catIconWrap { color: var(--dia-green-text); }
+.catTone_green  { border: 2px solid rgba(34, 197, 94, 0.8); box-shadow: 0 0 10px rgba(34, 197, 94, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.05); }
 .catTone_red    .catIconWrap { color: var(--dia-red); }
+.catTone_red    { border: 2px solid rgba(239, 68, 68, 0.8); box-shadow: 0 0 10px rgba(239, 68, 68, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.05); }
 .catTone_purple .catIconWrap { color: var(--dia-purple); }
+.catTone_purple { border: 2px solid rgba(139, 92, 246, 0.8); box-shadow: 0 0 10px rgba(139, 92, 246, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 5px 12px rgba(0, 0, 0, 0.13), 0 1px 2px rgba(0, 0, 0, 0.05); }
 
 .catIconWrap { display: flex; align-items: center; justify-content: center; }
 

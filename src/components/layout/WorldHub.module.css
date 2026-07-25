@@ -218,7 +218,8 @@
 
 .servicesGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0,1fr) — 콘텐츠 최소폭 아래로도 줄어들게 해야 오른쪽 칸이 안 잘림 */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--dia-space-3);
 }
 
@@ -236,6 +237,7 @@
   -webkit-user-select: none;
   user-select: none;
   text-align: left;
+  min-width: 0;               /* 그리드 아이템 축소 허용 → 가로 넘침 방지 */
   min-height: 78px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--dia-shadow-sm);

@@ -13,8 +13,9 @@ import styles from './ServiceWorkerRegistrar.module.css';
  * useServiceWorker는 여기서만 호출한다(중복 등록 방지).
  */
 export default function ServiceWorkerRegistrar() {
-  const { updateAvailable, applyUpdate } = useServiceWorker();
+  const { updateAvailable, applyUpdate, outdated, currentVersion, latestVersion } = useServiceWorker();
   const online = useOnlineStatus();
+  const showUpdate = updateAvailable || outdated;
 
   useEffect(() => {
     // 영구 스토리지 요청 — 설치 PWA 의 교번/설정이 브라우저 정리로 지워지지 않게 (1회)
@@ -33,15 +34,20 @@ export default function ServiceWorkerRegistrar() {
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
 
-  if (!updateAvailable && online) return null;
+  if (!showUpdate && online) return null;
 
   return (
     <div className={styles.bannerStack}>
-      {updateAvailable && (
+      {showUpdate && (
         <div className={styles.updateBanner}>
-          <span>새 버전이 나왔어요</span>
+          <div className={styles.updateInfo}>
+            <span>새 버전이 나왔어요</span>
+            {outdated && latestVersion && (
+              <span className={styles.updateVer}>현재 {currentVersion} → 최신 {latestVersion}</span>
+            )}
+          </div>
           <button type="button" className={styles.updateBtn} onClick={applyUpdate}>
-            업데이트
+            지금 업데이트
           </button>
         </div>
       )}

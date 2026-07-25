@@ -30,6 +30,19 @@
   font-weight: var(--dia-weight-medium);
 }
 
+.updateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.updateVer {
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  opacity: 0.85;
+}
+
 .updateBtn {
   padding: var(--dia-space-2) var(--dia-space-3);
   background: var(--dia-surface);

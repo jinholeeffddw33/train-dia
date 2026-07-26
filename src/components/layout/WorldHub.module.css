@@ -238,7 +238,7 @@
   user-select: none;
   text-align: left;
   min-width: 0;               /* 그리드 아이템 축소 허용 → 가로 넘침 방지 */
-  min-height: 78px;
+  min-height: 72px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--dia-shadow-sm);
 }
@@ -278,8 +278,8 @@
 /* 우측 화살표 — 은은한 원형 배경(모든 카드 공통) */
 .svcChevron {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,9 +327,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
   flex-shrink: 0;
   position: relative;
   color: #fff;

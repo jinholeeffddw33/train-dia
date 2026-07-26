@@ -62,6 +62,8 @@ export default function CompareTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
+  // 닫은 직후 '고스트 클릭'이 기관사 선택을 다시 눌러 모달이 재열림 되는 것 차단(안드로이드).
+  const lastCloseRef = useRef(0);
 
   const today = useMemo(() => new Date(), []);
   const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
@@ -121,6 +123,8 @@ export default function CompareTab() {
   }, [searchQuery]);
 
   const openSelector = () => {
+    // 방금 닫혔으면(≤500ms) 고스트 클릭에 의한 재열림으로 보고 무시 — "안 닫힘"의 근본 방지.
+    if (Date.now() - lastCloseRef.current < 500) return;
     // 현재 선택된 인원을 초기값으로
     setMultiSelected(persons.filter((p): p is Person => p !== null));
     setSearchQuery('');
@@ -143,6 +147,7 @@ export default function CompareTab() {
   };
 
   const confirmSelection = () => {
+    lastCloseRef.current = Date.now(); // 재열림 가드 타임스탬프
     setPersonsBatch(multiSelected);
     setSelectorOpen(false);
     setSearchQuery('');
@@ -154,6 +159,7 @@ export default function CompareTab() {
   };
 
   const handleModalClose = useCallback(() => {
+    lastCloseRef.current = Date.now(); // 재열림 가드 타임스탬프
     setSelectorOpen(false);
     setSearchQuery('');
   }, []);
@@ -299,13 +305,15 @@ export default function CompareTab() {
         onClose={handleModalClose}
         title={`기관사 선택 (${multiSelected.length}명)`}
         footer={
-          /* 스크롤 밖 고정 하단바. 안드로이드에서 click 이 씹혀도(스크롤/눌림효과 등) 확실히 실행되도록
-             터치는 onPointerUp(손 뗄 때)로 처리 — click 합성 억제 자체를 우회. 마우스는 onClick. */
+          /* 스크롤 밖 고정 하단바.
+             ★ 안드로이드 '고스트 클릭' 차단: 터치로 닫는 순간 뒤늦게 합성된 click 이 아래 '기관사 선택'을
+                눌러 모달이 다시 열리던 것이 근본 원인. onTouchEnd 에서 preventDefault → 합성 click 차단 +
+                즉시 confirmSelection. 마우스(PC)는 onTouchEnd 미발생 → onClick 이 처리. */
           <button
             type="button"
             className={`z-cta ${styles.confirmBtn}`}
             onClick={confirmSelection}
-            onPointerUp={(e) => { if (e.pointerType !== 'mouse') confirmSelection(); }}
+            onTouchEnd={(e) => { e.preventDefault(); confirmSelection(); }}
           >
             {multiSelected.length}명 선택 완료
           </button>

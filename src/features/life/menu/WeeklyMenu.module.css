@@ -153,16 +153,7 @@
 .hiddenInput { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
 /* 액션 */
-.actions {
-  display: flex;
-  gap: var(--dia-space-2);
-  position: sticky;
-  bottom: 0;
-  margin-top: auto;                 /* 내용 짧아도 하단으로, 길면 스티키로 항상 보임 */
-  padding: 10px 0 calc(4px + env(safe-area-inset-bottom, 0px));
-  background: var(--dia-bg);
-  z-index: 1;
-}
+.actions { display: flex; gap: var(--dia-space-2); margin-top: 4px; }
 .primaryBtn {
   flex: 1;
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;

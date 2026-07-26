@@ -228,14 +228,7 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
 
         <input ref={fileRef} type="file" accept="image/*,application/pdf" className={styles.hiddenInput} onChange={onFile} />
 
-        {msg && <p className={styles.err}>{msg}</p>}
-        <p className={styles.notice}>
-          {tab === 'next'
-            ? '다음주 메뉴를 미리 올려두면 일요일 밤에 자동으로 바뀌어요. 이번주 메뉴는 그대로 있습니다.'
-            : '사진 또는 PDF 파일을 올릴 수 있어요. 올린 메뉴는 전 직원이 함께 봅니다.'}
-        </p>
-
-        {/* 사진이 길어도 항상 닿도록 하단 고정 */}
+        {/* 버튼은 사진 바로 아래(일반 흐름) — 사진을 가리지 않음. 긴 사진은 스크롤로 내려서 봄 */}
         {!loading && (
           <div className={styles.actions}>
             <button type="button" className={styles.primaryBtn} onClick={() => fileRef.current?.click()} disabled={uploading}>
@@ -248,6 +241,13 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
             )}
           </div>
         )}
+
+        {msg && <p className={styles.err}>{msg}</p>}
+        <p className={styles.notice}>
+          {tab === 'next'
+            ? '다음주 메뉴를 미리 올려두면 일요일 밤에 자동으로 바뀌어요. 이번주 메뉴는 그대로 있습니다.'
+            : '사진 또는 PDF 파일을 올릴 수 있어요. 올린 메뉴는 전 직원이 함께 봅니다.'}
+        </p>
       </div>
     </div>
   );

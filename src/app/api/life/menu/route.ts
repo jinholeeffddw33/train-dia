@@ -38,7 +38,11 @@ async function listMenu(): Promise<FileRow[]> {
 
 function toItem(f: FileRow) {
   const path = `${FOLDER}/${f.name}`;
-  const url = serverSupabase!.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  const base = serverSupabase!.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  // 파일명이 주(週)로 고정 + 덮어쓰기(upsert)라 교체해도 URL이 같아 캐시가 옛 사진을 보여준다.
+  // 갱신 시각을 버전 표식으로 붙여, 교체할 때마다 URL이 달라지게 → 항상 최신 사진.
+  const ver = f.updated_at ?? f.created_at ?? '';
+  const url = ver ? `${base}?v=${encodeURIComponent(ver)}` : base;
   return {
     url,
     kind: f.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image',

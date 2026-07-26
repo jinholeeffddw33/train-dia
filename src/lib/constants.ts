@@ -1,7 +1,7 @@
 // ===== DISPLAY CONSTANTS (SSOT — 하드코딩 방지) =====
 
 /** 앱 버전 — 표지·설정 등 모든 표시 위치에서 이 상수를 참조 */
-export const APP_VERSION = 'v3.6.6';
+export const APP_VERSION = 'v3.6.7';
 
 
 export const LABELS = {

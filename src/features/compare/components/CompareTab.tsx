@@ -298,6 +298,13 @@ export default function CompareTab() {
         open={selectorOpen}
         onClose={handleModalClose}
         title={`기관사 선택 (${multiSelected.length}명)`}
+        footer={
+          /* 스크롤 밖 고정 하단바 — 안드로이드에서 sticky 푸터 탭이 씹히던 문제 해소.
+             data-press 없음(눌림효과가 터치 클릭 취소) → 모양은 .z-cta:active 가 담당. */
+          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
+            {multiSelected.length}명 선택 완료
+          </button>
+        }
       >
         <div className={styles.searchWrap}>
           <input
@@ -346,13 +353,6 @@ export default function CompareTab() {
               );
             })
           )}
-        </div>
-        <div className={styles.modalFooter}>
-          {/* data-press 제거 — 전역 눌림효과(GlassTapSweep)가 이 버튼의 click 을 취소해
-              '선택 완료가 안 눌리던' 근본 원인이었음. 눌림 모양은 .z-cta:active 가 대신 낸다. */}
-          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
-            {multiSelected.length}명 선택 완료
-          </button>
         </div>
       </Modal>
     </div>

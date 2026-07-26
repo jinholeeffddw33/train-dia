@@ -10,6 +10,8 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  /** 스크롤 밖 고정 하단바(선택). 여기 둔 버튼은 목록 스크롤/sticky 영향 없이 터치 클릭이 확실히 먹는다. */
+  footer?: React.ReactNode;
 }
 
 /**
@@ -22,7 +24,7 @@ interface ModalProps {
  *  4) dim 은 시트의 *형제* 레이어 — 부모 opacity 페이드 시 시트까지 투명해지는 버그 회피
  *  5) ESC/배경탭/스크롤락/포커스 유지
  */
-export default function Modal({ open, onClose, title, children }: ModalProps) {
+export default function Modal({ open, onClose, title, children, footer }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -164,6 +166,8 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
           </div>
         )}
         <div className={styles.body}>{children}</div>
+        {/* 고정 하단바 — 스크롤 본문(.body) 밖. sticky-in-scroll 이 안드로이드에서 탭을 삼키는 문제 회피. */}
+        {footer && <div className={styles.footerBar}>{footer}</div>}
       </div>
     </div>
   );

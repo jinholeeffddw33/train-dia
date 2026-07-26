@@ -101,6 +101,15 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* 고정 하단바 — 스크롤 밖(.content 의 flex 자식). 목록이 길어도 항상 보이고,
+   sticky-in-scroll 이 아니라서 안드로이드 터치 클릭이 확실히 먹는다. */
+.footerBar {
+  flex-shrink: 0;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-top: 1px solid var(--dia-border);
+  background: var(--dia-sheet-fill);
+}
+
 /* 닫힘 연출 — 시트 아래로 슬라이드 + dim 동기 페이드(동일 0.3s·동일 곡선). */
 .closing {
   animation: none;

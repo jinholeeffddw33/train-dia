@@ -476,15 +476,20 @@
   min-height: 48px;
 }
 
-/* 헤더 우측 '완료' — 터치 확실히 먹는 헤더 영역. look 은 전역 .z-cta 가 담당. */
-.headerDone {
-  padding: 8px 18px;
+/* 헤더 우측 '저장' — plain 버튼(z-cta 아님). 안드로이드에서 z-cta 버튼 탭이 안 먹던 정황을 피해
+   X·목록 항목처럼 단순 구조로. 솔리드 블루 + 흰 글자. */
+.headerSave {
+  padding: 9px 18px;
   min-height: 40px;
+  border: none;
   border-radius: var(--dia-radius-full);
+  background: var(--dia-blue);
+  color: var(--dia-text-on-color);
   font-size: var(--dia-text-sm);
   font-weight: 800;
   white-space: nowrap;
 }
+.headerSave:active { transform: scale(0.96); }
 
 /* ── 선택된 기관사 칩 ── */
 .selectedRow {

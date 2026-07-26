@@ -305,10 +305,10 @@ export default function CompareTab() {
         onClose={handleModalClose}
         title="기관사 선택"
         headerAction={
-          /* 완료 = 헤더(터치 안전 영역). 하단 버튼은 안드로이드에서 유독 클릭이 안 먹어 제거하고,
-             선택은 탭 즉시 저장되므로 완료/X 어느 쪽으로 닫아도 유지된다. */
-          <button type="button" className={`z-cta ${styles.headerDone}`} onClick={confirmSelection}>
-            완료{multiSelected.length > 0 ? ` ${multiSelected.length}` : ''}
+          /* 저장 = plain 버튼(z-cta 아님). 안드로이드에서 z-cta 버튼 탭이 안 먹던 정황 →
+             확실히 먹는 X·목록과 같은 단순 버튼으로. 선택은 탭 즉시 저장되므로 저장/X 어느 쪽이든 유지. */
+          <button type="button" className={styles.headerSave} onClick={confirmSelection}>
+            저장{multiSelected.length > 0 ? ` ${multiSelected.length}` : ''}
           </button>
         }
       >

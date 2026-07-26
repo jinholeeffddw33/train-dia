@@ -102,10 +102,12 @@
 }
 
 /* 고정 하단바 — 스크롤 밖(.content 의 flex 자식). 목록이 길어도 항상 보이고,
-   sticky-in-scroll 이 아니라서 안드로이드 터치 클릭이 확실히 먹는다. */
+   sticky-in-scroll 이 아니라서 안드로이드 터치 클릭이 확실히 먹는다.
+   ★ 하단 홈바(제스처) 영역에 버튼이 닿아 터치가 먹히지 않도록 넉넉히 띄운다(env=0 단말도 최소 확보). */
 .footerBar {
   flex-shrink: 0;
   padding: var(--dia-space-3) var(--dia-space-4);
+  padding-bottom: calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--dia-border);
   background: var(--dia-sheet-fill);
 }

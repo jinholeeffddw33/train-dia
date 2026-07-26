@@ -313,6 +313,7 @@ export default function CompareTab() {
             type="button"
             className={`z-cta ${styles.confirmBtn}`}
             onClick={confirmSelection}
+            onTouchStart={() => showToast('완료버튼 터치 감지 ✓', 'info')}
             onTouchEnd={(e) => { e.preventDefault(); confirmSelection(); }}
           >
             {multiSelected.length}명 선택 완료

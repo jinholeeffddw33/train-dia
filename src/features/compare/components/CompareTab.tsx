@@ -128,12 +128,18 @@ export default function CompareTab() {
   };
 
   const togglePerson = (person: Person) => {
-    setMultiSelected((prev) => {
-      const exists = prev.some((p) => p.I === person.I);
-      if (exists) return prev.filter((p) => p.I !== person.I);
-      if (prev.length >= MAX_COUNT) return prev;
-      return [...prev, person];
-    });
+    const exists = multiSelected.some((p) => p.I === person.I);
+    let next: Person[];
+    if (exists) {
+      next = multiSelected.filter((p) => p.I !== person.I);
+    } else {
+      if (multiSelected.length >= MAX_COUNT) return;
+      next = [...multiSelected, person];
+    }
+    setMultiSelected(next);
+    // 탭 즉시 store에 저장 — X·ESC·배경터치 등 어떤 방식으로 닫아도 선택이 유지되고 새로고침에도 남는다.
+    // (예전엔 '선택 완료' 버튼 한 곳에서만 저장 → 그 탭이 눌림효과에 취소되면 저장 자체가 안 됐음)
+    setPersonsBatch(next);
   };
 
   const confirmSelection = () => {
@@ -342,7 +348,9 @@ export default function CompareTab() {
           )}
         </div>
         <div className={styles.modalFooter}>
-          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection} data-press>
+          {/* data-press 제거 — 전역 눌림효과(GlassTapSweep)가 이 버튼의 click 을 취소해
+              '선택 완료가 안 눌리던' 근본 원인이었음. 눌림 모양은 .z-cta:active 가 대신 낸다. */}
+          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
             {multiSelected.length}명 선택 완료
           </button>
         </div>

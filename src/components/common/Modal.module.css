@@ -70,6 +70,14 @@
   flex-shrink: 0;
 }
 
+/* 헤더 우측 액션 그룹(완료 등) + 닫기 X — 헤더는 터치가 확실히 먹는 안전 영역 */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-shrink: 0;
+}
+
 .title {
   font-size: var(--dia-text-lg);
   font-weight: var(--dia-weight-bold);

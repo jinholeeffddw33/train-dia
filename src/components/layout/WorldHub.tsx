@@ -167,9 +167,6 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
                   <span className={styles.serviceLabel}>{s.label}</span>
                   <span className={styles.serviceDesc}>{s.desc}</span>
                 </div>
-                <span className={styles.svcChevron} aria-hidden>
-                  <ChevronRight size={15} />
-                </span>
                 {showBadge && (
                   <span className={styles.serviceBadge}>
                     {safetyTotal > 99 ? '99+' : safetyTotal}

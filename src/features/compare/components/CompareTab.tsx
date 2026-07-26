@@ -303,13 +303,12 @@ export default function CompareTab() {
       <Modal
         open={selectorOpen}
         onClose={handleModalClose}
-        title={`기관사 선택 (${multiSelected.length}명)`}
-        footer={
-          /* 스크롤 밖 고정 하단바. 근본 원인은 이 버튼이 하단 홈바(제스처) dead-zone 에 깔려
-             터치가 안 먹던 것 → footerBar 를 24px 띄워 해결. 나머지는 X·목록과 동일하게 순수 onClick.
-             (onTouchStart 로 뭔가 하면 그 DOM 변화가 뒤따르는 클릭을 취소하므로 절대 넣지 말 것) */
-          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
-            {multiSelected.length}명 선택 완료
+        title="기관사 선택"
+        headerAction={
+          /* 완료 = 헤더(터치 안전 영역). 하단 버튼은 안드로이드에서 유독 클릭이 안 먹어 제거하고,
+             선택은 탭 즉시 저장되므로 완료/X 어느 쪽으로 닫아도 유지된다. */
+          <button type="button" className={`z-cta ${styles.headerDone}`} onClick={confirmSelection}>
+            완료{multiSelected.length > 0 ? ` ${multiSelected.length}` : ''}
           </button>
         }
       >

@@ -12,6 +12,8 @@ interface ModalProps {
   children: React.ReactNode;
   /** 스크롤 밖 고정 하단바(선택). 여기 둔 버튼은 목록 스크롤/sticky 영향 없이 터치 클릭이 확실히 먹는다. */
   footer?: React.ReactNode;
+  /** 헤더 우측(닫기 X 옆) 액션(선택). 헤더는 안드로이드에서도 터치가 확실히 먹는 안전 영역. */
+  headerAction?: React.ReactNode;
 }
 
 /**
@@ -24,7 +26,7 @@ interface ModalProps {
  *  4) dim 은 시트의 *형제* 레이어 — 부모 opacity 페이드 시 시트까지 투명해지는 버그 회피
  *  5) ESC/배경탭/스크롤락/포커스 유지
  */
-export default function Modal({ open, onClose, title, children, footer }: ModalProps) {
+export default function Modal({ open, onClose, title, children, footer, headerAction }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -155,14 +157,17 @@ export default function Modal({ open, onClose, title, children, footer }: ModalP
         {title && (
           <div className={styles.headerArea}>
             <h2 className={styles.title}>{title}</h2>
-            <button
-              type="button"
-              className={styles.closeBtn}
-              onClick={requestClose}
-              aria-label="닫기"
-            >
-              <X size={18} strokeWidth={2.5} />
-            </button>
+            <div className={styles.headerRight}>
+              {headerAction}
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={requestClose}
+                aria-label="닫기"
+              >
+                <X size={18} strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
         )}
         <div className={styles.body}>{children}</div>

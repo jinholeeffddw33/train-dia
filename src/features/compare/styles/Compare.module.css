@@ -476,6 +476,16 @@
   min-height: 48px;
 }
 
+/* 헤더 우측 '완료' — 터치 확실히 먹는 헤더 영역. look 은 전역 .z-cta 가 담당. */
+.headerDone {
+  padding: 8px 18px;
+  min-height: 40px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 /* ── 선택된 기관사 칩 ── */
 .selectedRow {
   display: flex;

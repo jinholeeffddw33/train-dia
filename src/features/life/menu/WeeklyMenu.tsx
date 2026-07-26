@@ -115,8 +115,15 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
       let payload: Blob = f;
       let fname = f.name || 'menu';
       if (!isPdf) {
-        payload = await compressImage(f);
-        fname = 'menu.jpg';
+        try {
+          // 브라우저에서 리사이즈·압축(용량↓)
+          payload = await compressImage(f);
+          fname = 'menu.jpg';
+        } catch {
+          // 압축 실패(아이폰 HEIC·대용량·일부 브라우저 등) → 원본 사진 그대로 업로드
+          payload = f;
+          fname = f.name || 'menu.jpg';
+        }
       }
       const fd = new FormData();
       fd.append('file', new File([payload], fname, { type: payload.type || f.type || 'application/octet-stream' }));

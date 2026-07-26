@@ -305,17 +305,10 @@ export default function CompareTab() {
         onClose={handleModalClose}
         title={`기관사 선택 (${multiSelected.length}명)`}
         footer={
-          /* 스크롤 밖 고정 하단바.
-             ★ 안드로이드 '고스트 클릭' 차단: 터치로 닫는 순간 뒤늦게 합성된 click 이 아래 '기관사 선택'을
-                눌러 모달이 다시 열리던 것이 근본 원인. onTouchEnd 에서 preventDefault → 합성 click 차단 +
-                즉시 confirmSelection. 마우스(PC)는 onTouchEnd 미발생 → onClick 이 처리. */
-          <button
-            type="button"
-            className={`z-cta ${styles.confirmBtn}`}
-            onClick={confirmSelection}
-            onTouchStart={() => showToast('완료버튼 터치 감지 ✓', 'info')}
-            onTouchEnd={(e) => { e.preventDefault(); confirmSelection(); }}
-          >
+          /* 스크롤 밖 고정 하단바. 근본 원인은 이 버튼이 하단 홈바(제스처) dead-zone 에 깔려
+             터치가 안 먹던 것 → footerBar 를 24px 띄워 해결. 나머지는 X·목록과 동일하게 순수 onClick.
+             (onTouchStart 로 뭔가 하면 그 DOM 변화가 뒤따르는 클릭을 취소하므로 절대 넣지 말 것) */
+          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
             {multiSelected.length}명 선택 완료
           </button>
         }

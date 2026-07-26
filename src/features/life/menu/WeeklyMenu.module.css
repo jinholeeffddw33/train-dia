@@ -111,7 +111,8 @@
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* 메뉴 이미지 */
-.imgLink { display: block; border-radius: var(--dia-radius-xl); overflow: hidden; border: 1px solid var(--dia-border); box-shadow: var(--dia-card-depth); }
+/* flex-shrink:0 필수 — 없으면 flex 세로정렬에서 사진이 줄어들며 overflow:hidden 으로 아래가 잘리고 스크롤도 안 됨 */
+.imgLink { display: block; flex-shrink: 0; border-radius: var(--dia-radius-xl); overflow: hidden; border: 1px solid var(--dia-border); box-shadow: var(--dia-card-depth); }
 .imgLink:active { transform: scale(0.995); }
 .menuImg { display: block; width: 100%; height: auto; }
 

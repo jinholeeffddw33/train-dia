@@ -299,9 +299,14 @@ export default function CompareTab() {
         onClose={handleModalClose}
         title={`기관사 선택 (${multiSelected.length}명)`}
         footer={
-          /* 스크롤 밖 고정 하단바 — 안드로이드에서 sticky 푸터 탭이 씹히던 문제 해소.
-             data-press 없음(눌림효과가 터치 클릭 취소) → 모양은 .z-cta:active 가 담당. */
-          <button type="button" className={`z-cta ${styles.confirmBtn}`} onClick={confirmSelection}>
+          /* 스크롤 밖 고정 하단바. 안드로이드에서 click 이 씹혀도(스크롤/눌림효과 등) 확실히 실행되도록
+             터치는 onPointerUp(손 뗄 때)로 처리 — click 합성 억제 자체를 우회. 마우스는 onClick. */
+          <button
+            type="button"
+            className={`z-cta ${styles.confirmBtn}`}
+            onClick={confirmSelection}
+            onPointerUp={(e) => { if (e.pointerType !== 'mouse') confirmSelection(); }}
+          >
             {multiSelected.length}명 선택 완료
           </button>
         }

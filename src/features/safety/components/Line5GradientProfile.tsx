@@ -91,7 +91,7 @@ function buildH(stations: string[], dir: 'up' | 'down', br: boolean, arrowLeft: 
 }
 
 // ── 세로(막대) — DOM 문자열 ──
-const px = (g: number) => Math.max(16, Math.round((g - 15) * 4.6));
+const px = (g: number) => Math.max(14, Math.round((g - 15) * 3.7));
 const segFor = (x: string, y: string, br?: boolean) => INC.filter((i) => !!i.br === !!br && ((i.a === x && i.b === y) || (i.a === y && i.b === x)));
 const depotFor = (st: string) => DEPOT.filter((d) => d.station === st);
 function bcell(list: (Inc | Depot)[], side: 'R' | 'L'): string {

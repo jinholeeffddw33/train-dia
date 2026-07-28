@@ -72,7 +72,7 @@
 .term { border-color: var(--dia-purple); color: var(--dia-purple); font-weight: 800; }
 .jct { border-color: var(--dia-border-strong); background: var(--dia-surface-hover); }
 
-.brow { display: grid; grid-template-columns: minmax(0, 1fr) 90px 14px 90px minmax(0, 1fr); align-items: center; padding: 2px 0; position: relative; z-index: 2; }
+.brow { display: grid; grid-template-columns: minmax(0, 1fr) 74px 10px 74px minmax(0, 1fr); align-items: center; padding: 2px 0; position: relative; z-index: 2; }
 .zone { display: flex; align-items: center; }
 .zoneL { justify-content: flex-end; }
 .zoneR { justify-content: flex-start; }
@@ -81,7 +81,7 @@
 .barL { background: var(--dia-sky); clip-path: polygon(0 0, 100% 48%, 100% 100%, 0 100%); }
 .depot { opacity: 0.85; outline: 2px dashed var(--dia-surface); outline-offset: -4px; }
 
-.cap { min-width: 0; }
+.cap { min-width: 0; overflow-wrap: anywhere; }
 .capL { text-align: right; padding-right: 8px; }
 .capR { text-align: left; padding-left: 8px; }
 .l1 { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }

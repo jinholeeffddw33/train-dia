@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Gamepad2, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
@@ -49,29 +49,34 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
 }
 
 type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex';
-type View = 'home' | 'games' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp' | 'menu';
+type View = 'home' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp' | 'menu';
 
-const GAMES: { id: GameId; label: string; icon: typeof Zap; color: string; desc: string }[] = [
-  { id: 'reaction', label: '반응속도 테스트', icon: Zap, color: 'amber', desc: '초록색이 되면 터치! 얼마나 빠른지 측정' },
-  { id: 'snake', label: '사과 먹기', icon: Bug, color: 'green', desc: '사과를 먹고 장애물을 피하세요!' },
-  { id: 'mental', label: '암산 스프린트', icon: Brain, color: 'blue', desc: '60초 안에 계산 문제 최대한 많이!' },
-  { id: 'simon', label: '색깔 따라하기', icon: Palette, color: 'purple', desc: '순서를 기억하고 똑같이 눌러보세요' },
-  { id: 'halli', label: '할리갈리', icon: Bell, color: 'amber', desc: '같은 과일 5개면 종을 쳐라!' },
+// 홈에 직접 노출하는 게임 타일 — 1탭에 바로 실행. 중간 목록 화면 없음.
+// 게임 6개 먼저 → 온라인대전(7) → 명예의전당(8, 게임 아님 → 골드로 차별화).
+type HomeGameKey = GameId | 'hof';
+const HOME_GAMES: { key: HomeGameKey; label: string; icon: typeof Zap; bg: string; variant?: 'hof' }[] = [
+  { key: 'apex',     label: 'APEX',       icon: Bike,    bg: 'iconBgAmber' },
+  { key: 'reaction', label: '반응속도',    icon: Zap,     bg: 'iconBgAmber' },
+  { key: 'snake',    label: '사과 먹기',   icon: Bug,     bg: 'iconBgGreen' },
+  { key: 'mental',   label: '암산',        icon: Brain,   bg: 'iconBgBlue' },
+  { key: 'simon',    label: '색깔 맞추기', icon: Palette,  bg: 'iconBgPurple' },
+  { key: 'halli',    label: '할리갈리',    icon: Bell,    bg: 'iconBgAmber' },
+  { key: 'multi',    label: '온라인 대전', icon: Users,   bg: 'iconBgPurple' },
+  { key: 'hof',      label: '명예의 전당', icon: Trophy,  bg: 'iconBgAmber', variant: 'hof' },
 ];
 
 export default function LifeWorld({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<View>('home');
 
-  // 뒤로가기 Level 1: 비-홈 뷰 → 홈
+  // 뒤로가기: 비-홈 뷰(게임/명예전당/분재/…) → 홈. 게임이 홈에서 1탭 실행이라 중간 단계 없음.
   const goLifeHome = useCallback(() => setView('home'), []);
   useHistoryBack('life-l1', goLifeHome, view !== 'home');
 
-  // 뒤로가기 Level 2: game/hof → games
-  const isDepth2 = (typeof view === 'object' && view.type === 'game') || view === 'hof';
-  const goToParent2 = useCallback(() => {
-    if ((typeof view === 'object' && view.type === 'game') || view === 'hof') setView('games');
-  }, [view]);
-  useHistoryBack('life-l2', goToParent2, isDepth2);
+  // 홈 게임 타일 → 바로 실행(명예의전당은 hof 뷰).
+  const launchHomeGame = useCallback((key: HomeGameKey) => {
+    if (key === 'hof') setView('hof');
+    else setView({ type: 'game', gameId: key });
+  }, []);
 
   // ── 홈 화면 (DAB 휴식 모듈) ──
   if (view === 'home') {
@@ -144,122 +149,39 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
             <ChevronRight size={18} className={styles.dabCardArrow} />
           </button>
 
-          <button type="button" className={`${styles.dabCard} ${styles.dabCardPeach}`} onClick={() => setView('games')}>
-            <div className={styles.dabCardIcon}>
-              <Gamepad2 size={26} strokeWidth={2} />
-            </div>
-            <div className={styles.dabCardText}>
-              <span className={styles.dabCardLabel}>미니 게임</span>
-              <span className={styles.dabCardDesc}>가벼운 두뇌 게임으로 기분 전환</span>
-            </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
-          </button>
         </div>
-      </div>
-    );
-  }
 
-  // ── 게임 목록 (기존 유지) ──
-  if (view === 'games') {
-    return (
-      <div className={styles.wrap}>
-        <div className={styles.lifeHeader}>
-          <button type="button" className={styles.backBtn} onClick={() => setView('home')} aria-label="뒤로가기">
-            <ArrowLeft size={20} strokeWidth={2} />
-          </button>
-          <h2 className={styles.headerTitle}>미니 게임</h2>
-        </div>
+        {/* 🎮 게임 — 홈에 직접 노출. 타일 1탭에 바로 실행(중간 목록 화면 없음). */}
         <div className={styles.menuContent}>
-          <button
-            type="button"
-            className={`${styles.gameCard} ${styles.gameCardHof}`}
-            onClick={() => setView('hof')}
-          >
-            <div className={`${styles.gameCardIcon} ${styles.iconBgAmber}`}>
-              <Trophy size={24} />
-            </div>
-            <div className={styles.gameCardText}>
-              <span className={styles.gameCardLabel}>
-                <span className={styles.hofCrown} aria-hidden>👑</span>
-                명예의 전당
-              </span>
-              <span className={styles.gameCardDesc}>매월 1·2·3등 영구 기록</span>
-            </div>
-            <ChevronRight size={18} className={styles.gameEntryArrow} />
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.gameCard} ${styles.gameCardMulti}`}
-            onClick={() => setView({ type: 'game', gameId: 'multi' })}
-          >
-            <div className={`${styles.gameCardIcon} ${styles.iconBgPurple}`}>
-              <Users size={24} />
-            </div>
-            <div className={styles.gameCardText}>
-              <span className={styles.gameCardLabel}>
-                온라인 대전
-                <span className={styles.liveBadge}>LIVE</span>
-              </span>
-              <span className={styles.gameCardDesc}>동료와 함께! 오목 · 오델로</span>
-            </div>
-            <ChevronRight size={18} className={styles.gameEntryArrow} />
-          </button>
-
-          <div className={styles.sectionLabel}>혼자 즐기기</div>
-
-          {/* APEX RUSH — 3D 게임, 최상단 full 그라데이션 강조 카드 (진호 2026-07-08) */}
-          <button
-            type="button"
-            className={`${styles.gameCard} ${styles.gameCardApex}`}
-            onClick={() => setView({ type: 'game', gameId: 'apex' })}
-          >
-            <div className={styles.gameCardIcon}>
-              <Bike size={24} />
-            </div>
-            <div className={styles.gameCardText}>
-              <span className={styles.gameCardLabel}>
-                APEX RUSH
-                <span className={styles.apexBadge}>3D</span>
-              </span>
-              <span className={styles.gameCardDesc}>3D 다운힐 라이딩 · 트릭 &amp; 슈퍼부스트</span>
-            </div>
-            <ChevronRight size={18} className={styles.gameEntryArrow} />
-          </button>
-
-          {GAMES.map((g) => {
-            const Icon = g.icon;
-            return (
-              <button
-                key={g.id}
-                type="button"
-                className={styles.gameCard}
-                onClick={() => setView({ type: 'game', gameId: g.id })}
-              >
-                <div className={`${styles.gameCardIcon} ${
-                  g.color === 'amber' ? styles.iconBgAmber :
-                  g.color === 'blue' ? styles.iconBgBlue :
-                  g.color === 'purple' ? styles.iconBgPurple :
-                  styles.iconBgGreen
-                }`}>
-                  <Icon size={24} />
-                </div>
-                <div className={styles.gameCardText}>
-                  <span className={styles.gameCardLabel}>{g.label}</span>
-                  <span className={styles.gameCardDesc}>{g.desc}</span>
-                </div>
-                <ChevronRight size={18} className={styles.gameEntryArrow} />
-              </button>
-            );
-          })}
+          <div className={styles.sectionLabel}>🎮 게임 — 눌러서 바로 시작</div>
+          <div className={styles.homeGameGrid}>
+            {HOME_GAMES.map((g) => {
+              const Icon = g.icon;
+              return (
+                <button
+                  key={g.key}
+                  type="button"
+                  className={`${styles.homeGameTile} ${g.variant === 'hof' ? styles.homeGameTileHof : ''}`}
+                  onClick={() => launchHomeGame(g.key)}
+                  aria-label={g.label}
+                >
+                  {g.variant === 'hof' && <span className={styles.hofCrownTop} aria-hidden>👑</span>}
+                  <span className={`${styles.gameCardIcon} ${styles[g.bg]}`}>
+                    <Icon size={20} />
+                  </span>
+                  <span className={`${styles.homeGameTileLabel} ${g.variant === 'hof' ? styles.homeGameTileLabelHof : ''}`}>{g.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
   }
 
-  // ── 게임 플레이 (기존 유지) ──
+  // ── 게임 플레이 ── (뒤로가기 = 홈, 중간 목록 화면 없음)
   if (typeof view === 'object' && view.type === 'game') {
-    const goBack = () => setView('games');
+    const goBack = () => setView('home');
     return (
       <LifeErrorBoundary onBack={goBack}>
         <Suspense fallback={lifeLoading}>
@@ -275,9 +197,9 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     );
   }
 
-  // ── 명예의 전당 ──
+  // ── 명예의 전당 ── (뒤로가기 = 홈)
   if (view === 'hof') {
-    const goBack = () => setView('games');
+    const goBack = () => setView('home');
     return (
       <LifeErrorBoundary onBack={goBack}>
         <Suspense fallback={lifeLoading}>

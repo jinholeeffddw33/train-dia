@@ -136,6 +136,62 @@
   color: var(--dia-text-tertiary);
 }
 
+/* ── 홈 게임 — 4열 × 2줄 컴팩트 타일 (1탭 실행) ── */
+.homeGameGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dia-space-2);
+}
+.homeGameTile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: var(--dia-space-3) 4px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  /* 3D 입체 — 상단 인셋 하이라이트 + 하단 깊이 그림자(솟아오른 느낌) */
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dia-transition-fast), transform var(--dia-transition-fast), box-shadow var(--dia-transition-fast);
+}
+.homeGameTile:active { background: var(--dia-surface-hover); transform: scale(0.95); box-shadow: var(--dia-3d-pressed); }
+/* 컴팩트라 아이콘을 축소 — 3D 컬러/그림자는 .gameCardIcon 재사용 */
+.homeGameGrid .gameCardIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+}
+.homeGameTileLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  text-align: center;
+  line-height: 1.2;
+  word-break: keep-all;
+}
+
+/* 명예의 전당 — 게임과 헷갈리지 않게 '명예로운' 골드 톤으로 차별화 */
+.homeGameTileHof {
+  background: var(--dia-amber-dim);
+  border-color: var(--dia-amber);
+}
+.homeGameTileLabelHof {
+  color: var(--dia-amber-text);
+  font-weight: 800;
+}
+.hofCrownTop {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: var(--dia-text-meta);
+  line-height: 1;
+}
+
 .iconBgRose { background: rgba(244, 63, 94, 0.1); }
 .iconBgGreen { background: rgba(34, 197, 94, 0.1); }
 .iconBgBlue { background: rgba(59, 130, 246, 0.1); }

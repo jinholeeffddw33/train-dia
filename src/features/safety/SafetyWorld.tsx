@@ -1,7 +1,8 @@
 'use client';
 
 import { Component, type ReactNode, useState, useEffect, useCallback } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, TrendingUp, ChevronRight } from 'lucide-react';
+import { LINE5_PROFILE_ID } from './constants';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAlertStore } from '@/stores/alert';
 import { useHazardStore } from '@/stores/hazard';
@@ -16,6 +17,7 @@ import HazardDetail from './components/HazardDetail';
 import NoticeForm from './components/NoticeForm';
 import SafetyDashboard from './components/SafetyDashboard';
 import SafetyTipsView from './components/SafetyTipsView';
+import Line5GradientProfile from './components/Line5GradientProfile';
 import { isAdmin, getUserRole } from '@/lib/auth';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
@@ -131,6 +133,17 @@ function CategoryListView({
         <div className={styles.adminAlert}>관리자만 등록할 수 있어요</div>
       )}
       <main className={styles.content}>
+        {/* 위험개소 고정 항목 — 제목 클릭 시 5호선 상구배 단면도 상세로 진입 */}
+        {cardKey === 'hazard' && (
+          <button type="button" className={styles.pinnedCard} onClick={() => onSelect(LINE5_PROFILE_ID)}>
+            <span className={styles.pinnedIcon}><TrendingUp size={22} strokeWidth={2.2} /></span>
+            <span className={styles.pinnedText}>
+              <span className={styles.pinnedTitle}>5호선 상구배 단면도</span>
+              <span className={styles.pinnedSub}>20‰ 초과 오르막 구간 · 가로/세로 보기</span>
+            </span>
+            <ChevronRight size={18} className={styles.pinnedChevron} aria-hidden />
+          </button>
+        )}
         {loading && reports.length === 0 ? (
           <div className={styles.loadingState}>
             <span className={styles.loadingDot} />
@@ -138,11 +151,13 @@ function CategoryListView({
             <span className={styles.loadingDot} />
           </div>
         ) : reports.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>{emptyConfig.icon}</span>
-            <p className={styles.emptyText}>{emptyConfig.text}</p>
-            <p className={styles.emptyHint}>{emptyConfig.hint}</p>
-          </div>
+          cardKey === 'hazard' ? null : (
+            <div className={styles.emptyState}>
+              <span className={styles.emptyIcon}>{emptyConfig.icon}</span>
+              <p className={styles.emptyText}>{emptyConfig.text}</p>
+              <p className={styles.emptyHint}>{emptyConfig.hint}</p>
+            </div>
+          )
         ) : (
           <HazardList onSelect={onSelect} category={category} cardKey={cardKey} />
         )}
@@ -265,12 +280,28 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   // ── 상세 화면 (위험/조치/점검 공통) ──
   if (typeof view === 'object' && view.type === 'detail') {
+    const backToList = () => setView({ type: 'list', category: view.category, cardKey: view.cardKey });
+    // 고정 항목 → 5호선 상구배 단면도
+    if (view.id === LINE5_PROFILE_ID) {
+      return (
+        <SafetyErrorBoundary onBack={backToList}>
+          <div className={styles.wrap}>
+            <header className={styles.header}>
+              <button type="button" className={styles.backBtn} onClick={backToList} aria-label="뒤로가기">
+                <ArrowLeft size={20} strokeWidth={2} />
+              </button>
+              <h1 className={styles.headerTitle}>5호선 상구배 단면도</h1>
+            </header>
+            <main className={styles.content}>
+              <Line5GradientProfile />
+            </main>
+          </div>
+        </SafetyErrorBoundary>
+      );
+    }
     return (
-      <SafetyErrorBoundary onBack={() => setView({ type: 'list', category: view.category, cardKey: view.cardKey })}>
-        <HazardDetail
-          reportId={view.id}
-          onBack={() => setView({ type: 'list', category: view.category, cardKey: view.cardKey })}
-        />
+      <SafetyErrorBoundary onBack={backToList}>
+        <HazardDetail reportId={view.id} onBack={backToList} />
       </SafetyErrorBoundary>
     );
   }
@@ -288,7 +319,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
         emptyConfig={{ icon: display.emptyIcon, text: display.emptyText, hint: display.emptyHint }}
         sabun={sabun}
         onBack={goHome}
-        onSelect={(id) => { markAsRead(id); setView({ type: 'detail', category: cat, cardKey, id }); }}
+        onSelect={(id) => { if (id !== LINE5_PROFILE_ID) markAsRead(id); setView({ type: 'detail', category: cat, cardKey, id }); }}
         onShowForm={() => setShowHazardForm(true)}
         showForm={showHazardForm}
         onCloseForm={() => setShowHazardForm(false)}
@@ -316,7 +347,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
 
   /** 대시보드 카드 클릭 시 해당 리포트 상세보기로 바로 진입 */
   const handleOpenReport = (reportId: string, cardKey: CardKey) => {
-    markAsRead(reportId);
+    if (reportId !== LINE5_PROFILE_ID) markAsRead(reportId);
     let cat: SafetyCategory;
     if (cardKey === 'hazard') cat = 'hazard';
     else if (cardKey === 'incident') cat = 'action';

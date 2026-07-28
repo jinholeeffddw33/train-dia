@@ -423,3 +423,38 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-text-tertiary);
 }
+
+/* 위험개소 고정 항목 — 5호선 상구배 단면도 진입 카드 */
+.pinnedCard {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: var(--dia-space-4);
+  margin-bottom: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-purple);
+  border-radius: var(--dia-radius-xl);
+  box-shadow: var(--dia-shadow-sm);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.pinnedCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
+.pinnedIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--dia-radius-lg);
+  flex-shrink: 0;
+  color: var(--dia-text-on-color);
+  background: var(--dia-purple);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+}
+.pinnedText { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pinnedTitle { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
+.pinnedSub { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-weight: 600; }
+.pinnedChevron { color: var(--dia-text-tertiary); flex-shrink: 0; }

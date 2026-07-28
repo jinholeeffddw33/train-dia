@@ -1094,3 +1094,35 @@
 }
 
 /* (옛 주얼 아이콘 스타일 제거 — 글리프 뒤 회색 글로우/테두리/배경 잔재였음) */
+
+/* 주요 위험개소 — 5호선 상구배 단면도 고정 카드 (3열 전체 폭) */
+.hazardProfileCard {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-purple);
+  border-radius: var(--dia-radius-lg);
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hazardProfileCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
+.hazardProfileIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--dia-radius-md);
+  flex-shrink: 0;
+  color: var(--dia-text-on-color);
+  background: var(--dia-purple);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+}
+.hazardProfileText { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.hazardProfileTitle { font-size: var(--dia-text-base); font-weight: var(--dia-weight-bold); color: var(--dia-text-primary); }
+.hazardProfileDesc { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-weight: 600; }
+.hazardProfileChevron { color: var(--dia-text-tertiary); flex-shrink: 0; }

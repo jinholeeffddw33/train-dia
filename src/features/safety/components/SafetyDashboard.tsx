@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ArrowLeft, AlertTriangle, TrainFront, Gauge, GraduationCap,
-  Megaphone, ChevronRight, Bell, Check, X, Lightbulb,
+  Megaphone, ChevronRight, Bell, Check, X, Lightbulb, TrendingUp,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
+import { LINE5_PROFILE_ID } from '../constants';
 
 /** DB report 형태 (필요한 필드만) */
 interface ReportItem {
@@ -651,6 +652,19 @@ export default function SafetyDashboard({
             </div>
           </div>
           <div className={styles.hazardGrid}>
+            {/* 고정 항목 — 5호선 상구배 단면도 (누르면 상세로 진입) */}
+            <button
+              type="button"
+              className={`${styles.itemBtn} ${styles.hazardProfileCard}`}
+              onClick={() => onOpenReport?.(LINE5_PROFILE_ID, 'hazard')}
+            >
+              <span className={styles.hazardProfileIcon}><TrendingUp size={18} strokeWidth={2.2} /></span>
+              <span className={styles.hazardProfileText}>
+                <span className={styles.hazardProfileTitle}>5호선 상구배 단면도</span>
+                <span className={styles.hazardProfileDesc}>20‰ 초과 오르막 · 가로/세로 보기</span>
+              </span>
+              <ChevronRight size={16} className={styles.hazardProfileChevron} aria-hidden />
+            </button>
             {realHazardTop.length > 0 ? (
               realHazardTop.map((h) => {
                 const severe = h.severity === '위험';

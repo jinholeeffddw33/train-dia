@@ -711,6 +711,12 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
             <div className={styles.explanation}>
               {selected === q.answer ? '정답. ' : '오답. '}{q.explanation}
             </div>
+            {q.source && (
+              <div className={styles.quizSource}>
+                <BookOpen size={13} aria-hidden />
+                <span className={styles.quizSourceText}>출처 · {q.source}</span>
+              </div>
+            )}
             <button ref={nextBtnRef} type="button" className={styles.nextBtn} onClick={handleNext}>
               {currentIdx < questions.length - 1 ? '다음 문제' : '결과 보기'}
             </button>

@@ -2451,6 +2451,30 @@
   border: 1px solid rgba(59, 130, 246, 0.1);
 }
 
+/* 문항 출처 — 어느 교재 어느 절에서 출제됐는지 표시 */
+.quizSource {
+  margin-top: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-2);
+  border: 1px solid var(--dia-border-light);
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+  line-height: var(--dia-leading-normal);
+}
+
+.quizSource svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.quizSourceText {
+  min-width: 0;
+  word-break: keep-all;
+}
+
 .nextBtn {
   margin-top: var(--dia-space-4);
   width: 100%;

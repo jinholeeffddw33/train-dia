@@ -129,6 +129,7 @@ const REGULATIONS: RegulationDef[] = [
   { id: 'crew-management-rules',  title: '승무원지도운용내규',     shortName: '승무원',   quizUrl: '/data/edu/regulations/crew-management-rules-quiz.json',  totalQuestions: 64 },
   { id: 'operating-staff-rules',  title: '운전관계직원업무내규',   shortName: '운전직원', quizUrl: '/data/edu/regulations/operating-staff-rules-quiz.json',  totalQuestions: 104 },
   { id: 'depot-operation-rules',  title: '차량기지운전취급내규',   shortName: '차량기지', quizUrl: '/data/edu/regulations/depot-operation-rules-quiz.json',  totalQuestions: 126 },
+  { id: 'crew-business-rules',    title: '전동차승무원업무예규',   shortName: '업무예규', quizUrl: '/data/edu/regulations/crew-business-rules-quiz.json',    totalQuestions: 80 },
   { id: 'safety-record-rules',    title: '운전무사고성적심사규정', shortName: '무사고',   quizUrl: '/data/edu/regulations/safety-record-rules-quiz.json',    totalQuestions: 26 },
   { id: 'detail-operation-rules', title: '운전취급세부요령',       shortName: '세부요령', quizUrl: '/data/edu/regulations/detail-operation-rules-quiz.json', totalQuestions: 28 },
   { id: 'hr-rules',               title: '인사규정',               shortName: '인사',     quizUrl: '/data/edu/regulations/hr-rules-quiz.json',               totalQuestions: 58 },

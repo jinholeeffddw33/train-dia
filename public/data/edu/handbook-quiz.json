@@ -266,7 +266,7 @@
         "45km/h 이하"
       ],
       "answer": 1,
-      "explanation": "⚠️ 변경됨 (25 → 20km/h): 1A 신호기부터 검사고까지 수동운전 제한속도 20km/h 이하입니다."
+      "explanation": "1A 신호기부터 검사고까지 수동운전 제한속도는 20km/h 이하입니다. (2025년 25 → 20km/h 변경)"
     },
     {
       "id": "q011",
@@ -551,7 +551,7 @@
         "45km/h 이하"
       ],
       "answer": 1,
-      "explanation": "⚠️ 변경됨 (25 → 20km/h): YARD(기지) 수동운전 제한속도는 20km/h 이하입니다."
+      "explanation": "YARD(기지) 수동운전 제한속도는 20km/h 이하입니다. (2025년 25 → 20km/h 변경)"
     },
     {
       "id": "q030",
@@ -1143,7 +1143,7 @@
       "area": "compare",
       "level": 3,
       "chapter": "ch5",
-      "question": "우진 전동차에서 TC 강제절체 방법은?",
+      "question": "우진 전동차에서 LIU 강제절체 방법은?",
       "choices": [
         "AP.CBSUTC 차단",
         "TCUCB1 차단",
@@ -1151,7 +1151,7 @@
         "SIVCN 차단"
       ],
       "answer": 1,
-      "explanation": "우진은 TCUCB1 차단으로 강제절체합니다."
+      "explanation": "LIU1 고장 시 LIU2로 자동절체되며, 자동절체가 안 되면 LIU1,2 리셋(TCUN OFF/ON) 후 TCUCB1 차단으로 강제절체합니다."
     },
     {
       "id": "q070",
@@ -1203,7 +1203,7 @@
       "area": "compare",
       "level": 3,
       "chapter": "ch5",
-      "question": "1개 출입문 닫힘 불능 시 공통 조치 순서로 올바른 것은?",
+      "question": "ABB 전동차에서 1개 출입문 닫힘 불능 시 조치는?",
       "choices": [
         "회송 → 재개폐",
         "코크 및 이물질 확인 → 출입문 차단장치 '차단'",
@@ -1211,7 +1211,7 @@
         "승객 하차 → 다음 열차 안내"
       ],
       "answer": 1,
-      "explanation": "코크 및 이물질 확인 → 출입문 차단장치 '차단' 취급입니다."
+      "explanation": "ABB는 해당 출입문 코크 및 이물질 확인 후 출입문 차단장치를 “차단(쇄정)” 위치로 절환(BYPASS)합니다. 우진은 비상핸들을 비상위치로 절환, 로템은 DCU 전원스위치 OFF/ON입니다."
     },
     {
       "id": "q074",
@@ -1250,20 +1250,20 @@
       "chapter": "ch5",
       "question": "완전 재기동 순서에서 가장 먼저 하는 것은?",
       "choices": [
-        "역전기 전진",
-        "PAN 하강",
-        "MC 키 OFF",
-        "비상제동 체결"
+        "ABB는 MC 7STEP, 우진·로템은 MC 중립",
+        "PAN 하강 스위치 취급",
+        "역전기 중립",
+        "TCMS 로그인"
       ],
-      "answer": 1,
-      "explanation": "PAN 하강이 먼저입니다."
+      "answer": 0,
+      "explanation": "재기동 순서: ①ABB는 MC 7STEP·우진/로템은 MC 중립 → ②수동모드 전환 → ③PAN 하강 → ④역전기 중립 → ⑤역전기 전진 → ⑥PAN 상승 → ⑦TCMS 로그인"
     },
     {
       "id": "q077",
       "area": "compare",
       "level": 3,
       "chapter": "ch5",
-      "question": "ABB-우진/로템 간 구원연결 시 구원차 판토 상태는?",
+      "question": "ABB(고장차)-우진/로템(구원차) 구원연결 시 고장차 PAN 상태는?",
       "choices": [
         "상승",
         "하강",
@@ -1271,7 +1271,7 @@
         "1량만 상승"
       ],
       "answer": 0,
-      "explanation": "ABB가 구원차일 때 판토 On(상승)입니다."
+      "explanation": "차종별 구원운전 설정표: ABB-우진/로템 조합은 고장차 KEY On, 고장차 PAN 상승, 고장차 EROS 없음, 구원차 EROS N입니다. 반대로 우진/로템-ABB 조합은 고장차 PAN 하강입니다."
     },
     {
       "id": "q078",
@@ -1325,13 +1325,13 @@
       "chapter": "ch5b",
       "question": "차량 재기동 순서로 올바른 것은?",
       "choices": [
-        "판하강→KEY OFF→10초→KEY ON→판상승",
-        "KEY OFF→판하강→판상승→KEY ON",
-        "판상승→KEY OFF→KEY ON→판하강",
-        "KEY ON→판하강→KEY OFF→판상승"
+        "MC 중립(ABB는 7STEP)→수동모드→PAN 하강→역전기 중립→역전기 전진→PAN 상승",
+        "PAN 하강→KEY OFF→10초→KEY ON→PAN 상승",
+        "KEY OFF→PAN 하강→PAN 상승→KEY ON",
+        "PAN 상승→KEY OFF→KEY ON→PAN 하강"
       ],
       "answer": 0,
-      "explanation": "판하강→KEY OFF→10초 후 KEY ON→판상승 순입니다."
+      "explanation": "MC 중립(ABB는 7STEP) → 운전모드 수동 → PAN 하강 → 역전기 중립 → 역전기 전진 → PAN 상승 → TCMS 로그인 순입니다. 역전기만 재투입하는 것은 완전 재기동이 아닙니다."
     },
     {
       "id": "q082",
@@ -1368,15 +1368,15 @@
       "area": "basic_fix",
       "level": 3,
       "chapter": "ch5b",
-      "question": "전체 판토 상승 불능 시 확인해야 할 MR 압력은?",
+      "question": "전체 판토그라프 상승 불능 시 ACM이 구동되는 MR 압력 기준은?",
       "choices": [
         "3kg/cm² 이상",
         "5kg/cm² 이상",
-        "7kg/cm² 이상",
+        "6.5kg/cm² 이상",
         "9kg/cm² 이상"
       ],
-      "answer": 1,
-      "explanation": "MR 압력 5kg/cm² 이상을 확인합니다."
+      "answer": 2,
+      "explanation": "MR 6.5kg/cm²에서 Pan 상승 스위치를 취급하면 ACM이 구동됩니다. 함께 축전지 전압 75V 이상과 MR 압력계를 확인합니다."
     },
     {
       "id": "q085",
@@ -1398,15 +1398,15 @@
       "area": "basic_fix",
       "level": 3,
       "chapter": "ch5b",
-      "question": "SIV 중고장 시 연장급전 불능이면?",
+      "question": "SIV 고장으로 자동 연장급전이 되지 않을 때의 조치는?",
       "choices": [
         "비상운전",
-        "차량 교환",
-        "구원 요청",
-        "회송"
+        "SIVCN1(전부) 또는 SIVCN2(후부) OFF하여 강제 연장급전",
+        "즉시 구원 요청",
+        "즉시 회송"
       ],
       "answer": 1,
-      "explanation": "연장급전 불능 시 차량 교환합니다."
+      "explanation": "연장급전 불능 시 SIVCN1(전부) 또는 SIVCN2(후부)를 OFF하여 강제 연장급전하고, ESKN(연장급전 제어 NFB) 상태를 확인합니다. 중고장인 경우 연장급전 상태로 기지 입고합니다."
     },
     {
       "id": "q087",
@@ -1586,7 +1586,7 @@
         "정상 역행 가능"
       ],
       "answer": 3,
-      "explanation": "TC 고장 시 역행은 불가합니다."
+      "explanation": "TC 고장 현상은 계기등(전압계·전류계) 소등, FIS 모니터 현시불가, 비상전원차단등·연장급전등·LIU절체등 점등입니다. 차량 재기동 후 고장 원인이 소멸하면 4/4 출력으로 정상 운행하고, 동일 고장이 반복되면 1/2 출력으로 차량기지에 입고합니다."
     },
     {
       "id": "q099",
@@ -1653,7 +1653,7 @@
       "area": "abb",
       "level": 3,
       "chapter": "ch5a",
-      "question": "ABB LIU2 자동절체 시간은?",
+      "question": "ABB에서 LIU2로 자동절체가 되지 않을 때 강제절체를 위한 LIU Reset 스위치 취급 시간은?",
       "choices": [
         "10초",
         "15초",
@@ -1661,7 +1661,7 @@
         "30초"
       ],
       "answer": 2,
-      "explanation": "자동절체 안 되면 22초 후 강제절체됩니다."
+      "explanation": "LIU2로 자동절체가 안 된 경우 LIU Reset 스위치를 22초 이상 취급하여 강제절체합니다."
     },
     {
       "id": "q104",
@@ -1698,45 +1698,45 @@
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 MC 키 ON 시 축전지 전압 기준은?",
+      "question": "우진 출고 기동 시 역전기 제동 취급 후 기능시험에 들어가려면 주공기 압력이 얼마여야 하는가?",
       "choices": [
-        "60V 이상",
-        "70V 이상",
-        "75V 이상",
-        "80V 이상"
+        "5~6kg/cm² 이상",
+        "6.5~7kg/cm² 이상",
+        "8~9kg/cm² 이상",
+        "10~12kg/cm² 이상"
       ],
       "answer": 2,
-      "explanation": "MC 키 ON 시 TCMS, ATC 초기화, 축전지 전압 75V 이상을 확인합니다."
+      "explanation": "기동요령 4항: 주공기 압력이 8~9kg/cm² 이상이 될 때까지 대기하고, 압력이 형성되면 역전기 제동을 취급한 후 기능시험을 시행합니다."
     },
     {
       "id": "q107",
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 판토 상승 완료 및 SIV 기동까지 표준시분은?",
+      "question": "우진 CMSB(공기압축기 기동장치) 1개 고장 시 자동으로 어떻게 되는가?",
       "choices": [
-        "약 3분",
-        "약 5분",
-        "약 10분",
-        "약 15분"
+        "바이패스가 작동하여 직입기동",
+        "해당 CM 영구 정지",
+        "전 차량 재기동",
+        "연장급전 작동"
       ],
-      "answer": 2,
-      "explanation": "표준시분 약 10분 이내 판토그라프 상승 완료 및 SIV 기동합니다."
+      "answer": 0,
+      "explanation": "CMSB 1개 고장 시 자동으로 바이패스가 작동하여 직입기동하며, F/L8006 [CMSB] CMSB Bypass 모드(CMBPYM)로 확인할 수 있습니다."
     },
     {
       "id": "q108",
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 차량 재기동 순서로 올바른 것은?",
+      "question": "우진 SIV 경고장 발생 시 고장 리셋스위치는 주간제어기를 어디에 두고 취급하는가?",
       "choices": [
-        "판하강→KEY OFF→10초→KEY ON→판상승",
-        "KEY OFF→판하강→KEY ON→판상승",
-        "판상승→KEY OFF→KEY ON→판하강",
-        "KEY ON→판하강→KEY OFF→판상승"
+        "B7 위치",
+        "중립 위치",
+        "P4 위치",
+        "비상 위치"
       ],
       "answer": 0,
-      "explanation": "안내방송→출입문 폐문→판토 하강→KEY OFF→10초 후→KEY ON→판토 상승입니다."
+      "explanation": "중고장 이외의 고장(경고장) 시 고장 리셋스위치를 취급하며, 이때 반드시 주간제어기를 B7에 위치시켜야 합니다."
     },
     {
       "id": "q109",
@@ -1758,15 +1758,15 @@
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 전체 판토 상승 불능 시 확인해야 할 MR 압력은?",
+      "question": "우진 1량 판토그라프 상승 불능 시 확인 대상 차호는?",
       "choices": [
-        "3kg/cm² 이상",
-        "5kg/cm² 이상",
-        "7kg/cm² 이상",
-        "9kg/cm² 이상"
+        "0호 또는 1호",
+        "2호 또는 6호",
+        "3호 또는 7호",
+        "4호 또는 8호"
       ],
       "answer": 1,
-      "explanation": "MR 압력 5kg/cm² 이상을 확인합니다."
+      "explanation": "모니터에 2호 또는 6호차 판토그라프 상승불가가 현시되며, 해당 차호의 일반배전반 PanVN과 객실 비상인터폰 배전반 내 Pan 개방 코크(2개)를 확인합니다."
     },
     {
       "id": "q111",
@@ -1805,43 +1805,43 @@
       "chapter": "ch5b",
       "question": "우진 피뢰기 동작 시 나타나는 현상은?",
       "choices": [
-        "판토 하강",
-        "HSCB 개방",
+        "전차선 단전",
+        "출입문 열림",
         "비상제동 체결",
-        "출입문 열림"
+        "주차제동 체결"
       ],
-      "answer": 1,
-      "explanation": "피뢰기 동작 시 HSCB가 개방됩니다."
+      "answer": 0,
+      "explanation": "피뢰기 동작 시 현상은 전차선 단전이며, 해당 차량을 완전부동취급(PANDN OFF ⇒ SIVCN1,2 OFF)한 후 연장급전합니다."
     },
     {
       "id": "q114",
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 전 차량 비상제동 체결 시 가장 먼저 확인하는 것은?",
+      "question": "우진 전 차량 비상제동 체결 시 가장 먼저 취급하는 것은?",
       "choices": [
-        "MR 압력",
-        "출입문 상태",
-        "ATC 비상제동 여부",
-        "역전기 위치"
+        "MR 압력 확인",
+        "출입문 상태 확인",
+        "ATC 리셋",
+        "주간제어기 비상 → B7 스텝, 역전기 N위치면 F 또는 R로 취급"
       ],
-      "answer": 2,
-      "explanation": "ATC 비상제동인지 먼저 확인합니다."
+      "answer": 3,
+      "explanation": "조치요령 1항: 주간제어기 비상위치 ⇒ B7 스텝 위치 취급, 역전기 N위치 시 ⇒ F 또는 R 위치로 취급합니다. 이후 후부 운전실 역전기·EBS·MRPS·EROS 순으로 확인합니다."
     },
     {
       "id": "q115",
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 ATC 1,2 동시 고장 시 운전 방법은?",
+      "question": "우진 ATC 1,2 동시 고장으로 복귀 불능일 때의 운전 방법은?",
       "choices": [
-        "자동운전",
-        "수동운전 15km/h",
+        "자동운전 계속",
         "EO모드",
-        "구원 요청"
+        "지령식 운전(관제 지시)",
+        "즉시 구원 요청"
       ],
       "answer": 2,
-      "explanation": "ATC 1,2 동시 고장 시 EO모드(EROS 'EO' 취급)로 운전합니다."
+      "explanation": "ATCN 1,2를 동시에 OFF→ON(재부팅 45~50초) 하여도 복귀되지 않으면 ATC 고장으로, 이례상황 조치 순서에 따라 1차 ATC 리셋 → 2차 강제절체 → 3차 지령식 운전(45km/h 이하, 폐색구간마다 관제 출발지시)으로 운행합니다."
     },
     {
       "id": "q116",
@@ -1863,15 +1863,15 @@
       "area": "woojin",
       "level": 4,
       "chapter": "ch5b",
-      "question": "우진 출입문 안전루프 이상(SLF) 시 현상은?",
+      "question": "우진 출입문 안전루프 이상(SLF) 시 나타나는 현상은?",
       "choices": [
+        "출입문은 정상 동작하나 DCU가 TCMS에 에러코드를 송신",
         "출입문 닫힘 불능",
-        "비상제동 체결",
-        "역행 불능",
-        "판토 하강"
+        "판토 하강",
+        "전 차량 정전"
       ],
-      "answer": 2,
-      "explanation": "안전루프 이상 시 역행 불능이 발생합니다."
+      "answer": 0,
+      "explanation": "SLF는 출입문이 정상 동작하지만 DCU가 에러코드를 송신하고, 닫힘·잠김 상태에서 Safety 회로가 연결되지 않는 고장입니다(DCS·DLS 고장 동반). 열차가 출발·가속 불능이 되는 것은 DCS1,2 고장(DCS1,2F)입니다."
     },
     {
       "id": "q118",
@@ -2043,15 +2043,15 @@
       "area": "rotem",
       "level": 4,
       "chapter": "ch5c",
-      "question": "로템-우진 간 구원연결 시 역전기 위치는?",
+      "question": "로템(고장차)-우진(구원차) 구원연결 시 구원차 EROS(비상·구원스위치) 위치는?",
       "choices": [
-        "전진(F)",
-        "중립(N)",
-        "후진(R)",
+        "N(중립)",
+        "없음",
+        "EO",
         "R1(전동차)"
       ],
       "answer": 3,
-      "explanation": "로템-우진 구원연결 시 역전기 R1(전동차)입니다."
+      "explanation": "로템-우진 조합은 고장차 KEY On, 고장차 PAN 상승, 고장차 EROS N, 구원차 EROS R1(전동차)입니다. R1은 역전기가 아니라 EROS 위치입니다."
     },
     {
       "id": "q130",
@@ -2088,30 +2088,30 @@
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "BCH 중고장(BCH_ERR) 시 영향 받는 시스템은?",
+      "question": "BCH 중고장(BCH_ERR, 고장코드 3001)은 어떤 장치의 고장인가?",
       "choices": [
-        "출입문",
-        "제동 충전 장치",
-        "냉난방",
-        "조명"
+        "출입문 제어장치",
+        "추진제어장치(VVVF 인버터)",
+        "냉난방 장치",
+        "객실 조명"
       ],
       "answer": 1,
-      "explanation": "BCH(Brake Charger)는 제동 충전 장치입니다."
+      "explanation": "BCH 중고장은 고장분류 VVVF, 차량위치 M1·M2 하부기기 VVVF INVERTER BOX이며 해당 인버터가 동작 불가해집니다. BCH IGBT 고장(BCHCFD), BCH CPU 고장(BCHWDTD)도 모두 VVVF 분류입니다."
     },
     {
       "id": "q133",
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "인버터 ARM단락(CFD) 발생 시 조치는?",
+      "question": "인버터 ARM단락(CFD, 고장코드 3007) 발생 시 점검조치는?",
       "choices": [
-        "해당 인버터 차단",
-        "전 차량 재기동",
-        "관제 보고만",
+        "즉시 전 차량 재기동",
+        "종착역까지 운행 후 회차선에서 관제 보고 및 추진제어장치 차단기(PECN) OFF/ON",
+        "관제 보고만 하고 계속 운행",
         "ATC 리셋"
       ],
-      "answer": 0,
-      "explanation": "ARM단락 시 해당 인버터를 차단합니다."
+      "answer": 1,
+      "explanation": "해당 인버터가 동작 불가(자동 CUT OUT)되며, 종착역까지 운행한 뒤 회차선 진입 후 관제에 보고하고 일반 배전반의 추진제어장치 차단기(PECN)를 OFF/ON하여 고장 재발 여부를 확인합니다. M차 1량 고장 시 3/4 출력입니다."
     },
     {
       "id": "q134",
@@ -2163,30 +2163,30 @@
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "SIV 고장(SIVF) 시 연장급전 불능이면?",
+      "question": "SIV 고장(SIVF) 중고장 CUT OUT 시 조치는?",
       "choices": [
-        "정상 운행",
-        "해당 차량 조명 소등",
-        "차량 재기동 후 불가 시 차량 교환",
+        "즉시 정차 후 구원 요청",
+        "해당 차량 조명만 소등하고 방치",
+        "종착역까지 정상 운행 후 회차선에서 관제 보고 및 SIVCN1,2 OFF/ON 리셋",
         "비상제동 체결"
       ],
       "answer": 2,
-      "explanation": "재기동 후 불가 시 차량 교환합니다."
+      "explanation": "종착역까지 정상 운행하고, 회차선 진입 후 관제에 보고한 뒤 일반 배전반의 SIVCN1, SIVCN2를 OFF/ON(리셋)합니다. 계속 고장 시 관제보고 후 협의 조치합니다."
     },
     {
       "id": "q138",
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "ATC 비상제동 체결(ATCEB) 시 가장 먼저 할 것은?",
+      "question": "ATC 비상제동 체결(ATCEB, 고장코드 1009) 시 점검조치는?",
       "choices": [
         "판토 하강",
         "ATC 리셋",
-        "속도코드 확인",
+        "주간제어기(MC)를 B7에 위치 후 운행",
         "출입문 개방"
       ],
       "answer": 2,
-      "explanation": "속도코드를 확인하여 원인을 파악합니다."
+      "explanation": "검지조건은 속도코드보다 초과 속도이며, 점검조치 및 중고장 CUT OUT 시 조치 모두 주간제어기(MC)를 B7에 위치시킨 후 운행하는 것입니다."
     },
     {
       "id": "q139",
@@ -2208,30 +2208,30 @@
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "CM 과부하(OVERLOAD) 시 해당 CM은?",
+      "question": "CM 과부하(OVERLOAD) 발생 시 해당 CM은 어떻게 되는가?",
       "choices": [
-        "자동 정지",
-        "자동 재기동",
-        "속도 감소",
-        "정상 가동"
+        "자동 재기동을 5회 실시하고, 미복귀 시 인버터 정지 후 BY-PASS 모드 운전",
+        "즉시 영구 정지",
+        "속도만 감소",
+        "아무 변화 없이 정상 가동"
       ],
       "answer": 0,
-      "explanation": "CM 과부하 시 해당 CM은 자동 정지됩니다."
+      "explanation": "CMSB 인버터 출력전류가 정격(28A)의 150% 이상으로 1분간 지속되면 고장이 발생하며, 자동 재기동을 5회 실시한 뒤에도 복귀되지 않으면 인버터가 정지하고 BY-PASS 모드로 운전합니다."
     },
     {
       "id": "q141",
       "area": "critical",
       "level": 4,
       "chapter": "ch5b",
-      "question": "축전지 저전압 고장(LVF)의 기준 전압은?",
+      "question": "축전지 저전압 고장(LVF) 발생 후 알람이 해제되는 배터리 충전 기준은?",
       "choices": [
-        "60V 미만",
-        "70V 미만",
-        "75V 미만",
-        "80V 미만"
+        "배터리 팩 75V 이상",
+        "배터리 팩 80V 이상",
+        "배터리 팩 87.5V 이상 또는 충전전류 5A 이상",
+        "배터리 팩 103V 이상"
       ],
       "answer": 2,
-      "explanation": "축전지 저전압 고장(LVF)은 75V 미만입니다."
+      "explanation": "배터리를 충전하여 배터리 팩 87.5V 이상(또는 충전전류 5A 이상)이고 셀 3.5V 이상이 되면 TCMS·모니터링 프로그램·현시장치에서 알람 해제를 확인할 수 있습니다."
     },
     {
       "id": "q142",
@@ -2246,7 +2246,7 @@
         "ATC 고장"
       ],
       "answer": 1,
-      "explanation": "안전 인터록 이상 시 닫혀도 역행 불가합니다."
+      "explanation": "출입문 안전 인터록 회로 이상(고장코드 7009, 등급 B)은 DCU 내부 Safety 회로 고장으로, 출입문은 정상 동작하지만 열차가 출발·가속하지 못하고 비상 브레이크가 동작한 상태가 됩니다. 조치는 DCU 교체입니다."
     },
     {
       "id": "q143",

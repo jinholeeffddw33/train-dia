@@ -1,0 +1,55 @@
+# train-dia CI — push 마다 타입·테스트·CSS 규칙 검증
+#
+# 목적: 교번/인원 데이터 변경(발령·퇴직·복귀)이 근무표를 어긋나게 만드는 것을
+#       사람이 npm test 를 기억해서 치지 않아도 잡아내는 것.
+#
+# 이 워크플로는 로컬 커밋을 막지 않는다. 실패하면 GitHub 에 빨간 X 로 표시될 뿐이다.
+# 커밋 차단이 필요해지면 .githooks/pre-commit 에 npm test 를 추가하는 별도 작업으로.
+#
+# 제외한 것:
+#   - npm run lint       : next lint 가 미설정 상태라 대화형 프롬프트로 멈춤
+#   - check:hooks        : core.hooksPath 로컬 설정을 보는 검사라 CI 에선 항상 실패
+#   - check:*:changed    : git diff 기반이라 CI 체크아웃에서 의미 없음
+#   - npm run build      : .env.local(Supabase 키) 필요 — 필요해지면 secrets 붙여서 추가
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# 같은 브랜치에 연속 push 시 이전 실행은 취소
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: 타입 · 테스트 · CSS 규칙
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Node 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 타입 검사
+        run: npm run typecheck
+
+      - name: 테스트 (교번 계산 · 데이터 무결성)
+        run: npm test
+
+      - name: CSS 규칙 — raw :hover 금지
+        run: npm run check:hover

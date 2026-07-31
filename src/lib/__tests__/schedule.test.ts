@@ -1,21 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { getDia, getType, getSchedule, isHoliday, getDiaDisplay, getLabel, getMonthSummary, calcWorkTime, timeToMins, getNextShift } from '../schedule';
-import { P, CYCLE, CL } from '@/data/cycle';
+import { P, CYCLE, CL, DB_STD } from '@/data/cycle';
 
 describe('getDia — 교번 계산', () => {
+  // 기준일은 교번 개편 때마다 바뀐다(2026-03-23 → 05-16 …).
+  // 날짜를 테스트에 박아두면 개편 때마다 조용히 깨지므로 반드시 DB_STD 를 가져다 쓴다.
   it('DB_STD 기준일에 1번 기관사의 교번은 자신의 초기 교번', () => {
     const person = P[0]; // 1번 기관사
-    const dbStd = new Date(2026, 2, 23); // 2026-03-23
-    const dia = getDia(person, dbStd);
+    const dia = getDia(person, DB_STD);
     expect(dia).toBe(person.d);
   });
 
-  it('171일 뒤에 같은 교번으로 순환', () => {
+  it('CL(171)일 뒤에 같은 교번으로 순환', () => {
     const person = P[0];
-    const dbStd = new Date(2026, 2, 23);
-    const after171 = new Date(2026, 2, 23);
-    after171.setDate(after171.getDate() + 171);
-    expect(getDia(person, after171)).toBe(getDia(person, dbStd));
+    const afterCycle = new Date(DB_STD);
+    afterCycle.setDate(afterCycle.getDate() + CL);
+    expect(getDia(person, afterCycle)).toBe(getDia(person, DB_STD));
   });
 
   it('null person이면 ~', () => {
@@ -27,8 +27,9 @@ describe('getDia — 교번 계산', () => {
     expect(CYCLE.length).toBe(171);
   });
 
-  it('모든 기관사(171명)가 유효한 교번을 가짐', () => {
-    const date = new Date(2026, 3, 1);
+  it('전 인원이 유효한 교번을 가짐', () => {
+    const date = new Date(DB_STD);
+    date.setDate(date.getDate() + 30);
     for (const p of P) {
       const dia = getDia(p, date);
       expect(dia).toBeTruthy();
@@ -40,7 +41,8 @@ describe('getDia — 교번 계산', () => {
     const person = P[0];
     const dias = new Set<string>();
     for (let i = 0; i < 7; i++) {
-      const d = new Date(2026, 2, 23 + i);
+      const d = new Date(DB_STD);
+      d.setDate(d.getDate() + i);
       dias.add(getDia(person, d));
     }
     // 7일 연속 완전히 같은 교번은 불가능

@@ -83,70 +83,72 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
     return (
       <div className={styles.dabPage}>
         <div className={styles.dabHero}>
-          <button type="button" className={styles.heroBackBtn} onClick={onBack} aria-label="뒤로가기">
-            <ArrowLeft size={20} strokeWidth={2} />
-          </button>
           <div className={styles.dabHeroHaze} />
 
-          <p className={styles.dabBrand}>DAB · Define Answer Beyond</p>
-          <h1 className={styles.dabTitle}>휴식 모듈</h1>
+          {/* 뒤로가기와 제목을 한 줄에 — 버튼 아래로 제목을 내리면 히어로만 60px 넘게 먹는다 */}
+          <div className={styles.dabHeroTop}>
+            <button type="button" className={`${styles.heroBackBtn} ${styles.dabBackInline}`} onClick={onBack} aria-label="뒤로가기">
+              <ArrowLeft size={20} strokeWidth={2} />
+            </button>
+            <h1 className={styles.dabTitle}>휴식 모듈</h1>
+          </div>
           <p className={styles.dabSub}>운행 사이, 잠시 숨을 고르세요</p>
         </div>
 
         <div className={styles.dabCardWrap}>
           <button type="button" className={`${styles.dabCard} ${styles.dabCardMenu}`} onClick={() => setView('menu')}>
             <div className={styles.dabCardIcon}>
-              <UtensilsCrossed size={26} strokeWidth={2} />
+              <UtensilsCrossed size={22} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>이번주 식당 메뉴 <span className={styles.dabCardNewBadge}>NEW</span></span>
-              <span className={styles.dabCardDesc}>이번주 식단표를 등록하고 함께 확인해요</span>
+              <span className={styles.dabCardDesc}>이번주 식단표 보고 등록하기</span>
             </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
+            <ChevronRight size={16} className={styles.dabCardArrow} />
           </button>
 
           <button type="button" className={`${styles.dabCard} ${styles.dabCardSage}`} onClick={() => setView('fortune')}>
             <div className={styles.dabCardIcon}>
-              <Sparkles size={26} strokeWidth={2} />
+              <Sparkles size={22} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>오늘의 운세 <span className={styles.dabCardNewBadge}>NEW</span></span>
-              <span className={styles.dabCardDesc}>5호선 기관사를 위한 오늘의 한 줄</span>
+              <span className={styles.dabCardDesc}>기관사를 위한 오늘의 한 줄</span>
             </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
+            <ChevronRight size={16} className={styles.dabCardArrow} />
           </button>
 
           <button type="button" className={`${styles.dabCard} ${styles.dabCardSky}`} onClick={() => setView('stamp')}>
             <div className={styles.dabCardIcon}>
-              <Stamp size={26} strokeWidth={2} />
+              <Stamp size={22} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>무사고 출근 도장 <span className={styles.dabCardNewBadge}>NEW</span></span>
-              <span className={styles.dabCardDesc}>매일 도장 찍고 마일스톤 응원 받기</span>
+              <span className={styles.dabCardDesc}>매일 도장 찍고 응원 받기</span>
             </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
+            <ChevronRight size={16} className={styles.dabCardArrow} />
           </button>
 
           <button type="button" className={`${styles.dabCard} ${styles.dabCardMint}`} onClick={() => setView('bonsai')}>
             <div className={styles.dabCardIcon}>
-              <Sprout size={26} strokeWidth={2} />
+              <Sprout size={22} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>젠 분재</span>
-              <span className={styles.dabCardDesc}>휴식을 완료할 때마다 한 단계씩 자라나는 나무</span>
+              <span className={styles.dabCardDesc}>쉴 때마다 한 단계씩 자라는 나무</span>
             </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
+            <ChevronRight size={16} className={styles.dabCardArrow} />
           </button>
 
           <button type="button" className={`${styles.dabCard} ${styles.dabCardLavender}`} onClick={() => setView('asmr')}>
             <div className={styles.dabCardIcon}>
-              <Music2 size={26} strokeWidth={2} />
+              <Music2 size={22} strokeWidth={2} />
             </div>
             <div className={styles.dabCardText}>
               <span className={styles.dabCardLabel}>ASMR 테라피</span>
               <span className={styles.dabCardDesc}>빗소리·숲바람·장작 타는 소리</span>
             </div>
-            <ChevronRight size={18} className={styles.dabCardArrow} />
+            <ChevronRight size={16} className={styles.dabCardArrow} />
           </button>
 
         </div>

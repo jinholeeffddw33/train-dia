@@ -80,7 +80,7 @@
 .lifeSvg { width: 100px; height: 80px; overflow: visible; }
 
 /* ── 메뉴 ── */
-.menuContent { padding: var(--dia-space-3) var(--dia-space-4); }
+.menuContent { padding: 0 var(--dia-space-4) calc(var(--dia-space-4) + env(safe-area-inset-bottom)); }
 
 .menuGrid {
   display: grid;
@@ -147,9 +147,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
-  padding: var(--dia-space-3) 4px;
+  padding: var(--dia-space-2) 4px;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
@@ -162,9 +162,9 @@
 .homeGameTile:active { background: var(--dia-surface-hover); transform: scale(0.95); box-shadow: var(--dia-3d-pressed); }
 /* 컴팩트라 아이콘을 축소 — 3D 컬러/그림자는 .gameCardIcon 재사용 */
 .homeGameGrid .gameCardIcon {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
 }
 .homeGameTileLabel {
   font-size: var(--dia-text-sm);
@@ -448,7 +448,7 @@
 
 /* ── 섹션 구분 라벨 ── */
 .sectionLabel {
-  margin: var(--dia-space-4) var(--dia-space-1) var(--dia-space-2);
+  margin: var(--dia-space-3) var(--dia-space-1) var(--dia-space-2);
   font-size: var(--dia-text-meta);
   font-weight: 700;
   color: var(--dia-text-tertiary);
@@ -937,18 +937,31 @@
   color: var(--dia-text-primary);
 }
 
+/* 히어로는 최소한만 — 카드 5개 + 게임 8개가 폰 한 화면에 다 들어와야 한다.
+   뒤로가기 버튼과 제목을 한 줄에 두어(.dabHeroTop) 버튼 높이만큼의 상단 여백을 없앴다. */
 .dabHero {
   position: relative;
   overflow: hidden;
-  min-height: 168px;
-  /* 상단 여백에 뒤로가기 버튼(top:space-3 + 40px) 공간을 확보 — 안 그러면 브랜드/제목 글씨가
-     좌상단 화살표 버튼 위에 겹쳐 "화살표 안에 글씨"처럼 보인다. */
-  padding: calc(env(safe-area-inset-top) + var(--dia-space-3) + 48px) var(--dia-space-5) var(--dia-space-8);
+  padding: calc(env(safe-area-inset-top) + var(--dia-space-2)) var(--dia-space-4) var(--dia-space-4);
   background:
     var(--dab-hero-scrim),
     var(--dab-hero-photo) center / cover no-repeat;
   color: var(--dab-hero-ink);
   border-radius: 0 0 var(--dia-radius-2xl) var(--dia-radius-2xl);
+}
+
+/* 뒤로가기 + 제목 한 줄 */
+.dabHeroTop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+
+/* 이 화면에서만 버튼을 흐름 안으로 — 기본 .heroBackBtn 은 absolute */
+.dabBackInline {
+  position: static;
+  flex-shrink: 0;
 }
 
 .dabHeroHaze {
@@ -960,23 +973,14 @@
   pointer-events: none;
 }
 
-.dabBrand {
-  position: relative;
-  font-size: var(--dia-text-meta);
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: var(--dab-hero-brand);
-  margin: 0 0 var(--dia-space-2);
-}
-
 .dabTitle {
   position: relative;
-  font-size: var(--dia-text-2xl);
+  font-size: var(--dia-text-xl);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.3px;
   color: var(--dab-hero-ink);
-  margin: 0 0 var(--dia-space-2);
+  margin: 0;
 }
 
 .dabSub {
@@ -984,16 +988,16 @@
   font-size: var(--dia-text-sm);
   font-weight: 500;
   color: var(--dab-hero-sub);
-  margin: 0;
+  margin: var(--dia-space-2) 0 0;
 }
 
 .dabCardWrap {
   position: relative;
-  margin-top: calc(-1 * var(--dia-space-5));
-  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-8) + env(safe-area-inset-bottom));
+  margin-top: calc(-1 * var(--dia-space-3));
+  padding: var(--dia-space-3) var(--dia-space-4) 0;
   display: flex;
   flex-direction: column;
-  gap: var(--dia-space-3);
+  gap: var(--dia-space-2);
 }
 
 .dabCard {
@@ -1001,16 +1005,17 @@
   overflow: hidden;
   display: flex;
   align-items: center;
-  gap: var(--dia-space-4);
-  padding: var(--dia-space-3) var(--dia-space-5);
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-4);
   background: var(--_dabCard, var(--dia-surface));
   border: 1px solid var(--dab-card-border);
-  border-radius: var(--dia-radius-2xl);
+  border-radius: var(--dia-radius-xl);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   text-align: left;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-height: 74px;
+  /* 터치 타겟 최소 48px 은 지키면서 74 → 56 (5장이면 90px 절약) */
+  min-height: 56px;
   box-shadow: var(--dia-shadow-sm);
 }
 
@@ -1045,9 +1050,9 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--dia-radius-xl);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--dia-radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1068,6 +1073,7 @@
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
   letter-spacing: -0.2px;
+  line-height: 1.25;
 }
 
 .dabCardNewBadge {
@@ -1087,8 +1093,8 @@
   display: block;
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
-  margin-top: 3px;
-  line-height: 1.45;
+  margin-top: 1px;
+  line-height: 1.3;
 }
 
 .dabCardArrow {

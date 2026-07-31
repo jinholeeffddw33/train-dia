@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import type { TokenPayload } from '@/lib/jwt';
+import { getTodayStartKST, kstDay, todayKST, VISIT_ACTIONS } from '@/lib/visitStats';
 
 export async function GET(req: NextRequest) {
   const userOrRes = await requireAuth(req);
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKST();
 
   // 병렬 쿼리
   const [
@@ -31,21 +32,22 @@ export async function GET(req: NextRequest) {
     { data: allProfiles },
     { count: totalLogs },
   ] = await Promise.all([
-    // 오늘 접속자 (app_visit + login)
+    // 오늘 접속자 (app_visit + login) — KST 자정 기준
     serverSupabase
       .from('audit_log')
       .select('user_id, user_name, action, created_at')
-      .gte('created_at', `${today}T00:00:00`)
-      .in('action', ['app_visit', 'login_pin', 'login_webauthn', 'first_login'])
-      .order('created_at', { ascending: false }),
+      .gte('created_at', getTodayStartKST())
+      .in('action', VISIT_ACTIONS)
+      .order('created_at', { ascending: false })
+      .limit(5000),
     // 최근 7일 로그 (일별 집계용)
     serverSupabase
       .from('audit_log')
       .select('user_id, user_name, action, created_at')
       .gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString())
-      .in('action', ['app_visit', 'login_pin', 'login_webauthn', 'first_login'])
+      .in('action', VISIT_ACTIONS)
       .order('created_at', { ascending: false })
-      .limit(1000),
+      .limit(5000),
     // 전체 활성 사용자
     serverSupabase
       .from('driver_profiles')
@@ -75,7 +77,8 @@ export async function GET(req: NextRequest) {
   // 7일 일별 유니크 접속자 수
   const dailyMap = new Map<string, Set<string>>();
   for (const log of (recentLogs ?? [])) {
-    const day = log.created_at.slice(0, 10);
+    const day = kstDay(log.created_at); // UTC 그대로 자르면 00~09시 접속이 전날로 밀린다
+
     if (!dailyMap.has(day)) dailyMap.set(day, new Set());
     dailyMap.get(day)!.add(log.user_id);
   }

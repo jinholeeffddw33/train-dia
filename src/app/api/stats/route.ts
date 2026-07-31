@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { requireAuth } from '@/lib/authServer';
-
-/** KST(UTC+9) 기준 오늘 자정 ISO 문자열 */
-function getTodayStartKST(): string {
-  const now = new Date();
-  // KST = UTC + 9시간
-  const kstOffset = 9 * 60 * 60 * 1000;
-  const kstNow = new Date(now.getTime() + kstOffset);
-  // KST 기준 날짜의 00:00:00을 UTC로 변환
-  const kstMidnight = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()));
-  // KST 00:00 = UTC 전날 15:00
-  return new Date(kstMidnight.getTime() - kstOffset).toISOString();
-}
+import { getTodayStartKST, VISIT_ACTIONS } from '@/lib/visitStats';
 
 // ── GET: 오늘의 통계 ──
 export async function GET() {
@@ -22,14 +11,16 @@ export async function GET() {
 
   const todayISO = getTodayStartKST();
 
-  // 오늘 앱 접속자 수 (audit_log의 app_visit 이벤트 unique user_id)
+  // 오늘 앱 접속자 수 — 홈 진입(app_visit) + 로그인 unique user_id.
+  // 로그인만 하고 홈을 안 거친 사람도 접속자다(관리자 대시보드와 같은 기준).
   let todayVisitors = 0;
   try {
     const { data } = await serverSupabase
       .from('audit_log')
       .select('user_id')
-      .eq('action', 'app_visit')
-      .gte('created_at', todayISO);
+      .in('action', VISIT_ACTIONS)
+      .gte('created_at', todayISO)
+      .limit(5000);
     if (data) {
       todayVisitors = new Set(data.map((r: { user_id: string }) => r.user_id)).size;
     }

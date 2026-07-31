@@ -67,8 +67,8 @@ export const EXTRA_USERS: Person[] = [
   { I: '0', d: '', n: '전동규', s: '21711304' },
   { I: '0', d: '', n: '박용덕', s: '21711438' },
   { I: '0', d: '', n: '이태원', s: '21711216' },
-  // 2026-07 신규 내근직 (직함: 과장/부장/대리)
-  { I: '0', d: '', n: '유희종', s: '21715488' }, // 과장
+  // 2026-07 신규 내근직 (직함: 부장/대리)
+  // 유희종(21715488) → 2026-08-01 결원02 자리로 기관사 발령 (내근 해제, cycle.ts I:60/d:73~)
   { I: '0', d: '', n: '유승용', s: '21706793' }, // 부장
   { I: '0', d: '', n: '신은미', s: '21717671' }, // 대리
 ];
@@ -191,10 +191,8 @@ export function isManager(sabun: string): boolean {
   return MANAGER_SABUNS.has(sabun);
 }
 
-/** 과장 여부 */
-const GWAJANG_SABUNS: ReadonlySet<string> = new Set([
-  '21715488', // 유희종 (2026-07 신규)
-]);
+/** 과장 여부 — 현재 해당자 없음 (유희종 2026-08-01 기관사 발령으로 해제) */
+const GWAJANG_SABUNS: ReadonlySet<string> = new Set([]);
 export function isGwajang(sabun: string): boolean {
   return GWAJANG_SABUNS.has(sabun);
 }
@@ -207,7 +205,7 @@ export function isDaeri(sabun: string): boolean {
   return DAERI_SABUNS.has(sabun);
 }
 
-/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 8명 + 인턴 7명) */
+/** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 10명 + 인턴 9명) */
 const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '21704630', // 안성숙
   '21711216', // 이태원
@@ -225,7 +223,7 @@ const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '22601008', // 강미진 (인턴)
   '22601134', // 조건희 (인턴 2026-07-07)
   '22601146', // 신석희 (인턴 2026-07-07)
-  '21715488', // 유희종 (과장, 2026-07 신규)
+  // 유희종(21715488) → 2026-08-01 결원02 자리로 기관사 발령 (일근 해제, cycle.ts I:60/d:73~)
   '21706793', // 유승용 (부장, 2026-07 신규)
   '21717671', // 신은미 (대리, 2026-07 신규)
   '22000358', // 주정재 (인턴, 2026-07 신규)

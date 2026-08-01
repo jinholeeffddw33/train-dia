@@ -225,24 +225,54 @@
 .soon { display: inline-flex; align-items: center; gap: 4px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); margin-top: 4px; }
 
 /* ===== 주간 시간표 뷰 ===== */
-.wg { margin-top: 2px; }
+/* --wg-col: 한 칸 최소 폭. 이보다 좁히면 제목이 세로로 잘린다
+   (360px 폰에서 7칸을 다 넣으면 40px = 한글 2자/줄이 되어 못 읽음).
+   94px 면 글자영역 84px = 한글 6자/줄. 7칸이 화면을 넘치면 가로로 스크롤한다. */
+.wg { margin-top: 2px; --wg-col: 94px; }
 .wgNav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
 .wgRange { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-primary); font-variant-numeric: tabular-nums; }
-.wgHead { display: flex; align-items: stretch; border-bottom: 1px solid var(--dia-border); padding-bottom: 4px; }
-.wgGutter { width: 38px; flex-shrink: 0; }
-.wgDayBtn { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 0; border-radius: 8px; }
+/* 가로 스크롤 뷰포트 — 일주일(7칸)을 옆으로 밀어 본다.
+   칸 폭을 좁히면 제목이 세로로 잘리므로(360px 폰에서 40px = 한글 2자)
+   칸은 --wg-col 로 고정하고 넘치는 만큼 스크롤한다. */
+.wgViewport {
+  max-height: 62dvh;
+  overflow: auto;                     /* 가로·세로 동시 */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;     /* 끝에서 뒤로가기 제스처로 새지 않게 */
+  margin-top: 2px;
+}
+.wgInner { min-width: 100%; width: max-content; }
+
+.wgHead {
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid var(--dia-border); padding-bottom: 4px;
+  position: sticky; top: 0; z-index: 3;   /* 세로로 밀어도 요일은 붙어 있는다 */
+  background: var(--dia-bg);
+}
+/* 시간축 자리 — 가로로 밀어도 왼쪽에 붙어 있는다 */
+.wgGutter {
+  width: 38px; flex-shrink: 0;
+  position: sticky; left: 0; z-index: 4;
+  background: var(--dia-bg);
+}
+/* 한 칸 = --wg-col 이상(읽을 수 있는 폭), 남으면 늘어나되 줄지는 않는다 */
+.wgDayBtn { flex: 1 0 var(--wg-col); min-width: var(--wg-col); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 0; border-radius: 8px; }
 .wgDayBtn:active { transform: scale(0.96); }
 .wgDaySel { background: var(--dia-blue-dim); }
 .wgDow { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-tertiary); }
 .wgDayNum { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-primary); width: 22px; height: 22px; display: grid; place-items: center; }
 .wgToday { background: var(--dia-blue); color: #fff; border-radius: 50%; }
-.wgScroll { max-height: 62dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-top: 2px; }
 .wgGrid { display: flex; position: relative; }
-.wgGutterCol { width: 38px; flex-shrink: 0; position: relative; }
+/* 시간 눈금 — 가로로 밀어도 왼쪽 고정 */
+.wgGutterCol {
+  width: 38px; flex-shrink: 0;
+  position: sticky; left: 0; z-index: 2;
+  background: var(--dia-bg);
+}
 .wgHour { height: 56px; box-sizing: border-box; position: relative; }
 .wgHour span { position: absolute; top: -7px; right: 6px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-variant-numeric: tabular-nums; background: var(--dia-bg); padding: 0 1px; }
 .wgCols { position: relative; flex: 1; min-width: 0; display: flex; background-image: repeating-linear-gradient(to bottom, var(--dia-border-light) 0, var(--dia-border-light) 1px, transparent 1px, transparent 56px); }
-.wgCol { position: relative; flex: 1; min-width: 0; border-left: 1px solid var(--dia-border-light); }
+.wgCol { position: relative; flex: 1 0 var(--wg-col); min-width: var(--wg-col); border-left: 1px solid var(--dia-border-light); }
 .wgColToday { background: color-mix(in srgb, var(--dia-blue) 6%, transparent); }
 .wgEvt { position: absolute; overflow: hidden; border-radius: 6px; padding: 2px 4px; display: flex; flex-direction: column; gap: 0; text-align: left; border: 1px solid var(--dia-border-light); }
 .wgEvtTime { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); font-variant-numeric: tabular-nums; line-height: 1.25; }

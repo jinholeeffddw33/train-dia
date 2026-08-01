@@ -100,34 +100,12 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
   const todayISO = iso(new Date());
 
   // 선택 주(일~토)
-  /**
-   * 주간 시간표에 몇 칸을 보여줄지 — 좁은 화면은 3일.
-   * 360px 폰에서 7칸이면 한 칸이 40px 뿐이라 제목이 한 줄에 2자씩 세로로 잘린다.
-   * 3일이면 94px 로 넓어져 "09:00 안전 회의" 가 제대로 읽힌다.
-   * (주 전체 파악은 월 달력·목록 탭이 담당)
-   */
-  const [wide, setWide] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 600px)');
-    const sync = () => setWide(mq.matches);
-    sync();
-    mq.addEventListener('change', sync);
-    return () => mq.removeEventListener('change', sync);
-  }, []);
-  const daysShown = wide ? 7 : 3;
-
   const weekDays = useMemo(() => {
     const d = fromISO(sel);
     const start = new Date(d);
     start.setDate(d.getDate() - d.getDay());
     return Array.from({ length: 7 }, (_, i) => iso(new Date(start.getFullYear(), start.getMonth(), start.getDate() + i)));
   }, [sel]);
-
-  /** 주간 시간표에 실제로 그릴 날들 — 넓으면 그 주 전체(일~토), 좁으면 선택일부터 3일 */
-  const gridDays = useMemo(
-    () => (wide ? weekDays : Array.from({ length: daysShown }, (_, i) => addDays(sel, i))),
-    [wide, weekDays, sel, daysShown],
-  );
 
   const dayEvents = useMemo(
     () => schedules.filter((s) => s.date === sel).sort((a, b) => a.time.localeCompare(b.time)),
@@ -148,7 +126,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
 
   // 주간 시간표 — 요일별 이벤트 배치 + 표시 시간 범위
   const week = useMemo(() => {
-    const perDay = gridDays.map((d) => {
+    const perDay = weekDays.map((d) => {
       const evs: Omit<WEvt, 'lane' | 'cols'>[] = schedules.filter((s) => s.date === d).map((s) => ({
         id: s.id, kind: 'sched' as const, title: s.title, category: s.category,
         startM: toMin(s.time), endM: s.end ? Math.max(toMin(s.end), toMin(s.time) + 30) : toMin(s.time) + 30, done: false,
@@ -162,7 +140,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     let minM = 8 * 60, maxM = 19 * 60;
     perDay.forEach((day) => day.forEach((e) => { minM = Math.min(minM, e.startM); maxM = Math.max(maxM, e.endM); }));
     return { perDay, startHour: Math.max(0, Math.floor(minM / 60)), endHour: Math.min(24, Math.ceil(maxM / 60)) };
-  }, [gridDays, schedules, todos, todayISO]);
+  }, [weekDays, schedules, todos, todayISO]);
   const hours = useMemo(() => Array.from({ length: week.endHour - week.startHour }, (_, i) => week.startHour + i), [week]);
   const gridH = (week.endHour - week.startHour) * HOUR_PX;
 
@@ -172,9 +150,9 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     const id = window.setInterval(() => { const d = new Date(); setNowM(d.getHours() * 60 + d.getMinutes()); }, 60000);
     return () => window.clearInterval(id);
   }, []);
-  const showNow = gridDays.includes(todayISO) && nowM >= week.startHour * 60 && nowM <= week.endHour * 60;
+  const showNow = weekDays.includes(todayISO) && nowM >= week.startHour * 60 && nowM <= week.endHour * 60;
   const nowTop = ((nowM - week.startHour * 60) / 60) * HOUR_PX;
-  const weekRange = gridDays.length ? `${fromISO(gridDays[0]).getMonth() + 1}.${fromISO(gridDays[0]).getDate()} – ${fromISO(gridDays[gridDays.length - 1]).getMonth() + 1}.${fromISO(gridDays[gridDays.length - 1]).getDate()}` : '';
+  const weekRange = weekDays.length ? `${fromISO(weekDays[0]).getMonth() + 1}.${fromISO(weekDays[0]).getDate()} – ${fromISO(weekDays[6]).getMonth() + 1}.${fromISO(weekDays[6]).getDate()}` : '';
 
   // 월 그리드 — 표시 중인 달(monthAnchor) 기준
   const monthGrid = useMemo(() => {
@@ -392,23 +370,26 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
       {view === 'week' && (
         <div className={styles.wg}>
           <div className={styles.wgNav}>
-            <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, -daysShown))} aria-label={wide ? '이전 주' : '이전 3일'}><ChevronLeft size={16} /></button>
+            <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, -7))} aria-label="이전 주"><ChevronLeft size={16} /></button>
             <span className={styles.wgRange}>{weekRange}</span>
-            <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, daysShown))} aria-label={wide ? '다음 주' : '다음 3일'}><ChevronRight size={16} /></button>
+            <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, 7))} aria-label="다음 주"><ChevronRight size={16} /></button>
           </div>
-          <div className={styles.wgHead}>
-            <span className={styles.wgGutter} />
-            {gridDays.map((d) => {
-              const dd = fromISO(d);
-              return (
-                <button key={d} type="button" className={`${styles.wgDayBtn} ${d === sel ? styles.wgDaySel : ''}`} onClick={() => setSel(d)}>
-                  <span className={`${styles.wgDow} ${dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
-                  <span className={`${styles.wgDayNum} ${d === todayISO ? styles.wgToday : ''}`}>{dd.getDate()}</span>
-                </button>
-              );
-            })}
-          </div>
-          <div className={styles.wgScroll}>
+          {/* 가로로 밀어 일주일 전체를 본다. 칸 폭(--wg-col)은 읽을 수 있게 고정하고
+              넘치는 만큼 스크롤 — 시간축과 요일 머리글은 sticky 로 붙어 있는다. */}
+          <div className={styles.wgViewport}>
+            <div className={styles.wgInner}>
+              <div className={styles.wgHead}>
+                <span className={styles.wgGutter} />
+                {weekDays.map((d) => {
+                  const dd = fromISO(d);
+                  return (
+                    <button key={d} type="button" className={`${styles.wgDayBtn} ${d === sel ? styles.wgDaySel : ''}`} onClick={() => setSel(d)}>
+                      <span className={`${styles.wgDow} ${dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
+                      <span className={`${styles.wgDayNum} ${d === todayISO ? styles.wgToday : ''}`}>{dd.getDate()}</span>
+                    </button>
+                  );
+                })}
+              </div>
             {/* STYLE-EXCEPTION: 시간축 높이는 이벤트 개수에 따른 동적 런타임 값 */}
             <div className={styles.wgGrid} style={{ height: gridH }}>
               <div className={styles.wgGutterCol}>
@@ -416,7 +397,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
               </div>
               <div className={styles.wgCols}>
                 {week.perDay.map((day, ci) => (
-                  <div key={gridDays[ci]} className={`${styles.wgCol} ${gridDays[ci] === todayISO ? styles.wgColToday : ''}`}>
+                  <div key={weekDays[ci]} className={`${styles.wgCol} ${weekDays[ci] === todayISO ? styles.wgColToday : ''}`}>
                     {day.map((e) => {
                       const top = ((e.startM - week.startHour * 60) / 60) * HOUR_PX;
                       const h = Math.max(((e.endM - e.startM) / 60) * HOUR_PX, 24);
@@ -428,7 +409,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                           className={`${styles.wgEvt} ${styles[`c_${e.category}`]} ${e.done ? styles.wgEvtDone : ''}`}
                           /* STYLE-EXCEPTION: 시간대 위치·크기·레인 폭은 동적 런타임 값 */
                           style={{ top, height: h, left: `${e.lane * w}%`, width: `calc(${w}% - 3px)` }}
-                          onClick={() => { setSel(gridDays[ci]); setView('day'); }}>
+                          onClick={() => { setSel(weekDays[ci]); setView('day'); }}>
                           {!compact && <span className={styles.wgEvtTime}>{fmtMin(e.startM)}</span>}
                           <span className={styles.wgEvtTitle}>{e.title}</span>
                         </button>
@@ -441,6 +422,7 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                   <div className={styles.wgNow} style={{ top: nowTop }} aria-hidden><span className={styles.wgNowDot} /></div>
                 )}
               </div>
+            </div>
             </div>
           </div>
         </div>

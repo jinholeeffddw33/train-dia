@@ -39,36 +39,8 @@ function addMonths(s: string, n: number): string {
   return iso(target);
 }
 
-/* ── 주간 시간표 뷰 ── */
-const HOUR_PX = 56; // ScheduleManager.module.css 의 --wg-hour(56px) 과 동일해야 함
-const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-const fmtMin = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-
-interface WEvt { id: string; kind: 'sched' | 'todo'; title: string; category: string; startM: number; endM: number; done: boolean; lane: number; cols: number; }
-
-/** 하루치 이벤트를 겹침 없이 레인(열)에 배치 — 겹치는 묶음은 열 수(cols)를 공유해 폭 분할 */
-function layoutDay(evs: Omit<WEvt, 'lane' | 'cols'>[]): WEvt[] {
-  const sorted = [...evs].sort((a, b) => a.startM - b.startM || a.endM - b.endM);
-  const laneEnd: number[] = [];
-  const out: WEvt[] = sorted.map((e) => {
-    let lane = 0;
-    while (lane < laneEnd.length && laneEnd[lane] > e.startM) lane++;
-    laneEnd[lane] = e.endM;
-    return { ...e, lane, cols: 1 };
-  });
-  let i = 0;
-  while (i < out.length) {
-    let clusterEnd = out[i].endM, maxLane = out[i].lane, k = i + 1;
-    while (k < out.length && out[k].startM < clusterEnd) {
-      clusterEnd = Math.max(clusterEnd, out[k].endM);
-      maxLane = Math.max(maxLane, out[k].lane);
-      k++;
-    }
-    for (let t = i; t < k; t++) out[t].cols = maxLane + 1;
-    i = k;
-  }
-  return out;
-}
+/* 주간 뷰는 목록형이라 시간→픽셀 좌표 변환이나 겹침 레인 배치가 필요 없다.
+   시간대 겹침 표현은 하루 뷰가 담당한다. */
 
 export default function ScheduleManager({ onClose, startMonth = false, startView = 'day' }: { onClose: () => void; startMonth?: boolean; startView?: 'day' | 'week' | 'list' }) {
   const { schedules, addSchedule, addSchedules, updateSchedule, removeSchedule, removeSeries, todos, toggleTodo } = useOfficeStore();
@@ -124,34 +96,32 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
     [schedules, todayISO],
   );
 
-  // 주간 시간표 — 요일별 이벤트 배치 + 표시 시간 범위
-  const week = useMemo(() => {
-    const perDay = weekDays.map((d) => {
-      const evs: Omit<WEvt, 'lane' | 'cols'>[] = schedules.filter((s) => s.date === d).map((s) => ({
-        id: s.id, kind: 'sched' as const, title: s.title, category: s.category,
-        startM: toMin(s.time), endM: s.end ? Math.max(toMin(s.end), toMin(s.time) + 30) : toMin(s.time) + 30, done: false,
-      }));
-      if (d === todayISO) {
-        // 주간 시간표는 시간 위치가 필요 → '일정에 추가'한 할 일 중 시간 있는 것만(종일은 제외)
-        todos.forEach((t) => { if (t.time && (t.inSchedule ?? true)) evs.push({ id: t.id, kind: 'todo' as const, title: t.text, category: 'amber', startM: toMin(t.time), endM: toMin(t.time) + 30, done: t.done }); });
-      }
-      return layoutDay(evs);
+  /**
+   * 주간 = 요일별 목록. 타임그리드가 아니다.
+   * 세로 화면에서 7일 타임그리드는 칸이 너무 좁아(360px 에서 46px) 제목을 못 읽고,
+   * 칸 폭을 확보하면 가로 스크롤이 생겨 "한눈에 주 전체" 라는 목적 자체가 깨진다.
+   * 시간대 겹침 파악은 하루 뷰가 담당하고, 주간은 "언제 무엇이 있나" 에 집중한다.
+   * 시간 없는 종일 일정도 여기서는 정상적으로 보인다(그리드에선 빠져 있었다).
+   */
+  const weekList = useMemo(() => weekDays.map((d) => {
+    const ev = schedules.filter((s) => s.date === d).map((s) => ({
+      kind: 'sched' as const, id: s.id, time: s.time, end: s.end,
+      title: s.title, place: s.place, category: s.category, done: false, repeatId: s.repeatId,
+    }));
+    const td = d === todayISO
+      ? todos.filter((t) => t.inSchedule ?? !!t.time).map((t) => ({
+          kind: 'todo' as const, id: t.id, time: t.time || '', end: '',
+          title: t.text, place: '', category: 'amber', done: t.done, repeatId: undefined as string | undefined,
+        }))
+      : [];
+    // 종일(시간 없음)이 맨 위, 그다음 시간순
+    const items = [...ev, ...td].sort((a, b) => {
+      if (!a.time && b.time) return -1;
+      if (a.time && !b.time) return 1;
+      return a.time.localeCompare(b.time);
     });
-    let minM = 8 * 60, maxM = 19 * 60;
-    perDay.forEach((day) => day.forEach((e) => { minM = Math.min(minM, e.startM); maxM = Math.max(maxM, e.endM); }));
-    return { perDay, startHour: Math.max(0, Math.floor(minM / 60)), endHour: Math.min(24, Math.ceil(maxM / 60)) };
-  }, [weekDays, schedules, todos, todayISO]);
-  const hours = useMemo(() => Array.from({ length: week.endHour - week.startHour }, (_, i) => week.startHour + i), [week]);
-  const gridH = (week.endHour - week.startHour) * HOUR_PX;
-
-  // 현재 시각 선(1분마다 갱신)
-  const [nowM, setNowM] = useState(() => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); });
-  useEffect(() => {
-    const id = window.setInterval(() => { const d = new Date(); setNowM(d.getHours() * 60 + d.getMinutes()); }, 60000);
-    return () => window.clearInterval(id);
-  }, []);
-  const showNow = weekDays.includes(todayISO) && nowM >= week.startHour * 60 && nowM <= week.endHour * 60;
-  const nowTop = ((nowM - week.startHour * 60) / 60) * HOUR_PX;
+    return { date: d, items };
+  }), [weekDays, schedules, todos, todayISO]);
   const weekRange = weekDays.length ? `${fromISO(weekDays[0]).getMonth() + 1}.${fromISO(weekDays[0]).getDate()} – ${fromISO(weekDays[6]).getMonth() + 1}.${fromISO(weekDays[6]).getDate()}` : '';
 
   // 월 그리드 — 표시 중인 달(monthAnchor) 기준
@@ -374,56 +344,54 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
             <span className={styles.wgRange}>{weekRange}</span>
             <button type="button" className={styles.weekArrow} onClick={() => setSel(addDays(sel, 7))} aria-label="다음 주"><ChevronRight size={16} /></button>
           </div>
-          {/* 가로로 밀어 일주일 전체를 본다. 칸 폭(--wg-col)은 읽을 수 있게 고정하고
-              넘치는 만큼 스크롤 — 시간축과 요일 머리글은 sticky 로 붙어 있는다. */}
-          <div className={styles.wgViewport}>
-            <div className={styles.wgInner}>
-              <div className={styles.wgHead}>
-                <span className={styles.wgGutter} />
-                {weekDays.map((d) => {
-                  const dd = fromISO(d);
-                  return (
-                    <button key={d} type="button" className={`${styles.wgDayBtn} ${d === sel ? styles.wgDaySel : ''}`} onClick={() => setSel(d)}>
-                      <span className={`${styles.wgDow} ${dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : ''}`}>{DOW[dd.getDay()]}</span>
-                      <span className={`${styles.wgDayNum} ${d === todayISO ? styles.wgToday : ''}`}>{dd.getDate()}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            {/* STYLE-EXCEPTION: 시간축 높이는 이벤트 개수에 따른 동적 런타임 값 */}
-            <div className={styles.wgGrid} style={{ height: gridH }}>
-              <div className={styles.wgGutterCol}>
-                {hours.map((h) => <div key={h} className={styles.wgHour}><span>{String(h).padStart(2, '0')}:00</span></div>)}
-              </div>
-              <div className={styles.wgCols}>
-                {week.perDay.map((day, ci) => (
-                  <div key={weekDays[ci]} className={`${styles.wgCol} ${weekDays[ci] === todayISO ? styles.wgColToday : ''}`}>
-                    {day.map((e) => {
-                      const top = ((e.startM - week.startHour * 60) / 60) * HOUR_PX;
-                      const h = Math.max(((e.endM - e.startM) / 60) * HOUR_PX, 24);
-                      const w = 100 / e.cols;
-                      // 블록이 낮으면 시간까지 넣을 세로 공간이 없다 → 제목만(위치가 이미 시간을 말해준다)
-                      const compact = h < 40;
-                      return (
-                        <button key={`${e.kind}-${e.id}`} type="button"
-                          className={`${styles.wgEvt} ${styles[`c_${e.category}`]} ${e.done ? styles.wgEvtDone : ''}`}
-                          /* STYLE-EXCEPTION: 시간대 위치·크기·레인 폭은 동적 런타임 값 */
-                          style={{ top, height: h, left: `${e.lane * w}%`, width: `calc(${w}% - 3px)` }}
-                          onClick={() => { setSel(weekDays[ci]); setView('day'); }}>
-                          {!compact && <span className={styles.wgEvtTime}>{fmtMin(e.startM)}</span>}
-                          <span className={styles.wgEvtTitle}>{e.title}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))}
-                {showNow && (
-                  /* STYLE-EXCEPTION: 현재 시각 위치는 동적 런타임 값 */
-                  <div className={styles.wgNow} style={{ top: nowTop }} aria-hidden><span className={styles.wgNowDot} /></div>
-                )}
-              </div>
-            </div>
-            </div>
+          {/* 요일별 섹션 목록 — 세로 스크롤만. 날짜 머리글을 누르면 그날 하루 뷰로 간다. */}
+          <div className={styles.wlBody}>
+            {weekList.map(({ date, items }) => {
+              const dd = fromISO(date);
+              const isToday = date === todayISO;
+              const dowCls = dd.getDay() === 0 || isHoliday(dd) ? styles.sun : dd.getDay() === 6 ? styles.sat : '';
+              return (
+                <section key={date} className={`${styles.wlDay} ${isToday ? styles.wlDayToday : ''}`}>
+                  <button type="button" className={styles.wlHead}
+                    onClick={() => { setSel(date); setView('day'); }}
+                    aria-label={`${dd.getMonth() + 1}월 ${dd.getDate()}일 하루 일정 보기`}>
+                    <span className={`${styles.wlDow} ${dowCls}`}>{DOW[dd.getDay()]}</span>
+                    <span className={`${styles.wlDate} ${dowCls}`}>{dd.getMonth() + 1}.{dd.getDate()}</span>
+                    {isToday && <span className={styles.wlToday}>오늘</span>}
+                    {/* 빈 날은 머리글 한 줄로만 — 7일 중 여러 날이 비면 빈 줄이 화면을 잡아먹는다 */}
+                    <span className={`${styles.wlCount} ${items.length ? '' : styles.wlCountEmpty}`}>
+                      {items.length ? `${items.length}건` : '일정 없음'}
+                    </span>
+                    <ChevronRight size={14} className={styles.wlGo} aria-hidden />
+                  </button>
+
+                  {items.length > 0 && (
+                    <ul className={styles.wlList}>
+                      {items.map((it) => (
+                        <li key={`${it.kind}-${it.id}`} className={`${styles.wlItem} ${it.done ? styles.wlItemDone : ''}`}>
+                          <span className={styles.wlTime}>
+                            <b>{it.time || '종일'}</b>
+                            {it.end && <s>~{it.end}</s>}
+                          </span>
+                          <span className={`${styles.wlBar} ${styles[`p_${it.category}`]}`} aria-hidden />
+                          <button type="button" className={styles.wlMain}
+                            onClick={() => {
+                              // 일정은 바로 수정, 할 일은 그날 하루 뷰로(거기서 완료 토글)
+                              if (it.kind === 'sched') { const s = schedules.find((x) => x.id === it.id); if (s) { openEdit(s); return; } }
+                              setSel(date); setView('day');
+                            }}>
+                            <span className={styles.wlTitle}>{it.title}</span>
+                            {it.kind === 'todo' && <span className={styles.wlChip}>할 일</span>}
+                            {it.repeatId && <Repeat size={11} className={styles.repMark} aria-label="반복 일정" />}
+                            {it.place && <span className={styles.wlPlace}><MapPin size={10} /> {it.place}</span>}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              );
+            })}
           </div>
         </div>
       )}

@@ -225,61 +225,56 @@
 .soon { display: inline-flex; align-items: center; gap: 4px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); margin-top: 4px; }
 
 /* ===== 주간 시간표 뷰 ===== */
-/* --wg-col: 한 칸 최소 폭. 이보다 좁히면 제목이 세로로 잘린다
-   (360px 폰에서 7칸을 다 넣으면 40px = 한글 2자/줄이 되어 못 읽음).
-   94px 면 글자영역 84px = 한글 6자/줄. 7칸이 화면을 넘치면 가로로 스크롤한다. */
-.wg { margin-top: 2px; --wg-col: 94px; }
+/* 주간 = 요일별 목록.
+   타임그리드는 세로 화면에서 7칸을 넣으면 한 칸이 46px(한글 2자/줄)이라 제목을 못 읽고,
+   칸 폭을 확보하면 가로 스크롤이 생겨 "한눈에 주 전체" 라는 목적이 깨진다.
+   목록은 세로로만 스크롤하고 제목이 잘리지 않으며, 종일 일정도 자연스럽게 들어간다. */
+.wg { margin-top: 2px; }
 .wgNav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px; }
 .wgRange { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-primary); font-variant-numeric: tabular-nums; }
-/* 가로 스크롤 뷰포트 — 일주일(7칸)을 옆으로 밀어 본다.
-   칸 폭을 좁히면 제목이 세로로 잘리므로(360px 폰에서 40px = 한글 2자)
-   칸은 --wg-col 로 고정하고 넘치는 만큼 스크롤한다. */
-.wgViewport {
-  max-height: 62dvh;
-  overflow: auto;                     /* 가로·세로 동시 */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;     /* 끝에서 뒤로가기 제스처로 새지 않게 */
-  margin-top: 2px;
-}
-.wgInner { min-width: 100%; width: max-content; }
 
-.wgHead {
-  display: flex; align-items: stretch;
-  border-bottom: 1px solid var(--dia-border); padding-bottom: 4px;
-  position: sticky; top: 0; z-index: 3;   /* 세로로 밀어도 요일은 붙어 있는다 */
-  background: var(--dia-bg);
+.wlBody { display: flex; flex-direction: column; gap: var(--dia-space-3); }
+.wlDay { border-radius: var(--dia-radius-md); }
+/* 오늘은 왼쪽 띠로 표시 — 배경을 칠하면 카테고리 색과 경쟁한다 */
+.wlDayToday { box-shadow: inset 3px 0 0 var(--dia-blue); padding-left: 7px; }
+
+.wlHead {
+  width: 100%; display: flex; align-items: center; gap: 7px;
+  padding: 6px 2px; border-bottom: 1px solid var(--dia-border-light);
+  min-height: 44px; box-sizing: border-box; text-align: left;
 }
-/* 시간축 자리 — 가로로 밀어도 왼쪽에 붙어 있는다 */
-.wgGutter {
-  width: 38px; flex-shrink: 0;
-  position: sticky; left: 0; z-index: 4;
-  background: var(--dia-bg);
+.wlHead:active { background: var(--dia-surface-hover); }
+.wlDow { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-secondary); min-width: 16px; }
+.wlDate { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); font-variant-numeric: tabular-nums; }
+.wlToday { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-on-color); background: var(--dia-blue); border-radius: 999px; padding: 1px 7px; }
+.wlCount { margin-left: auto; font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-tertiary); }
+/* 빈 날은 한 줄로만 — 글자를 더 죽여 일정 있는 날이 먼저 눈에 들어오게 한다 */
+.wlCountEmpty { font-weight: 600; opacity: 0.75; }
+.wlGo { flex-shrink: 0; color: var(--dia-text-tertiary); }
+
+.wlList { list-style: none; margin: 0; padding: 4px 0 0; display: flex; flex-direction: column; gap: 2px; }
+.wlItem { display: flex; align-items: flex-start; gap: 7px; }
+/* 시간 열 고정 폭 — 제목 시작점이 세로로 맞아 훑어보기 쉽다 */
+.wlTime {
+  flex-shrink: 0; width: 52px; padding-top: 9px;
+  display: flex; flex-direction: column; align-items: flex-end;
+  font-variant-numeric: tabular-nums; line-height: 1.15;
 }
-/* 한 칸 = --wg-col 이상(읽을 수 있는 폭), 남으면 늘어나되 줄지는 않는다 */
-.wgDayBtn { flex: 1 0 var(--wg-col); min-width: var(--wg-col); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 3px 0; border-radius: 8px; }
-.wgDayBtn:active { transform: scale(0.96); }
-.wgDaySel { background: var(--dia-blue-dim); }
-.wgDow { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-tertiary); }
-.wgDayNum { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-primary); width: 22px; height: 22px; display: grid; place-items: center; }
-.wgToday { background: var(--dia-blue); color: #fff; border-radius: 50%; }
-.wgGrid { display: flex; position: relative; }
-/* 시간 눈금 — 가로로 밀어도 왼쪽 고정 */
-.wgGutterCol {
-  width: 38px; flex-shrink: 0;
-  position: sticky; left: 0; z-index: 2;
-  background: var(--dia-bg);
+.wlTime b { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-secondary); }
+.wlTime s { font-size: var(--dia-text-meta); text-decoration: none; color: var(--dia-text-tertiary); }
+/* 카테고리는 얇은 세로 막대 — 목록은 폭이 넉넉해 배경을 칠할 필요가 없다 */
+.wlBar { flex-shrink: 0; width: 3px; align-self: stretch; min-height: 34px; border-radius: 2px; margin-top: 4px; }
+
+.wlMain {
+  flex: 1; min-width: 0; text-align: left;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px;
+  padding: 8px 4px; min-height: 44px; box-sizing: border-box; border-radius: var(--dia-radius-sm);
 }
-.wgHour { height: 56px; box-sizing: border-box; position: relative; }
-.wgHour span { position: absolute; top: -7px; right: 6px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-variant-numeric: tabular-nums; background: var(--dia-bg); padding: 0 1px; }
-.wgCols { position: relative; flex: 1; min-width: 0; display: flex; background-image: repeating-linear-gradient(to bottom, var(--dia-border-light) 0, var(--dia-border-light) 1px, transparent 1px, transparent 56px); }
-.wgCol { position: relative; flex: 1 0 var(--wg-col); min-width: var(--wg-col); border-left: 1px solid var(--dia-border-light); }
-.wgColToday { background: color-mix(in srgb, var(--dia-blue) 6%, transparent); }
-.wgEvt { position: absolute; overflow: hidden; border-radius: 6px; padding: 2px 4px; display: flex; flex-direction: column; gap: 0; text-align: left; border: 1px solid var(--dia-border-light); }
-.wgEvtTime { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); font-variant-numeric: tabular-nums; line-height: 1.25; }
-.wgEvtTitle { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-text-primary); line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.wgEvtDone .wgEvtTitle { text-decoration: line-through; color: var(--dia-text-tertiary); }
-.wgNow { position: absolute; left: 0; right: 0; height: 2px; background: var(--dia-red); z-index: 6; pointer-events: none; }
-.wgNowDot { position: absolute; left: -2px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--dia-red); }
+.wlMain:active { background: var(--dia-surface-hover); }
+.wlTitle { font-size: var(--dia-text-sm); font-weight: 700; color: var(--dia-text-primary); word-break: keep-all; }
+.wlChip { font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-amber-text); background: var(--dia-amber-dim); border-radius: 999px; padding: 0 6px; }
+.wlPlace { display: inline-flex; align-items: center; gap: 2px; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); min-width: 0; }
+.wlItemDone .wlTitle { text-decoration: line-through; color: var(--dia-text-tertiary); }
 
 /* 반복 일정 */
 .repeatRow { display: flex; gap: 6px; }

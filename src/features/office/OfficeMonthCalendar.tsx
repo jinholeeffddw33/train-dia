@@ -5,12 +5,11 @@ import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useOfficeStore } from '@/stores/office';
 import { isHoliday } from '@/lib/schedule';
 import Modal from '@/components/common/Modal';
-import dotColor from './ScheduleManager.module.css'; // 카테고리 점 색(p_*)만 재사용 — 크기는 이 파일 것
+// 카테고리 색만 재사용 — 크기는 이 파일 것. b_*(제목 바탕색) / p_*(팝업 목록의 점)
+import catBg from './ScheduleManager.module.css';
 import styles from './OfficeMonthCalendar.module.css';
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
-/** 칸에 찍는 점 최대 개수 — 넘치면 날짜를 눌러 팝업에서 전부 본다 */
-const MAX_DOTS = 3;
 
 function iso(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -27,7 +26,8 @@ function addMonths(s: string, n: number): string {
 /**
  * 내근직 홈 '이번 달 일정' — 보기 전용 미니 달력.
  * 편집은 일정관리(ScheduleManager) 전체화면이 담당하므로 여기선 한눈에 보기에 집중한다.
- * 일정은 제목 대신 색 점으로 표시 — 칸 폭이 좁아 제목은 어차피 잘려서 못 읽는다.
+ * 칸에는 첫 일정의 제목을 카테고리 바탕색으로 한 줄만 보여준다(나머지는 +N).
+ * 글자영역이 34~46px 뿐이라 3자 안팎에서 잘리지만, 색과 함께 보면 무슨 일정인지 떠올릴 수 있다.
  * 날짜를 누르면 그 날 일정 전체가 팝업으로 뜬다.
  */
 export default function OfficeMonthCalendar() {
@@ -102,10 +102,10 @@ export default function OfficeMonthCalendar() {
                   {dd.getDate()}
                 </span>
                 {evs.length > 0 && (
-                  <span className={styles.dots}>
-                    {evs.slice(0, MAX_DOTS).map((e) => (
-                      <span key={e.id} className={`${styles.dot} ${dotColor[`p_${e.category}`]}`} />
-                    ))}
+                  <span className={styles.chips}>
+                    {/* 칸이 좁아 첫 일정 하나만 제목으로, 나머지는 개수로 */}
+                    <span className={`${styles.chip} ${catBg[`b_${evs[0].category}`]}`}>{evs[0].title}</span>
+                    {evs.length > 1 && <span className={styles.more}>+{evs.length - 1}</span>}
                   </span>
                 )}
               </button>
@@ -126,7 +126,7 @@ export default function OfficeMonthCalendar() {
             <div className={styles.dayList}>
               {openEvents.map((e) => (
                 <div key={e.id} className={styles.dayRow}>
-                  <span className={`${styles.dayDot} ${dotColor[`p_${e.category}`]}`} />
+                  <span className={`${styles.dayDot} ${catBg[`p_${e.category}`]}`} />
                   <span className={styles.dayTime}>{e.time || '종일'}{e.end ? `~${e.end}` : ''}</span>
                   <span className={styles.dayTitle}>{e.title}</span>
                   {e.place && <span className={styles.dayPlace}><MapPin size={11} /> {e.place}</span>}

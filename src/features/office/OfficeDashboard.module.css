@@ -19,8 +19,11 @@
   overflow-x: hidden;
 }
 
-/* 내부 컴포넌트 가로 정렬 — 월드허브와 동일한 420px 컬럼 (기존 560px → 화면 폭이 달라 보이던 원인) */
-.dash > * {
+/* 내부 컴포넌트 가로 정렬 — 월드허브와 동일한 420px 컬럼 (기존 560px → 화면 폭이 달라 보이던 원인)
+   ★ 전체화면 오버레이(.schedOverlay)는 제외한다.
+     position: fixed + inset:0 로 화면을 덮어야 하는데 max-width:420px 가 폭을 잘라
+     그 바깥으로 뒤의 대시보드가 그대로 비쳤다(스크롤도 잘린 상자에만 걸렸다). */
+.dash > *:not(.schedOverlay) {
   align-self: center;
   width: 100%;
   max-width: 420px;

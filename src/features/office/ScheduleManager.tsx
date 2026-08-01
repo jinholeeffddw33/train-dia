@@ -304,10 +304,10 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
                   {/* 공휴일도 일요일과 같은 빨강 — 요일만 보면 제헌절 같은 날이 검게 나온다 */}
                   <span className={`${styles.mNum} ${dow === 0 || isHoliday(dd) ? styles.sun : dow === 6 ? styles.sat : ''} ${c === todayISO ? styles.mTodayNum : ''}`}>{dd.getDate()}</span>
                   <span className={styles.mChips}>
+                    {/* 카테고리는 점이 아니라 제목 바탕색으로 구분 — 좁은 칸에서 점이 먹던 8px 를 제목이 쓴다 */}
                     {evs.slice(0, 3).map((e) => (
-                      <span key={e.id} className={styles.mChip}>
-                        <span className={`${styles.mChipDot} ${styles[`p_${e.category}`]}`} />
-                        <span className={styles.mChipTxt}>{e.title}</span>
+                      <span key={e.id} className={`${styles.mChip} ${styles[`b_${e.category}`]}`} title={e.title}>
+                        {e.title}
                       </span>
                     ))}
                     {evs.length > 3 && <span className={styles.mMore}>+{evs.length - 3}</span>}

@@ -21,6 +21,13 @@
   --dia-amber-text: #FBBF24;    /* dark bg 위 텍스트 (10.7:1) — 라이트는 :root.light 오버라이드 */
   --dia-sky-text: #38BDF8;      /* dark bg 위 텍스트 (9.9:1) — 라이트는 :root.light 오버라이드 */
   --dia-blue-text: #60A5FA;     /* dark bg 위 텍스트 (7.2:1) — 라이트는 :root.light 오버라이드 */
+  /* 일정 카테고리 칩 전용 — 26% 틴트 배경 위 텍스트. 일반 -text 토큰보다 밝게 잡아야
+     틴트를 진하게 올려도 4.5:1 이 유지된다(실측: 다크 5.73~7.41:1). */
+  --dia-cat-blue-text: #93C5FD;
+  --dia-cat-amber-text: #FCD34D;
+  --dia-cat-green-text: #6EE7B7;
+  --dia-cat-purple-text: #C4B5FD;
+  --dia-cat-gray-text: #CBD5E1;
   --dia-on-amber: #451a03;      /* amber bg 위 텍스트 — 모드 무관 항상 dark (9.8:1) */
   --dia-text-on-color: #FFFFFF; /* 색 배지/필 배경 위 텍스트 — 모드 무관 항상 white */
   --dia-purple: #8B5CF6;
@@ -400,6 +407,12 @@
   --dia-green-text: #15803D;    /* light bg 위 텍스트 (4.5:1 on white — #16a34a는 실측 2.98:1이라 상향) */
   --dia-amber-text: #B45309;    /* light bg 위 텍스트 (4.5:1 on white) */
   --dia-sky-text: #0284C7;      /* light bg 위 텍스트 (4.5:1 on white) */
+  /* 일정 카테고리 칩 전용 — 26% 틴트 배경 위 텍스트 (실측: 라이트 4.96~7.45:1) */
+  --dia-cat-blue-text: #1D4ED8;
+  --dia-cat-amber-text: #92400E;
+  --dia-cat-green-text: #166534;
+  --dia-cat-purple-text: #5B21B6;
+  --dia-cat-gray-text: #334155;
   --dia-pink: #DB2777;          /* 라이트 배경 가독(진한 핑크) */
   --dia-pink-dim: rgba(219, 39, 119, 0.13);
   --dia-blue-text: #1D4ED8;     /* light bg 위 텍스트 (6.3:1 on white) */

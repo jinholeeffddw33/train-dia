@@ -2,7 +2,10 @@
 .sel {
   flex: 1 1 auto;
   min-width: 0;
-  background: var(--dia-surface);
+  /* --dia-surface 는 --zg-card-fill(반투명 글래스 그라디언트)이라 solid 색이 없다.
+     시트(--dia-sheet-fill)도 같은 글래스여서 셀렉트가 배경에 묻혀 "안 보인다".
+     StandbyCoverage 와 동일하게 solid --dia-bg 를 써서 시트와 확실히 분리한다. */
+  background: var(--dia-bg);
   border: 1.5px solid var(--dia-border-strong);
   border-radius: var(--dia-radius-md);
   color: var(--dia-text-primary);
@@ -10,11 +13,19 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   padding: 7px 4px;
+  /* 터치 타겟 — 기존 약 36px 은 CLAUDE.md 3.3(최소 44px, 50-60대 48px 권장) 미달 */
+  min-height: 48px;
   box-sizing: border-box;
   appearance: none;
   -webkit-appearance: none;
   text-align: center;
   text-align-last: center;
+}
+/* 네이티브 드롭다운 목록 — color-scheme 만으로는 삼성 인터넷 등에서 색이 어긋나는 경우가 있어
+   배경·글자를 명시한다(select 의 밝은 글자색이 흰 팝업에 그대로 상속되는 것 방지). */
+.sel option {
+  background: var(--dia-bg-elevated);
+  color: var(--dia-text-primary);
 }
 .sel:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 1px; }
 .colon { flex-shrink: 0; font-weight: 800; color: var(--dia-text-tertiary); }

@@ -200,7 +200,7 @@ export default function ExchangeRequest() {
 
   return (
     <div className={styles.container}>
-      <h2 className={`${styles.pageTitle} z-app-header z-app-header-frost`}>교번 교체</h2>
+      <h2 className={`${styles.pageTitle} z-app-header`}>교번 교체</h2>
 
       {/* 서브 탭 — 버튼 4법 ① 이어진 세그먼트(상태선택, 슬라이딩 thumb) */}
       <div

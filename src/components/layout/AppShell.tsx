@@ -25,9 +25,9 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
   // 진입 시 '근무'(대시보드) 탭으로 시작 — '홈' 탭은 맨 앞(WorldHub)으로 나가는 액션
   const [activeTab, setActiveTab] = useState<TabId>(initialTab ?? 'work');
   // SW 등록/업데이트 배너는 루트의 ServiceWorkerRegistrar가 전역 담당 (중복 등록 방지)
-  // ZINOSB 헤더 통일 이식 — window 스크롤 모델. 아래로 스크롤 시 헤더(.z-app-header)·TabBar 슬라이드 숨김,
-  // 위로 올리면 복귀 + topZone 통과 후 frosted. data-attr 로 후손 헤더/탭바에 전파.
-  const { hidden: chromeHidden, frosted: chromeFrosted } = useHeaderScroll();
+  // 하단 TabBar 만 스크롤 방향에 따라 숨긴다. 상단 헤더(.z-app-header)는 2026-08-03 부터
+  // 고정/자동숨김을 걷어내고 본문과 함께 스크롤 — 헤더만 따로 움직여 보이던 문제.
+  const { hidden: chromeHidden } = useHeaderScroll();
 
 
   const triggerScroll = useTrainStore((s) => s.triggerScroll);
@@ -72,8 +72,6 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
     <div
       className={styles.shell}
       data-has-back={onBack ? '' : undefined}
-      data-chrome-hidden={chromeHidden ? '' : undefined}
-      data-chrome-frosted={chromeFrosted ? '' : undefined}
     >
       {/* 업데이트 배너 — 루트 ServiceWorkerRegistrar로 이동 */}
       {/* 조회 모드 배너 — 삭제: HomeHeader 내 돌아가기 버튼으로 통합 */}

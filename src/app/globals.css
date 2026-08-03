@@ -339,36 +339,13 @@ input, textarea, select {
   box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-violet-glow);
 }
 
-/* ════════ 상단 헤더 통일 — ZINOSB AppPageHeader 스크롤 엔진 이식 (2026-06-23) ════════
-   탭 헤더 요소에 .z-app-header 를 붙이면 sticky + 아래로 스크롤 시 위로 슬라이드 숨김.
-   AppShell 이 useHeaderScroll → shell[data-chrome-hidden]/[data-chrome-frosted] 로 후손에 전파.
-   기하 불변(transform/opacity 만) → reflow 0. backdrop 전역 무력화라 frost=반투명 솔리드 fill.
-   - .z-app-header        : sticky top + 스크롤 숨김 (모든 탭 헤더 공통)
-   - .z-app-header-frost  : + 상단 노치(--sat) 패딩 + frosted 배경(투명 타이틀 헤더용 — 컨테이너에
-                            이미 safe-area-top 이 있으면 그쪽을 빼고 이걸 쓴다, 이중 패딩 방지) */
+/* ════════ 상단 헤더 통일 — 본문과 한 덩어리로 스크롤 (2026-08-03) ════════
+   .z-app-header 는 각 탭(근무·달력·5호선·더보기)의 맨 위 헤더에 붙는다.
+   2026-06-23 ~ 08-03: sticky + 아래로 스크롤 시 슬라이드 숨김(ZINOSB AppPageHeader 이식).
+   → 헤더만 제자리에 고정돼 있다가 뒤늦게 미끄러져 본문과 따로 노는 것처럼 보였고,
+     탭마다(교번은 고정 헤더 자체가 없음) 움직임이 달라 화면이 겹쳐 보인다는 지적을 받았다.
+   지금은 고정/자동숨김 없이 본문과 함께 위로 올라간다 — 교번 탭과 동일한 모델.
+   position: relative 는 유지: 헤더 안 absolute 자식(새로고침 버튼 등)의 기준점이다. */
 .z-app-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--dia-layer-fixed);
-  transition: transform 0.3s ease-out;
-  will-change: transform;
-}
-[data-chrome-hidden] .z-app-header {
-  transform: translateY(-100%);
-}
-/* frost 변형 — 헤더 뒤 반투명 솔리드 배경(스크롤 후 등장). 노치/패딩/full-width(음수 margin)는
-   헤더별 모듈에서 처리(탭마다 컨테이너 패딩이 달라 이중 방지). 여기선 frost 레이어만. */
-.z-app-header-frost::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--dia-bg);
-  border-bottom: 1px solid var(--dia-border);
-  opacity: 0;
-  transition: opacity 0.3s ease-out;
-  pointer-events: none;
-}
-[data-chrome-frosted] .z-app-header-frost::before {
-  opacity: 1;
+  position: relative;
 }

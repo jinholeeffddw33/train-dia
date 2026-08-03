@@ -6,11 +6,9 @@
   font-size: var(--dia-text-xl);
   font-weight: var(--dia-weight-bold);
   color: var(--dia-text-primary);
-  /* ZINOSB 헤더 통일 — sticky frost 헤더 바. 컨테이너 좌우 패딩(16px) 음수 상쇄로 full-width frost,
-     텍스트는 padding-inline 으로 재정렬. 노치=padding-top. .z-app-header(transform-hide)+.z-app-header-frost(배경). */
-  position: sticky;
-  top: 0;
-  z-index: var(--dia-layer-fixed);
+  /* 헤더 통일 — 고정하지 않고 본문과 함께 스크롤(.z-app-header). 컨테이너 좌우 패딩(16px)
+     음수 상쇄로 full-width, 텍스트는 padding-inline 으로 재정렬. 노치=padding-top. */
+  position: relative;
   margin-inline: calc(-1 * var(--dia-space-4));
   padding: calc(var(--sat) + var(--dia-space-3)) var(--dia-space-4) var(--dia-space-3);
   margin-bottom: var(--dia-space-3);

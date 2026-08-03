@@ -93,9 +93,11 @@
   transform: scale(0.98);
 }
 
-/* ── Back to Hub button ── */
+/* ── Back to Hub button ──
+   fixed → absolute (2026-08-03): 화면에 붙어 혼자 떠 있으면 본문·헤더와 따로 움직여 보인다.
+   맨 위 요소는 전부 본문과 함께 올라가게 통일. 스크롤로 사라져도 하단 '홈' 탭이 같은 동작. */
 .backBtn {
-  position: fixed;
+  position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 8px);
   left: calc(env(safe-area-inset-left, 0px) + 10px);
   z-index: var(--dia-layer-fixed);

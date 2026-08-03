@@ -40,7 +40,7 @@ export default function MoreTab() {
 
   return (
     <div className={styles.container}>
-      <h2 className={`${styles.pageTitle} z-app-header z-app-header-frost`}>
+      <h2 className={`${styles.pageTitle} z-app-header`}>
         <span>일상생활 서비스</span>
       </h2>
 

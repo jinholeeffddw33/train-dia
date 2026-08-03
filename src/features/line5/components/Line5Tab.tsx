@@ -62,7 +62,7 @@ export default function Line5Tab() {
   return (
     <div className={styles.container}>
       {/* 헤더 */}
-      <div className={`${styles.header} z-app-header z-app-header-frost`}>
+      <div className={`${styles.header} z-app-header`}>
         <h2 className={styles.title}>5호선 실시간</h2>
       </div>
 

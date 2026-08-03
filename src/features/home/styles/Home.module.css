@@ -6,11 +6,8 @@
   color: var(--dia-text-primary);
   border-bottom: 1px solid var(--dia-border);
   padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
-  /* ZINOSB 헤더 통일 — sticky + 스크롤-숨김(.z-app-header transform). 자체 gradient bg/노치 보유라 frost 불필요.
-     모듈에서 직접 sticky 선언(글로벌 .z-app-header position 과 소스순서 충돌 회피). */
-  position: sticky;
-  top: 0;
-  z-index: var(--dia-layer-fixed);
+  /* 헤더 통일 — 고정하지 않고 본문과 함께 스크롤. relative 는 .refreshBtn(absolute) 기준점. */
+  position: relative;
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;

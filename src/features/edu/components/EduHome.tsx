@@ -36,12 +36,20 @@ interface EduHomeProps {
   onNewcomerHandbook: () => void;
 }
 
+/**
+ * 4열 그리드 = 2행. 행 단위로 성격을 묶고, 행 안에서는 배우는 순서대로 둔다.
+ *  1행 = 읽고 배우는 것 : 입문(새내기·영상) → 일상 업무(기본업무·안내방송)
+ *  2행 = 찾아보고 점검하는 것 : 이상 상황(고장조치) → 근거(규정) → 평가 → 기록
+ * 예전 순서는 '새내기'가 2행 맨 앞이라, 정작 새내기용인 '영상 가이드'(1행)와 갈라져 있었다.
+ */
 const MENU_ITEMS = [
+  // 1행 — 입문 → 일상 업무
+  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer-handbook' as const, targets: [] },
+  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  color: 'green'  as const, action: 'video-guide' as const, targets: [] },
   { id: 'duty',           label: '기본업무',   icon: ClipboardList, color: 'blue'   as const, action: 'chapters' as const, targets: ['ch1'] },
   { id: 'announce',       label: '안내방송',   icon: Mic,           color: 'purple' as const, action: 'chapters' as const, targets: ['ch8', 'ch9', 'ch10', 'ch11'] },
-  { id: 'video-guide',    label: '영상 가이드', icon: Clapperboard,  color: 'green'  as const, action: 'video-guide' as const, targets: [] },
+  // 2행 — 이상 상황 → 근거 → 점검
   { id: 'repair',         label: '고장조치',   icon: Wrench,        color: 'red'    as const, action: 'submenu'  as const, targets: [] },
-  { id: 'newcomer',       label: '새내기',     icon: DoorOpen,      color: 'amber'  as const, action: 'newcomer-handbook' as const, targets: [] },
   { id: 'edu',            label: '규정',      icon: BookOpen,      color: 'blue'   as const, action: 'training' as const, targets: [] },
   { id: 'exam',           label: '평가',      icon: Award,         color: 'green'  as const, action: 'quiz'     as const, targets: [] },
   { id: 'myinfo',         label: '내 정보',   icon: User,          color: 'purple' as const, action: 'myinfo'   as const, targets: [] },

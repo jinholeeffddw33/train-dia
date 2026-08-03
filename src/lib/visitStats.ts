@@ -21,8 +21,17 @@ const KST_OFFSET = 9 * 60 * 60 * 1000;
  * 00~09시 접속이 통째로 빠진다. 반드시 이 함수를 쓸 것.
  */
 export function getTodayStartKST(): string {
+  return getKstDayStart(0);
+}
+
+/** KST 기준 daysAgo 일 전 자정을 UTC ISO 로. 0=오늘, 1=어제. */
+export function getKstDayStart(daysAgo = 0): string {
   const kstNow = new Date(Date.now() + KST_OFFSET);
-  const kstMidnight = Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate());
+  const kstMidnight = Date.UTC(
+    kstNow.getUTCFullYear(),
+    kstNow.getUTCMonth(),
+    kstNow.getUTCDate() - daysAgo,
+  );
   return new Date(kstMidnight - KST_OFFSET).toISOString();
 }
 
@@ -31,7 +40,12 @@ export function kstDay(ts: string): string {
   return new Date(new Date(ts).getTime() + KST_OFFSET).toISOString().slice(0, 10);
 }
 
+/** KST 기준 daysAgo 일 전 날짜 (YYYY-MM-DD). 0=오늘, 1=어제. */
+export function dayKST(daysAgo = 0): string {
+  return kstDay(getKstDayStart(daysAgo));
+}
+
 /** KST 기준 오늘 날짜 (YYYY-MM-DD) */
 export function todayKST(): string {
-  return kstDay(new Date().toISOString());
+  return dayKST(0);
 }

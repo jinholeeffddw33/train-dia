@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import type { TokenPayload } from '@/lib/jwt';
-import { getTodayStartKST, kstDay, todayKST, VISIT_ACTIONS } from '@/lib/visitStats';
+import { dayKST, getKstDayStart, kstDay, todayKST, VISIT_ACTIONS } from '@/lib/visitStats';
 
 export async function GET(req: NextRequest) {
   const userOrRes = await requireAuth(req);
@@ -24,19 +24,21 @@ export async function GET(req: NextRequest) {
   }
 
   const today = todayKST();
+  const yesterday = dayKST(1);
 
   // 병렬 쿼리
   const [
-    { data: todayVisits },
+    { data: twoDayVisits },
     { data: recentLogs },
     { data: allProfiles },
     { count: totalLogs },
   ] = await Promise.all([
-    // 오늘 접속자 (app_visit + login) — KST 자정 기준
+    // 오늘+어제 접속자 (app_visit + login) — KST 자정 기준.
+    // 자정이 지나면 오늘 목록이 비워져 야간·심야 접속자를 놓친다는 요청으로 이틀치를 함께 준다.
     serverSupabase
       .from('audit_log')
       .select('user_id, user_name, action, created_at')
-      .gte('created_at', getTodayStartKST())
+      .gte('created_at', getKstDayStart(1))
       .in('action', VISIT_ACTIONS)
       .order('created_at', { ascending: false })
       .limit(5000),
@@ -59,20 +61,23 @@ export async function GET(req: NextRequest) {
       .select('id', { count: 'exact', head: true }),
   ]);
 
-  // 오늘 유니크 접속자
-  const todayUniqueMap = new Map<string, { name: string; lastAt: string; action: string }>();
-  for (const log of (todayVisits ?? [])) {
-    if (!todayUniqueMap.has(log.user_id)) {
-      todayUniqueMap.set(log.user_id, {
-        name: log.user_name,
-        lastAt: log.created_at,
-        action: log.action,
-      });
+  // 하루치 로그 → 사람별 1줄(그날의 마지막 접속). 쿼리가 최신순이라 처음 만난 게 마지막 접속이다.
+  type VisitLog = { user_id: string; user_name: string; action: string; created_at: string };
+  const uniqueByUser = (logs: VisitLog[]) => {
+    const m = new Map<string, { name: string; lastAt: string; action: string }>();
+    for (const log of logs) {
+      if (!m.has(log.user_id)) {
+        m.set(log.user_id, { name: log.user_name, lastAt: log.created_at, action: log.action });
+      }
     }
-  }
-  const todayUsers = Array.from(todayUniqueMap.entries()).map(([id, v]) => ({
-    userId: id, name: v.name, lastAt: v.lastAt, action: v.action,
-  }));
+    return Array.from(m.entries()).map(([id, v]) => ({
+      userId: id, name: v.name, lastAt: v.lastAt, action: v.action,
+    }));
+  };
+
+  const twoDay = (twoDayVisits ?? []) as VisitLog[];
+  const todayUsers = uniqueByUser(twoDay.filter((l) => kstDay(l.created_at) === today));
+  const yesterdayUsers = uniqueByUser(twoDay.filter((l) => kstDay(l.created_at) === yesterday));
 
   // 7일 일별 유니크 접속자 수
   const dailyMap = new Map<string, Set<string>>();
@@ -99,6 +104,11 @@ export async function GET(req: NextRequest) {
       uniqueCount: todayUsers.length,
       totalMembers: (allProfiles ?? []).filter(p => p.person_id !== 'ADMIN').length,
       users: todayUsers,
+    },
+    yesterday: {
+      date: yesterday,
+      uniqueCount: yesterdayUsers.length,
+      users: yesterdayUsers,
     },
     dailyStats,
     inactive: neverOrOldUsers,

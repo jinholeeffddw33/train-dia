@@ -1535,8 +1535,42 @@
 }
 
 .adminSummaryLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
+}
+
+/* 오늘↔어제 전환 카드 — 자정이 지나면 오늘 목록이 비워져 심야 접속자를 놓치던 문제.
+   버튼 4법 ② 무색 3D 솟음(테두리 대신 그림자로 깊이). */
+.adminSummaryCardBtn {
+  border: none;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: box-shadow var(--dia-transition-fast), transform var(--dia-transition-fast);
+}
+
+@media (hover: hover) {
+  .adminSummaryCardBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.adminSummaryCardBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+  transform: scale(0.98);
+}
+
+/* 반대쪽 날 미리보기 — 누르지 않아도 어제/오늘 숫자가 같이 보인다 */
+.adminSummarySub {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-blue);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 섹션 */
@@ -1554,6 +1588,15 @@
   font-weight: 600;
   color: var(--dia-text-secondary);
   margin: 0;
+}
+
+/* 어느 날짜인지 — '어제' 로 넘겼을 때 며칠인지 헷갈리지 않도록 */
+.adminSectionDate {
+  margin-left: auto;
+  font-size: var(--dia-text-meta);
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 리스트 */

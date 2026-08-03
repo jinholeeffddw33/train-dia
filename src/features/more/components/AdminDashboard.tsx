@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Users, Clock, UserX, Activity } from 'lucide-react';
+import { ArrowLeft, Users, Clock, UserX, Activity, ArrowLeftRight } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/More.module.css';
 
@@ -9,12 +9,20 @@ import styles from '../styles/More.module.css';
 
 const ADMIN_PIN = '9110';
 
+interface VisitUser { userId: string; name: string; lastAt: string; action: string }
+
 interface DashboardData {
   today: {
     date: string;
     uniqueCount: number;
     totalMembers: number;
-    users: { userId: string; name: string; lastAt: string; action: string }[];
+    users: VisitUser[];
+  };
+  /** 자정이 지나면 오늘 목록이 비워져 심야 접속자를 놓친다 → 어제도 함께 본다 */
+  yesterday: {
+    date: string;
+    uniqueCount: number;
+    users: VisitUser[];
   };
   dailyStats: { date: string; count: number }[];
   inactive: { name: string; sabun: string }[];
@@ -32,6 +40,8 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  /** 접속자 목록에 보여 줄 날 — 요약 카드를 눌러 오늘↔어제 전환 */
+  const [day, setDay] = useState<'today' | 'yesterday'>('today');
 
   const handlePinSubmit = useCallback(() => {
     if (pin === ADMIN_PIN) {
@@ -141,6 +151,13 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
   const maxDaily = Math.max(...data.dailyStats.map(d => d.count), 1);
 
+  // 선택한 날 / 반대쪽 날 — 카드는 선택한 날을 보여주고, 아래 줄에 반대쪽을 미리 알려 준다
+  const isToday = day === 'today';
+  const sel = isToday ? data.today : data.yesterday;
+  const other = isToday ? data.yesterday : data.today;
+  const selLabel = isToday ? '오늘' : '어제';
+  const otherLabel = isToday ? '어제' : '오늘';
+
   return (
     <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
       <div className={styles.overlayHeader}>
@@ -153,11 +170,20 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       <div className={styles.adminContent}>
         {/* 오늘 접속 현황 */}
         <div className={styles.adminSummary}>
-          <div className={styles.adminSummaryCard}>
+          <button
+            type="button"
+            className={`${styles.adminSummaryCard} ${styles.adminSummaryCardBtn}`}
+            onClick={() => setDay(isToday ? 'yesterday' : 'today')}
+            aria-label={`${selLabel} 접속 ${sel.uniqueCount}명. 누르면 ${otherLabel} 접속으로 바꿉니다`}
+          >
             <Users size={20} className={styles.adminSummaryIcon} />
-            <div className={styles.adminSummaryValue}>{data.today.uniqueCount}</div>
-            <div className={styles.adminSummaryLabel}>오늘 접속</div>
-          </div>
+            <div className={styles.adminSummaryValue}>{sel.uniqueCount}</div>
+            <div className={styles.adminSummaryLabel}>
+              {selLabel} 접속
+              <ArrowLeftRight size={12} aria-hidden />
+            </div>
+            <div className={styles.adminSummarySub}>{otherLabel} {other.uniqueCount}명</div>
+          </button>
           <div className={styles.adminSummaryCard}>
             <Activity size={20} className={styles.adminSummaryIcon} />
             <div className={styles.adminSummaryValue}>{data.today.totalMembers}</div>
@@ -170,17 +196,18 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
           </div>
         </div>
 
-        {/* 오늘 접속자 목록 */}
+        {/* 접속자 목록 — 위 요약 카드에서 고른 날 */}
         <div className={styles.adminSection}>
           <h3 className={styles.adminSectionTitle}>
-            <Clock size={16} /> 오늘 접속자 ({data.today.uniqueCount}명)
+            <Clock size={16} /> {selLabel} 접속자 ({sel.uniqueCount}명)
+            <span className={styles.adminSectionDate}>{formatDate(sel.date)}</span>
           </h3>
-          {data.today.users.length === 0 ? (
-            <p className={styles.adminEmptyText}>오늘 접속자가 없어요</p>
+          {sel.users.length === 0 ? (
+            <p className={styles.adminEmptyText}>{selLabel} 접속자가 없어요</p>
           ) : (
             <div className={styles.adminList}>
-              {data.today.users.map((u, i) => (
-                <div key={i} className={styles.adminListItem}>
+              {sel.users.map((u) => (
+                <div key={u.userId} className={styles.adminListItem}>
                   <span className={styles.adminListName}>{u.name}</span>
                   <span className={styles.adminListTime}>{formatTime(u.lastAt)}</span>
                 </div>

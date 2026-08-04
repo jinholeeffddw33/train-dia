@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { TrainFront, FileText, ChevronRight, Briefcase, Calendar } from 'lucide-react';
+import { TrainFront, FileText, ChevronRight, Briefcase, Calendar, CalendarDays } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useGetSwappedDia } from '@/hooks/useSwappedDia';
 import {
@@ -17,9 +17,11 @@ import styles from './HubHero.module.css';
 interface HubHeroProps {
   /** 카드 본체 클릭 → 근무 세계 진입 */
   onClick?: () => void;
+  /** 하단 '달력' 버튼 → 근무 세계의 달력 탭으로 바로 진입 */
+  onOpenCalendar?: () => void;
 }
 
-export default function HubHero({ onClick }: HubHeroProps) {
+export default function HubHero({ onClick, onOpenCalendar }: HubHeroProps) {
   const [chartOpen, setChartOpen] = useState(false);
   // 0 = 오늘, 1 = 내일
   const [dayOffset, setDayOffset] = useState<0 | 1>(0);
@@ -75,6 +77,11 @@ export default function HubHero({ onClick }: HubHeroProps) {
   const openChart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (info?.dia && !info.isRest) setChartOpen(true);
+  };
+  // 카드 전체가 '근무 진입' 버튼이라, 안쪽 버튼은 반드시 전파를 막아야 한다
+  const openCalendar = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onOpenCalendar?.();
   };
 
   // ─── 1) 내근직 (기관사 외 직원) 전용 카드 ───
@@ -229,19 +236,34 @@ export default function HubHero({ onClick }: HubHeroProps) {
           </div>
         )}
 
-        {/* 근무날만 다이아 표 버튼 노출 (비번/휴무/대휴/운휴/정보 없음 → 미노출) */}
-        {isWorking && (
-          <button
-            type="button"
-            className={styles.detailBtn}
-            onClick={openChart}
-            aria-label="다이아 표 보기"
-          >
-            <FileText size={18} strokeWidth={2.2} className={styles.detailIcon} aria-hidden />
-            <span>근무 정보 상세보기</span>
-            <ChevronRight size={18} className={styles.detailChevron} aria-hidden />
-          </button>
-        )}
+        {/* 하단 액션 — 다이아 표는 근무날만, 달력은 항상.
+            비번·휴무일수록 "다음 근무가 언제인지" 를 달력에서 찾게 되므로 늘 노출한다. */}
+        <div className={styles.heroActions}>
+          {isWorking && (
+            <button
+              type="button"
+              className={styles.detailBtn}
+              onClick={openChart}
+              aria-label="다이아 표 보기"
+            >
+              <FileText size={18} strokeWidth={2.2} className={styles.detailIcon} aria-hidden />
+              <span>근무 정보 상세보기</span>
+              <ChevronRight size={18} className={styles.detailChevron} aria-hidden />
+            </button>
+          )}
+          {onOpenCalendar && (
+            <button
+              type="button"
+              className={`${styles.detailBtn} ${isWorking ? styles.calBtnCompact : ''}`}
+              onClick={openCalendar}
+              aria-label="이번 달 근무 달력 보기"
+            >
+              <CalendarDays size={18} strokeWidth={2.2} className={styles.detailIcon} aria-hidden />
+              <span>{isWorking ? '달력' : '이번 달 달력 보기'}</span>
+              {!isWorking && <ChevronRight size={18} className={styles.detailChevron} aria-hidden />}
+            </button>
+          )}
+        </div>
       </div>
 
       {info && (

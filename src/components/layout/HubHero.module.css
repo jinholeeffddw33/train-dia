@@ -299,14 +299,31 @@
 }
 
 /* ── 상세보기 버튼 — 독립 액션 (모달 오픈) ── */
+/* 하단 액션 행 — 근무날은 [근무 정보 상세보기][달력], 비번·휴무는 [이번 달 달력 보기] 하나 */
+.heroActions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* 근무날 2개 나란히 놓일 때의 '달력' — 아이콘+짧은 라벨만, 폭을 덜 먹는다 */
+.calBtnCompact {
+  width: auto;
+  flex: 0 0 auto;
+  padding-inline: 12px;
+  gap: 6px;
+}
+
 .detailBtn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   width: 100%;
+  min-width: 0;
+  flex: 1;
   padding: 9px 14px;
-  margin-top: 2px;
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: var(--dia-radius-md);

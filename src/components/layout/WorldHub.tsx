@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarDays, ChevronRight, Settings, Star } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Star } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -20,7 +20,8 @@ const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 export type WorldId = 'duty' | 'edu' | 'safety' | 'life' | 'standby';
 
 interface WorldHubProps {
-  onEnter: (world: WorldId) => void;
+  /** tab 을 주면 그 월드의 해당 탭으로 바로 들어간다(달력 바로가기 등) */
+  onEnter: (world: WorldId, tab?: 'work' | 'calendar' | 'line' | 'duty' | 'more') => void;
   /** 일정관리 대시보드로 교차 진입(기관사도 내근직 대시보드 사용) */
   onOpenSchedule?: () => void;
   onOpenSettings?: () => void;
@@ -125,8 +126,11 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
           </div>
           <button type="button" className={styles.crossCard} onClick={() => onOpenSchedule?.()}
             aria-label="일정관리 화면으로 이동" data-press>
+            {/* 아이콘은 '도착지에서 보이는 아이콘'을 그대로 쓴다 — 일정관리 대시보드의
+                퀵아이콘이 CalendarRange 라 여기도 같은 걸 쓴다. CalendarDays 는
+                근무 달력(탭바 아이콘) 몫으로 남겨 둔다 — 같은 화면에서 겹치면 헷갈린다. */}
             <span className={styles.crossTop}>
-              <CalendarDays size={16} strokeWidth={2.4} />
+              <CalendarRange size={16} strokeWidth={2.4} />
               <span className={styles.crossText}>{todayLabel()}</span>
             </span>
             <span className={styles.crossGo}>일정관리 보기 <ChevronRight size={13} /></span>
@@ -135,7 +139,10 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
       </header>
 
       {/* ── Today's Duty Hero ── */}
-      <HubHero onClick={() => onEnter('duty')} />
+      <HubHero
+        onClick={() => onEnter('duty')}
+        onOpenCalendar={() => onEnter('duty', 'calendar')}
+      />
 
       {/* ── 주요 서비스 ── */}
       <section className={styles.servicesWrap} aria-labelledby="services-title">

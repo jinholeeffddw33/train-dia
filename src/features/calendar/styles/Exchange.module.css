@@ -41,6 +41,7 @@
   display: flex;
   gap: 6px;
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
   scrollbar-width: none;
@@ -342,6 +343,7 @@
   display: flex;
   gap: var(--dia-space-2);
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   padding-bottom: 2px;
 }
@@ -694,6 +696,7 @@
   display: flex;
   gap: var(--dia-space-2);
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   padding-bottom: 2px;
   scrollbar-width: none;

@@ -26,7 +26,7 @@
 .count { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-tertiary); }
 
 /* 빠른 메모 (고정 컬러카드, 가로 스크롤) */
-.quickScroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.quickScroll { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
 .quickCard { flex: 0 0 150px; display: flex; flex-direction: column; gap: 3px; text-align: left; border-radius: var(--dia-radius-lg); padding: 11px 12px; min-height: 92px; }
 .qcTitle { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-primary); }
 .qcBody { flex: 1; font-size: var(--dia-text-meta); color: var(--dia-text-secondary); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
@@ -40,7 +40,7 @@
 .c_gray { background: color-mix(in srgb, var(--dia-text-tertiary) 14%, transparent); }
 
 /* 필터 */
-.filterRow { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: var(--dia-space-3); -webkit-overflow-scrolling: touch; }
+.filterRow { display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; margin-bottom: var(--dia-space-3); -webkit-overflow-scrolling: touch; }
 .f, .fOn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; font-size: var(--dia-text-meta); font-weight: 800; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-secondary); }
 .fOn { background: var(--dia-blue); color: #fff; border-color: transparent; }
 .fdot { width: 8px; height: 8px; border-radius: 50%; }

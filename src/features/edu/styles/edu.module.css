@@ -1307,6 +1307,7 @@
 /* table */
 .tableWrap {
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   border-radius: var(--dia-radius-md);
   border: 1px solid var(--dia-border);
@@ -1778,6 +1779,7 @@
   padding-bottom: max(var(--dia-space-3), env(safe-area-inset-bottom));
   flex-shrink: 0;
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
 }
 
 .slideViewerDot {
@@ -4898,6 +4900,7 @@
 .rescueTableWrap {
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   margin-top: var(--dia-space-3);
 }
@@ -5534,6 +5537,7 @@
 
 .mrTrainScroll {
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
   padding: var(--dia-space-2) var(--dia-space-3);
 }
@@ -5875,6 +5879,7 @@
   gap: 1px;
   padding: var(--dia-space-2) 0;
   overflow-x: auto;
+  overflow-y: hidden; /* 가로 전용 — overflow-y 를 명시하지 않으면 auto 로 계산돼 세로 스크롤 상자가 된다 */
   -webkit-overflow-scrolling: touch;
 }
 

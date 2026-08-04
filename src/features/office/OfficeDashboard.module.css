@@ -36,9 +36,12 @@
   position: absolute;
   border-radius: var(--dia-radius-full);
   pointer-events: none;
-  filter: blur(60px);
-  /* 자체 레이어로 올려 blur 를 한 번만 굽는다. 없으면 8~10초 루프가 도는 내내
-     360px 짜리 blur(60px) 를 매 프레임 다시 그려 스크롤 프레임을 잡아먹는다. */
+  /* filter: blur(60px) 를 걷어냈다.
+     배경이 이미 가장자리가 투명으로 사라지는 radial-gradient 라 흐림이 눈에 띄게
+     더해주는 게 없는데, 8초·10초 무한 루프가 도는 내내 이 화면에서 매 프레임 일하는
+     유일한 요소였다. 대시보드는 페이지 자체가 스크롤돼서 그 비용이 스크롤 프레임과
+     그대로 부딪힌다 — 스크롤이 중간에 멈칫하던 원인.
+     will-change 는 남긴다: 필터가 빠진 지금은 이동이 순수 합성 작업이 된다. */
   will-change: transform;
 }
 

@@ -30,7 +30,10 @@
   position: absolute;
   border-radius: var(--dia-radius-full);
   pointer-events: none;
-  filter: blur(60px);
+  /* 내근직 대시보드와 같은 이유로 filter: blur(60px) 제거 — 배경이 이미 투명으로
+     사라지는 radial-gradient 라 흐림 효과 차이는 거의 없는데, 무한 루프가 도는 내내
+     스크롤 프레임을 갉아먹는다. 이동은 will-change 로 합성기에 맡긴다. */
+  will-change: transform;
 }
 
 .hub::before {

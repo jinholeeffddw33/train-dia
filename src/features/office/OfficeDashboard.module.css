@@ -16,7 +16,15 @@
   padding-right: max(var(--dia-space-4), env(safe-area-inset-right, 0px));
   background: var(--dia-bg);
   position: relative;
-  overflow-x: hidden;
+  /* overflow-x 만 hidden 이면 명세상 overflow-y 가 auto 로 계산돼 .dash 자체가
+     스크롤 상자가 된다. 그런데 배경 오브(::after)가 bottom:-10% 로 바닥 아래까지
+     뻗어 있어 그만큼 '스크롤 가능한 넘침'이 생겼다.
+     → 페이지 안에 스크롤 영역이 둘(.dash + 문서). 크롬은 한 제스처를 안쪽에 물고
+       있다가(scroll latching) 안쪽이 끝에 닿으면 그 제스처로는 더 안 움직이고,
+       손을 떼고 다시 굴려야 바깥이 움직인다 — 스크롤이 중간에 멈췄다 가던 원인.
+     양축을 hidden 으로 닫아 .dash 를 사용자 스크롤 대상에서 뺀다. 오브의 위쪽 bleed 는
+     이미 auto 가 잘라내고 있었으므로 보이는 모습은 그대로다. */
+  overflow: hidden;
 }
 
 /* 내부 컴포넌트 가로 정렬 — 월드허브와 동일한 420px 컬럼 (기존 560px → 화면 폭이 달라 보이던 원인)

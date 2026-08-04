@@ -13,7 +13,10 @@
   padding-right: max(var(--dia-space-4), env(safe-area-inset-right, 0px));
   background: var(--dia-bg);
   position: relative;
-  overflow-x: hidden;
+  /* .dash 와 같은 문제 — overflow-x 만 hidden 이면 overflow-y 가 auto 로 계산돼
+     이 요소가 스크롤 상자가 되고, bottom:-10% 인 배경 오브가 스크롤 가능한 넘침을
+     만든다. 스크롤 영역이 둘이 되어 중간에 한 번 걸린다. 양축을 닫는다. */
+  overflow: hidden;
 }
 
 /* 내부 컴포넌트 가로 정렬 — max-width 카드를 좌측 정렬 */

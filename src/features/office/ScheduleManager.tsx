@@ -204,6 +204,14 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
 
   return (
     <div className={styles.wrap}>
+      {/*
+        스크롤은 이 안쪽(.scroll)이 담당한다. 바깥 .schedOverlay 가 스크롤러였을 때는
+        그 안에 position:fixed 인 FAB·바텀시트가 들어 있어서, 스크롤할 때마다 고정 요소를
+        제자리에 붙잡아 두느라 합성기(compositor)가 빠른 경로를 못 탔다 — 멈칫거리던 원인.
+        고정 요소들을 스크롤 영역 밖(.wrap 직계)으로 빼고, 스크롤 상자는 순수 콘텐츠만 담는다.
+        보이는 모습은 그대로다(헤더도 같이 스크롤).
+      */}
+      <div className={styles.scroll}>
       {/* 헤더 */}
       <header className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onClose} aria-label="닫기"><ArrowLeft size={20} /></button>
@@ -423,8 +431,9 @@ export default function ScheduleManager({ onClose, startMonth = false, startView
           ))}
         </div>
       )}
+      </div>
 
-      {/* FAB */}
+      {/* FAB — 스크롤 상자 밖. 안에 두면 위 주석의 합성 문제가 되돌아온다 */}
       <button type="button" className={styles.fab} onClick={() => openAdd()} aria-label="일정 추가"><Plus size={24} /></button>
 
       {/* 날짜 탭 → 하단 시트 (그날 일정을 달력 아래로 스크롤하지 않고 바로 확인) */}

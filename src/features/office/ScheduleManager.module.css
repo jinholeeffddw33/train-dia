@@ -1,10 +1,23 @@
 /* ===== 일정관리 (하루 타임라인) ===== */
+/* 화면을 꽉 채우고 스크롤은 안쪽 .scroll 이 맡는다 — 바깥 오버레이가 스크롤러이면
+   그 안의 position:fixed(FAB·바텀시트)를 매 프레임 붙잡아 두느라 스크롤이 멈칫거린다. */
 .wrap {
-  padding: calc(var(--sat) + var(--dia-space-2)) var(--dia-space-4)
-           calc(90px + env(safe-area-inset-bottom, 0px));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   max-width: 560px;
   margin: 0 auto;
   position: relative;
+}
+
+/* 실제 스크롤 상자 — 고정 요소가 하나도 없는 순수 콘텐츠 */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--sat) + var(--dia-space-2)) var(--dia-space-4)
+           calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 /* 헤더 */

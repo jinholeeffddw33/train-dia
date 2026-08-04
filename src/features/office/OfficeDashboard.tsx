@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange,
@@ -131,6 +131,21 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
     setNoteText('');
   };
 
+  /**
+   * 전체화면 오버레이가 떠 있는 동안 뒤 페이지 스크롤을 잠근다.
+   *
+   * 오버레이(.schedOverlay)는 자체 스크롤러인데 뒤의 대시보드도 계속 스크롤 가능했다.
+   * 스크롤러가 둘이면 안드로이드 크롬이 드래그 일부를 주소창 숨김/표시에 써 버려서,
+   * 내용이 잠깐 멈췄다 다시 움직이는 끊김으로 보인다. 앱의 다른 모달들과 같은 방식.
+   */
+  const anyOverlay = scheduleOpen || noteMgrOpen || taskBoardOpen || menuOpen || newsOpen;
+  useEffect(() => {
+    if (!anyOverlay) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [anyOverlay]);
+
   const quickIcons = [
     { key: 'cal',   label: '일정관리',    tone: 'blue',   Icon: CalendarRange, onClick: () => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); } },
     { key: 'todo',  label: '오늘의 할일', tone: 'blue',   Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
@@ -139,7 +154,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   ];
 
   return (
-    <div className={styles.dash}>
+    <div className={styles.dash} data-overlay={anyOverlay ? '' : undefined}>
       {/* ── 인사말(좌) + [아이콘 + 날짜 카드](우) — 시안 배치 ── */}
       <div className={styles.headerRow}>
         <div className={styles.greetBlock}>

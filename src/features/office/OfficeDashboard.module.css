@@ -37,6 +37,15 @@
   border-radius: var(--dia-radius-full);
   pointer-events: none;
   filter: blur(60px);
+  /* 자체 레이어로 올려 blur 를 한 번만 굽는다. 없으면 8~10초 루프가 도는 내내
+     360px 짜리 blur(60px) 를 매 프레임 다시 그려 스크롤 프레임을 잡아먹는다. */
+  will-change: transform;
+}
+
+/* 전체화면 오버레이가 덮고 있으면 오브는 보이지도 않는데 계속 그려진다 → 아예 뺀다 */
+.dash[data-overlay]::before,
+.dash[data-overlay]::after {
+  display: none;
 }
 
 .dash::before {
@@ -480,6 +489,9 @@
   background: var(--dia-bg);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* 끝까지 스크롤해도 뒤 페이지로 넘어가지 않게 — 넘어가는 순간 당겨서 새로고침·
+     주소창 애니메이션이 끼어들어 스크롤이 멈칫한다 */
+  overscroll-behavior: contain;
   animation: schedIn 220ms ease;
 }
 @keyframes schedIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }

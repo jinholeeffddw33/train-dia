@@ -9,7 +9,11 @@ import { getDia, getType, getDiaDisplay, isHoliday, getSchedule, isDepotStart } 
 import { findDutyByName } from '@/lib/dutySchedule';
 import { isOffice, getOfficeName, isRegularDayOffice } from '@/lib/auth';
 import { useMemoStore } from '@/stores/memo';
+import { useOfficeStore } from '@/stores/office';
 import styles from '../styles/Calendar.module.css';
+
+/** 한 칸에 찍을 일정 점의 최대 개수 — 320px 폭에서 칸 너비가 ~38px 라 3개가 한계 */
+const MAX_SCHED_DOTS = 3;
 
 interface CalendarGridProps {
   year: number;
@@ -24,6 +28,8 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
   const authUser = useAuthStore((s) => s.user);
   const memos = useMemoStore((s) => s.memos);
   const swaps = useSwapStore((s) => s.swaps);
+  // 일정관리(내근직 일정)에 등록한 일정 — 같은 기기에 보관되므로 근무 달력에서 바로 읽는다
+  const officeSchedules = useOfficeStore((s) => s.schedules);
   // 내근직 모드: driver 있으면 driver 기준, 없으면 로그인 사용자 기준
   const officeMode = driver
     ? driver.I === '0'
@@ -33,6 +39,15 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
   const todayDate = new Date();
   const todayStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
+  /** 날짜 → 그날 일정(시간순). 셀마다 전체 배열을 훑지 않도록 한 번만 묶는다 */
+  const schedByDate = useMemo(() => {
+    const m: Record<string, { category: string }[]> = {};
+    for (const s of [...officeSchedules].sort((a, b) => a.time.localeCompare(b.time))) {
+      (m[s.date] ??= []).push({ category: s.category });
+    }
+    return m;
+  }, [officeSchedules]);
+
   type EmptyCell = { key: string; empty: true };
   type DateCell = {
     key: string; empty: false; d: number; dateStr: string;
@@ -41,6 +56,10 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
     depotStart: boolean;
     hol: boolean; hasMemo: boolean; isToday: boolean; isSelected: boolean;
     isSun: boolean; isSat: boolean; isSwapped: boolean;
+    /** 그날 일정관리에 등록된 일정 수 */
+    schedCount: number;
+    /** 점 색 = 일정 카테고리(앞에서부터 MAX_SCHED_DOTS 개) */
+    schedCats: string[];
   };
   type CalendarCell = EmptyCell | DateCell;
 
@@ -113,6 +132,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
       }
       const hol = isHoliday(date);
       const hasMemo = !!memos[dateStr];
+      const daySched = schedByDate[dateStr];
       const isToday = dateStr === todayStr;
       const isSelected = dateStr === selectedDate;
       const isSun = date.getDay() === 0;
@@ -147,10 +167,12 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
         isSun,
         isSat,
         isSwapped,
+        schedCount: daySched?.length ?? 0,
+        schedCats: (daySched ?? []).slice(0, MAX_SCHED_DOTS).map((s) => s.category),
       });
     }
     return result;
-  }, [driver, authUser, officeMode, year, month, selectedDate, memos, swaps, todayStr]);
+  }, [driver, authUser, officeMode, year, month, selectedDate, memos, swaps, todayStr, schedByDate]);
 
   return (
     <div className={styles.grid}>
@@ -174,7 +196,7 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             type="button"
             className={`${styles.cell} ${cell.isToday ? styles.cellToday : ''} ${cell.isSelected ? styles.cellSelected : ''} ${swapMode ? styles.cellSwapMode : ''} ${cell.isSwapped ? styles.cellSwapped : ''} ${cell.depotStart ? styles.cellDepotStart : ''}`}
             onClick={() => onSelectDate(cell.dateStr)}
-            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.type === 'night' ? ' 야간' : ''}${cell.depotStart ? ' 기지 출근' : ''}${cell.isSwapped ? ' (변경됨)' : ''}`}
+            aria-label={`${month}월 ${cell.d}일 ${cell.display || ''}${cell.type === 'night' ? ' 야간' : ''}${cell.depotStart ? ' 기지 출근' : ''}${cell.isSwapped ? ' (변경됨)' : ''}${cell.schedCount > 0 ? ` 일정 ${cell.schedCount}건` : ''}`}
             aria-current={cell.isToday ? 'date' : undefined}
           >
             {/* 야간 비색상 마커 — 색약/흑백에서도 주간(파랑)과 구분되도록 우상단 작은 달 */}
@@ -202,6 +224,14 @@ export default function CalendarGrid({ year, month, selectedDate, onSelectDate, 
             )}
             {cell.isSwapped && <span className={styles.swapTag}>변경</span>}
             {cell.hasMemo && !cell.isSwapped && <span className={styles.memoDot} />}
+            {/* 일정관리 일정 — 좌하단에 개수만큼 점(메모는 우하단 앰버 점이라 안 겹친다) */}
+            {cell.schedCount > 0 && (
+              <span className={styles.schedDots} aria-hidden>
+                {cell.schedCats.map((cat, i) => (
+                  <span key={i} className={`${styles.schedDot} ${styles[`sd_${cat}`] ?? styles.sd_gray}`} />
+                ))}
+              </span>
+            )}
           </button>
         ),
       )}

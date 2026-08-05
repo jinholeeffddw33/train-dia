@@ -229,6 +229,29 @@
   background: var(--dia-amber);
 }
 
+/* 일정관리에 등록한 일정 — 개수만큼 좌하단에 점. 메모(우하단 앰버)와 자리가 갈린다.
+   색은 일정 카테고리를 그대로 따라가 일정관리 화면과 같은 의미를 갖는다. */
+.schedDots {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  display: flex;
+  gap: 2px;
+}
+
+.schedDot {
+  width: 4px;
+  height: 4px;
+  border-radius: var(--dia-radius-full);
+}
+
+/* 카테고리 색 — ScheduleManager 의 .p_* 와 같은 토큰 */
+.sd_blue { background: var(--dia-blue); }
+.sd_amber { background: var(--dia-amber); }
+.sd_green { background: var(--dia-green); }
+.sd_purple { background: var(--dia-purple); }
+.sd_gray { background: var(--dia-text-tertiary); }
+
 /* 야간 근무 비색상 마커 — 색(보라)으로만 구분되던 주/야를 형태로도 구분 (우상단 작은 달) */
 .nightMark {
   position: absolute;
@@ -243,8 +266,9 @@
 
 /* ── Detail ── */
 /* 모달(바텀시트) 내부 — 자체 카드 배경 없이 시트 위에 바로(두 겹 방지) */
+/* 세로를 줄여 전체를 위로 끌어올린다 — 행로 그림과 메모가 한 화면에 더 많이 들어오게 */
 .detail {
-  padding: var(--dia-space-2) var(--dia-space-4) var(--dia-space-5);
+  padding: 0 var(--dia-space-4) var(--dia-space-4);
 }
 
 .detailHeader {
@@ -252,7 +276,7 @@
   align-items: center;
   gap: var(--dia-space-2);
   flex-wrap: wrap;
-  margin-bottom: var(--dia-space-4);
+  margin-bottom: var(--dia-space-2);
 }
 
 .detailDow {
@@ -316,18 +340,20 @@
 
 .detailTimeRow {
   display: flex;
-  gap: var(--dia-space-3);
-  margin-bottom: var(--dia-space-3);
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-2);
 }
 
-/* 출근·퇴근·근무 — 시트 위에서도 또렷한 칩(라이트/다크 공통) */
+/* 출근·퇴근·근무 — 시트 위에서도 또렷한 칩(라이트/다크 공통).
+   세로 여백을 16px → 8px 로 줄여 칩 한 줄이 ~16px 낮아진다(=아래 내용이 그만큼 올라온다).
+   숫자 크기는 건드리지 않는다 — 여기가 이 화면의 핵심 정보다. */
 .detailTimeItem {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dia-space-1);
-  padding: var(--dia-space-4) var(--dia-space-2);
+  gap: 2px;
+  padding: var(--dia-space-2);
   background: var(--dia-surface);
   border: 1.5px solid var(--dia-border-strong);
   border-radius: var(--dia-radius-lg);
@@ -337,6 +363,7 @@
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   color: var(--dia-text-secondary);
+  line-height: 1.2;
 }
 
 .detailTimeValue {
@@ -393,6 +420,55 @@
 
 .memoInput::placeholder {
   color: var(--dia-text-tertiary);
+}
+
+/* ── 그날 일정관리 일정 — 메모 아래, 제목만 ── */
+.daySchedSection {
+  margin-top: var(--dia-space-3);
+  padding-top: var(--dia-space-3);
+  border-top: 1px solid var(--dia-border-light);
+}
+
+.daySchedLabel {
+  display: block;
+  font-size: var(--dia-text-xs);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-2);
+}
+
+.daySchedList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.daySchedItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  min-width: 0;
+}
+
+.daySchedDot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--dia-radius-full);
+}
+
+/* 제목만 — 길면 한 줄에서 자른다(달력 상세는 훑어보는 자리라 줄바꿈보다 낫다) */
+.daySchedTitle {
+  min-width: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Empty ── */

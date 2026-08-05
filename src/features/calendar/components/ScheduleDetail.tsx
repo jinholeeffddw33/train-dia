@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Warehouse } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useMemoStore } from '@/stores/memo';
+import { useOfficeStore } from '@/stores/office';
 import { useSwapStore } from '@/stores/swap';
 import { getDia, getType, getSchedule, getLabel, getDiaDisplay, getWorkTime, isHoliday, isDepotStart } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
@@ -43,6 +44,7 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
   const { getMemo, setMemo, removeMemo } = useMemoStore();
   const swap = useSwapStore((s) => s.getSwap(dateStr));
   const removeSwap = useSwapStore((s) => s.removeSwap);
+  const officeSchedules = useOfficeStore((s) => s.schedules);
 
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -69,6 +71,14 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
   }, [driver, dateStr, swap]);
 
   const memo = getMemo(dateStr);
+
+  // 일정관리에 등록한 그날 일정 — 제목만 훑어보는 용도(수정은 일정관리에서)
+  const daySchedules = useMemo(
+    () => officeSchedules
+      .filter((s) => s.date === dateStr)
+      .sort((a, b) => a.time.localeCompare(b.time)),
+    [officeSchedules, dateStr],
+  );
 
   if (!info) return null;
 
@@ -162,6 +172,21 @@ export default function ScheduleDetail({ dateStr }: ScheduleDetailProps) {
           rows={2}
         />
       </div>
+
+      {/* 일정관리에 등록한 그날 일정 — 제목만. 달력 칸의 점과 같은 카테고리 색을 쓴다 */}
+      {daySchedules.length > 0 && (
+        <div className={styles.daySchedSection}>
+          <span className={styles.daySchedLabel}>등록한 일정 {daySchedules.length}건</span>
+          <ul className={styles.daySchedList}>
+            {daySchedules.map((s) => (
+              <li key={s.id} className={styles.daySchedItem}>
+                <span className={`${styles.daySchedDot} ${styles[`sd_${s.category}`] ?? styles.sd_gray}`} aria-hidden />
+                <span className={styles.daySchedTitle}>{s.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

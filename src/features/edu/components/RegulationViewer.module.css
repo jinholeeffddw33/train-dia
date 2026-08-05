@@ -560,6 +560,39 @@
   border-bottom: 1px solid var(--dia-border);
 }
 
+/* 원본 PDF 내려받기 — 버튼 4법 ② 무색 3D 솟음(테두리 대신 그림자로 깊이).
+   제목이 flex:1 이라 자동으로 우측 끝에 붙는다. */
+.pdfDownBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--dia-radius-md);
+  border: none;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: box-shadow var(--dia-transition-fast), transform 0.12s ease;
+}
+
+@media (hover: hover) {
+  .pdfDownBtn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.pdfDownBtn:active {
+  box-shadow: var(--dia-3d-pressed);
+  transform: scale(0.95);
+}
+
 .pdfIframeWrap {
   flex: 1;
   background: var(--dia-bg-elevated);

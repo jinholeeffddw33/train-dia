@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import { useFontSizeStore } from '@/stores/fontSize';
@@ -880,6 +880,20 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
               <ArrowLeft size={20} />
             </button>
             <h2 className={styles.title}>{title} (원본 p.{visiblePage})</h2>
+            {/*
+              PDF.js 툴바에도 저장 버튼이 있지만 아이콘만 있고 라벨이 영어(Save)라 찾기 어렵다.
+              같은 출처(/data/edu/regulations/*.pdf)라 download 속성이 그대로 먹는다 —
+              뷰어를 거치지 않고 한 번에 받아지고, 파일명도 규정 이름으로 저장된다.
+            */}
+            <a
+              href={pdfUrl}
+              download={`${title}.pdf`}
+              className={styles.pdfDownBtn}
+              aria-label={`${title} 원본 PDF 내려받기`}
+            >
+              <Download size={16} strokeWidth={2.2} aria-hidden />
+              <span>내려받기</span>
+            </a>
           </div>
           <div className={styles.pdfIframeWrap}>
             <iframe src={pdfSrcWithPage} title={`${title} 원본 PDF p.${visiblePage}`} className={styles.pdfIframe} />

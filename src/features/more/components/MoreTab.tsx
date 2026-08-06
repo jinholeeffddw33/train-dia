@@ -48,21 +48,7 @@ export default function MoreTab() {
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>도구</h3>
 
-        <button
-          type="button"
-          className={`${styles.toolBtn} ${styles.toolBtnHighlight}`}
-          onClick={() => setExchangeOpen(true)}
-          data-press
-        >
-          <div className={styles.settingInfo}>
-            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
-              <RefreshCw size={20} />
-            </div>
-            <span className={styles.settingLabel}>근무 교체</span>
-          </div>
-          <ChevronRight size={18} className={styles.toolArrow} />
-        </button>
-
+        {/* 교번 비교 — 맨 위 + 강조 테두리. 이 섹션에서 강조는 하나만 둔다(둘이면 강조가 아니다) */}
         <button
           type="button"
           className={`${styles.toolBtn} ${styles.toolBtnHighlight}`}
@@ -74,6 +60,20 @@ export default function MoreTab() {
               <GitCompareArrows size={20} />
             </div>
             <span className={styles.settingLabel}>교번 비교</span>
+          </div>
+          <ChevronRight size={18} className={styles.toolArrow} />
+        </button>
+
+        <button
+          type="button"
+          className={styles.toolBtn} data-press
+          onClick={() => setExchangeOpen(true)}
+        >
+          <div className={styles.settingInfo}>
+            <div className={`${styles.toolIconWrap} ${styles.toolIconGreen}`}>
+              <RefreshCw size={20} />
+            </div>
+            <span className={styles.settingLabel}>근무 교체</span>
           </div>
           <ChevronRight size={18} className={styles.toolArrow} />
         </button>

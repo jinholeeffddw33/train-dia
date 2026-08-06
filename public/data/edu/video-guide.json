@@ -2,11 +2,36 @@
   "title": "눈으로 보는 영상 가이드",
   "subtitle": "새내기 기관사 필수 영상 · 순서대로 시청",
   "categories": [
-    { "id": "newcomer", "label": "신규 적응", "emoji": "🎓", "color": "blue" },
-    { "id": "daily",    "label": "일상 업무", "emoji": "🚆", "color": "green" },
-    { "id": "trouble",  "label": "고장 조치", "emoji": "🛠️", "color": "amber" },
-    { "id": "hr",       "label": "인사·복지", "emoji": "📋", "color": "purple" },
-    { "id": "story",    "label": "지하철 이야기", "emoji": "🚇", "color": "sky" }
+    {
+      "id": "newcomer",
+      "label": "신규 적응",
+      "emoji": "🎓",
+      "color": "blue"
+    },
+    {
+      "id": "daily",
+      "label": "일상 업무",
+      "emoji": "🚆",
+      "color": "green"
+    },
+    {
+      "id": "trouble",
+      "label": "고장 조치",
+      "emoji": "🛠️",
+      "color": "amber"
+    },
+    {
+      "id": "hr",
+      "label": "인사·복지",
+      "emoji": "📋",
+      "color": "purple"
+    },
+    {
+      "id": "story",
+      "label": "지하철 이야기",
+      "emoji": "🚇",
+      "color": "sky"
+    }
   ],
   "videos": [
     {
@@ -73,17 +98,26 @@
       "source": "youtube"
     },
     {
-      "id": "overnight-parking-guide",
+      "id": "overnight-parking-guide-1",
       "order": 8,
       "category": "daily",
-      "title": "알아야 할 주박요령",
+      "title": "알아야 할 주박요령 1",
+      "url": "https://youtu.be/ru8NVuPjfdk",
+      "thumbnail": "/data/edu/thumbnails/overnight-parking-guide-1.jpg",
+      "source": "youtube"
+    },
+    {
+      "id": "overnight-parking-guide",
+      "order": 9,
+      "category": "daily",
+      "title": "알아야 할 주박요령 2",
       "url": "https://youtu.be/n-K-f0vRrNM",
       "thumbnail": "/data/edu/thumbnails/overnight-parking-guide.jpg",
       "source": "youtube"
     },
     {
       "id": "safety-driving-10-commandments",
-      "order": 9,
+      "order": 10,
       "category": "daily",
       "title": "안전운행 메뉴얼 10계명",
       "url": "https://youtu.be/M08xU9uEz3g",
@@ -91,7 +125,7 @@
     },
     {
       "id": "rescue-coupling",
-      "order": 10,
+      "order": 11,
       "category": "trouble",
       "title": "5호선 구원연결 이해하기",
       "url": "https://youtu.be/zzBidwDgTnE",
@@ -100,7 +134,7 @@
     },
     {
       "id": "rescue-coupling-2",
-      "order": 11,
+      "order": 12,
       "category": "trouble",
       "title": "5호선 구원연결 방법 2",
       "url": "https://youtu.be/g_s_W3bpieM",
@@ -108,7 +142,7 @@
     },
     {
       "id": "train-radio-lte-r",
-      "order": 12,
+      "order": 13,
       "category": "trouble",
       "title": "열차무전기 LTE-R 사용법",
       "url": "https://youtu.be/jLYTowSIQeg",
@@ -117,7 +151,7 @@
     },
     {
       "id": "train-radio-lte-r-2",
-      "order": 13,
+      "order": 14,
       "category": "trouble",
       "title": "열차무전기(LTE-R) 사용법 2",
       "url": "https://youtu.be/N_K68sAsoDw",
@@ -125,7 +159,7 @@
     },
     {
       "id": "uninterruptible-announce",
-      "order": 14,
+      "order": 15,
       "category": "trouble",
       "title": "무정전방송장치 사용법",
       "url": "https://youtu.be/PfCDzaQnOJs",
@@ -134,7 +168,7 @@
     },
     {
       "id": "emergency-brake-release",
-      "order": 15,
+      "order": 16,
       "category": "trouble",
       "title": "비상제동 완해 불능 조치 메뉴얼",
       "url": "https://youtu.be/PpK9VvtZabs",
@@ -142,7 +176,7 @@
     },
     {
       "id": "brake-release-failure",
-      "order": 16,
+      "order": 17,
       "category": "trouble",
       "title": "제동 불완해 (상용, 비상)",
       "url": "https://youtu.be/spOl6e0iRWw",
@@ -150,7 +184,7 @@
     },
     {
       "id": "traction-failure-recovery",
-      "order": 17,
+      "order": 18,
       "category": "trouble",
       "title": "역행불능시 고장조치 방법",
       "url": "https://youtu.be/Be4Gm6vAi44",
@@ -158,7 +192,7 @@
     },
     {
       "id": "eo-mode-guide",
-      "order": 18,
+      "order": 19,
       "category": "trouble",
       "title": "EO모드(비상역행) 완벽 가이드",
       "url": "https://youtu.be/A9QgWma6YLw",
@@ -166,7 +200,7 @@
     },
     {
       "id": "newcomer-vacation-guide",
-      "order": 19,
+      "order": 20,
       "category": "hr",
       "title": "새내기를 위한 휴가 가이드",
       "url": "https://youtu.be/vt1YYw9SYPo",
@@ -175,7 +209,7 @@
     },
     {
       "id": "promotion-guide",
-      "order": 20,
+      "order": 21,
       "category": "hr",
       "title": "승진! 그것이 알고싶다",
       "url": "https://youtu.be/7-XCv8RrGDc",
@@ -184,7 +218,7 @@
     },
     {
       "id": "subway-gate-secret",
-      "order": 21,
+      "order": 22,
       "category": "story",
       "title": "지하철 개찰구의 비밀",
       "url": "https://youtu.be/d5Go8yDQPjg",

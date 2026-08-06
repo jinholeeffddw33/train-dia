@@ -35,6 +35,9 @@ interface VideoGuideListProps {
   onBack: () => void;
 }
 
+/** 화면에 보이는 순서대로 매긴 강 번호(no)를 붙인 영상 */
+type NumberedVideo = VideoItem & { no: number };
+
 const SOURCE_LABEL: Record<string, string> = {
   'naver-cafe': '네이버 카페',
   'youtube': '유튜브',
@@ -82,7 +85,7 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
     .sort((a, b) => a.order - b.order);
   const categories = data?.categories ?? [];
   // 카테고리별로 그룹화 — 카테고리 없는 영상은 마지막에 "기타"로
-  const groupedVideos: { category: VideoCategory; items: VideoItem[] }[] = (() => {
+  const groupedVideos: { category: VideoCategory; items: NumberedVideo[] }[] = (() => {
     if (categories.length === 0) return [];
     const map = new Map<string, VideoItem[]>();
     for (const cat of categories) map.set(cat.id, []);
@@ -91,11 +94,19 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
       if (v.category && map.has(v.category)) map.get(v.category)!.push(v);
       else other.push(v);
     }
+    /**
+     * 강 번호는 order 가 아니라 "화면에 보이는 순서"로 붙인다.
+     * order 는 JSON 기본 영상(1~)과 DB 등록 영상(9000~)이 섞여 있어
+     * 그대로 쓰면 목록 중간에 "9001강" 이 튀어나온다.
+     */
+    let no = 0;
+    const number = (items: VideoItem[]) => items.map((v) => ({ ...v, no: ++no }));
     const groups = categories
       .map((c) => ({ category: c, items: map.get(c.id) ?? [] }))
-      .filter((g) => g.items.length > 0);
+      .filter((g) => g.items.length > 0)
+      .map((g) => ({ category: g.category, items: number(g.items) }));
     if (other.length > 0) {
-      groups.push({ category: { id: '_other', label: '기타', emoji: '📁' }, items: other });
+      groups.push({ category: { id: '_other', label: '기타', emoji: '📁' }, items: number(other) });
     }
     return groups;
   })();
@@ -162,13 +173,14 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
           <div className={styles.videoGuideList}>
             {sortedVideos.map((video, idx) => {
               const thumb = video.thumbnail || getYouTubeThumbnail(video.url);
+              const no = idx + 1;
               return (
                 <div key={video.id} className={styles.videoGuideItem}>
                   <button
                     type="button"
                     className={styles.videoGuideCard}
                     onClick={() => openVideo(video.id, video.url)}
-                    aria-label={`${video.order}강 ${video.title} 재생`}
+                    aria-label={`${no}강 ${video.title} 재생`}
                   >
                     <div className={styles.videoGuideThumb}>
                       {thumb ? (
@@ -186,7 +198,7 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                     </div>
                     <div className={styles.videoGuideBody}>
                       <div className={styles.videoGuideTitle}>
-                        <span className={styles.videoGuideOrder}>{video.order}강</span>
+                        <span className={styles.videoGuideOrder}>{no}강</span>
                         <span>{video.title}</span>
                       </div>
                       {video.description && (
@@ -226,13 +238,14 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                 <div className={styles.videoGuideList}>
                   {group.items.map((video, idx) => {
                     const thumb = video.thumbnail || getYouTubeThumbnail(video.url);
+                    const no = video.no;
                     return (
                       <div key={video.id} className={styles.videoGuideItem}>
                         <button
                           type="button"
                           className={styles.videoGuideCard}
                           onClick={() => openVideo(video.id, video.url)}
-                          aria-label={`${video.order}강 ${video.title} 재생`}
+                          aria-label={`${no}강 ${video.title} 재생`}
                         >
                           <div className={styles.videoGuideThumb}>
                             {thumb ? (
@@ -250,7 +263,7 @@ export default function VideoGuideList({ onBack }: VideoGuideListProps) {
                           </div>
                           <div className={styles.videoGuideBody}>
                             <div className={styles.videoGuideTitle}>
-                              <span className={styles.videoGuideOrder}>{video.order}강</span>
+                              <span className={styles.videoGuideOrder}>{no}강</span>
                               <span>{video.title}</span>
                             </div>
                             {video.description && (

@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabase } from '@/lib/supabase-lazy';
 
 export type SafetyCategory = 'hazard' | 'action' | 'inspect';
 
@@ -64,6 +66,10 @@ interface HazardState {
   fetchReadStatus: (reportId: string) => Promise<ReadStatusResponse | null>;
   toggleLike: (reportId: string, name: string, sabun: string) => Promise<void>;
   incrementView: (reportId: string) => Promise<void>;
+  /** 목록을 비우지 않고 조용히 갱신 — 실시간 반영용 (fetchReports 는 스피너용이라 목록을 비운다) */
+  refreshReports: (currentSabun?: string, category?: SafetyCategory) => Promise<void>;
+  /** 실시간 구독 — 정리 함수를 돌려준다. 화면 마운트 시 1회 호출. */
+  subscribeRealtime: (opts?: { sabun?: string; category?: SafetyCategory }) => () => void;
 }
 
 export const useHazardStore = create<HazardState>()((set, get) => ({
@@ -335,5 +341,79 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
           : r,
       ),
     }));
+  },
+
+  /**
+   * 목록을 **비우지 않고** 갱신한다.
+   * fetchReports 는 시작하자마자 `reports: []` 로 비우는데(스피너를 보여주려고),
+   * 실시간 갱신에 그걸 쓰면 남이 글을 올릴 때마다 내 화면의 목록이 통째로 깜빡인다.
+   * 읽던 자리를 잃지 않도록 조용히 갈아끼운다.
+   */
+  refreshReports: async (currentSabun?: string, category?: SafetyCategory) => {
+    try {
+      const params = new URLSearchParams();
+      if (currentSabun) params.set('sabun', currentSabun);
+      if (category) params.set('category', category);
+      const qs = params.toString();
+      const res = await fetch(`/api/safety/hazards${qs ? `?${qs}` : ''}`);
+      if (!res.ok) return;
+      const json = (await res.json()) as { data: HazardReport[] };
+      set({ reports: json.data ?? [] });
+    } catch {
+      // 네트워크 에러 — 조용히 실패(다음 이벤트나 수동 새로고침에 따라잡는다)
+    }
+  },
+
+  /**
+   * 안전 게시판 실시간 구독 (2026-08-09 신설).
+   *
+   * 이전에는 hazard 만 실시간이 아니었다 — 공지(alerts)·교체요청(exchange)·대전게임은
+   * 이미 postgres_changes 를 쓰고 있었는데, 안전 게시판은 수동 새로고침 전까지
+   * 남이 올린 위험요인이 안 보였다. 안전 정보는 늦게 보는 것 자체가 위험이다.
+   *
+   * 구조는 stores/alert.ts 의 패턴을 그대로 따른다(supabase-js 지연 로드 → 채널 구독 → 정리).
+   * · hazard_reports  : 새 글/수정/삭제/해결처리 → 목록 조용히 갱신
+   * · hazard_comments : 댓글 변경 → **이미 열어 둔 글의 댓글만** 다시 읽는다
+   *   (전체를 다시 읽으면 안 보고 있는 글까지 네트워크를 쓴다)
+   *
+   * ⚠️ 좋아요(hazard_likes)·읽음(hazard_reads)은 구독하지 않는다 —
+   *   변경이 잦은데 화면에 미치는 영향은 카운트 숫자뿐이라, 트래픽 대비 이득이 없다.
+   *   해당 카운트는 각자의 액션 응답으로 이미 갱신된다.
+   */
+  subscribeRealtime: (opts) => {
+    let channel: RealtimeChannel | null = null;
+    let cancelled = false;
+
+    getSupabase().then((sb) => {
+      if (!sb || cancelled) return;
+      channel = sb
+        .channel('hazard-realtime')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'hazard_reports' },
+          () => { get().refreshReports(opts?.sabun, opts?.category); },
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'hazard_comments' },
+          (payload) => {
+            const row = (payload.new ?? payload.old) as { report_id?: string } | null;
+            const reportId = row?.report_id;
+            // 열어 둔 글의 댓글만 갱신 — 그 외는 다음에 열 때 최신을 받는다
+            if (reportId && get().comments[reportId]) get().fetchComments(reportId);
+            // 댓글 수 배지는 목록에 있으므로 목록도 조용히 갱신
+            get().refreshReports(opts?.sabun, opts?.category);
+          },
+        )
+        .subscribe();
+    });
+
+    return () => {
+      cancelled = true;
+      if (channel) {
+        const ch = channel;
+        getSupabase().then((sb) => { sb?.removeChannel(ch); });
+      }
+    };
   },
 }));

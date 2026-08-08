@@ -99,6 +99,7 @@ function CategoryListView({
   onCloseForm: () => void;
 }) {
   const fetchReports = useHazardStore((s) => s.fetchReports);
+  const subscribeHazardRealtime = useHazardStore((s) => s.subscribeRealtime);
   const reports = useHazardStore((s) => s.reports);
   const loading = useHazardStore((s) => s.loadingReports);
   const isInspect = category === 'inspect';
@@ -108,6 +109,13 @@ function CategoryListView({
   useEffect(() => {
     fetchReports(sabun, category);
   }, [fetchReports, sabun, category]);
+
+  // 실시간 반영 — 남이 올린 위험요인/공지가 새로고침 없이 바로 보인다.
+  // 공지(alerts)·교체요청은 이미 실시간이었는데 안전 게시판만 빠져 있었다.
+  // 안전 정보는 늦게 보는 것 자체가 위험이라 여기가 오히려 더 필요했다.
+  useEffect(() => {
+    return subscribeHazardRealtime({ sabun, category });
+  }, [subscribeHazardRealtime, sabun, category]);
 
   const handleAddClick = () => {
     if (isInspect && !adminUser) {

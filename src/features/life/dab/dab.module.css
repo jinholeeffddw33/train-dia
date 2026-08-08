@@ -1,16 +1,17 @@
-/* ═══════════════════════════════════════════
- * DAB · Define Answer Beyond 휴식 모듈 스타일
- * ═══════════════════════════════════════════ */
+/* ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+ * DAB 쨌 Define Answer Beyond ?댁떇 紐⑤뱢 ?ㅽ???
+ * ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??*/
 
-/* ── ASMR Therapy ── */
+/* ?? ASMR Therapy ?? */
 .asmrWrap {
   min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(ellipse 80% 50% at 50% 10%, rgba(99, 102, 241, 0.18), transparent 70%),
     radial-gradient(ellipse 70% 40% at 50% 90%, rgba(168, 85, 247, 0.12), transparent 70%),
     var(--dia-bg);
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
 }
 
 .asmrHeader {
@@ -60,7 +61,7 @@
   margin: 0;
 }
 
-/* 웨이브폼 */
+/* ?⑥씠釉뚰뤌 */
 .waveWrap {
   position: relative;
   width: 100%;
@@ -89,7 +90,7 @@
   pointer-events: none;
 }
 
-/* ── YouTube 플레이어 ── */
+/* ?? YouTube ?뚮젅?댁뼱 ?? */
 .ytPlayerWrap {
   position: relative;
   width: 100%;
@@ -118,7 +119,7 @@
   text-align: center;
 }
 
-/* 테마 카드 */
+/* ?뚮쭏 移대뱶 */
 .themeGrid {
   display: flex;
   flex-direction: column;
@@ -215,7 +216,7 @@
   50% { opacity: 1; }
 }
 
-/* ── 라이트 모드 오버라이드 ── */
+/* ?? ?쇱씠??紐⑤뱶 ?ㅻ쾭?쇱씠???? */
 :root.light .asmrWrap {
   background:
     radial-gradient(ellipse 80% 50% at 50% 10%, rgba(99, 102, 241, 0.12), transparent 70%),
@@ -232,7 +233,7 @@
   border-color: rgba(99, 102, 241, 0.5);
 }
 
-/* ───────────────────── Zen Bonsai ───────────────────── */
+/* ????????????????????? Zen Bonsai ????????????????????? */
 .bonsaiWrap {
   min-height: 100vh;
   min-height: 100dvh;
@@ -255,7 +256,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--dia-space-3) var(--dia-space-4);
-  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
+  padding-top: calc(var(--dia-space-3) + var(--sat));
   gap: var(--dia-space-2);
   position: relative;
   z-index: 3;
@@ -374,7 +375,7 @@
   filter: drop-shadow(0 2px 12px rgba(253, 224, 71, 0.08));
 }
 
-/* 실사 이미지 — SVG 위에 절대 위치로 겹쳐서 덮음 (이미지가 없으면 onError로 unmount → SVG 보임) */
+/* ?ㅼ궗 ?대?吏 ??SVG ?꾩뿉 ?덈? ?꾩튂濡?寃뱀퀜????쓬 (?대?吏媛 ?놁쑝硫?onError濡?unmount ??SVG 蹂댁엫) */
 .bonsaiPhotoWrap {
   position: absolute;
   inset: 0;
@@ -502,7 +503,7 @@
 
 .bonsaiBottom {
   padding: var(--dia-space-4);
-  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--dia-space-4) + var(--sab));
   display: flex;
   flex-direction: column;
   gap: var(--dia-space-3);
@@ -553,7 +554,7 @@
   background: linear-gradient(145deg, #4ade80, #22c55e);
 }
 
-/* ───────────────────── 확장: 포인트 게이지 / 계절 / 도감 ───────────────────── */
+/* ????????????????????? ?뺤옣: ?ъ씤??寃뚯씠吏 / 怨꾩젅 / ?꾧컧 ????????????????????? */
 .bonsaiProgressBar {
   position: relative;
   margin: 0 16px 4px;
@@ -592,7 +593,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* 날씨 뱃지 */
+/* ?좎뵪 諭껋? */
 .weatherBadge {
   display: inline-flex;
   align-items: center;
@@ -627,7 +628,7 @@
   color: #fca5a5 !important;
 }
 
-/* 계절별 배경 */
+/* 怨꾩젅蹂?諛곌꼍 */
 .season_spring {
   background: linear-gradient(to bottom, #fff7f9, #fef3f6) !important;
 }
@@ -668,7 +669,7 @@
   overflow: visible;
 }
 
-/* 완성 팝업 */
+/* ?꾩꽦 ?앹뾽 */
 .bonsaiCompleted {
   position: absolute;
   top: 30%;
@@ -703,7 +704,7 @@
   color: #b45309;
 }
 
-/* 하단 컨트롤 그룹 */
+/* ?섎떒 而⑦듃濡?洹몃９ */
 .bonsaiActions {
   display: flex;
   gap: 10px;
@@ -738,13 +739,13 @@
   transform: scale(0.95);
 }
 
-/* ───────────────────── 도감 ───────────────────── */
+/* ????????????????????? ?꾧컧 ????????????????????? */
 .collectionWrap {
   min-height: 100vh;
   min-height: 100dvh;
   background: linear-gradient(to bottom, #faf7f0, #f5f0e6);
   color: #1e293b;
-  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--dia-space-4) + var(--sab));
 }
 
 :root.dark .collectionWrap {
@@ -894,7 +895,7 @@
   border-radius: 999px;
 }
 
-/* ───────────────────── 무지개 링 (오늘 첫 성장) ───────────────────── */
+/* ????????????????????? 臾댁?媛?留?(?ㅻ뒛 泥??깆옣) ????????????????????? */
 .bonsaiRainbow {
   position: absolute;
   top: 50%;
@@ -914,7 +915,7 @@
   filter: blur(1px);
 }
 
-/* 무지개 스파클 — 일반 스파클 변종 */
+/* 臾댁?媛??ㅽ뙆?????쇰컲 ?ㅽ뙆??蹂醫?*/
 .bonsaiSparkleRainbow {
   background: linear-gradient(135deg, #fef3c7, #fce7f3, #ddd6fe) !important;
   color: #7c3aed !important;
@@ -922,7 +923,7 @@
   box-shadow: 0 4px 18px rgba(167, 139, 250, 0.55) !important;
 }
 
-/* ───────────────────── 마일스톤 팝업 ───────────────────── */
+/* ????????????????????? 留덉씪?ㅽ넠 ?앹뾽 ????????????????????? */
 .bonsaiMilestone {
   position: absolute;
   top: 22%;

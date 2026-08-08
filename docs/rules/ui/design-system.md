@@ -49,6 +49,29 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## CSS-SAFEAREA-001 — safe-area 는 토큰 경유 (노치/다이내믹 아일랜드)
+
+raw `env(safe-area-inset-*)` 신규 사용 **금지** → `var(--sat)` / `var(--sab)` / `var(--sal)` / `var(--sar)`.
+
+**왜** — `layout.tsx` 가 `viewportFit:'cover'` + `appleWebApp.statusBarStyle:'black-translucent'` 이라 콘텐츠가 이미 상태바 뒤까지 올라가 있다. iOS PWA standalone 에는 `env(safe-area-inset-top)` 이 **0 을 반환하는 WebKit 버그**가 있어, raw `env()` 를 쓰면 fallback `0px` 이 그대로 먹혀 헤더가 노치·다이내믹 아일랜드 밑으로 들어간다. 보정식(`html.pwa-ios { --sat: max(env(...), 20px) }`)은 `globals.css` 한 곳에만 있으므로 화면이 raw `env()` 를 쓰면 그 보정을 통째로 우회한다.
+
+- 정의부(`--sat: env(...)`)만 raw `env()` 를 쓴다 — 거기가 정답 자리. SSOT: `src/styles/tokens.css` + `src/app/globals.css` 플랫폼 오버라이드.
+- 플랫폼 클래스(`html.pwa-ios` / `html.pwa-android`)는 `layout.tsx` 인라인 스크립트가 hydration 전에 붙이며, **standalone 일 때만** 붙는다(일반 Safari 브라우징은 `env()` 가 정상 0 이라 바닥값을 걸면 없던 여백이 생김).
+- 전역 `--sab` 에 최소 높이를 깔지 않는다 — 하단 inset 이 정상 0 인 기기에서 빈 띠가 생긴다(ZINOSB 도 같은 이유로 전역을 안 건드림).
+- 예외: 직전 줄 `/* SAFEAREA-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-safearea.mjs` (`check:safearea`) · severity **fail** · **전량 스캔**(이관 완료로 위반 0 이라 baseline 불필요).
+
+## CSS-VIEWPORT-UNIT-001 — bare 100vh 금지
+
+`100vh` 는 iOS 주소창 높이를 포함해 화면이 잘린다. 반드시 바로 다음 줄에 같은 속성의 `100dvh` 폴백 짝을 둔다(구형 브라우저용 점진적 향상 — `100vh` 를 *지우는* 게 아니라 `100dvh` 를 *덧붙인다*).
+
+```css
+min-height: 100vh;   /* 구형 폴백 */
+min-height: 100dvh;  /* 실제 적용 */
+```
+- 예외: 직전 줄 `/* VIEWPORT-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-safearea.mjs` (`check:safearea`) · severity **fail**.
+
 ---
 
 ## 보류 룰 (train-dia 미도입 — ZINOSB_SYSTEM_PORT.md 참조)

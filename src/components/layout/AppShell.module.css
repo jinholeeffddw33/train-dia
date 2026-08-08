@@ -10,20 +10,21 @@
   max-width: 480px;
   margin: 0 auto;
   padding-bottom: calc(var(--dia-tab-height-safe) + var(--dia-space-4));
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* 뒤로가기 버튼 있을 때 컨텐츠 상단 여백 */
+/* ?ㅻ줈媛湲?踰꾪듉 ?덉쓣 ??而⑦뀗痢??곷떒 ?щ갚 */
 .shell[data-has-back] .content {
   padding-top: 36px;
   min-height: 100dvh;
 }
 
-/* ── Update Banner — ServiceWorkerRegistrar.module.css 로 이동 ── */
+/* ?? Update Banner ??ServiceWorkerRegistrar.module.css 濡??대룞 ?? */
 
-/* ── Install Banner ── */
+/* ?? Install Banner ?? */
 .installBanner {
   display: flex;
   align-items: center;
@@ -57,7 +58,7 @@
   min-height: 44px;
 }
 
-/* ── View Mode Banner ── */
+/* ?? View Mode Banner ?? */
 .viewModeBanner {
   display: flex;
   align-items: center;
@@ -80,7 +81,7 @@
 .viewModeBtn {
   padding: var(--dia-space-2) var(--dia-space-4);
   background: var(--dia-amber);
-  /* 앰버 위 텍스트는 모드 무관 항상 dark. inverse 는 라이트서 near-white→~1.95:1 안보임 */
+  /* ?곕쾭 ???띿뒪?몃뒗 紐⑤뱶 臾닿? ??긽 dark. inverse ???쇱씠?몄꽌 near-white??1.95:1 ?덈낫??*/
   color: var(--dia-on-amber);
   border-radius: var(--dia-radius-md);
   font-size: var(--dia-text-sm);
@@ -93,13 +94,13 @@
   transform: scale(0.98);
 }
 
-/* ── Back to Hub button ──
-   fixed → absolute (2026-08-03): 화면에 붙어 혼자 떠 있으면 본문·헤더와 따로 움직여 보인다.
-   맨 위 요소는 전부 본문과 함께 올라가게 통일. 스크롤로 사라져도 하단 '홈' 탭이 같은 동작. */
+/* ?? Back to Hub button ??
+   fixed ??absolute (2026-08-03): ?붾㈃??遺숈뼱 ?쇱옄 ???덉쑝硫?蹂몃Ц쨌?ㅻ뜑? ?곕줈 ?吏곸뿬 蹂댁씤??
+   留????붿냼???꾨? 蹂몃Ц怨??④퍡 ?щ씪媛寃??듭씪. ?ㅽ겕濡ㅻ줈 ?щ씪?몃룄 ?섎떒 '?? ??씠 媛숈? ?숈옉. */
 .backBtn {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 8px);
-  left: calc(env(safe-area-inset-left, 0px) + 10px);
+  top: calc(var(--sat) + 8px);
+  left: calc(var(--sal) + 10px);
   z-index: var(--dia-layer-fixed);
   width: 40px;
   height: 40px;

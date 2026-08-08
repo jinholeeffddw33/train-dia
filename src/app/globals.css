@@ -28,6 +28,50 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* ==========================================
+   Safe Area System v4 — 플랫폼별 보정 (ZINOSB 이식 2026-08-09)
+   기본값 SSOT 는 tokens.css. 여기서는 플랫폼 실측 차이만 덮는다.
+
+   진단(2026-08-09 실측): raw env() 179건 vs var(--sat) 6건 · --sab 정의 자체가 없었음.
+   layout.tsx 가 viewportFit:'cover' + statusBarStyle:'black-translucent' 이라
+   콘텐츠는 이미 상태바 뒤까지 올라가 있는데 방어가 없어, env() 가 0 을 반환하는
+   환경에서 헤더가 노치/다이내믹 아일랜드에 먹혔다.
+
+   ⚠️ 클래스는 layout.tsx <head> 인라인 스크립트가 hydration 전에 붙인다.
+      (JS 없이도 아래 @media standalone 이 보수적으로 동작 — 점진적 향상)
+   ========================================== */
+
+/* JS 없이도 도는 1차 방어 — PWA standalone 은 env() 를 그대로 신뢰 */
+@media all and (display-mode: standalone) {
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* iOS (PWA standalone / Safari) — env() 가 0 을 반환하는 WebKit 버그 대비.
+   상태바 최소 높이 20px 를 바닥으로 깔아 "0px 이 그대로 먹혀 헤더가 노치 밑으로"
+   들어가는 것을 막는다. env() 가 정상인 기기에서는 실제값(노치 47 / 다이내믹 아일랜드 59)이
+   20 보다 크므로 max() 가 실제값을 그대로 통과시킨다 = 정상 기기엔 영향 0. */
+html.pwa-ios {
+  --sat: max(env(safe-area-inset-top, 20px), 20px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+/* Android — 상태바가 얇고 홈 인디케이터가 없어 env() 를 그대로 신뢰(빈 공간 최소화).
+   ★ 하단에 최소 높이를 깔고 싶은 유혹이 있지만 하지 않는다: 하단 inset 이 정상적으로
+     0 인 기기(하드웨어 버튼/일부 제스처 설정)에서 없던 여백이 생긴다. ZINOSB 도 같은
+     이유로 전역 --sab 는 건드리지 않고(blast radius 제한) 네이티브 주입으로 따로 풀었는데,
+     train-dia 는 PWA 라 그 주입 경로가 없다. 실기기에서 하단 먹힘이 실제로 관측되면
+     그때 탭바 전용 토큰 하나만 별도로 만든다(전역 --sab 오염 금지). */
+html.pwa-android {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+/* ※ safe-area 소비 유틸(.safeTop/.safeBottom/.safeLandscape)은 이 파일 아래쪽
+   "===== Safe area =====" 블록에 이미 존재한다 — 여기서 다시 만들지 않는다. */
+
 /* Page-level ambient glow (ZINOSB-grade) */
 body::before {
   content: '';
@@ -119,12 +163,12 @@ input, textarea, select {
 }
 
 /* ===== Safe area ===== */
-@supports (padding: env(safe-area-inset-bottom)) {
+@supports (padding: var(--sab)) {
   .safeBottom {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--sab);
   }
   .safeTop {
-    padding-top: env(safe-area-inset-top);
+    padding-top: var(--sat);
   }
 }
 
@@ -228,10 +272,10 @@ input, textarea, select {
 }
 
 /* Safe-area 가로 모드 보강 */
-@supports (padding: env(safe-area-inset-left)) {
+@supports (padding: var(--sal)) {
   .safeLandscape {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    padding-left: var(--sal);
+    padding-right: var(--sar);
   }
 }
 

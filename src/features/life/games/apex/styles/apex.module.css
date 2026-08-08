@@ -79,7 +79,7 @@
 
 .hudTop {
   position: absolute;
-  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px);
+  top: calc(var(--sat, var(--sat)) + 12px);
   left: 16px;
   right: 16px;
   display: flex;
@@ -204,7 +204,7 @@
 /* 콤보 배지 — 니어미스마다 팝 */
 .comboBadge {
   position: absolute;
-  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 72px);
+  top: calc(var(--sat, var(--sat)) + 72px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -239,7 +239,7 @@
    위로 흐름. safe-area(가로면 노치 좌측) 반영. 좌상단 점수(hudTop)보다 아래라 겹침 없음. */
 .floatLayer {
   position: absolute;
-  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  left: calc(var(--sal) + 16px);
   right: auto;
   bottom: 38%;
   max-width: 46%;
@@ -365,7 +365,7 @@
 /* 피버 배너 */
 .feverBanner {
   position: absolute;
-  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 64px);
+  top: calc(var(--sat, var(--sat)) + 64px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -404,7 +404,7 @@
 /* 🌈 슈퍼부스트 배너 — 인스타 그라데이션(라벤더→핫핑크) 텍스트 (진호 2026-07-07) */
 .superBanner {
   position: absolute;
-  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 64px);
+  top: calc(var(--sat, var(--sat)) + 64px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -496,7 +496,7 @@
 /* 아이템 상태 도크 — 시야 안(우상단, 피버 배너 대역 아래)으로 (진호: "아래는 볼 수가 없어") */
 .itemDock {
   position: absolute;
-  top: calc(var(--sat, env(safe-area-inset-top, 0px)) + 124px);
+  top: calc(var(--sat, var(--sat)) + 124px);
   right: 16px;
   display: flex;
   flex-direction: column;
@@ -565,7 +565,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: calc(var(--sat, env(safe-area-inset-top, 0px)) + 10px) 12px 0;
+  padding: calc(var(--sat, var(--sat)) + 10px) 12px 0;
 }
 
 .menuBack,
@@ -598,10 +598,10 @@
   align-items: center;
   /* 가로 화면 safe-area(노치가 좌/우로 옴) 대응 — 상/하/좌/우 inset 모두 반영 (진호 2026-07-07 가로 전환) */
   padding:
-    calc(var(--sat, env(safe-area-inset-top, 0px)) + var(--z-space-2))
-    calc(env(safe-area-inset-right, 0px) + var(--z-space-5))
-    calc(var(--sab, env(safe-area-inset-bottom, 0px)) + var(--z-space-4))
-    calc(env(safe-area-inset-left, 0px) + var(--z-space-5));
+    calc(var(--sat, var(--sat)) + var(--z-space-2))
+    calc(var(--sar) + var(--z-space-5))
+    calc(var(--sab, var(--sab)) + var(--z-space-4))
+    calc(var(--sal) + var(--z-space-5));
   max-width: 680px;
   margin: 0 auto;
   width: 100%;
@@ -871,10 +871,10 @@
   justify-content: center;
   /* 가로 화면 safe-area 4방향(노치가 좌/우로 옴) + 짧은 세로 여백 (진호 2026-07-07 가로 전환) */
   padding:
-    calc(var(--sat, env(safe-area-inset-top, 0px)) + var(--z-space-4))
-    calc(env(safe-area-inset-right, 0px) + var(--z-space-5))
-    calc(var(--sab, env(safe-area-inset-bottom, 0px)) + var(--z-space-4))
-    calc(env(safe-area-inset-left, 0px) + var(--z-space-5));
+    calc(var(--sat, var(--sat)) + var(--z-space-4))
+    calc(var(--sar) + var(--z-space-5))
+    calc(var(--sab, var(--sab)) + var(--z-space-4))
+    calc(var(--sal) + var(--z-space-5));
   /* 뒤 게임 3D 씬을 블러로 은은히 살려 "배경 살아있게"(진호 2026-07-06) — 딤은 줄이고 blur 로 카드 부각 */
   background: rgba(6, 8, 18, 0.5);
   backdrop-filter: blur(10px);

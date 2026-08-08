@@ -54,6 +54,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         {/*
+          Safe Area 플랫폼 감지 — hydration 전에 <html> 에 클래스를 붙인다.
+          globals.css 의 html.pwa-ios / html.pwa-android 오버라이드가 이 클래스를 탄다.
+
+          ★ standalone(설치된 PWA)일 때만 붙인다. 일반 Safari 브라우징에서는
+            env(safe-area-inset-top) 이 정상적으로 0 이라, 여기에 iOS 용
+            max(env, 20px) 바닥을 걸면 없던 20px 여백이 상단에 생긴다.
+            버그(env()=0 거짓보고)는 standalone 전용 현상이므로 범위를 거기로 좁힌다.
+
+          ★ FOUC 방지 스크립트와 분리해 둔 이유 — 저건 테마/글자크기(localStorage) 담당이고
+            이건 기기/표시모드 담당이라 실패 원인이 섞이면 진단이 어려워진다.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var d=document.documentElement;var s=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;if(!s)return;var u=navigator.userAgent||'';var ios=/iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){d.classList.add('pwa-ios')}else if(/Android/.test(u)){d.classList.add('pwa-android')}}catch(e){}})()`,
+          }}
+        />
+        {/*
           설치 신호(beforeinstallprompt) 조기 캡처 — hydration 전에 실행돼야 한다.
           Chrome 은 이 신호를 딱 한 번 보내는데, useEffect 로 듣기 시작하면 이미 지나간 뒤라
           영영 놓친다. 놓치면 '홈 화면에 추가하기'가 진짜 설치창 대신 안내 팝업으로 빠졌다.

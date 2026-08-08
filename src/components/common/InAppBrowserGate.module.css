@@ -8,9 +8,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: max(var(--dia-space-6), env(safe-area-inset-top))
+  padding: max(var(--dia-space-6), var(--sat))
            var(--dia-space-5)
-           max(var(--dia-space-6), env(safe-area-inset-bottom));
+           max(var(--dia-space-6), var(--sab));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

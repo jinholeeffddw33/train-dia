@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: max(env(safe-area-inset-top, 0px), 12px) 12px max(env(safe-area-inset-bottom, 0px), 12px);
+  padding: max(var(--sat), 12px) 12px max(var(--sab), 12px);
   z-index: 1100;
   animation: fadeIn 0.18s ease;
   backdrop-filter: blur(8px);

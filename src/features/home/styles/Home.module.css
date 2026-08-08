@@ -5,7 +5,7 @@
   background: var(--dia-bg-elevated);
   color: var(--dia-text-primary);
   border-bottom: 1px solid var(--dia-border);
-  padding: calc(16px + env(safe-area-inset-top, 20px)) 16px 14px;
+  padding: calc(16px + var(--sat)) 16px 14px;
   /* 헤더 통일 — 고정하지 않고 본문과 함께 스크롤. relative 는 .refreshBtn(absolute) 기준점. */
   position: relative;
   overflow: hidden;
@@ -16,7 +16,7 @@
 /* 새로고침 버튼 — PWA standalone에서 pull-to-refresh 미지원 환경 보완 */
 .refreshBtn {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  top: calc(var(--sat) + 6px);
   right: 8px;
   width: 40px;
   height: 40px;

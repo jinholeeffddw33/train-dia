@@ -230,7 +230,7 @@
 .footer {
   display: flex;
   gap: 8px;
-  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-4) + var(--sab));
   border-top: 1px solid var(--dia-border-light);
 }
 .btnSecondary, .btnPrimary {

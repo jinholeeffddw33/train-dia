@@ -2,7 +2,7 @@
 
 .container {
   padding: var(--dia-space-4);
-  padding-top: calc(var(--dia-space-4) + env(safe-area-inset-top, 0px));
+  padding-top: calc(var(--dia-space-4) + var(--sat));
 }
 
 /* ── Notice Banner (공지 팝업) ── */

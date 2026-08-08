@@ -8,13 +8,13 @@
   z-index: var(--dia-layer-toast);
   display: flex;
   flex-direction: column;
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
 }
 
 /* iOS 노치 대응 — 맨 위 배너가 safe-area만큼 패딩을 먹어 노치 밑에 깔리지 않게 */
 .bannerStack > :first-child {
-  padding-top: calc(env(safe-area-inset-top, 0px) + var(--dia-space-3));
+  padding-top: calc(var(--sat) + var(--dia-space-3));
 }
 
 /* ── 업데이트 배너 (AppShell에서 이식) ── */

@@ -1847,7 +1847,7 @@
   align-items: flex-end;
   gap: var(--dia-space-2);
   padding: var(--dia-space-2) var(--dia-space-3);
-  padding-bottom: calc(var(--dia-space-2) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--dia-space-2) + var(--sab));
   background: var(--dia-surface);
   border-top: 1px solid var(--dia-border-light);
 }

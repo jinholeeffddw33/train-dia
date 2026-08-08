@@ -10,10 +10,10 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--dia-space-3);
-  padding-top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
-  padding-bottom: calc(var(--dia-space-16, 64px) + env(safe-area-inset-bottom, 0px));
-  padding-left: max(var(--dia-space-4), env(safe-area-inset-left, 0px));
-  padding-right: max(var(--dia-space-4), env(safe-area-inset-right, 0px));
+  padding-top: calc(var(--dia-space-3) + var(--sat));
+  padding-bottom: calc(var(--dia-space-16, 64px) + var(--sab));
+  padding-left: max(var(--dia-space-4), var(--sal));
+  padding-right: max(var(--dia-space-4), var(--sar));
   background: var(--dia-bg);
   position: relative;
   /* overflow-x 만 hidden 이면 명세상 overflow-y 가 auto 로 계산돼 .dash 자체가

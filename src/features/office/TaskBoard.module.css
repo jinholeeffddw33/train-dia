@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-2);
-  padding: max(var(--dia-space-3), env(safe-area-inset-top)) var(--dia-space-4) var(--dia-space-3);
+  padding: max(var(--dia-space-3), var(--sat)) var(--dia-space-4) var(--dia-space-3);
   background: var(--dia-bg-elevated);
   border-bottom: 1px solid var(--dia-border);
   position: sticky;
@@ -212,7 +212,7 @@
 .fab {
   position: fixed;
   right: var(--dia-space-5);
-  bottom: calc(var(--dia-space-6) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--dia-space-6) + var(--sab));
   width: 56px;
   height: 56px;
   border-radius: var(--dia-radius-full);
@@ -250,7 +250,7 @@
   border-radius: var(--dia-radius-2xl) var(--dia-radius-2xl) 0 0;
   border: 1px solid var(--dia-border);
   padding: var(--dia-space-4);
-  padding-bottom: calc(var(--dia-space-4) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--dia-space-4) + var(--sab));
 }
 .modalHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--dia-space-3); }
 .modalTitle { font-size: var(--dia-text-lg); font-weight: 800; color: var(--dia-text-primary); }

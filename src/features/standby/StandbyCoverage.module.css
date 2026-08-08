@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
-  padding: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px)) var(--dia-space-3) var(--dia-space-3);
+  padding: calc(var(--dia-space-3) + var(--sat)) var(--dia-space-3) var(--dia-space-3);
   background: var(--dia-surface);
   border-bottom: 1px solid var(--dia-border-light);
   position: sticky;
@@ -60,7 +60,7 @@
 .content {
   flex: 1;
   padding: var(--dia-space-3);
-  padding-bottom: calc(var(--dia-space-8) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--dia-space-8) + var(--sab));
 }
 
 /* ── Loading / Empty ── */
@@ -390,7 +390,7 @@
 }
 .zoomCloseBtn {
   position: absolute;
-  top: calc(var(--dia-space-3) + env(safe-area-inset-top, 0px));
+  top: calc(var(--dia-space-3) + var(--sat));
   right: var(--dia-space-3);
   width: 40px;
   height: 40px;
@@ -690,7 +690,7 @@
 .formFoot {
   display: flex;
   gap: 8px;
-  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-3) + env(safe-area-inset-bottom, 0px));
+  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-3) + var(--sab));
   border-top: 1px solid var(--dia-border-light);
 }
 /* 취소=법② (.z-glass-pill) / 등록=법③ (.z-cta) — 배경/색/테두리/라운딩/섀도우/:active 는 전역이 담당.

@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
   "lastUpdated": "2026-08-09",
   "verificationCommands": {
@@ -21,7 +21,7 @@
         "src/**/*.module.css",
         "src/components/**/*.tsx"
       ],
-      "verification": ["check:surface-3d:changed", "check:theme-override:changed", "check:hover"]
+      "verification": ["check:surface-3d:changed", "check:theme-override:changed", "check:hover", "check:safearea"]
     },
     "design-system": {
       "description": "토큰 SSOT(--dia-*, 이식된 --z-* 버튼4법/글래스), 색상, 간격, 폰트",
@@ -112,6 +112,22 @@
       "scope": ["src/**/*.css", "src/**/*.module.css"],
       "exceptions": ["@media (hover: hover) 가드 내부", "premium-fake-glass.css(이미 가드됨)"],
       "autoCheck": "scripts/check-no-raw-hover.cjs (check:hover)",
+      "severity": "fail"
+    },
+    "CSS-SAFEAREA-001": {
+      "description": "safe-area 는 토큰 경유 — raw env(safe-area-inset-*) 신규 사용 금지, var(--sat/--sab/--sal/--sar) 사용. layout.tsx 가 viewportFit:'cover' + black-translucent 라 콘텐츠가 상태바 뒤까지 올라가 있는데, iOS PWA standalone 의 env()=0 반환 버그가 겹치면 fallback 0px 이 그대로 먹혀 헤더가 노치/다이내믹 아일랜드 밑으로 들어간다. 보정식은 globals.css 의 html.pwa-ios/.pwa-android 한 곳에만 있으므로 raw env() 는 보정을 통째로 우회한다. 정의부만 raw env() 허용.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.css", "src/**/*.tsx", "src/**/*.ts"],
+      "exceptions": ["토큰 정의 라인(--sat/--sab/--sal/--sar: env(...))", "직전 줄 /* SAFEAREA-EXCEPTION: 사유 */"],
+      "autoCheck": "scripts/check-safearea.mjs (check:safearea) — 전량 스캔",
+      "severity": "fail"
+    },
+    "CSS-VIEWPORT-UNIT-001": {
+      "description": "bare 100vh 금지 — iOS 주소창 높이가 포함돼 화면이 잘린다. 바로 다음 줄에 같은 속성의 100dvh 폴백 짝을 둘 것(100vh 를 지우는 게 아니라 100dvh 를 덧붙이는 점진적 향상). 2026-08-09 실측: 폴백 짝 26건은 정상, 단독 5건만 결함이었다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.css"],
+      "exceptions": ["인접 줄에 같은 속성의 100dvh 가 있는 폴백 짝", "직전 줄 /* VIEWPORT-EXCEPTION: 사유 */"],
+      "autoCheck": "scripts/check-safearea.mjs (check:safearea) — 전량 스캔",
       "severity": "fail"
     },
     "GIT-SCOPE-001": {

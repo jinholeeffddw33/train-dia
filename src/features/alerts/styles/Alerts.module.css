@@ -3,7 +3,7 @@
 /* ── FAB Button ── */
 .fab {
   position: fixed;
-  bottom: calc(var(--dia-tab-height) + env(safe-area-inset-bottom) + var(--dia-space-4));
+  bottom: calc(var(--dia-tab-height) + var(--sab) + var(--dia-space-4));
   right: var(--dia-space-4);
   width: 56px;
   height: 56px;

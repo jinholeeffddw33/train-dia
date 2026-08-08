@@ -40,7 +40,7 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 var(--dia-space-4) calc(var(--dia-space-8) + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--dia-space-4) calc(var(--dia-space-8) + var(--sab));
   max-width: 560px;
   width: 100%;
   margin: 0 auto;
@@ -158,7 +158,7 @@
 .scrollTop {
   position: absolute;
   right: var(--dia-space-4);
-  bottom: calc(var(--dia-space-5) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--dia-space-5) + var(--sab));
   width: 48px;
   height: 48px;
   display: flex;

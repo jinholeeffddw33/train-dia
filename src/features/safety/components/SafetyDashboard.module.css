@@ -7,9 +7,9 @@
   flex-direction: column;
   /* 앱 표준 배경으로 통일 (다른 파트와 동일) */
   background: var(--dia-bg);
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
+  padding-bottom: var(--sab);
 }
 
 :global(.light) .wrap {
@@ -22,7 +22,7 @@
   align-items: center;
   gap: 8px;
   padding: var(--dia-space-2) var(--dia-space-3);
-  padding-top: calc(var(--dia-space-2) + env(safe-area-inset-top, 0px));
+  padding-top: calc(var(--dia-space-2) + var(--sat));
   flex-shrink: 0;
   background: transparent;
   color: #fff;

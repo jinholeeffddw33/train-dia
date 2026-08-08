@@ -11,7 +11,7 @@
   right: 0;
   display: flex;
   align-items: stretch;
-  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 8px calc(8px + var(--sab));
   background: var(--dia-bg-elevated);
   border-top: 1px solid var(--dia-border);
   border-radius: 28px 28px 0 0;
@@ -37,7 +37,7 @@
 .tabJewel {
   position: absolute;
   top: 8px;
-  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(8px + var(--sab));
   left: 8px;
   width: calc((100% - 16px) / var(--bn-n, 6));
   border-radius: 9999px;

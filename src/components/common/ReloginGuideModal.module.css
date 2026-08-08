@@ -7,8 +7,8 @@
   align-items: center;
   justify-content: center;
   padding: var(--dia-space-4);
-  padding-top: max(var(--dia-space-4), env(safe-area-inset-top));
-  padding-bottom: max(var(--dia-space-4), env(safe-area-inset-bottom));
+  padding-top: max(var(--dia-space-4), var(--sat));
+  padding-bottom: max(var(--dia-space-4), var(--sab));
   animation: fadeIn 200ms var(--dia-ease);
 }
 

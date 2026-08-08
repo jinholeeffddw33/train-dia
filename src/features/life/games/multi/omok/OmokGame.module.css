@@ -1,7 +1,8 @@
 .wrap {
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--dia-bg);
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  padding-bottom: calc(80px + var(--sab));
   display: flex;
   flex-direction: column;
 }
@@ -10,7 +11,7 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
-  padding: max(var(--dia-space-3), env(safe-area-inset-top)) var(--dia-space-4) var(--dia-space-3);
+  padding: max(var(--dia-space-3), var(--sat)) var(--dia-space-4) var(--dia-space-3);
   background: var(--dia-bg);
   border-bottom: 1px solid var(--dia-border);
 }
@@ -177,7 +178,7 @@
   padding: 0;
   cursor: pointer;
   z-index: 2;
-  /* 셀 크기를 키워 손가락이 쉽게 닿도록 */
+  /* ? ?ш린瑜??ㅼ썙 ?먭??쎌씠 ?쎄쾶 ?용룄濡?*/
 }
 
 .cell:disabled {

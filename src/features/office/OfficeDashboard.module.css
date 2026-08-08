@@ -190,9 +190,16 @@
 }
 
 /* ── 2열 그리드 — 두 박스 높이를 같게(stretch) ── */
+/* 진행률 | 자주 보는 기능 — 폭이 모자라면 1열로 내려온다.
+   ★ 이전엔 `1fr 1fr` 고정이라 360px 에서 각 열이 ~158px 밖에 안 됐고,
+     카드 패딩(24)까지 빼면 내용 폭이 ~134px 였다. 그래서 두 가지가 동시에 깨졌다:
+       · .ringWrap 이 64px 고정(flex-shrink:0) + 통계 열 → 가로가 넘쳐 도넛이 카드 밖으로 잘림
+       · "이번주 식당메뉴"(14px, 아이콘+패딩 41px 오버헤드)가 한 글자만 다음 줄로 넘어감
+     CLAUDE.md §3.1 "레이아웃 크기에 픽셀 고정 금지" 위반이기도 했다.
+   minmax(190px,1fr) 기준: 360/390 = 1열, 430 = 2열(각 193px, 내용 169px 로 라벨이 들어감). */
 .twoCol {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: var(--dia-space-3);
   align-items: stretch;
 }

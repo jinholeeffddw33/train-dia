@@ -1,11 +1,12 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
-  "lastUpdated": "2026-06-23",
+  "lastUpdated": "2026-08-09",
   "verificationCommands": {
     "preCommit": "npm run check:quality-gates",
     "hooks": "npm run check:hooks",
+    "docs": "npm run check:docs",
     "typecheck": "npm run typecheck"
   },
   "domains": {
@@ -69,7 +70,7 @@
         "scripts/*.js",
         "supabase/migrations/**/*.sql"
       ],
-      "verification": []
+      "verification": ["typecheck"]
     }
   },
   "ruleIds": {
@@ -118,7 +119,7 @@
       "canonical": "docs/ZINOSB_SYSTEM_PORT.md",
       "scope": ["Bash", "PowerShell"],
       "exceptions": ["진호 명시 승인 — 명령 끝에 ' # GIT-SCOPE-OVERRIDE'"],
-      "autoCheck": ".claude/hooks/pre-git-stage-check.mjs (PreToolUse) — ★ .claude/settings.json 에 PreToolUse 훅으로 등록 필요",
+      "autoCheck": ".claude/hooks/pre-git-stage-check.mjs — .claude/settings.json 의 PreToolUse(Bash/PowerShell) 훅으로 등록 완료(2026-08-09). 위반 시 exit 2 로 차단.",
       "severity": "fail"
     },
     "QG-HOOK-001": {

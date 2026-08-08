@@ -24,9 +24,10 @@
     "check:text-size": "node scripts/check-text-size.mjs",
     "check:text-size:staged": "node scripts/check-text-size.mjs --staged",
     "check:text-size:changed": "node scripts/check-text-size.mjs --changed",
+    "check:docs": "node scripts/docs-validate.mjs",
     "check:hooks": "node scripts/ensure-hooks.mjs",
     "install:hooks": "node scripts/install-hooks.mjs",
-    "check:quality-gates": "npm run check:hooks && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed && npm run check:text-size:changed",
+    "check:quality-gates": "npm run check:hooks && npm run check:docs && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed && npm run check:text-size:changed",
     "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
   },
   "dependencies": {

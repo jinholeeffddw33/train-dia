@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://zinosb.com/schemas/rules-registry.schema.json",
-  "title": "ZINOSB Rule Registry",
-  "description": "Schema for docs/rules/registry.json — machine-readable rule SSOT. Validated by scripts/docs-validate.mjs.",
+  "$id": "https://train-dia.local/schemas/rules-registry.schema.json",
+  "title": "train-dia Rule Registry",
+  "description": "Schema for docs/rules/registry.json — machine-readable rule SSOT. ZINOSB 이식본(2026-06-23), train-dia 게이트 구성에 맞게 적응(2026-08-09). Validated by scripts/docs-validate.mjs.",
   "type": "object",
   "required": ["version", "lastUpdated", "domains", "ruleIds", "decisionQueue", "verificationCommands"],
   "additionalProperties": true,
@@ -26,14 +26,15 @@
     },
     "verificationCommands": {
       "type": "object",
-      "description": "Named npm scripts AI/CI runs at gate points.",
-      "required": ["preCommit", "rules", "docs", "conflicts"],
+      "description": "Named npm scripts AI/CI runs at gate points. train-dia 적응: rules(ai-rule-guard)/conflicts(docs-conflict-scan)는 아직 미이식이라 optional — 이식 시 required 로 승격.",
+      "required": ["preCommit", "docs"],
       "additionalProperties": { "type": "string" },
       "properties": {
         "preCommit": { "type": "string" },
         "rules": { "type": "string" },
         "docs": { "type": "string" },
         "conflicts": { "type": "string" },
+        "hooks": { "type": "string" },
         "typecheck": { "type": "string" }
       }
     },

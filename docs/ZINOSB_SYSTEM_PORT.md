@@ -140,8 +140,8 @@ git commit -m "..."                            # pre-commit 통과해야 함
 - [ ] AGENTS.md 단일화(CLAUDE.md 중복 제거 — 미처리, 후속)
 - [ ] (보류) bleed / sheet-handle / double-padding — train-dia 게터·시트 SSOT 도입 후
 - [ ] ai-rule-guard.mjs (최대 난제 — F1 inline/F2 as any/F4 typo/F8 hover 등, 후속)
-- [ ] check:docs 용 docs-validate(경량) 이식 — registry 무결성 검사용 (후속)
-- [ ] ★ .claude/settings.json 에 pre-git-stage-check 를 PreToolUse 훅으로 등록(현재 파일만 존재, 다른 train-dia 세션에서 발동하려면 등록 필요)
+- [x] 2026-08-09 — ★ `.claude/settings.json` 에 pre-git-stage-check 를 PreToolUse(Bash/PowerShell) 훅으로 등록. 커밋 698c157. 검증: `git add -A`/`git add .`/`git commit -am` → exit 2 차단, 명시 경로·`git status`·`# GIT-SCOPE-OVERRIDE` → exit 0 통과.
+- [x] 2026-08-09 — `scripts/docs-validate.mjs`(경량 적응) + `check:docs` 배선 + quality-gates 편입. D8(.claude/rules)·D9(ledger)·W2(decision-queue.md)는 train-dia 에 해당 구조가 없어 제외, 대신 **D3(domains.*.mustRead 실재)** 신설. 첫 실행에서 실제 불일치 4건 검출 → 수정: registry.schema.json 의 `verificationCommands.required` 를 zinosb 기준(`rules`/`conflicts`)에서 train-dia 기준(`preCommit`/`docs`)으로 적응(미이식 가드는 optional 로 강등), `domains.domain-data.verification` 빈 배열 → `["typecheck"]`, GIT-SCOPE-001 autoCheck 문구를 "등록 필요"→"등록 완료"로 갱신. registry 1.0.0→1.1.0.
 
 ---
 

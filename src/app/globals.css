@@ -217,6 +217,32 @@ input, textarea, select {
   white-space: nowrap;
 }
 
+/* ── 풀블리드 (UI-BLEED-001 / UI-BLEED-002) ──
+   탭 .container 의 좌우 게터(--dia-page-pad)를 *넘어* 화면 끝까지 빼는 유틸.
+   ★ 상쇄를 손으로 적지 말 것 — 게터 값이 바뀌어도 자동으로 따라가야 한다.
+     ZINOSB 실사고: 게터 16 vs 복귀 28 이 3개월 생존(같은 화면 안에서도 12px 어긋남).
+     탈출(margin)만 검사하는 가드는 그때 "위반 0건"을 냈다 → UI-BLEED-002 가 복귀도 본다. */
+
+/* 순수 풀블리드 — 안쪽 패딩 복원 X. 이미지/구분선처럼 *내용까지* 끝까지 가는 것 */
+.diaBleed {
+  margin-inline: calc(-1 * var(--dia-page-pad));
+  width: calc(100% + 2 * var(--dia-page-pad));
+}
+
+/* 블리드 + 안쪽 게터 복원 — 배경/구분선은 끝까지, 텍스트는 게터 라인에 정렬
+   (스크롤-숨김 헤더의 frost 배경이 이 패턴) */
+.diaBleedInset {
+  margin-inline: calc(-1 * var(--dia-page-pad));
+  padding-inline: var(--dia-page-pad);
+}
+
+/* 가로 스크롤 리스트 — 화면 끝까지 확장하되 첫/마지막 아이템 여백 유지 */
+.diaScrollRow {
+  margin-inline: calc(-1 * var(--dia-page-pad));
+  padding-inline: var(--dia-page-pad);
+  scroll-padding-left: var(--dia-page-pad);
+}
+
 /* 44px 아이콘 버튼 표준 */
 .diaBtnIcon {
   width: 44px;

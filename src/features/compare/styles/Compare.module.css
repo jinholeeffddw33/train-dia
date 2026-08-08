@@ -1,6 +1,6 @@
 /* ===== Compare Tab ===== */
 
-.container { padding: var(--dia-space-4); }
+.container { padding: var(--dia-space-4) var(--dia-page-pad); }
 
 /* ── Group Tabs (법① 세그먼트 — 룩은 globals .z-segment) ── */
 .groupTabs {

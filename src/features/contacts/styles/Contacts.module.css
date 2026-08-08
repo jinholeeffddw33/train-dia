@@ -2,7 +2,7 @@
 
 .container {
   position: relative;
-  padding: var(--dia-space-4);
+  padding: var(--dia-space-4) var(--dia-page-pad);
   padding-bottom: var(--dia-space-12);
   overflow: hidden;
 }

@@ -49,6 +49,27 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-BLEED-001 / UI-BLEED-002 — 페이지 게터와 풀블리드
+
+화면 좌우 여백은 **`var(--dia-page-pad)` 하나**로만 정한다(= 16px, 기존 실사용값 그대로).
+
+- **UI-BLEED-001 (탈출)** — 게터를 넘어 화면 끝까지 빼는 음수 가로 마진은 `calc(-1 * var(--dia-page-pad))`. raw px·`--dia-space-*` 직접 사용 금지(게터 값이 바뀌면 같이 안 움직인다).
+- **UI-BLEED-002 (복귀)** — 블리드한 규칙의 **가로 복귀 패딩**은 `var(--dia-page-pad)` 또는 `0` 둘 중 하나. `calc(게터 + 무언가)` 금지 — 더 들여쓰려면 **자식 요소**에 준다.
+
+**왜 룰이 둘인가 (ZINOSB 실사고)** — 게터 16 vs 복귀 28이 **3개월 생존**했다. 같은 화면의 다른 요소와 12px 어긋났는데도 **탈출(margin)만 검사하던 가드는 "위반 0건"을 냈다**. margin이 정답이면 복귀가 28px여도 통과였기 때문이다. 그래서 복귀까지 보는 002가 따로 필요하다.
+
+**유틸을 쓰면 손으로 안 적어도 된다** (globals.css)
+| 클래스 | 용도 |
+|---|---|
+| `.diaBleed` | 순수 풀블리드 — 내용까지 끝까지 (이미지/구분선) |
+| `.diaBleedInset` | 블리드 + 안쪽 게터 복원 (스크롤-숨김 헤더 frost 배경) |
+| `.diaScrollRow` | 가로 스크롤 리스트 — 끝까지 확장 + 첫/마지막 여백 유지 |
+
+> ★ 가드 판정 주의 — "음수 가로 마진"이라고 다 블리드가 아니다. `-1px`(srOnly), `-8px`(아이콘 정렬), `-150px`(`left:50%` 센터링)은 게터와 무관한 광학 보정이다. 초안 가드가 이걸 전부 잡아 거짓 FAIL 8건을 냈다. 판정은 **좌우 대칭 + 게터 크기 이상**일 때만.
+
+- 예외: 직전 줄 `/* BLEED-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-bleed.mjs` (`check:bleed`) · severity **fail** · 전량 스캔.
+
 ## UI-ZLAYER-001 — 레이어급 z-index 는 토큰 경유
 
 `z-index` 가 **10 이상**이면 raw 숫자 금지 → `var(--dia-layer-*)`. 로컬 스택(**-1~9**)은 컴포넌트 내부 겹침이라 대상이 아니다.

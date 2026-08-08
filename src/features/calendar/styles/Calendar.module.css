@@ -2,7 +2,7 @@
 
 .container {
   /* 노치(safe-area-top)는 sticky .nav 헤더가 흡수 → 컨테이너에선 제거(이중 노치 방지) */
-  padding: var(--dia-space-4);
+  padding: var(--dia-space-4) var(--dia-page-pad);
 }
 
 /* ── Navigation (ZINOSB 헤더 통일 — sticky frost 헤더 바, 월 네비 컨트롤 포함) ── */
@@ -13,8 +13,8 @@
   /* 컨테이너 좌우 패딩(16px) 음수 상쇄로 full-width, 내부는 padding-inline 으로 재정렬.
      노치=padding-top(--sat). 고정하지 않고 본문과 함께 스크롤(.z-app-header). */
   position: relative;
-  margin-inline: calc(-1 * var(--dia-space-4));
-  padding: calc(var(--sat) + var(--dia-space-2)) var(--dia-space-4) var(--dia-space-2);
+  margin-inline: calc(-1 * var(--dia-page-pad));
+  padding: calc(var(--sat) + var(--dia-space-2)) var(--dia-page-pad) var(--dia-space-2);
   margin-bottom: var(--dia-space-3);
 }
 

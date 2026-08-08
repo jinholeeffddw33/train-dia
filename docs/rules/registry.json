@@ -142,6 +142,14 @@
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) 와 baseline 공유",
       "severity": "fail"
     },
+    "UI-SHEET-HEIGHT-001": {
+      "description": "시트/모달 max-height 는 --dia-sheet-h-full / --dia-sheet-h-compact 만 — 노치·다이내믹 아일랜드를 절대 가리지 않는다. full = calc(100dvh - var(--sat) - 44px). ★실측 2026-08-09: 시트 높이가 80~98vh 로 흩어져 있었고 전부 safe-area 미고려였다. 96vh 는 852px 화면에서 상단에 32px 만 남기는데 다이내믹 아일랜드는 59px 을 요구한다 → 가려졌다(98vh 는 17px 로 더 심함). 토큰 적용 후 --sat 59px 기준 상단 여백 103px 확보. 호출부에서 calc(100dvh - env(...)) 를 손으로 적지 말 것 — Android env() 거짓보고 대응이 --sat 에만 있다. 90vh 미만은 이미 노치 아래라 미이관(일괄 치환 금지).",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.module.css"],
+      "exceptions": ["90vh 미만 기존 시트", "이미지/내부 스크롤 영역의 max-height(시트가 아님)"],
+      "autoCheck": "미도입 — 신규 시트가 늘면 raw vh 금지 가드 신설 검토",
+      "severity": "warn"
+    },
     "UI-MOTION-001": {
       "description": "transition 의 duration/easing 은 토큰 경유 — duration 5단계(instant 0.1 / fast 0.12 / base 0.15 / slow 0.2 / slower 0.3), easing 5종(--dia-ease/-out/-in/-press/-spring). raw cubic-bezier 금지. ★실측 2026-08-09: duration 이 22종 334개 값으로 흩어져 있었고 기존 --dia-transition-* 3종(150/250/350ms)은 사용 0회였다 — 정의만 있고 실사용 지배값(0.12s 97건)과 안 맞아 아무도 안 썼다. 그래서 토큰을 실사용값에 맞췄다(반대가 아니라). animation duration 은 루프/장식이라 대상 아님. 이관 334 → 잔여 27건(92% 감소), 나머지 baseline.",
       "canonical": "docs/rules/ui/design-system.md",

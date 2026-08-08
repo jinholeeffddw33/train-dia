@@ -49,6 +49,27 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-SHEET-HEIGHT-001 — 시트/모달 높이는 노치를 가리지 않는다
+
+바텀시트·풀스크린 모달의 `max-height` 는 **토큰 두 개**만 쓴다.
+
+| 토큰 | 값 | 용도 |
+|---|---|---|
+| `--dia-sheet-h-full` | `calc(100dvh - var(--sat) - 44px)` | 끝까지 올린 시트 |
+| `--dia-sheet-h-compact` | `min(72dvh, full)` | 짧은 시트(기본) |
+
+**왜** — 실측(2026-08-09): 시트/모달 `max-height` 가 80~98vh 로 흩어져 있었고 **전부 safe-area 를 고려하지 않았다**.
+
+| | 상단 여백 | 다이내믹 아일랜드(59px) |
+|---|---|---|
+| 이전 `96vh` (852px 화면) | **32px** | ❌ **가림** |
+| `98vh` (MissionCard) | 17px | ❌ 더 심함 |
+| `--dia-sheet-h-full` + `--sat:59px` | **103px** | ✅ |
+
+- **호출부에서 `calc(100dvh - env(...))` 를 손으로 적지 말 것** — Android 는 `env()` 가 0 을 거짓 보고하는 기기가 있어 `--sat` 을 타야 한다(CSS-SAFEAREA-001).
+- 90vh 미만은 이미 노치 아래에서 멈추므로 **건드리지 않았다**(일괄 치환 금지). 이관 대상은 ≥90vh **19건 / 13파일**.
+- 이미지·내부 스크롤 영역의 `max-height` 는 시트가 아니므로 대상이 아니다.
+
 ## UI-MOTION-001 — transition 의 duration/easing 은 토큰 경유
 
 **duration 5단계** (실사용 지배값 그대로 — 값 보존)

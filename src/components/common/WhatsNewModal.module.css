@@ -22,8 +22,7 @@
   flex-direction: column;
   overflow: hidden;
   /* 애니메이션 제거 — opacity 0 시작이 안 끝나는 환경 대비 */
-  max-height: 90vh;
-  max-height: 90dvh;
+  max-height: var(--dia-sheet-h-full);
   opacity: 1 !important;
   isolation: isolate;
 }

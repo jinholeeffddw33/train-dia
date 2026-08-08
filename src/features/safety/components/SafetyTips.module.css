@@ -186,7 +186,7 @@
   background: var(--dia-surface);
   border-radius: 16px;
   overflow: hidden;
-  max-height: 95vh; max-height: 95dvh;
+  max-height: var(--dia-sheet-h-full);
   display: flex; flex-direction: column;
 }
 .detailHead {
@@ -247,7 +247,7 @@
   border-radius: 20px 20px 0 0;
   overflow: hidden;
   display: flex; flex-direction: column;
-  max-height: 90vh; max-height: 90dvh;
+  max-height: var(--dia-sheet-h-full);
 }
 @media (min-width: 520px) {
   .formOverlay { align-items: center; }

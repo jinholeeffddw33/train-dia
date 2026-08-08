@@ -20,8 +20,7 @@
 .content {
   width: 100%;
   max-width: 720px;
-  max-height: 92vh;
-  max-height: 92dvh; /* iOS 툴바 수축 대응 */
+  max-height: var(--dia-sheet-h-full); /* iOS 툴바 수축 대응 */
   background: #fff;
   border-radius: 18px;
   display: flex;

@@ -244,7 +244,7 @@
 .modal {
   width: 100%;
   max-width: 520px;
-  max-height: 92dvh;
+  max-height: var(--dia-sheet-h-full);
   overflow-y: auto;
   background: var(--dia-bg-elevated);
   border-radius: var(--dia-radius-2xl) var(--dia-radius-2xl) 0 0;

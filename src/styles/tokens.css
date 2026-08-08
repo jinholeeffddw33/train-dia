@@ -234,6 +234,26 @@
   --dia-leading-relaxed: 1.65;
 
   /* ========================================
+     바텀시트/모달 높이 SSOT (UI-SHEET-HEIGHT-001)
+
+     ★ 노치·다이내믹 아일랜드를 절대 가리지 않는다.
+       실측(2026-08-09): 시트/모달 max-height 가 80~98vh 로 흩어져 있었고 전부
+       **safe-area 를 고려하지 않았다**. 96vh 는 852px 화면(아이폰 15 Pro)에서
+       상단에 34px 만 남기는데 다이내믹 아일랜드는 59px 을 요구한다 → 25px 이 가려진다.
+       98vh(MissionCard)는 17px 만 남아 더 심하다.
+
+     계산: 100dvh 에서 상단 안전영역(--sat)과 잡을 여백(44px = 터치 최소치)을 뺀다.
+       · full    = 끝까지 올린 시트. 그래도 노치 아래에서 멈춘다.
+       · compact = 짧은 시트(기본). full 을 넘지 않도록 min() 으로 묶는다.
+
+     ⚠️ 호출부에서 `calc(100dvh - env(...))` 를 손으로 적지 말 것 —
+       Android 는 env() 가 0 을 거짓 보고하는 기기가 있어 --sat 을 타야 한다(CSS-SAFEAREA-001).
+     ======================================== */
+  --dia-sheet-notch-gap: 44px;
+  --dia-sheet-h-full: calc(100dvh - var(--sat) - var(--dia-sheet-notch-gap));
+  --dia-sheet-h-compact: min(72dvh, calc(100dvh - var(--sat) - var(--dia-sheet-notch-gap)));
+
+  /* ========================================
      페이지 좌우 게터 SSOT (UI-BLEED-001 / UI-BLEED-002)
 
      화면 좌우 여백은 이 토큰 하나로만 정한다. 값은 기존 실사용값 16px 그대로

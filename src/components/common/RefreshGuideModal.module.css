@@ -15,7 +15,7 @@
 .content {
   width: 100%;
   max-width: 420px;
-  max-height: 96vh;
+  max-height: var(--dia-sheet-h-full);
   background: var(--dia-sheet-fill); /* 불투명 — 반투명 --dia-surface 는 뒤 콘텐츠 비침 */
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-2xl);

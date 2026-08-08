@@ -49,6 +49,28 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-MOTION-001 — transition 의 duration/easing 은 토큰 경유
+
+**duration 5단계** (실사용 지배값 그대로 — 값 보존)
+
+| 토큰 | 값 | 용도 |
+|---|---|---|
+| `--dia-dur-instant` | 0.1s | 소형 아이콘 press (§2.6) |
+| `--dia-dur-fast` | 0.12s | 버튼/칩/탭 press — 최다 사용 |
+| `--dia-dur-base` | 0.15s | 카드/대형 서피스 press |
+| `--dia-dur-slow` | 0.2s | 패널 전환·확장 |
+| `--dia-dur-slower` | 0.3s | 시트/오버레이 진입 |
+
+**easing** — `--dia-ease`(표준) / `-out`(진입) / `-in`(퇴장) / `-press`(press 감쇠) / `-spring`(팝). raw `cubic-bezier(...)` 금지.
+
+**왜** — 실측(2026-08-09): transition duration 이 **22종 334개 값**으로 흩어져 있었다. 기존 `--dia-transition-*` 3종(150/250/350ms)은 **사용 0회** — 정의만 있고 실사용 지배값(0.12s 97건 · 0.15s 53건)과 아예 안 맞아서 아무도 안 썼다. 그래서 이번엔 **토큰을 실사용값에 맞췄다**(반대가 아니라). 같은 성격의 인터랙션인데 0.12/0.14/0.15/0.18 이 섞이면 "이 앱은 왜 반응이 들쭉날쭉하지"가 된다.
+
+- `animation` 의 duration 은 **대상 아님** — 루프/장식이라 인터랙션 스케일과 성격이 다르다.
+- `prefers-reduced-motion` 오버라이드(0.01ms)는 제외.
+- 이관 결과 334건 → 잔여 **27건**(92% 감소), 나머지는 baseline 등록.
+- 예외: 직전 줄 `/* MOTION-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-motion.mjs` (`check:motion`) · severity **fail** · baseline 래칫(stale 도 FAIL).
+
 ## UI-TOAST-001 / UI-HAPTIC-001 — 알림과 햅틱은 SSOT 하나로
 
 **토스트** — 상태는 [`src/stores/toast.ts`](../../../src/stores/toast.ts) 가 갖고, `components/common/Toast.tsx` 는 **그리기만** 한다. 호출은 `showToast(text, type)` 하나 (`info` | `success` | `error` | `warning`).

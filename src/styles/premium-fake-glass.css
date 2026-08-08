@@ -437,7 +437,7 @@ html[data-safe-glass='true'] .z-glass-jewel::after {
 /* 후보2 · Micro Sink — 진짜 눌림(살짝 더 깊게). safe-glass(S25)도 tap 순간 1px 만 허용
    — translateY 는 transient tap 변위라 스크롤 재합성(떨림 진범)과 무관. */
 .z-glass-jewel.z-press-sink {
-  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease, border-color var(--dia-dur-fast) ease;
 }
 .z-glass-jewel.z-press-sink:active {
   transform: translateY(2px);
@@ -511,7 +511,7 @@ html[data-safe-glass='true'] .z-pressing {
 
 /* ⭐ 후보 2+4 합본 · Sink + Sweep (진호 선택) — 더 깊게 눌리며 빛이 왼→오로 지나감 */
 .z-glass-jewel.z-press-sink-flash {
-  transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease, border-color var(--dia-dur-fast) ease;
 }
 .z-glass-jewel.z-press-sink-flash:active {
   transform: translateY(2px);

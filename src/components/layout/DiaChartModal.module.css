@@ -74,7 +74,7 @@
   color: #475569;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dia-dur-base) ease, transform var(--dia-dur-fast) ease;
 }
 .closeBtn:active {
   transform: scale(0.9);

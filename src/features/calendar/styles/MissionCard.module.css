@@ -88,7 +88,7 @@
   color: var(--dia-text-tertiary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
   flex-shrink: 0;
 }
 
@@ -144,7 +144,7 @@
     linear-gradient(145deg, #f87171, #dc2626);
   color: #fff;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
 }
 
 .btnPrimary:active {
@@ -171,7 +171,7 @@
   box-shadow:
     0 0 0 3px rgba(245, 158, 11, 0.25),
     var(--dia-3d-depth);
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   /* 살짝 펄스 */

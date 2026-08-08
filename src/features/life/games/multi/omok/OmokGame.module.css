@@ -29,7 +29,7 @@
   border: 1px solid var(--dia-border);
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   flex-shrink: 0;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active,
@@ -63,7 +63,7 @@
   border: none;
   padding: 4px 8px;
   border-radius: var(--dia-radius-md);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background var(--dia-dur-base) ease, transform var(--dia-dur-fast) ease;
 }
 
 .roomCode:active {
@@ -89,7 +89,7 @@
   border: 1px solid var(--dia-border-light);
   min-width: 0;
   opacity: 0.5;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
+  transition: opacity var(--dia-dur-slow) ease, border-color var(--dia-dur-slow) ease;
 }
 
 .playerChip:last-child {

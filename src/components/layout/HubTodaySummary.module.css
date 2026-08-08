@@ -225,7 +225,7 @@
   cursor: pointer;
   min-height: 44px;
   -webkit-tap-highlight-color: transparent;
-  transition: border-color 0.2s var(--dia-ease), background 0.2s var(--dia-ease);
+  transition: border-color var(--dia-dur-slow) var(--dia-ease), background var(--dia-dur-slow) var(--dia-ease);
   font-family: inherit;
 }
 

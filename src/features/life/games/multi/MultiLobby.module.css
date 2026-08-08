@@ -28,7 +28,7 @@
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active {
@@ -96,7 +96,7 @@
   text-align: left;
   width: 100%;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
-  transition: transform 0.15s ease;
+  transition: transform var(--dia-dur-base) ease;
 }
 
 .modeCard:active {
@@ -186,7 +186,7 @@
   justify-content: center;
   gap: var(--dia-space-2);
   font-size: var(--dia-text-base);
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
 }
 
 .primaryBtn:active {

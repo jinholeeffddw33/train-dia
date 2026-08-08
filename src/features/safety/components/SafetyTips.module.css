@@ -31,7 +31,7 @@
   color: var(--dia-text-secondary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .backBtn:active { transform: scale(0.9); }
 .title {
@@ -55,7 +55,7 @@
   font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.35);
   min-height: 36px;
 }
@@ -107,7 +107,7 @@
   width: 100%; padding: 0;
   background: transparent; border: none; cursor: pointer; text-align: left;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .cardBtn:active { transform: scale(0.99); }
 
@@ -307,7 +307,7 @@
   font-weight: 600;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s ease;
+  transition: all var(--dia-dur-base) ease;
 }
 .typeBtn:active { transform: scale(0.97); }
 .typeBtnActive {
@@ -365,7 +365,7 @@
   font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
   min-height: 48px; border: none;
 }
 .formBtnSecondary {

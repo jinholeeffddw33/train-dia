@@ -1,0 +1,26 @@
+{
+  "_comment": "UI-MOTION-001 baseline — 파일별 raw transition duration + raw cubic-bezier 잔량. 갚으면 npm run check:motion:update.",
+  "total": 27,
+  "files": {
+    "src/app/globals.css": 2,
+    "src/components/common/Modal.module.css": 1,
+    "src/components/layout/TabBar.module.css": 2,
+    "src/features/calendar/styles/Calendar.module.css": 1,
+    "src/features/edu/components/QuizPlayer.module.css": 1,
+    "src/features/edu/components/RegulationViewer.module.css": 1,
+    "src/features/edu/styles/edu.module.css": 1,
+    "src/features/home/components/HomeStampCard.module.css": 1,
+    "src/features/home/styles/Home.module.css": 1,
+    "src/features/life/dab/dab.module.css": 1,
+    "src/features/life/fortune/Fortune.module.css": 1,
+    "src/features/life/games/apex/styles/apex.module.css": 2,
+    "src/features/life/games/HalliGalli.module.css": 1,
+    "src/features/more/styles/JubakLocation.module.css": 1,
+    "src/features/office/NoteManager.module.css": 1,
+    "src/features/office/OfficeDashboard.module.css": 1,
+    "src/features/office/ScheduleManager.module.css": 1,
+    "src/features/office/TaskBoard.module.css": 1,
+    "src/features/safety/components/SafetyDashboard.module.css": 2,
+    "src/styles/premium-fake-glass.css": 4
+  }
+}

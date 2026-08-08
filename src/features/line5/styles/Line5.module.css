@@ -527,7 +527,7 @@
   flex-shrink: 0;
   line-height: 1;
   user-select: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform var(--dia-dur-slow) ease, box-shadow var(--dia-dur-slow) ease;
 }
 
 .tkDirDown {
@@ -683,7 +683,7 @@
   text-decoration-color: rgba(59, 130, 246, 0.4);
   text-underline-offset: 2px;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, opacity 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease, opacity var(--dia-dur-fast) ease;
 }
 .tkDriverName:active {
   transform: scale(0.9);
@@ -875,7 +875,7 @@
   width: 100%;
   height: auto;
   min-width: 700px; /* 노안 가독 — SVG fontSize 18 × (700/960) ≈ 13px 실효 보장 */
-  transition: transform 0.2s ease;
+  transition: transform var(--dia-dur-slow) ease;
 }
 
 .mapFullscreen .mapSvg {

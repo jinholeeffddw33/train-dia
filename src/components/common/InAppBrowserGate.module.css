@@ -125,7 +125,7 @@
   cursor: pointer;
   padding: var(--dia-space-2) var(--dia-space-3);
   border-radius: var(--dia-radius-sm);
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .helperBtn:active {
   transform: scale(0.95);

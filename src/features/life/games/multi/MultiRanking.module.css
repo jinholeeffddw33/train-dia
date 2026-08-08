@@ -31,7 +31,7 @@
 
 .backBtn:active {
   transform: scale(0.95);
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 
 .headerTitle {

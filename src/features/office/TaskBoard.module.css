@@ -227,7 +227,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .fab:active { transform: scale(0.94); box-shadow: var(--dia-3d-pressed); }
 

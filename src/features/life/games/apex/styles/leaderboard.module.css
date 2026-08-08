@@ -58,7 +58,7 @@
   color: var(--z-text-secondary);
   font-size: var(--z-text-lg);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--dia-dur-base);
   text-decoration: none;
 }
 
@@ -106,7 +106,7 @@
   border: 1px solid transparent;
   border-radius: var(--z-radius-md);
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s, opacity 0.15s;
+  transition: border-color var(--dia-dur-base), box-shadow var(--dia-dur-base), color var(--dia-dur-base), transform var(--dia-dur-base), opacity var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -143,7 +143,7 @@
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s, opacity 0.15s;
+  transition: border-color var(--dia-dur-base), box-shadow var(--dia-dur-base), color var(--dia-dur-base), transform var(--dia-dur-base), opacity var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -183,7 +183,7 @@
   border: 1px solid var(--z-border);
   background: var(--z-surface);
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.1s;
+  transition: border-color var(--dia-dur-base), transform var(--dia-dur-instant);
   text-decoration: none;
   color: inherit;
 }
@@ -409,7 +409,7 @@
   border: 1px solid var(--z-border);
   border-radius: var(--z-radius-lg);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -481,7 +481,7 @@
   border-radius: var(--z-radius-lg);
   cursor: pointer;
   text-decoration: none;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: opacity var(--dia-dur-base), transform var(--dia-dur-instant);
 }
 
 @media (hover: hover) {
@@ -546,7 +546,7 @@
   border: none;
   border-radius: var(--z-radius-lg);
   text-decoration: none;
-  transition: opacity 0.15s;
+  transition: opacity var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -612,7 +612,7 @@
   border: 1px solid var(--z-accent);
   border-radius: var(--z-radius-lg);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -642,7 +642,7 @@
   border: 1px solid var(--z-border);
   border-radius: var(--z-radius-md);
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s, opacity 0.15s;
+  transition: border-color var(--dia-dur-base), box-shadow var(--dia-dur-base), color var(--dia-dur-base), transform var(--dia-dur-base), opacity var(--dia-dur-base);
 }
 
 @media (hover: hover) {
@@ -732,7 +732,7 @@
   padding: var(--z-space-2) var(--z-space-4);
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.1s;
+  transition: background-color var(--dia-dur-instant);
 }
 
 @media (hover: hover) {

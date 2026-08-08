@@ -62,7 +62,7 @@
   color: var(--dia-text-tertiary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 @media (hover: hover) {

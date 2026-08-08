@@ -29,13 +29,16 @@
     "check:token-refs": "node scripts/check-token-refs.mjs",
     "check:zlayer": "node scripts/check-zlayer.mjs",
     "check:bleed": "node scripts/check-bleed.mjs",
+    "check:motion": "node scripts/check-motion.mjs",
+    "check:motion:update": "node scripts/check-motion.mjs --update",
+    "check:motion:report": "node scripts/check-motion.mjs --report",
     "check:envelope": "node scripts/check-response-envelope.mjs",
     "check:envelope:update": "node scripts/check-response-envelope.mjs --update",
     "check:envelope:report": "node scripts/check-response-envelope.mjs --report",
     "check:token-refs:report": "node scripts/check-token-refs.mjs --report",
     "check:hooks": "node scripts/ensure-hooks.mjs",
     "install:hooks": "node scripts/install-hooks.mjs",
-    "check:quality-gates": "npm run check:hooks && npm run check:docs && npm run check:safearea && npm run check:token-refs && npm run check:zlayer && npm run check:bleed && npm run check:envelope && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed && npm run check:text-size:changed",
+    "check:quality-gates": "npm run check:hooks && npm run check:docs && npm run check:safearea && npm run check:token-refs && npm run check:zlayer && npm run check:bleed && npm run check:motion && npm run check:envelope && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed && npm run check:text-size:changed",
     "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
   },
   "dependencies": {

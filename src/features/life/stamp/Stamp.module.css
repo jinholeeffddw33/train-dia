@@ -25,7 +25,7 @@
   color: var(--dia-text-primary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active { background: var(--dia-surface-hover); transform: scale(0.9); }
@@ -110,7 +110,7 @@
   letter-spacing: 0.5px;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
   cursor: pointer;
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
   -webkit-tap-highlight-color: transparent;
 }
 

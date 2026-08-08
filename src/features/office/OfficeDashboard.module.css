@@ -155,7 +155,7 @@
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
   color: var(--dia-text-secondary);
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .iconBtn:active { transform: scale(0.9); }
 
@@ -334,7 +334,7 @@
   border: 1px solid var(--dia-amber); border-radius: var(--dia-radius-full);
   background: var(--dia-amber-dim); color: var(--dia-amber-text, var(--dia-amber));
   font-size: var(--dia-text-meta); font-weight: 800;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .pullBtn:active { transform: scale(0.9); }
 .itemTime { flex-shrink: 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-variant-numeric: tabular-nums; }
@@ -468,7 +468,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.6),   /* 상단 하이라이트 → 볼록 */
     0 5px 12px rgba(0, 0, 0, 0.13),           /* 하단 그림자 → 부양 */
     0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .gridBtn:active {
   transform: scale(0.96) translateY(1px);
@@ -522,7 +522,7 @@
     0 5px 12px rgba(0, 0, 0, 0.13),
     0 1px 2px rgba(0, 0, 0, 0.05);
   text-align: left;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 .newsCard:active {
   transform: scale(0.98) translateY(1px);

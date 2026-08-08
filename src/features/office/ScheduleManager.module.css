@@ -35,8 +35,8 @@
 .dateLabel { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 월/일 전환 토글임을 알리는 힌트 */
 .toggleHint { flex-shrink: 0; display: inline-flex; align-items: center; gap: 1px; font-size: var(--dia-text-meta); font-weight: 800; color: var(--dia-blue-text); background: var(--dia-blue-dim); border-radius: 999px; padding: 2px 6px 2px 8px; }
-.chev { transition: transform 0.2s ease; transform: rotate(0deg); }
-.chevOpen { transition: transform 0.2s ease; transform: rotate(180deg); }
+.chev { transition: transform var(--dia-dur-slow) ease; transform: rotate(0deg); }
+.chevOpen { transition: transform var(--dia-dur-slow) ease; transform: rotate(180deg); }
 .todayBtn { font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-text-secondary); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md); padding: 6px 12px; }
 .todayBtn:active { transform: scale(0.95); }
 
@@ -92,7 +92,7 @@
   padding: var(--dia-space-2) var(--dia-space-3); text-align: left;
   background: var(--dia-surface); border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-md); min-height: 44px;
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 .dsMain:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 .dsTime {
@@ -119,7 +119,7 @@
   font-size: var(--dia-text-sm); font-weight: 700;
   border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md);
   background: var(--dia-surface); color: var(--dia-text-secondary);
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 .repBtn:active, .repOn:active { transform: scale(0.95); }
 .repOn { background: var(--dia-blue-dim); color: var(--dia-blue-text); border-color: var(--dia-blue); }

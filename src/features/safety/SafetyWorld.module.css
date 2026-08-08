@@ -291,8 +291,8 @@
   color: #fff;
   transform: translateY(0);
   transition:
-    transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform var(--dia-dur-fast) var(--dia-ease-press),
+    box-shadow var(--dia-dur-fast) var(--dia-ease-press);
 }
 
 .menuBadge {
@@ -439,7 +439,7 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-base) ease, background var(--dia-dur-base) ease;
 }
 .pinnedCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 .pinnedIcon {

@@ -340,10 +340,35 @@
   --dia-type-rest-bg: rgba(107, 114, 128, 0.15);
 
   /* ========================================
-     Transition
+     Transition / Motion (UI-MOTION-001)
+
+     실측(2026-08-09): transition duration 이 **22종 210건**으로 흩어져 있었다.
+     기존 --dia-transition-* 3종(150/250/350ms)은 **사용 0회** — 정의만 있고
+     실사용값(0.12s 97건 · 0.15s 53건)과 아예 안 맞아서 아무도 안 썼다.
+     또 하나의 미완주 마이그레이션.
+
+     ★ 그래서 토큰을 "예쁜 숫자"가 아니라 **실사용 지배값 그대로** 잡았다.
+       값 보존이라 이관해도 모션이 1ms 도 안 달라진다.
+       0.1 / 0.12 / 0.15 는 CLAUDE.md §2.6 press 3티어(아이콘/버튼/카드)와도 일치한다.
+
+     커버리지: 0.1(6) + 0.12(97) + 0.15(53) + 0.2(15) + 0.3(16) = 187/210 = 89%
+     나머지 23건은 baseline 등록(신규 유입만 차단).
      ======================================== */
-  --dia-ease: cubic-bezier(0.4, 0, 0.2, 1);
-  --dia-transition-fast: 150ms var(--dia-ease);
+  --dia-dur-instant: 0.1s;   /* 소형 아이콘 press (CLAUDE.md §2.6) */
+  --dia-dur-fast: 0.12s;     /* 버튼/칩/탭 press — 최다 사용 */
+  --dia-dur-base: 0.15s;     /* 카드/대형 서피스 press */
+  --dia-dur-slow: 0.2s;      /* 패널 전환, 확장 */
+  --dia-dur-slower: 0.3s;    /* 시트/오버레이 진입 */
+
+  --dia-ease: cubic-bezier(0.4, 0, 0.2, 1);           /* 표준 */
+  --dia-ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* 진입 — 빠르게 나타나 부드럽게 멈춤 */
+  --dia-ease-in: cubic-bezier(0.4, 0, 1, 1);          /* 퇴장 */
+  --dia-ease-press: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* press 감쇠 (globals button) */
+  --dia-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* 팝/바운스 */
+
+  /* 레거시 별칭 — 기존 정의를 지우면 팬텀 var() 가 되므로 유지한다.
+     신규 코드는 --dia-dur-* 를 쓸 것. */
+  --dia-transition-fast: var(--dia-dur-base) var(--dia-ease);
   --dia-transition-normal: 250ms var(--dia-ease);
   --dia-transition-slow: 350ms var(--dia-ease);
 

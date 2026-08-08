@@ -101,7 +101,7 @@
   padding: var(--dia-space-4);
   min-height: 64px;
   text-align: left;
-  transition: transform 0.15s ease;
+  transition: transform var(--dia-dur-base) ease;
 }
 
 .pickBtn:active {

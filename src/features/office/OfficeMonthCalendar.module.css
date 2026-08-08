@@ -59,7 +59,7 @@
   background: none;
   border-radius: var(--dia-radius-full);
   color: var(--dia-text-secondary);
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 
 .navBtn:active {
@@ -111,7 +111,7 @@
   align-items: center;
   gap: 2px;
   padding: 5px 2px;
-  transition: background 0.15s ease;
+  transition: background var(--dia-dur-base) ease;
   overflow: hidden;
 }
 

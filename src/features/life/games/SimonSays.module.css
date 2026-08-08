@@ -166,7 +166,7 @@
   border: none;
   cursor: pointer;
   min-height: 120px;
-  transition: filter 0.1s ease, transform 0.1s ease, opacity 0.1s ease, box-shadow 0.1s ease;
+  transition: filter var(--dia-dur-instant) ease, transform var(--dia-dur-instant) ease, opacity var(--dia-dur-instant) ease, box-shadow var(--dia-dur-instant) ease;
   opacity: 0.75;
   color: var(--dia-text-primary);
 }

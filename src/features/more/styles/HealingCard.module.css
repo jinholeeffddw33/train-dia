@@ -82,7 +82,7 @@
   height: 100%;
   background: var(--dia-blue);
   border-radius: var(--dia-radius-full);
-  transition: width 0.3s ease;
+  transition: width var(--dia-dur-slower) ease;
 }
 
 .balanceDetail {

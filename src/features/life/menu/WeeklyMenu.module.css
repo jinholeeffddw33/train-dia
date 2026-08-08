@@ -53,7 +53,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
   box-shadow: var(--dia-shadow-sm);
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 
 .tab:active { transform: scale(0.95); }

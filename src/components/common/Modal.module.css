@@ -17,7 +17,7 @@
   inset: 0;
   background: var(--dia-overlay-bg);
   animation: fadeIn 160ms ease-out;
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 1, 1);
+  transition: opacity var(--dia-dur-slower) var(--dia-ease-in);
 }
 
 .content {
@@ -38,7 +38,7 @@
   animation: slideUp 240ms cubic-bezier(0.32, 0.72, 0, 1);
   will-change: transform;
   /* 닫힘은 base transition 이 transform 값 변화를 슬라이드(진입은 animation 담당). */
-  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
+  transition: transform var(--dia-dur-slower) var(--dia-ease-in);
 }
 
 /* 상단 핸들 — 히트영역 28px, 시각 바는 ::before(36×4). 스크롤 본문 밖이라 고정. */

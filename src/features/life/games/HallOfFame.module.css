@@ -23,7 +23,7 @@
   border: 1px solid var(--dia-border);
   border-radius: var(--dia-radius-lg);
   color: var(--dia-text-primary);
-  transition: transform 0.12s ease, background var(--dia-transition-fast);
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-transition-fast);
 }
 .backBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }
 

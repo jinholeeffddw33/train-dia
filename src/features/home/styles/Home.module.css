@@ -30,7 +30,7 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 3;
-  transition: transform 0.18s ease, background 0.15s ease;
+  transition: transform 0.18s ease, background var(--dia-dur-base) ease;
 }
 
 .refreshBtn:active {
@@ -423,7 +423,7 @@
   cursor: pointer;
   vertical-align: middle;
   opacity: 0.92;
-  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease, opacity var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .nextDiaChip:active { transform: scale(0.92); }
 .nextDiaChipOn { opacity: 1; box-shadow: inset 0 0 0 2px currentColor; }
@@ -1072,7 +1072,7 @@
   justify-content: center;
   border-radius: var(--dia-radius-full);
   color: var(--dia-text-tertiary);
-  transition: transform 0.12s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
 .selectorClose:active { transform: scale(0.9); background: var(--dia-surface-hover); }
 

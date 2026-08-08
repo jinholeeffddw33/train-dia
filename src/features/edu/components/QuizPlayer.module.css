@@ -26,7 +26,7 @@
   color: var(--dia-text-primary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active {
@@ -113,7 +113,7 @@
   font-size: var(--dia-text-meta);
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 
 .resumeReset:active {
@@ -167,7 +167,7 @@
   line-height: 1.5;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, border-color var(--dia-dur-base) ease, background var(--dia-dur-base) ease;
   word-break: keep-all;
   min-height: 56px;
 }
@@ -306,7 +306,7 @@
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: transform 0.12s ease, filter 0.15s ease;
+  transition: transform var(--dia-dur-fast) ease, filter var(--dia-dur-base) ease;
 }
 
 .nextBtn:active {
@@ -373,7 +373,7 @@
   font-weight: 700;
   border: none;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 
 /* 법② 분리 단발(보조 — 나가기) — 무색 3D 솟음 */

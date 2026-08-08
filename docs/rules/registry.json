@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
   "lastUpdated": "2026-08-09",
   "verificationCommands": {
@@ -140,6 +140,14 @@
       "scope": ["src/app/api/**/*.ts"],
       "exceptions": ["baseline 미전환 라우트(전환 시점에 함께 적용)"],
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) 와 baseline 공유",
+      "severity": "fail"
+    },
+    "UI-MOTION-001": {
+      "description": "transition 의 duration/easing 은 토큰 경유 — duration 5단계(instant 0.1 / fast 0.12 / base 0.15 / slow 0.2 / slower 0.3), easing 5종(--dia-ease/-out/-in/-press/-spring). raw cubic-bezier 금지. ★실측 2026-08-09: duration 이 22종 334개 값으로 흩어져 있었고 기존 --dia-transition-* 3종(150/250/350ms)은 사용 0회였다 — 정의만 있고 실사용 지배값(0.12s 97건)과 안 맞아 아무도 안 썼다. 그래서 토큰을 실사용값에 맞췄다(반대가 아니라). animation duration 은 루프/장식이라 대상 아님. 이관 334 → 잔여 27건(92% 감소), 나머지 baseline.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/**/*.css"],
+      "exceptions": ["animation duration", "prefers-reduced-motion 오버라이드(0.01ms)", "tokens.css 정의부", "직전 줄 /* MOTION-EXCEPTION: 사유 */", "docs/ops/motion-baseline.json 등록분"],
+      "autoCheck": "scripts/check-motion.mjs (check:motion) — baseline 래칫",
       "severity": "fail"
     },
     "UI-TOAST-001": {

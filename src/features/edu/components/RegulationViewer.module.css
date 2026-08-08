@@ -29,7 +29,7 @@
   color: var(--dia-text-primary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active,
@@ -140,7 +140,7 @@
   color: var(--dia-text-primary);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
-  transition: transform 0.12s ease, background var(--dia-transition-fast);
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-transition-fast);
 }
 
 .navBtn:active {
@@ -519,7 +519,7 @@
   letter-spacing: 0.3px;
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
   cursor: pointer;
-  transition: transform 0.14s ease, filter 0.15s ease;
+  transition: transform 0.14s ease, filter var(--dia-dur-base) ease;
   animation: tocFabIn 220ms var(--dia-ease);
   -webkit-tap-highlight-color: transparent;
 }
@@ -578,7 +578,7 @@
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
-  transition: box-shadow var(--dia-transition-fast), transform 0.12s ease;
+  transition: box-shadow var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 @media (hover: hover) {
@@ -616,7 +616,7 @@
   padding: 1px 1px;
   cursor: pointer;
   position: relative;
-  transition: filter 0.15s ease;
+  transition: filter var(--dia-dur-base) ease;
 }
 @media (hover: hover) {
 .annotation:hover { filter: brightness(0.95); }
@@ -663,7 +663,7 @@
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.85);
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .annoColorBtn:active { transform: scale(0.9); }
 

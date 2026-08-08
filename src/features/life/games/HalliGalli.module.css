@@ -137,7 +137,7 @@
   padding: var(--dia-space-5) var(--dia-space-4);
   gap: var(--dia-space-4);
   min-height: 0;
-  transition: background 0.2s ease;
+  transition: background var(--dia-dur-slow) ease;
 }
 
 /* 정답/오답 플래시 */
@@ -268,7 +268,7 @@
   color: #FFFFFF;
   cursor: pointer;
   font-weight: var(--dia-weight-bold);
-  transition: transform 0.06s ease, filter 0.1s ease;
+  transition: transform 0.06s ease, filter var(--dia-dur-instant) ease;
 }
 
 .judgeYes {

@@ -25,7 +25,7 @@
   color: var(--dia-text-primary);
   background: transparent;
   border: none;
-  transition: background var(--dia-transition-fast), transform 0.12s ease;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
 }
 
 .backBtn:active { background: var(--dia-surface-hover); transform: scale(0.9); }
@@ -63,7 +63,7 @@
   padding: var(--dia-space-5);
   border-radius: var(--dia-radius-2xl);
   cursor: pointer;
-  transition: transform 0.25s var(--dia-ease), box-shadow 0.2s ease;
+  transition: transform 0.25s var(--dia-ease), box-shadow var(--dia-dur-slow) ease;
   position: relative;
   overflow: hidden;
   isolation: isolate;

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useId } from 'react';
 import { X } from 'lucide-react';
 import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -43,6 +44,17 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
       return true;
     });
   }, [onClose]);
+
+  // ── 뒤로가기(안드로이드 하드웨어 / iOS 엣지 스와이프)로 시트를 닫는다 (2026-08-09) ──
+  // ★ 실측: useHistoryBack 은 21개 파일이 쓰는데 onClose 를 가진 오버레이 27개가 안 썼다.
+  //   그 화면들에선 뒤로가기가 시트를 닫는 대신 **앱을 종료**시켰다.
+  //   앱은 페이지가 '/' 하나뿐이라 화면 전환이 URL 로 남지 않아서, 훅이 더미 히스토리
+  //   엔트리를 쌓아 두지 않으면 브라우저 입장에선 "더 뒤로 갈 곳이 없음"이 되기 때문이다.
+  // ★ 개별 화면마다 배선하는 대신 **공용 Modal 한 곳**에 넣는다 —
+  //   Modal 을 쓰는 화면은 전부 공짜로 따라오고, 앞으로 추가되는 시트도 마찬가지다.
+  //   (UI-ADOPT-001: 채택률은 강제력에서 나온다)
+  const modalKey = useId();
+  useHistoryBack(modalKey, requestClose, open && !closing);
 
   // ESC 닫기 + Tab 포커스 트랩 (VideoRegisterModal 완성형 패턴 이식 — 2026-07-02 R4)
   const handleKeyDown = useCallback(

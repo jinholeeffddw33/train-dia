@@ -1,7 +1,15 @@
 // ===== 기관사 DIA v2 Service Worker =====
 
-const CACHE_NAME = 'dia-v2.5-cache';
-const MEDIA_CACHE = 'dia-v2.5-media';
+// ── 캐시 이름은 **배포 버전에서 파생**한다 ──
+// ★ 이전에는 'dia-v2.5-cache' 로 하드코딩돼 있었고 앱이 v3.8.1 이 되도록 **한 번도 안 올라갔다**.
+//   결과: activate 의 옛 캐시 정리가 영원히 아무것도 안 지웠고, /_next/static/ 의 해시 청크가
+//   배포마다 쌓이기만 했다(cache-first 라 지워지지도 않는다).
+//   또 sw.js 자체는 배포해도 내용이 안 바뀌므로 **브라우저가 SW 업데이트를 감지조차 못 했다**.
+//   → useServiceWorker 가 `/sw.js?v=<APP_VERSION>` 으로 등록하고, 여기서 그 v 를 읽어
+//     버전마다 새 캐시를 쓰고 옛 캐시를 activate 에서 자동 폐기한다.
+const SW_VERSION = new URL(self.location.href).searchParams.get('v') || 'dev';
+const CACHE_NAME = `dia-${SW_VERSION}-cache`;
+const MEDIA_CACHE = `dia-${SW_VERSION}-media`;
 const MEDIA_MAX_ENTRIES = 60;
 const STATIC_ASSETS = [
   '/',
@@ -17,12 +25,18 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 활성화: 이전 캐시 정리 (현재 버전 캐시 2개는 유지)
+// 활성화: 이전 버전 캐시 폐기 (현재 버전 캐시 2개만 유지)
+// SW_VERSION 이 배포마다 바뀌므로 여기서 옛 버전 캐시가 실제로 지워진다.
+// (dia- 로 시작하는 것만 건드린다 — 다른 출처의 캐시는 남긴다)
 self.addEventListener('activate', (event) => {
   const KEEP = [CACHE_NAME, MEDIA_CACHE];
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => !KEEP.includes(k)).map((k) => caches.delete(k)))
+      Promise.all(
+        keys
+          .filter((k) => k.startsWith('dia-') && !KEEP.includes(k))
+          .map((k) => caches.delete(k))
+      )
     )
   );
   // 첫 설치 시 제어권 확보용 — 클라이언트 controllerchange 핸들러가 첫 설치는 reload 하지 않게 가드함

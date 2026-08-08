@@ -5,6 +5,8 @@ import { APP_VERSION } from '@/lib/constants';
 
 const UPDATE_CHECK_INTERVAL = 30 * 60 * 1000;
 const VERSION_CHECK_INTERVAL = 5 * 60 * 1000;
+/** 콜드 스타트 자동 업데이트를 이 세션에서 이미 시도했는지 (무한 새로고침 방지) */
+const AUTO_UPDATE_KEY = 'dia-auto-updated';
 
 /**
  * 어디서든(버튼 등) 호출해 즉시 최신으로 만든다 — 훅 부수효과(중복 SW 등록) 없음.
@@ -91,7 +93,11 @@ export function useServiceWorker() {
       });
     };
 
-    navigator.serviceWorker.register('/sw.js').then((reg) => {
+    // ★ 등록 URL 에 배포 버전을 실어 보낸다 — sw.js 파일 내용은 배포해도 안 바뀌므로
+    //   `/sw.js` 그대로면 브라우저가 **SW 업데이트를 감지조차 못 한다**(바이트 동일).
+    //   v 가 바뀌면 새 스크립트로 취급돼 install→activate 가 돌고,
+    //   sw.js 가 그 v 로 캐시 이름을 만들어 옛 버전 캐시를 activate 에서 폐기한다.
+    navigator.serviceWorker.register(`/sw.js?v=${APP_VERSION}`).then((reg) => {
       regRef.current = reg;
       reg.addEventListener('updatefound', () => watchInstalling(reg));
       reg.update().catch(() => {});
@@ -146,6 +152,30 @@ export function useServiceWorker() {
   }, []);
 
   const outdated = latestVersion != null && latestVersion !== APP_VERSION;
+
+  // ── 콜드 스타트 자동 적용 ──
+  // "앱을 밀었다 켜면 새 버전이 적용돼 있어야 한다"(진호 2026-08-09).
+  // 이전에는 outdated 여도 배너를 띄우고 **사용자가 눌러야** 적용됐다.
+  //
+  // ★ 콜드 스타트에서만 자동 적용한다. 포그라운드 복귀 때 자동 새로고침하면
+  //   작성 중이던 메모·폼이 날아간다 — 그 경우는 기존대로 배너로 남긴다.
+  //   "콜드 스타트"의 판정 = 이 세션에서 아직 자동 적용을 한 적이 없음(sessionStorage).
+  //   세션 저장소는 앱을 완전히 종료하면 비므로 "밀었다 켜기"와 정확히 일치한다.
+  // ★ 무한 새로고침 방지: 적용 직전에 표식을 남기고, 표식이 있으면 다시는 자동 적용하지 않는다.
+  //   (배포가 롤백되는 등으로 버전이 계속 어긋나도 루프에 빠지지 않는다)
+  const autoAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!outdated || autoAppliedRef.current) return;
+    if (typeof window === 'undefined') return;
+    let alreadyTried = false;
+    try {
+      alreadyTried = window.sessionStorage.getItem(AUTO_UPDATE_KEY) === '1';
+    } catch { /* 프라이빗 모드 등 — 자동 적용을 포기하고 배너로 */ alreadyTried = true; }
+    if (alreadyTried) return;
+    autoAppliedRef.current = true;
+    try { window.sessionStorage.setItem(AUTO_UPDATE_KEY, '1'); } catch { /* ignore */ }
+    forceAppUpdate();
+  }, [outdated]);
 
   return { updateAvailable, applyUpdate: forceAppUpdate, outdated, currentVersion: APP_VERSION, latestVersion };
 }

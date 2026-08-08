@@ -65,7 +65,7 @@
 /* FAB */
 .fab { position: fixed; right: calc(50% - 280px + 20px); bottom: calc(24px + var(--sab));
   width: 52px; height: 52px; border-radius: 50%; background: var(--dia-hero-gradient); color: #fff;
-  display: grid; place-items: center; box-shadow: 0 8px 22px rgba(37,99,235,0.5); z-index: 20; }
+  display: grid; place-items: center; box-shadow: 0 8px 22px rgba(37,99,235,0.5); z-index: var(--dia-layer-dropdown); }
 .fab:active { transform: scale(0.92); }
 @media (max-width: 600px) { .fab { right: 20px; } }
 

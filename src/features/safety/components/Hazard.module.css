@@ -1458,7 +1458,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
   min-width: 120px;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
@@ -1620,7 +1620,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1100;
+  z-index: var(--dia-layer-fullscreen-above);
   padding: max(var(--sat), 16px)
            max(var(--sar), 16px)
            max(var(--sab), 16px)
@@ -1802,7 +1802,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
   min-width: 100px;
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);

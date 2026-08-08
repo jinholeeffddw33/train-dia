@@ -49,6 +49,26 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-ZLAYER-001 — 레이어급 z-index 는 토큰 경유
+
+`z-index` 가 **10 이상**이면 raw 숫자 금지 → `var(--dia-layer-*)`. 로컬 스택(**-1~9**)은 컴포넌트 내부 겹침이라 대상이 아니다.
+
+**사다리** (`src/styles/tokens.css`)
+```
+base 0 < sticky 10 / sticky-above 11 < dropdown 20 < fixed 30
+      < overlay 50 / overlay-above 60 < modal 100 / modal-above 150 < toast 200
+      < fullscreen 1000 / fullscreen-above 1100
+      < viewer 1150 / viewer-panel 1200 / viewer-sheet 1300 / viewer-sheet-above 1305 / viewer-top 1310
+      < critical 9999
+```
+
+**왜** — 숫자가 흩어져 있으면 "이게 저것보다 위인가"를 코드만 보고 판단할 수 없다. 새 오버레이마다 "일단 큰 숫자"를 찍게 되고 그렇게 1000→1100→1305→1310 같은 사다리 아닌 사다리가 자란다. 실측(2026-08-09): raw 24종 135건, 레이어급 16종 45건, `--dia-layer-*` 토큰은 정의만 있고 **사용 0회**.
+
+> ★ 이관은 **값 보존 치환**이다 — 토큰이 현재 값을 그대로 갖는다. 번호를 재배치하면 라이브에서 모달이 토스트 뒤로 숨는 사고가 난다. 사다리를 예쁘게 정리하는 건 **이름이 붙은 뒤**의 다음 문제다.
+
+- 예외: 직전 줄 `/* ZLAYER-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-zlayer.mjs` (`check:zlayer`) · severity **fail** · 전량 스캔.
+
 ## UI-TOKEN-REF-001 — 팬텀 var() 금지
 
 `var(--x)` 를 쓰기 전에 토큰이 실재하는지 확인한다. CSS 커스텀 프로퍼티는 **silent fail** — 미정의 토큰을 폴백 없이 참조하면 그 선언 전체가 계산 시점에 무효가 되어 **조용히 사라진다**. 에러도 경고도 빌드 실패도 없다.

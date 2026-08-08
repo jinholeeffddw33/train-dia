@@ -2,7 +2,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: var(--dia-layer-critical);
   background: var(--dia-bg);
   display: flex;
   flex-direction: column;

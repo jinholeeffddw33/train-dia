@@ -3,7 +3,7 @@
   inset: 0;
   /* 퀴즈(QuizPlayer overlay z-index 1150)에서 "본문 보기"로 열 때 그 위에 떠야 함.
      .overlay가 stacking context라 내부 레이어(1150~1300)는 이 안에서만 상대적 → 베이스를 퀴즈 위로. */
-  z-index: 1200;
+  z-index: var(--dia-layer-viewer-panel);
   background: var(--dia-bg);
   display: flex;
   flex-direction: column;
@@ -502,7 +502,7 @@
   position: fixed;
   right: var(--dia-space-4);
   bottom: calc(var(--dia-space-5) + var(--sab));
-  z-index: 1150;
+  z-index: var(--dia-layer-viewer);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -545,7 +545,7 @@
 .pdfOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: var(--dia-layer-viewer-panel);
   background: var(--dia-bg);
   display: flex;
   flex-direction: column;
@@ -648,7 +648,7 @@
   border: 1px solid var(--dia-border);
   border-radius: 999px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-  z-index: 1300;
+  z-index: var(--dia-layer-viewer-sheet);
   animation: annoPop 160ms var(--dia-ease, ease-out);
 }
 
@@ -692,7 +692,7 @@
 .memoOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1310;
+  z-index: var(--dia-layer-viewer-top);
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
@@ -801,7 +801,7 @@
 .notesOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1305;
+  z-index: var(--dia-layer-viewer-sheet-above);
   background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: flex-end;

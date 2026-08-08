@@ -365,7 +365,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.92);
-  z-index: 200;
+  z-index: var(--dia-layer-toast);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -412,7 +412,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
-  z-index: 150;
+  z-index: var(--dia-layer-modal-above);
   display: flex;
   align-items: flex-end;
   justify-content: center;

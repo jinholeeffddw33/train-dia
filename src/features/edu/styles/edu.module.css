@@ -144,7 +144,7 @@
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 10;
+  z-index: var(--dia-layer-sticky);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
@@ -368,7 +368,7 @@
 .subMenuOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--dia-layer-fullscreen);
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: flex-end;
@@ -1676,7 +1676,7 @@
 .slideViewerOverlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: var(--dia-layer-critical);
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   flex-direction: column;
@@ -1844,7 +1844,7 @@
   padding-bottom: calc(var(--dia-space-3) + var(--sab));
   background: var(--dia-bg);
   border-top: 1px solid var(--dia-border);
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
   transform: translateY(0);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -4608,7 +4608,7 @@
 .videoPlayerOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  z-index: var(--dia-layer-fullscreen-above);
   background: var(--dia-bg);
   display: flex;
   flex-direction: column;

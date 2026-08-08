@@ -3,7 +3,7 @@
   position: fixed;
   top: calc(var(--sat) + 8px);
   right: calc(var(--sar) + 8px);
-  z-index: 9999;
+  z-index: var(--dia-layer-critical);
 
   display: inline-flex;
   align-items: center;

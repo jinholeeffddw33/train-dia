@@ -141,7 +141,7 @@
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 10;
+  z-index: var(--dia-layer-sticky);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 

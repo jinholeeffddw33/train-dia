@@ -2058,7 +2058,7 @@
 .installGuideOverlay {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  z-index: var(--dia-layer-fullscreen-above);
   background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: flex-end;

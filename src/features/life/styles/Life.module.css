@@ -40,7 +40,7 @@
   border: 1px solid var(--dia-border);
   display: flex; align-items: center; justify-content: center;
   color: var(--dia-text-primary);
-  cursor: pointer; z-index: 10;
+  cursor: pointer; z-index: var(--dia-layer-sticky);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -499,7 +499,7 @@
 
 /* ── 헤더 (리스트/상세/글쓰기 공통) ── */
 .header {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: 0; z-index: var(--dia-layer-dropdown);
   display: flex; align-items: center;
   gap: var(--dia-space-3);
   padding: var(--dia-space-3) var(--dia-space-4);

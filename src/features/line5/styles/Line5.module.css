@@ -161,7 +161,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
 }
 
 .fab {
@@ -735,7 +735,7 @@
 .mapFullscreen {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: var(--dia-layer-modal);
   border-radius: 0;
   background: var(--dia-bg);
   display: flex;
@@ -751,7 +751,7 @@
   padding-top: calc(var(--dia-space-3) + var(--sat));
   background: var(--dia-surface);
   border-bottom: 1px solid var(--dia-border);
-  z-index: 11;
+  z-index: var(--dia-layer-sticky-above);
   flex-shrink: 0;
 }
 
@@ -793,7 +793,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--dia-space-1);
-  z-index: 10;
+  z-index: var(--dia-layer-sticky);
 }
 
 .mapFullscreen .mapControls {
@@ -827,7 +827,7 @@
   padding: var(--dia-space-2) var(--dia-space-3);
   background: rgba(15, 23, 42, 0.85);
   border-radius: var(--dia-radius-md);
-  z-index: 10;
+  z-index: var(--dia-layer-sticky);
   backdrop-filter: blur(8px);
 }
 

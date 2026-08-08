@@ -730,7 +730,7 @@
 .fullOverlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
   background: var(--dia-bg);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

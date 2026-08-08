@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--dia-shadow-lg);
-  z-index: 50;
+  z-index: var(--dia-layer-overlay);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 

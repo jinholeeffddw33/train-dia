@@ -32,7 +32,7 @@
   border: 1px solid var(--dia-border-strong);
   border-radius: var(--dia-radius-lg);
   box-shadow: var(--dia-shadow-lg);
-  z-index: 10;
+  z-index: var(--dia-layer-sticky);
   overflow: hidden;
 }
 
@@ -250,7 +250,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 60;
+  z-index: var(--dia-layer-overlay-above);
   display: flex;
   align-items: center;
   justify-content: center;

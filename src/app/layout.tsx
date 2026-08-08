@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;var s=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;if(!s)return;var u=navigator.userAgent||'';var ios=/iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){d.classList.add('pwa-ios')}else if(/Android/.test(u)){d.classList.add('pwa-android')}}catch(e){}})()`,
+            __html: `(function(){try{var d=document.documentElement;d.style.setProperty('--dpr',String(window.devicePixelRatio||1));var s=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;if(!s)return;var u=navigator.userAgent||'';var ios=/iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(ios){d.classList.add('pwa-ios')}else if(/Android/.test(u)){d.classList.add('pwa-android')}}catch(e){}})()`,
           }}
         />
         {/*

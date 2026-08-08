@@ -49,6 +49,20 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-TOKEN-REF-001 — 팬텀 var() 금지
+
+`var(--x)` 를 쓰기 전에 토큰이 실재하는지 확인한다. CSS 커스텀 프로퍼티는 **silent fail** — 미정의 토큰을 폴백 없이 참조하면 그 선언 전체가 계산 시점에 무효가 되어 **조용히 사라진다**. 에러도 경고도 빌드 실패도 없다.
+
+**실제 사고 (2026-08-09)** — apex 게임 `.canvasRetryBtn`(캔버스 오류 시 재시도 버튼)이 ZINOSB 잔재 `var(--z-3d-lime-hi/lo/shadow)` 를 폴백 없이 참조했다. train-dia 에 그 토큰이 이식되지 않아 `background` 와 `box-shadow` 가 통째로 죽었고, 어두운 배경(`#0a0d1e`) 위에 어두운 글자(`#101408`)만 남아 **버튼이 보이지 않았다**.
+
+- **[FAIL]** 폴백 없는 미정의 참조 `var(--x)` — 선언이 죽는다.
+- **[WARN]** 폴백 있는 미정의 참조 `var(--x, 폴백)` — 동작은 하지만 주입처가 없으면 "색을 갈아끼우려던 설계가 배선되지 않은 것"이라 항상 폴백값만 보인다. (예: `--dia-sky-dim` 누락으로 영상가이드 sky 그룹만 회색이었음)
+- 정의로 인정: CSS 어디서든 `--x:`(한 줄 규칙 포함) · `@property` · JS `setProperty` · JSX `style={{ '--x': v }}` 및 계산된 키 `[ '--x' as string ]`.
+- 예외: 직전 줄 `/* TOKEN-REF-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-token-refs.mjs` (`check:token-refs`) · severity **fail** · 전량 스캔. 현황 리포트 `check:token-refs:report`.
+
+> ★ 가드 작성 시 함정 — 정의 탐지를 **줄머리로 한정하면 안 된다**. `.cls { --x: v; }` 같은 한 줄 규칙이 흔해서 거짓 FAIL 이 쏟아진다(초안에서 실제 발생). 계산된 JSX 키(`['--x' as string]:`)도 마찬가지.
+
 ## CSS-SAFEAREA-001 — safe-area 는 토큰 경유 (노치/다이내믹 아일랜드)
 
 raw `env(safe-area-inset-*)` 신규 사용 **금지** → `var(--sat)` / `var(--sab)` / `var(--sal)` / `var(--sar)`.

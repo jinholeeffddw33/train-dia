@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
   "lastUpdated": "2026-08-09",
   "verificationCommands": {
@@ -141,6 +141,22 @@
       "exceptions": ["baseline 미전환 라우트(전환 시점에 함께 적용)"],
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) 와 baseline 공유",
       "severity": "fail"
+    },
+    "UI-TOAST-001": {
+      "description": "토스트 상태는 src/stores/toast.ts 가 SSOT — components/common/Toast.tsx 는 그리기만. 호출은 showToast(text, type) 하나. ★이전 구현은 모듈 레벨 가변 싱글턴(let addToastFn = null)이라 컨테이너가 마운트되기 전이나 재마운트 사이에 부른 토스트가 조용히 사라졌다(초기 로드 중 에러 알림이 증발하던 경로). store 는 컴포넌트 생명주기 밖이라 그 창이 없다. 같은 문구 연타는 억제하고 최대 3개까지만 쌓으며 3초 후 자동 소멸.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/stores/toast.ts", "src/components/common/Toast.tsx", "src/**/*.tsx"],
+      "exceptions": [],
+      "autoCheck": "src/stores/__tests__/toast-store.test.ts (npm test) — 회귀 테스트 9건",
+      "severity": "fail"
+    },
+    "UI-HAPTIC-001": {
+      "description": "햅틱은 src/lib/haptic.ts SSOT 만 — navigator.vibrate 직접 호출 금지. hapticLight/Medium/Success/Warning/Error. feature detect 우선(canVibrate 로 먼저 묻고 미지원이면 아예 안 부른다 — try/catch 로 예외를 삼키는 것과 다르다). train-dia 는 PWA 라 iOS Safari 미지원이므로 없어도 동작에 지장 0 이어야 한다. prefers-reduced-motion 이면 진동도 안 한다. ★중복 발화 금지 — success/error/warning 토스트는 store 가 햅틱을 자동 발화하므로 호출부에서 또 부르면 두 번 울린다. 개별 버튼 703곳 배선은 다음 세션 후보(실측 커버리지 3.5%).",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": ["src/lib/haptic.ts", "src/**/*.ts", "src/**/*.tsx"],
+      "exceptions": ["features/life/games/useGameFeedback.ts — 게임 전용 사운드+진동 토글 UI 를 자체로 가짐"],
+      "autoCheck": "미도입 — 배선이 늘면 raw navigator.vibrate 금지 가드 신설 검토",
+      "severity": "warn"
     },
     "UI-BLEED-001": {
       "description": "풀블리드 탈출은 게터 토큰으로만 — 게터를 넘어 화면 끝까지 빼는 음수 가로 마진은 calc(-1 * var(--dia-page-pad)). raw px 나 --dia-space-* 직접 사용 금지(게터 값이 바뀌면 같이 안 움직인다). 판정은 좌우 대칭 + 게터 크기(16px) 이상일 때만 — -1px(srOnly)/-8px(아이콘 정렬)/-150px(센터링)은 광학 보정이라 대상 아님. 유틸 .diaBleed/.diaBleedInset/.diaScrollRow 를 쓰면 손으로 안 적어도 된다.",

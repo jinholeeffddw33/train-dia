@@ -49,6 +49,23 @@
 - 자동 변환: `node scripts/wrap-hover-media.cjs <file>`.
 - 가드: `scripts/check-no-raw-hover.cjs` (`check:hover`) · severity **fail** (전체 src, 현재 클린).
 
+## UI-TOAST-001 / UI-HAPTIC-001 — 알림과 햅틱은 SSOT 하나로
+
+**토스트** — 상태는 [`src/stores/toast.ts`](../../../src/stores/toast.ts) 가 갖고, `components/common/Toast.tsx` 는 **그리기만** 한다. 호출은 `showToast(text, type)` 하나 (`info` | `success` | `error` | `warning`).
+
+**왜 store 인가** — 이전 구현은 모듈 레벨 가변 싱글턴(`let addToastFn = null`)이었다. 컨테이너가 마운트될 때 자기 `setState` 를 꽂고 언마운트 때 `null` 로 되돌린다. 그래서 **컨테이너가 뜨기 전이나 재마운트 사이에 부른 토스트는 조용히 사라졌다** — 초기 로드 중 에러 알림이 증발하는 경로였다. store 는 컴포넌트 생명주기 밖이라 그 창이 없다.
+
+**햅틱** — [`src/lib/haptic.ts`](../../../src/lib/haptic.ts) 만 쓴다. `navigator.vibrate` 직접 호출 금지.
+
+- `hapticLight`(탭·토글) / `hapticMedium`(주요 CTA) / `hapticSuccess` / `hapticWarning` / `hapticError`
+- **feature detect 우선** — `canVibrate()` 로 먼저 묻고 미지원이면 아예 안 부른다. try/catch 로 예외를 삼키는 방식이 아니다("실패했지만 호출은 했다" ≠ "지원 안 하면 안 부른다").
+- train-dia 는 PWA 라 **iOS Safari 는 미지원**. 없어도 동작에 지장 0 이어야 한다.
+- `prefers-reduced-motion: reduce` 면 진동도 하지 않는다(train-dia 는 모션 감소를 **존중**하는 게 정책).
+
+**★ 중복 발화 금지** — `success`/`error`/`warning` 토스트는 store 가 **햅틱을 자동 발화**한다. 호출부에서 토스트와 함께 햅틱을 또 부르지 말 것. 개별 버튼 703곳 배선 대신 이 한 곳으로 커버한다(실측 커버리지 3.5% → 알림 경로 100%).
+
+- 회귀 테스트: `src/stores/__tests__/toast-store.test.ts` (9건 — 렌더러 없이도 동작 / 중복 억제 / 개수 제한 / 수명 / 미지원 환경 no-op)
+
 ## UI-BLEED-001 / UI-BLEED-002 — 페이지 게터와 풀블리드
 
 화면 좌우 여백은 **`var(--dia-page-pad)` 하나**로만 정한다(= 16px, 기존 실사용값 그대로).

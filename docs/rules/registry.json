@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.8.0",
+  "version": "1.10.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
   "lastUpdated": "2026-08-09",
   "verificationCommands": {
@@ -140,6 +140,14 @@
       "scope": ["src/app/api/**/*.ts"],
       "exceptions": ["baseline 미전환 라우트(전환 시점에 함께 적용)"],
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) 와 baseline 공유",
+      "severity": "fail"
+    },
+    "STORE-PERSIST-001": {
+      "description": "저장 키와 버전은 계약이다 — persist name 을 바꾸면 기존 저장분을 못 찾아 전 사용자 데이터가 조용히 사라진다(서버 백업 없음). version 을 올리면 migrate 를 함께 넣는다 — zustand persist 는 버전이 다르고 migrate 가 없으면 저장분을 버린다. 키 14개와 version 값을 persistence-contract.test.ts 가 고정한다. 부채: bonsai(v2)/shortcuts(v1)는 migrate 없이 version 이 올라간 상태 — 다음 bump 때 반드시 넣을 것. 스토리지가 예외를 던져도(사파리 프라이빗/용량초과) store import 가 실패하면 안 된다.",
+      "canonical": "docs/rules/data/persistence.md",
+      "scope": ["src/stores/**/*.ts"],
+      "exceptions": ["마이그레이션을 함께 넣는 의도적 변경 — CONTRACT 표도 같이 갱신"],
+      "autoCheck": "src/stores/__tests__/persistence-contract.test.ts (npm test) — 32건",
       "severity": "fail"
     },
     "UI-SHEET-HEIGHT-001": {

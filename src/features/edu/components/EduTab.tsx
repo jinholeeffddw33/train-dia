@@ -18,7 +18,7 @@ import VideoGuideList from './VideoGuideList';
 type EduView =
   | { type: 'home' }
   | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[]; initTitle?: string; flatMode?: boolean }
-  | { type: 'quiz'; chapter?: string }
+  | { type: 'quiz'; chapter?: string; area?: string }
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
   | { type: 'myinfo' }
@@ -63,7 +63,7 @@ export default function EduTab({ onBack }: EduTabProps) {
         />
       );
     case 'quiz':
-      return <QuizSystem onBack={goBack} initChapter={view.chapter} />;
+      return <QuizSystem onBack={goBack} initChapter={view.chapter} initArea={view.area} />;
     case 'wrong-quiz':
       return <QuizSystem onBack={goBack} wrongOnly />;
     case 'wrong-review':
@@ -78,6 +78,7 @@ export default function EduTab({ onBack }: EduTabProps) {
         <MyInfo
           onBack={goBack}
           onWrongReview={() => push({ type: 'wrong-review' })}
+          onAreaQuiz={(area) => push({ type: 'quiz', area })}
         />
       );
     case 'video':

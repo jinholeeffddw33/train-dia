@@ -13,6 +13,8 @@ import styles from '../styles/edu.module.css';
 interface QuizSystemProps {
   onBack: () => void;
   initChapter?: string;
+  /** 이 영역(area) 문제만 바로 시작 — 내 정보의 취약 영역에서 진입 */
+  initArea?: string;
   wrongOnly?: boolean;
 }
 
@@ -163,7 +165,7 @@ function normalizeRegQuestion(q: RawRegQuestion, reg: RegulationDef) {
   };
 }
 
-export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSystemProps) {
+export default function QuizSystem({ onBack, initChapter, initArea, wrongOnly }: QuizSystemProps) {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
   const [levels, setLevels] = useState<LevelDef[]>([]);
   const [areas, setAreas] = useState<AreaDef[]>([]);
@@ -217,7 +219,10 @@ export default function QuizSystem({ onBack, initChapter, wrongOnly }: QuizSyste
         for (const a of (data.areas ?? [])) {
           AREA_LABELS[a.id] = a.name;
         }
-        if (initChapter && data.questions.length > 0) {
+        if (initArea && data.questions.length > 0) {
+          const pool = data.questions.filter((q: any) => q.area === initArea);
+          if (pool.length > 0) startQuizWith(pool, Math.min(pool.length, 20), 'area');
+        } else if (initChapter && data.questions.length > 0) {
           const pool = data.questions.filter((q: any) => q.chapter === initChapter);
           if (pool.length > 0) startQuizWith(pool, Math.min(pool.length, 20), 'chapter');
         }

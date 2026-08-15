@@ -3735,6 +3735,104 @@
 
 .myInfoWrongCard:active { opacity: 0.8; }
 
+/* ── 취약 영역 ── */
+.weakAreaHint {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.weakAreaList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+/* 버튼 4법 ② 무색 3D 솟음 — 테두리 대신 그림자로 깊이 */
+.weakAreaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  min-height: 44px;
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    box-shadow var(--dia-dur-fast) var(--dia-ease-press),
+    transform var(--dia-dur-fast) var(--dia-ease-press);
+}
+
+@media (hover: hover) {
+  .weakAreaRow:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+}
+
+.weakAreaRow:active {
+  box-shadow: var(--dia-3d-pressed);
+  transform: scale(0.98);
+}
+
+.weakAreaRow:disabled {
+  cursor: default;
+  box-shadow: var(--dia-3d-inset);
+}
+
+.weakAreaTop {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.weakAreaIcon {
+  flex-shrink: 0;
+  color: var(--dia-amber-text);
+}
+
+.weakAreaName {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 미해결 오답 / 영역 전체 문항 */
+.weakAreaCount {
+  flex-shrink: 0;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  color: var(--dia-amber-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.weakAreaBarWrap {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--dia-bg);
+  overflow: hidden;
+}
+
+.weakAreaBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--dia-amber);
+}
+
 .myInfoWrongInfo {
   flex: 1;
   min-width: 0;

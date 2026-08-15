@@ -1,12 +1,15 @@
 'use client';
 
-import { ArrowLeft, Trophy, Target, TrendingUp, TrendingDown, Minus, BookOpen, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, Target, TrendingUp, TrendingDown, Minus, BookOpen, RotateCcw, Crosshair } from 'lucide-react';
 import { useEduStore, QuizRecord } from '../hooks/useEduStore';
+import { useWeakAreas } from '../hooks/useWeakAreas';
 import styles from '../styles/edu.module.css';
 
 interface MyInfoProps {
   onBack: () => void;
   onWrongReview: () => void;
+  /** 취약 영역 카드에서 그 영역만 다시 풀기 */
+  onAreaQuiz?: (areaId: string) => void;
 }
 
 function formatDate(iso: string): string {
@@ -41,11 +44,12 @@ function GrowthIcon({ value }: { value: number }) {
   return <Minus size={16} className={styles.gradeOrange} />;
 }
 
-export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
+export default function MyInfo({ onBack, onWrongReview, onAreaQuiz }: MyInfoProps) {
   const {
     progress, readCount, totalQuizzes, bestScore, avgScore,
     latestScore, previousScore, streak, wrongCount, unresolvedWrongCount,
   } = useEduStore();
+  const { areas: weakAreas } = useWeakAreas();
 
   const quizHistory = [...progress.quizHistory].reverse(); // 최신순
   const growth = latestScore !== null && previousScore !== null
@@ -120,6 +124,46 @@ export default function MyInfo({ onBack, onWrongReview }: MyInfoProps) {
             </div>
             <span className={styles.resumeArrow}>›</span>
           </button>
+        )}
+
+        {/* ── 취약 영역 ──
+             미해결 오답을 문제은행의 영역으로 되돌려 묶는다. 막대는 '영역 문항 수 대비
+             아직 못 잡은 문제 비율'이다 — 정답률이 아니다(푼 문제 수를 영역별로
+             기록하지 않아 진짜 정답률은 낼 수 없다). 과장하지 않으려고 문구도 그렇게 썼다. */}
+        {weakAreas.length > 0 && (
+          <>
+            <div className={styles.sectionDivider}>취약 영역 ({weakAreas.length}개)</div>
+            <p className={styles.weakAreaHint}>
+              아직 못 잡은 오답이 많은 순서예요. 눌러서 그 영역만 다시 풀 수 있어요.
+            </p>
+            <div className={styles.weakAreaList}>
+              {weakAreas.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  className={styles.weakAreaRow}
+                  onClick={() => onAreaQuiz?.(a.id)}
+                  disabled={!onAreaQuiz}
+                  aria-label={`${a.name} — 미해결 오답 ${a.wrong}문제, 전체 ${a.total}문항`}
+                >
+                  <span className={styles.weakAreaTop}>
+                    <Crosshair size={15} className={styles.weakAreaIcon} aria-hidden />
+                    <span className={styles.weakAreaName}>{a.name}</span>
+                    <span className={styles.weakAreaCount}>
+                      {a.wrong} / {a.total}
+                    </span>
+                  </span>
+                  <span className={styles.weakAreaBarWrap}>
+                    {/* STYLE-EXCEPTION: 비율 막대 — 런타임 값이라 CSS 로 표현 불가 */}
+                    <span
+                      className={styles.weakAreaBar}
+                      style={{ width: `${Math.max(4, Math.round(a.ratio * 100))}%` }}
+                    />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </>
         )}
 
         {/* ── 시험 이력 ── */}

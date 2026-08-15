@@ -11,7 +11,7 @@ interface Props { onBack: () => void }
 
 interface SourceRef {
   label: string;
-  kind: 'reg' | 'book';
+  kind: 'reg' | 'book' | 'case';
   regId: string | null;
   article: number | null;
   sectionId: string | null;

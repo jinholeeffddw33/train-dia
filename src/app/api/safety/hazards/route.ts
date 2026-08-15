@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
   const { data: d1, error: e1 } = await serverSupabase
     .from('hazard_reports')
-    .select('id, photo_url, attachment_url, attachment_name, description, location, created_by, created_at, category, view_count, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
+    .select('id, photo_url, attachment_url, attachment_name, description, location, tags, created_by, created_at, category, view_count, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count), hazard_reads(count)')
     .eq('category', category)
     .order('created_at', { ascending: false });
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     // hazard_reads 테이블 없으면 reads 없이 재시도
     const { data: d2, error: e2 } = await serverSupabase
       .from('hazard_reports')
-      .select('id, photo_url, attachment_url, attachment_name, description, location, created_by, created_at, category, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count)')
+      .select('id, photo_url, attachment_url, attachment_name, description, location, tags, created_by, created_at, category, resolved, resolved_at, resolved_by, hazard_comments(count), hazard_likes(count)')
       .eq('category', category)
       .order('created_at', { ascending: false });
     data = d2;
@@ -76,6 +76,7 @@ function mapReports(data: Record<string, unknown>[], likedIds: Set<string>) {
     attachmentName: (r.attachment_name as string | null) ?? '',
     description: r.description,
     location: r.location || '',
+    tags: (r.tags as string[] | null) ?? [],
     createdBy: r.created_by,
     createdAt: r.created_at,
     category: r.category || 'hazard',

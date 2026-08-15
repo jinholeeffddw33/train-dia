@@ -431,6 +431,17 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
               </span>
             </div>
           )}
+
+          {/* 사고 유형 태그 — 같은 유형끼리 묶어보기 위한 표시.
+              [열차]/[신호]/[시설물] 3분류만으로는 13호·14호(둘 다 PSD 미개방)가 안 묶인다. */}
+          {!editMode && report.tags && report.tags.length > 0 && (
+            <div className={styles.detailTags}>
+              {report.tags.map((t) => (
+                <span key={t} className={styles.detailTag}>{t}</span>
+              ))}
+            </div>
+          )}
+
           {editMode ? (
             isPureNotice ? (
               /* 공지사항 수정: 번호별 항목 편집 (태그 prefix 없는 순수 공지) */

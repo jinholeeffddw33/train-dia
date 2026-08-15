@@ -11,6 +11,8 @@ export interface HazardReport {
   attachmentName: string;
   description: string;
   location: string;
+  /** 사고 유형 태그 — 출입문·승강장안전문·미개방·지적확인환호 등 */
+  tags?: string[];
   createdBy: string;
   createdAt: string;
   category?: SafetyCategory;

@@ -24,7 +24,7 @@ const DAILY_LIMIT = 30;
 const AUDIT_ACTION = 'railbot_ask';
 
 interface Chunk {
-  kind: 'reg' | 'book';
+  kind: 'reg' | 'book' | 'case';
   id: string;
   title: string;
   source: string;
@@ -40,11 +40,38 @@ interface Chunk {
 let indexCache: { at: number; chunks: Chunk[] } | null = null;
 const INDEX_TTL = 30 * 60 * 1000;
 
+/**
+ * 사고사례(운전정보)는 DB 에 있고 계속 늘어난다 — 정적 인덱스에 넣을 수 없어 따로 읽어 합친다.
+ * 규정이 "무엇을 해야 하는가"라면 사고사례는 "안 지켰을 때 무슨 일이 났는가"다.
+ * 같은 유형이 반복되는 것을 보여줄 수 있어야 답변이 설득력을 갖는다.
+ */
+async function loadCases(): Promise<Chunk[]> {
+  if (!serverSupabase) return [];
+  const { data } = await serverSupabase
+    .from('hazard_reports')
+    .select('id, location, description, tags')
+    .eq('category', 'inspect')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  return (data ?? []).map((r) => {
+    const title = String(r.description).split('\n')[0].replace(/^\[[^\]]+\]\s*/, '');
+    const no = r.location ? `운전정보 ${r.location}` : '사고사례';
+    return {
+      kind: 'case' as const,
+      id: `case-${r.id}`,
+      title,
+      source: `${no} — ${title}`,
+      // 태그를 본문에 얹어 검색어와 걸리게 한다("PSD 미개방" → 승강장안전문·미개방)
+      text: `${(r.tags ?? []).join(' ')}\n${r.description}`,
+    };
+  });
+}
+
 async function loadIndex(origin: string): Promise<Chunk[]> {
   if (indexCache && Date.now() - indexCache.at < INDEX_TTL) return indexCache.chunks;
   const res = await fetch(`${origin}/data/edu/railbot-index.json`, { cache: 'force-cache' });
   if (!res.ok) throw new Error('검색 자료를 불러오지 못했습니다');
-  const chunks = (await res.json()) as Chunk[];
+  const chunks = [...((await res.json()) as Chunk[]), ...(await loadCases())];
   indexCache = { at: Date.now(), chunks };
   return chunks;
 }

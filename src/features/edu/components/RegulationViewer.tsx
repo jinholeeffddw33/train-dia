@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import { useFontSizeStore } from '@/stores/fontSize';
@@ -165,6 +165,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   const globalFontSize = useFontSizeStore((s) => s.size);
   const [fontSize, setFontSize] = useState<FontSize>(globalFontSize);
   const [pdfOpen, setPdfOpen] = useState(false);
+  /**
+   * 형광펜 모드 — 켜면 본문의 네이티브 텍스트 선택을 끈다.
+   * 끌어서 선택하면 브라우저가 '복사·공유·모두 선택·웹 검색' 막대를 먼저 띄우는데,
+   * 이건 OS가 그리는 것이라 웹에서 막을 방법이 없다. 선택 자체를 없애고
+   * '문장을 탭하면 그 문장이 잡히는' 방식으로 바꾼다.
+   */
+  const [markMode, setMarkMode] = useState(false);
   const [tocOpen, setTocOpen] = useState(true);
   const [visiblePage, setVisiblePage] = useState<number>(1);
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
@@ -278,11 +285,75 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     }
   }, [tocOpen]);
 
+  /**
+   * 문장 하나를 팝오버 대상으로 잡는다. (형광펜 모드 · 탭)
+   * 페이지 원문에서 offset 을 기준으로 문장 경계까지 넓힌다 —
+   * 마침표/줄바꿈/호(①②) 앞뒤가 경계다.
+   */
+  const pickSentenceAt = useCallback((clientX: number, clientY: number) => {
+    const root = bodyRef.current;
+    if (!root) return;
+    // 탭 지점의 문자 위치
+    type WithCaret = Document & {
+      caretRangeFromPoint?: (x: number, y: number) => Range | null;
+      caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+    };
+    const doc = document as WithCaret;
+    let node: Node | null = null;
+    let offset = 0;
+    if (doc.caretRangeFromPoint) {
+      const r = doc.caretRangeFromPoint(clientX, clientY);
+      if (r) { node = r.startContainer; offset = r.startOffset; }
+    } else if (doc.caretPositionFromPoint) {
+      const p = doc.caretPositionFromPoint(clientX, clientY);
+      if (p) { node = p.offsetNode; offset = p.offset; }
+    }
+    if (!node || !root.contains(node)) return;
+
+    const el = node.nodeType === Node.TEXT_NODE ? (node as Text).parentElement : (node as Element);
+    const pageEl = el?.closest('[data-page]') as HTMLElement | null;
+    if (!pageEl) return;
+    const page = parseInt(pageEl.dataset.page || '0', 10);
+    const pageData = pages.find((p) => p.page === page);
+    if (!page || !pageData) return;
+
+    // 탭한 텍스트 노드의 내용으로 페이지 원문에서의 대략 위치를 찾는다
+    const nodeText = node.nodeType === Node.TEXT_NODE ? (node as Text).data : (el?.textContent ?? '');
+    const probe = nodeText.slice(Math.max(0, offset - 12), offset + 12).trim();
+    if (probe.length < 3) return;
+    const base = pageData.text.indexOf(probe);
+    if (base < 0) return;
+    const at = base + Math.min(12, offset);
+
+    // 문장 경계까지 확장
+    const src = pageData.text;
+    const isEnd = (i: number) => i >= 0 && i < src.length && /[.\n]/.test(src[i]);
+    let s = at;
+    while (s > 0 && !isEnd(s - 1)) s--;
+    let e = at;
+    while (e < src.length && !isEnd(e)) e++;
+    if (isEnd(e)) e++;                       // 마침표 포함
+    const text = src.slice(s, e).trim();
+    if (text.length < 2) return;
+
+    const rect = (el as HTMLElement).getBoundingClientRect();
+    setSelPopover({
+      text: text.slice(0, 300),
+      before: src.slice(Math.max(0, s - 30), s),
+      after: src.slice(e, e + 30),
+      page,
+      x: Math.min(Math.max(rect.left + rect.width / 2, 90), window.innerWidth - 90),
+      y: clientY - 12,
+    });
+  }, [pages]);
+
   // ── 텍스트 선택 캡처 → 형광 팝오버 ──
   useEffect(() => {
     if (loading || pages.length === 0) return;
     const root = bodyRef.current;
     if (!root) return;
+    // 형광펜 모드에선 네이티브 선택을 안 쓴다 (아래 탭 핸들러가 담당)
+    if (markMode) return;
     const handleSelectionEnd = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
@@ -320,7 +391,22 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       document.removeEventListener('mouseup', handleSelectionEnd);
       document.removeEventListener('touchend', handleSelectionEnd);
     };
-  }, [loading, pages]);
+  }, [loading, pages, markMode]);
+
+  // ── 형광펜 모드: 본문을 탭하면 그 문장을 잡는다 ──
+  useEffect(() => {
+    if (!markMode || loading || pages.length === 0) return;
+    const root = bodyRef.current;
+    if (!root) return;
+    const onTap = (e: PointerEvent) => {
+      // 팝오버·형광 마크 자체를 누른 건 통과
+      const t = e.target as HTMLElement;
+      if (t.closest('[data-anno]') || t.closest('button')) return;
+      pickSentenceAt(e.clientX, e.clientY);
+    };
+    root.addEventListener('pointerup', onTap);
+    return () => root.removeEventListener('pointerup', onTap);
+  }, [markMode, loading, pages, pickSentenceAt]);
 
   // ── annotations → DOM 적용 (텍스트 노드 walk + wrap) ──
   useEffect(() => {
@@ -785,6 +871,16 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         )}
         <button
           type="button"
+          className={`${styles.pdfBtn} ${markMode ? styles.markModeOn : ''}`}
+          onClick={() => { setMarkMode((v) => !v); setSelPopover(null); window.getSelection()?.removeAllRanges(); }}
+          aria-pressed={markMode}
+          aria-label={markMode ? '형광펜 모드 끄기' : '형광펜 모드 켜기 — 문장을 눌러 표시'}
+        >
+          <Highlighter size={14} />
+          <span>{markMode ? '형광펜 켜짐' : '형광펜'}</span>
+        </button>
+        <button
+          type="button"
           className={styles.pdfBtn}
           onClick={() => setNotesOpen(true)}
           aria-label="내 메모·형광 목록"
@@ -795,7 +891,16 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       </div>
 
       {/* STYLE-EXCEPTION: 사용자 선택 폰트 크기를 CSS 변수로 전달 (런타임 값) */}
-      <div ref={bodyRef} className={styles.body} style={{ ['--reg-font-size' as string]: computedFontSize }}>
+      <div
+        ref={bodyRef}
+        className={`${styles.body} ${markMode ? styles.bodyMarkMode : ''}`}
+        style={{ ['--reg-font-size' as string]: computedFontSize }}
+      >
+        {markMode && (
+          <p className={styles.markModeHint}>
+            형광펜 모드 — 문장을 누르면 색을 고를 수 있어요. 끄면 평소처럼 복사할 수 있어요.
+          </p>
+        )}
         {loading && <div className={styles.loading}>불러오는 중...</div>}
         {!loading && pages.length === 0 && (
           <div className={styles.emptyState}>본문을 불러올 수 없어요</div>

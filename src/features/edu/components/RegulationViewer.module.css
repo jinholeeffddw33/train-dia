@@ -202,6 +202,35 @@
   background: var(--dia-surface-hover);
 }
 
+/* 형광펜 모드 ON — 툴바 버튼 강조 */
+.markModeOn {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+}
+
+/**
+ * 형광펜 모드의 본문 — 네이티브 텍스트 선택을 끈다.
+ * 끌어서 선택하면 브라우저가 '복사·공유·모두 선택·웹 검색' 막대를 먼저 띄우는데,
+ * 그건 OS 가 그리는 것이라 웹에서 가릴 수 없다. 선택 자체를 없애고 문장 탭으로 받는다.
+ * 모드를 끄면 원래대로 복사가 된다.
+ */
+.bodyMarkMode {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.markModeHint {
+  margin: 0 0 var(--dia-space-3);
+  padding: 9px 12px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
 .body {
   flex: 1;
   overflow-y: auto;

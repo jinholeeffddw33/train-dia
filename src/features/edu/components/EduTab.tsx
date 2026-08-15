@@ -14,6 +14,7 @@ import RescueSimulation from './RescueSimulation';
 import MrBurstSimulation from './MrBurstSimulation';
 import NewcomerHome from './NewcomerHome';
 import VideoGuideList from './VideoGuideList';
+import RailBot from './RailBot';
 
 type EduView =
   | { type: 'home' }
@@ -22,6 +23,7 @@ type EduView =
   | { type: 'wrong-quiz' }
   | { type: 'wrong-review' }
   | { type: 'myinfo' }
+  | { type: 'railbot' }
   | { type: 'video' }
   | { type: 'training' }
   | { type: 'rescue-procedure' }
@@ -81,6 +83,8 @@ export default function EduTab({ onBack }: EduTabProps) {
           onAreaQuiz={(area) => push({ type: 'quiz', area })}
         />
       );
+    case 'railbot':
+      return <RailBot onBack={goBack} />;
     case 'video':
       return <VideoEducation onBack={goBack} />;
     case 'training':
@@ -127,6 +131,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onWrongReview={() => push({ type: 'wrong-review' })}
           onWrongQuiz={() => push({ type: 'wrong-quiz' })}
           onMyInfo={() => push({ type: 'myinfo' })}
+          onRailBot={() => push({ type: 'railbot' })}
           onVideo={() => push({ type: 'video' })}
           onTraining={() => push({ type: 'training' })}
           onRescueProcedure={() => push({ type: 'rescue-procedure' })}

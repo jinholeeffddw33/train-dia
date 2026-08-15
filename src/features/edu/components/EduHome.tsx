@@ -8,7 +8,7 @@ import {
   Mic, DoorOpen, Wrench,
   Award, User, ClipboardList,
   RotateCcw, GitCompareArrows, Link, Zap, Wind,
-  Clapperboard, BookOpen,
+  Clapperboard, BookOpen, Bot,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
 import styles from '../styles/edu.module.css';
@@ -34,6 +34,7 @@ interface EduHomeProps {
   onMrBurst: () => void;
   onNewcomerVideo: () => void;
   onNewcomerHandbook: () => void;
+  onRailBot: () => void;
 }
 
 /**
@@ -73,7 +74,7 @@ const SUBMENU_COLOR_MAP = {
   red:    styles.iconBgRed,
 } as const;
 
-export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomerVideo, onNewcomerHandbook }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
   const { wrongCount, unresolvedWrongCount } = useEduStore();
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
@@ -202,6 +203,18 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
       </header>
 
       <div className={styles.homeContentV3}>
+        {/* ── 레일봇 — 8칸 격자를 깨지 않도록 위에 한 줄로 ── */}
+        <button type="button" className={`${styles.listRowV3} ${styles.railBotEntry}`} onClick={onRailBot}>
+          <span className={`${styles.listRowIconV3} ${styles.railBotEntryIcon}`} aria-hidden="true">
+            <Bot size={22} strokeWidth={1.9} />
+          </span>
+          <span className={styles.listRowBodyV3}>
+            <span className={styles.listRowTitleV3}>레일봇</span>
+            <span className={styles.listRowMetaV3}>규정·교재에서 찾아 답해요 · 근거 함께 표시</span>
+          </span>
+          <ChevronRight size={22} className={styles.listRowArrowV3} />
+        </button>
+
         {/* ── 8개 메뉴 — 통일된 회색 카드 ── */}
         <nav className={styles.menuGridV3} aria-label="교육 메뉴">
           {MENU_ITEMS.map(item => {

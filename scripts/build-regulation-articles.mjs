@@ -23,7 +23,21 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const DIR = 'public/data/edu/regulations';
+const INDEX_OUT = 'public/data/edu/railbot-index.json';
 const DRY = process.argv.includes('--dry-run');
+
+/** 파일 id → 사람이 읽는 규정 이름 (근거 표기용) */
+const REG_TITLES = {
+  'operation-rules': '운전취급규정',
+  'crew-management-rules': '승무원지도운용내규',
+  'operating-staff-rules': '운전관계직원업무내규',
+  'safety-record-rules': '운전무사고성적심사규정',
+  'depot-operation-rules': '차량기지운전취급내규',
+  'crew-business-rules': '전동차승무원업무예규',
+  'detail-operation-rules': '운전취급세부요령',
+  'hr-rules': '인사규정',
+  'employment-rules': '취업규칙',
+};
 
 /**
  * 조문 시작 — 반드시 제목이 붙은 `제N조(제목)` 만 인정한다.
@@ -137,7 +151,44 @@ function buildOne(file) {
   return { id, articles, rawChars: pages.reduce((s, p) => s + p.text.length, 0) };
 }
 
+/* ── 레일봇 검색 인덱스 ──
+   조문(892) + 교재 절(120)을 한 파일로 합친다. 서버가 요청마다 9개 파일을 따로 읽지
+   않도록 하나로 모으고, 검색은 '공백 제거 부분문자열'로 한다 — 원문 띄어쓰기가
+   PDF 추출 과정에 뭉개져 있어 단어 단위 매칭이 애초에 성립하지 않는다.
+   질의에서도 공백을 지우면 오히려 정확히 걸린다. */
+function buildBookChunks() {
+  const hb = JSON.parse(fs.readFileSync('public/data/edu/handbook.json', 'utf8'));
+  const chapters = hb.chapters ?? hb;
+  const out = [];
+  for (const ch of chapters) {
+    for (const sec of ch.sections ?? []) {
+      const parts = [];
+      const walk = (node) => {
+        if (Array.isArray(node)) return node.forEach(walk);
+        if (node && typeof node === 'object') {
+          if (node.type === 'searchText' && typeof node.content === 'string') parts.push(node.content);
+          Object.values(node).forEach(walk);
+        }
+      };
+      walk(sec.content ?? []);
+      const text = parts.join('\n').trim();
+      if (text.length < 30) continue;
+      out.push({
+        kind: 'book',
+        id: `${ch.id}/${sec.id}`,
+        chapterId: ch.id,
+        sectionId: sec.id,
+        title: sec.title,
+        source: `${ch.title} › ${sec.title}`,
+        text,
+      });
+    }
+  }
+  return out;
+}
+
 const files = fs.readdirSync(DIR).filter((f) => f.endsWith('-search.json')).sort();
+const indexChunks = [];
 let totalA = 0, totalRaw = 0, totalOut = 0;
 console.log(`${DRY ? '=== DRY-RUN ===' : '=== BUILD ==='}\n`);
 console.log('규정'.padEnd(26) + '조문'.padStart(6) + '원문'.padStart(10) + '정제후'.padStart(10) + '  범위');
@@ -157,10 +208,32 @@ for (const f of files) {
   if (!DRY) {
     fs.writeFileSync(path.join(DIR, `${id}-articles.json`), JSON.stringify(articles, null, 1) + '\n', 'utf8');
   }
+  for (const a of articles) {
+    indexChunks.push({
+      kind: 'reg',
+      id: `${id}#${a.n}`,
+      regId: id,
+      article: a.n,
+      title: a.title,
+      source: `${REG_TITLES[id] ?? id} 제${a.n}조(${a.title})`,
+      chapter: a.chapter,
+      text: a.text,
+    });
+  }
 }
 console.log('─'.repeat(74));
 console.log('합계'.padEnd(26) + String(totalA).padStart(6) +
   (totalRaw.toLocaleString() + '자').padStart(10) +
   (totalOut.toLocaleString() + '자').padStart(10) +
   `  (노이즈 ${(100 - totalOut / totalRaw * 100).toFixed(1)}% 제거)`);
+// ── 레일봇 인덱스 (조문 + 교재 절) ──
+const book = buildBookChunks();
+indexChunks.push(...book);
+const idxChars = indexChunks.reduce((s, c) => s + c.text.length, 0);
+console.log(`\n레일봇 인덱스: 조문 ${totalA}개 + 교재 절 ${book.length}개 = ${indexChunks.length}청크 / ${idxChars.toLocaleString()}자`);
+if (!DRY) {
+  fs.writeFileSync(INDEX_OUT, JSON.stringify(indexChunks), 'utf8');
+  console.log(`  → ${INDEX_OUT} (${(fs.statSync(INDEX_OUT).size / 1024).toFixed(0)} KB)`);
+}
+
 if (DRY) console.log('\n(dry-run) 파일 미생성');

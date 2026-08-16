@@ -65,7 +65,6 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [readStatus, setReadStatus] = useState<ReadStatusResponse | null>(null);
   const [readStatusExpanded, setReadStatusExpanded] = useState(false);
-  const [readStatusTab, setReadStatusTab] = useState<'unread' | 'read'>('unread');
   const bottomRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -744,55 +743,42 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
             {readStatusExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
+          {/* 전체 인원을 한 화면에 이름순으로 깔고 색으로만 구분한다.
+              전에는 '안 읽음'/'읽음' 탭을 번갈아 눌러야 해서 전체를 한눈에 못 봤다.
+              안 읽은 사람은 굵게 — 색만으로 구분하지 않아야 색약도 읽을 수 있다. */}
           {readStatusExpanded && readStatus && (
             <div className={styles.readStatusBody}>
-              <div
-                className={`z-segment ${styles.readStatusTabs}`}
-                role="tablist"
-                data-no-press
-                style={{ '--seg-count': 2, '--seg-idx': readStatusTab === 'unread' ? 0 : 1 } as React.CSSProperties}
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={readStatusTab === 'unread'}
-                  className={`z-segment-item ${styles.readStatusTab} ${readStatusTab === 'unread' ? 'is-on' : ''}`}
-                  onClick={() => setReadStatusTab('unread')}
-                >
-                  안 읽음 <span className={styles.readStatusTabNum}>{readStatus.nonReaders.length}</span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={readStatusTab === 'read'}
-                  className={`z-segment-item ${styles.readStatusTab} ${readStatusTab === 'read' ? 'is-on' : ''}`}
-                  onClick={() => setReadStatusTab('read')}
-                >
-                  읽음 <span className={styles.readStatusTabNum}>{readStatus.readers.length}</span>
-                </button>
+              <div className={styles.readLegend}>
+                <span className={styles.readLegendItem}>
+                  <span className={`${styles.readLegendDot} ${styles.readLegendDotUnread}`} aria-hidden />
+                  안 읽음 <strong>{readStatus.nonReaders.length}</strong>
+                </span>
+                <span className={styles.readLegendItem}>
+                  <span className={`${styles.readLegendDot} ${styles.readLegendDotRead}`} aria-hidden />
+                  읽음 <strong>{readStatus.readers.length}</strong>
+                </span>
               </div>
 
-              {readStatusTab === 'unread' ? (
-                readStatus.nonReaders.length === 0 ? (
-                  <p className={styles.readStatusEmpty}>모두 읽었어요 🎉</p>
-                ) : (
-                  <div className={styles.readStatusChips}>
-                    {readStatus.nonReaders.map((p) => (
-                      <span key={p.sabun} className={`${styles.readChip} ${styles.readChipUnread}`}>
-                        {p.name || p.sabun}
-                      </span>
-                    ))}
-                  </div>
-                )
-              ) : readStatus.readers.length === 0 ? (
-                <p className={styles.readStatusEmpty}>아직 읽은 사람이 없어요</p>
+              {readStatus.totalExpected === 0 ? (
+                <p className={styles.readStatusEmpty}>대상 인원이 없어요</p>
               ) : (
                 <div className={styles.readStatusChips}>
-                  {readStatus.readers.map((p) => (
-                    <span key={p.sabun} className={`${styles.readChip} ${styles.readChipRead}`}>
-                      {p.name || p.sabun}
-                    </span>
-                  ))}
+                  {[
+                    ...readStatus.nonReaders.map((p) => ({ ...p, read: false })),
+                    ...readStatus.readers.map((p) => ({ ...p, read: true })),
+                  ]
+                    .sort((a, b) => (a.name || a.sabun).localeCompare(b.name || b.sabun, 'ko'))
+                    .map((p) => (
+                      <span
+                        key={p.sabun}
+                        className={`${styles.readChip} ${p.read ? styles.readChipRead : styles.readChipUnread}`}
+                        title={p.read ? '읽음' : '안 읽음'}
+                      >
+                        {p.read && <Check size={12} className={styles.readChipCheck} aria-hidden />}
+                        {p.name || p.sabun}
+                        <span className={styles.srOnlyInline}>{p.read ? ' 읽음' : ' 안 읽음'}</span>
+                      </span>
+                    ))}
                 </div>
               )}
             </div>

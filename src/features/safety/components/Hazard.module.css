@@ -404,31 +404,8 @@
 }
 
 /* 법① 세그먼트 — 전역 .z-segment 가 트랙·슬라이딩 thumb 담당. 여기선 여백만 */
-.readStatusTabs {
-  margin-bottom: var(--dia-space-3);
-}
-
-/* 전역 .z-segment-item 이 레이아웃·thumb 위 텍스트색 담당. 여기선 본문 폰트 크기만 보강 */
-.readStatusTab {
-  gap: 6px;
-  font-size: var(--dia-text-sm);
-}
-
-.readStatusTabNum {
-  font-size: var(--dia-text-meta);
-  padding: 1px 6px;
-  border-radius: var(--dia-radius-full);
-  background: var(--dia-border);
-  color: var(--dia-text-secondary);
-  font-weight: var(--dia-weight-bold);
-}
 /* 활성 탭(thumb 위) 카운트 배지 — 대비 확보 */
-:global(.z-segment-item.is-on) .readStatusTabNum {
-  background: var(--dia-surface-hover);
-  color: var(--dia-text-primary);
-}
-
-.readStatusEmpty {
+:global(.z-segment-item.is-on) .readStatusEmpty {
   text-align: center;
   padding: var(--dia-space-4) 0;
   font-size: var(--dia-text-sm);
@@ -436,12 +413,48 @@
   margin: 0;
 }
 
+/* 범례 — 색만으로 구분하지 않도록 숫자와 함께 보여준다 */
+.readLegend {
+  display: flex;
+  gap: var(--dia-space-4);
+  margin-bottom: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.readLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.readLegendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--dia-radius-full);
+  flex-shrink: 0;
+}
+
+.readLegendDotUnread { background: var(--dia-amber); }
+.readLegendDotRead { background: var(--dia-blue); }
+
+/* 화면에는 안 보이고 스크린리더만 읽는 상태 표시 */
+.srOnlyInline {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .readStatusChips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 280px;
+  max-height: 320px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 2px;
 }
 
@@ -456,16 +469,28 @@
   border: 1px solid transparent;
 }
 
+/* 안 읽음 — 빨강은 동료 이름 옆에 붙으면 질책처럼 읽힌다. '아직'을 뜻하는 앰버로.
+   굵기까지 함께 줘서 색만으로 구분하지 않는다. */
 .readChipUnread {
-  background: rgba(239, 68, 68, 0.08);
-  color: var(--dia-red);
-  border-color: rgba(239, 68, 68, 0.25);
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  border-color: var(--dia-amber);
+  font-weight: var(--dia-weight-bold);
 }
 
+/* 읽음 — 초록 대신 블루. 앰버·초록은 적록색약에서 잘 안 갈리는데 앰버·블루는 뚜렷하다.
+   확인이 끝난 쪽이라 톤을 낮춰 뒤로 물러나게 한다. */
 .readChipRead {
-  background: rgba(34, 197, 94, 0.10);
-  color: var(--dia-green);
-  border-color: rgba(34, 197, 94, 0.25);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+  border-color: transparent;
+  font-weight: var(--dia-weight-medium);
+}
+
+/* 읽음 표시 — 색·굵기에 더해 형태로도 알 수 있게 */
+.readChipCheck {
+  margin-right: 4px;
+  opacity: 0.85;
 }
 
 /* ── Comments ── */

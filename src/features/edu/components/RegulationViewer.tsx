@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones } from 'lucide-react';
+import RegulationReader from './RegulationReader';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import { useFontSizeStore } from '@/stores/fontSize';
@@ -51,6 +52,26 @@ const SECTION_RE = /제\s*(\d+)\s*절\s*([\s\S]{1,30}?)(?=\s*제\s*\d+\s*조)/g;
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * 공백을 무시하고 본문에서 찾은 뒤, 원문 기준 [시작, 끝) 을 돌려준다.
+ * 앞뒤 문맥(withContext)으로 먼저 찾고 실패하면 문장 단독(needle)으로 찾는다 —
+ * 같은 문장이 여러 번 나올 때 엉뚱한 자리에 붙는 것을 줄인다.
+ */
+function findIgnoringSpaces(flat: string, withContext: string, needle: string): [number, number] | null {
+  const map: number[] = [];          // 공백 뺀 위치 → 원문 위치
+  let squashed = '';
+  for (let i = 0; i < flat.length; i++) {
+    if (!/\s/.test(flat[i])) { map.push(i); squashed += flat[i]; }
+  }
+  const target = needle.replace(/\s+/g, '');
+  if (!target) return null;
+  const ctx = withContext.replace(/\s+/g, '');
+  let at = ctx ? squashed.indexOf(ctx) : -1;
+  at = at >= 0 ? at + (ctx.length - target.length) : squashed.indexOf(target);
+  if (at < 0 || at + target.length > map.length) return null;
+  return [map[at], map[at + target.length - 1] + 1];
 }
 
 /**
@@ -190,8 +211,14 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   const [memoEditor, setMemoEditor] = useState<{ id: string; text: string; memo: string } | null>(null);
   const [memoDraft, setMemoDraft] = useState('');
   const [notesOpen, setNotesOpen] = useState(false);
+  const [readerOpen, setReaderOpen] = useState(false);
+  /* 낭독을 시작할 조문. 화면에 보이는 조문을 따라가다가, 낭독을 켜는 순간의 값으로 고정한다.
+     계속 따라가면 낭독이 스크롤시킨 위치를 다시 읽어 제자리를 맴돈다. */
+  const visibleArticleRef = useRef<number | undefined>(undefined);
+  const [readerStart, setReaderStart] = useState<number | undefined>(undefined);
 
   useHistoryBack('regulation-pdf', () => setPdfOpen(false), pdfOpen);
+  useHistoryBack('regulation-reader', () => setReaderOpen(false), readerOpen);
   useHistoryBack('regulation-popover', () => setSelPopover(null), !!selPopover);
   useHistoryBack('regulation-memo', () => setMemoEditor(null), !!memoEditor);
   useHistoryBack('regulation-notes', () => setNotesOpen(false), notesOpen);
@@ -274,6 +301,16 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     pageRefs.current.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [loading, pages]);
+
+  /* 낭독이 다음 조문으로 넘어가면 본문도 따라간다 — 귀로 듣다 화면을 봤을 때
+     읽고 있는 자리가 그대로 보여야 한다. 부드럽게(smooth) 움직이면 조문이 짧을 때
+     스크롤이 밀리므로 즉시 이동한다. */
+  const scrollToArticle = useCallback((n: number) => {
+    const root = bodyRef.current;
+    if (!root) return;
+    const el = root.querySelector<HTMLElement>(`[data-article="${n}"]`);
+    if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }, []);
 
   // 목차로 즉시 스크롤
   const scrollToTopToc = useCallback(() => {
@@ -600,8 +637,17 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         }
         // 3차: text 단독 (첫 번째 매치)
         if (idx < 0) idx = flat.indexOf(needle);
+        let endIdx = idx + needle.length;
+        /* 4차: 공백 무시 대조.
+           규정 PDF 5종은 원래 본문에 공백 문자가 없어("이규정은서울교통공사") 그 상태로
+           형광펜이 저장됐다. 본문에 띄어쓰기를 복원한 뒤로는 저장된 문장이 그대로는
+           안 맞는다. 공백을 지우고 맞춘 뒤 위치를 되짚어 준다 — 검색이 쓰는 방식과 같다. */
+        if (idx < 0) {
+          const loose = findIgnoringSpaces(flat, anno.before + anno.text, anno.text);
+          if (!loose) continue;
+          [idx, endIdx] = loose;
+        }
         if (idx < 0) continue;
-        const endIdx = idx + needle.length;
 
         // 시작/끝 텍스트 노드 + 노드 내 offset 찾기
         const findNodeFor = (pos: number): { node: Text; offset: number } | null => {
@@ -1024,6 +1070,34 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         </button>
         <button
           type="button"
+          className={`${styles.pdfBtn} ${readerOpen ? styles.markModeOn : ''}`}
+          onClick={() => {
+            if (readerOpen) { setReaderOpen(false); return; }
+            /* 지금 화면 맨 위에 걸린 조문부터 읽는다 — 보던 자리에서 이어지도록.
+               observer 를 따로 두지 않고 열 때 한 번만 훑는다(조문 블록이 수백 개다). */
+            const root = bodyRef.current;
+            let start: number | undefined;
+            if (root) {
+              const top = root.getBoundingClientRect().top;
+              for (const el of root.querySelectorAll<HTMLElement>('[data-article]')) {
+                if (el.getBoundingClientRect().bottom > top) {
+                  start = parseInt(el.dataset.article ?? '', 10) || undefined;
+                  break;
+                }
+              }
+            }
+            visibleArticleRef.current = start;
+            setReaderStart(start);
+            setReaderOpen(true);
+          }}
+          aria-pressed={readerOpen}
+          aria-label={readerOpen ? '음성 읽기 닫기' : '음성 읽기 — 보고 있는 조문부터 읽어줍니다'}
+        >
+          <Headphones size={14} />
+          <span>읽어주기</span>
+        </button>
+        <button
+          type="button"
           className={styles.pdfBtn}
           onClick={() => setNotesOpen(true)}
           aria-label="내 메모·형광 목록"
@@ -1119,6 +1193,15 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
           <ListTree size={18} />
           <span>목차로</span>
         </button>
+      )}
+
+      {readerOpen && (
+        <RegulationReader
+          regulationId={regulationId}
+          startArticle={readerStart}
+          onClose={() => setReaderOpen(false)}
+          onArticleChange={scrollToArticle}
+        />
       )}
 
       {pdfOpen && pdfUrl && (

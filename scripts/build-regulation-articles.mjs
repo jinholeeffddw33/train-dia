@@ -15,7 +15,10 @@
  *   · 개정 표시            `<개정2019.12.16.>`  (조문 본문 의미에 영향 없음)
  *   · 표 세로 분해 파편     한 줄에 1~2글자만 있는 줄이 연속으로 이어지는 구간
  *   · 빈 괄호 줄           `(`  `)`
- *   붙어 있는 띄어쓰기(`이규정은서울교통공사`)는 건드리지 않는다 — 임의 복원은 오히려 왜곡이다.
+ *   · 줄 끝에서 잘린 어절   "각 관 / 계자는" → "각 관계자는" (말뭉치 사전으로 판정)
+ *
+ * 띄어쓰기 자체는 여기서 손대지 않는다. 규정 5종은 PDF 텍스트 층에 공백 문자가 없어
+ * scripts/respace_regulations.py 가 글자 좌표로 복원한 뒤 -search.json 에 반영해 둔다.
  *
  * 사용: node scripts/build-regulation-articles.mjs [--dry-run]
  */
@@ -55,43 +58,124 @@ const SECTION_RE = /제\s*(\d+)\s*절\s*([\s\S]{1,24}?)(?=\s*제\s*\d+\s*조)/g;
    줄 맨 앞에 올 때만 구조 표시로 본다 — 마지막 조문이 문서 끝까지 삼키는 것을 막는다. */
 const TAIL_RE = /\n\s*(?:부\s*칙|[[〔<]\s*별[표지]|별표\s*\d|별지제\d)/;
 
-/** 표가 세로로 분해된 구간을 걷어낸다 — 1~2글자 줄이 4줄 이상 연속되면 표 파편으로 본다 */
-function stripVerticalTableFragments(text) {
+/** 표 구간의 시작·끝 표시. 지우지 않고 감싸기만 한다 — 쓰는 쪽마다 처리가 달라서다.
+ *  낭독: 통째로 건너뛰고 "표가 있습니다" 한 마디로 대체 (셀이 순서 없이 흩어져 귀로는 못 따라간다)
+ *  레일봇: 마커만 벗기고 내용은 그대로 (제한속도 같은 수치는 답변에 필요하다) */
+export const TABLE_OPEN = '【표】';
+export const TABLE_CLOSE = '【/표】';
+
+/**
+ * PDF 에서 표는 셀이 줄 단위로 흩어져 나온다.
+ *   "열\n차\n번\n호\n착\n발..."  또는  "기울기(‰)\n제한속도(㎞/h)\n비\n고\n90\n80\n75"
+ * 짧은 줄이 연달아 나오면 표로 본다. 목록 표시(1. 가. ①)로 시작하는 줄은 본문이므로 제외.
+ */
+const LIST_HEAD = /^\s*(?:\d+[.)]|[가-힣][.)]|[①-⑳]|[-·•])/;
+/* 상한 14자 — 이 규정들의 본문 줄은 30~36자로 감기고, 표 셀은 '비'(1자)부터
+   '1,000분의10 이하'(12자)까지 흩어진다. 실측 분포에서 15자 위로는 본문이 대부분이다. */
+const CELL_MAX = 14;
+/**
+ * 길이만으로는 못 가른다. 일부 PDF(차량기지내규 등)는 본문까지 단어 단위로 쪼개 놓는다:
+ *   "또는 / 지도통신식 / 또는 / 지령식을 / 시행하여야"  ← 전부 짧지만 표가 아니다.
+ * 표 셀은 명사·수치·단위다. 어미(하여야·한다)나 목적격 조사(을·를)로 끝나면 잘린 본문이다.
+ * '비 고' 같은 진짜 셀은 걸리지 않도록 어미 목록을 좁게 잡았다.
+ */
+const PROSE_END = /(?:하여야|하여|한다|하며|해야|되어|된다|되며|을|를|에게|에서|으로|부터|까지|의한|각)$/;
+/* 마지막 그물 — 구간을 다 모은 뒤 서술어가 남아 있으면 표가 아니라 본문이다.
+   낭독에서 표는 통째로 건너뛰므로, 본문을 표로 오인하면 들어야 할 규정이 소리 없이 사라진다.
+   반대(표를 놓쳐 읽어 버림)는 어색할 뿐이라 정밀도 쪽으로 치우쳐 잡는다. */
+const REGION_PROSE = /하여야|하여서는|한다|있다|없다|경우에는|따른다/;
+
+function isCellLine(ln) {
+  const t = ln.trim();
+  if (!t || t.length > CELL_MAX) return false;
+  if (LIST_HEAD.test(t)) return false;
+  if (/[.。]$/.test(t)) return false;       // 문장 끝이면 본문
+  if (PROSE_END.test(t)) return false;
+  return true;
+}
+
+function markTableRegions(text) {
   const lines = text.split('\n');
   const out = [];
   let run = [];
   const flush = () => {
-    if (run.length >= 4) { /* 표 파편 — 버린다 */ }
+    const joined = run.map((l) => l.trim()).join(' ');
+    if (run.length >= 5 && !REGION_PROSE.test(joined)) out.push(TABLE_OPEN + joined + TABLE_CLOSE);
     else out.push(...run);
     run = [];
   };
   for (const ln of lines) {
-    const t = ln.trim();
-    if (t.length > 0 && t.length <= 2) run.push(ln);
+    if (isCellLine(ln)) run.push(ln);
     else { flush(); out.push(ln); }
   }
   flush();
   return out.join('\n');
 }
 
-function clean(text) {
+/**
+ * 줄 끝에서 잘린 어절을 다시 붙인다.
+ *
+ * PDF 는 어절 한가운데서도 줄을 바꾼다 — "…각 관 / 계자는", "…운 / 전하는".
+ * 줄을 이을 때 공백을 넣으면 단어 안에 쉼이 생겨 낭독은 "관, 계자는" 으로 들리고
+ * 검색·레일봇은 "관계자" 를 못 찾는다. 그렇다고 늘 붙이면 "열차 / 및" 이 "열차및" 이 된다.
+ *
+ * 어느 쪽인지는 말뭉치가 안다. 규정 9종 전체에서 어절 사전을 만들어 두고,
+ * 붙인 형태가 사전에 있으면 붙이고 아니면 띄운다. 실측 판정:
+ *     붙여야 1,541 · 띄워야 9,826 · 판단보류 4,304(띄움으로 처리)
+ * 판단보류를 띄움으로 두는 건 안전한 쪽이다 — 원문이 그렇게 보이기 때문이다.
+ */
+function buildVocab(allPages) {
+  const vocab = new Map();
+  for (const pages of allPages)
+    for (const p of pages)
+      for (const line of p.text.split('\n'))
+        for (const w of line.trim().split(/\s+/))
+          if (w.length > 1) vocab.set(w, (vocab.get(w) ?? 0) + 1);
+  return vocab;
+}
+
+function rejoinWrappedWords(text, vocab) {
+  const lines = text.split('\n');
+  const out = [lines[0]];
+  for (let i = 1; i < lines.length; i++) {
+    const prev = out[out.length - 1];
+    const cur = lines[i];
+    // 표 구간은 셀이 줄로 흩어진 것이라 어절이 아니다 — 건드리지 않는다
+    if (!prev?.trim() || !cur.trim() || prev.includes(TABLE_OPEN) || cur.includes(TABLE_OPEN)) {
+      out.push(cur);
+      continue;
+    }
+    const tail = prev.trimEnd().split(/\s+/).pop();
+    const head = cur.trim().split(/\s+/)[0];
+    const merged = (vocab.get(tail + head) ?? 0);
+    if (merged > 0 && merged >= Math.min(vocab.get(tail) ?? 0, vocab.get(head) ?? 0)) {
+      out[out.length - 1] = prev.trimEnd() + cur.trim();   // 붙인다 (줄바꿈도 없앤다)
+    } else {
+      out.push(cur);
+    }
+  }
+  return out.join('\n');
+}
+
+function clean(text, vocab) {
   let t = text;
   t = t.replace(/^\s*-\s*\d+\s*-\s*$/gm, '');            // 페이지 번호 줄
   t = t.replace(/<개정[^>]*>/g, '');                      // 개정 표시
   t = t.replace(/<신설[^>]*>/g, '');
   t = t.replace(/^\s*[()]\s*$/gm, '');                    // 괄호만 있는 줄
-  t = stripVerticalTableFragments(t);
+  t = markTableRegions(t);
+  if (vocab) t = rejoinWrappedWords(t, vocab);
   t = t.replace(/[ \t]+/g, ' ');
   t = t.replace(/\n{3,}/g, '\n\n');
   return t.trim();
 }
 
 /** 페이지 전체를 이어붙이되 각 글자가 몇 페이지인지 기억해 둔다 (조문 → 페이지 역추적용) */
-function joinPages(pages) {
+function joinPages(pages, vocab) {
   let text = '';
   const pageAt = [];   // 글자 인덱스 → 페이지 번호
   for (const p of pages) {
-    const c = clean(p.text);
+    const c = clean(p.text, vocab);
     if (!c) continue;
     const start = text.length;
     text += c + '\n';
@@ -111,10 +195,10 @@ function lastBefore(text, re, idx) {
   return found;
 }
 
-function buildOne(file) {
+function buildOne(file, vocab) {
   const id = path.basename(file, '-search.json');
   const pages = JSON.parse(fs.readFileSync(path.join(DIR, file), 'utf8'));
-  const { text, pageAt } = joinPages(pages);
+  const { text, pageAt } = joinPages(pages, vocab);
 
   // 조문 시작 위치 수집
   const marks = [];
@@ -136,17 +220,41 @@ function buildOne(file) {
     // 부칙·별표가 붙어 오면 거기서 자른다 (특히 마지막 조문)
     const tail = TAIL_RE.exec(body);
     if (tail && tail.index > 40) body = body.slice(0, tail.index).trim();
+    /* 조문 경계가 표 구간 한가운데를 지날 수 있다(표 안에 "제1조(목적)"이 들어간 경우).
+       그러면 짝 없는 마커가 남아 낭독·레일봇 양쪽에 그대로 새어 나간다. 짝을 맞춘다.
+        · 앞쪽에 닫기만 있으면 → 앞 조문의 표 꼬리다. 거기까지 잘라 버린다.
+        · 뒤쪽에 열기만 있으면 → 표가 다음 조문으로 이어진다. 끝에서 닫아 준다. */
+    const firstClose = body.indexOf(TABLE_CLOSE);
+    const firstOpen = body.indexOf(TABLE_OPEN);
+    if (firstClose !== -1 && (firstOpen === -1 || firstClose < firstOpen)) {
+      // 마커만 지운다. 앞에 있는 건 조문 머리("제1조(목적)")라 잘라내면 안 된다.
+      body = (body.slice(0, firstClose) + body.slice(firstClose + TABLE_CLOSE.length)).trim();
+    }
+    if (body.lastIndexOf(TABLE_OPEN) > body.lastIndexOf(TABLE_CLOSE)) body += TABLE_CLOSE;
+
     const ch = lastBefore(text, CHAPTER_RE, s.idx);
     const sec = lastBefore(text, SECTION_RE, s.idx);
+    /* 표가 차지하는 비율. 낭독 쪽 판단 근거다 — 표 사이에 낀 본문 조각("신호현시를",
+       "시환호만할수있다.")은 따로 읽으면 말이 안 된다. 비중이 높으면 조문째로
+       "표로 되어 있습니다" 안내만 하고 넘어가는 편이 낫다. */
+    let marked = 0;
+    for (const m of body.matchAll(/【표】[\s\S]*?【\/표】/g)) marked += m[0].length;
     return {
       n: s.n,
       title: s.title,
+      hasTable: marked > 0,
+      tableShare: body.length ? Math.round((marked / body.length) * 100) : 0,
       page: pageAt[s.idx] ?? 1,
       chapter: ch ? `제${ch.num}장 ${ch.title}` : '',
       section: sec ? `제${sec.num}절 ${sec.title}` : '',
       text: body,
     };
-  }).filter((a) => a.text.length >= 20);   // 목차 줄 같은 껍데기 제외
+  })
+    .filter((a) => a.text.length >= 20)     // 목차 줄 같은 껍데기 제외
+    /* 삭제된 조문("제48조(삭제 ’17.12.21.)")은 번호만 남은 자리다. 낭독하면
+       "제48조. 삭제 17.12.21." 만 나오고 레일봇 근거로도 못 쓴다.
+       길이로 거르면 띄어쓰기 유무에 따라 됐다 안 됐다 한다 — 이유로 거른다. */
+    .filter((a) => !/^\s*삭\s*제/.test(a.title));
 
   return { id, articles, rawChars: pages.reduce((s, p) => s + p.text.length, 0) };
 }
@@ -188,6 +296,9 @@ function buildBookChunks() {
 }
 
 const files = fs.readdirSync(DIR).filter((f) => f.endsWith('-search.json')).sort();
+/* 어절 사전은 9종 전체에서 한 번만 만든다. 한 문서에서 줄 끝에 잘린 말이
+   다른 문서(또는 같은 문서 다른 자리)에서는 온전히 나오는 것을 근거로 삼는다. */
+const VOCAB = buildVocab(files.map((f) => JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8'))));
 const indexChunks = [];
 let totalA = 0, totalRaw = 0, totalOut = 0;
 console.log(`${DRY ? '=== DRY-RUN ===' : '=== BUILD ==='}\n`);
@@ -195,7 +306,7 @@ console.log('규정'.padEnd(26) + '조문'.padStart(6) + '원문'.padStart(10) +
 console.log('─'.repeat(74));
 
 for (const f of files) {
-  const { id, articles, rawChars } = buildOne(f);
+  const { id, articles, rawChars } = buildOne(f, VOCAB);
   const outChars = articles.reduce((s, a) => s + a.text.length, 0);
   totalA += articles.length; totalRaw += rawChars; totalOut += outChars;
   const nums = articles.map((a) => a.n);

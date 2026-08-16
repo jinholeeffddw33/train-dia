@@ -1,0 +1,163 @@
+/* 규정 낭독 패널 — 화면 아래 고정. 걸으면서·운전석 밖에서 한 손으로 누른다. */
+.panel {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  padding-bottom: calc(var(--dia-space-3) + var(--sab));
+  background: var(--dia-bg-elevated);
+  border-top: 1px solid var(--dia-border-strong);
+  box-shadow: var(--dia-shadow-lg);
+}
+
+.nowRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  min-width: 0;
+}
+.nowArt {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nowCount {
+  flex: 0 0 auto;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.closeBtn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-secondary);
+  transition: transform var(--dia-dur-instant) var(--dia-ease-out);
+}
+.closeBtn:active { transform: scale(0.9); }
+
+/* 지금 읽는 문장 — 소리를 못 듣는 상황(시끄러운 승강장)에서 눈으로 따라간다 */
+.line {
+  min-height: 44px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  line-height: 1.5;
+}
+.lineNotice {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-weight: 600;
+}
+.lineIdle { color: var(--dia-text-secondary); }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+.ctlBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 64px;
+  height: 52px;                /* 50~60대 · 걸으면서 누른다 — 48px 권장 위 */
+  border-radius: var(--dia-radius-md);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  box-shadow: var(--z-pill-shadow);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform var(--dia-dur-fast) var(--dia-ease-out);
+}
+.ctlBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }
+.ctlBtn:disabled { opacity: 0.45; }
+
+/* 재생/일시정지 — 이 패널의 유일한 Primary */
+.playBtn {
+  flex: 2 1 0;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
+    linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
+  border: none;
+  color: #FFFFFF;   /* TOKEN-REF-EXCEPTION: 파랑 3D 그라디언트 위 고정 대비 — globals 의 CTA 버튼과 동일 */
+}
+.playBtn:active { box-shadow: var(--dia-3d-pressed); }
+
+@media (hover: hover) {
+  .ctlBtn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+}
+
+.speedRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+.speedLabel {
+  flex: 0 0 auto;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+}
+.speedBtn {
+  flex: 1 1 0;
+  min-width: 44px;
+  height: 44px;
+  border-radius: var(--dia-radius-md);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-meta);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--dia-dur-fast) var(--dia-ease-out);
+}
+.speedBtn:active { transform: scale(0.95); }
+.speedOn {
+  background: var(--dia-blue-dim);
+  border-color: var(--dia-blue);
+  color: var(--dia-blue-text);
+}
+
+.voiceSelect {
+  flex: 1 1 0;
+  min-width: 0;                /* flex 자식 — 없으면 긴 음성 이름이 줄을 밀어낸다 */
+  height: 44px;
+  padding: 0 var(--dia-space-2);
+  border-radius: var(--dia-radius-md);
+  background: var(--z-card-fill);
+  border: 1px solid var(--z-surface-edge);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+}
+
+.msg {
+  padding: var(--dia-space-2) var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn, .ctlBtn, .speedBtn { transition: none; }
+}

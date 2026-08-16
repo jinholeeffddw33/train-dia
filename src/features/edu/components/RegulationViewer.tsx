@@ -1001,6 +1001,11 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
             </button>
           ))}
         </div>
+      </div>
+
+      {/* 도구 줄 — 글자 크기와 한 줄에 두면 360px 에서 폭을 넘겨 마지막 버튼이 잘린다.
+          별도 줄로 빼고 셋을 균등 배분한다(좁으면 잘리지 않고 다음 줄로 내려감). */}
+      <div className={styles.actionRow}>
         {pdfUrl && (
           <button type="button" className={styles.pdfBtn} onClick={() => setPdfOpen(true)}>
             <FileText size={14} />
@@ -1015,7 +1020,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
           aria-label={markMode ? '형광펜 모드 끄기' : '형광펜 모드 켜기 — 문장을 눌러 표시'}
         >
           <Highlighter size={14} />
-          <span>{markMode ? '형광펜 켜짐' : '형광펜'}</span>
+          <span>형광펜</span>
         </button>
         <button
           type="button"
@@ -1024,7 +1029,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
           aria-label="내 메모·형광 목록"
         >
           <span>📝</span>
-          <span>내 메모 {annotations.length > 0 && `(${annotations.length})`}</span>
+          <span>내 메모{annotations.length > 0 && ` ${annotations.length}`}</span>
         </button>
       </div>
 

@@ -179,14 +179,28 @@
   font-size: var(--dia-text-meta);
 }
 
-/* 법② 분리 단발(네비 — 원본 PDF·내 메모 열기) — 무색 3D 솟음 */
+/* 도구 줄 — 원본 PDF · 형광펜 · 내 메모.
+   글자 크기 줄에 같이 두었더니 360px 에서 폭을 넘겨 마지막 버튼이 잘렸다.
+   별도 줄로 빼고 셋을 균등 배분한다. 더 좁으면 잘리는 대신 다음 줄로 내려간다. */
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+/* 법② 분리 단발(네비 — 원본 PDF·형광펜·내 메모) — 무색 3D 솟음 */
 .pdfBtn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;   /* 글자를 버튼 가운데로 */
   gap: 4px;
-  margin-left: auto;
-  padding: 0 12px;
-  height: 32px;
+  flex: 1 1 0;               /* 셋이 폭을 고르게 나눠 갖는다 */
+  min-width: 92px;           /* 이보다 좁아지면 줄바꿈 (잘리지 않게) */
+  padding: 0 10px;
+  height: 34px;
   border-radius: var(--dia-radius-md);
   background: var(--z-card-fill);
   border: 1px solid var(--z-surface-edge);
@@ -194,7 +208,7 @@
   color: var(--dia-text-primary);
   font-size: var(--dia-text-meta);
   font-weight: 600;
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .pdfBtn:active {

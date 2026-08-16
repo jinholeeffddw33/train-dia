@@ -218,6 +218,8 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  /* 끌어서 범위를 잡는 동안 화면이 따라 스크롤되지 않게 — 세로 스크롤은 살린다 */
+  touch-action: pan-y;
 }
 
 .markModeHint {

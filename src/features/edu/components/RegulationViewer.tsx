@@ -393,20 +393,158 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     };
   }, [loading, pages, markMode]);
 
-  // ── 형광펜 모드: 본문을 탭하면 그 문장을 잡는다 ──
+  /**
+   * 형광펜 모드의 범위 지정.
+   *
+   * 끌면 그 구간이 그대로 잡힌다. 브라우저 선택(window.getSelection)을 쓰지 않고
+   * **CSS Custom Highlight API** 로 직접 칠하기 때문에 OS 의 '복사·공유' 막대가 뜨지 않는다.
+   * 끌지 않고 그냥 누르면 그 문장 하나를 잡는다(빠른 길).
+   *
+   * Highlight API 미지원 브라우저에서는 미리보기만 안 보이고 지정은 그대로 된다.
+   */
   useEffect(() => {
     if (!markMode || loading || pages.length === 0) return;
     const root = bodyRef.current;
     if (!root) return;
-    const onTap = (e: PointerEvent) => {
-      // 팝오버·형광 마크 자체를 누른 건 통과
-      const t = e.target as HTMLElement;
-      if (t.closest('[data-anno]') || t.closest('button')) return;
-      pickSentenceAt(e.clientX, e.clientY);
+
+    type WithCaret = Document & {
+      caretRangeFromPoint?: (x: number, y: number) => Range | null;
+      caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
     };
-    root.addEventListener('pointerup', onTap);
-    return () => root.removeEventListener('pointerup', onTap);
+    const doc = document as WithCaret;
+    const caretAt = (x: number, y: number): { node: Node; offset: number } | null => {
+      if (doc.caretRangeFromPoint) {
+        const r = doc.caretRangeFromPoint(x, y);
+        return r ? { node: r.startContainer, offset: r.startOffset } : null;
+      }
+      if (doc.caretPositionFromPoint) {
+        const p = doc.caretPositionFromPoint(x, y);
+        return p ? { node: p.offsetNode, offset: p.offset } : null;
+      }
+      return null;
+    };
+
+    // CSS.highlights 로 미리보기 — 선택 시스템을 건드리지 않는다
+    const HL = 'regsel';
+    const hlSupported = typeof CSS !== 'undefined' && 'highlights' in CSS;
+    const paint = (range: Range | null) => {
+      if (!hlSupported) return;
+      const reg = (CSS as unknown as { highlights: Map<string, unknown> }).highlights;
+      if (!range) { reg.delete(HL); return; }
+      reg.set(HL, new (window as unknown as { Highlight: new (r: Range) => unknown }).Highlight(range));
+    };
+
+    let start: { node: Node; offset: number } | null = null;
+    let startXY: { x: number; y: number } | null = null;
+    let dragged = false;
+
+    const buildRange = (endX: number, endY: number): Range | null => {
+      if (!start) return null;
+      const end = caretAt(endX, endY);
+      if (!end || !root.contains(end.node)) return null;
+      const r = document.createRange();
+      try {
+        r.setStart(start.node, start.offset);
+        r.setEnd(end.node, end.offset);
+        if (r.collapsed) {           // 거꾸로 끈 경우
+          r.setStart(end.node, end.offset);
+          r.setEnd(start.node, start.offset);
+        }
+      } catch { return null; }
+      return r.collapsed ? null : r;
+    };
+
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('button')) return;
+      const c = caretAt(e.clientX, e.clientY);
+      if (!c || !root.contains(c.node)) return;
+      start = c;
+      startXY = { x: e.clientX, y: e.clientY };
+      dragged = false;
+      paint(null);
+      setSelPopover(null);
+    };
+
+    const onMove = (e: PointerEvent) => {
+      if (!start || !startXY) return;
+      // 손떨림은 드래그로 치지 않는다
+      if (Math.hypot(e.clientX - startXY.x, e.clientY - startXY.y) < 8) return;
+      dragged = true;
+      paint(buildRange(e.clientX, e.clientY));
+    };
+
+    const onUp = (e: PointerEvent) => {
+      if (!start) return;
+      const t = e.target as HTMLElement;
+      if (t.closest('button')) { start = null; return; }
+
+      if (!dragged) {                       // 그냥 눌렀다 → 문장 하나
+        paint(null);
+        pickSentenceAt(e.clientX, e.clientY);
+        start = null;
+        return;
+      }
+
+      const range = buildRange(e.clientX, e.clientY);
+      start = null;
+      if (!range) { paint(null); return; }
+
+      const text = range.toString().replace(/\s+/g, ' ').trim();
+      if (text.length < 2) { paint(null); return; }
+
+      // 페이지 식별 + 원문에서 위치 찾기 (기존 저장 형식 그대로)
+      const anchor = range.startContainer.nodeType === Node.TEXT_NODE
+        ? (range.startContainer as Text).parentElement
+        : (range.startContainer as Element);
+      const pageEl = anchor?.closest('[data-page]') as HTMLElement | null;
+      const page = parseInt(pageEl?.dataset.page || '0', 10);
+      const pageData = pages.find((p) => p.page === page);
+      if (!page || !pageData) { paint(null); return; }
+
+      // 렌더 텍스트는 공백이 정규화돼 원문과 다를 수 있다 → 공백 무시로 찾는다
+      const squash = (s: string) => s.replace(/\s+/g, '');
+      const target = squash(text);
+      const src = pageData.text;
+      const map: number[] = [];
+      let flat = '';
+      for (let i = 0; i < src.length; i++) {
+        if (!/\s/.test(src[i])) { flat += src[i]; map.push(i); }
+      }
+      const at = flat.indexOf(target);
+      if (at < 0) { paint(null); return; }
+      const s = map[at];
+      const e2 = map[Math.min(at + target.length - 1, map.length - 1)] + 1;
+
+      const rect = range.getBoundingClientRect();
+      setSelPopover({
+        text: src.slice(s, e2),
+        before: src.slice(Math.max(0, s - 30), s),
+        after: src.slice(e2, e2 + 30),
+        page,
+        x: Math.min(Math.max(rect.left + rect.width / 2, 90), window.innerWidth - 90),
+        y: rect.top,
+      });
+    };
+
+    root.addEventListener('pointerdown', onDown);
+    root.addEventListener('pointermove', onMove);
+    root.addEventListener('pointerup', onUp);
+    root.addEventListener('pointercancel', () => { start = null; paint(null); });
+    return () => {
+      root.removeEventListener('pointerdown', onDown);
+      root.removeEventListener('pointermove', onMove);
+      root.removeEventListener('pointerup', onUp);
+      paint(null);
+    };
   }, [markMode, loading, pages, pickSentenceAt]);
+
+  // 팝오버가 닫히면 미리보기도 지운다
+  useEffect(() => {
+    if (selPopover) return;
+    if (typeof CSS === 'undefined' || !('highlights' in CSS)) return;
+    (CSS as unknown as { highlights: Map<string, unknown> }).highlights.delete('regsel');
+  }, [selPopover]);
 
   // ── annotations → DOM 적용 (텍스트 노드 walk + wrap) ──
   useEffect(() => {
@@ -898,7 +1036,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       >
         {markMode && (
           <p className={styles.markModeHint}>
-            형광펜 모드 — 문장을 누르면 색을 고를 수 있어요. 끄면 평소처럼 복사할 수 있어요.
+            형광펜 모드 — <b>끌면 그 구간</b>, <b>누르면 그 문장</b>이 잡혀요. 끄면 평소처럼 복사할 수 있어요.
           </p>
         )}
         {loading && <div className={styles.loading}>불러오는 중...</div>}

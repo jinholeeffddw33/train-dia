@@ -409,6 +409,15 @@ input, textarea, select {
   box-shadow: var(--z-3d-inset), var(--z-3d-depth), var(--z-3d-violet-glow);
 }
 
+/* 규정 형광펜 모드의 범위 미리보기.
+   CSS Custom Highlight API 는 이름이 전역이라 규칙도 전역에 둔다.
+   브라우저 선택(::selection)이 아니라 이걸 쓰기 때문에 끌어도 OS 의
+   '복사·공유·모두 선택' 막대가 뜨지 않는다. */
+::highlight(regsel) {
+  background: var(--dia-amber);
+  color: var(--dia-on-amber);
+}
+
 /* ════════ 상단 헤더 통일 — 본문과 한 덩어리로 스크롤 (2026-08-03) ════════
    .z-app-header 는 각 탭(근무·달력·5호선·더보기)의 맨 위 헤더에 붙는다.
    2026-06-23 ~ 08-03: sticky + 아래로 스크롤 시 슬라이드 숨김(ZINOSB AppPageHeader 이식).

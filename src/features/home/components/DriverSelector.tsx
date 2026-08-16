@@ -3,14 +3,14 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Modal from '@/components/common/Modal';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
 
 /** 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원 + 인턴) */
-const ALL_PEOPLE = [...P, ...EXTRA_USERS, ...INTERN_USERS];
-const SORTED_P = [...ALL_PEOPLE].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
+const sortedPeople = () =>
+  [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 /** I가 '0'인 직원/인턴 구분용 Set */
 const EXTRA_SET = new Set(EXTRA_USERS.map((u) => u.s));
 const INTERN_SET = new Set(INTERN_USERS.map((u) => u.s));
@@ -32,9 +32,10 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
   const myDriver = useDriverStore((s) => s.myDriver);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return SORTED_P;
+    const people = sortedPeople();
+    if (!query.trim()) return people;
     const q = query.trim();
-    return SORTED_P.filter(
+    return people.filter(
       (p) => p.n.includes(q) || (p.I !== '0' && p.I.includes(q)) || p.d.includes(q) || (p.s && p.s.includes(q)),
     );
   }, [query]);

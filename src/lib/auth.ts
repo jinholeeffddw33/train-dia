@@ -1,4 +1,5 @@
-import { P } from '@/data/cycle';
+import { P, getRoster } from '@/data/cycle';
+import { departedSabuns } from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 
 /**
@@ -93,7 +94,19 @@ export const INTERN_USERS: Person[] = [
  */
 export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [];
 
-const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
+/**
+ * 시행일이 반영된 전체 인원. 발령일이 지난 사람은 기관사 명부(getRoster)에 들어가 있고
+ * 인턴/내근 목록에서는 빠진다 — 그래서 한 사람이 두 번 잡히지 않는다.
+ */
+function allUsers(at: Date = new Date()): Person[] {
+  const goneIntern = departedSabuns('intern', at);
+  const goneExtra = departedSabuns('extra', at);
+  return [
+    ...getRoster(at),
+    ...EXTRA_USERS.filter((u) => !u.s || !goneExtra.has(u.s)),
+    ...INTERN_USERS.filter((u) => !u.s || !goneIntern.has(u.s)),
+  ];
+}
 
 /**
  * 사업소 관리자 사번 (22명) — 푸시 발송·안전신고 처리 권한. isAdmin() 이 이 목록으로 판정.
@@ -132,10 +145,11 @@ const ADMIN_SABUNS = new Set([
 
 export function verifyUser(name: string, sabun: string): Person | null {
   // 1. P + EXTRA_USERS에서 먼저 검색
-  const local = ALL_USERS.find((p) => p.n === name && p.s === sabun);
+  const ALL = allUsers();
+  const local = ALL.find((p) => p.n === name && p.s === sabun);
   if (local) return local;
   // 2. sabun만 일치하면 DB 이름이 변경된 케이스 → 허용
-  const bySabun = ALL_USERS.find((p) => p.s === sabun);
+  const bySabun = ALL.find((p) => p.s === sabun);
   if (bySabun) return { ...bySabun, n: name };
   // 3. P/EXTRA에 없는 계정(030827 등) → 사번으로만 허용
   return { I: '0', d: '', n: name, s: sabun };
@@ -148,6 +162,8 @@ export function isAdmin(sabun: string): boolean {
 
 /** 내근직 여부 확인 (기관사 외 모든 직원 — EXTRA_USERS + 교번 미배정 INTERN_USERS) */
 export function isOffice(sabun: string): boolean {
+  // 발령일이 지났으면 더 이상 내근직이 아니다(기관사 명부로 옮겨간다)
+  if (departedSabuns('intern').has(sabun) || departedSabuns('extra').has(sabun)) return false;
   return EXTRA_USERS.some((u) => u.s === sabun) || INTERN_USERS.some((u) => u.s === sabun);
 }
 
@@ -160,6 +176,7 @@ export function getOfficeName(sabun: string): string | null {
 
 /** 인턴사원 여부 확인 (2026년 신규임용 — 통상근무 중) */
 export function isIntern(sabun: string): boolean {
+  if (departedSabuns('intern').has(sabun)) return false;   // 정식 임용됨
   return INTERN_USERS.some((u) => u.s === sabun);
 }
 
@@ -214,7 +231,7 @@ const REGULAR_DAY_OFFICE_SABUNS: ReadonlySet<string> = new Set([
   '21713568', // 신승헌
   '21714898', // 강병우
   '21715676', // 김민정
-  '21706363', // 김대환
+  // 김대환(21706363) → 2026-08-14 결원27 자리로 기관사 복직 (지도기관사 해제, cycle.ts I:52/d:89)
   // 김민경(22400349) → 2026-07-08 결원10 자리로 기관사 복귀 (일근 해제, cycle.ts I:90/d:64)
   '22600439', // 김경률 (인턴)
   '22600472', // 최승빈 (인턴)
@@ -271,7 +288,6 @@ const SABUN_SPECIFIC_CARDS: Record<string, MissionCardKind> = {
   '21711197': 'jido-bujang-lee-seongil',  // 이선길 — 지도부장
   '21713568': 'anjeon-gwanrija',          // 신승헌 — 안전관리자
   '21714898': 'jido-gigwansa',            // 강병우 — 지도기관사
-  '21706363': 'jido-gigwansa',            // 김대환 — 지도기관사
   '21715676': 'samu-jikwon',              // 김민정 — 사무직원
 };
 

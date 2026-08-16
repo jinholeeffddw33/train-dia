@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Megaphone } from 'lucide-react';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { getDia, getType, getSchedule, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import type { Person, Schedule } from '@/lib/types';
@@ -87,7 +87,7 @@ export default function DutyTab() {
   // 역방향 조회: 다이아 → 기관사
   const entries = useMemo(() => {
     const diaToDriver = new Map<string, Person>();
-    for (const person of P) {
+    for (const person of getRoster(date)) {
       const dia = getDia(person, date);
       const type = getType(dia);
       if (type !== 'rest') {

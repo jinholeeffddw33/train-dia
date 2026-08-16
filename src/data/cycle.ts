@@ -2,6 +2,7 @@
 // 0515 보완 근무계획 기준: 5/15 연결다이아 후 5/16부터 새 패턴 시작
 
 import type { Person } from '@/lib/types';
+import { applyRosterChanges } from './rosterChanges';
 
 /** 171일 주기 배열 (9행×19열, 2026-05-16 기준) */
 export const CYCLE: string[] = [
@@ -102,3 +103,17 @@ export const P: Person[] = [
   // 내근 직원 (교번 없음, 평일 고정 내근)
   {I:"W5",d:"내근",n:"이태원",s:"21711216"},
 ];
+
+/**
+ * 시행일이 반영된 명부 — 화면·조회는 이걸 쓴다.
+ *
+ * P 는 "cycle.ts 에 적힌 그대로"라 발령 예약(rosterChanges.ts)이 반영돼 있지 않다.
+ * 결원 자리에 사람이 들어오는 날짜가 정해져 있으면, 그 날이 되기 전에는 결원으로
+ * 보여야 한다 — 미리 반영하면 교번 목록·교대자 매칭이 틀리고 출근 착오로 이어진다.
+ *
+ * 호출할 때마다 오늘 날짜로 계산한다(모듈 로드 시점에 얼려두면 자정을 넘겨도 안 바뀐다).
+ * 변경이 하나도 시행되지 않았으면 P 를 그대로 돌려주므로 비용도 없다.
+ */
+export function getRoster(at: Date = new Date()): Person[] {
+  return applyRosterChanges(P, at);
+}

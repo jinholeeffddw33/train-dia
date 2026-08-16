@@ -1,18 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 
 // 내근직·인턴은 I('순번')가 전원 '0' → 고유값인 사번(s)을 우선 키로 사용
-const ALL_PEOPLE = [...P, ...EXTRA_USERS, ...INTERN_USERS];
+// 발령 시행일 반영 — 호출 시점에 계산한다
+const allPeople = () => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
 function findById(id: string | null | undefined): Person | null {
   if (!id || id === '0') return null;
-  return ALL_PEOPLE.find((p) => p.I === id) ?? null;
+  return allPeople().find((p) => p.I === id) ?? null;
 }
 function findBySabun(sabun: string | null | undefined): Person | null {
   if (!sabun) return null;
-  return ALL_PEOPLE.find((p) => p.s === sabun) ?? null;
+  return allPeople().find((p) => p.s === sabun) ?? null;
 }
 /** 사번 우선 → 순번 순으로 fresh Person 해석 */
 function resolvePerson(sabun: string | null | undefined, id: string | null | undefined): Person | null {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 import type { Person } from '@/lib/types';
 
@@ -15,7 +15,7 @@ const serverSupabase =
     ? createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey)
     : null;
 
-const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
+const allUsers = () => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
 
 /**
  * 이름 + 사번 매칭 검증.
@@ -23,7 +23,7 @@ const ALL_USERS = [...P, ...EXTRA_USERS, ...INTERN_USERS];
  * 여기 필요한 "일치하지 않으면 null" 이 성립하지 않는다.
  */
 function verifyUser(name: string, sabun: string): Person | null {
-  return ALL_USERS.find((p) => p.n === name && p.s === sabun) ?? null;
+  return allUsers().find((p) => p.n === name && p.s === sabun) ?? null;
 }
 
 // ── POST: 알림 등록 ──

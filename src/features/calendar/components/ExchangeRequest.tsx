@@ -8,7 +8,7 @@ import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
 import { getDia, getType, getDiaDisplay, isHoliday as checkHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import type { Person } from '@/lib/types';
 import styles from '../styles/Exchange.module.css';
 
@@ -149,7 +149,7 @@ export default function ExchangeRequest() {
     const wishEntries = Object.entries(wishes);
     if (wishEntries.length === 0) return [];
 
-    return P.filter(p => {
+    return getRoster().filter(p => {
       if (driver && p.I === driver.I) return false;
       return wishEntries.every(([dateStr, wish]) => {
         const date = fromISODate(dateStr);

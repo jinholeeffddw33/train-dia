@@ -1,23 +1,25 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
-import { P } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 
 // 내근직(EXTRA_USERS)·인턴(INTERN_USERS)은 교번 미배정이라 I('순번')가 전원 '0'으로 동일하다.
 // 따라서 I는 고유 식별자가 아니며, 고유값인 사번(s)을 우선 키로 써야 한다.
-const ALL_PEOPLE = [...P, ...EXTRA_USERS, ...INTERN_USERS];
+// 발령 시행일이 지나면 그 사람은 getRoster() 쪽으로 옮겨 간다 → 호출 시점에 계산한다
+//   (모듈 로드 때 얼려두면 앱을 켜 둔 채 자정을 넘겼을 때 옛 명부가 남는다)
+const allPeople = (): Person[] => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
 
 /** 순번(I)으로 조회 — '0'은 내근직/인턴 공용 placeholder라 식별 불가 → 무시 */
 function findById(id: string | null | undefined): Person | null {
   if (!id || id === '0') return null;
-  return ALL_PEOPLE.find((p) => p.I === id) ?? null;
+  return allPeople().find((p) => p.I === id) ?? null;
 }
 
 /** 사번(고유)으로 조회 */
 function findBySabun(sabun: string | null | undefined): Person | null {
   if (!sabun) return null;
-  return ALL_PEOPLE.find((p) => p.s === sabun) ?? null;
+  return allPeople().find((p) => p.s === sabun) ?? null;
 }
 
 /** 사번(고유) → 순번 → 원본 순으로 fresh Person 해석 */
@@ -96,7 +98,7 @@ export const useDriverStore = create<DriverState>()(
       },
 
       setMyDriverBySabun: (sabun: string) => {
-        const person = ALL_PEOPLE.find((p) => p.s === sabun) ?? null;
+        const person = allPeople().find((p) => p.s === sabun) ?? null;
         if (person) {
           set({ myDriver: person, current: person, isViewMode: false });
         }

@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { Minus, Plus, X, RotateCcw, Pencil, UserPlus, Check } from 'lucide-react';
 import { useCompareStore } from '@/stores/compare';
-import { P as P_RAW } from '@/data/cycle';
+import { getRoster } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
@@ -12,7 +12,7 @@ import { showToast } from '@/components/common/Toast';
 import type { Person } from '@/lib/types';
 import styles from '../styles/Compare.module.css';
 
-const P_SORTED = [...P_RAW].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
+const P_SORTED = getRoster().sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 
 const MIN_COUNT = 2;
 const MAX_COUNT = 20;

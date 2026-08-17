@@ -112,7 +112,7 @@
 
 /* 메뉴 이미지 */
 /* flex-shrink:0 필수 — 없으면 flex 세로정렬에서 사진이 줄어들며 overflow:hidden 으로 아래가 잘리고 스크롤도 안 됨 */
-.imgLink { display: block; flex-shrink: 0; border-radius: var(--dia-radius-xl); overflow: hidden; border: 1px solid var(--dia-border); box-shadow: var(--dia-card-depth); }
+.imgLink { display: block; width: 100%; padding: 0; flex-shrink: 0; border-radius: var(--dia-radius-xl); overflow: hidden; border: 1px solid var(--dia-border); box-shadow: var(--dia-card-depth); cursor: zoom-in; }
 .imgLink:active { transform: scale(0.995); }
 .menuImg { display: block; width: 100%; height: auto; }
 
@@ -183,3 +183,74 @@
 
 .err { font-size: var(--dia-text-sm); color: var(--dia-red); text-align: center; margin: 0; }
 .notice { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); text-align: center; margin: 4px 0 0; line-height: 1.5; }
+
+/* ── 식단 사진 인앱 뷰어 (라이트박스) ──
+   새 탭 대신 앱 위에 전체화면으로 띄운다. 뒤로가기/X/배경탭/ESC 로 닫힘.
+   열기=Z축 확대(Shared Axis open), 닫기=축소(close). 스크림은 사진이 주인공이라
+   테마 무관 검정(기존 safety 라이트박스와 동일 관례). reduced-motion 은 globals 가 무력화. */
+.viewerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-fullscreen-above);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+  padding: max(var(--sat), 16px) max(var(--sar), 16px) max(var(--sab), 16px) max(var(--sal), 16px);
+  animation: menuViewerBackdropIn var(--dia-dur-slower) var(--dia-ease-out) both;
+}
+.viewerOverlay.viewerClosing { animation: menuViewerBackdropOut var(--dia-dur-slow) var(--dia-ease-in) both; }
+
+/* 사진을 감싸는 버튼 — 키보드 접근(탭/Enter=닫기), 시각적으론 투명 래퍼 */
+.viewerImageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  background: transparent;
+  animation: menuViewerImageIn var(--dia-dur-slower) var(--dia-ease-out) both;
+}
+.viewerClosing .viewerImageBtn { animation: menuViewerImageOut var(--dia-dur-slow) var(--dia-ease-in) both; }
+
+.viewerImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--dia-radius-md);
+  cursor: zoom-out;
+  user-select: none;
+}
+
+.viewerClose {
+  position: absolute;
+  top: calc(var(--sat) + 12px);
+  right: calc(var(--sar) + 12px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dia-dur-base) ease;
+}
+@media (hover: hover) {
+  .viewerClose:hover { background: rgba(255, 255, 255, 0.28); }
+}
+.viewerClose:active { transform: scale(0.95); }
+
+@keyframes menuViewerBackdropIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes menuViewerBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes menuViewerImageIn {
+  0%   { transform: scale(0.94); opacity: 0; }
+  45%  { opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes menuViewerImageOut {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.94); opacity: 0; }
+}

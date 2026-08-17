@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, UtensilsCrossed, Upload, Trash2, FileText, RotateCw, Check } from 'lucide-react';
+import { ArrowLeft, UtensilsCrossed, Upload, Trash2, FileText, RotateCw, Check, X } from 'lucide-react';
+import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './WeeklyMenu.module.css';
 
 interface MenuItem {
@@ -79,6 +80,45 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // 식단 사진 인앱 뷰어 — 새 탭 대신 앱 위에 띄우고 뒤로가기/X/배경/ESC 로 닫는다
+  const [viewer, setViewer] = useState(false);
+  const [viewerClosing, setViewerClosing] = useState(false);
+  const closeTimer = useRef<number | null>(null);
+
+  const openViewer = useCallback(() => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setViewerClosing(false);
+    setViewer(true);
+  }, []);
+  const closeViewer = useCallback(() => {
+    if (closeTimer.current) return;            // 이미 닫히는 중 — 중복 방지
+    setViewerClosing(true);                    // 축소하며 사라지는 exit 애니메이션
+    closeTimer.current = window.setTimeout(() => {
+      setViewer(false);
+      setViewerClosing(false);
+      closeTimer.current = null;
+    }, 200);                                   // --dia-dur-slow 와 맞춤
+  }, []);
+
+  // 하드웨어/제스처 뒤로가기 → 뷰어부터 닫는다 (앱을 벗어나지 않는다)
+  useHistoryBack('menu-photo', closeViewer, viewer);
+
+  // ESC 로 닫기 + 열려 있는 동안 배경 스크롤 잠금
+  useEffect(() => {
+    if (!viewer) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeViewer(); };
+    window.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [viewer, closeViewer]);
+
+  // 언마운트 시 타이머 정리
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
   // 매 렌더가 아니라 마운트 시 1회 — 보는 중에 날짜가 바뀌는 일은 사실상 없다
   const thisWeek = useMemo(() => mondayOf(new Date()), []);
@@ -202,10 +242,10 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
         ) : shown ? (
           <>
             {shown.kind === 'image' ? (
-              <a href={shown.url} target="_blank" rel="noopener noreferrer" className={styles.imgLink}>
+              <button type="button" onClick={openViewer} className={styles.imgLink} aria-label="식단 사진 크게 보기">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={shown.url} alt={`${tab === 'this' ? '이번주' : '다음주'} 식당 메뉴`} className={styles.menuImg} />
-              </a>
+              </button>
             ) : (
               <a href={shown.url} target="_blank" rel="noopener noreferrer" className={styles.pdfCard}>
                 <FileText size={30} />
@@ -249,6 +289,36 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
             : '사진 또는 PDF 파일을 올릴 수 있어요. 올린 메뉴는 전 직원이 함께 봅니다.'}
         </p>
       </div>
+
+      {/* 식단 사진 인앱 뷰어 — 이미지일 때만. PDF 는 지금처럼 새 탭이 맞다. */}
+      {viewer && shown?.kind === 'image' && (
+        <div
+          className={`${styles.viewerOverlay} ${viewerClosing ? styles.viewerClosing : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="식단 사진 보기"
+          onClick={closeViewer}
+        >
+          <button
+            type="button"
+            className={styles.viewerClose}
+            onClick={(e) => { e.stopPropagation(); closeViewer(); }}
+            aria-label="닫기"
+          >
+            <X size={22} strokeWidth={2.4} />
+          </button>
+          {/* 사진을 버튼으로 감싸 키보드 접근 보장 — 탭/Enter 시 닫기 */}
+          <button
+            type="button"
+            className={styles.viewerImageBtn}
+            onClick={(e) => { e.stopPropagation(); closeViewer(); }}
+            aria-label="사진 닫기"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={shown.url} alt="식단 사진 크게 보기" className={styles.viewerImage} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

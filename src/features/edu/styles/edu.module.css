@@ -3838,6 +3838,37 @@
 
 .railBotText { margin: 0; white-space: pre-wrap; word-break: break-word; }
 
+/* 레일봇 근거(교재) → 교안 원문 섹션 전체화면 뷰어 (RegulationViewer 와 동일 거동) */
+.handbookViewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-viewer-panel);
+  background: var(--dia-bg);
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+}
+.handbookBody {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-6) + var(--sab));
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+.handbookChapter {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.handbookNote {
+  margin: var(--dia-space-4) 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
 /* 진행 중인 상황 경고 — 설명보다 관제보고가 먼저 */
 .railBotUrgent {
   display: flex;

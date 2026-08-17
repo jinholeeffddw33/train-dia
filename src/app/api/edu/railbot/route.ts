@@ -279,6 +279,8 @@ export async function POST(req: NextRequest) {
       kind: c.kind,
       regId: c.regId ?? null,
       article: c.article ?? null,
+      // 교재(book)는 규정처럼 원문으로 점프하려면 handbook.json 의 장/절 id 가 필요하다
+      chapterId: c.chapterId ?? null,
       sectionId: c.sectionId ?? null,
     })),
   });

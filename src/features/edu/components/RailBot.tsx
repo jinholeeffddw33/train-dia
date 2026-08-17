@@ -5,6 +5,7 @@ import { ArrowLeft, Send, BookOpen, AlertTriangle, Loader2, Bot } from 'lucide-r
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import RegulationViewer from './RegulationViewer';
+import HandbookSectionViewer from './HandbookSectionViewer';
 import styles from '../styles/edu.module.css';
 
 interface Props { onBack: () => void }
@@ -14,6 +15,7 @@ interface SourceRef {
   kind: 'reg' | 'book' | 'case';
   regId: string | null;
   article: number | null;
+  chapterId: string | null;
   sectionId: string | null;
 }
 
@@ -42,10 +44,12 @@ export default function RailBot({ onBack }: Props) {
   const [busy, setBusy] = useState(false);
   const [docs, setDocs] = useState<Record<string, DocEntry>>({});
   const [openDoc, setOpenDoc] = useState<(DocEntry & { article?: number }) | null>(null);
+  const [openBook, setOpenBook] = useState<{ chapterId: string | null; sectionId: string; title: string } | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useHistoryBack('railbot', onBack, !openDoc);
-  useEscapeClose(!openDoc, onBack);
+  const anyViewer = !!openDoc || !!openBook;
+  useHistoryBack('railbot', onBack, !anyViewer);
+  useEscapeClose(!anyViewer, onBack);
 
   // 근거 배지 → 규정 원문으로 점프하려면 문서 경로가 필요하다
   useEffect(() => {
@@ -112,11 +116,21 @@ export default function RailBot({ onBack }: Props) {
   };
 
   const openSource = (s: SourceRef) => {
-    if (s.kind !== 'reg' || !s.regId) return;
-    const d = docs[s.regId];
-    if (!d) return;
-    setOpenDoc({ ...d, article: s.article ?? undefined });
+    if (s.kind === 'reg' && s.regId) {
+      const d = docs[s.regId];
+      if (!d) return;
+      setOpenDoc({ ...d, article: s.article ?? undefined });
+    } else if (s.kind === 'book' && s.sectionId) {
+      // 교재 — handbook.json 의 장/절 원문 섹션으로 점프
+      setOpenBook({ chapterId: s.chapterId, sectionId: s.sectionId, title: s.label });
+    }
+    // case(사고사례)는 답변 본문에 전체가 이미 표시되어 별도 이동 없음
   };
+
+  /** 근거 배지를 누를 수 있는가 (열 곳이 있는가) */
+  const canOpen = (s: SourceRef) =>
+    (s.kind === 'reg' && !!s.regId && !!docs[s.regId]) ||
+    (s.kind === 'book' && !!s.sectionId);
 
   return (
     <div className={styles.screen}>
@@ -177,7 +191,7 @@ export default function RailBot({ onBack }: Props) {
                       type="button"
                       className={styles.railBotSource}
                       onClick={() => openSource(s)}
-                      disabled={s.kind !== 'reg' || !s.regId || !docs[s.regId]}
+                      disabled={!canOpen(s)}
                     >
                       <BookOpen size={12} aria-hidden />
                       {s.label}
@@ -226,6 +240,15 @@ export default function RailBot({ onBack }: Props) {
           pdfUrl={openDoc.pdfUrl}
           initialArticle={openDoc.article}
           onClose={() => setOpenDoc(null)}
+        />
+      )}
+
+      {openBook && (
+        <HandbookSectionViewer
+          chapterId={openBook.chapterId}
+          sectionId={openBook.sectionId}
+          fallbackTitle={openBook.title}
+          onClose={() => setOpenBook(null)}
         />
       )}
     </div>

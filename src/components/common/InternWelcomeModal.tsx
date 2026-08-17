@@ -6,6 +6,7 @@ import { X, Sparkles } from 'lucide-react';
 import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './InternWelcomeModal.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 const STORAGE_KEY = 'intern-welcome-2026-05-dismiss';
 const SHOW_FROM = '2026-05-17';
 const SHOW_UNTIL = '2026-05-19';
@@ -45,11 +46,10 @@ export default function InternWelcomeModal() {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [open, handleClose]);
 

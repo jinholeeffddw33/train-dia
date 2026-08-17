@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { X, Download } from 'lucide-react';
 import styles from './Hazard.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface Props {
   url: string;
   onClose: () => void;
@@ -18,11 +19,10 @@ export default function AttachmentLightbox({ url, onClose }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [onClose]);
 

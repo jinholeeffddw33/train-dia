@@ -5,6 +5,7 @@ import { ArrowLeft, UtensilsCrossed, Upload, Trash2, FileText, RotateCw, Check, 
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './WeeklyMenu.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface MenuItem {
   url: string;
   kind: 'image' | 'pdf';
@@ -109,11 +110,10 @@ export default function WeeklyMenu({ onBack }: { onBack: () => void }) {
     if (!viewer) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeViewer(); };
     window.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
+      releaseScrollLock();
     };
   }, [viewer, closeViewer]);
 

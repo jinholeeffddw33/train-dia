@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { getType, isHoliday } from '@/lib/schedule';
 import styles from './DiaChartModal.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface DiaChartModalProps {
   open: boolean;
   dia: string | null;
@@ -45,11 +46,10 @@ export default function DiaChartModal({ open, dia, date, diaLabel, compact, onCl
     setImgError(false);
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [open, handleClose]);
 

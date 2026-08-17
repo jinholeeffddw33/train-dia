@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Camera, Link as LinkIcon } from 'lucide-react';
 import styles from './SafetyTips.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface Props {
   sabun: string;
   name: string;
@@ -34,11 +35,10 @@ export default function SafetyTipsForm({ sabun, name, onClose, onSuccess }: Prop
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [onClose]);
 

@@ -7,6 +7,7 @@ import { useDriverStore } from '@/stores/driver';
 import SafetyTipsForm from './SafetyTipsForm';
 import styles from './SafetyTips.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface Tip {
   id: string;
   title: string;
@@ -71,11 +72,10 @@ export default function SafetyTipsView({ onBack }: Props) {
     if (!selected) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [selected]);
 

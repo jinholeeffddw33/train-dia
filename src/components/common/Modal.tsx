@@ -6,6 +6,7 @@ import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import styles from './Modal.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface ModalProps {
   open: boolean;
   onClose: () => void;
@@ -98,9 +99,8 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
   useEffect(() => {
     if (!open) return;
 
-    const prevOverflow = document.body.style.overflow;
-    document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
+    document.addEventListener('keydown', handleKeyDown);
 
     const firstFocusable = contentRef.current?.querySelector<HTMLElement>(
       'button, input, [tabindex]:not([tabindex="-1"])',
@@ -109,7 +109,7 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = prevOverflow;
+      releaseScrollLock();
     };
   }, [open, handleKeyDown]);
 

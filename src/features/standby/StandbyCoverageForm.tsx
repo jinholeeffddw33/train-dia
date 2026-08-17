@@ -6,6 +6,7 @@ import { DOW } from '@/lib/constants';
 import MonthDatePicker from './MonthDatePicker';
 import styles from './StandbyCoverage.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface Props {
   sabun: string;
   name: string;
@@ -48,11 +49,10 @@ export default function StandbyCoverageForm({ sabun, name, onClose, onSuccess }:
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [onClose]);
 

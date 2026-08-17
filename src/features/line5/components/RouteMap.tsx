@@ -4,6 +4,7 @@ import { memo, useMemo, useRef, useEffect, useCallback, useState } from 'react';
 import { useTrainStore } from '@/stores/train';
 import { buildTrainDriverMap } from '@/lib/schedule';
 import { LINE5_MAP, LINE5_ROUTES, LINE5_TRANSFERS } from '@/data/line5';
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 import styles from '../styles/Line5.module.css';
 
 /* 색상 = CSS 변수 (SVG 에서 var() 동작) — 라이트 모드 다크색 잔존 버그 방지 */
@@ -109,12 +110,11 @@ function RouteMap() {
     return () => document.removeEventListener('keydown', handleKey);
   }, [mapFullscreen, toggleFullscreen]);
 
-  // 전체화면 시 body 스크롤 방지
+  // 전체화면 시 배경 스크롤 방지 — 전역 카운터 SSOT 경유(중첩 오버레이에서도 안전)
   useEffect(() => {
-    if (mapFullscreen) {
-      document.body.style.overflow = 'hidden';
-      return () => { document.body.style.overflow = ''; };
-    }
+    if (!mapFullscreen) return;
+    acquireScrollLock();
+    return () => releaseScrollLock();
   }, [mapFullscreen]);
 
   const handleStationClick = useCallback((name: string) => {

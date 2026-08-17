@@ -23,6 +23,7 @@ import WeeklyMenu from '@/features/life/menu/WeeklyMenu';
 import NewsOverlay from './NewsOverlay';
 import styles from './OfficeDashboard.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
 
 function todayLabel(): string {
@@ -142,9 +143,8 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   const anyOverlay = scheduleOpen || noteMgrOpen || taskBoardOpen || menuOpen || newsOpen;
   useEffect(() => {
     if (!anyOverlay) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    acquireScrollLock();
+    return () => { releaseScrollLock(); };
   }, [anyOverlay]);
 
   // 가로 스와이프로 기관사 허브 열기 — 왼쪽으로 밀기('next') = 오른쪽에 있는 hub 로.

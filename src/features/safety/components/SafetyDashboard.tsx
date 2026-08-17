@@ -6,6 +6,7 @@ import {
   Megaphone, ChevronRight, Bell, Check, X, Lightbulb, TrendingUp,
 } from 'lucide-react';
 import styles from './SafetyDashboard.module.css';
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 import { LINE5_PROFILE_ID } from '../constants';
 
 /** DB report 형태 (필요한 필드만) */
@@ -754,10 +755,10 @@ function SampleDetailModal({ detail, onClose }: { detail: SampleDetail; onClose:
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      releaseScrollLock();
     };
   }, [onClose]);
 

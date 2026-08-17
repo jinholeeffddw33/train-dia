@@ -6,6 +6,7 @@ import { X, ShieldAlert } from 'lucide-react';
 import { getMissionCardKind, MISSION_CARD_META } from '@/lib/auth';
 import styles from '../styles/MissionCard.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface Props {
   sabun: string | undefined | null;
   name: string;
@@ -26,11 +27,10 @@ export default function MissionCardModal({ sabun, name, onClose }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      releaseScrollLock();
     };
   }, [handleClose]);
 

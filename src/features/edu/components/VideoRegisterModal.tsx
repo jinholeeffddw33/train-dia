@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, Upload, Link2, Type } from 'lucide-react';
 import styles from '../styles/edu.module.css';
 
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface VideoCategory {
   id: string;
   label: string;
@@ -61,8 +62,7 @@ export default function VideoRegisterModal({
   useEffect(() => {
     if (!open) return;
     prevFocusRef.current = document.activeElement as HTMLElement | null;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    acquireScrollLock();
     const focusTimer = window.setTimeout(() => titleInputRef.current?.focus(), 60);
 
     const onKey = (e: KeyboardEvent) => {
@@ -91,7 +91,7 @@ export default function VideoRegisterModal({
 
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
+      releaseScrollLock();
       window.clearTimeout(focusTimer);
       prevFocusRef.current?.focus?.();
     };

@@ -1,7 +1,7 @@
 {
   "_comment": "API-ENVELOPE-001 baseline — 파일별 raw NextResponse.json 잔량. 전환하면 npm run check:envelope:update 로 낮춘다(안 낮추면 stale=FAIL).",
-  "_updated": "2026-08-09",
-  "total": 323,
+  "_updated": "unknown",
+  "total": 301,
   "files": {
     "src/app/api/admin/dashboard/route.ts": 3,
     "src/app/api/alerts/route.ts": 12,
@@ -10,8 +10,6 @@
     "src/app/api/auth/logout/route.ts": 1,
     "src/app/api/auth/me/route.ts": 3,
     "src/app/api/auth/pin/change/route.ts": 8,
-    "src/app/api/auth/webauthn/login/route.ts": 14,
-    "src/app/api/auth/webauthn/register/route.ts": 8,
     "src/app/api/edu/video-views/route.ts": 9,
     "src/app/api/edu/videos/route.ts": 11,
     "src/app/api/feedback/route.ts": 20,

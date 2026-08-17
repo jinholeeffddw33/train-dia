@@ -491,7 +491,7 @@
   font-weight: 800;
   white-space: nowrap;
 }
-.headerSave:active { transform: scale(0.96); }
+.headerSave:active { transform: scale(0.95); }
 
 /* ── 선택된 기관사 칩 ── */
 .selectedRow {

@@ -29,7 +29,7 @@
   color: var(--dia-text-primary);
   cursor: pointer;
 }
-.backBtn:active { transform: scale(0.92); }
+.backBtn:active { transform: scale(0.9); }
 .topTitle { font-size: var(--dia-text-lg); font-weight: 800; color: var(--dia-text-primary); }
 
 .body {
@@ -125,7 +125,7 @@
   cursor: pointer;
   white-space: nowrap;
 }
-.chip:active { transform: scale(0.96); }
+.chip:active { transform: scale(0.95); }
 .chipOn { background: var(--dia-blue); border-color: var(--dia-blue); color: var(--dia-text-on-color); }
 
 /* ── 목록 ── */
@@ -193,7 +193,7 @@
 .emptyIcon { color: var(--dia-text-tertiary); opacity: 0.5; }
 .emptyText { font-size: var(--dia-text-base); color: var(--dia-text-secondary); margin: 0; }
 .emptyAdd { display: inline-flex; align-items: center; gap: 5px; padding: 9px 16px; border-radius: var(--dia-radius-full); border: 1px solid var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); font-size: var(--dia-text-sm); font-weight: 700; cursor: pointer; }
-.emptyAdd:active { transform: scale(0.96); }
+.emptyAdd:active { transform: scale(0.95); }
 
 /* ── AI 추천 ── */
 .aiCard {
@@ -229,7 +229,7 @@
   justify-content: center;
   transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
-.fab:active { transform: scale(0.94); box-shadow: var(--dia-3d-pressed); }
+.fab:active { transform: scale(0.9); box-shadow: var(--dia-3d-pressed); }
 
 /* ── 모달 ── */
 .modalOverlay {
@@ -304,7 +304,7 @@
     linear-gradient(145deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-blue-glow);
 }
-.saveBtn:active { box-shadow: var(--dia-3d-pressed); transform: scale(0.99); }
+.saveBtn:active { box-shadow: var(--dia-3d-pressed); transform: scale(0.98); }
 .saveBtn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -323,7 +323,7 @@
   color: var(--dia-text-secondary);
   font-size: var(--dia-text-sm); font-weight: 700;
 }
-.allDay:active, .allDayOn:active, .schedOff:active, .schedOn:active { transform: scale(0.97); }
+.allDay:active, .allDayOn:active, .schedOff:active, .schedOn:active { transform: scale(0.98); }
 .allDayOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
 .schedOn { border-color: var(--dia-green, #22c55e); background: color-mix(in srgb, var(--dia-green, #22c55e) 16%, transparent); color: var(--dia-text-primary); }
 .fieldHint { font-weight: 600; color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); }

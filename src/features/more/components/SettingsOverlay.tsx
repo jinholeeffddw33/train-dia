@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
+import AlarmSettings from './AlarmSettings';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminDashboard from './AdminDashboard';
@@ -151,9 +152,15 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
       </div>
 
       {/* 알림 */}
+      <p className={styles.setGroupTitle}>알림</p>
+      {/*
+        근무 알람 — 2026-08-18 복원.
+        엔진(useSegmentAlarm)은 계속 돌고 있었는데 켜는 UI 만 홈 재구성 때 빠져서
+        기능이 통째로 죽어 있었다. 조건 없이 항상 보여 준다(웹/앱 모두 의미가 있다).
+      */}
+      <AlarmSettings />
       {(notifSupported || pushSupported || (isIOS && !isInstalled)) && (
         <>
-          <p className={styles.setGroupTitle}>알림</p>
           {notifSupported && (
             <div className={styles.ctrlRow}>
               <span className={styles.ctrlLabel}><span className={styles.ctrlIcon}>🔔</span>알림</span>

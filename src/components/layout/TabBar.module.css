@@ -82,7 +82,7 @@
 }
 
 .tab:active {
-  transform: scale(0.94);
+  transform: scale(0.95);
 }
 
 /* 활성 탭 — 주얼 위 어두운 글씨/아이콘 (다크 #0a1400 / 라이트 #1a2e00) */

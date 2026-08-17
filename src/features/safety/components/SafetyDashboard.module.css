@@ -418,7 +418,7 @@
   transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .catBtn:active {
-  transform: scale(0.96) translateY(1px);
+  transform: scale(0.95) translateY(1px);
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
@@ -518,7 +518,7 @@
   min-height: 28px;
 }
 
-.addBtn:active { transform: scale(0.94); box-shadow: var(--dia-3d-pressed); transition: transform var(--dia-dur-fast) ease; }
+.addBtn:active { transform: scale(0.95); box-shadow: var(--dia-3d-pressed); transition: transform var(--dia-dur-fast) ease; }
 
 /* ── 아이템 리스트 ── */
 .itemList {

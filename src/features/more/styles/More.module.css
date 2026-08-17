@@ -353,19 +353,30 @@
 }
 
 .alarmChip {
-  padding: 6px 14px;
+  /* 터치 타겟 — 50~60대 사용자 기준 44px 하한(CLAUDE.md §3.3).
+     예전 값(padding 6px)은 높이가 34px 라 손가락으로 정확히 누르기 어려웠다. */
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--dia-radius-full);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-medium);
   color: var(--dia-text-secondary);
   background: var(--dia-bg);
   border: 1px solid var(--dia-border);
-  transition: background var(--dia-transition-fast), color var(--dia-transition-fast), border-color var(--dia-transition-fast);
+  transition:
+    background var(--dia-transition-fast),
+    color var(--dia-transition-fast),
+    border-color var(--dia-transition-fast),
+    transform var(--dia-dur-fast) var(--dia-ease-press);
   cursor: pointer;
 }
 
+/* press 표준 3티어 중 버튼·칩·탭 = 0.95 (CLAUDE.md §2.6) */
 .alarmChip:active {
   background: var(--dia-surface-hover);
+  transform: scale(0.95);
 }
 
 .alarmChipActive {
@@ -669,7 +680,7 @@
   text-align: center;
   transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
-.tile:active { transform: scale(0.96); background: var(--dia-surface-hover); }
+.tile:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 .tileIcon {
   width: 34px;
   height: 34px;

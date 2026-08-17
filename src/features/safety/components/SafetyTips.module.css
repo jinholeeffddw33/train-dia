@@ -109,7 +109,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform var(--dia-dur-fast) ease;
 }
-.cardBtn:active { transform: scale(0.99); }
+.cardBtn:active { transform: scale(0.98); }
 
 .cardMedia {
   position: relative;
@@ -309,7 +309,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: all var(--dia-dur-base) ease;
 }
-.typeBtn:active { transform: scale(0.97); }
+.typeBtn:active { transform: scale(0.98); }
 .typeBtnActive {
   background: rgba(139, 92, 246, 0.12);
   border-color: #8B5CF6;

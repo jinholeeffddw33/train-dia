@@ -70,7 +70,7 @@
   position: relative;
   transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
 }
-.item:active { transform: scale(0.985); background: var(--dia-surface-hover); }
+.item:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 
 .itemMeta {
   display: flex;
@@ -145,7 +145,7 @@
   font-size: var(--dia-text-sm);
   font-weight: 800;
 }
-.retryBtn:active { transform: scale(0.96); }
+.retryBtn:active { transform: scale(0.95); }
 
 .credit {
   margin-top: var(--dia-space-4);

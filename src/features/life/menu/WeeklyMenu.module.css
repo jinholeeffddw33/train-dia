@@ -25,7 +25,7 @@
   border: 1px solid var(--dia-border);
   color: var(--dia-text-primary);
 }
-.back:active { transform: scale(0.92); }
+.back:active { transform: scale(0.9); }
 .title { font-size: var(--dia-text-lg); font-weight: 800; color: var(--dia-text-primary); }
 
 /* ── 이번주 / 다음주 탭 ── */
@@ -113,7 +113,7 @@
 /* 메뉴 이미지 */
 /* flex-shrink:0 필수 — 없으면 flex 세로정렬에서 사진이 줄어들며 overflow:hidden 으로 아래가 잘리고 스크롤도 안 됨 */
 .imgLink { display: block; width: 100%; padding: 0; flex-shrink: 0; border-radius: var(--dia-radius-xl); overflow: hidden; border: 1px solid var(--dia-border); box-shadow: var(--dia-card-depth); cursor: zoom-in; }
-.imgLink:active { transform: scale(0.995); }
+.imgLink:active { transform: scale(0.98); }
 .menuImg { display: block; width: 100%; height: auto; }
 
 /* PDF 카드 */
@@ -126,7 +126,7 @@
   color: var(--dia-blue-text);
   font-size: var(--dia-text-base); font-weight: 800;
 }
-.pdfCard:active { transform: scale(0.99); background: var(--dia-surface-hover); }
+.pdfCard:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 
 .meta { text-align: center; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); margin: 0; }
 
@@ -149,7 +149,7 @@
   border: 1px solid var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text);
   font-size: var(--dia-text-sm); font-weight: 700;
 }
-.retryBtn:active { transform: scale(0.96); }
+.retryBtn:active { transform: scale(0.95); }
 
 .hiddenInput { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
@@ -178,7 +178,7 @@
   color: var(--dia-red);
   font-size: var(--dia-text-sm); font-weight: 700;
 }
-.delBtn:active { transform: scale(0.96); background: var(--dia-surface-hover); }
+.delBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }
 .delBtn:disabled { opacity: 0.6; }
 
 .err { font-size: var(--dia-text-sm); color: var(--dia-red); text-align: center; margin: 0; }

@@ -893,7 +893,7 @@
 }
 
 .tocBroadcastShortcut:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
   box-shadow:
     inset 0 1px 2px rgba(0,0,0,0.15),
     0 1px 3px rgba(37, 99, 235, 0.25);
@@ -1882,7 +1882,7 @@
 }
 
 .navBtn:active {
-  transform: translateY(1px) scale(0.97);
+  transform: translateY(1px) scale(0.98);
   box-shadow: var(--dia-3d-pressed);
 }
 
@@ -1895,7 +1895,7 @@
 }
 
 .navBtnPrimary:active {
-  transform: translateY(1px) scale(0.97);
+  transform: translateY(1px) scale(0.98);
   box-shadow: var(--dia-3d-pressed);
 }
 
@@ -2098,7 +2098,7 @@
 }
 
 .areaChip:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
   background: var(--dia-surface-hover);
   border-color: var(--dia-border-strong);
 }
@@ -3384,7 +3384,7 @@
 }
 
 .menuTileV3:active {
-  transform: translateY(2px) scale(0.97);
+  transform: translateY(2px) scale(0.98);
 }
 
 .menuTileV3_blue:active   { box-shadow: inset 0 2px 6px rgba(30, 64, 175, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15); }
@@ -3444,7 +3444,7 @@
 }
 
 .resumeV3:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(1px) scale(0.98);
   box-shadow: var(--dia-3d-pressed);
 }
 
@@ -3511,7 +3511,7 @@
 }
 
 .listRowV3:active {
-  transform: scale(0.99);
+  transform: scale(0.98);
   background: var(--dia-surface-hover);
 }
 
@@ -4581,7 +4581,7 @@
 }
 
 .regBtn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .regBtnGhost {
@@ -4856,7 +4856,7 @@
 }
 
 .videoRetryBtn:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 /* 영상 카드 */
@@ -5010,7 +5010,7 @@
 }
 
 .videoPlayerClose:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .videoPlayerBody {
@@ -6340,7 +6340,7 @@
 }
 
 .newcomerSubCard:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
 }
 
 .newcomerSubIcon {
@@ -6355,7 +6355,7 @@
 }
 
 .newcomerSubCard:active .newcomerSubIcon {
-  transform: scale(0.92);
+  transform: scale(0.9);
   transition: transform var(--dia-dur-fast) ease;
 }
 
@@ -6788,7 +6788,7 @@
   transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .vregClose:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
   box-shadow: var(--dia-3d-pressed);
 }
 .vregClose:focus-visible {
@@ -6846,7 +6846,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform var(--dia-dur-fast) ease, border-color var(--dia-dur-base) ease, background var(--dia-dur-base) ease;
 }
-.vregArea:active { transform: scale(0.96); }
+.vregArea:active { transform: scale(0.95); }
 .vregArea:focus-visible {
   outline: 2px solid var(--dia-blue);
   outline-offset: 2px;

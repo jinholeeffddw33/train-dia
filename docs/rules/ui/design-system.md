@@ -189,6 +189,99 @@ min-height: 100dvh;  /* 실제 적용 */
 
 ---
 
+## UI-SCROLLLOCK-001 — 배경 스크롤 잠금은 SSOT 하나로
+
+오버레이가 열린 동안 뒤 화면이 따라 스크롤되지 않게 하는 잠금은 **`lib/overlay/scrollLockManager` 하나만** 쓴다.
+`document.body.style.overflow` / `position` 을 화면에서 직접 만지지 않는다.
+
+```ts
+import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager'
+useEffect(() => { acquireScrollLock(); return () => releaseScrollLock() }, [isOpen])
+// 또는 모달이면 useModalA11y 가 알아서 한다
+```
+
+**왜** (2026-08-18 실측): 모달 20곳이 각자 `const prev = ...overflow; ...= 'hidden'` 패턴을 갖고 있었다.
+하나만 열릴 때는 멀쩡하지만 겹치면 무너진다 — A 열림(prev='') → 그 위 B 열림(prev='hidden') → A 가 먼저 닫히면
+배경이 풀리고(B 가 떠 있는데), B 가 닫힐 때 'hidden' 을 되심어 **다 닫힌 뒤에도 화면이 영구히 잠긴다**.
+train-dia 에 실제로 겹치는 자리가 있다(안전수칙 전체화면 → 첨부 라이트박스, 설정 → PIN 변경).
+또 iOS Safari 는 `overflow:hidden` 만으로 배경이 안 막혀 `position:fixed` + scrollY 복원이 필요한데, 그 대응도 SSOT 에만 있다.
+
+- 예외: 잠금 구현 자신 · `lib/originGuard`(되돌리지 않는 영구 차단) · `__tests__`.
+- 가드: `scripts/check-ai-rules.mjs` F6 (`check:ai-rules`) · severity **fail**.
+- 회귀 테스트: `src/lib/overlay/__tests__/scrollLockManager.test.ts` (옛 방식이 실제로 얼리는 것까지 재현).
+
+---
+
+## UI-A11Y-001 — `<button>` 에 type 명시
+
+모든 `<button>` 에 `type="button"` 또는 `type="submit"` 을 쓴다(CLAUDE.md §1.6).
+폼 안에서 type 이 없으면 브라우저 기본값이 `submit` 이라, 누르는 순간 **의도치 않게 폼이 제출된다**.
+
+- 가드: `scripts/check-ai-rules.mjs` F3 (여는 태그가 여러 줄이어도 5줄 창으로 확인) · severity **fail**.
+
+---
+
+## UI-A11Y-002 — 포커스는 어떤 방식으로든 보여야 한다
+
+`outline: none` 을 쓰는 것 자체는 금지가 아니다. **포커스 표시가 하나도 없는 것**이 금지다.
+`:focus-visible` 링 · `border-color` 변화 · `box-shadow` 중 무엇이든 하나는 있어야 한다.
+
+텍스트 입력은 사각 outline 대신 `border-color` + `transition` 으로 표시하는 편이 오히려 권장이다
+(train-dia 의 입력들이 이미 그렇게 돼 있다).
+
+- 예외: 직전 줄 `/* A11Y-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-ai-rules.mjs` F5 · severity **fail**.
+
+---
+
+## CSS-INLINE-001 — 인라인 스타일 금지
+
+`style={{ }}` 대신 CSS Module 을 쓴다(CLAUDE.md §1.7). 인라인은 토큰·테마·글자크기 설정을 전부 우회한다.
+진행바 폭·차트 좌표처럼 **CSS 로 표현할 수 없는 동적 런타임 값**만 예외이며, 직전 줄에 사유를 적는다.
+
+```tsx
+// STYLE-EXCEPTION: 진행률은 런타임 계산값이라 CSS 로 표현 불가
+<div style={{ width: `${percent}%` }} />
+```
+
+- 가드: `scripts/check-ai-rules.mjs` F1 · severity **fail**.
+
+---
+
+## TS-ANY-001 — `as any` 금지
+
+`unknown` + 타입가드 또는 Zod `parse` 를 쓴다. `as any` 는 타입 오류를 미래로 미루는 것일 뿐이다.
+
+- 가드: `scripts/check-ai-rules.mjs` F2 · severity **fail**.
+
+---
+
+## UI-ALERT-001 — `alert()` / `confirm()` 금지
+
+브라우저 기본 대화상자는 앱 문맥을 끊고, 스타일·문구·다크모드를 통제할 수 없다(CLAUDE.md §1.5).
+`showToast` 또는 인라인 UI / `ConfirmDialog` 를 쓴다.
+
+- 예외: 직전 줄 `// ALERT-EXCEPTION: 사유`.
+- 가드: `scripts/check-ai-rules.mjs` F4 · severity **fail**.
+
+---
+
+## UI-PRESS-001 — press 는 표준 3티어 (WARN)
+
+| 대상 | scale | transition |
+|---|---|---|
+| 카드/대형 서피스 | `0.98` | `transform 0.15s ease` |
+| 버튼/칩/탭 | `0.95` | `transform 0.12s ease` |
+| 소형 아이콘 | `0.9` | `transform 0.1s ease` |
+
+한 화면 안에서 누를 때마다 눌리는 깊이가 다르면 완성도가 깨진다(2026-08-18 실측: 0.99·0.97·0.96·0.94·0.92 가 67건 흩어져 있었다 → 표준으로 통일).
+`:active` 에 `transform` 이 있으면 **`transition` 도 반드시** 있어야 한다 — 없으면 눌림이 툭 끊긴다.
+
+- 예외: `features/life/games/`(게임은 자체 촉감 설계) · 직전 줄 `/* PRESS-EXCEPTION: 사유 */`.
+- 가드: `scripts/check-ai-rules.mjs` W1/W2 · severity **warn**.
+
+---
+
 ## 보류 룰 (train-dia 미도입 — ZINOSB_SYSTEM_PORT.md 참조)
 - **UI-BLEED-001**(풀블리드): train-dia 에 페이지 게터(#main-content / --z-page-pad) 없음 → 게터 SSOT 도입 시 이식.
 - **UI-SHEET-003**(BottomSheetShell): train-dia 에 시트 단일 컴포넌트 없음 → 도입 시 이식.

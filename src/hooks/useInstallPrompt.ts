@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { isNativeApp } from '@/lib/native/platform';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -28,6 +29,21 @@ export function useInstallPrompt() {
   const [isInApp, setIsInApp] = useState(false);
 
   useEffect(() => {
+    /**
+     * ★ 네이티브 앱(Capacitor)이면 여기서 끝낸다 — 이미 "설치된 것"의 최종 형태다.
+     *
+     * 실측(2026-08-18 Z플립3): 네이티브 WebView 에서 `display-mode: standalone` 은 **false**,
+     * `navigator.standalone` 도 undefined 다. 그래서 아래 standalone 판정으로는 앱을 못 알아보고
+     * `isInstalled=false` + `isAndroid=true` 가 되어, **앱 안에서 "홈 화면 추가" 타일이 보이고
+     * 누르면 설치 안내 모달까지 떴다**(이미 앱인데). 홈 화면의 설치 배너도 같은 이유로 떴다.
+     *
+     * 판정을 이 훅 한 곳에서 끝내면 소비처(설정 타일·홈 배너·안내 모달)가 전부 따라온다.
+     */
+    if (isNativeApp()) {
+      setIsInstalled(true);
+      return;
+    }
+
     const ua = navigator.userAgent;
     // iPadOS 13+ 는 UA 가 Mac 으로 위장 — 멀티터치 Mac = iPad 로 판정
     const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.maxTouchPoints > 1 && /Mac/.test(ua));

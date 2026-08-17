@@ -596,7 +596,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform var(--dia-dur-instant) ease, background var(--dia-dur-base) ease, border-color var(--dia-dur-base) ease;
 }
-.mdpCell:active { transform: scale(0.92); }
+.mdpCell:active { transform: scale(0.98); }
 .mdpCell:focus-visible {
   outline: 2px solid var(--dia-blue);
   outline-offset: 1px;

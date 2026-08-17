@@ -4,9 +4,8 @@ import { useEffect, useRef, useCallback, useState, useId } from 'react';
 import { X } from 'lucide-react';
 import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import { useModalA11y } from '@/hooks/useModalA11y';
 import styles from './Modal.module.css';
-
-import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface ModalProps {
   open: boolean;
   onClose: () => void;
@@ -32,7 +31,6 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
   const overlayRef = useRef<HTMLDivElement>(null);
   const dimRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const prevFocusRef = useRef<HTMLElement | null>(null);
   const [closing, setClosing] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -57,61 +55,22 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
   const modalKey = useId();
   useHistoryBack(modalKey, requestClose, open && !closing);
 
-  // ESC 닫기 + Tab 포커스 트랩 (VideoRegisterModal 완성형 패턴 이식 — 2026-07-02 R4)
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        requestClose();
-        return;
-      }
-      if (e.key === 'Tab' && contentRef.current) {
-        const focusables = contentRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
-        );
-        if (focusables.length === 0) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    },
-    [requestClose],
-  );
-
-  // 이전 포커스 저장/복원 — open 에만 의존 (onClose 재생성으로 열림 중 복원되는 것 방지)
-  useEffect(() => {
-    if (!open) return;
-    prevFocusRef.current = document.activeElement as HTMLElement | null;
-    return () => {
-      // 닫힐 때 열기 전 포커스 위치로 복원 (키보드 사용자 문맥 유지)
-      prevFocusRef.current?.focus?.();
-      prevFocusRef.current = null;
-    };
-  }, [open]);
-
-  // 포커스 트랩 + 스크롤 잠금
-  useEffect(() => {
-    if (!open) return;
-
-    acquireScrollLock();
-    document.addEventListener('keydown', handleKeyDown);
-
-    const firstFocusable = contentRef.current?.querySelector<HTMLElement>(
-      'button, input, [tabindex]:not([tabindex="-1"])',
-    );
-    firstFocusable?.focus();
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      releaseScrollLock();
-    };
-  }, [open, handleKeyDown]);
+  /**
+   * ESC · Tab 포커스 트랩 · 진입/복원 포커스 · 배경 스크롤 잠금 — 전부 SSOT 훅에 위임 (2026-08-18).
+   *
+   * 예전에는 이 파일이 직접 다 했는데, 그 구현에 ZINOSB 가 실제로 겪은 사고 세 가지가
+   * 그대로 남아 있었다:
+   *   ① 첫 포커스 대상이 **텍스트 입력이어도 포커스** → 모바일에서 시트를 여는 순간
+   *      키보드가 올라와 화면 절반을 먹었다 (시트를 여는 것 ≠ 글을 쓰겠다는 것).
+   *   ② 포커스 복원에 preventScroll 이 없어, 닫을 때 뒤 목록이 그 버튼 위치로 튀었다.
+   *   ③ 포커스 effect 가 handleKeyDown(→requestClose→onClose) 에 의존해 **부모가 리렌더될
+   *      때마다** 재실행 → 입력에서 포커스를 뺏어 키보드가 올라오다 내려갔다.
+   * 훅은 셋을 다 막고, 잠금은 전역 카운터를 쓴다(중첩 시트에서도 안전).
+   *
+   * isOpen 에서 closing 을 빼지 않는 이유: 닫힘 애니메이션 330ms 동안에도 배경은 잠겨
+   * 있어야 한다. 여기서 풀면 시트가 내려가는 사이 뒤 화면이 스크롤된다.
+   */
+  const modalRef = useModalA11y<HTMLDivElement>(open, requestClose);
 
   // 외부에서 open=false 로 닫힌 경우 closing 상태 리셋 (다음 오픈 때 내려간 채로 뜨는 것 방지)
   useEffect(() => {
@@ -162,7 +121,7 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
       {/* dim — 시트의 형제 레이어. 닫힘 시 이것만 페이드(시트는 항상 불투명) */}
       <div ref={dimRef} className={`${styles.dim} ${closing ? styles.dimClosing : ''}`} aria-hidden />
       <div
-        ref={(el) => { contentRef.current = el; sheetRef.current = el; }}
+        ref={(el) => { contentRef.current = el; sheetRef.current = el; modalRef.current = el; }}
         className={`${styles.content} ${closing ? styles.closing : ''}`}
       >
         {/* 상단 핸들 — 잡고 아래로 끌어 닫기(드래그 소스). 스크롤 본문 밖이라 고정. */}

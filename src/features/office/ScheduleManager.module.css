@@ -30,7 +30,7 @@
 /* 날짜 + 오늘 */
 .dateRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: var(--dia-space-3); }
 .datePick { display: inline-flex; align-items: center; gap: 7px; min-width: 0; padding: 6px 10px 6px 6px; border: 1px solid var(--dia-border); border-radius: 999px; background: var(--dia-surface); }
-.datePick:active { transform: scale(0.97); background: var(--dia-surface-hover); }
+.datePick:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 .dateChip { flex-shrink: 0; width: 30px; height: 30px; border-radius: 9px; background: var(--dia-blue-dim); color: var(--dia-blue-text); display: grid; place-items: center; }
 .dateLabel { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 월/일 전환 토글임을 알리는 힌트 */
@@ -174,13 +174,13 @@
 .ecTitle { font-size: var(--dia-text-base); font-weight: 800; color: var(--dia-text-primary); }
 .ecSub { display: inline-flex; align-items: center; gap: 3px; font-size: var(--dia-text-meta); color: var(--dia-text-secondary); margin-top: 2px; }
 .ecDel { flex-shrink: 0; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; color: var(--dia-text-tertiary); }
-.ecDel:active { transform: scale(0.85); }
+.ecDel:active { transform: scale(0.9); }
 /* 시간 있는 할 일이 일정에 겹쳐 보일 때 */
 .ecChip { margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--dia-amber-dim); color: var(--dia-amber-text); font-size: var(--dia-text-meta); font-weight: 800; vertical-align: middle; }
 .ecTitle { display: flex; align-items: center; min-width: 0; }
 .ecTitleText { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ecCheck { flex-shrink: 0; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 6px; border: 2px solid var(--dia-amber); color: var(--dia-on-amber); background: transparent; }
-.ecCheck:active { transform: scale(0.85); }
+.ecCheck:active { transform: scale(0.9); }
 .ecCheckOn { background: var(--dia-amber); }
 .itemDone .ecTitleText { color: var(--dia-text-tertiary); text-decoration: line-through; }
 
@@ -192,7 +192,7 @@
 .p_gray { background: var(--dia-text-tertiary); } .c_gray { background: color-mix(in srgb, var(--dia-text-tertiary) 16%, transparent); }
 
 .addRow { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px dashed var(--dia-border-strong); border-radius: var(--dia-radius-lg); padding: 11px; font-size: var(--dia-text-sm); font-weight: 800; color: var(--dia-blue-text); margin-top: 4px; }
-.addRow:active { transform: scale(0.99); background: var(--dia-surface-hover); }
+.addRow:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 
 /* 목록 보기 */
 .list { display: flex; flex-direction: column; gap: 4px; }
@@ -214,7 +214,7 @@
   box-shadow: 0 8px 22px rgba(37, 99, 235, 0.5);
   z-index: var(--dia-layer-dropdown);
 }
-.fab:active { transform: scale(0.92); }
+.fab:active { transform: scale(0.9); }
 @media (max-width: 600px) { .fab { right: 20px; } }
 
 /* 등록 바텀시트 */
@@ -292,7 +292,7 @@
 /* 반복 일정 */
 .repeatRow { display: flex; gap: 6px; }
 .rep, .repOn { flex: 1; text-align: center; padding: 9px 6px; border-radius: var(--dia-radius-md); border: 1.5px solid var(--dia-border-strong); background: var(--dia-bg); color: var(--dia-text-secondary); font-size: var(--dia-text-sm); font-weight: 700; }
-.rep:active, .repOn:active { transform: scale(0.96); }
+.rep:active, .repOn:active { transform: scale(0.95); }
 .repOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
 .repHint { margin: 6px 0 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
 .repMark { flex-shrink: 0; color: var(--dia-text-tertiary); margin-left: 4px; }

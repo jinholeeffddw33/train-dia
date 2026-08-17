@@ -370,7 +370,7 @@
   transition: background var(--dia-transition-fast);
 }
 
-.readStatusHeader:active { background: var(--dia-surface-hover); transform: scale(0.99); }
+.readStatusHeader:active { background: var(--dia-surface-hover); transform: scale(0.98); }
 .readStatusHeader:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
 
 .readStatusHeaderLabel {
@@ -632,7 +632,7 @@
   box-shadow: none;
 }
 
-.sendBtn:active:not(:disabled) { transform: scale(0.92); opacity: 0.9; }
+.sendBtn:active:not(:disabled) { transform: scale(0.9); opacity: 0.9; }
 
 /* ── Form ── */
 .formWrap {
@@ -770,7 +770,7 @@
   cursor: pointer;
 }
 
-.attachmentRemove:active { transform: scale(0.96); }
+.attachmentRemove:active { transform: scale(0.95); }
 
 .fieldGroup {
   display: flex;
@@ -811,7 +811,7 @@
   transition: transform var(--dia-dur-fast) ease;
 }
 
-.kindBtn:active { transform: scale(0.96); }
+.kindBtn:active { transform: scale(0.95); }
 
 .kindBtnIcon {
   display: inline-flex;
@@ -1471,7 +1471,7 @@
 }
 
 .noticeFileLink:active {
-  transform: scale(0.97);
+  transform: scale(0.98);
   opacity: 0.85;
 }
 
@@ -1740,7 +1740,7 @@
   font-weight: var(--dia-weight-semibold);
   text-decoration: none;
 }
-.lightboxDownloadBtn:active { transform: scale(0.97); }
+.lightboxDownloadBtn:active { transform: scale(0.98); }
 
 .readersList {
   margin: 0 var(--dia-space-4);

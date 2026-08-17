@@ -15,7 +15,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease, border-color var(--dia-dur-base) ease;
 }
-.pill:active { transform: scale(0.96); }
+.pill:active { transform: scale(0.95); }
 .pill:focus-visible { outline: 2px solid var(--dia-amber); outline-offset: 2px; }
 
 .pillDone {
@@ -39,7 +39,7 @@
   transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
 }
 .pill:active .icon {
-  transform: translateY(1px) scale(0.94);
+  transform: translateY(1px) scale(0.9);
   box-shadow: var(--dia-3d-pressed);
 }
 .pillDone .icon {

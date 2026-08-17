@@ -61,4 +61,16 @@ npm run --silent check:text-size:staged || {
   exit 1
 }
 
+echo "[pre-commit] check:ai-rules (staged — 변경 라인만)"
+npm run --silent check:ai-rules:staged || {
+  echo ""
+  echo "❌ pre-commit blocked: CLAUDE.md §1 P0 위반 (check-ai-rules)."
+  echo "   F1 inline style / F2 as any / F3 <button> type 누락 / F4 alert() /"
+  echo "   F5 포커스 표시 부재 / F6 body 스크롤 직접 잠금."
+  echo "   F6 은 중첩 오버레이에서 화면이 영구히 잠기던 사고 방지 —"
+  echo "   acquireScrollLock/releaseScrollLock(@/lib/overlay/scrollLockManager) 또는 useModalA11y 사용."
+  echo "   의도된 예외는 직전 줄 // STYLE-EXCEPTION / A11Y-EXCEPTION / ALERT-EXCEPTION 주석."
+  exit 1
+}
+
 echo "✅ pre-commit passed."

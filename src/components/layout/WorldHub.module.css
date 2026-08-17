@@ -388,7 +388,7 @@
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
   overflow: hidden;
 }
-.crossCard:active { transform: scale(0.97); }
+.crossCard:active { transform: scale(0.98); }
 .crossTop { display: flex; align-items: center; gap: 6px; padding: 9px 14px 7px; color: #fff; }
 .crossText { font-size: var(--dia-text-sm); font-weight: 800; letter-spacing: -0.2px; white-space: nowrap; }
 .crossGo {

@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "train-dia rule registry — machine-readable SSOT. ZINOSB 시스템 이식본(2026-06-23). AI는 작업 전 이 파일을 먼저 읽고 도메인/파일패턴→문서 매핑을 자동 결정. CLAUDE.md는 이 registry의 bootstrap. 이식 명세: docs/ZINOSB_SYSTEM_PORT.md",
   "lastUpdated": "2026-08-09",
   "verificationCommands": {
@@ -21,7 +21,14 @@
         "src/**/*.module.css",
         "src/components/**/*.tsx"
       ],
-      "verification": ["check:surface-3d:changed", "check:theme-override:changed", "check:hover", "check:safearea", "check:token-refs", "check:zlayer"]
+      "verification": [
+        "check:surface-3d:changed",
+        "check:theme-override:changed",
+        "check:hover",
+        "check:safearea",
+        "check:token-refs",
+        "check:zlayer"
+      ]
     },
     "design-system": {
       "description": "토큰 SSOT(--dia-*, 이식된 --z-* 버튼4법/글래스), 색상, 간격, 폰트",
@@ -33,7 +40,12 @@
         "src/**/*.module.css",
         "src/styles/**/*.css"
       ],
-      "verification": ["check:surface-3d:changed", "check:card-rhythm:changed", "check:bleed", "check:zlayer"]
+      "verification": [
+        "check:surface-3d:changed",
+        "check:card-rhythm:changed",
+        "check:bleed",
+        "check:zlayer"
+      ]
     },
     "mobile-integrity": {
       "description": "모바일 무결성 — 320~430 폭, safe-area, 터치 44px, 다크/라이트 양면",
@@ -45,7 +57,9 @@
         "src/**/*.tsx",
         "src/**/*.module.css"
       ],
-      "verification": ["check:hover"]
+      "verification": [
+        "check:hover"
+      ]
     },
     "quality": {
       "description": "테스트/검증/quality gate/hook",
@@ -57,7 +71,10 @@
         "scripts/check-*.cjs",
         ".githooks/**"
       ],
-      "verification": ["check:hooks", "check:quality-gates"]
+      "verification": [
+        "check:hooks",
+        "check:quality-gates"
+      ]
     },
     "api": {
       "description": "API 라우트 — 응답 봉투, zod 검증, 에러 로깅 마스킹",
@@ -69,7 +86,10 @@
         "src/app/api/**/*.ts",
         "src/lib/api/**/*.ts"
       ],
-      "verification": ["check:envelope", "typecheck"]
+      "verification": [
+        "check:envelope",
+        "typecheck"
+      ]
     },
     "domain-data": {
       "description": "열차번호/행로/교번/교대자/스케줄 — train 도메인 데이터 규칙",
@@ -82,94 +102,155 @@
         "scripts/*.js",
         "supabase/migrations/**/*.sql"
       ],
-      "verification": ["typecheck"]
+      "verification": [
+        "typecheck"
+      ]
     }
   },
   "ruleIds": {
     "UI-SURFACE-3D-001": {
       "description": "칩/버튼/카드/세그먼트는 입체 표면 — 평면 단색 채움(AP2)·테두리만 색칠한 hollow outline(AP1) 금지. 다크=리퀴드 글래스(raised), 라이트=클린 뉴모피즘. 정답=--z-card-fill/--z-seg-*/--z-3d-* 또는 .z-glass-surface/.z-segment(ZINOSB 버튼4법 이식됨). 변경 라인만 fail, SURFACE-EXCEPTION 면제.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.module.css"],
-      "exceptions": ["클래스 직전 줄 /* SURFACE-EXCEPTION: 사유 */", "읽기전용 배지/점/바/구분선/토글 손잡이", "기존 평면 칩 점진 마이그레이션(변경 전까지 통과)"],
+      "scope": [
+        "src/**/*.module.css"
+      ],
+      "exceptions": [
+        "클래스 직전 줄 /* SURFACE-EXCEPTION: 사유 */",
+        "읽기전용 배지/점/바/구분선/토글 손잡이",
+        "기존 평면 칩 점진 마이그레이션(변경 전까지 통과)"
+      ],
       "autoCheck": "scripts/check-surface-3d.mjs (check:surface-3d)",
       "severity": "fail"
     },
     "CSS-THEME-OVERRIDE-001": {
       "description": "테마 오버라이드는 background-color 로 다크 gradient/이미지를 못 지운다. 베이스가 background:(shorthand)/background-image: 로 gradient/url 을 깔았으면 반대 테마(:root.light / [data-theme=light]) 오버라이드도 background:(shorthand) 로 이미지째 교체하거나 테마 토큰 사용. 변경 라인만 FAIL, THEME-EXCEPTION 면제.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.module.css", "src/app/globals.css"],
-      "exceptions": ["레거시(변경 전까지 보호)", "규칙 직전 줄 /* THEME-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.module.css",
+        "src/app/globals.css"
+      ],
+      "exceptions": [
+        "레거시(변경 전까지 보호)",
+        "규칙 직전 줄 /* THEME-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-theme-override.mjs (check:theme-override)",
       "severity": "fail"
     },
     "UI-RHYTHM-001": {
       "description": "카드/섹션 리듬 토큰 권장(WARN) — 카드 리스트/그리드 컨테이너 gap 은 var(--dia-space-3)(12, 카드)/var(--dia-space-6)(24, 섹션) 또는 --dia-space-* 스케일. 1~3px 타이트 그리드 제외. 변경 라인만, RHYTHM-EXCEPTION 면제.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.module.css"],
-      "exceptions": ["1~3px 타이트 그리드", "컨테이너 이름 아님", "규칙 직전 줄 /* RHYTHM-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.module.css"
+      ],
+      "exceptions": [
+        "1~3px 타이트 그리드",
+        "컨테이너 이름 아님",
+        "규칙 직전 줄 /* RHYTHM-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-card-rhythm.mjs (check:card-rhythm)",
       "severity": "warn"
     },
     "UI-TEXT-SIZE-001": {
       "description": "텍스트 하한 + 글자 설정 우회 방지 — font-size 13px 미만 raw px 는 FAIL(50-60대 가독 하한). 13px 이상 raw px 는 WARN(font-small/large/xlarge 설정을 우회 → var(--dia-text-*) 토큰). 버튼성 셀렉터 min-height<40px 는 WARN(터치 44px 권장). 변경 라인만, TEXT-EXCEPTION 면제, components/dev 제외.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.module.css", "src/app/globals.css"],
-      "exceptions": ["직전 줄 /* TEXT-EXCEPTION: 사유 */ (장식/dev 전용만)", "components/dev/** 자동 제외"],
+      "scope": [
+        "src/**/*.module.css",
+        "src/app/globals.css"
+      ],
+      "exceptions": [
+        "직전 줄 /* TEXT-EXCEPTION: 사유 */ (장식/dev 전용만)",
+        "components/dev/** 자동 제외"
+      ],
       "autoCheck": "scripts/check-text-size.mjs (check:text-size)",
       "severity": "fail"
     },
     "CSS-HOVER-001": {
       "description": "터치 우선 앱 — raw :hover 금지. :hover 는 @media (hover: hover) 로 감싸거나 제거(터치 sticky hover 방지). 자동 변환 scripts/wrap-hover-media.cjs.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css", "src/**/*.module.css"],
-      "exceptions": ["@media (hover: hover) 가드 내부", "premium-fake-glass.css(이미 가드됨)"],
+      "scope": [
+        "src/**/*.css",
+        "src/**/*.module.css"
+      ],
+      "exceptions": [
+        "@media (hover: hover) 가드 내부",
+        "premium-fake-glass.css(이미 가드됨)"
+      ],
       "autoCheck": "scripts/check-no-raw-hover.cjs (check:hover)",
       "severity": "fail"
     },
     "API-ENVELOPE-001": {
       "description": "API 라우트 응답은 봉투 SSOT(src/lib/api/response.ts) 경유 — raw NextResponse.json 직접 호출 금지. errorResponse/okJson/internalError/parseBody 사용. ★새 모양을 발명하지 않았다: 실측상 에러는 이미 {code:'UPPER_SNAKE', message:'한국어'} 로 123건 통일돼 있어 errorResponse 가 바이트 단위로 같은 모양을 낸다(전환해도 프론트가 안 깨짐). 성공 모양은 바꾸지 않는다 — 봉투를 씌우면 그 API 를 읽는 화면이 조용히 빈다. 기존 323건은 baseline 등록, 신규 유입만 FAIL, stale 도 FAIL. 전환은 한 커밋 = 한 API + 그 소비처 전부.",
       "canonical": "docs/rules/api/response-envelope.md",
-      "scope": ["src/app/api/**/*.ts"],
-      "exceptions": ["docs/ops/api-envelope-baseline.json 에 등록된 기존 잔량"],
+      "scope": [
+        "src/app/api/**/*.ts"
+      ],
+      "exceptions": [
+        "docs/ops/api-envelope-baseline.json 에 등록된 기존 잔량"
+      ],
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) — baseline 래칫",
       "severity": "fail"
     },
     "API-ZOD-001": {
       "description": "요청 본문/쿼리 검증은 zod 스키마로 — parseBody(req, Schema) / parseQuery(url, Schema). 손으로 필드를 하나씩 검사하지 않는다(타입도 안 보고 메시지도 뭉뚱그린다). await req.json() 을 try/catch 없이 쓰면 잘못된 JSON 에 500 스택이 노출된다. 실패 메시지는 어떤 필드인지 사람 말로 알려주되 zod 원문 이슈나 필드 목록 전체를 흘리지 않는다.",
       "canonical": "docs/rules/api/response-envelope.md",
-      "scope": ["src/app/api/**/*.ts"],
-      "exceptions": ["baseline 미전환 라우트(전환 시점에 함께 적용)"],
+      "scope": [
+        "src/app/api/**/*.ts"
+      ],
+      "exceptions": [
+        "baseline 미전환 라우트(전환 시점에 함께 적용)"
+      ],
       "autoCheck": "scripts/check-response-envelope.mjs (check:envelope) 와 baseline 공유",
       "severity": "fail"
     },
     "STORE-PERSIST-001": {
       "description": "저장 키와 버전은 계약이다 — persist name 을 바꾸면 기존 저장분을 못 찾아 전 사용자 데이터가 조용히 사라진다(서버 백업 없음). version 을 올리면 migrate 를 함께 넣는다 — zustand persist 는 버전이 다르고 migrate 가 없으면 저장분을 버린다. 키 14개와 version 값을 persistence-contract.test.ts 가 고정한다. 부채: bonsai(v2)/shortcuts(v1)는 migrate 없이 version 이 올라간 상태 — 다음 bump 때 반드시 넣을 것. 스토리지가 예외를 던져도(사파리 프라이빗/용량초과) store import 가 실패하면 안 된다.",
       "canonical": "docs/rules/data/persistence.md",
-      "scope": ["src/stores/**/*.ts"],
-      "exceptions": ["마이그레이션을 함께 넣는 의도적 변경 — CONTRACT 표도 같이 갱신"],
+      "scope": [
+        "src/stores/**/*.ts"
+      ],
+      "exceptions": [
+        "마이그레이션을 함께 넣는 의도적 변경 — CONTRACT 표도 같이 갱신"
+      ],
       "autoCheck": "src/stores/__tests__/persistence-contract.test.ts (npm test) — 32건",
       "severity": "fail"
     },
     "UI-SHEET-HEIGHT-001": {
       "description": "시트/모달 max-height 는 --dia-sheet-h-full / --dia-sheet-h-compact 만 — 노치·다이내믹 아일랜드를 절대 가리지 않는다. full = calc(100dvh - var(--sat) - 44px). ★실측 2026-08-09: 시트 높이가 80~98vh 로 흩어져 있었고 전부 safe-area 미고려였다. 96vh 는 852px 화면에서 상단에 32px 만 남기는데 다이내믹 아일랜드는 59px 을 요구한다 → 가려졌다(98vh 는 17px 로 더 심함). 토큰 적용 후 --sat 59px 기준 상단 여백 103px 확보. 호출부에서 calc(100dvh - env(...)) 를 손으로 적지 말 것 — Android env() 거짓보고 대응이 --sat 에만 있다. 90vh 미만은 이미 노치 아래라 미이관(일괄 치환 금지).",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.module.css"],
-      "exceptions": ["90vh 미만 기존 시트", "이미지/내부 스크롤 영역의 max-height(시트가 아님)"],
+      "scope": [
+        "src/**/*.module.css"
+      ],
+      "exceptions": [
+        "90vh 미만 기존 시트",
+        "이미지/내부 스크롤 영역의 max-height(시트가 아님)"
+      ],
       "autoCheck": "미도입 — 신규 시트가 늘면 raw vh 금지 가드 신설 검토",
       "severity": "warn"
     },
     "UI-MOTION-001": {
       "description": "transition 의 duration/easing 은 토큰 경유 — duration 5단계(instant 0.1 / fast 0.12 / base 0.15 / slow 0.2 / slower 0.3), easing 5종(--dia-ease/-out/-in/-press/-spring). raw cubic-bezier 금지. ★실측 2026-08-09: duration 이 22종 334개 값으로 흩어져 있었고 기존 --dia-transition-* 3종(150/250/350ms)은 사용 0회였다 — 정의만 있고 실사용 지배값(0.12s 97건)과 안 맞아 아무도 안 썼다. 그래서 토큰을 실사용값에 맞췄다(반대가 아니라). animation duration 은 루프/장식이라 대상 아님. 이관 334 → 잔여 27건(92% 감소), 나머지 baseline.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css"],
-      "exceptions": ["animation duration", "prefers-reduced-motion 오버라이드(0.01ms)", "tokens.css 정의부", "직전 줄 /* MOTION-EXCEPTION: 사유 */", "docs/ops/motion-baseline.json 등록분"],
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "animation duration",
+        "prefers-reduced-motion 오버라이드(0.01ms)",
+        "tokens.css 정의부",
+        "직전 줄 /* MOTION-EXCEPTION: 사유 */",
+        "docs/ops/motion-baseline.json 등록분"
+      ],
       "autoCheck": "scripts/check-motion.mjs (check:motion) — baseline 래칫",
       "severity": "fail"
     },
     "UI-TOAST-001": {
       "description": "토스트 상태는 src/stores/toast.ts 가 SSOT — components/common/Toast.tsx 는 그리기만. 호출은 showToast(text, type) 하나. ★이전 구현은 모듈 레벨 가변 싱글턴(let addToastFn = null)이라 컨테이너가 마운트되기 전이나 재마운트 사이에 부른 토스트가 조용히 사라졌다(초기 로드 중 에러 알림이 증발하던 경로). store 는 컴포넌트 생명주기 밖이라 그 창이 없다. 같은 문구 연타는 억제하고 최대 3개까지만 쌓으며 3초 후 자동 소멸.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/stores/toast.ts", "src/components/common/Toast.tsx", "src/**/*.tsx"],
+      "scope": [
+        "src/stores/toast.ts",
+        "src/components/common/Toast.tsx",
+        "src/**/*.tsx"
+      ],
       "exceptions": [],
       "autoCheck": "src/stores/__tests__/toast-store.test.ts (npm test) — 회귀 테스트 9건",
       "severity": "fail"
@@ -177,74 +258,220 @@
     "UI-HAPTIC-001": {
       "description": "햅틱은 src/lib/haptic.ts SSOT 만 — navigator.vibrate 직접 호출 금지. hapticLight/Medium/Success/Warning/Error. feature detect 우선(canVibrate 로 먼저 묻고 미지원이면 아예 안 부른다 — try/catch 로 예외를 삼키는 것과 다르다). train-dia 는 PWA 라 iOS Safari 미지원이므로 없어도 동작에 지장 0 이어야 한다. prefers-reduced-motion 이면 진동도 안 한다. ★중복 발화 금지 — success/error/warning 토스트는 store 가 햅틱을 자동 발화하므로 호출부에서 또 부르면 두 번 울린다. 개별 버튼 703곳 배선은 다음 세션 후보(실측 커버리지 3.5%).",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/lib/haptic.ts", "src/**/*.ts", "src/**/*.tsx"],
-      "exceptions": ["features/life/games/useGameFeedback.ts — 게임 전용 사운드+진동 토글 UI 를 자체로 가짐"],
+      "scope": [
+        "src/lib/haptic.ts",
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "features/life/games/useGameFeedback.ts — 게임 전용 사운드+진동 토글 UI 를 자체로 가짐"
+      ],
       "autoCheck": "미도입 — 배선이 늘면 raw navigator.vibrate 금지 가드 신설 검토",
       "severity": "warn"
     },
     "UI-BLEED-001": {
       "description": "풀블리드 탈출은 게터 토큰으로만 — 게터를 넘어 화면 끝까지 빼는 음수 가로 마진은 calc(-1 * var(--dia-page-pad)). raw px 나 --dia-space-* 직접 사용 금지(게터 값이 바뀌면 같이 안 움직인다). 판정은 좌우 대칭 + 게터 크기(16px) 이상일 때만 — -1px(srOnly)/-8px(아이콘 정렬)/-150px(센터링)은 광학 보정이라 대상 아님. 유틸 .diaBleed/.diaBleedInset/.diaScrollRow 를 쓰면 손으로 안 적어도 된다.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css"],
-      "exceptions": ["globals.css 의 .diaBleed* 유틸 정의부", "직전 줄 /* BLEED-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "globals.css 의 .diaBleed* 유틸 정의부",
+        "직전 줄 /* BLEED-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-bleed.mjs (check:bleed) — 전량 스캔",
       "severity": "fail"
     },
     "UI-BLEED-002": {
       "description": "게터 복귀도 정확히 게터만큼 — 블리드한 규칙의 가로 복귀 패딩은 var(--dia-page-pad) 또는 0 하나. calc(게터 + 무언가) 금지, 더 들여쓰려면 자식 요소에 준다. ★이 룰이 001 과 따로 있는 이유: ZINOSB 에서 게터 16 vs 복귀 28 이 3개월 생존했는데 탈출(margin)만 검사하던 가드가 '위반 0건'을 냈다. margin 이 정답이면 복귀가 28px 이어도 통과였기 때문.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css"],
-      "exceptions": ["globals.css 의 .diaBleed* 유틸 정의부", "직전 줄 /* BLEED-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "globals.css 의 .diaBleed* 유틸 정의부",
+        "직전 줄 /* BLEED-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-bleed.mjs (check:bleed) — 전량 스캔",
       "severity": "fail"
     },
     "UI-ZLAYER-001": {
       "description": "레이어급 z-index(10 이상)는 raw 숫자 금지 — var(--dia-layer-*) 경유. 로컬 스택(-1~9)은 컴포넌트 내부 겹침이라 대상 아님. 숫자가 흩어지면 상하관계를 코드만 보고 판단할 수 없어 새 오버레이마다 '일단 큰 숫자'를 찍게 되고 1000→1100→1305→1310 같은 사다리 아닌 사다리가 자란다. 실측 2026-08-09: raw 24종 135건 중 레이어급 16종 45건, --dia-layer-* 토큰은 정의만 있고 사용 0회. 이관은 값 보존 치환(토큰이 현재 값을 그대로 가짐) — 번호 재배치는 라이브에서 모달이 토스트 뒤로 숨는 사고를 낸다.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css"],
-      "exceptions": ["로컬 스택 -1~9", "토큰 정의 라인", "직전 줄 /* ZLAYER-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "로컬 스택 -1~9",
+        "토큰 정의 라인",
+        "직전 줄 /* ZLAYER-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-zlayer.mjs (check:zlayer) — 전량 스캔",
       "severity": "fail"
     },
     "UI-TOKEN-REF-001": {
       "description": "팬텀 var() 금지 — CSS 커스텀 프로퍼티는 silent fail 이라 미정의 토큰을 폴백 없이 참조하면 그 선언이 계산 시점에 통째로 무효가 되어 조용히 사라진다(에러·경고·빌드실패 없음). 폴백 없는 미정의=FAIL, 폴백 있는 미정의=WARN(주입처가 없으면 항상 폴백값만 보임). 실제 사고: apex .canvasRetryBtn 이 ZINOSB 잔재 --z-3d-lime-* 를 참조해 background/box-shadow 가 죽어 어두운 배경 위 어두운 글자만 남아 버튼이 안 보였음(2026-08-09).",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css", "src/**/*.tsx", "src/**/*.ts"],
-      "exceptions": ["직전 줄 /* TOKEN-REF-EXCEPTION: 사유 */", "JS setProperty / JSX style 인라인 주입(계산된 키 포함)은 정의로 인정"],
+      "scope": [
+        "src/**/*.css",
+        "src/**/*.tsx",
+        "src/**/*.ts"
+      ],
+      "exceptions": [
+        "직전 줄 /* TOKEN-REF-EXCEPTION: 사유 */",
+        "JS setProperty / JSX style 인라인 주입(계산된 키 포함)은 정의로 인정"
+      ],
       "autoCheck": "scripts/check-token-refs.mjs (check:token-refs) — 전량 스캔",
       "severity": "fail"
     },
     "CSS-SAFEAREA-001": {
       "description": "safe-area 는 토큰 경유 — raw env(safe-area-inset-*) 신규 사용 금지, var(--sat/--sab/--sal/--sar) 사용. layout.tsx 가 viewportFit:'cover' + black-translucent 라 콘텐츠가 상태바 뒤까지 올라가 있는데, iOS PWA standalone 의 env()=0 반환 버그가 겹치면 fallback 0px 이 그대로 먹혀 헤더가 노치/다이내믹 아일랜드 밑으로 들어간다. 보정식은 globals.css 의 html.pwa-ios/.pwa-android 한 곳에만 있으므로 raw env() 는 보정을 통째로 우회한다. 정의부만 raw env() 허용.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css", "src/**/*.tsx", "src/**/*.ts"],
-      "exceptions": ["토큰 정의 라인(--sat/--sab/--sal/--sar: env(...))", "직전 줄 /* SAFEAREA-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.css",
+        "src/**/*.tsx",
+        "src/**/*.ts"
+      ],
+      "exceptions": [
+        "토큰 정의 라인(--sat/--sab/--sal/--sar: env(...))",
+        "직전 줄 /* SAFEAREA-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-safearea.mjs (check:safearea) — 전량 스캔",
       "severity": "fail"
     },
     "CSS-VIEWPORT-UNIT-001": {
       "description": "bare 100vh 금지 — iOS 주소창 높이가 포함돼 화면이 잘린다. 바로 다음 줄에 같은 속성의 100dvh 폴백 짝을 둘 것(100vh 를 지우는 게 아니라 100dvh 를 덧붙이는 점진적 향상). 2026-08-09 실측: 폴백 짝 26건은 정상, 단독 5건만 결함이었다.",
       "canonical": "docs/rules/ui/design-system.md",
-      "scope": ["src/**/*.css"],
-      "exceptions": ["인접 줄에 같은 속성의 100dvh 가 있는 폴백 짝", "직전 줄 /* VIEWPORT-EXCEPTION: 사유 */"],
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "인접 줄에 같은 속성의 100dvh 가 있는 폴백 짝",
+        "직전 줄 /* VIEWPORT-EXCEPTION: 사유 */"
+      ],
       "autoCheck": "scripts/check-safearea.mjs (check:safearea) — 전량 스캔",
       "severity": "fail"
     },
     "GIT-SCOPE-001": {
       "description": "광역 git stage 금지 — git add -A/--all/./:/, git commit -a/--all. 다중 대화창 환경에서 다른 세션의 미커밋 변경이 묻히는 사고 방지. 명시적 경로만 stage.",
       "canonical": "docs/ZINOSB_SYSTEM_PORT.md",
-      "scope": ["Bash", "PowerShell"],
-      "exceptions": ["진호 명시 승인 — 명령 끝에 ' # GIT-SCOPE-OVERRIDE'"],
+      "scope": [
+        "Bash",
+        "PowerShell"
+      ],
+      "exceptions": [
+        "진호 명시 승인 — 명령 끝에 ' # GIT-SCOPE-OVERRIDE'"
+      ],
       "autoCheck": ".claude/hooks/pre-git-stage-check.mjs — .claude/settings.json 의 PreToolUse(Bash/PowerShell) 훅으로 등록 완료(2026-08-09). 위반 시 exit 2 로 차단.",
       "severity": "fail"
     },
     "QG-HOOK-001": {
       "description": "pre-commit hook 의무 — core.hooksPath=.githooks 활성 + --no-verify 금지. 비활성 시 commit 금지 → npm run install:hooks 먼저.",
       "canonical": "docs/ZINOSB_SYSTEM_PORT.md",
-      "scope": [".githooks/**", "scripts/install-hooks.mjs", "scripts/ensure-hooks.mjs"],
-      "exceptions": ["진호가 명시적으로 임시 우회를 승인한 경우만"],
+      "scope": [
+        ".githooks/**",
+        "scripts/install-hooks.mjs",
+        "scripts/ensure-hooks.mjs"
+      ],
+      "exceptions": [
+        "진호가 명시적으로 임시 우회를 승인한 경우만"
+      ],
       "autoCheck": "scripts/ensure-hooks.mjs (check:hooks)",
       "severity": "fail"
+    },
+    "UI-SCROLLLOCK-001": {
+      "description": "배경 스크롤 잠금은 lib/overlay/scrollLockManager SSOT 하나만. document.body.style.overflow/position 직접 조작 금지. 실측(2026-08-18) 모달 20곳이 각자 잠그고 있었는데, 겹치면 A→B 순서로 열고 A 를 먼저 닫을 때 배경이 새고, 마지막엔 다 닫혔는데 화면이 영구히 잠긴다. iOS Safari 는 overflow:hidden 만으론 안 막혀 position:fixed + scrollY 복원이 필요한데 그 대응도 SSOT 에만 있다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "lib/overlay/scrollLockManager 자신",
+        "lib/originGuard (되돌리지 않는 영구 차단 — 성격이 다름)",
+        "__tests__ (초기 상태 복원 필요)"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F6 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "UI-A11Y-001": {
+      "description": "<button> 에 type 명시 필수(CLAUDE.md §1.6). 폼 안에서 type 없는 버튼은 submit 으로 동작해 의도치 않게 폼이 제출된다. 여는 태그가 여러 줄에 걸쳐도 5줄 창에서 확인한다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "components/dev/",
+        "__tests__/"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F3 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "UI-A11Y-002": {
+      "description": "outline:none 을 쓰면 다른 방식으로라도 포커스를 보여야 한다(CLAUDE.md §1.6). border-color / box-shadow / :focus-visible 중 하나면 통과 — 텍스트 입력은 사각 outline 대신 border-color 로 표시하는 편이 오히려 권장이다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "직전 줄 /* A11Y-EXCEPTION: 사유 */",
+        "STYLE-EXCEPTION"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F5 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "CSS-INLINE-001": {
+      "description": "style={{ }} 인라인 스타일 금지(CLAUDE.md §1.7). CSS Module 로 옮긴다. 동적 런타임 값(진행바 폭·차트 좌표 등 CSS 로 표현 불가한 것)만 직전 줄 STYLE-EXCEPTION 주석으로 허용.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "직전 줄 // STYLE-EXCEPTION: 사유",
+        "components/dev/",
+        "__tests__/"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F1 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "TS-ANY-001": {
+      "description": "`as any` 금지 — unknown + 타입가드 또는 Zod parse 를 쓴다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "__tests__/"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F2 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "UI-ALERT-001": {
+      "description": "alert() / confirm() 금지(CLAUDE.md §1.5). 브라우저 기본 대화상자는 앱 문맥을 끊고 스타일도 통제 불가 — showToast 또는 인라인 UI/ConfirmDialog 를 쓴다.",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exceptions": [
+        "직전 줄 // ALERT-EXCEPTION: 사유"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs F4 (check:ai-rules)",
+      "severity": "fail"
+    },
+    "UI-PRESS-001": {
+      "description": "press 는 표준 3티어만 — 0.98(카드/대형 서피스) · 0.95(버튼/칩/탭) · 0.9(소형 아이콘). CLAUDE.md §2.6. 한 화면에서 누를 때마다 눌리는 깊이가 다르면 완성도가 깨진다. :active 에 transform 이 있으면 transition 도 필수(없으면 툭 끊긴다).",
+      "canonical": "docs/rules/ui/design-system.md",
+      "scope": [
+        "src/**/*.css"
+      ],
+      "exceptions": [
+        "features/life/games/ (게임은 자체 촉감 설계)",
+        "직전 줄 /* PRESS-EXCEPTION: 사유 */"
+      ],
+      "autoCheck": "scripts/check-ai-rules.mjs W1/W2 (check:ai-rules)",
+      "severity": "warn"
     }
   },
   "decisionQueue": {

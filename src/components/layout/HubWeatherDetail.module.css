@@ -30,8 +30,10 @@
   color: #fff;
   font-size: var(--dia-text-sm);
   font-weight: 700;
+  /* press 에 transition 이 없으면 눌림이 툭 끊긴다 (CLAUDE.md §2.6 — 버튼 티어) */
+  transition: transform var(--dia-dur-fast) var(--dia-ease-press);
 }
-.retryBtn:active { transform: translateY(1px) scale(0.97); }
+.retryBtn:active { transform: translateY(1px) scale(0.98); }
 
 /* ── 섹션 ── */
 .section {

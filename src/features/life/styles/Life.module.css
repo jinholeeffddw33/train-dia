@@ -472,7 +472,7 @@
   pointer-events: none;
 }
 .gameCardApex:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(1px) scale(0.98);
 }
 /* 진한 그라데이션 위 = 아이콘/텍스트 흰색 */
 .gameCardApex .gameCardIcon {

@@ -58,15 +58,15 @@
 .nMeta { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); }
 .starBtn { flex-shrink: 0; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: var(--dia-text-tertiary); }
 .starOn { color: var(--dia-amber); }
-.starBtn:active { transform: scale(0.85); }
+.starBtn:active { transform: scale(0.9); }
 .rowDel { flex-shrink: 0; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--dia-text-tertiary); }
-.rowDel:active { transform: scale(0.85); background: var(--dia-surface-hover); }
+.rowDel:active { transform: scale(0.98); background: var(--dia-surface-hover); }
 
 /* FAB */
 .fab { position: fixed; right: calc(50% - 280px + 20px); bottom: calc(24px + var(--sab));
   width: 52px; height: 52px; border-radius: 50%; background: var(--dia-hero-gradient); color: #fff;
   display: grid; place-items: center; box-shadow: 0 8px 22px rgba(37,99,235,0.5); z-index: var(--dia-layer-dropdown); }
-.fab:active { transform: scale(0.92); }
+.fab:active { transform: scale(0.9); }
 @media (max-width: 600px) { .fab { right: 20px; } }
 
 /* 편집 시트 */
@@ -99,11 +99,11 @@
 /* 음성 입력 */
 .sttRow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
 .mic, .micOn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--dia-border-strong); background: var(--dia-surface); color: var(--dia-text-secondary); font-size: var(--dia-text-sm); font-weight: 700; }
-.mic:active, .micOn:active { transform: scale(0.96); }
+.mic:active, .micOn:active { transform: scale(0.9); }
 .micOn { border-color: var(--dia-red); background: color-mix(in srgb, var(--dia-red) 14%, transparent); color: var(--dia-red); animation: micPulse 1.4s ease-in-out infinite; }
 @keyframes micPulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--dia-red) 45%, transparent); } 50% { box-shadow: 0 0 0 6px transparent; } }
 .sttInterim { flex: 1; min-width: 0; font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* 내용 지우기 */
 .clearBtn { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); font-weight: 700; }
-.clearBtn:active { transform: scale(0.96); background: var(--dia-surface-hover); }
+.clearBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }

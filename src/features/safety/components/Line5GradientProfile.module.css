@@ -21,8 +21,10 @@
   padding: 9px 15px; border: none; background: transparent;
   color: var(--dia-text-secondary); font-size: var(--dia-text-sm); font-weight: 700;
   border-radius: var(--dia-radius-md); cursor: pointer; min-height: 40px;
+  /* press 에 transition 이 없으면 눌림이 툭 끊긴다 (CLAUDE.md §2.6 — 버튼 티어) */
+  transition: transform var(--dia-dur-fast) var(--dia-ease-press);
 }
-.tbtn:active { transform: scale(0.96); }
+.tbtn:active { transform: scale(0.95); }
 .tbtn.on { background: var(--dia-surface); color: var(--dia-purple); box-shadow: var(--dia-shadow-sm); }
 .tbtn:focus-visible { outline: 2px solid var(--dia-purple); outline-offset: 2px; }
 

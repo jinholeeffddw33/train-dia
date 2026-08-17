@@ -123,8 +123,9 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
 
   useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
-  // 핸들 잡고 아래로 드래그 → 닫기. 드래그 중 dim 을 시트 위치에 실시간 동기(끄는 만큼 뒤 화면 밝아짐).
-  const { handleRef, sheetRef } = useSheetDragDismiss({
+  // 핸들 잡고 아래로 드래그 → 닫기. 본문도 맨 위에서 아래로 끌면 닫기(스크롤은 그대로).
+  // 드래그 중 dim 을 시트 위치에 실시간 동기(끄는 만큼 뒤 화면 밝아짐).
+  const { handleRef, sheetRef, bodyRef } = useSheetDragDismiss({
     onDismiss: onClose,
     onDragMove: (dy, h) => {
       const d = dimRef.current;
@@ -182,7 +183,7 @@ export default function Modal({ open, onClose, title, children, footer, headerAc
             </div>
           </div>
         )}
-        <div className={styles.body}>{children}</div>
+        <div ref={bodyRef} className={styles.body}>{children}</div>
         {/* 고정 하단바 — 스크롤 본문(.body) 밖. sticky-in-scroll 이 안드로이드에서 탭을 삼키는 문제 회피. */}
         {footer && <div className={styles.footerBar}>{footer}</div>}
       </div>

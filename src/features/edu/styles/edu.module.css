@@ -3740,6 +3740,19 @@
 .railBotEntryIcon { background: var(--dia-blue-dim); color: var(--dia-blue-text); }
 
 /* ══════════ 레일봇 ══════════ */
+/* 레일봇 전용 루트 — 고정 높이 flex 컬럼이라야 본문(.railBotBody)만 스크롤되고
+   상단바·입력바가 제자리에 고정된다. 공용 .screen(min-height)만으로는 flex:1 이 무효. */
+.railBotScreen {
+  height: 100vh;
+  height: 100dvh;
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .railBotBody {
   flex: 1;
   min-height: 0;
@@ -3833,6 +3846,8 @@
   color: var(--dia-text-primary);
   border-bottom-left-radius: var(--dia-radius-sm);
   box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  /* 답변은 규정 원문이라 길다 — 오른쪽 여백을 줄여 폭을 넓게 쓴다(질문 말풍선은 88% 유지) */
+  max-width: 96%;
 }
 .railBotErr { color: var(--dia-red); }
 

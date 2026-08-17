@@ -133,7 +133,7 @@ export default function RailBot({ onBack }: Props) {
     (s.kind === 'book' && !!s.sectionId);
 
   return (
-    <div className={styles.screen}>
+    <div className={styles.railBotScreen}>
       <div className={styles.topBar}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={22} />

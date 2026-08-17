@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
+import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { startViewTransition } from '@/lib/viewTransition';
 import { ArrowLeft } from 'lucide-react';
 import TabBar, { type TabId } from './TabBar';
@@ -60,12 +61,31 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
       return;
     }
     if (tab === 'line') triggerScroll();
-    // Shared Axis — 탭은 위계가 같고 방향이 없다 → 페이드(fade). 미지원/모션 감소 시 즉시 전환.
+    // Shared Axis — 탭 탭(TabBar 클릭)은 위계가 같고 방향이 없다 → 페이드. 미지원/모션 감소 시 즉시 전환.
     startViewTransition(() => {
       setActiveTab(tab);
       window.scrollTo({ top: 0 });
     }, 'fade');
   }, [triggerScroll, onBack]);
+
+  // ── 가로 스와이프로 인접 탭 이동 (홈 제외 — '홈'은 세계 밖 나가기 액션이라 스와이프 루프 밖) ──
+  // 순서 = TabBar 시각 순서에서 '홈'만 뺀 것. 왼쪽으로 밀기=다음(오른쪽 탭, forward 슬라이드), 반대는 back.
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
+  const goAdjacentTab = useCallback((dir: 'next' | 'prev') => {
+    const order: TabId[] = ['work', 'calendar', 'duty', 'line', 'more'];
+    const idx = order.indexOf(activeTabRef.current);
+    if (idx === -1) return;
+    const nextIdx = dir === 'next' ? idx + 1 : idx - 1;
+    if (nextIdx < 0 || nextIdx >= order.length) return; // 양 끝 — 홈 제외라 여기서 멈춘다(튕김)
+    const target = order[nextIdx];
+    if (target === 'line') triggerScroll();
+    startViewTransition(() => {
+      setActiveTab(target);
+      window.scrollTo({ top: 0 });
+    }, dir === 'next' ? 'forward' : 'back');
+  }, [triggerScroll]);
+  const swipeRef = useSwipeNav({ onSwipe: goAdjacentTab });
 
 
   return (
@@ -87,7 +107,7 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
         </button>
       )}
 
-      <main className={styles.content}>
+      <main ref={swipeRef} className={styles.content}>
         {children(activeTab)}
       </main>
       <TabBar

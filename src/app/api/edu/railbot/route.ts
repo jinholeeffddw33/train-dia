@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ERROR_CODES, errorResponse, okJson } from '@/lib/api/response';
-import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
-import { getTodayStartKST } from '@/lib/visitStats';
 import type { TokenPayload } from '@/lib/jwt';
 
 /**
- * 레일봇 — 규정·교재 근거 검색 답변.
+ * 레일봇 — 규정·교재 근거 검색 답변 (LLM 미사용, 발췌형).
  *
- * 원칙 (안전 자료라 지키지 않으면 안 쓰느니만 못하다)
- *  1) 근거가 없으면 답하지 않는다. 지어내지 않는다.
+ * 왜 LLM 없이:
+ *  - 안전 자료라 "지어냄 0%"가 최우선이다. 원문을 발췌해 보여주면 환각이 원천 불가능하다.
+ *  - 검색·차종 되묻기·긴급 감지는 원래 규칙 기반이라 AI가 필요 없었다.
+ *  - 유일하게 AI가 하던 "문장 요약"만 뺐다. 그 자리는 가장 관련 높은 조문 원문을 정리해 채운다.
+ *
+ * 원칙
+ *  1) 근거를 못 찾으면 답하지 않는다. 지어내지 않는다.
  *  2) 고장조치는 차종(ABB/우진/로템)에 따라 다르다. 차종을 모르면 **먼저 되묻는다**.
  *  3) 지금 벌어지고 있는 상황이면 설명보다 관제보고가 먼저다.
  *  4) 최종 판단은 규정 원문과 관제 지시 — 답변 말미에 항상 붙인다.
  */
 
-const apiKey = (process.env.ANTHROPIC_API_KEY ?? '').trim();
-const anthropic = apiKey ? new Anthropic({ apiKey }) : null;
-
-/** 하루 질문 한도 (사용자당) */
-const DAILY_LIMIT = 30;
 const AUDIT_ACTION = 'railbot_ask';
 
 interface Chunk {
@@ -43,7 +41,6 @@ const INDEX_TTL = 30 * 60 * 1000;
 /**
  * 사고사례(운전정보)는 DB 에 있고 계속 늘어난다 — 정적 인덱스에 넣을 수 없어 따로 읽어 합친다.
  * 규정이 "무엇을 해야 하는가"라면 사고사례는 "안 지켰을 때 무슨 일이 났는가"다.
- * 같은 유형이 반복되는 것을 보여줄 수 있어야 답변이 설득력을 갖는다.
  */
 async function loadCases(): Promise<Chunk[]> {
   if (!serverSupabase) return [];
@@ -61,7 +58,7 @@ async function loadCases(): Promise<Chunk[]> {
       id: `case-${r.id}`,
       title,
       source: `${no} — ${title}`,
-      // 태그를 본문에 얹어 검색어와 걸리게 한다("PSD 미개방" → 승강장안전문·미개방)
+      // 태그를 본문 첫 줄에 얹어 검색어와 걸리게 한다("PSD 미개방" → 승강장안전문·미개방)
       text: `${(r.tags ?? []).join(' ')}\n${r.description}`,
     };
   });
@@ -79,6 +76,39 @@ async function loadIndex(origin: string): Promise<Chunk[]> {
 /** 공백 제거 — 원문 띄어쓰기가 PDF 추출로 뭉개져 있어 단어 매칭이 성립하지 않는다 */
 const squash = (s: string) => s.replace(/\s+/g, '').toLowerCase();
 
+/**
+ * 동의어 사전 — LLM 없이 검색 품질을 올리는 유일한 지렛대.
+ * 기관사가 쓰는 구어/약어를 규정 원문 용어와 이어준다. 자유롭게 확장 가능.
+ * 한 그룹 안의 단어 중 하나라도 질문에 있으면, 나머지를 검색어에 함께 넣는다.
+ */
+const SYNONYMS: string[][] = [
+  ['판토', '팬터', '팬터그래프', 'pantograph'],
+  ['psd', '스크린도어', '승강장안전문', '승강장 안전문'],
+  ['구원', '구원운전', '구원연결', '구원차'],
+  ['제동', '브레이크', '제동장치', '주차제동'],
+  ['mcb', '주차단기'],
+  ['hscb', '고속도차단기'],
+  ['냉방', '에어컨', '공조', '송풍'],
+  ['무전', '무전기', '열차무선', '무선'],
+  ['비상', '비상시', '긴급', '비상제동'],
+  ['입환', '입고', '출고', '기지'],
+  ['역행', '역행불능', '무동력', '출력'],
+  ['전차선', '가선', '급전', '단전'],
+  ['확인운전', '확인 운전', '주의운전'],
+  ['탈선', '차량고장', '고장조치'],
+  ['방송', '안내방송', '차내방송'],
+];
+
+/** 질문에 동의어가 있으면 검색어를 확장한다 */
+function expandQuery(q: string): string {
+  const s = squash(q);
+  const extra: string[] = [];
+  for (const group of SYNONYMS) {
+    if (group.some((t) => s.includes(squash(t)))) extra.push(...group);
+  }
+  return extra.length ? `${q} ${extra.join(' ')}` : q;
+}
+
 /** 질의에서 2~7글자 조각을 뽑는다. 긴 조각일수록 가중치가 크다. */
 function grams(q: string): { g: string; w: number }[] {
   const s = squash(q).replace(/[?!.,·()[\]"'~]/g, '');
@@ -89,7 +119,7 @@ function grams(q: string): { g: string; w: number }[] {
       const g = s.slice(i, i + len);
       if (seen.has(g)) continue;
       seen.add(g);
-      out.push({ g, w: len * len });   // 길이 제곱 가중 — 긴 일치가 훨씬 값지다
+      out.push({ g, w: len * len }); // 길이 제곱 가중 — 긴 일치가 훨씬 값지다
     }
   }
   return out;
@@ -116,9 +146,9 @@ function detectVehicle(q: string): VehicleId | null {
 /** 지금 벌어지고 있는 상황인가 — 설명보다 보고가 먼저다 */
 const URGENT_RE = /지금|방금|현재|막\s*지금|났는데|안되는데|안돼요|어떡|어떻게\s*해|급함|긴급/;
 
-function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, limit = 6): Chunk[] {
-  const gs = grams(question);
-  // 제N조 직접 지목 시 강한 가산
+/** 근거 검색 — 점수와 함께 반환한다(발췌 답변 구성에 점수가 필요) */
+function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, limit = 6): { c: Chunk; score: number }[] {
+  const gs = grams(expandQuery(question));
   const artNum = /제\s*(\d+)\s*조/.exec(question)?.[1];
 
   const scored = chunks.map((c) => {
@@ -130,7 +160,8 @@ function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, li
     if (vehicle) {
       const mine: string = VEHICLES[vehicle].chapterId;
       const others: string[] = (Object.keys(VEHICLES) as VehicleId[])
-        .filter((v) => v !== vehicle).map((v) => VEHICLES[v].chapterId);
+        .filter((v) => v !== vehicle)
+        .map((v) => VEHICLES[v].chapterId);
       if (c.chapterId === mine) score *= 1.6;
       else if (c.chapterId && others.includes(c.chapterId)) score *= 0.15;
     }
@@ -140,34 +171,58 @@ function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, li
   return scored
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
-    .map((s) => s.c);
+    .slice(0, limit);
 }
 
-const SYSTEM = `너는 서울교통공사 5호선 답십리승무사업소 기관사를 돕는 '레일봇'이다.
+/**
+ * 조문/사례 본문을 읽기 좋게 다듬는다 — 발췌만 하고 한 글자도 새로 지어내지 않는다.
+ *  - 조문 앞머리 "제N조(제목)"은 출처에 이미 있으니 제거
+ *  - PDF 추출로 문장 중간에 끊긴 줄바꿈을 이어붙임
+ *  - 항 기호(①②③…)는 줄을 나눠 단계가 보이게
+ */
+function cleanBody(text: string, kind: 'reg' | 'case'): string {
+  let t = text;
+  if (kind === 'reg') t = t.replace(/^제\s*\d+\s*조\s*(\([^)]*\))?\s*/, '');
+  else t = t.replace(/^[^\n]*\n/, ''); // 사례: 첫 줄(태그)은 검색용이라 표시에서 뺀다
+  t = t.replace(/【\/?표】/g, ' '); // PDF 표 영역 마커 — 화면엔 군더더기
+  t = t.replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  t = t.replace(/\s*([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*/g, '\n$1 ');
+  if (t.length > 620) t = `${t.slice(0, 620).trim()} …`;
+  return t.trim();
+}
 
-절대 규칙
-1. 주어진 【근거】 안에 있는 내용만으로 답한다. 근거에 없으면 "제공된 규정·교재에서 근거를 찾지 못했습니다"라고 말하고 추측하지 않는다.
-2. 조치 절차를 안내할 때는 근거에 적힌 순서를 그대로 지킨다. 순서를 바꾸거나 임의로 합치지 않는다.
-3. 답변에 사용한 근거를 반드시 밝힌다. 【근거】 항목의 '출처' 문자열을 그대로 인용한다.
-4. 답변 마지막 줄은 항상: "최종 판단은 규정 원문과 관제 지시를 따르세요."
+/** 검색 결과를 발췌형 답변 문자열로 조립한다 (요약이 아니라 원문 정리) */
+function buildAnswer(scored: { c: Chunk; score: number }[], vehicle: VehicleId | null): string {
+  const top = scored[0];
+  const render = (c: Chunk) =>
+    c.kind === 'case'
+      ? `〔비슷한 사례〕\n${cleanBody(c.text, 'case')}`
+      : `〔${c.source}〕\n${cleanBody(c.text, 'reg')}`;
 
-말투
-- 상대는 50~60대 현직 기관사다. 존대하되 군더더기 없이 짧게.
-- 전문용어는 그대로 쓴다(풀어쓰지 않는다). 열차번호·조문번호·시각은 정확히.
-- 3~6문장 또는 번호 목록. 길게 늘어놓지 않는다.`;
+  const parts: string[] = [];
+  parts.push(vehicle ? `${VEHICLES[vehicle].label} 전동차 기준으로 관련 규정을 찾았어요.` : '관련 규정을 찾았어요.');
+  parts.push(render(top.c));
+
+  // 두 번째 근거가 충분히 관련되면 함께 보여준다
+  const second = scored[1];
+  if (second && second.score >= top.score * 0.45 && second.c.id !== top.c.id) {
+    parts.push(`함께 볼 내용이에요.\n${render(second.c)}`);
+  }
+
+  parts.push('정확한 절차는 아래 ‘근거’를 눌러 원문에서 확인하세요.');
+  parts.push('최종 판단은 규정 원문과 관제 지시를 따르세요.');
+  return parts.join('\n\n');
+}
 
 export async function POST(req: NextRequest) {
   const userOrRes = await requireAuth(req);
   if (userOrRes instanceof NextResponse) return userOrRes;
   const user = userOrRes as TokenPayload;
 
-  if (!anthropic) {
-    return errorResponse('AI_DISABLED', '레일봇이 아직 켜져 있지 않아요. 관리자에게 알려주세요.', 503);
-  }
-
   let body: { question?: string; vehicle?: VehicleId };
-  try { body = await req.json(); } catch {
+  try {
+    body = await req.json();
+  } catch {
     return errorResponse(ERROR_CODES.BAD_REQUEST, '잘못된 요청입니다');
   }
 
@@ -177,19 +232,6 @@ export async function POST(req: NextRequest) {
   }
   if (question.length > 300) {
     return errorResponse(ERROR_CODES.UNPROCESSABLE, '질문이 너무 길어요. 300자 안으로 줄여주세요');
-  }
-
-  // ── 하루 한도 (audit_log 재사용 — 별도 테이블 없이) ──
-  if (serverSupabase) {
-    const { count } = await serverSupabase
-      .from('audit_log')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.sub)
-      .eq('action', AUDIT_ACTION)
-      .gte('created_at', getTodayStartKST());
-    if ((count ?? 0) >= DAILY_LIMIT) {
-      return errorResponse(ERROR_CODES.RATE_LIMITED, `오늘 질문 한도(${DAILY_LIMIT}개)를 다 쓰셨어요. 내일 다시 물어봐 주세요.`);
-    }
   }
 
   // ── 차종 되묻기 — 답하기 전에 ──
@@ -204,7 +246,7 @@ export async function POST(req: NextRequest) {
 
   // ── 근거 검색 ──
   const origin = new URL(req.url).origin;
-  let hits: Chunk[];
+  let hits: { c: Chunk; score: number }[];
   try {
     hits = search(await loadIndex(origin), question, vehicle);
   } catch {
@@ -220,25 +262,7 @@ export async function POST(req: NextRequest) {
   }
 
   const urgent = URGENT_RE.test(question);
-  const evidence = hits
-    .map((c, i) => `[${i + 1}] 출처: ${c.source}\n${c.text.slice(0, 1200)}`)
-    .join('\n\n');
-
-  let answer: string;
-  try {
-    const res = await anthropic.messages.create({
-      model: 'claude-sonnet-5',
-      max_tokens: 1024,
-      system: SYSTEM,
-      messages: [{
-        role: 'user',
-        content: `【질문】\n${question}${vehicle ? `\n(차종: ${VEHICLES[vehicle].label} 전동차)` : ''}\n\n【근거】\n${evidence}`,
-      }],
-    });
-    answer = res.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join('\n').trim();
-  } catch {
-    return errorResponse(ERROR_CODES.UPSTREAM_ERROR, '답변을 만들지 못했어요. 잠시 후 다시 시도해주세요.');
-  }
+  const answer = buildAnswer(hits, vehicle);
 
   await auditLog(user.sub, user.name, AUDIT_ACTION, {
     metadata: { q: question.slice(0, 120), vehicle: vehicle ?? null, hits: hits.length },
@@ -250,7 +274,7 @@ export async function POST(req: NextRequest) {
     urgent,
     vehicle: vehicle ? VEHICLES[vehicle].label : null,
     answer,
-    sources: hits.map((c) => ({
+    sources: hits.map(({ c }) => ({
       label: c.source,
       kind: c.kind,
       regId: c.regId ?? null,

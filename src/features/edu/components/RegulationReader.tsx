@@ -20,7 +20,9 @@ export default function RegulationReader({ regulationId, startArticle, onClose, 
   const r = useRegulationReader(regulationId);
   const { current, status, chunks, chunkIdx } = r;
 
-  useEffect(() => { if (current) onArticleChange?.(current.n); }, [current, onArticleChange]);
+  // 재생 중일 때만 본문을 따라 스크롤한다. 열자마자(idle) 통지하면 보던 자리를 잃고
+  // 무조건 제1조로 튀어 버린다 — 읽기 시작한 조문부터 따라가야 한다.
+  useEffect(() => { if (current && status !== 'idle') onArticleChange?.(current.n); }, [current, status, onArticleChange]);
 
   if (!r.supported) {
     return (
@@ -87,23 +89,14 @@ export default function RegulationReader({ regulationId, startArticle, onClose, 
         </button>
       </div>
 
-      {/* 기기마다 깔린 한국어 음성이 다르고 품질 차이가 크다. 가장 자연스러운 것을
-          기본으로 잡되, 귀에 맞는 게 사람마다 달라 바꿀 수 있게 둔다. */}
-      {r.voices.length > 1 && (
-        <div className={styles.speedRow}>
-          <label className={styles.speedLabel} htmlFor="reader-voice">목소리</label>
-          <select
-            id="reader-voice"
-            className={styles.voiceSelect}
-            value={r.voiceURI ?? ''}
-            onChange={(e) => r.setVoiceURI(e.target.value)}
-          >
-            {r.voices.map((v) => (
-              <option key={v.voiceURI} value={v.voiceURI}>{v.name}</option>
-            ))}
-          </select>
-        </div>
+      {/* 미리 합성한 음성이 있으면 그걸 쓴다 — 안내방송과 같은 목소리다.
+          기기 음성 선택은 이때 의미가 없어 감춘다(못 받으면 자동으로 넘어간다). */}
+      {r.usingRecorded && (
+        <p className={styles.voiceNote}>안내방송과 같은 목소리로 읽어드려요</p>
       )}
+
+      {/* 목소리 선택기는 없앴다 — 기기마다 가장 자연스러운 한국어 음성을 자동으로 고른다.
+          50~60대 사용자에게 "무슨 목소리를 골라야 하나" 묻는 화면은 군더더기다. */}
 
       <div className={styles.speedRow}>
         <span className={styles.speedLabel}>속도</span>

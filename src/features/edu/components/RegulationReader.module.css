@@ -139,6 +139,12 @@
   color: var(--dia-blue-text);
 }
 
+.voiceNote {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+
 .voiceSelect {
   flex: 1 1 0;
   min-width: 0;                /* flex 자식 — 없으면 긴 음성 이름이 줄을 밀어낸다 */

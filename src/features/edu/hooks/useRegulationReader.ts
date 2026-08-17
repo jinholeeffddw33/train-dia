@@ -170,6 +170,20 @@ export function articleToChunks(a: ReaderArticle): Chunk[] {
 
 export type ReaderStatus = 'idle' | 'playing' | 'paused';
 
+/** {id}-audio.json — 조문 번호 → 조각별 MP3 이름(문장 내용의 SHA-1 12자) */
+interface AudioManifest {
+  voice: string;
+  chunks: Record<string, string[]>;
+}
+
+/* 공개 버킷이라 로그인 없이 CDN 에서 바로 받는다 — 지하에서 토큰 갱신을 기다리지 않게. */
+const AUDIO_BASE = `${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''}/storage/v1/object/public/regulation-audio/sunhi`;
+
+/* 모바일은 사용자 탭이 아닌 재생을 막는다. 재생 버튼을 누른 그 순간(제스처 안에서)
+   이 무음 클립을 한 번 재생해 <audio> 엘리먼트를 "언락"해 두면, 이후 조각별
+   MP3 를 이펙트/onended 에서 자동으로 이어 재생할 수 있다(iOS 사파리 필수). */
+const SILENT = 'data:audio/wav;base64,UklGRgQCAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YeABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=';
+
 export function useRegulationReader(regulationId: string) {
   const [articles, setArticles] = useState<ReaderArticle[] | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -179,6 +193,15 @@ export function useRegulationReader(regulationId: string) {
   const [rate, setRate] = useState(1);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceURI, setVoiceURI] = useState<string | null>(null);
+  /* null = 아직 확인 중 · undefined = 이 규정엔 MP3 가 없다(기기 음성으로 읽는다) */
+  const [audioMap, setAudioMap] = useState<AudioManifest | null | undefined>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<(string | null)[]>([]);
+  const unlockedRef = useRef(false);
+  /* 조각이 조용히 멎으면(onended/onend 유실·모바일 재생차단) 다음 조각으로 넘겨
+     낭독이 통째로 멈추는 것을 막는 감시견 타이머. */
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearWatchdog = () => { if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; } };
 
   const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   const chunksRef = useRef<Chunk[]>([]);
@@ -190,7 +213,12 @@ export function useRegulationReader(regulationId: string) {
      구분하지 않으면 정지·건너뛸 때 다음 조각이 한 번 더 튀어 나간다. */
   const genRef = useRef(0);
 
-  useEffect(() => { rateRef.current = rate; }, [rate]);
+  /* 속도는 재생 중에도 즉시 먹혀야 한다. MP3 는 playbackRate 로 음높이를 유지한 채
+     빨라지고, 기기 음성은 다음 조각부터 반영된다(utterance 는 도중에 못 바꾼다). */
+  useEffect(() => {
+    rateRef.current = rate;
+    if (audioRef.current) audioRef.current.playbackRate = rate;
+  }, [rate]);
 
   /* ── 목소리 목록 ──
      getVoices() 는 처음엔 빈 배열을 주고 나중에 voiceschanged 로 채워진다(크롬).
@@ -229,6 +257,19 @@ export function useRegulationReader(regulationId: string) {
     return () => { alive = false; };
   }, [regulationId]);
 
+  /* ── 사람 목소리(미리 합성한 MP3) 목록 ──
+     있으면 이걸 쓰고 없으면 기기 음성으로 읽는다. 안내방송과 같은 Neural 음성이라
+     확연히 자연스럽다. 아직 만들지 않은 규정도 있어서 없는 게 정상인 경우가 있다. */
+  useEffect(() => {
+    let alive = true;
+    setAudioMap(null);
+    fetch(`/data/edu/regulations/${regulationId}-audio.json`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('no audio'))))
+      .then((j: AudioManifest) => { if (alive) setAudioMap(j); })
+      .catch(() => { if (alive) setAudioMap(undefined); });   // undefined = 없음이 확정
+    return () => { alive = false; };
+  }, [regulationId]);
+
   /* ── 화면 잠금 방지 ── */
   const releaseWake = useCallback(() => {
     wakeRef.current?.release().catch(() => {});
@@ -239,19 +280,73 @@ export function useRegulationReader(regulationId: string) {
     try { wakeRef.current = await navigator.wakeLock.request('screen'); } catch { /* 배터리 절약 모드 등 — 낭독은 계속한다 */ }
   }, []);
 
+  /**
+   * 조문 하나의 조각별 MP3 주소. 없으면 그 자리는 null → 기기 음성이 읽는다.
+   *
+   * 조각 개수가 매니페스트와 다르면 통째로 포기한다. 규정을 다시 만들었는데 음성을
+   * 아직 안 만든 경우인데, 어긋난 채로 이어 붙이면 엉뚱한 조문을 읽어 준다 —
+   * 조금 딱딱하게 읽히는 것보다 훨씬 나쁘다.
+   */
+  const urlsFor = useCallback((a: ReaderArticle, chunkCount: number): (string | null)[] => {
+    const hashes = audioMap?.chunks?.[String(a.n)];
+    if (!hashes || hashes.length !== chunkCount) return new Array(chunkCount).fill(null);
+    return hashes.map((h) => `${AUDIO_BASE}/${h}.mp3`);
+  }, [audioMap]);
+
+  const silence = useCallback(() => {
+    clearWatchdog();
+    if (supported) window.speechSynthesis.cancel();
+    const el = audioRef.current;
+    // pause 만 한다. removeAttribute+load 를 부르면 바로 뒤 조각의 play() 가
+    // "interrupted by a new load request" 로 거부돼 조문 경계에서 낭독이 끊긴다.
+    if (el) el.pause();
+  }, [supported]);
+
+  /* 재생 버튼(사용자 제스처) 안에서 <audio> 를 무음으로 한 번 깨워 언락한다.
+     이래야 이후 조각별 MP3 를 이펙트에서 이어 재생할 수 있다(모바일 자동재생 정책). */
+  const unlock = useCallback(() => {
+    if (unlockedRef.current) return;
+    const el = audioRef.current ?? (audioRef.current = new Audio());
+    el.src = SILENT;
+    el.play().then(() => { if (el.src === SILENT) el.pause(); }).catch(() => {});
+    unlockedRef.current = true;
+  }, []);
+
   const stop = useCallback(() => {
     genRef.current += 1;
-    if (supported) window.speechSynthesis.cancel();
+    silence();
     releaseWake();
     setStatus('idle');
     setChunkIdx(0);
-  }, [supported, releaseWake]);
+  }, [silence, releaseWake]);
 
-  /** i 번째 조각부터 끝까지 이어서 읽는다. onend 로 다음 조각을 부르는 사슬. */
+  /** 기기 음성으로 읽는다 — MP3 가 없거나 못 받았을 때의 대비책. */
+  const speakWithTts = useCallback((chunk: Chunk, onDone: () => void) => {
+    if (!supported) { onDone(); return; }
+    const u = new SpeechSynthesisUtterance(chunk.text);
+    u.lang = 'ko-KR';
+    u.rate = rateRef.current;
+    /* 조문 번호·제목은 표제다. 조금 낮고 느리게 읽어야 본문과 구분돼 들린다.
+       안내("표가 있습니다")는 규정이 아니라 앱이 하는 말이라 살짝 높여 구별한다. */
+    if (chunk.kind === 'head') { u.pitch = 0.95; u.rate = rateRef.current * 0.92; }
+    else if (chunk.kind === 'notice') { u.pitch = 1.1; }
+    if (voiceRef.current) u.voice = voiceRef.current;
+    u.onend = onDone;
+    u.onerror = onDone;
+    window.speechSynthesis.speak(u);
+  }, [supported]);
+
+  /**
+   * i 번째 조각부터 끝까지 이어서 읽는다. 끝나면 다음 조각을 부르는 사슬.
+   *
+   * 미리 합성해 둔 MP3 가 있으면 그것부터 쓴다(안내방송과 같은 Neural 음성).
+   * 지하 구간처럼 못 받는 곳에서는 소리가 끊기는 대신 기기 음성으로 이어 읽는다 —
+   * 읽던 자리를 잃지 않는 게 음질보다 중요하다.
+   */
   const speakFrom = useCallback((i: number) => {
-    if (!supported) return;
     const gen = genRef.current;
     const chunks = chunksRef.current;
+    clearWatchdog();
     if (i >= chunks.length) {           // 조문 하나 끝 → 다음 조문
       setArtIdx((prev) => {
         const next = prev + 1;
@@ -261,18 +356,30 @@ export function useRegulationReader(regulationId: string) {
       return;
     }
     setChunkIdx(i);
-    const u = new SpeechSynthesisUtterance(chunks[i].text);
-    u.lang = 'ko-KR';
-    u.rate = rateRef.current;
-    /* 조문 번호·제목은 표제다. 조금 낮고 느리게 읽어야 본문과 구분돼 들린다.
-       안내("표가 있습니다")는 규정이 아니라 앱이 하는 말이라 살짝 높여 구별한다. */
-    if (chunks[i].kind === 'head') { u.pitch = 0.95; u.rate = rateRef.current * 0.92; }
-    else if (chunks[i].kind === 'notice') { u.pitch = 1.1; }
-    if (voiceRef.current) u.voice = voiceRef.current;
-    u.onend = () => { if (gen === genRef.current) speakFrom(i + 1); };
-    u.onerror = () => { if (gen === genRef.current) speakFrom(i + 1); };
-    window.speechSynthesis.speak(u);
-  }, [supported]);
+    const next = () => { clearWatchdog(); if (gen === genRef.current) speakFrom(i + 1); };
+    /* 진행이 멎으면(onended/onend 유실) 스스로 다음 조각으로 넘어간다.
+       조각 길이로 넉넉한 상한을 잡아, 정상 재생은 건드리지 않고 멈춤만 되살린다. */
+    const armWatchdog = () => {
+      clearWatchdog();
+      const ms = (chunks[i].text.length * 140) / rateRef.current + 6000;
+      watchdogRef.current = setTimeout(() => { if (gen === genRef.current) speakFrom(i + 1); }, ms);
+    };
+    const url = audioUrlRef.current[i];
+    if (!url) { armWatchdog(); speakWithTts(chunks[i], next); return; }
+
+    const el = audioRef.current ?? (audioRef.current = new Audio());
+    el.src = url;
+    el.playbackRate = rateRef.current;   // 브라우저가 음높이를 유지한 채 속도만 바꾼다
+    el.onended = next;
+    el.onerror = () => { if (gen === genRef.current) speakWithTts(chunks[i], next); };
+    armWatchdog();
+    el.play().catch(() => { if (gen === genRef.current) speakWithTts(chunks[i], next); });
+
+    /* 다음 조각을 미리 받아 둔다. 조각마다 요청이 나가서 그냥 두면 문장 사이가
+       한 박자씩 끊긴다. 캐시에만 올려 두면 되므로 응답은 버린다. */
+    const ahead = audioUrlRef.current[i + 1];
+    if (ahead) fetch(ahead, { cache: 'force-cache' }).catch(() => {});
+  }, [speakWithTts]);
 
   /* 조문이 바뀌면 그 조문을 처음부터 읽는다. 재생 중일 때만 — 멈춘 상태에서 조문만
      골라 둔 경우까지 소리가 나면 안 된다. */
@@ -281,52 +388,56 @@ export function useRegulationReader(regulationId: string) {
     const a = articles[artIdx];
     if (!a) { stop(); return; }         // 마지막 조문까지 읽었다
     genRef.current += 1;
-    window.speechSynthesis.cancel();
+    silence();
     chunksRef.current = articleToChunks(a);
+    audioUrlRef.current = urlsFor(a, chunksRef.current.length);
     speakFrom(0);
     // artIdx 가 바뀔 때만 새로 시작한다. chunkIdx 는 사슬이 스스로 굴린다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [artIdx, status === 'playing', articles]);
 
   const play = useCallback((startArticle?: number) => {
-    if (!supported || !articles) return;
+    if (!articles) return;
+    unlock();                            // 제스처 안에서 <audio> 언락 (모바일 필수)
     if (startArticle != null) {
       const i = articles.findIndex((a) => a.n === startArticle);
       if (i >= 0) { artIdxRef.current = i; setArtIdx(i); }
     }
     acquireWake();
     setStatus('playing');
-  }, [supported, articles, acquireWake]);
+  }, [articles, acquireWake, unlock]);
 
   const pause = useCallback(() => {
-    if (!supported) return;
-    /* pause() 는 안드로이드 크롬에서 재개가 안 되는 사례가 있다. cancel 하고
-       현재 조각 번호를 붙잡아 뒀다가 거기서 다시 읽는 편이 확실하다. */
+    /* speechSynthesis.pause() 는 안드로이드 크롬에서 재개가 안 되는 사례가 있다.
+       멈추고 현재 조각 번호를 붙잡아 뒀다가 거기서 다시 읽는 편이 확실하다. */
     genRef.current += 1;
-    window.speechSynthesis.cancel();
+    silence();
     releaseWake();
     setStatus('paused');
-  }, [supported, releaseWake]);
+  }, [silence, releaseWake]);
 
   const resume = useCallback(() => {
-    if (!supported) return;
+    unlock();                            // 제스처 안에서 <audio> 언락
     acquireWake();
     setStatus('playing');
     genRef.current += 1;
     speakFrom(chunkIdx);
-  }, [supported, acquireWake, speakFrom, chunkIdx]);
+  }, [acquireWake, speakFrom, chunkIdx, unlock]);
 
   const jump = useCallback((delta: number) => {
     if (!articles) return;
     const next = Math.min(articles.length - 1, Math.max(0, artIdxRef.current + delta));
     artIdxRef.current = next;
     genRef.current += 1;
-    if (supported) window.speechSynthesis.cancel();
+    silence();
     setChunkIdx(0);
     setArtIdx(next);
     /* 멈춘 상태에서 넘기면 그 조문 첫 조각을 준비만 해 둔다 */
-    if (status !== 'playing') chunksRef.current = articleToChunks(articles[next]);
-  }, [articles, supported, status]);
+    if (status !== 'playing') {
+      chunksRef.current = articleToChunks(articles[next]);
+      audioUrlRef.current = urlsFor(articles[next], chunksRef.current.length);
+    }
+  }, [articles, silence, status, urlsFor]);
 
   /* 크롬은 발화가 15초쯤 지나면 조용히 멈춘다(오래된 버그). 조각을 짧게 유지해도
      느린 속도로 들으면 넘길 수 있어서, 재생 중에는 주기적으로 깨워 둔다.
@@ -351,14 +462,21 @@ export function useRegulationReader(regulationId: string) {
 
   useEffect(() => () => {
     genRef.current += 1;
+    clearWatchdog();
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    audioRef.current?.pause();
     wakeRef.current?.release().catch(() => {});
   }, []);
 
   const current = articles?.[artIdx] ?? null;
+  /* 이 규정에 미리 합성한 음성이 있는가. 있으면 기기 음성 선택은 예비용이라
+     화면에서 감춘다 — 고를 필요가 없는데 보이면 뭘 골라야 하나 헷갈린다. */
+  const usingRecorded = !!audioMap && !!current && !!audioMap.chunks[String(current.n)];
   return {
-    supported, articles, loadError, status, rate, setRate,
-    voices, voiceURI, setVoiceURI,
+    /* 미리 합성한 MP3 만 있어도 들을 수 있다 — 기기 음성이 없는 브라우저도 재생된다 */
+    supported: supported || !!audioMap,
+    articles, loadError, status, rate, setRate,
+    voices, voiceURI, setVoiceURI, usingRecorded,
     current, chunks: chunksRef.current, chunkIdx,
     play, pause, resume, stop, jump,
     total: articles?.length ?? 0, index: artIdx,

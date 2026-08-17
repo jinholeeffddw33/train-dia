@@ -1182,8 +1182,9 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         })}
       </div>
 
-      {/* 목차로 빠르게 이동하는 FAB — TOC 카드가 화면 밖으로 나갔을 때 노출 */}
-      {showTocFab && tocEntries.length > 0 && (
+      {/* 목차로 빠르게 이동하는 FAB — TOC 카드가 화면 밖으로 나갔을 때 노출.
+          낭독 패널이 열리면 하단 속도 버튼(1.5배)을 덮어 못 누르게 되므로 숨긴다. */}
+      {showTocFab && tocEntries.length > 0 && !readerOpen && (
         <button
           type="button"
           className={styles.tocFab}

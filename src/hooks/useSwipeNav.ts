@@ -9,6 +9,8 @@ interface SwipeNavOptions {
   threshold?: number;
   /** 화면 좌우 끝 이 폭(px)에서 시작한 제스처는 무시 — iOS/안드로이드 시스템 엣지 제스처 양보. 기본 16 */
   edgeGuard?: number;
+  /** false 면 리스너를 안 붙인다 — 오버레이가 화면을 덮은 동안 뒤 화면이 스와이프되는 것 방지. 기본 true */
+  enabled?: boolean;
 }
 
 /**
@@ -23,12 +25,12 @@ interface SwipeNavOptions {
  *
  * 반환: container 에 부착할 콜백 ref.
  */
-export function useSwipeNav({ onSwipe, threshold = 60, edgeGuard = 16 }: SwipeNavOptions) {
+export function useSwipeNav({ onSwipe, threshold = 60, edgeGuard = 16, enabled = true }: SwipeNavOptions) {
   const onSwipeRef = useRef(onSwipe);
   onSwipeRef.current = onSwipe;
 
   return useCallback((el: HTMLElement | null) => {
-    if (!el) return;
+    if (!el || !enabled) return;
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -82,5 +84,5 @@ export function useSwipeNav({ onSwipe, threshold = 60, edgeGuard = 16 }: SwipeNa
     el.addEventListener('touchcancel', () => { active = false; }, { passive: true, signal });
 
     return () => controller.abort();
-  }, [threshold, edgeGuard]);
+  }, [threshold, edgeGuard, enabled]);
 }

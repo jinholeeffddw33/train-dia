@@ -98,6 +98,12 @@ export default function HomePage() {
     setHomeOverride(target === defaultHome ? null : target);
   }, [defaultHome]);
 
+  // 두 홈(일정관리 office ↔ 월드허브 hub) 전환 — 버튼 탭과 가로 스와이프가 공유.
+  // 공간 배치를 office=왼쪽 / hub=오른쪽 으로 고정 → 목적지가 hub 면 forward(오른쪽으로), office 면 back.
+  const navHome = useCallback((target: 'office' | 'hub') => {
+    startViewTransition(() => goHome(target), target === 'hub' ? 'forward' : 'back');
+  }, [goHome]);
+
   // manifest shortcuts 진입 — ?world=duty&tab=calendar 를 초기 상태로 반영
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -126,8 +132,8 @@ export default function HomePage() {
 
   // 월드 진입 시 히스토리 push → 뒤로가기로 WorldHub 복귀
   useHistoryBack(`world-${world}`, handleBack, world !== null);
-  // 홈 교차(내근직↔월드허브) — 뒤로가기 시 원래 홈으로 복귀(없으면 앱이 튕겨 나감)
-  useHistoryBack('home-override', () => setHomeOverride(null), homeOverride !== null);
+  // 홈 교차(내근직↔월드허브) — 뒤로가기 시 원래 홈으로 복귀(없으면 앱이 튕겨 나감). 전환도 슬라이드로.
+  useHistoryBack('home-override', () => navHome(defaultHome), homeOverride !== null);
 
   return (
     <>
@@ -142,8 +148,8 @@ export default function HomePage() {
         <SettingsOverlay open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         {world === null ? (
           home === 'office'
-            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => goHome('hub')} onOpenSettings={() => setSettingsOpen(true)} />
-            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => goHome('office')} onOpenSettings={() => setSettingsOpen(true)} />
+            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => navHome('hub')} onOpenSettings={() => setSettingsOpen(true)} />
+            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => navHome('office')} onOpenSettings={() => setSettingsOpen(true)} />
         ) : world === 'duty' ? (
           <AppShell onBack={handleBack} initialTab={initialTab}>
             {(activeTab) => <TabContent tab={activeTab} />}

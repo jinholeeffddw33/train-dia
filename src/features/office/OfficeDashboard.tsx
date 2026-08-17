@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
 import { useThemeStore } from '@/stores/theme';
 import { useOfficeStore, isOverdue } from '@/stores/office';
+import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { APP_VERSION } from '@/lib/constants';
 import { COPYRIGHT_NOTICE } from '@/lib/provenance';
 import type { WorldId } from '@/components/layout/WorldHub';
@@ -146,6 +147,13 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
     return () => { document.body.style.overflow = prev; };
   }, [anyOverlay]);
 
+  // 가로 스와이프로 기관사 허브 열기 — 왼쪽으로 밀기('next') = 오른쪽에 있는 hub 로.
+  // 오버레이(일정관리·메모 등)가 떠 있을 땐 비활성(뒤 화면이 스와이프되는 것 방지).
+  const swipeRef = useSwipeNav({
+    enabled: !anyOverlay,
+    onSwipe: (dir) => { if (dir === 'next') onOpenHub?.(); },
+  });
+
   const quickIcons = [
     { key: 'cal',   label: '일정관리',    tone: 'blue',   Icon: CalendarRange, onClick: () => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); } },
     { key: 'todo',  label: '오늘의 할일', tone: 'blue',   Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
@@ -154,7 +162,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   ];
 
   return (
-    <div className={styles.dash} data-overlay={anyOverlay ? '' : undefined}>
+    <div ref={swipeRef} className={styles.dash} data-overlay={anyOverlay ? '' : undefined}>
       {/* ── 인사말(좌) + [아이콘 + 날짜 카드](우) — 시안 배치 ── */}
       <div className={styles.headerRow}>
         <div className={styles.greetBlock}>

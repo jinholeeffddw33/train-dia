@@ -210,13 +210,16 @@ input, textarea, select {
 ::view-transition-old(root) { animation: axis-out-fade 260ms var(--dia-ease-in) both; }
 ::view-transition-new(root) { animation: axis-in-fade 260ms var(--dia-ease-out) both; }
 
-/* ① 다음 단계로 (X축) */
+/* ① 다음으로 (X축) — 스와이프 내비 전용 "진짜 페이저 슬라이드".
+   두 화면이 100% 폭으로 나란히(겹침 0) 함께 미끄러진다: 나가는 쪽 0→-100%, 들어오는 쪽 +100%→0.
+   불투명 유지 + old·new 같은 곡선 → 깜빡임/겹침 없이 옆으로 넘어간다.
+   (open/close/fade 의 어긋난 페이드와 다르다 — 저건 공간관계 없는 전환의 덜컹 방지용.) */
 html[data-vt='forward']::view-transition-old(root) { animation: axis-out 340ms var(--dia-ease) both; }
-html[data-vt='forward']::view-transition-new(root) { animation: axis-in 340ms var(--dia-ease-out) both; }
+html[data-vt='forward']::view-transition-new(root) { animation: axis-in 340ms var(--dia-ease) both; }
 
 /* ② 이전으로 (X축, 방향 반대) */
 html[data-vt='back']::view-transition-old(root) { animation: axis-out-back 340ms var(--dia-ease) both; }
-html[data-vt='back']::view-transition-new(root) { animation: axis-in-back 340ms var(--dia-ease-out) both; }
+html[data-vt='back']::view-transition-new(root) { animation: axis-in-back 340ms var(--dia-ease) both; }
 
 /* ③ 창을 열 때 (Z축 — 위계 안으로) : 새 화면이 위 */
 html[data-vt='open']::view-transition-old(root) { animation: axis-out-z 300ms var(--dia-ease) both; z-index: 1; }
@@ -230,25 +233,22 @@ html[data-vt='close']::view-transition-new(root) { animation: axis-in-z-back 300
 html[data-vt='fade']::view-transition-old(root) { animation: axis-out-fade 260ms var(--dia-ease-in) both; }
 html[data-vt='fade']::view-transition-new(root) { animation: axis-in-fade 260ms var(--dia-ease-out) both; }
 
+/* 페이저 슬라이드 — 불투명 유지, 100% 폭 이동. 두 화면이 딱 붙어 함께 미끄러진다. */
 @keyframes axis-in {
-  0%   { transform: translate3d(5%, 0, 0); opacity: 0; }
-  45%  { opacity: 0; }
-  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  from { transform: translate3d(100%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
 }
 @keyframes axis-out {
-  0%   { transform: translate3d(0, 0, 0); opacity: 1; }
-  35%  { opacity: 0; }
-  100% { transform: translate3d(-5%, 0, 0); opacity: 0; }
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-100%, 0, 0); }
 }
 @keyframes axis-in-back {
-  0%   { transform: translate3d(-5%, 0, 0); opacity: 0; }
-  45%  { opacity: 0; }
-  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  from { transform: translate3d(-100%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
 }
 @keyframes axis-out-back {
-  0%   { transform: translate3d(0, 0, 0); opacity: 1; }
-  35%  { opacity: 0; }
-  100% { transform: translate3d(5%, 0, 0); opacity: 0; }
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(100%, 0, 0); }
 }
 @keyframes axis-in-z {
   0%   { transform: scale(0.94); opacity: 0; }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Star } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
+import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
 import { COPYRIGHT_NOTICE } from '@/lib/provenance';
@@ -82,8 +83,13 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
     window.setTimeout(() => onEnter(worldId), 60);
   }, [onEnter]);
 
+  // 가로 스와이프로 일정관리(office) 열기 — 오른쪽으로 밀기('prev') = 왼쪽에 있는 office 로.
+  const swipeRef = useSwipeNav({
+    onSwipe: (dir) => { if (dir === 'prev') onOpenSchedule?.(); },
+  });
+
   return (
-    <div className={styles.hub}>
+    <div ref={swipeRef} className={styles.hub}>
       {/* ── Header — 인사말(좌) + [아이콘 + 교차 카드](우) — 내근직 대시보드와 동일 배치 ──
            좌상단(인사말)이 아이콘과 같은 높이에서 시작하도록 아이콘을 우측 묶음에 넣는다.
            두 홈의 좌상단이 같은 위치·문구 → 오가도 안 바뀐 느낌. */}

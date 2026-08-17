@@ -24,21 +24,9 @@ export async function GET(req: NextRequest) {
 
   const admin = isAdmin(profile.sabun);
 
-  // 이 기기(서버)에 생체인증 등록 여부 확인
-  let hasBiometric = false;
-  if (admin && serverSupabase) {
-    const { data: creds } = await serverSupabase
-      .from('webauthn_credentials')
-      .select('credential_id')
-      .eq('user_id', profile.id)
-      .limit(1);
-    hasBiometric = (creds?.length ?? 0) > 0;
-  }
-
   return NextResponse.json({
     exists: true,
     isAdmin: admin,
     mustChangePin: admin ? profile.must_change_pin : false,
-    hasBiometric,
   });
 }

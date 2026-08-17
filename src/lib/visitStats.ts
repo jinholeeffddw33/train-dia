@@ -6,6 +6,8 @@
 export const VISIT_ACTIONS = [
   'app_visit',
   'login_pin',
+  // 생체인증은 2026-08-18 에 제거됐지만 **과거 audit_log 에 남아 있는 기록**이라 계속 센다.
+  // 목록에서 빼면 지난 접속 통계가 소급해서 줄어든다(같은 날의 숫자가 어제와 달라진다).
   'login_webauthn',
   'login_name',
   'first_login',

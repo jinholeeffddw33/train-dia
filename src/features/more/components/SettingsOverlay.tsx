@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, UserRoundPen, Bookmark, LogOut, Fingerprint, KeyRound, ShieldCheck, Smartphone, ClipboardList, BarChart3 } from 'lucide-react';
+import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, BarChart3 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -36,8 +36,6 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const driverLogout = useDriverStore((s) => s.logout);
   const authUser = useAuthStore((s) => s.user);
   const authLogout = useAuthStore((s) => s.logout);
-  const hasBiometric = useAuthStore((s) => s.hasBiometric);
-  const registerBiometric = useAuthStore((s) => s.registerBiometric);
   const { size: fontSize, setSize: setFontSize } = useFontSizeStore();
   const { supported: notifSupported, permission: notifPerm, requestPermission } = useNotification();
   const { supported: pushSupported, subscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushSubscription();
@@ -209,15 +207,6 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
             <span className={styles.tileLabel}>홈 화면 추가</span>
           </button>
         )}
-        <button
-          type="button"
-          className={styles.tile}
-          data-press
-          onClick={() => { if (!hasBiometric) registerBiometric(); }}
-        >
-          <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><Fingerprint size={18} /></span>
-          <span className={styles.tileLabel}>{hasBiometric ? '생체인증 ✓' : '생체인증'}</span>
-        </button>
         <button
           type="button"
           className={styles.tile}

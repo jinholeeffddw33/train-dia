@@ -88,17 +88,6 @@ export async function POST(req: NextRequest) {
     role: profile.role,
   }, TOKEN_MAX_AGE_PIN);
 
-  // 생체인증 등록 여부 확인 (관리자만)
-  let hasBiometric = false;
-  if (admin && serverSupabase) {
-    const { data: creds } = await serverSupabase
-      .from('webauthn_credentials')
-      .select('credential_id')
-      .eq('user_id', profile.id)
-      .limit(1);
-    hasBiometric = (creds?.length ?? 0) > 0;
-  }
-
   // 감사 로그
   const auditAction = admin
     ? (profile.must_change_pin ? 'first_login' : 'login_pin')
@@ -117,7 +106,6 @@ export async function POST(req: NextRequest) {
       personId: profile.person_id,
       role: profile.role,
       mustChangePin: admin ? profile.must_change_pin : false,
-      hasBiometric,
     },
   });
 

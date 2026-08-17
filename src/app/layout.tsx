@@ -4,6 +4,7 @@ import './globals.css';
 import DevThemeToggle from '@/components/dev/DevThemeToggle';
 import GlassTapSweep from '@/components/common/GlassTapSweep';
 import ServiceWorkerRegistrar from '@/components/common/ServiceWorkerRegistrar';
+import NativeBridge from '@/components/native/NativeBridge';
 import ToastContainer from '@/components/common/Toast';
 import Provenance from '@/components/common/Provenance';
 import { COPYRIGHT_NOTICE, COPYRIGHT_OWNER, WATERMARK } from '@/lib/provenance';
@@ -87,6 +88,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Provenance />
         {children}
         <ServiceWorkerRegistrar />
+        {/* 네이티브 셸 배선(스플래시·뒤로가기·상태바·키보드) — 브라우저/PWA 에서는 no-op */}
+        <NativeBridge />
         <GlassTapSweep />
         <DevThemeToggle />
         {/* 전역 토스트 — AppShell(근무 월드) 밖 안전/생활/대기 월드에서도 showToast 동작 */}

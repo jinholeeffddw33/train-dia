@@ -7,10 +7,16 @@
  * 실측(2026-08-09): onClick 703건 · <button> 647건 인데 햅틱은 13건/4파일 = **3.5%**.
  *   전부 게임 안에만 있었고 SSOT 도 없었다.
  *
- * ⚠️ train-dia 는 PWA 라 `navigator.vibrate` 만 쓸 수 있고 **iOS Safari 는 미지원**이다.
+ * ⚠️ 웹(브라우저·PWA)에서는 `navigator.vibrate` 만 쓸 수 있고 **iOS Safari 는 미지원**이다.
  *   그래서 설계 원칙은 "없어도 동작에 지장 0" — 지원 여부를 **feature detect 로 먼저 확인**하고
  *   미지원이면 조용히 no-op 한다(try/catch 로 예외를 삼키는 방식이 아니다. 예외 처리는
  *   "실패했지만 일단 호출은 했다"는 뜻이고, 여기 필요한 건 "지원 안 하면 아예 안 부른다"이다).
+ *
+ * ★ 네이티브 앱(2026-08-18 추가) — Capacitor Haptics 로 간다.
+ *   웹 진동은 "몇 ms 를 떨어라"는 저수준 명령이라 iOS 에는 아예 없지만, 네이티브 API 는
+ *   **의미**(가벼운 탭 / 성공 / 실패)를 받아 OS 가 기종에 맞는 촉감으로 번역해 준다.
+ *   그래서 iOS 에서도 비로소 햅틱이 생기고, 안드로이드에서도 기계적 진동 대신 시스템 촉감이 된다.
+ *   패턴 배열(PATTERNS)은 웹 폴백 전용으로 남는다.
  *
  * ⚠️ 개별 버튼 703곳 배선은 이번 세션 범위 밖(진호 결정 2026-08-09).
  *   대신 **토스트가 자동 발화**하므로 성공/실패/경고 피드백은 배선 0으로 커버된다.
@@ -19,7 +25,10 @@
  * 관련 룰: docs/rules/ui/design-system.md UI-HAPTIC-001
  */
 
-/** 의미 단위 패턴 (ms). 배열 = [진동, 정지, 진동, ...] */
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics'
+import { isNativeApp } from '@/lib/native/platform'
+
+/** 의미 단위 패턴 (ms) — **웹 폴백 전용**. 배열 = [진동, 정지, 진동, ...] */
 const PATTERNS = {
   /** 가벼운 탭 — 탭 전환, 토글, 칩 선택 */
   light: 10,
@@ -36,10 +45,12 @@ const PATTERNS = {
 type HapticKind = keyof typeof PATTERNS
 
 /**
- * 이 환경에서 진동이 가능한가 — **호출 전에 먼저 묻는다**.
- * iOS Safari 는 navigator.vibrate 자체가 없어 여기서 false 가 되고 아무 일도 일어나지 않는다.
+ * 이 환경에서 촉각 피드백이 가능한가 — **호출 전에 먼저 묻는다**.
+ * 네이티브 앱이면 항상 가능(OS 가 담당). 웹은 navigator.vibrate 유무로 판정하며,
+ * iOS Safari 는 그게 없어 false 가 되고 아무 일도 일어나지 않는다.
  */
 export function canVibrate(): boolean {
+  if (isNativeApp()) return true
   return (
     typeof navigator !== 'undefined' &&
     typeof navigator.vibrate === 'function'
@@ -59,10 +70,35 @@ function prefersReducedMotion(): boolean {
   )
 }
 
+/** 의미 → 네이티브 촉감 매핑. impact = 물리적 탭, notification = 결과 알림. */
+function fireNative(kind: HapticKind): void {
+  switch (kind) {
+    case 'light':
+      Haptics.impact({ style: ImpactStyle.Light }).catch(() => {})
+      break
+    case 'medium':
+      Haptics.impact({ style: ImpactStyle.Medium }).catch(() => {})
+      break
+    case 'success':
+      Haptics.notification({ type: NotificationType.Success }).catch(() => {})
+      break
+    case 'warning':
+      Haptics.notification({ type: NotificationType.Warning }).catch(() => {})
+      break
+    case 'error':
+      Haptics.notification({ type: NotificationType.Error }).catch(() => {})
+      break
+  }
+}
+
 /** 내부 공용 — 지원/정책 확인 후에만 실제로 호출한다. */
 function fire(kind: HapticKind): void {
-  if (!canVibrate()) return
   if (prefersReducedMotion()) return
+  if (isNativeApp()) {
+    fireNative(kind)
+    return
+  }
+  if (!canVibrate()) return
   navigator.vibrate(PATTERNS[kind] as number | number[])
 }
 
@@ -77,8 +113,13 @@ export const hapticWarning = () => fire('warning')
 /** 실패 — 토스트가 자동 발화 */
 export const hapticError = () => fire('error')
 
-/** 진행 중 진동을 즉시 끊는다(화면 이탈 등) */
+/**
+ * 진행 중 진동을 즉시 끊는다(화면 이탈 등).
+ * 네이티브는 끊을 대상이 없다 — impact/notification 은 지속형이 아니라 순간 촉감이라
+ * 발화 시점에 이미 끝나 있다. 그래서 웹 폴백에서만 의미가 있다.
+ */
 export function hapticCancel(): void {
-  if (!canVibrate()) return
+  if (isNativeApp()) return
+  if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return
   navigator.vibrate(0)
 }

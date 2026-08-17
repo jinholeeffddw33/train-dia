@@ -77,6 +77,18 @@ function scheduleSync() {
   });
 }
 
+/**
+ * 지금 뒤로가기로 닫을 화면이 있는가 — 네이티브 하드웨어 뒤로가기가 묻는다.
+ *
+ * 안드로이드 뒤로가기는 웹과 달리 "더 물러날 곳이 없으면 앱 종료"가 기본이다.
+ * 그래서 브릿지(components/native/NativeBridge)는 종료 확인을 띄우기 전에
+ * 여기로 "아직 닫을 게 남았나"를 물어본다. handlerStack 은 모듈 밖에서 못 보므로
+ * 이 함수가 유일한 창구다. (길이가 아니라 여부만 노출 — 깊이는 내부 사정이다)
+ */
+export function hasOpenBackHandler(): boolean {
+  return handlerStack.length > 0;
+}
+
 export function useHistoryBack(
   key: string,
   onBack: () => void,

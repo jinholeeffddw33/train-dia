@@ -47,7 +47,7 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
 
   // 기준 탭 = '근무'(대시보드). 뒤로가기 시 여기로 복귀
   const goWorkTab = useCallback(() => {
-    startViewTransition(() => setActiveTab('work'));
+    startViewTransition(() => setActiveTab('work'), 'fade');
   }, []);
 
   // 근무 탭이 아닐 때 뒤로가기 → 근무 탭 복귀
@@ -60,11 +60,11 @@ export default function AppShell({ children, onBack, initialTab }: AppShellProps
       return;
     }
     if (tab === 'line') triggerScroll();
-    // View Transition — 탭 전환 크로스페이드 (미지원/모션 감소 시 즉시 전환)
+    // Shared Axis — 탭은 위계가 같고 방향이 없다 → 페이드(fade). 미지원/모션 감소 시 즉시 전환.
     startViewTransition(() => {
       setActiveTab(tab);
       window.scrollTo({ top: 0 });
-    });
+    }, 'fade');
   }, [triggerScroll, onBack]);
 
 

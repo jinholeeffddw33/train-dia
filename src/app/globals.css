@@ -195,11 +195,83 @@ input, textarea, select {
   }
 }
 
-/* ===== View Transitions — 탭/월드 전환 크로스페이드 (미지원 브라우저 무해) ===== */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.15s;
+/* ═══════════════════════════════════════════════════
+   화면 전환 SSOT — Shared Axis (Material Design 3)
+   View Transitions API 로 구현 — 브라우저가 옛/새 화면을 스냅샷으로 겹쳐 준다.
+   움직이는 속성은 transform 과 opacity 뿐 (레이아웃/재도색 유발 속성 금지).
+   ★핵심: 불투명 구간을 어긋낸다 — 나가는 쪽은 앞부분(35%)에서 이미 사라지고,
+     들어오는 쪽은 뒷부분(45%)에서야 나타난다. 두 화면이 동시에 반투명해지지 않아
+     배경이 비쳐 "덜컹"하는 크로스페이드를 피한다. 이동은 그 사이에도 계속된다.
+   방향은 viewTransition.ts 가 <html data-vt="…"> 로 지정. 나가는 곡선(--dia-ease)과
+   들어오는 곡선(--dia-ease-out)은 서로 다르다. 미지원 브라우저는 즉시 전환(무해).
+   ═══════════════════════════════════════════════════ */
+
+/* 방향 미지정(기본) = 페이드 (탭 등 방향 없는 전환) */
+::view-transition-old(root) { animation: axis-out-fade 260ms var(--dia-ease-in) both; }
+::view-transition-new(root) { animation: axis-in-fade 260ms var(--dia-ease-out) both; }
+
+/* ① 다음 단계로 (X축) */
+html[data-vt='forward']::view-transition-old(root) { animation: axis-out 340ms var(--dia-ease) both; }
+html[data-vt='forward']::view-transition-new(root) { animation: axis-in 340ms var(--dia-ease-out) both; }
+
+/* ② 이전으로 (X축, 방향 반대) */
+html[data-vt='back']::view-transition-old(root) { animation: axis-out-back 340ms var(--dia-ease) both; }
+html[data-vt='back']::view-transition-new(root) { animation: axis-in-back 340ms var(--dia-ease-out) both; }
+
+/* ③ 창을 열 때 (Z축 — 위계 안으로) : 새 화면이 위 */
+html[data-vt='open']::view-transition-old(root) { animation: axis-out-z 300ms var(--dia-ease) both; z-index: 1; }
+html[data-vt='open']::view-transition-new(root) { animation: axis-in-z 300ms var(--dia-ease-out) both; z-index: 2; }
+
+/* ④ 창을 닫을 때 (Z축 — 위계 밖으로) : 닫히는(old) 화면이 위여야 작아지며 사라지는 게 보인다 */
+html[data-vt='close']::view-transition-old(root) { animation: axis-out-z-back 300ms var(--dia-ease) both; z-index: 2; }
+html[data-vt='close']::view-transition-new(root) { animation: axis-in-z-back 300ms var(--dia-ease-out) both; z-index: 1; }
+
+/* ⑤ 방향 없는 전환(탭) — 페이드, 역시 구간을 어긋낸다 */
+html[data-vt='fade']::view-transition-old(root) { animation: axis-out-fade 260ms var(--dia-ease-in) both; }
+html[data-vt='fade']::view-transition-new(root) { animation: axis-in-fade 260ms var(--dia-ease-out) both; }
+
+@keyframes axis-in {
+  0%   { transform: translate3d(5%, 0, 0); opacity: 0; }
+  45%  { opacity: 0; }
+  100% { transform: translate3d(0, 0, 0); opacity: 1; }
 }
+@keyframes axis-out {
+  0%   { transform: translate3d(0, 0, 0); opacity: 1; }
+  35%  { opacity: 0; }
+  100% { transform: translate3d(-5%, 0, 0); opacity: 0; }
+}
+@keyframes axis-in-back {
+  0%   { transform: translate3d(-5%, 0, 0); opacity: 0; }
+  45%  { opacity: 0; }
+  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+@keyframes axis-out-back {
+  0%   { transform: translate3d(0, 0, 0); opacity: 1; }
+  35%  { opacity: 0; }
+  100% { transform: translate3d(5%, 0, 0); opacity: 0; }
+}
+@keyframes axis-in-z {
+  0%   { transform: scale(0.94); opacity: 0; }
+  45%  { opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes axis-out-z {
+  0%   { transform: scale(1); opacity: 1; }
+  35%  { opacity: 0; }
+  100% { transform: scale(1.04); opacity: 0; }
+}
+@keyframes axis-in-z-back {
+  0%   { transform: scale(1.04); opacity: 0; }
+  45%  { opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes axis-out-z-back {
+  0%   { transform: scale(1); opacity: 1; }
+  35%  { opacity: 0; }
+  100% { transform: scale(0.94); opacity: 0; }
+}
+@keyframes axis-in-fade  { 0% { opacity: 0; } 50% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes axis-out-fade { 0% { opacity: 1; } 40% { opacity: 0; } 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),

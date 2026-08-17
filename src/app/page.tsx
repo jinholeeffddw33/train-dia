@@ -108,17 +108,18 @@ export default function HomePage() {
   }, []);
 
   const handleEnter = useCallback((w: WorldId, tab?: TabId) => {
-    // View Transition — 월드 진입 크로스페이드 (미지원/모션 감소 시 즉시 전환)
+    // Shared Axis — 월드 진입은 위계 안으로 들어가는 것 → Z축 확대(open)
     // tab 을 주면 그 탭으로 바로 연다(허브의 달력 바로가기). AppShell 이 새로 마운트되며
     // initialTab 을 초기값으로 받으므로, 지정이 없으면 기준 탭인 '근무'로 되돌린다.
     startViewTransition(() => {
       setInitialTab(tab ?? 'work');
       setWorld(w);
-    });
+    }, 'open');
   }, []);
 
   const handleBack = useCallback(() => {
-    startViewTransition(() => setWorld(null));
+    // Shared Axis — 월드에서 나오는 것은 위계 밖으로 → Z축 축소(close)
+    startViewTransition(() => setWorld(null), 'close');
     // shortcut 진입 탭은 1회성 — 허브로 나오면 소진 (기준 = 근무 대시보드)
     setInitialTab('work');
   }, []);

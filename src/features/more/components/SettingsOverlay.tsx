@@ -11,6 +11,8 @@ import { useAuthStore } from '@/stores/auth';
 import { useFontSizeStore, type FontSize } from '@/stores/fontSize';
 import { useNotification } from '@/hooks/useNotification';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
+import { Browser } from '@capacitor/browser';
+import { isNativeApp } from '@/lib/native/platform';
 import AlarmSettings from './AlarmSettings';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
@@ -247,6 +249,23 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
       <button type="button" className={styles.logoutBtnCompact} onClick={() => setLogoutConfirmOpen(true)}>
         <LogOut size={16} />
         <span>{authUser ? `${authUser.name} 로그아웃` : '로그아웃'}</span>
+      </button>
+      {/*
+        개인정보처리방침 — 법이 "정보주체가 쉽게 확인할 수 있도록 공개"를 요구하고,
+        스토어 심사도 앱 안에서 닿는지를 본다. 별도 라우트(/privacy)라 로그인 없이도 열린다.
+        네이티브에서는 인앱 브라우저로 띄운다 — 같은 WebView 에서 이동하면 앱이 통째로
+        다시 로드돼 로그인 화면부터 다시 그려진다.
+      */}
+      <button
+        type="button"
+        className={styles.privacyLink}
+        onClick={() => {
+          const url = `${window.location.origin}/privacy`;
+          if (isNativeApp()) Browser.open({ url }).catch(() => { window.location.href = url; });
+          else window.open(url, '_blank', 'noopener');
+        }}
+      >
+        개인정보처리방침
       </button>
       <p className={styles.setFooterText}>{APP_VERSION} · {COPYRIGHT_NOTICE}</p>
 

@@ -1,0 +1,123 @@
+/*
+ * 개인정보처리방침 — 법정 공개 문서.
+ * 로그인 없이 열리고, 심사자·이용자가 폰에서 그대로 읽는다.
+ * 50~60대 기준(CLAUDE.md §1.1): 본문 16px, 표 안도 14px 이상.
+ */
+
+.page {
+  min-height: 100vh;   /* 구형 폴백 */
+  min-height: 100dvh;
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  padding:
+    calc(var(--sat) + var(--dia-space-6)) var(--dia-page-pad)
+    calc(var(--sab) + var(--dia-space-10));
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  line-height: var(--dia-leading-tight);
+  margin-bottom: var(--dia-space-2);
+}
+
+.meta {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  margin-bottom: var(--dia-space-5);
+}
+
+.lead {
+  font-size: var(--dia-text-base);
+  line-height: var(--dia-leading-relaxed);
+  color: var(--dia-text-secondary);
+  padding: var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  margin-bottom: var(--dia-space-6);
+}
+
+.section {
+  margin-bottom: var(--dia-space-6);
+}
+
+.h2 {
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  padding-bottom: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
+  border-bottom: 2px solid var(--dia-border-strong);
+}
+
+.p {
+  font-size: var(--dia-text-base);
+  line-height: var(--dia-leading-relaxed);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-3);
+}
+
+.note {
+  font-size: var(--dia-text-sm);
+  line-height: var(--dia-leading-relaxed);
+  color: var(--dia-text-tertiary);
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border-left: 3px solid var(--dia-blue);
+  border-radius: var(--dia-radius-sm);
+  margin-top: var(--dia-space-3);
+}
+
+.list {
+  margin: 0 0 var(--dia-space-3);
+  padding-left: var(--dia-space-5);
+}
+
+.list li {
+  font-size: var(--dia-text-base);
+  line-height: var(--dia-leading-relaxed);
+  color: var(--dia-text-secondary);
+  margin-bottom: var(--dia-space-2);
+}
+
+/* 표 — 좁은 화면에서 가로 스크롤로 빠져나가지 않게 감싼다 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--dia-space-3);
+  font-size: var(--dia-text-sm);
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  padding: var(--dia-space-3);
+  border: 1px solid var(--dia-border);
+  text-align: left;
+  vertical-align: top;
+  line-height: var(--dia-leading-normal);
+  /* 긴 항목명이 표를 밀어내지 않도록 */
+  overflow-wrap: anywhere;
+  word-break: keep-all;
+}
+
+.table th {
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.table td {
+  color: var(--dia-text-secondary);
+}
+
+.table strong {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-semibold);
+}

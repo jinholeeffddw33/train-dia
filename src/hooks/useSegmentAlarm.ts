@@ -54,12 +54,18 @@ export function useSegmentAlarm(
     const sync = () => {
       if (disposed) return;
 
-      // ★ 앱이 화면에 없으면 네이티브 호출이 **응답하지 않는다**.
-      //   안드로이드는 액티비티가 정지(stopped)되면 플러그인 콜백이 돌아오지 않아
-      //   Promise 가 영원히 매달리고, 그 뒤의 알림 플러그인 호출까지 줄줄이 막힌다.
-      //   (2026-08-18 Z플립3 실측: 접힌 채로 schedule 을 부르니 30초가 지나도 무응답,
-      //    앱을 다시 띄우자 같은 호출이 22ms 에 끝났다.)
-      //   그래서 백그라운드면 실행하지 않고 **복귀 시점으로 미룬다**.
+      // 화면에 없을 때는 동기화를 **복귀 시점으로 미룬다**.
+      //   이유는 두 가지다:
+      //   ① 앱이 안 보이는 동안 계획을 다시 짤 이유가 없다 — 설정을 바꾸는 UI 는 포그라운드에만 있다.
+      //   ② 복귀할 때 어차피 한 번 다시 맞춰야 한다. 밤새 열어 둔 채 날짜가 바뀌면
+      //      "오늘 근무"가 달라져 있기 때문이다(아래 appStateChange/visibilitychange).
+      //
+      //   ⚠️ 처음에는 "백그라운드에서 네이티브 호출이 무응답이라서"라고 적었는데 **그건 틀렸다**.
+      //      재실측(2026-08-18): 앱이 포그라운드(topResumedActivity)여도 CDP 로 밀어넣은
+      //      schedule 의 Promise 는 응답하지 않았고, 그런데도 알림은 제 시각에 발화했다
+      //      (logcat 발화 기록 + getPending 잔존 + dumpsys alarm 의 RTC_WAKEUP 등록으로 3중 확인).
+      //      즉 무응답은 **CDP 로 코드를 주입했을 때의 현상**이지 앱 코드의 문제가 아니다.
+      //      가드는 위 ①②의 이유로 남긴다.
       if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
         deferred = true;
         return;

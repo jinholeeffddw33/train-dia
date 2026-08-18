@@ -14,8 +14,13 @@ STATUS: 1라운드 완료 — push 대기(진호 승인 필요) · 폰 QA 대기
   **`display-mode: standalone` 도 false** ← 설치 배너가 앱 안에서 뜨던 원인.
   있는 것: serviceWorker(+controller) · vibrate · geolocation · clipboard.
   safe-area top 32 / bottom 48, 360x880 @dpr3.
-- 안드 액티비티가 **정지 상태면 네이티브 플러그인 호출이 무응답**(Promise 영구 pending → 이후 호출까지 큐 막힘).
-  접힌 Z플립3 에서 schedule 이 30초 무응답 → 앱을 띄우자 같은 호출이 22ms. useSegmentAlarm 이 visibility 로 가드.
+- **알람은 잠금/화면꺼짐/Doze 에서도 정상 발화한다** (2026-08-18 재실측으로 확정):
+  `dumpsys alarm` 에 `type=RTC_WAKEUP tag=*walarm*:kr.dia5.app/...TimedNotificationPublisher`
+  → OS 가 기기를 깨워서 울린다. logcat 발화 기록 + getPending 잔존까지 3중 확인.
+  ⚠️ 처음에 "접힌 폰이라 예약이 안 된다"고 적었던 것은 **오진**이었다.
+  포그라운드(topResumedActivity)여도 CDP 로 주입한 schedule 의 Promise 는 응답하지 않았고,
+  그런데도 알림은 제 시각에 떴다 → 무응답은 **CDP 주입 시의 현상**이지 앱 코드 문제가 아니다.
+  useSegmentAlarm 의 visibility 가드는 "복귀 시 날짜 변경 반영" 목적으로만 남긴다.
 - Z플립3 USB(R3CR90MTPYT)와 무선(192.168.200.169)은 **같은 폰**. 실기기는 2대(Z플립3 + S25).
 - S25 저장공간 734MB(100%) — 설치 거부됨. 진호가 정리해야 함.
 - webview-probe 는 포트 **9333**(9222 는 진호 PC 디버그 크롬 점유 → 폰 대신 PC 를 측정한 사고).

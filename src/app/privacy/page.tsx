@@ -21,9 +21,12 @@ export const metadata: Metadata = {
  *   · 위험요인 제보 텍스트가 Anthropic API 로 전송(api/safety/extract-driving-info)
  *   · 익명 ID(localStorage UUID)로 피드백 스레드 추적(lib/anonymousId)
  *
- * ⚠️ TODO(진호): 아래 [   ] 표시 3곳은 법정 필수 기재사항인데 내가 임의로 채울 수 없다.
- *   ①개인정보 보호책임자 성명 ②연락처(이메일) ③시행일 확정.
- *   채운 뒤 이 주석을 지우고, 같은 값을 Play Console 의 개인정보처리방침 URL 과 함께 제출할 것.
+ * 보호책임자 표기: 법 제30조는 "성명 **또는** 보호업무 처리 부서의 명칭과 연락처"를 요구한다.
+ *   개인이 운영하는 서비스라 부서가 없으므로 직책("운영자") + 연락처로 요건을 충족시켰다.
+ *   실명이나 사업자명으로 바꾸려면 아래 표 한 줄만 고치면 된다.
+ *
+ * ⚠️ TODO(진호): Supabase 리전 확인. 서울(ap-northeast-2)이면 현행 표기가 맞고,
+ *   해외 리전이면 §5 국외 이전 표에 Supabase 행의 이전 국가를 명시해야 한다.
  */
 
 const UPDATED = '2026년 8월 18일';
@@ -203,8 +206,8 @@ export default function PrivacyPolicyPage() {
           <h2 className={styles.h2}>10. 개인정보 보호책임자</h2>
           <table className={styles.table}>
             <tbody>
-              <tr><th>성명</th><td>[ 진호 확인 후 기재 ]</td></tr>
-              <tr><th>연락처</th><td>[ 진호 확인 후 기재 — 이메일 ]</td></tr>
+              <tr><th>보호책임자</th><td>운영자</td></tr>
+              <tr><th>연락처</th><td>jinho@zinosb.com</td></tr>
             </tbody>
           </table>
           <p className={styles.note}>

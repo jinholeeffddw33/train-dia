@@ -15,10 +15,23 @@
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync, writeFileSync } from 'node:fs'
+import { randomBytes } from 'node:crypto'
 import { createInterface } from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+/**
+ * --auto : 비밀번호를 직접 입력받지 않고 **강한 랜덤으로 생성**해 파일에만 기록한다.
+ *   화면(stdout)에는 절대 찍지 않는다 — 터미널 로그·대화 기록에 남는 순간 그게 유출이다.
+ *   확인이 필요하면 android/keystore.properties 파일을 직접 열어 본다.
+ */
+const AUTO = process.argv.includes('--auto')
+
+/** 사람이 옮겨 적을 일이 없으므로 길고 복잡해도 된다 (base64 43자 ≈ 256bit) */
+function generatePassword() {
+  return randomBytes(32).toString('base64url')
+}
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const ANDROID = path.join(ROOT, 'android')
@@ -53,21 +66,31 @@ async function main() {
   console.log('릴리스 서명 키를 만든다.\n')
   console.log('⚠️  이 키를 잃어버리면 앱 업데이트를 영원히 못 올린다 — 만든 뒤 반드시 백업할 것.\n')
 
-  const rl = createInterface({ input: stdin, output: stdout })
-  const storePassword = await rl.question('키 저장소 비밀번호 (6자 이상): ')
-  if (storePassword.length < 6) {
-    console.error('✗ 6자 이상이어야 한다')
+  let storePassword
+  let owner
+
+  if (AUTO) {
+    storePassword = generatePassword()
+    owner = process.argv.find((a) => a.startsWith('--cn='))?.slice(5) || 'DIA5'
+    console.log('· 비밀번호를 강한 랜덤으로 생성했다 (화면에는 표시하지 않는다)')
+    console.log('  확인이 필요하면 android/keystore.properties 를 직접 열어 볼 것')
+  } else {
+    const rl = createInterface({ input: stdin, output: stdout })
+    storePassword = await rl.question('키 저장소 비밀번호 (6자 이상): ')
+    if (storePassword.length < 6) {
+      console.error('✗ 6자 이상이어야 한다')
+      rl.close()
+      process.exit(1)
+    }
+    const confirm = await rl.question('한 번 더 입력: ')
+    if (storePassword !== confirm) {
+      console.error('✗ 두 입력이 다르다')
+      rl.close()
+      process.exit(1)
+    }
+    owner = await rl.question('소유자 이름(CN, 예: Jinho Lee): ')
     rl.close()
-    process.exit(1)
   }
-  const confirm = await rl.question('한 번 더 입력: ')
-  if (storePassword !== confirm) {
-    console.error('✗ 두 입력이 다르다')
-    rl.close()
-    process.exit(1)
-  }
-  const owner = await rl.question('소유자 이름(CN, 예: Jinho Lee): ')
-  rl.close()
 
   const keytool = findKeytool()
   // 키 비밀번호는 저장소 비밀번호와 동일하게 둔다(구글 권장 구성, 관리 포인트 감소)

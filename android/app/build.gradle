@@ -35,7 +35,10 @@ android {
     signingConfigs {
         release {
             if (hasSigning) {
-                storeFile file(keystoreProperties['storeFile'])
+                // ★ file() 은 **app 모듈** 기준이라 android/app/dia5-release.jks 를 찾는다.
+                //   키는 android/ 에 있으므로 rootProject 기준으로 풀어야 한다
+                //   (증상: "Keystore file ... not found for signing config 'release'").
+                storeFile rootProject.file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
                 keyPassword keystoreProperties['keyPassword']

@@ -1,5 +1,21 @@
 apply plugin: 'com.android.application'
 
+/*
+ * 릴리스 서명 — 키와 비밀번호는 **저장소에 절대 넣지 않는다**.
+ * android/keystore.properties (gitignore) 에서 읽고, 파일이 없으면 서명 없이 빌드한다
+ * (디버그 빌드/CI 문법검사가 키 없이도 돌아가야 하므로 실패시키지 않는다).
+ *
+ * 최초 1회 키 생성:  node scripts/make-keystore.mjs
+ * ⚠️ 이 키를 잃어버리면 **같은 앱으로 업데이트를 영원히 못 올린다**(패키지명 재사용 불가).
+ *    keystore.properties 와 .jks 파일은 반드시 별도 백업할 것.
+ */
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasSigning = keystorePropertiesFile.exists()
+if (hasSigning) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "kr.dia5.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +32,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasSigning) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -24,7 +24,11 @@ const ANDROID_DIR = path.join(ROOT, 'android');
 
 const args = process.argv.slice(2);
 const doInstall = args.includes('--install');
-const isRelease = args.includes('--release');
+/** 스토어 업로드용 번들(AAB). Play 는 APK 가 아니라 AAB 를 받는다 */
+const isAab = args.includes('--aab');
+const isRelease = args.includes('--release') || isAab;
+/** 스토어는 같은 versionCode 를 두 번 받지 않는다 — 업로드마다 올려야 한다 */
+const doBump = args.includes('--bump');
 const deviceArg = args.find((a) => a.startsWith('--device='))?.split('=')[1];
 
 /** Android Studio 번들 JDK 후보 — 설치 폴더명이 버전마다 달라 여러 개를 본다 */
@@ -75,6 +79,36 @@ function ensureLocalProperties(sdkDir) {
  * Windows 는 .bat/.cmd 를 직접 spawn 할 수 없다 — Node 20+ 부터 보안상 막혀 EINVAL 이 난다.
  * 그래서 배치 파일만 shell 을 거치고, 인자는 공백 대비로 따옴표를 씌운다.
  */
+/**
+ * versionCode 를 1 올린다. Play 는 같은 versionCode 를 두 번 받지 않으므로
+ * 업로드할 때마다 올려야 하는데, 손으로 하면 반드시 한 번은 잊는다.
+ */
+function bumpVersionCode() {
+  const gradle = path.join(ANDROID_DIR, 'app', 'build.gradle')
+  const src = readFileSync(gradle, 'utf8')
+  const m = src.match(/versionCode\s+(\d+)/)
+  if (!m) {
+    console.error('✗ build.gradle 에서 versionCode 를 못 찾았다')
+    process.exit(1)
+  }
+  const next = parseInt(m[1], 10) + 1
+  writeFileSync(gradle, src.replace(/versionCode\s+\d+/, `versionCode ${next}`), 'utf8')
+  console.log(`· versionCode ${m[1]} → ${next}`)
+  return next
+}
+
+/** 릴리스 빌드인데 서명 설정이 없으면 스토어가 받아 주지 않는다 — 미리 알려 준다 */
+function warnIfUnsigned() {
+  if (!isRelease) return
+  const props = path.join(ANDROID_DIR, 'keystore.properties')
+  if (existsSync(props)) return
+  console.error('\n✗ 릴리스 서명 설정이 없다 (android/keystore.properties).');
+  console.error('  스토어는 서명되지 않은 빌드를 거부한다. 최초 1회:');
+  console.error('     node scripts/make-keystore.mjs');
+  console.error('  ⚠️ 만든 키는 반드시 백업할 것 — 잃으면 앱 업데이트가 영원히 불가능하다.\n');
+  process.exit(1);
+}
+
 function run(cmd, cmdArgs, opts = {}) {
   const needsShell = process.platform === 'win32' && /\.(bat|cmd)$/i.test(cmd);
   const res = needsShell
@@ -119,8 +153,11 @@ function main() {
   console.log(`· JDK: ${javaHome}`);
   console.log(`· SDK: ${sdkDir}`);
 
+  warnIfUnsigned();
+  if (doBump) bumpVersionCode();
+
   const env = { ...process.env, JAVA_HOME: javaHome, ANDROID_HOME: sdkDir };
-  const task = isRelease ? 'assembleRelease' : 'assembleDebug';
+  const task = isAab ? 'bundleRelease' : isRelease ? 'assembleRelease' : 'assembleDebug';
   const gradlew = path.join(ANDROID_DIR, process.platform === 'win32' ? 'gradlew.bat' : 'gradlew');
 
   console.log(`\n▶ gradle ${task} …`);
@@ -131,13 +168,21 @@ function main() {
   }
 
   const variant = isRelease ? 'release' : 'debug';
-  const apk = path.join(ANDROID_DIR, 'app', 'build', 'outputs', 'apk', variant, `app-${variant}.apk`);
+  const apk = isAab
+    ? path.join(ANDROID_DIR, 'app', 'build', 'outputs', 'bundle', 'release', 'app-release.aab')
+    : path.join(ANDROID_DIR, 'app', 'build', 'outputs', 'apk', variant, `app-${variant}.apk`);
   if (!existsSync(apk)) {
-    console.error(`✗ 빌드는 성공했는데 APK 가 없다: ${path.relative(ROOT, apk)}`);
+    console.error(`✗ 빌드는 성공했는데 산출물이 없다: ${path.relative(ROOT, apk)}`);
     process.exit(1);
   }
   const mb = (readFileSync(apk).length / 1024 / 1024).toFixed(2);
-  console.log(`\n✓ APK: ${path.relative(ROOT, apk)} (${mb} MB)`);
+  console.log(`\n✓ ${isAab ? 'AAB' : 'APK'}: ${path.relative(ROOT, apk)} (${mb} MB)`);
+
+  if (isAab) {
+    console.log('  → Play Console > 테스트/프로덕션 > 새 버전 만들기 에 이 파일을 올린다.');
+    console.log('  ※ AAB 는 기기에 직접 설치할 수 없다 — 설치 확인은 --release APK 로.');
+    return;
+  }
 
   if (!doInstall) {
     console.log('  설치하려면: npm run native:install');

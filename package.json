@@ -46,7 +46,9 @@
     "check:hooks": "node scripts/ensure-hooks.mjs",
     "install:hooks": "node scripts/install-hooks.mjs",
     "check:quality-gates": "npm run check:hooks && npm run check:docs && npm run check:safearea && npm run check:token-refs && npm run check:zlayer && npm run check:bleed && npm run check:motion && npm run check:envelope && npm run check:hover && npm run check:surface-3d:changed && npm run check:theme-override:changed && npm run check:card-rhythm:changed && npm run check:text-size:changed && npm run check:ai-rules:changed",
-    "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint"
+    "check:quality-gates:full": "npm run check:quality-gates && npm run typecheck && npm run lint",
+    "native:aab": "node scripts/build-apk.mjs --aab --bump",
+    "native:keystore": "node scripts/make-keystore.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.111.0",

@@ -99,3 +99,8 @@ app/src/main/assets/public
 app/src/main/assets/capacitor.config.json
 app/src/main/assets/capacitor.plugins.json
 app/src/main/res/xml/config.xml
+
+# 릴리스 서명 키 — 유출되면 앱을 사칭당한다. 절대 커밋 금지
+*.jks
+*.keystore
+keystore.properties

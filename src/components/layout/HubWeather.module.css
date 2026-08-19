@@ -5,10 +5,12 @@
   width: 100%;
   max-width: 380px;
   padding: var(--dia-space-3) var(--dia-space-4);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  /* 위 타일들과 같은 껍데기를 물려받는다(홈 밖에서 쓰일 때를 대비해 폴백) —
+     혼자 흰 카드로 남으면 타일 줄과 색이 어긋나 아래로 갈수록 화면이 풀린다 */
+  background: var(--hub-tile-bg, var(--dia-surface));
+  border: 1px solid var(--hub-tile-border, var(--dia-border));
   border-radius: var(--dia-radius-lg);
-  box-shadow: var(--dia-shadow-sm);
+  box-shadow: var(--hub-tile-shadow, var(--dia-shadow-sm));
   min-height: 64px;
   text-align: left;
 }

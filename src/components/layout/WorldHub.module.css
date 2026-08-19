@@ -1,6 +1,14 @@
 /* ===== World Hub — DIA Station ===== */
 
+/* ── 홈 타일 공통 껍데기 ──
+   근무·교육·안전·라이프 4장과 아래 3개(대기충당확인·출근도장·카페)가 같은 바탕·테두리·
+   그림자를 쓰도록 한곳에 모아 둔다. 값을 각자 적어 두면 한쪽만 고쳐져 아래 줄이 위와
+   따로 놀기 시작한다. 커스텀 속성이라 자식 컴포넌트(HomeStampCard)도 그대로 물려받는다. */
 .hub {
+  --hub-tile-bg: var(--dia-surface);
+  --hub-tile-border: var(--dia-border);
+  --hub-tile-shadow: var(--dia-shadow-sm);
+
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -17,6 +25,20 @@
      이 요소가 스크롤 상자가 되고, bottom:-10% 인 배경 오브가 스크롤 가능한 넘침을
      만든다. 스크롤 영역이 둘이 되어 중간에 한 번 걸린다. 양축을 닫는다. */
   overflow: hidden;
+}
+
+/* 라이트에서는 흰 바탕에 블루 주얼 fill 한 겹 — 근무 카드의 블루로 전부 통일 */
+:global(:root.light) .hub {
+  --hub-tile-bg:
+    radial-gradient(120% 90% at 50% -14%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 40%, transparent 68%),
+    radial-gradient(120% 120% at 50% 122%, rgba(96, 165, 250, 0.28) 0%, rgba(96, 165, 250, 0.08) 52%, transparent 78%),
+    linear-gradient(160deg, rgba(96, 165, 250, 0.13), rgba(96, 165, 250, 0.05)),
+    #ffffff;
+  --hub-tile-border: rgba(96, 165, 250, 0.26);
+  --hub-tile-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 6px 16px rgba(96, 165, 250, 0.16),
+    0 2px 5px rgba(15, 23, 42, 0.05);
 }
 
 /* 내부 컴포넌트 가로 정렬 — max-width 카드를 좌측 정렬 */
@@ -235,8 +257,8 @@
   align-items: center;
   gap: var(--dia-space-2);
   padding: var(--dia-space-3);
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-border);
+  background: var(--hub-tile-bg);
+  border: 1px solid var(--hub-tile-border);
   border-radius: var(--dia-radius-lg);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -246,40 +268,19 @@
   min-width: 0;               /* 그리드 아이템 축소 허용 → 가로 넘침 방지 */
   min-height: 72px;
   transition: transform var(--dia-dur-base) ease, box-shadow var(--dia-dur-base) ease;
-  box-shadow: var(--dia-shadow-sm);
+  box-shadow: var(--hub-tile-shadow);
 }
 
-/* ── 근무 = 파란 3D 테두리로 강조(크기는 동일, 테두리로 우선순위 표현) ── */
-/* ── 근무 = 진한 파랑 3D 테두리로 강조(아이콘은 나머지와 동일하게 유지) ──
-   테두리 링(box-shadow)이 라이트 규칙에 덮이지 않도록 라이트 전용 규칙도 아래에 별도 정의 */
+/* ── 근무 = 파란 테두리 한 줄로만 강조(크기·바탕은 나머지와 동일) ──
+   덧대던 링(box-shadow)을 없애고 테두리 1px 만 남겼다. 링과 테두리가 겹치면
+   두 줄로 보여 다른 타일보다 유난히 두꺼워진다. */
 .serviceCardPrimary {
-  overflow: visible; /* '안전' 배지가 위로 튀어나오게 */
   border-color: var(--dia-blue);
   box-shadow:
-    0 0 0 2px var(--dia-blue),                 /* 덜 진한 파랑 테두리 링 */
     inset 0 2px 1px rgba(255, 255, 255, 0.35), /* 상단 하이라이트 → 3D 볼록 */
     0 18px 38px rgba(29, 78, 216, 0.52),       /* 더 크게 뜬 그림자 → 3D 부양↑ */
     0 8px 16px rgba(0, 0, 0, 0.38);
 }
-
-/* '안전' 배지 — 근무 카드 좌상단에 살짝 튀어나오게 */
-.svcBadge {
-  position: absolute;
-  top: -9px;
-  left: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 10px;
-  border-radius: var(--dia-radius-full);
-  background: linear-gradient(135deg, var(--dia-3d-blue-start), var(--dia-3d-blue-end));
-  color: var(--dia-text-on-color);
-  font-size: var(--dia-text-meta);
-  font-weight: 800;
-  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.4);
-  z-index: 2;
-}
-.svcBadge svg { flex-shrink: 0; }
 
 /* 우측 화살표 — 은은한 원형 배경(모든 카드 공통) */
 .svcChevron {
@@ -301,29 +302,10 @@
   outline-offset: 2px;
 }
 
-/* 라이트 홈 전용 — 4 서비스 카드, 각자 고유 색 주얼 fill (자연스러운 톤, 진호 요청).
-   색 = --jw(RGB) 카드별, 아이콘 정체성 색과 일치. */
-:global(:root.light) .serviceCard[data-tone="duty"]   { --jw: 96, 165, 250; }   /* 근무 = 블루 */
-:global(:root.light) .serviceCard[data-tone="edu"]    { --jw: 52, 211, 153; }   /* 스마트승무원 = 민트그린 */
-:global(:root.light) .serviceCard[data-tone="safety"] { --jw: 251, 191, 36; }   /* 안전 = 앰버 */
-:global(:root.light) .serviceCard[data-tone="life"]   { --jw: 244, 114, 182; }  /* 라이프 = 핑크 */
-:global(:root.light) .serviceCard {
-  background:
-    radial-gradient(120% 90% at 50% -14%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 40%, transparent 68%),
-    radial-gradient(120% 120% at 50% 122%, rgba(var(--jw, 148, 163, 184), 0.28) 0%, rgba(var(--jw, 148, 163, 184), 0.08) 52%, transparent 78%),
-    linear-gradient(160deg, rgba(var(--jw, 148, 163, 184), 0.13), rgba(var(--jw, 148, 163, 184), 0.05)),
-    #ffffff;
-  border-color: rgba(var(--jw, 148, 163, 184), 0.26);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 6px 16px rgba(var(--jw, 148, 163, 184), 0.16),
-    0 2px 5px rgba(15, 23, 42, 0.05);
-}
 /* 라이트 전용 — 근무 강조 테두리(위 .serviceCard 규칙보다 뒤라서 box-shadow가 이김) */
 :global(:root.light) .serviceCardPrimary {
   border-color: var(--dia-blue);
   box-shadow:
-    0 0 0 2px var(--dia-blue),                 /* 덜 진한 파랑 테두리 링 */
     inset 0 1px 0 rgba(255, 255, 255, 0.95),   /* 상단 하이라이트 */
     0 18px 38px rgba(59, 130, 246, 0.42),      /* 더 크게 뜬 그림자 → 3D 부양↑ */
     0 8px 16px rgba(15, 23, 42, 0.16);
@@ -883,69 +865,49 @@
   height: 62px;
 }
 
-/* Per-world icon colors */
-.iconDuty {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.15));
-  color: var(--dia-blue);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-  animation: iconFloat 3s ease-in-out infinite, iconGlowBlue 3s ease-in-out infinite;
-}
+/* Per-world icon colors
+   ── 근무는 꽉 찬 파랑, 나머지 셋은 옅은 회색 ──
+   색을 서로 다르게 하는 것만으로는 무엇이 먼저인지 안 보인다. 넷 다 '색 위에 색'인
+   같은 방식이라 결국 나란히 놓인다. 그래서 방식 자체를 갈랐다.
 
-@keyframes iconGlowBlue {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
-  50% { box-shadow: 0 0 32px rgba(59, 130, 246, 0.35); }
+     근무  = 파랑으로 꽉 채우고 아이콘을 흰색으로 (칠한 칸)
+     나머지 = 옅은 회색 바탕에 회색 아이콘 (비운 칸)
+
+   칠한 칸 하나와 비운 칸 셋은 크기·색을 따지지 않아도 먼저 볼 곳이 즉시 보인다.
+   나머지 셋은 색조를 지우고 무채색으로 두어, 그 자체로 '지금은 덜 급한 것'이 된다.
+   20~32px 로 뿜던 색 광채(glow)는 뺐다. 그게 타일 바탕까지 번져서, 배경을 통일해도
+   교육은 초록, 안전은 앰버 타일로 보이게 만들던 원인이다. */
+.iconDuty {
+  background: linear-gradient(145deg, #5B9BF5, #2C6FD1);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.28);
+  animation: iconFloat 3s ease-in-out infinite;
 }
 
 .iconEdu {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(56, 189, 248, 0.15));
-  color: var(--dia-green);
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-  animation: iconFloat 3s 0.3s ease-in-out infinite, iconGlowGreen 3s 0.3s ease-in-out infinite;
-}
-
-@keyframes iconGlowGreen {
-  0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
-  50% { box-shadow: 0 0 32px rgba(34, 197, 94, 0.35); }
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.14), rgba(100, 116, 139, 0.07));
+  color: #7E8CA0;
+  animation: iconFloat 3s 0.3s ease-in-out infinite;
 }
 
 .iconSafety {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 68, 68, 0.15));
-  color: var(--dia-amber);
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-  animation: iconFloat 3s 0.6s ease-in-out infinite, iconGlowAmber 3s 0.6s ease-in-out infinite;
-}
-
-@keyframes iconGlowAmber {
-  0%, 100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); }
-  50% { box-shadow: 0 0 32px rgba(245, 158, 11, 0.35); }
-}
-
-:global(:root.light) .iconDuty {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
-}
-
-:global(:root.light) .iconEdu {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(56, 189, 248, 0.1));
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.14), rgba(100, 116, 139, 0.07));
+  color: #7E8CA0;
+  animation: iconFloat 3s 0.6s ease-in-out infinite;
 }
 
 .iconLife {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.15));
-  color: #ec4899;
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.2);
-  animation: iconFloat 3s 0.9s ease-in-out infinite, iconGlowRose 3s 0.9s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.14), rgba(100, 116, 139, 0.07));
+  color: #7E8CA0;
+  animation: iconFloat 3s 0.9s ease-in-out infinite;
 }
 
-@keyframes iconGlowRose {
-  0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.2); }
-  50% { box-shadow: 0 0 32px rgba(236, 72, 153, 0.35); }
-}
-
-:global(:root.light) .iconSafety {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.1));
-}
-
-:global(:root.light) .iconLife {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.1));
+/* 다크에서는 회색 셋이 배경에 묻힌다 — 읽히는 선까지만 밝힌다(근무보다 세지 않게) */
+:global(:root.dark) .iconEdu,
+:global(:root.dark) .iconSafety,
+:global(:root.dark) .iconLife {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.16), rgba(148, 163, 184, 0.08));
+  color: #94A3B8;
 }
 
 /* ── Card Text ── */
@@ -1017,48 +979,44 @@
   );
 }
 
-/* ── 미니 액션 그룹 (대기충당확인 + 카페 바로가기) ── */
+/* ── 미니 액션 그룹 (대기충당확인 + 출근도장 + 카페 바로가기) ──
+   위 서비스 타일과 같은 격자로 세운다. 알약 세 개가 가운데 몰려 있으면 위의 2×2 타일과
+   전혀 다른 물건처럼 보인다 — 같은 폭·같은 간격의 칸 세 개로 두면 한 화면으로 읽힌다. */
 .miniActions {
+  display: grid;
+  /* 가운데 출근도장은 글자가 짧다("완료"·"도장꽝") — 셋을 똑같이 3등분하면 가운데만
+     휑하고 양옆은 글자가 눌린다. 가운데는 글자 폭(auto)만 차지하고, 남는 폭을 양옆이
+     반씩 나눠 갖는다. */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--dia-space-3);
+  margin-top: 2px;
+}
+
+/* ── 아래 3칸 공통 껍데기 — 위 서비스 타일과 같은 바탕·테두리·모서리 ── */
+.standbyCard {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   gap: 5px;
-  margin: 2px auto 0;
-}
-
-/* ── 대기충당확인 카드 — 컴팩트 (label만 노출) ── */
-/* .hub > *의 width:100%를 override해 fit-content로 중앙 정렬 */
-.standbyCard {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  width: fit-content !important;
-  max-width: 100%;
-  margin: 2px auto 0;
-  padding: 3px 9px 3px 5px;
-  /* 메인 배경과 구분되는 인디고 톤 (라이트/다크 공통) */
-  background:
-    linear-gradient(rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.12)),
-    var(--dia-surface);
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  border-radius: 999px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  background: var(--hub-tile-bg);
+  border: 1px solid var(--hub-tile-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--hub-tile-shadow);
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease, border-color var(--dia-dur-base) ease;
+  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-base) ease;
+  /* 44px 아래로는 내리지 않는다 — 손가락으로 정확히 누를 수 있는 최소 크기다 */
   min-height: 44px;
-  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
 }
 .standbyCard:active {
   transform: scale(0.98);
-  background:
-    linear-gradient(rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.2)),
-    var(--dia-surface);
-  border-color: rgba(99, 102, 241, 0.6);
 }
 .standbyCard:focus-visible {
-  outline: 2px solid #6366F1;
+  outline: 2px solid var(--dia-blue);
   outline-offset: 2px;
 }
 .standbyIcon {
@@ -1068,8 +1026,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.2);
-  color: #6366F1;
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--dia-blue);
   flex-shrink: 0;
 }
 .standbyIcon svg {
@@ -1077,10 +1035,11 @@
   height: 11px;
 }
 .standbyLabel {
-  font-size: var(--dia-text-sm);
+  /* 세 칸으로 나눠 담느라 한 칸이 좁다 — 보조 텍스트 등급(13px)까지만 내린다 */
+  font-size: var(--dia-text-xs);
   font-weight: 700;
   color: var(--dia-text-primary);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   white-space: nowrap;
 }
 .standbyChevron {
@@ -1090,27 +1049,10 @@
   height: 12px;
 }
 
-/* ── 카페 바로가기 — 그린 톤으로 차별화 ── */
+/* ── 카페 바로가기 — 대기충당확인과 같은 블루 알약 ──
+   색으로 갈라놓지 않고 .standbyCard 를 그대로 물려받는다. 링크라는 건 아이콘이 말한다. */
 .cafeCard {
-  background:
-    linear-gradient(rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.12)),
-    var(--dia-surface);
-  border-color: rgba(34, 197, 94, 0.4);
-  box-shadow: 0 1px 4px rgba(34, 197, 94, 0.12);
   text-decoration: none;
-}
-.cafeCard:active {
-  background:
-    linear-gradient(rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.2)),
-    var(--dia-surface);
-  border-color: rgba(34, 197, 94, 0.6);
-}
-.cafeCard:focus-visible {
-  outline-color: var(--dia-green);
-}
-.cafeIcon {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--dia-green);
 }
 
 /* ── Version footer — 하단 중앙 ── */

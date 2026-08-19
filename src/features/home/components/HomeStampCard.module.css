@@ -1,62 +1,65 @@
-/* 홈 출근 도장 — 대기충당확인·카페 사이 컴팩트 pill (앰버 톤) */
+/* 홈 출근 도장 — 대기충당확인·카페 사이 한 칸.
+   껍데기(바탕·테두리·모서리·그림자)는 홈 타일에서 그대로 물려받는다. 여기만 앰버·초록
+   테두리를 두르면 같은 줄에서 혼자 튀어 아래 세 칸이 위 타일과 따로 논다.
+   찍었는지 여부는 아이콘 색(앰버→초록)과 글자가 말해 준다.
+   홈 밖에서 쓰일 때를 대비해 폴백을 둔다. */
 .pill {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 4px;
-  width: fit-content;
-  padding: 3px 10px 3px 4px;
+  justify-content: center;
+  gap: 5px;
+  /* 글자 폭만큼만 — 격자에서 auto 칸이라 여기서 넓히지 않는다 */
+  width: auto;
+  min-width: 0;
+  padding: 6px 12px;
   min-height: 44px;
-  border-radius: 999px;
-  background: var(--dia-surface);
-  border: 1px solid var(--dia-amber);
+  border-radius: var(--dia-radius-lg);
+  background: var(--hub-tile-bg, var(--dia-surface));
+  border: 1px solid var(--hub-tile-border, var(--dia-border));
+  box-shadow: var(--hub-tile-shadow, var(--dia-shadow-sm));
   color: var(--dia-text-primary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease, border-color var(--dia-dur-base) ease;
+  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-base) ease;
 }
-.pill:active { transform: scale(0.95); }
-.pill:focus-visible { outline: 2px solid var(--dia-amber); outline-offset: 2px; }
+.pill:active { transform: scale(0.98); }
+.pill:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
 
-.pillDone {
-  border-color: var(--dia-green);
-}
-
-/* 3D 입체 아이콘 — 만지고 싶게 광택/양각 (design-system 3D icon 토큰) */
+/* 아이콘 — 크기·모양은 옆 두 칸(18px 원)과 맞추고, 색만 상태를 말한다(앰버=전, 초록=후).
+   3D 광택과 색 광채는 뺐다. 세 칸이 나란한데 가운데만 번쩍이면 통일이 깨진다. */
 .icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: var(--dia-radius-sm);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   flex-shrink: 0;
   color: var(--dia-text-on-color);
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
-    linear-gradient(145deg, var(--dia-3d-amber-start), var(--dia-3d-amber-end));
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-amber-glow);
-  transition: transform var(--dia-dur-fast) ease, box-shadow var(--dia-dur-fast) ease;
+  background: var(--dia-amber);
+  transition: transform var(--dia-dur-fast) ease;
 }
+.icon svg {
+  width: 11px;
+  height: 11px;
+}
+/* 소형 아이콘 press 등급 = 0.9 (프로젝트 press 3티어) */
 .pill:active .icon {
   transform: translateY(1px) scale(0.9);
-  box-shadow: var(--dia-3d-pressed);
 }
 .pillDone .icon {
-  background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, var(--dia-3d-bloom)), transparent 55%),
-    linear-gradient(145deg, var(--dia-3d-green-start), var(--dia-3d-green-end));
-  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth), var(--dia-3d-green-glow);
+  background: var(--dia-green);
 }
 
+/* 글자는 옆 두 칸과 같은 등급·같은 색. 찍었는지 여부는 아이콘 색과 문구가 말한다 */
 .label {
-  font-size: var(--dia-text-sm);
-  font-weight: 800;
-  letter-spacing: -0.2px;
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  letter-spacing: -0.3px;
   white-space: nowrap;
-  color: var(--dia-amber-text);
+  color: var(--dia-text-primary);
 }
-.pillDone .label { color: var(--dia-green-text); }
 
 /* 무사고 출근도장 달력 오버레이 (완료 pill 탭 시) */
 .calendarOverlay {

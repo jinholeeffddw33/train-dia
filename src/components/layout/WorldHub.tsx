@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Star } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { getUserRole } from '@/lib/auth';
@@ -156,7 +156,7 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
         <div className={styles.servicesGrid}>
           {SERVICES.map((s) => {
             const Icon = s.Icon;
-            const isPrimary = s.id === 'duty'; // 근무 = 파란 3D 테두리로 강조
+            const isPrimary = s.id === 'duty'; // 근무 = 얇은 파란 테두리로 강조
             const showBadge = s.id === 'safety' && safetyTotal > 0;
             return (
               <button
@@ -165,14 +165,8 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
                 className={`${styles.serviceCard} ${isPrimary ? styles.serviceCardPrimary : ''}`}
                 onClick={() => handleClick(s.id)}
                 aria-label={`${s.label} — ${s.desc}`}
-                data-tone={s.id}
                 data-press
               >
-                {isPrimary && (
-                  <span className={styles.svcBadge}>
-                    <Star size={11} fill="currentColor" strokeWidth={0} aria-hidden />안전
-                  </span>
-                )}
                 <span className={`${styles.serviceIcon} ${styles[s.iconClass]}`}>
                   <Icon size={24} strokeWidth={2.2} />
                 </span>
@@ -217,7 +211,7 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
           aria-label="네이버 카페 바로가기 (새 창)"
           data-press
         >
-          <span className={`${styles.standbyIcon} ${styles.cafeIcon}`}>
+          <span className={styles.standbyIcon}>
             <Coffee size={14} strokeWidth={2.4} />
           </span>
           <span className={styles.standbyLabel}>카페 바로가기</span>

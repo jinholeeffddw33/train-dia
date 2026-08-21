@@ -192,7 +192,8 @@ function RouteMap() {
           보던 자리를 잃는다. (useSwipeNav) */}
       <div className={styles.mapScroll} ref={scrollRef} data-swipe-guard>
         <svg
-          viewBox="0 0 960 580"
+          /* 높이 700 — 줄 간격을 100 으로 벌린 만큼(line5.ts) 캔버스도 함께 키운다 */
+          viewBox="0 0 960 700"
           className={styles.mapSvg}
           /* STYLE-EXCEPTION: SVG 동적 줌 */
           style={{ transform: `scale(${mapZoom})`, transformOrigin: 'center center' }}
@@ -274,7 +275,7 @@ function RouteMap() {
                   x={x}
                   y={y - (isDapsimni ? 16 : labelTier(x) === 0 ? 12 : 32)}
                   textAnchor="middle"
-                  className={styles.mapStationName}
+                  className={`${styles.mapStationName} ${styles.mapLabel}`}
                   fontSize={isDapsimni ? FS_STATION_MAIN : FS_STATION}
                   fill={isDapsimni ? 'var(--dia-blue-text)' : hasTrain ? 'var(--dia-amber-text)' : 'var(--dia-text-secondary)'}
                   fontWeight={isDapsimni ? 'bold' : 'normal'}
@@ -291,6 +292,7 @@ function RouteMap() {
                         x={x - 26}
                         y={y + 24 + ti * 44}
                         textAnchor="middle"
+                        className={styles.mapLabel}
                         fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                         fontWeight="bold"
@@ -302,6 +304,7 @@ function RouteMap() {
                           x={x - 26}
                           y={y + 42 + ti * 44}
                           textAnchor="middle"
+                          className={styles.mapLabel}
                           fontSize={FS_TRAIN}
                           fill="var(--dia-blue-text)"
                         >
@@ -319,6 +322,7 @@ function RouteMap() {
                         x={x + 26}
                         y={y + 24 + ti * 44}
                         textAnchor="middle"
+                        className={styles.mapLabel}
                         fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                         fontWeight="bold"
@@ -330,6 +334,7 @@ function RouteMap() {
                           x={x + 26}
                           y={y + 42 + ti * 44}
                           textAnchor="middle"
+                          className={styles.mapLabel}
                           fontSize={FS_TRAIN}
                           fill="var(--dia-blue-text)"
                         >
@@ -361,6 +366,7 @@ function RouteMap() {
                         x={x}
                         y={y + 52 + Math.max(upTrains.length, downTrains.length) * 44 + ti * 24}
                         textAnchor="middle"
+                        className={styles.mapLabel}
                         fontSize={FS_TRAIN}
                         fill={getTrainColor(t.trainNo, t.status)}
                       >

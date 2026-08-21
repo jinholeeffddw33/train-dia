@@ -876,10 +876,29 @@
   height: auto;
   min-width: 700px; /* 노안 가독 — SVG fontSize 18 × (700/960) ≈ 13px 실효 보장 */
   transition: transform var(--dia-dur-slow) ease;
+  /* 라벨 뒤에 깔 테두리 색 — 노선도 카드 바탕과 같은 톤(글래스라 솔리드 값으로 잡는다) */
+  --map-label-halo: #ffffff;
+}
+:global(:root.dark) .mapSvg {
+  --map-label-halo: #131B2E;
 }
 
 .mapFullscreen .mapSvg {
   min-width: 800px;
+}
+
+/* ── 라벨 겹침 대비 ──
+   역이 가로 70px 간격인데 '동대문역사문화공원' 같은 역명은 그보다 넓다. 좌표를 아무리
+   벌려도 라벨끼리 스치는 건 피할 수 없다. 그래서 글자 뒤에 바탕색 테두리를 한 겹 깔아,
+   겹치더라도 위에 그린 글자가 제 모양을 유지하게 한다(지도에서 쓰는 방식).
+   paint-order: stroke — 테두리를 먼저 칠하고 글자를 그 위에 얹는다. 없으면 테두리가
+   글자 획을 파고들어 오히려 뭉개진다. */
+.mapLabel {
+  paint-order: stroke;
+  stroke: var(--map-label-halo, #fff);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .mapStationName {

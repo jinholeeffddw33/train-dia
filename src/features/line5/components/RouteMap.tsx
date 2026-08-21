@@ -187,7 +187,10 @@ function RouteMap() {
         </span>
       </div>
 
-      <div className={styles.mapScroll} ref={scrollRef}>
+      {/* data-swipe-guard: 노선도 위에서 시작한 가로 스와이프는 탭 이동으로 넘기지 않는다.
+          손으로 끌어 보는 판이라, 끝까지 민 김에 한 번 더 밀었다고 교번·더보기로 튀면
+          보던 자리를 잃는다. (useSwipeNav) */}
+      <div className={styles.mapScroll} ref={scrollRef} data-swipe-guard>
         <svg
           viewBox="0 0 960 580"
           className={styles.mapSvg}

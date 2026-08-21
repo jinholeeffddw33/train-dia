@@ -41,13 +41,23 @@ export function useSwipeNav({ onSwipe, threshold = 60, edgeGuard = 16, enabled =
     let yieldRight = false;  // 시작 시점: 오른쪽으로 더 갈 수 있나(왼쪽 스와이프 양보)
 
     // 터치 지점에서 위로 올라가며 가장 가까운 가로 스크롤 요소를 찾는다(본문 루트까지).
+    /* 시작점은 Element 로 받는다 — SVG 안에서 시작한 터치도 타고 올라가야 하기 때문이다.
+       SVGElement 는 HTMLElement 가 아니라서 HTMLElement 로 좁히면 5호선 노선도(<svg> 한 장이
+       스크롤 상자를 가득 채운다)를 민 손가락이 첫 줄에서 걸러지고, 양보 로직이 통째로
+       건너뛰어져 노선도를 좌우로 훑을 때마다 교번·더보기 탭으로 넘어갔다.
+       스크롤 상자 판정 자체는 HTMLElement 로만 한다(SVG 내부 요소는 스크롤 상자가 아니다). */
     const findHScroller = (start: EventTarget | null): HTMLElement | null => {
-      let node = start instanceof HTMLElement ? start : null;
+      let node: Element | null = start instanceof Element ? start : null;
       const stop = el.parentElement;
       while (node && node !== stop) {
-        if (node.scrollWidth > node.clientWidth + 1) {
-          const ox = getComputedStyle(node).overflowX;
-          if (ox === 'auto' || ox === 'scroll') return node;
+        if (node instanceof HTMLElement) {
+          /* 지도처럼 손으로 끌어 보는 판은 끝까지 밀었더라도 탭을 넘기지 않는다 —
+             끝에서 한 번 더 민다고 다른 화면으로 튀면 보던 자리를 잃는다. */
+          if (node.dataset.swipeGuard !== undefined) return node;
+          if (node.scrollWidth > node.clientWidth + 1) {
+            const ox = getComputedStyle(node).overflowX;
+            if (ox === 'auto' || ox === 'scroll') return node;
+          }
         }
         node = node.parentElement;
       }
@@ -64,8 +74,9 @@ export function useSwipeNav({ onSwipe, threshold = 60, edgeGuard = 16, enabled =
       }
       sx = t.clientX; sy = t.clientY; active = true;
       const hs = findHScroller(t.target);
-      yieldLeft = !!hs && hs.scrollLeft > 0;
-      yieldRight = !!hs && hs.scrollLeft + hs.clientWidth < hs.scrollWidth - 1;
+      const guarded = !!hs && hs.dataset.swipeGuard !== undefined;
+      yieldLeft = !!hs && (guarded || hs.scrollLeft > 0);
+      yieldRight = !!hs && (guarded || hs.scrollLeft + hs.clientWidth < hs.scrollWidth - 1);
     }, { passive: true, signal });
 
     el.addEventListener('touchend', (e) => {

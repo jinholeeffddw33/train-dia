@@ -1,0 +1,525 @@
+/* 제한속도 운전 — 한 손으로 하는 게임이라 누르는 판을 크게, 숫자는 노안 기준으로 크게 */
+
+/* 누르는 판이 화면 끝까지 닿아야 한다 — 한 손으로 아무 데나 눌러 조작하는 게임이라,
+   판이 중간에서 끊기면 빈 곳을 눌렀을 때 역행이 안 걸린다. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+}
+@supports not (min-height: 100dvh) {
+  .wrap { min-height: 100vh; }
+}
+
+/* ── 헤더 ── (다른 게임과 같은 구성) */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: calc(var(--dia-space-3) + var(--sat)) var(--dia-space-4) var(--dia-space-3);
+}
+.backBtn,
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
+}
+.backBtn:active,
+.toggleBtn:active { transform: scale(0.95); }
+.toggleBtnOff { color: var(--dia-text-tertiary); }
+.headerTitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+/* 속도공부 — 제목 옆. 글자를 남겨 둔다(아이콘만 두면 무슨 버튼인지 모른다) */
+.studyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--dia-blue);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-blue-dim);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.studyBtn:active { transform: scale(0.95); }
+
+.roundBadge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 시작·결과 패널 ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-8) + var(--sab));
+}
+.lead {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-primary);
+}
+.lead b { color: var(--dia-blue); }
+.rules {
+  margin: 0;
+  padding-left: 1.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.6;
+}
+.rules b { color: var(--dia-text-primary); font-weight: 700; }
+.best {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+.best b { color: var(--dia-text-primary); font-variant-numeric: tabular-nums; }
+
+.primaryBtn {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-blue);
+  color: var(--dia-text-on-color);
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.primaryBtn:active { transform: scale(0.98); }
+
+/* ── 주행 화면 ── */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-6) + var(--sab));
+  border: none;
+  background: var(--dia-surface);
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;             /* 누른 채 끌 때 화면이 스크롤되면 조작이 끊긴다 */
+  transition: background var(--dia-dur-base) ease;
+}
+.stage_warn { background: var(--dia-amber-dim); }
+.stage_eb { background: var(--dia-red-dim); }
+
+.situation {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 62px;
+  justify-content: center;
+}
+.situationLabel {
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+/* 제한속도는 절대 여기 쓰지 않는다 — 답을 보여주면 암기가 되지 않는다 */
+.situationAsk {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  font-weight: 600;
+}
+
+/* 속도계와 주간제어기를 나란히 — 속도를 보면서 손은 핸들에 있어야 한다 */
+.readout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 5vw, 32px);
+  width: 100%;
+  margin: var(--dia-space-2) 0;
+}
+
+/* 속도계 — 화면에서 가장 큰 글자 */
+.gauge {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.gaugeV {
+  font-size: clamp(52px, 17vw, 92px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -3px;
+  font-variant-numeric: tabular-nums;
+}
+.gaugeUnit {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+}
+
+/* ── 주간제어기(T바) ──
+   실물처럼 위가 역행(P4~P1), 가운데가 중립, 아래가 제동(B1~B7)이다.
+   핸들은 눈금 사이를 미끄러지지 않고 단에 딱 붙는다 — 실물이 단마다 걸리기 때문이다. */
+.mc {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface-hover);
+  transition: box-shadow var(--dia-dur-base) ease, border-color var(--dia-dur-base) ease;
+}
+/* 잡으면 손에 들어온 티가 나야 한다 */
+.mcGrabbed {
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 2px var(--dia-blue-dim);
+}
+
+.mcSlot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding-left: 44px;      /* 핸들이 지나갈 자리 */
+}
+/* 핸들이 미끄러지는 축 — 이게 있어야 T 가 '레버'로 읽힌다 */
+.mcSlot::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 6px;
+  bottom: 6px;
+  width: 6px;
+  border-radius: 3px;
+  background: var(--dia-surface-active);
+}
+
+.mcTick {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  font-size: var(--dia-text-meta);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.mcTickN {
+  color: var(--dia-text-secondary);
+  font-weight: 800;
+}
+.mcTickOn {
+  color: var(--dia-blue);
+  font-weight: 800;
+}
+
+/* 핸들 — 단(--n: 0=P4 … 11=B7)에 따라 세로로 움직인다 */
+.mcHandle {
+  position: absolute;
+  left: 0;
+  top: calc(var(--n, 4) * 22px);
+  width: 44px;
+  height: 22px;
+  transition: top var(--dia-dur-fast) ease;
+}
+/* T 자 — 손이 잡는 가로 손잡이 + 축에 물리는 짧은 목 */
+.mcGrip {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 44px;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--dia-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.mcStem {
+  position: absolute;
+  left: 16px;
+  top: 3px;
+  width: 12px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--dia-text-secondary);
+}
+.mcGrabbed .mcGrip { background: var(--dia-blue); }
+.mcGrabbed .mcStem { background: var(--dia-blue-text); }
+
+.readyWord {
+  margin: var(--dia-space-6) 0 0;
+  font-size: var(--dia-text-4xl);
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--dia-blue);
+}
+
+.statusLine {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+  letter-spacing: 0.02em;
+  min-height: 22px;
+}
+.stage_warn .statusLine { color: var(--dia-amber-text); }
+.stage_eb .statusLine { color: var(--dia-red); }
+
+/* 구간 진행 — 앞 3/4 는 맞추는 시간, 마지막 1/4 은 그 속도를 유지해야 하는 판정 구간 */
+.track {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 14px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-hover);
+  overflow: hidden;
+  transition: box-shadow var(--dia-dur-base) ease;
+}
+/* 판정 구간을 눈에 보이게 갈라 둔다 — 언제부터 유지해야 하는지 알아야 맞출 수 있다 */
+.trackJudgeZone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 75%;
+  right: 0;
+  background: var(--dia-amber-dim);
+  border-left: 2px solid var(--dia-amber);
+}
+.trackJudging {
+  box-shadow: 0 0 0 2px var(--dia-amber);
+}
+.trackFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--pos, 0%);
+  background: var(--dia-blue);
+  opacity: 0.55;
+}
+.trackTrain {
+  position: absolute;
+  top: 50%;
+  left: var(--pos, 0%);
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--dia-text-primary);
+  box-shadow: 0 0 0 3px var(--dia-surface);
+}
+
+.trackLegend {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 420px;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+.legendOn {
+  color: var(--dia-amber-text);
+  font-weight: 700;
+}
+
+/* ── 정답 공개 ── */
+.revealStage {
+  justify-content: center;
+  gap: var(--dia-space-2);
+}
+.verdict {
+  padding: 4px 16px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.verdict_correct { background: var(--dia-green-dim); color: var(--dia-green-text); }
+.verdict_over    { background: var(--dia-red-dim);   color: var(--dia-red); }
+.verdict_slow    { background: var(--dia-amber-dim); color: var(--dia-amber-text); }
+
+.answer {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: var(--dia-space-1);
+}
+.answerV {
+  font-size: clamp(72px, 26vw, 128px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -4px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dia-blue);
+}
+.answerU {
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.answerMine {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  color: var(--dia-text-secondary);
+}
+.answerMine b { color: var(--dia-text-primary); font-variant-numeric: tabular-nums; }
+.answerSource {
+  margin: 0;
+  max-width: 30ch;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  line-height: 1.55;
+}
+.answerScore {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-green-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.foot {
+  display: flex;
+  gap: var(--dia-space-4);
+  margin-top: auto;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+.footItem b {
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.ebOn { color: var(--dia-red); }
+
+.hint {
+  margin: 0;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── 결과 ── */
+.resultTitle {
+  margin: 0;
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.resultScore {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.resultScoreV {
+  font-size: clamp(40px, 13vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--dia-blue);
+}
+.resultScoreU {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+}
+.record {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-green-text);
+}
+
+/* 틀린 구간 복습 — 틀린 채로 넘어가지 않게 근거까지 붙인다 */
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  text-align: left;
+}
+.reviewTitle {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.reviewList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.reviewList li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 10px;
+  border-left: 3px solid var(--dia-red);
+}
+.reviewList b {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+}
+.reviewLimit {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-red);
+  font-variant-numeric: tabular-nums;
+}
+.reviewLimit em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--dia-text-tertiary);
+}
+.reviewList small {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backBtn, .toggleBtn, .primaryBtn, .stage { transition: none; }
+}

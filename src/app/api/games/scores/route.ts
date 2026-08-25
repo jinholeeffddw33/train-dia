@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 
-const VALID_GAMES = ['snake', 'reaction', 'mental', 'simon', 'halli', 'apex'] as const;
+const VALID_GAMES = ['snake', 'reaction', 'mental', 'simon', 'halli', 'apex', 'speed'] as const;
 
 // 게임별 점수 상한 — 클라이언트 점수 위조 방어(안티치트). APEX 는 3D 실시간이라 위조가 쉬워 상한 필수.
 //   APEX 이론 최대 ≈ 거리 10만m × 150/m = 1500만이지만, 현실 상위 플레이는 수십만 → 500만으로 넉넉히 차단.
-const SCORE_CAP: Record<string, number> = { apex: 5_000_000 };
+//   speed(제한속도 운전)는 12구간 × (거리 약 233 + 보너스 400) ≈ 7,600 이 상한이라 2만으로 잘라 둔다.
+const SCORE_CAP: Record<string, number> = { apex: 5_000_000, speed: 20_000 };
 
 /** POST: 점수 저장 */
 export async function POST(req: NextRequest) {

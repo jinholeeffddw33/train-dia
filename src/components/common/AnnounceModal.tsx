@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import Image from 'next/image';
-import { X, Megaphone } from 'lucide-react';
+import { X, Megaphone, Gauge } from 'lucide-react';
 import { requestEntryModal } from '@/lib/entryModalGate';
 import styles from './InternWelcomeModal.module.css';
 
 import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
-// 3일 공지 (2026-07-14 ~ 07-16). 전 직원 대상.
-const STORAGE_KEY = 'announce-2026-07-14-dismiss';
-const SHOW_FROM = '2026-07-14';
-const SHOW_UNTIL = '2026-07-16';
+// 스피드 마스터 안내 (2026-08-26 ~ 08-28). 전 직원 대상.
+// SHOW_UNTIL 은 그 날짜까지 포함이라 28일 밤 12시에 저절로 내려간다.
+const STORAGE_KEY = 'announce-2026-08-26-speedmaster-dismiss';
+const SHOW_FROM = '2026-08-26';
+const SHOW_UNTIL = '2026-08-28';
 
 function todayStr(): string {
   const d = new Date();
@@ -31,7 +31,7 @@ export default function AnnounceModal() {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldShow()) requestEntryModal('announce-2026-07-14', () => setOpen(true));
+    if (shouldShow()) requestEntryModal('announce-2026-08-26-speedmaster', () => setOpen(true));
   }, []);
 
   const handleClose = useCallback(() => setOpen(false), []);
@@ -80,15 +80,21 @@ export default function AnnounceModal() {
         </div>
 
         <div className={styles.body}>
-          <div className={styles.photoWrap}>
-            <Image
-              src="/notice/announce-2026-07-14.png"
-              alt="공지사항 이미지"
-              width={1536}
-              height={1024}
-              className={styles.photo}
-              priority
-            />
+          <div className={styles.noticeBody}>
+            <h3 className={styles.noticeHead}>새 게임 — 스피드 마스터</h3>
+            <p className={styles.noticeText}>
+              쉬는 시간에 <b>운행 속도를 익히는 게임</b>이 새로 생겼습니다.
+            </p>
+            <p className={styles.noticeText}>
+              화면에는 상황만 나옵니다. <b>몇 km/h로 가야 하는지 직접 판단</b>해서,
+              주간제어기를 잡고 역행·제동으로 속도를 맞추면 됩니다.
+              구간이 끝나면 정답을 알려드립니다.
+            </p>
+            <p className={styles.noticeWhere}>
+              <Gauge size={18} strokeWidth={2.2} />
+              라이프 → 스피드 마스터
+            </p>
+            <p className={styles.noticeUntil}>이 안내는 8월 28일까지 보입니다.</p>
           </div>
         </div>
 

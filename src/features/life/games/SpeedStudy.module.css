@@ -1,0 +1,147 @@
+/* 속도 공부하기 — 게임 위에 덮는 전체 화면. 노안 기준으로 숫자를 크게 잡는다. */
+
+.wrap {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-modal);
+  display: flex;
+  flex-direction: column;
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-shrink: 0;
+  padding: calc(var(--dia-space-3) + var(--sat)) var(--dia-space-4) var(--dia-space-3);
+  border-bottom: 1px solid var(--dia-border);
+  background: var(--dia-surface);
+}
+.title {
+  flex: 1;
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.closeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.closeBtn:active { transform: scale(0.95); }
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-10) + var(--sab));
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-5);
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.6;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.groupTitle {
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--dia-border);
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--dia-text-secondary);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-3);
+}
+
+/* 속도 — 이 화면의 주인공이라 가장 크고 또렷하게 */
+.limit {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 6px 8px;
+  border-radius: var(--dia-radius-md);
+  border-left: 3px solid currentColor;
+  background: var(--dia-surface);
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.limit em {
+  font-style: normal;
+  font-size: var(--dia-text-meta);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.75;
+}
+.bandStop { color: var(--dia-red); }
+.bandCaution { color: var(--dia-amber-text); }
+.bandGo { color: var(--dia-green-text); }
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 2px;
+}
+.itemLabel {
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+.itemSource {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  line-height: 1.5;
+}
+
+.foot {
+  margin: 0;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .closeBtn { transition: none; }
+}

@@ -90,6 +90,45 @@
   border: 1px solid var(--dia-border);
 }
 
+/* ── 글로 쓰는 공지 (사진 없는 경우) ── */
+.noticeBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+.noticeHead {
+  margin: 0;
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--dia-text-primary);
+}
+.noticeText {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  line-height: 1.7;
+  color: var(--dia-text-secondary);
+}
+.noticeText b { color: var(--dia-text-primary); font-weight: 700; }
+/* 어디 있는지 한 줄로 — 공지를 보고 바로 찾아갈 수 있어야 한다 */
+.noticeWhere {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-blue-dim);
+  border: 1px solid var(--dia-blue);
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+.noticeUntil {
+  margin: 0;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+}
+
 .photo {
   width: 100%;
   height: auto;

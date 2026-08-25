@@ -41,8 +41,8 @@ export const ROSTER_CHANGES: RosterChange[] = [
   { from: '2026-08-19', I: '49',  n: '박민석', s: '22600519', replaces: '결원07', leaves: 'intern' },
 
   // 2026-08-27 — 인턴 2명 정식 기관사 임용
-  { from: '2026-08-27', I: '168', n: '강미진', s: '22601008', replaces: '결원09', leaves: 'intern' },
-  { from: '2026-08-27', I: '83',  n: '한지승', s: '22601004', replaces: '결원05', leaves: 'intern' },
+  { from: '2026-08-27', I: '83',  n: '강미진', s: '22601008', replaces: '결원05', leaves: 'intern' },
+  { from: '2026-08-27', I: '168', n: '한지승', s: '22601004', replaces: '결원09', leaves: 'intern' },
 ];
 
 /** KST 기준 오늘 날짜 문자열 — 시행일 비교용 */

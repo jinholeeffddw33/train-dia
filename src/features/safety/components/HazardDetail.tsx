@@ -61,7 +61,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const [commentMenuId, setCommentMenuId] = useState<string | null>(null);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
+  /** 크게 볼 사진의 순번 — null 이면 닫힘 (여러 장이라 '열림/닫힘'만으로는 부족하다) */
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const [readStatus, setReadStatus] = useState<ReadStatusResponse | null>(null);
   const [readStatusExpanded, setReadStatusExpanded] = useState(false);
@@ -69,6 +70,11 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const report = useHazardStore((s) => s.reports.find((r) => r.id === reportId));
+  /* 보여 줄 사진들 — 빈 값·placeholder 를 걸러 낸다. 서버가 옛 글도 한 장짜리 목록으로
+     맞춰 주므로 여기서는 "여러 장"만 다루면 된다. */
+  const photoUrls = (report?.photoUrls ?? []).filter(
+    (u) => u && u.length > 10 && !u.includes('placeholder'),
+  );
   const comments = useHazardStore((s) => s.comments[reportId] ?? EMPTY_COMMENTS);
   const loadingComments = useHazardStore((s) => s.loadingComments);
   const loadingReports = useHazardStore((s) => s.loadingReports);
@@ -401,21 +407,31 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       </header>
 
       <div className={styles.detailScroll}>
-        {/* 사진 — 빈 URL/placeholder 숨김 + 로드 실패 시 숨김. 탭하면 라이트박스로 확대 */}
-        {report.photoUrl && !report.photoUrl.includes('placeholder') && report.photoUrl.length > 10 && (
-          <button
-            type="button"
-            className={styles.detailPhotoBtn}
-            onClick={() => setLightboxOpen(true)}
-            aria-label="사진 크게 보기"
-          >
-            <img
-              src={report.photoUrl}
-              alt="첨부 사진"
-              className={styles.detailPhoto}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          </button>
+        {/* 사진 — 여러 장이면 옆으로 밀어 넘긴다. 빈 URL/placeholder 숨김 + 로드 실패 시 숨김.
+            탭하면 라이트박스로 확대. 한 장뿐이면 예전과 똑같이 한 장만 보인다.
+            data-swipe-guard: 사진을 넘기려던 손짓이 탭 이동으로 새지 않게(useSwipeNav) */}
+        {photoUrls.length > 0 && (
+          <div className={styles.detailPhotoStrip} data-swipe-guard>
+            {photoUrls.map((url, i) => (
+              <button
+                key={url}
+                type="button"
+                className={`${styles.detailPhotoBtn} ${photoUrls.length > 1 ? styles.detailPhotoBtnMulti : ''}`}
+                onClick={() => setLightboxIdx(i)}
+                aria-label={photoUrls.length > 1 ? `사진 ${i + 1}/${photoUrls.length} 크게 보기` : '사진 크게 보기'}
+              >
+                <img
+                  src={url}
+                  alt={photoUrls.length > 1 ? `첨부 사진 ${i + 1}` : '첨부 사진'}
+                  className={styles.detailPhoto}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+                {photoUrls.length > 1 && (
+                  <span className={styles.detailPhotoCount}>{i + 1}/{photoUrls.length}</span>
+                )}
+              </button>
+            ))}
+          </div>
         )}
 
         {/* 내용 */}
@@ -686,7 +702,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <button
                     type="button"
                     className={styles.noticeFileLink}
-                    onClick={() => setLightboxOpen(true)}
+                    onClick={() => setLightboxIdx(0)}
                   >
                     <Paperclip size={14} /> 첨부파일 보기
                   </button>
@@ -913,9 +929,13 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
         </div>
       </div>
 
-      {/* 첨부파일 라이트박스 — 이미지면 인라인 표시, 그 외엔 다운로드 */}
-      {lightboxOpen && report.photoUrl && (
-        <AttachmentLightbox url={report.photoUrl} onClose={() => setLightboxOpen(false)} />
+      {/* 첨부파일 라이트박스 — 이미지면 인라인 표시, 그 외엔 다운로드.
+          여러 장이면 누른 사진부터 연다(사진 목록이 비면 대표 사진으로 되돌아간다). */}
+      {lightboxIdx !== null && (photoUrls[lightboxIdx] ?? report.photoUrl) && (
+        <AttachmentLightbox
+          url={photoUrls[lightboxIdx] ?? report.photoUrl}
+          onClose={() => setLightboxIdx(null)}
+        />
       )}
 
       {/* 삭제/조치완료 확인 — window.confirm 대체 */}

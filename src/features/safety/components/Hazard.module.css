@@ -682,6 +682,102 @@
   object-fit: cover;
 }
 
+/* ── 고른 사진 목록 (최대 10장) ──
+   한 줄에 3칸씩. 사진이 늘어도 등록 화면이 길어지지 않도록 정사각 썸네일로 줄인다. */
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--dia-space-2);
+  width: 100%;
+}
+
+.photoThumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--dia-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--dia-border);
+  background: var(--dia-surface);
+}
+
+.photoThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 첫 장은 목록 썸네일로 쓰이는 대표 사진 — 어느 것이 대표인지 보여 준다 */
+.photoThumbBadge {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 2px 6px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+}
+
+/* 빼기 버튼 — 손가락으로 누를 수 있게 44px 판을 두고 안에 작은 원을 그린다 */
+.photoThumbRemove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 4px;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: var(--dia-text-sm);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photoThumbRemove::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.photoThumbRemove > * ,
+.photoThumbRemove {
+  z-index: 1;
+}
+
+.photoAddBtn {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 2px dashed var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--dia-transition-fast);
+}
+.photoAddBtn:hover,
+.photoAddBtn:focus { border-color: var(--dia-amber); outline: none; }
+.photoAddBtn:active { transform: scale(0.98); }
+
+.photoAddIcon { font-size: var(--dia-text-xl); line-height: 1; }
+.photoAddCount { font-size: var(--dia-text-meta); }
+
 .photoPickerIcon { font-size: 32px; }
 
 .photoPickerLabel {
@@ -1651,8 +1747,40 @@
   background: transparent;
   border: none;
   cursor: zoom-in;
+  position: relative;
 }
 .detailPhotoBtn:active { opacity: 0.92; }
+
+/* ── 사진 여러 장 — 옆으로 밀어 넘기는 사진첩 ──
+   한 번에 한 장이 꽉 차게 보이고, 손을 떼면 그 장에 딱 멈춘다(scroll-snap).
+   사진이 한 장이면 칸이 하나뿐이라 예전과 똑같이 보인다. */
+.detailPhotoStrip {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.detailPhotoStrip::-webkit-scrollbar { display: none; }
+
+.detailPhotoBtnMulti {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+}
+
+/* 지금 몇 번째인지 — 사진 위 오른쪽 아래에 작게 */
+.detailPhotoCount {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 3px 9px;
+  border-radius: var(--dia-radius-full);
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
 
 /* ── 라이트박스 (전체화면 사진 확대) ── */
 .lightboxOverlay {

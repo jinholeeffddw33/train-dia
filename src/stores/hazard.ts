@@ -6,7 +6,10 @@ export type SafetyCategory = 'hazard' | 'action' | 'inspect';
 
 export interface HazardReport {
   id: string;
+  /** 대표 사진(첫 장) — 목록 썸네일이 쓴다 */
   photoUrl: string;
+  /** 첨부한 사진 전부. 사진이 한 장뿐이면 photoUrl 과 같은 한 장이 들어 있다 */
+  photoUrls: string[];
   attachmentUrl: string;
   attachmentName: string;
   description: string;
@@ -48,7 +51,8 @@ interface HazardState {
   loadingComments: boolean;
   fetchReports: (currentSabun?: string, category?: SafetyCategory) => Promise<void>;
   createReport: (params: {
-    photo: File | null;
+    /** 첨부할 사진들 — 고른 순서대로. 첫 장이 대표 사진이 된다 */
+    photos: File[];
     attachment?: File | null;
     description: string;
     location: string;
@@ -101,9 +105,10 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     set({ loadingReports: false });
   },
 
-  createReport: async ({ photo, attachment, description, location, name, sabun, category }) => {
+  createReport: async ({ photos, attachment, description, location, name, sabun, category }) => {
     const formData = new FormData();
-    if (photo) formData.append('photo', photo);
+    // 같은 이름으로 여러 번 담는다 — 서버가 getAll('photo') 로 순서대로 받는다
+    for (const photo of photos) formData.append('photo', photo);
     if (attachment) formData.append('attachment', attachment, attachment.name);
     formData.append('description', description);
     formData.append('location', location);

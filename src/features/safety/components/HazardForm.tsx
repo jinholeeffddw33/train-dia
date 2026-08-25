@@ -8,6 +8,11 @@ import { useAuthStore } from '@/stores/auth';
 import { showToast } from '@/components/common/Toast';
 import styles from './Hazard.module.css';
 
+/** 한 번에 올릴 수 있는 사진 수. 서버(api/safety/hazards)와 같은 값을 쓴다.
+    사진마다 5MB 이하로 줄여 보내므로 10장이면 넉넉잡아 한 번에 수십 MB다 — 현장에서
+    데이터로 올리는 것을 감안한 상한. */
+const MAX_PHOTOS = 10;
+
 async function compressImage(file: File): Promise<File> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -113,8 +118,9 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const defaultStation = variant.stationPicker ? STATIONS[0] : '';
   const defaultTrain = variant.trainPicker ? TRAIN_NUMBERS[0] : '';
 
-  const [photo, setPhoto] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  /* 사진은 여러 장(최대 MAX_PHOTOS). photos[i] 와 previews[i] 는 같은 순서로 짝을 이룬다 */
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [attachment, setAttachment] = useState<File | null>(null);
   const [titleText, setTitleText] = useState('');
   const [description, setDescription] = useState('');
@@ -142,14 +148,42 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
   const name = authName || driverName;
   const sabun = authSabun || driverSabun;
 
+  /**
+   * 고른 사진들을 뒤에 이어 붙인다(한 번에 여러 장 선택 가능, 나눠서 골라도 쌓인다).
+   *
+   * 10장을 넘기면 넘는 만큼만 버리고 이미 고른 것은 남긴다 — 다 지우고 다시 고르게 하면
+   * 현장에서 사진 고르던 걸 처음부터 다시 해야 한다.
+   */
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = ''; // 같은 사진을 다시 고를 수 있게 비운다
+    if (picked.length === 0) return;
     setError('');
-    const compressed = await compressImage(file);
-    setPhoto(compressed);
-    setPreview(URL.createObjectURL(compressed));
-    if (variant.drivingHoPicker) void scanPhoto(compressed);
+
+    const room = MAX_PHOTOS - photos.length;
+    if (room <= 0) {
+      setError(`사진은 ${MAX_PHOTOS}장까지 올릴 수 있어요`);
+      return;
+    }
+    if (picked.length > room) {
+      setError(`사진은 ${MAX_PHOTOS}장까지예요. ${room}장만 담았어요`);
+    }
+
+    const compressed = await Promise.all(picked.slice(0, room).map(compressImage));
+    setPhotos((prev) => [...prev, ...compressed]);
+    setPreviews((prev) => [...prev, ...compressed.map((f) => URL.createObjectURL(f))]);
+    // 운전정보 자동 인식은 첫 장 기준 — 여러 장을 한꺼번에 읽어 봐야 서로 덮어쓴다
+    if (variant.drivingHoPicker && photos.length === 0) void scanPhoto(compressed[0]);
+  };
+
+  /** 고른 사진 한 장 빼기 */
+  const removePhoto = (idx: number) => {
+    setPreviews((prev) => {
+      URL.revokeObjectURL(prev[idx]);
+      return prev.filter((_, i) => i !== idx);
+    });
+    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+    setError('');
   };
 
   /** 운전정보 사진에서 제목·분류·호수·내용을 읽어 폼을 미리 채운다 (사람이 확인 후 등록) */
@@ -228,7 +262,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
           ? drivingHo.trim()
           : (variant.showLocation ? location.trim() : '');
       await createReport({
-        photo,
+        photos,
         attachment,
         description: finalDescription,
         location: finalLocation,
@@ -236,7 +270,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
         sabun,
         category: variant.dataCategory,
       });
-      if (preview) URL.revokeObjectURL(preview);
+      previews.forEach((p) => URL.revokeObjectURL(p));
       showToast('등록했어요', 'success');
       onClose();
     } catch (e) {
@@ -250,29 +284,56 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
     <div className={styles.formWrap}>
       <h2 className={styles.formTitle}>{variant.title}</h2>
 
-      {/* 사진 선택 (선택 사항) */}
-      <div
-        className={`${styles.photoPickerArea} ${preview ? styles.photoPickerAreaFilled : ''}`}
-        onClick={() => fileRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
-        aria-label="사진 선택"
-      >
-        {preview ? (
-          <img src={preview} alt="선택된 사진" className={styles.photoPreview} />
-        ) : (
-          <>
-            <span className={styles.photoPickerIcon}>📷</span>
-            <span className={styles.photoPickerLabel}>사진 촬영 / 선택 (선택 사항)</span>
-            <span className={styles.photoPickerHint}>사진과 파일을 함께 첨부할 수 있어요</span>
-          </>
-        )}
-      </div>
+      {/* 사진 선택 (선택 사항, 최대 MAX_PHOTOS장) */}
+      {photos.length === 0 ? (
+        <div
+          className={styles.photoPickerArea}
+          onClick={() => fileRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
+          aria-label="사진 선택"
+        >
+          <span className={styles.photoPickerIcon}>📷</span>
+          <span className={styles.photoPickerLabel}>사진 촬영 / 선택 (선택 사항)</span>
+          <span className={styles.photoPickerHint}>최대 {MAX_PHOTOS}장까지 · 파일도 함께 첨부할 수 있어요</span>
+        </div>
+      ) : (
+        <div className={styles.photoGrid}>
+          {previews.map((src, i) => (
+            <div key={src} className={styles.photoThumb}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={src} alt={`선택한 사진 ${i + 1}`} className={styles.photoThumbImg} />
+              {/* 첫 장이 목록에 뜨는 대표 사진이라 표시해 준다 */}
+              {i === 0 && <span className={styles.photoThumbBadge}>대표</span>}
+              <button
+                type="button"
+                className={styles.photoThumbRemove}
+                onClick={() => removePhoto(i)}
+                aria-label={`${i + 1}번째 사진 빼기`}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          {photos.length < MAX_PHOTOS && (
+            <button
+              type="button"
+              className={styles.photoAddBtn}
+              onClick={() => fileRef.current?.click()}
+              aria-label="사진 더 고르기"
+            >
+              <span className={styles.photoAddIcon}>＋</span>
+              <span className={styles.photoAddCount}>{photos.length}/{MAX_PHOTOS}</span>
+            </button>
+          )}
+        </div>
+      )}
       <input
         ref={fileRef}
         type="file"
         accept="image/*"
+        multiple
         className={styles.hiddenInput}
         onChange={handlePhotoChange}
         aria-label="사진 파일 선택"

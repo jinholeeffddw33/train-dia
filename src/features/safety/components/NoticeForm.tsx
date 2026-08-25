@@ -82,7 +82,8 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
       }
 
       await createReport({
-        photo: photoFile,
+        // 공지는 사진 한 장 그대로 — 여러 장 첨부는 위험개소·열차정보 등록에서만 쓴다
+        photos: photoFile ? [photoFile] : [],
         description: desc,
         location: '',
         name,

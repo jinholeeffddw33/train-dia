@@ -44,7 +44,15 @@ const STAGE_PASS = 900;
 const stageSec = (stage: number) => 16 - (stage - 1) * 2;   // 16 · 14 · 12 · 10
 
 /** 계기판 최대 눈금 (km/h) */
-const MAX_SPEED = 100;
+const MAX_SPEED = 80;
+
+/* 눈금에 적는 숫자 — 5·15·25… 처럼 끝자리 5로 적는다(진호 요청).
+   제한속도가 5·15·25·45 처럼 5로 끝나는 값이 대부분이라, 그 숫자가 눈금에 직접 적혀
+   있어야 바늘을 갖다 댈 자리가 보인다. 0·20·40 만 적혀 있으면 25 를 눈대중해야 한다. */
+const DIAL_LABELS = Array.from(
+  { length: Math.floor((MAX_SPEED - 5) / 10) + 1 },
+  (_, i) => 5 + i * 10,
+);
 
 /** 역행 1~4단 가속도 (km/h per sec)
     예전엔 P4 가 26이라 순식간에 최고속도까지 닿았다 — 답을 알아도 손이 못 따라갔다.
@@ -144,12 +152,12 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
           d={`M ${start.x} ${start.y} A ${DIAL_R} ${DIAL_R} 0 ${large} 1 ${cur.x} ${cur.y}`}
           className={styles.dialFill}
         />
-        {/* 10km/h 마다 눈금, 20 마다 길게 */}
-        {Array.from({ length: MAX_SPEED / 10 + 1 }, (_, i) => i * 10).map((s) => {
+        {/* 5km/h 마다 눈금 — 숫자를 적는 자리(5·15·25…)는 길게 */}
+        {Array.from({ length: MAX_SPEED / 5 + 1 }, (_, i) => i * 5).map((s) => {
           const ang = dialAngle(s);
-          const long = s % 20 === 0;
+          const long = DIAL_LABELS.includes(s);
           const p1 = polar(ang, DIAL_R + 1);
-          const p2 = polar(ang, DIAL_R - (long ? 12 : 7));
+          const p2 = polar(ang, DIAL_R - (long ? 12 : 6));
           return (
             <line
               key={s}
@@ -158,9 +166,9 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
             />
           );
         })}
-        {/* 20km/h 마다 숫자 — 가운데 큰 숫자와 겹치지 않게 눈금 가까이 붙인다 */}
-        {Array.from({ length: MAX_SPEED / 20 + 1 }, (_, i) => i * 20).map((s) => {
-          const p = polar(dialAngle(s), DIAL_R - 21);
+        {/* 숫자 — 여덟 개라 촘촘하다. 눈금에 바짝 붙여 가운데 큰 숫자와 겹치지 않게 한다 */}
+        {DIAL_LABELS.map((s) => {
+          const p = polar(dialAngle(s), DIAL_R - 13);
           return (
             <text key={s} x={p.x} y={p.y + 4} className={styles.dialNum} textAnchor="middle">
               {s}
@@ -171,10 +179,10 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
             SVG 안에 넣어야 계기판이 커지거나 작아져도 자리가 그대로다. */}
         {!sweep && (
           <>
-            <text x={DIAL_CX} y={78} textAnchor="middle" className={styles.dialValue}>
+            <text x={DIAL_CX} y={80} textAnchor="middle" className={styles.dialValue}>
               {Math.floor(v)}
             </text>
-            <text x={DIAL_CX} y={92} textAnchor="middle" className={styles.dialUnit}>
+            <text x={DIAL_CX} y={93} textAnchor="middle" className={styles.dialUnit}>
               km/h
             </text>
           </>

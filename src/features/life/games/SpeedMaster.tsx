@@ -31,7 +31,9 @@ interface Props {
 
 /* ── 규칙 ── */
 const SECTION_COUNT = 10;
-const SECTION_SEC = 13;          // 한 구간 — 생각하고 맞출 시간
+/* 한 구간 — 생각하고, 맞추고, 유지하는 시간. 13초는 촉박해서 답을 떠올려도 손이 못 따라갔다.
+   18초로 늘려 조정 구간만 13.5초를 준다(그중 마지막 4.5초가 판정). */
+const SECTION_SEC = 18;
 const JUDGE_RATIO = 0.25;        // 마지막 1/4 이 판정 구간
 const REVEAL_MS = 2600;          // 정답 보여주는 시간
 
@@ -44,11 +46,8 @@ const MAX_SPEED = 80;
 const POWER_ACC = [0, 3, 6, 8.5, 11];
 /** 제동 1~7단 감속도 (km/h per sec) — 가속을 낮춘 만큼 함께 낮춰 균형을 맞춘다 */
 const BRAKE_DEC = [0, 2, 3.5, 5, 7, 9.5, 12, 15];
-const EB_DECEL = 55;
-/* 제한속도는 '이하'다. 조금이라도 넘으면 그 순간 오답이고 경고가 울린다.
+/* 제한속도는 '이하'다. 조금이라도 넘으면 그 구간은 오답이고 경고가 울린다.
    (실제 ATC 는 1km/h 초과에서 경고음이지만, 이 게임은 외우게 하는 것이 목적이라 더 엄격하다) */
-const EB_OVER = 4;
-const MAX_EB = 3;
 const READY_MS = 2200;
 
 const MAX_P = 4;
@@ -215,8 +214,8 @@ export default function SpeedMaster({ onBack }: Props) {
   const [study, setStudy] = useState(false);
 
   const [hud, setHud] = useState({
-    v: 0, idx: 0, t: 0, score: 0, eb: 0,
-    warn: false, braking: false, notch: 0, grabbed: false, judging: false,
+    v: 0, idx: 0, t: 0, score: 0,
+    warn: false, notch: 0, grabbed: false, judging: false,
   });
 
   const { feedback, soundOn, vibrateOn, toggleSound, toggleVibrate } = useGameFeedback();
@@ -225,8 +224,8 @@ export default function SpeedMaster({ onBack }: Props) {
   const play = useCallback((k: Parameters<typeof feedback>[0]) => fbRef.current(k), []);
 
   const run = useRef({
-    v: 0, t: 0, idx: 0, score: 0, eb: 0,
-    notch: 0, ebActive: false, warned: false, overInJudge: false,
+    v: 0, t: 0, idx: 0, score: 0,
+    notch: 0, warned: false, overInJudge: false,
     judgeSum: 0, judgeN: 0,
     sections: [] as Section[],
   });
@@ -299,13 +298,13 @@ export default function SpeedMaster({ onBack }: Props) {
 
     timerRef.current = window.setTimeout(() => {
       r.idx += 1;
-      if (r.idx >= r.sections.length || r.eb >= MAX_EB) { finish(); return; }
+      if (r.idx >= r.sections.length) { finish(); return; }
       // 다음 구간은 정지 상태에서 다시 시작한다 — 앞 구간 속도가 힌트가 되면 안 된다
-      r.v = 0; r.t = 0; r.notch = 0; r.ebActive = false; r.warned = false;
+      r.v = 0; r.t = 0; r.notch = 0; r.warned = false;
       r.overInJudge = false; r.judgeSum = 0; r.judgeN = 0;
       grab.current = null;
       setRevealed(null);
-      setHud((h) => ({ ...h, v: 0, t: 0, idx: r.idx, notch: 0, warn: false, braking: false, judging: false, grabbed: false }));
+      setHud((h) => ({ ...h, v: 0, t: 0, idx: r.idx, notch: 0, warn: false, judging: false, grabbed: false }));
       setPhase('running');
       lastRef.current = performance.now();
       rafRef.current = requestAnimationFrame(tickRef.current!);
@@ -325,10 +324,7 @@ export default function SpeedMaster({ onBack }: Props) {
     const limit = sec.rule.limit;
 
     /* ── 속도 ── 역행은 단수만큼 가속, 제동은 단수만큼 감속, 중립은 타행이라 유지 */
-    if (r.ebActive) {
-      r.v = Math.max(0, r.v - EB_DECEL * dt);
-      if (r.v <= 0.1) { r.ebActive = false; r.v = 0; }
-    } else if (r.notch > 0) {
+    if (r.notch > 0) {
       r.v = Math.min(MAX_SPEED, r.v + POWER_ACC[r.notch] * dt);
     } else if (r.notch < 0) {
       r.v = Math.max(0, r.v - BRAKE_DEC[-r.notch] * dt);
@@ -337,35 +333,27 @@ export default function SpeedMaster({ onBack }: Props) {
     r.t += dt;
     const judging = r.t >= SECTION_SEC * (1 - JUDGE_RATIO);
 
-    /* ── 초과 판정 — 실제와 같은 기준 ── */
-    if (!r.ebActive) {
-      const over = r.v - limit;
-      if (over > EB_OVER) {
-        r.ebActive = true;
-        r.eb += 1;
-        r.notch = -MAX_B;
-        r.overInJudge = true;      // 비상제동은 구간 어디서 걸렸든 오답
-        r.score = Math.max(0, r.score - 50);
-        play('fail');
-      } else if (over > 0) {
-        if (!r.warned) { r.warned = true; play('fail'); }
-        /* 구간 어디서 넘겼든 그 구간은 오답이다. 판정 구간에서만 따지면, 앞에서 슬쩍 올려
-           경고가 뜨는 지점을 찾아 답을 알아낸 뒤 내려오는 게 가능해진다 — 그러면 외울 이유가 없다.
-           실제로도 제한속도는 '이하'라 넘긴 순간 위반이다. */
-        r.overInJudge = true;
-      } else {
-        r.warned = false;
-      }
+    /* ── 초과 판정 ──
+       넘기면 그 구간은 오답이고 경고가 울린다. 다만 강제로 세우지는 않는다 —
+       전에는 4km/h 넘기면 비상제동이 걸려 속도가 0이 됐는데, 한 번 넘기면 그 구간을
+       되돌릴 방법이 없어 배우기 전에 게임이 끝나 버렸다(진호 요청으로 없앰).
+       구간 어디서 넘겼든 오답인 것은 그대로다. 판정 구간에서만 따지면 앞에서 슬쩍 올려
+       경고가 뜨는 지점을 찾아 답을 알아낸 뒤 내려오는 게 가능해진다 — 그러면 외울 이유가 없다. */
+    if (r.v > limit) {
+      if (!r.warned) { r.warned = true; play('fail'); }
+      r.overInJudge = true;
+    } else {
+      r.warned = false;
     }
 
     /* ── 판정 구간에서만 채점용 속도를 모은다 ── */
-    if (judging && !r.ebActive) { r.judgeSum += r.v; r.judgeN += 1; }
+    if (judging) { r.judgeSum += r.v; r.judgeN += 1; }
 
     if (r.t >= SECTION_SEC) { closeSection(); return; }
 
     setHud({
       v: r.v, idx: r.idx, t: r.t, score: Math.round(r.score),
-      eb: r.eb, warn: !r.ebActive && r.v > limit, braking: r.ebActive,
+      warn: r.v > limit,
       notch: r.notch, grabbed: grab.current !== null, judging,
     });
     rafRef.current = requestAnimationFrame(tick);
@@ -376,15 +364,15 @@ export default function SpeedMaster({ onBack }: Props) {
   const start = useCallback(() => {
     const secs = buildSections();
     run.current = {
-      v: 0, t: 0, idx: 0, score: 0, eb: 0,
-      notch: 0, ebActive: false, warned: false, overInJudge: false,
+      v: 0, t: 0, idx: 0, score: 0,
+      notch: 0, warned: false, overInJudge: false,
       judgeSum: 0, judgeN: 0,
       sections: secs,
     };
     grab.current = null;
     setSections(secs);
     setRevealed(null);
-    setHud({ v: 0, idx: 0, t: 0, score: 0, eb: 0, warn: false, braking: false, notch: 0, grabbed: false, judging: false });
+    setHud({ v: 0, idx: 0, t: 0, score: 0, warn: false, notch: 0, grabbed: false, judging: false });
     setPhase('ready');
     play('button');
     timerRef.current = window.setTimeout(() => {
@@ -436,7 +424,7 @@ export default function SpeedMaster({ onBack }: Props) {
 
   const cur = run.current.sections[hud.idx];
   const progress = Math.min(hud.t / SECTION_SEC, 1) * 100;
-  const overState = hud.braking ? 'eb' : hud.warn ? 'warn' : 'ok';
+  const overState = hud.warn ? 'warn' : 'ok';
   const correctCount = sections.filter((s) => s.verdict === 'correct').length;
 
   return (
@@ -484,7 +472,7 @@ export default function SpeedMaster({ onBack }: Props) {
             <li>제한속도는 <b>알려주지 않습니다.</b> 구간이 끝나야 정답이 나옵니다.</li>
             <li>화면을 잡고 <b>아래로 내리면 역행</b>(4단), <b>위로 올리면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
             <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
-            <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>이고, 4km/h 넘기면 비상제동입니다.</li>
+            <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>입니다.</li>
             <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
           </ul>
           {best > 0 && <p className={styles.best}>내 최고 점수 <b>{best.toLocaleString()}</b></p>}
@@ -554,7 +542,7 @@ export default function SpeedMaster({ onBack }: Props) {
           </div>
 
           <div className={styles.statusLine}>
-            {hud.braking ? '비상제동' : notchText(hud.notch)}
+            {notchText(hud.notch)}
           </div>
 
           {/* 진행 바 — 마지막 1/4 이 판정 구간이라 눈에 보이게 갈라 둔다 */}
@@ -570,9 +558,7 @@ export default function SpeedMaster({ onBack }: Props) {
 
           <div className={styles.foot}>
             <span className={styles.footItem}>점수 <b>{hud.score.toLocaleString()}</b></span>
-            <span className={styles.footItem}>
-              비상제동 <b className={hud.eb > 0 ? styles.ebOn : ''}>{hud.eb}</b> / {MAX_EB}
-            </span>
+            <span className={styles.footItem}>구간 <b>{Math.min(hud.idx + 1, SECTION_COUNT)}</b> / {SECTION_COUNT}</span>
           </div>
 
           <p className={styles.hint}>화면을 잡고 아래로 내리면 역행 · 위로 올리면 제동</p>
@@ -602,7 +588,7 @@ export default function SpeedMaster({ onBack }: Props) {
       {/* ── 결과 ── */}
       {phase === 'over' && (
         <div className={styles.panel}>
-          <h2 className={styles.resultTitle}>{hud.eb >= MAX_EB ? '비상제동 3회 — 운행 중지' : '완주'}</h2>
+          <h2 className={styles.resultTitle}>완주</h2>
           <div className={styles.resultScore}>
             <span className={styles.resultScoreV}>{hud.score.toLocaleString()}</span>
             <span className={styles.resultScoreU}>점</span>

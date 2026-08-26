@@ -64,7 +64,8 @@ export const SPEED_RULES: SpeedRule[] = [
   { id: 'sechukno', limit: 15, label: '세척하지 않고 세척고 통과', source: '15km/h 이하', group: 'depot' },
   { id: 'insang', limit: 15, label: '인상선 진입', source: '제100조 · 15km/h 이하', group: 'depot' },
   { id: 'banghyang', limit: 15, label: '방향전환선 운전', source: '차량기지운전취급내규 제11조 · 15km/h 이하', group: 'depot' },
-  { id: 'siheom', limit: 60, label: '시험선 운전', source: 'ATC 지령속도에 따르되 최고 60km/h', group: 'depot' },
+  /* 시험선 운전(60) 제외 — ATC 지령속도를 따르는 자리라 "정해진 한 숫자"를 외우는
+     이 게임의 문제로는 맞지 않는다(진호 요청). */
 
   // ── 이례상황·재해 (제349·356조) ──
   { id: 'jijingyeongbo', limit: 25, label: '지진경보 발령', source: '제356조 · 25km/h 이하 주의운전', group: 'disaster' },
@@ -72,8 +73,8 @@ export const SPEED_RULES: SpeedRule[] = [
   { id: 'chimsu', limit: 15, label: '선로 침수 (레일면 이하)', source: '제349조 · 일단정차 후 확인, 15km/h 이하 주의운전', group: 'disaster' },
 
   // ── 차량 고장 ──
-  { id: 'eo', limit: 45, label: 'TCU 고장 · EO 선택', source: '비상/구원스위치 EO · 45km/h 이하 (역행 P4, 제동 B7)', group: 'fault' },
-  { id: 'computer', limit: 35, label: '컴퓨터(TC·LIU) 고장', source: '35km/h 이하로 대피 운행 · 차종에 따라 다름', group: 'fault' },
+  /* TCU 고장·EO 선택(45)과 컴퓨터(TC·LIU) 고장(35) 제외 — 차종에 따라 값이 달라
+     하나로 외울 숫자가 아니다(진호 요청). */
   { id: 'jedongchuk80', limit: 60, label: '제동축수 80% 이상', source: '연결축수 100에 대하여 제동축수 80% 이상 · 60km/h 이하', group: 'fault' },
   { id: 'jedongchuk40', limit: 45, label: '제동축수 40~80% 미만', source: '연결축수 100에 대하여 40% 이상~80% 미만 · 45km/h 이하', group: 'fault' },
   { id: 'sidan', limit: 60, label: '승강장 시단 진입 (요구제동)', source: '요구제동 취급상태에서 60km/h 이하', group: 'fault' },

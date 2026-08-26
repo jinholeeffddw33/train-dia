@@ -147,7 +147,6 @@
   transition: background var(--dia-dur-base) ease;
 }
 .stage_warn { background: var(--dia-amber-dim); }
-.stage_eb { background: var(--dia-red-dim); }
 
 .situation {
   display: flex;
@@ -343,7 +342,6 @@
   min-height: 22px;
 }
 .stage_warn .statusLine { color: var(--dia-amber-text); }
-.stage_eb .statusLine { color: var(--dia-red); }
 
 /* 구간 진행 — 앞 3/4 는 맞추는 시간, 마지막 1/4 은 그 속도를 유지해야 하는 판정 구간 */
 .track {
@@ -468,7 +466,6 @@
   color: var(--dia-text-primary);
   font-variant-numeric: tabular-nums;
 }
-.ebOn { color: var(--dia-red); }
 
 .hint {
   margin: 0;

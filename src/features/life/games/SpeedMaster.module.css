@@ -104,6 +104,134 @@
   line-height: 1.6;
 }
 .rules b { color: var(--dia-text-primary); font-weight: 700; }
+/* ── 시작 화면 ──
+   계기판을 크게 얹고 한 줄로 무슨 게임인지 말한다. 규칙은 물음표 뒤로 넘겼다 —
+   처음부터 일곱 줄을 펼치면 읽지 않고 넘기게 되고 시작 버튼만 아래로 밀린다. */
+.startHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-4) 0 var(--dia-space-2);
+  /* 계기판 뒤로 은은한 빛 — 게임 시작 화면다운 깊이 */
+  background: radial-gradient(120% 70% at 50% 10%, var(--dia-blue-dim) 0%, transparent 70%);
+  border-radius: var(--dia-radius-xl);
+}
+.startLead {
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--dia-text-primary);
+  text-align: center;
+}
+.startLead b { color: var(--dia-blue); }
+.startSub {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-tertiary);
+  text-align: center;
+}
+
+/* 한눈에 보는 세 칸 — 최고 점수·단계·구간 */
+.startStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--dia-space-2);
+}
+.startStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--dia-space-3) var(--dia-space-2);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+}
+.startStatLabel {
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-tertiary);
+}
+.startStatValue {
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+
+/* 자세한 규칙 열기 — 시작 버튼보다 한 단계 낮게 */
+.helpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  background: transparent;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease, color var(--dia-dur-base) ease;
+}
+/* 터치 기기에서 hover 가 눌린 채 남는 것을 막는다 */
+@media (hover: hover) {
+  .helpBtn:hover { color: var(--dia-text-primary); }
+}
+.helpBtn:active { transform: scale(0.98); }
+
+/* ── 규칙 시트 ── */
+.rulesOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-modal);
+  background: var(--dia-overlay-bg);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.rulesSheet {
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-6) + var(--sab));
+  border-radius: var(--dia-radius-xl) var(--dia-radius-xl) 0 0;
+  background: var(--dia-sheet-fill);
+  border-top: 1px solid var(--dia-border);
+}
+.rulesHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-3);
+}
+.rulesTitle {
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+.rulesClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: var(--dia-radius-full);
+  background: transparent;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rulesClose:active { transform: scale(0.9); }
+
 .best {
   margin: 0;
   font-size: var(--dia-text-sm);
@@ -237,6 +365,19 @@
   stroke-linecap: round;
 }
 .dialHub { fill: var(--dia-text-primary); }
+
+/* 시작 화면 — 바늘이 눈금을 훑는다. 축(100,100)을 중심으로 돈다.
+   0km/h 바늘은 서쪽을 보고 있다. 시계방향(+)으로 돌려야 눈금 위(반원 안)를 지난다 —
+   반대로 돌리면 반원 아래로 내려가 글자 위를 가로지른다. 180°가 최고 눈금이라 165°까지만. */
+.dialSweep {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: dialSweepAnim 3.4s ease-in-out infinite;
+}
+@keyframes dialSweepAnim {
+  0%, 100% { transform: rotate(8deg); }
+  50%      { transform: rotate(165deg); }
+}
 
 /* 숫자 — 반원 안쪽(SVG 좌표계). 계기판 크기가 변해도 자리가 그대로다 */
 .dialValue {
@@ -577,4 +718,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .backBtn, .toggleBtn, .primaryBtn, .stage { transition: none; }
+  /* 시작 화면 바늘 스윕은 장식이다 — 움직임을 줄이라고 한 사람에게는 세워 둔다 */
+  .dialSweep { animation: none; }
 }

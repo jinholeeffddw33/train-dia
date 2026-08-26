@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, BookOpen } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, BookOpen, HelpCircle, X } from 'lucide-react';
 import { SPEED_RULES, type SpeedRule } from '@/data/speedLimits';
 import GameRanking from './GameRanking';
 import SpeedStudy from './SpeedStudy';
@@ -123,7 +123,8 @@ function polar(angleDeg: number, r: number): { x: number; y: number } {
   return { x: DIAL_CX + r * Math.cos(a), y: DIAL_CY - r * Math.sin(a) };
 }
 
-function SpeedDial({ value }: { value: number }) {
+/** sweep: 시작 화면용 — 바늘이 눈금을 훑는다(숫자는 감춘다). 게임 시작 전 '살아 있는' 느낌. */
+function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean }) {
   const v = Math.min(Math.max(value, 0), MAX_SPEED);
   const a = dialAngle(v);
   const tip = polar(a, DIAL_R - 12);
@@ -168,14 +169,20 @@ function SpeedDial({ value }: { value: number }) {
         })}
         {/* 숫자는 반원 안쪽, 바늘 축 위에 둔다 — 축과 겹치면 둘 다 안 읽힌다.
             SVG 안에 넣어야 계기판이 커지거나 작아져도 자리가 그대로다. */}
-        <text x={DIAL_CX} y={78} textAnchor="middle" className={styles.dialValue}>
-          {Math.floor(v)}
-        </text>
-        <text x={DIAL_CX} y={92} textAnchor="middle" className={styles.dialUnit}>
-          km/h
-        </text>
-        <line x1={DIAL_CX} y1={DIAL_CY} x2={tip.x} y2={tip.y} className={styles.dialNeedle} />
-        <circle cx={DIAL_CX} cy={DIAL_CY} r={6} className={styles.dialHub} />
+        {!sweep && (
+          <>
+            <text x={DIAL_CX} y={78} textAnchor="middle" className={styles.dialValue}>
+              {Math.floor(v)}
+            </text>
+            <text x={DIAL_CX} y={92} textAnchor="middle" className={styles.dialUnit}>
+              km/h
+            </text>
+          </>
+        )}
+        <g className={sweep ? styles.dialSweep : undefined}>
+          <line x1={DIAL_CX} y1={DIAL_CY} x2={tip.x} y2={tip.y} className={styles.dialNeedle} />
+          <circle cx={DIAL_CX} cy={DIAL_CY} r={6} className={styles.dialHub} />
+        </g>
       </svg>
     </div>
   );
@@ -218,6 +225,8 @@ export default function SpeedMaster({ onBack }: Props) {
   const [revealed, setRevealed] = useState<Section | null>(null);
   /** 속도 공부하기 화면 */
   const [study, setStudy] = useState(false);
+  /** 자세한 규칙 시트 — 시작 화면의 물음표로 연다 */
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   const [hud, setHud] = useState({
     v: 0, idx: 0, t: 0, score: 0,
@@ -506,24 +515,81 @@ export default function SpeedMaster({ onBack }: Props) {
       </header>
 
       {/* ── 시작 ── */}
+      {/* ── 시작 화면 ──
+          여기서는 "무슨 게임인지" 한 줄과 시작 버튼이면 된다. 규칙 일곱 줄을 처음부터
+          펼쳐 두면 읽지 않고 넘기게 되고, 정작 하고 싶은 사람의 시작 버튼만 아래로 밀린다.
+          자세한 규칙은 보고 싶은 사람만 물음표로 연다. */}
       {phase === 'idle' && (
         <div className={styles.panel}>
-          <p className={styles.lead}>상황만 보고 <b>몇 km/h로 가야 하는지 직접</b> 맞추세요.</p>
-          <ul className={styles.rules}>
-            <li>제한속도는 <b>알려주지 않습니다.</b> 구간이 끝나야 정답이 나옵니다.</li>
-            <li>화면을 잡고 <b>아래로 내리면 역행</b>(4단), <b>위로 올리면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
-            <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
-            <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>입니다.</li>
-            <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
-            <li>
-              한 단계는 {SECTION_COUNT}구간입니다. <b>{STAGE_PASS}점을 넘기면 다음 단계</b>로 가고,
-              단계마다 한 구간이 <b>2초씩 짧아집니다</b> (16 · 14 · 12 · 10초, {MAX_STAGE}단계까지).
-            </li>
-            <li>점수는 <b>단계마다 쌓입니다.</b> 기록은 그 총점입니다.</li>
-          </ul>
-          {best > 0 && <p className={styles.best}>내 최고 점수 <b>{best.toLocaleString()}</b></p>}
+          <div className={styles.startHero}>
+            <SpeedDial value={0} sweep />
+            <p className={styles.startLead}>상황만 보고 <b>제한속도</b>를 맞추세요</p>
+            <p className={styles.startSub}>답은 알려주지 않습니다 · 구간이 끝나야 정답이 나옵니다</p>
+          </div>
+
+          <div className={styles.startStats}>
+            <div className={styles.startStat}>
+              <span className={styles.startStatLabel}>최고 점수</span>
+              <b className={styles.startStatValue}>{best > 0 ? best.toLocaleString() : '—'}</b>
+            </div>
+            <div className={styles.startStat}>
+              <span className={styles.startStatLabel}>단계</span>
+              <b className={styles.startStatValue}>{MAX_STAGE}</b>
+            </div>
+            <div className={styles.startStat}>
+              <span className={styles.startStatLabel}>한 단계</span>
+              <b className={styles.startStatValue}>{SECTION_COUNT}구간</b>
+            </div>
+          </div>
+
           <button type="button" className={styles.primaryBtn} onClick={start}>출발</button>
+          <button
+            type="button"
+            className={styles.helpBtn}
+            onClick={() => { setRulesOpen(true); play('button'); }}
+            aria-label="자세한 규칙 보기"
+          >
+            <HelpCircle size={16} strokeWidth={2.4} /> 자세한 규칙
+          </button>
           <GameRanking game="speed" scoreLabel="점수" scoreUnit="점" />
+        </div>
+      )}
+
+      {/* ── 자세한 규칙 ── 물음표로 열고 닫는다 */}
+      {rulesOpen && (
+        <div
+          className={styles.rulesOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="스피드 마스터 규칙"
+          onClick={() => setRulesOpen(false)}
+        >
+          {/* 시트 안을 눌렀을 때는 닫히지 않아야 한다 */}
+          <div className={styles.rulesSheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.rulesHead}>
+              <h2 className={styles.rulesTitle}>규칙</h2>
+              <button
+                type="button"
+                className={styles.rulesClose}
+                onClick={() => setRulesOpen(false)}
+                aria-label="닫기"
+              >
+                <X size={18} strokeWidth={2.4} />
+              </button>
+            </div>
+            <ul className={styles.rules}>
+              <li>제한속도는 <b>알려주지 않습니다.</b> 구간이 끝나야 정답이 나옵니다.</li>
+              <li>화면을 잡고 <b>아래로 내리면 역행</b>(4단), <b>위로 올리면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
+              <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
+              <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>입니다.</li>
+              <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
+              <li>
+                한 단계는 {SECTION_COUNT}구간입니다. <b>{STAGE_PASS}점을 넘기면 다음 단계</b>로 가고,
+                단계마다 한 구간이 <b>2초씩 짧아집니다</b> (16 · 14 · 12 · 10초, {MAX_STAGE}단계까지).
+              </li>
+              <li>점수는 <b>단계마다 쌓입니다.</b> 기록은 그 총점입니다.</li>
+            </ul>
+          </div>
         </div>
       )}
 

@@ -118,7 +118,9 @@ function notchText(n: number): string {
    실물 계기판처럼 눈금이 반원으로 깔리고 바늘이 돈다. 숫자는 그 안에 크게 둔다 —
    바늘로 "지금 어디쯤"을 잡고, 정확한 값은 숫자로 읽는다. 둘 중 하나만으로는
    맞추기 어렵다(바늘만 있으면 눈금 사이를 못 읽고, 숫자만 있으면 얼마나 남았는지 감이 없다). */
-const DIAL_R = 84;          // 눈금 반지름
+/* 눈금 반지름. 숫자를 눈금 '바깥'에 두려고 84 → 74 로 줄였다 —
+   숫자를 안쪽에 두면 바늘이 지나는 자리와 같은 반지름이라 반드시 겹친다. */
+const DIAL_R = 74;
 const DIAL_CX = 100;
 const DIAL_CY = 100;
 
@@ -135,7 +137,7 @@ function polar(angleDeg: number, r: number): { x: number; y: number } {
 function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean }) {
   const v = Math.min(Math.max(value, 0), MAX_SPEED);
   const a = dialAngle(v);
-  const tip = polar(a, DIAL_R - 12);
+  const tip = polar(a, DIAL_R - 10);
   const start = polar(180, DIAL_R);
   const end = polar(0, DIAL_R);
   const cur = polar(a, DIAL_R);
@@ -166,9 +168,9 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
             />
           );
         })}
-        {/* 숫자 — 여덟 개라 촘촘하다. 눈금에 바짝 붙여 가운데 큰 숫자와 겹치지 않게 한다 */}
+        {/* 숫자는 눈금 바깥에 — 안쪽에 두면 바늘이 지나며 숫자를 가로지른다 */}
         {DIAL_LABELS.map((s) => {
-          const p = polar(dialAngle(s), DIAL_R - 13);
+          const p = polar(dialAngle(s), DIAL_R + 15);
           return (
             <text key={s} x={p.x} y={p.y + 4} className={styles.dialNum} textAnchor="middle">
               {s}

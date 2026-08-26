@@ -18,7 +18,7 @@ import styles from './SpeedMaster.module.css';
  * 구간은 [조정 3/4 → 판정 1/4] 로 나뉜다. 앞에서 충분히 생각해 맞추고, 마지막 1/4 동안
  * 그 속도를 유지해야 한다. 채점은 판정 구간의 평균 속도로만 한다.
  *
- * 조작은 실물과 같은 T바. 잡고 앞으로 밀면 역행(4단), 가운데는 중립(타행), 뒤로 당기면
+ * 조작은 실물과 같은 T바. 잡고 아래로 내리면 역행(4단), 가운데는 중립(타행), 위로 올리면
  * 제동(7단). 손을 떼도 단은 그 자리에 머문다.
  *
  * 구간을 거리(m)가 아니라 시간으로 재는 이유: 거리로 재면 제한 5 구간은 12m, 제한 60 구간은
@@ -35,10 +35,15 @@ const SECTION_SEC = 13;          // 한 구간 — 생각하고 맞출 시간
 const JUDGE_RATIO = 0.25;        // 마지막 1/4 이 판정 구간
 const REVEAL_MS = 2600;          // 정답 보여주는 시간
 
-/** 역행 1~4단 가속도 (km/h per sec) */
-const POWER_ACC = [0, 7, 13, 19, 26];
-/** 제동 1~7단 감속도 (km/h per sec) */
-const BRAKE_DEC = [0, 4, 7, 11, 15, 20, 26, 33];
+/** 계기판 최대 눈금 (km/h) — 5호선 실제 상한과 맞춘다 */
+const MAX_SPEED = 80;
+
+/** 역행 1~4단 가속도 (km/h per sec)
+    예전엔 P4 가 26이라 80까지 3초면 닿았다 — 답을 알아도 손이 못 따라가 맞출 수가 없었다.
+    절반 아래로 낮춰, P4 로 밀어도 80 까지 7초쯤 걸리게 한다(한 구간 13초). */
+const POWER_ACC = [0, 3, 6, 8.5, 11];
+/** 제동 1~7단 감속도 (km/h per sec) — 가속을 낮춘 만큼 함께 낮춰 균형을 맞춘다 */
+const BRAKE_DEC = [0, 2, 3.5, 5, 7, 9.5, 12, 15];
 const EB_DECEL = 55;
 /* 제한속도는 '이하'다. 조금이라도 넘으면 그 순간 오답이고 경고가 울린다.
    (실제 ATC 는 1km/h 초과에서 경고음이지만, 이 게임은 외우게 하는 것이 목적이라 더 엄격하다) */
@@ -48,8 +53,39 @@ const READY_MS = 2200;
 
 const MAX_P = 4;
 const MAX_B = 7;
-const NOTCH_PX = 26;
-const NOTCHES = [4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7] as const;
+
+/* ── 주간제어기 눈금 배치 ──
+   위가 제동(B7~B1), 가운데가 중립, 아래가 역행(P1~P4). 진호 요청으로 위아래를 바꿨다.
+   칸 높이는 단마다 다르다 — 역행은 네 단뿐이라 넓게 잡아 고르기 쉽게 하고,
+   제동은 일곱 단이라 좁게 잡아야 한 화면에 들어온다. */
+const POWER_PX = 32;   // 역행 한 단
+const NEUTRAL_PX = 28; // 중립
+const BRAKE_PX = 20;   // 제동 한 단
+const NOTCHES = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4] as const;
+
+const notchPx = (n: number) => (n > 0 ? POWER_PX : n < 0 ? BRAKE_PX : NEUTRAL_PX);
+
+/** 각 단의 위쪽 좌표(px)와 중심 좌표 — 칸 높이가 달라 누적으로 구한다 */
+const NOTCH_LAYOUT: { notch: number; top: number; center: number }[] = (() => {
+  const out: { notch: number; top: number; center: number }[] = [];
+  let y = 0;
+  for (const n of NOTCHES) {
+    const h = notchPx(n);
+    out.push({ notch: n, top: y, center: y + h / 2 });
+    y += h;
+  }
+  return out;
+})();
+const layoutOf = (n: number) => NOTCH_LAYOUT.find((l) => l.notch === n) ?? NOTCH_LAYOUT[0];
+
+/** 손가락이 멈춘 y(슬롯 기준)에서 가장 가까운 단 */
+function notchAt(y: number): number {
+  let best = NOTCH_LAYOUT[0];
+  for (const l of NOTCH_LAYOUT) {
+    if (Math.abs(l.center - y) < Math.abs(best.center - y)) best = l;
+  }
+  return best.notch;
+}
 
 /** 정답으로 인정하는 폭 — 제한속도 바로 아래. 너무 느려도 속도를 모르는 것이다. */
 const tolerance = (limit: number) => Math.max(2, limit * 0.12);
@@ -63,6 +99,81 @@ function notchText(n: number): string {
   if (n > 0) return `역행 ${n}단`;
   if (n < 0) return `제동 ${-n}단`;
   return '타행 (중립)';
+}
+
+/* ── 반원 속도계 ──
+   실물 계기판처럼 눈금이 반원으로 깔리고 바늘이 돈다. 숫자는 그 안에 크게 둔다 —
+   바늘로 "지금 어디쯤"을 잡고, 정확한 값은 숫자로 읽는다. 둘 중 하나만으로는
+   맞추기 어렵다(바늘만 있으면 눈금 사이를 못 읽고, 숫자만 있으면 얼마나 남았는지 감이 없다). */
+const DIAL_R = 84;          // 눈금 반지름
+const DIAL_CX = 100;
+const DIAL_CY = 100;
+
+/** 속도 → 반원 각도(도). 0km/h = 왼쪽(180°), 최고속도 = 오른쪽(0°) */
+function dialAngle(v: number): number {
+  return 180 - (Math.min(Math.max(v, 0), MAX_SPEED) / MAX_SPEED) * 180;
+}
+function polar(angleDeg: number, r: number): { x: number; y: number } {
+  const a = (angleDeg * Math.PI) / 180;
+  return { x: DIAL_CX + r * Math.cos(a), y: DIAL_CY - r * Math.sin(a) };
+}
+
+function SpeedDial({ value }: { value: number }) {
+  const v = Math.min(Math.max(value, 0), MAX_SPEED);
+  const a = dialAngle(v);
+  const tip = polar(a, DIAL_R - 12);
+  const start = polar(180, DIAL_R);
+  const end = polar(0, DIAL_R);
+  const cur = polar(a, DIAL_R);
+  /* 지나온 만큼만 색을 채운다 — 남은 눈금과 갈려 보여야 지금 위치가 읽힌다 */
+  const large = 0;
+  return (
+    <div className={styles.dial}>
+      <svg viewBox="0 0 200 116" className={styles.dialSvg} aria-hidden>
+        <path
+          d={`M ${start.x} ${start.y} A ${DIAL_R} ${DIAL_R} 0 ${large} 1 ${end.x} ${end.y}`}
+          className={styles.dialTrack}
+        />
+        <path
+          d={`M ${start.x} ${start.y} A ${DIAL_R} ${DIAL_R} 0 ${large} 1 ${cur.x} ${cur.y}`}
+          className={styles.dialFill}
+        />
+        {/* 10km/h 마다 눈금, 20 마다 길게 */}
+        {Array.from({ length: MAX_SPEED / 10 + 1 }, (_, i) => i * 10).map((s) => {
+          const ang = dialAngle(s);
+          const long = s % 20 === 0;
+          const p1 = polar(ang, DIAL_R + 1);
+          const p2 = polar(ang, DIAL_R - (long ? 12 : 7));
+          return (
+            <line
+              key={s}
+              x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+              className={long ? styles.dialTickLong : styles.dialTick}
+            />
+          );
+        })}
+        {/* 20km/h 마다 숫자 — 가운데 큰 숫자와 겹치지 않게 눈금 가까이 붙인다 */}
+        {Array.from({ length: MAX_SPEED / 20 + 1 }, (_, i) => i * 20).map((s) => {
+          const p = polar(dialAngle(s), DIAL_R - 21);
+          return (
+            <text key={s} x={p.x} y={p.y + 4} className={styles.dialNum} textAnchor="middle">
+              {s}
+            </text>
+          );
+        })}
+        {/* 숫자는 반원 안쪽, 바늘 축 위에 둔다 — 축과 겹치면 둘 다 안 읽힌다.
+            SVG 안에 넣어야 계기판이 커지거나 작아져도 자리가 그대로다. */}
+        <text x={DIAL_CX} y={78} textAnchor="middle" className={styles.dialValue}>
+          {Math.floor(v)}
+        </text>
+        <text x={DIAL_CX} y={92} textAnchor="middle" className={styles.dialUnit}>
+          km/h
+        </text>
+        <line x1={DIAL_CX} y1={DIAL_CY} x2={tip.x} y2={tip.y} className={styles.dialNeedle} />
+        <circle cx={DIAL_CX} cy={DIAL_CY} r={6} className={styles.dialHub} />
+      </svg>
+    </div>
+  );
 }
 
 type Phase = 'idle' | 'ready' | 'running' | 'reveal' | 'over';
@@ -218,7 +329,7 @@ export default function SpeedMaster({ onBack }: Props) {
       r.v = Math.max(0, r.v - EB_DECEL * dt);
       if (r.v <= 0.1) { r.ebActive = false; r.v = 0; }
     } else if (r.notch > 0) {
-      r.v = Math.min(120, r.v + POWER_ACC[r.notch] * dt);
+      r.v = Math.min(MAX_SPEED, r.v + POWER_ACC[r.notch] * dt);
     } else if (r.notch < 0) {
       r.v = Math.max(0, r.v - BRAKE_DEC[-r.notch] * dt);
     }
@@ -295,8 +406,11 @@ export default function SpeedMaster({ onBack }: Props) {
   const onMove = useCallback((e: React.PointerEvent) => {
     const g = grab.current;
     if (!g) return;
-    const moved = Math.round((g.y - e.clientY) / NOTCH_PX);
-    const next = Math.max(-MAX_B, Math.min(MAX_P, g.notch + moved));
+    /* 칸 높이가 단마다 달라 "몇 칸 움직였나"로는 셀 수 없다. 잡은 단의 위치에서 손가락이
+       움직인 만큼 더한 지점을 구하고, 그 자리에서 가장 가까운 단을 고른다.
+       아래가 역행이므로 손가락을 내리면(+dy) 역행 쪽으로 간다. */
+    const y = layoutOf(g.notch).center + (e.clientY - g.y);
+    const next = Math.max(-MAX_B, Math.min(MAX_P, notchAt(y)));
     if (next !== run.current.notch) {
       run.current.notch = next;
       play('tick');
@@ -368,7 +482,7 @@ export default function SpeedMaster({ onBack }: Props) {
           <p className={styles.lead}>상황만 보고 <b>몇 km/h로 가야 하는지 직접</b> 맞추세요.</p>
           <ul className={styles.rules}>
             <li>제한속도는 <b>알려주지 않습니다.</b> 구간이 끝나야 정답이 나옵니다.</li>
-            <li>화면을 잡고 <b>앞으로 밀면 역행</b>(4단), <b>뒤로 당기면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
+            <li>화면을 잡고 <b>아래로 내리면 역행</b>(4단), <b>위로 올리면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
             <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
             <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>이고, 4km/h 넘기면 비상제동입니다.</li>
             <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
@@ -400,7 +514,7 @@ export default function SpeedMaster({ onBack }: Props) {
           onPointerUp={onRelease}
           onPointerCancel={onRelease}
           role="application"
-          aria-label="주간제어기 — 잡고 앞으로 밀면 역행, 뒤로 당기면 제동"
+          aria-label="주간제어기 — 잡고 아래로 내리면 역행, 위로 올리면 제동"
         >
           <div className={styles.situation}>
             <span className={styles.situationLabel}>{cur.rule.label}</span>
@@ -408,10 +522,7 @@ export default function SpeedMaster({ onBack }: Props) {
           </div>
 
           <div className={styles.readout}>
-            <div className={styles.gauge}>
-              <span className={styles.gaugeV}>{Math.floor(hud.v)}</span>
-              <span className={styles.gaugeUnit}>km/h</span>
-            </div>
+            <SpeedDial value={hud.v} />
 
             <div className={`${styles.mc} ${hud.grabbed ? styles.mcGrabbed : ''}`} aria-hidden>
               <div className={styles.mcSlot}>
@@ -419,11 +530,22 @@ export default function SpeedMaster({ onBack }: Props) {
                   <span
                     key={n}
                     className={`${styles.mcTick} ${n === 0 ? styles.mcTickN : ''} ${n === hud.notch ? styles.mcTickOn : ''}`}
+                    // 칸 높이를 CSS 로 옮기면 같은 숫자가 두 곳에 생겨, 한쪽만 고쳐질 때
+                    // 핸들이 눈금과 어긋난다. 손가락 위치→단 계산과 출처를 하나로 둔다.
+                    // STYLE-EXCEPTION: 칸 높이는 단 종류마다 다르다(POWER_PX/BRAKE_PX)
+                    style={{ height: `${notchPx(n)}px` }}
                   >
                     {notchLabel(n)}
                   </span>
                 ))}
-                <div className={styles.mcHandle} style={{ ['--n' as string]: String(MAX_P - hud.notch) }}>
+                <div
+                  className={styles.mcHandle}
+                  // STYLE-EXCEPTION: 핸들 위치는 지금 단에 따라 매 프레임 바뀌는 런타임 값이다
+                  style={{
+                    top: `${layoutOf(hud.notch).top}px`,
+                    height: `${notchPx(hud.notch)}px`,
+                  }}
+                >
                   <span className={styles.mcGrip} />
                   <span className={styles.mcStem} />
                 </div>
@@ -453,7 +575,7 @@ export default function SpeedMaster({ onBack }: Props) {
             </span>
           </div>
 
-          <p className={styles.hint}>화면을 잡고 위로 밀면 역행 · 아래로 내리면 제동</p>
+          <p className={styles.hint}>화면을 잡고 아래로 내리면 역행 · 위로 올리면 제동</p>
         </div>
       )}
 

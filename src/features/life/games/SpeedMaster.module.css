@@ -178,27 +178,67 @@
   margin: var(--dia-space-2) 0;
 }
 
-/* 속도계 — 화면에서 가장 큰 글자 */
-.gauge {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
+/* ── 반원 속도계 ── 눈금과 바늘은 SVG, 숫자는 그 안에 겹쳐 둔다 */
+.dial {
+  position: relative;
+  width: clamp(180px, 52vw, 260px);
+  flex-shrink: 0;
 }
-.gaugeV {
-  font-size: clamp(52px, 17vw, 92px);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -3px;
+.dialSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.dialTrack {
+  fill: none;
+  stroke: var(--dia-surface-active);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+/* 지나온 구간 — 바늘이 어디까지 왔는지 한눈에 */
+.dialFill {
+  fill: none;
+  stroke: var(--dia-blue);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: none;  /* 매 프레임 바뀌므로 전환을 걸면 오히려 밀린다 */
+}
+
+.dialTick { stroke: var(--dia-text-tertiary); stroke-width: 2; }
+.dialTickLong { stroke: var(--dia-text-secondary); stroke-width: 3; }
+.dialNum {
+  fill: var(--dia-text-tertiary);
+  font-size: 13px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.gaugeUnit {
-  font-size: var(--dia-text-base);
+
+.dialNeedle {
+  stroke: var(--dia-red);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.dialHub { fill: var(--dia-text-primary); }
+
+/* 숫자 — 반원 안쪽(SVG 좌표계). 계기판 크기가 변해도 자리가 그대로다 */
+.dialValue {
+  fill: var(--dia-text-primary);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  font-variant-numeric: tabular-nums;
+}
+.dialUnit {
+  fill: var(--dia-text-tertiary);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--dia-text-tertiary);
 }
 
 /* ── 주간제어기(T바) ──
-   실물처럼 위가 역행(P4~P1), 가운데가 중립, 아래가 제동(B1~B7)이다.
+   위가 제동(B7~B1), 가운데가 중립, 아래가 역행(P1~P4). 칸 높이는 단마다 다르다 —
+   역행은 넓게, 제동은 좁게(SpeedMaster.tsx 의 POWER_PX/BRAKE_PX).
    핸들은 눈금 사이를 미끄러지지 않고 단에 딱 붙는다 — 실물이 단마다 걸리기 때문이다. */
 .mc {
   flex-shrink: 0;
@@ -234,10 +274,10 @@
   background: var(--dia-surface-active);
 }
 
+/* height 는 단마다 인라인으로 들어온다(역행 넓게 / 제동 좁게) */
 .mcTick {
   display: flex;
   align-items: center;
-  height: 22px;
   font-size: var(--dia-text-meta);
   font-weight: 700;
   line-height: 1;
@@ -254,20 +294,20 @@
   font-weight: 800;
 }
 
-/* 핸들 — 단(--n: 0=P4 … 11=B7)에 따라 세로로 움직인다 */
+/* 핸들 — top/height 는 단마다 인라인으로 들어온다(칸 높이가 다르기 때문) */
 .mcHandle {
   position: absolute;
   left: 0;
-  top: calc(var(--n, 4) * 22px);
   width: 44px;
-  height: 22px;
-  transition: top var(--dia-dur-fast) ease;
+  transition: top var(--dia-dur-fast) ease, height var(--dia-dur-fast) ease;
 }
 /* T 자 — 손이 잡는 가로 손잡이 + 축에 물리는 짧은 목 */
+/* 칸 높이가 단마다 다르므로 그립·목은 칸 한가운데에 맞춘다(고정 top 이면 어긋난다) */
 .mcGrip {
   position: absolute;
   left: 0;
-  top: 5px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 44px;
   height: 12px;
   border-radius: 6px;
@@ -277,7 +317,8 @@
 .mcStem {
   position: absolute;
   left: 16px;
-  top: 3px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 12px;
   height: 16px;
   border-radius: 3px;

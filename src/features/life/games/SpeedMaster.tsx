@@ -30,10 +30,11 @@ interface Props {
 }
 
 /* ── 규칙 ── */
-const SECTION_COUNT = 10;
+/* 한 판 7구간 × 16초 ≈ 2분. 10구간 18초면 3분을 넘겨 쉬는 시간에 한 판이 길었다. */
+const SECTION_COUNT = 7;
 /* 한 구간 — 생각하고, 맞추고, 유지하는 시간. 13초는 촉박해서 답을 떠올려도 손이 못 따라갔다.
-   18초로 늘려 조정 구간만 13.5초를 준다(그중 마지막 4.5초가 판정). */
-const SECTION_SEC = 18;
+   16초면 조정에 12초를 쓰고 마지막 4초가 판정 구간이다. */
+const SECTION_SEC = 16;
 const JUDGE_RATIO = 0.25;        // 마지막 1/4 이 판정 구간
 const REVEAL_MS = 2600;          // 정답 보여주는 시간
 

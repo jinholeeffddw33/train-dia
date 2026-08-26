@@ -21,7 +21,9 @@ type FeedbackKind =
   | 'gameover'      // 게임오버
   | 'record'        // 신기록
   | 'ready'         // ready 전환 (반응속도 초록 전환)
-  | 'button';       // 버튼 눌림
+  | 'button'        // 버튼 눌림
+  | 'power'         // 역행 단 올림 (스피드 마스터) — 밝고 짧게
+  | 'brake';        // 제동 단 취급 (스피드 마스터) — 낮고 바람 빠지듯
 
 interface ToneSpec {
   freq: number;
@@ -54,6 +56,13 @@ const TONES: Record<FeedbackKind, ToneSpec[]> = {
     { freq: 660, duration: 0.06, type: 'triangle', gain: 0.18 },
     { freq: 880, duration: 0.08, type: 'triangle', gain: 0.2 },
   ],
+  /* 역행/제동은 소리로 구분돼야 한다 — 화면을 안 보고 손만 움직여도 어느 쪽인지 알게.
+     역행은 위로 뻗는 밝은 두 음, 제동은 아래로 깔리는 탁한 한 음. */
+  power:    [
+    { freq: 590, duration: 0.04, type: 'triangle', gain: 0.16 },
+    { freq: 790, duration: 0.05, type: 'triangle', gain: 0.16 },
+  ],
+  brake:    [{ freq: 240, duration: 0.09, type: 'sawtooth', gain: 0.14 }],
 };
 
 const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
@@ -64,6 +73,8 @@ const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
   record: [60, 40, 60, 40, 120],
   ready: 30,
   button: [20, 40, 30],
+  power: 12,
+  brake: 22,
 };
 
 function loadPref(key: string, defaultValue: boolean): boolean {

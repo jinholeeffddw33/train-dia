@@ -30,20 +30,25 @@ interface Props {
 }
 
 /* ── 규칙 ── */
-/* 한 판 7구간 × 16초 ≈ 2분. 10구간 18초면 3분을 넘겨 쉬는 시간에 한 판이 길었다. */
+/* 한 단계 7구간. */
 const SECTION_COUNT = 7;
-/* 한 구간 — 생각하고, 맞추고, 유지하는 시간. 13초는 촉박해서 답을 떠올려도 손이 못 따라갔다.
-   16초면 조정에 12초를 쓰고 마지막 4초가 판정 구간이다. */
-const SECTION_SEC = 16;
 const JUDGE_RATIO = 0.25;        // 마지막 1/4 이 판정 구간
 const REVEAL_MS = 2600;          // 정답 보여주는 시간
 
-/** 계기판 최대 눈금 (km/h) — 5호선 실제 상한과 맞춘다 */
-const MAX_SPEED = 80;
+/* ── 단계 ──
+   단계가 오를수록 한 구간의 시간이 2초씩 짧아진다. 같은 문제라도 생각할 틈이 줄어드니,
+   "알고는 있다"에서 "몸이 먼저 안다"로 넘어가야 통과된다.
+   한 단계를 900점 넘게 마쳐야 다음 단계로 갈 수 있다(만점 1,050점 = 7구간 × 150점). */
+const MAX_STAGE = 4;
+const STAGE_PASS = 900;
+const stageSec = (stage: number) => 16 - (stage - 1) * 2;   // 16 · 14 · 12 · 10
+
+/** 계기판 최대 눈금 (km/h) */
+const MAX_SPEED = 100;
 
 /** 역행 1~4단 가속도 (km/h per sec)
-    예전엔 P4 가 26이라 80까지 3초면 닿았다 — 답을 알아도 손이 못 따라가 맞출 수가 없었다.
-    절반 아래로 낮춰, P4 로 밀어도 80 까지 7초쯤 걸리게 한다(한 구간 13초). */
+    예전엔 P4 가 26이라 순식간에 최고속도까지 닿았다 — 답을 알아도 손이 못 따라갔다.
+    절반 아래로 낮춰, P4 로 밀어도 80 까지 7초쯤 걸리게 한다(1단계 한 구간 16초). */
 const POWER_ACC = [0, 3, 6, 8.5, 11];
 /** 제동 1~7단 감속도 (km/h per sec) — 가속을 낮춘 만큼 함께 낮춰 균형을 맞춘다 */
 const BRAKE_DEC = [0, 2, 3.5, 5, 7, 9.5, 12, 15];
@@ -176,7 +181,7 @@ function SpeedDial({ value }: { value: number }) {
   );
 }
 
-type Phase = 'idle' | 'ready' | 'running' | 'reveal' | 'over';
+type Phase = 'idle' | 'ready' | 'running' | 'reveal' | 'stageclear' | 'over';
 type Verdict = 'correct' | 'slow' | 'over';
 
 interface Section {
@@ -217,6 +222,10 @@ export default function SpeedMaster({ onBack }: Props) {
   const [hud, setHud] = useState({
     v: 0, idx: 0, t: 0, score: 0,
     warn: false, notch: 0, grabbed: false, judging: false,
+    /** 지금 단계(1~4) */
+    stage: 1,
+    /** 앞 단계들에서 쌓은 점수 — 화면의 총점 = carried + score */
+    carried: 0,
   });
 
   const { feedback, soundOn, vibrateOn, toggleSound, toggleVibrate } = useGameFeedback();
@@ -229,6 +238,9 @@ export default function SpeedMaster({ onBack }: Props) {
     notch: 0, warned: false, overInJudge: false,
     judgeSum: 0, judgeN: 0,
     sections: [] as Section[],
+    stage: 1,
+    carried: 0,     // 앞 단계까지의 누적 점수
+    secSec: stageSec(1),
   });
   const rafRef = useRef<number | null>(null);
   const lastRef = useRef(0);
@@ -244,12 +256,13 @@ export default function SpeedMaster({ onBack }: Props) {
 
   useEffect(() => stopLoop, [stopLoop]);
 
+  /** 판 종료 — 점수는 지나온 단계까지 합친 총점이다 */
   const finish = useCallback(() => {
     stopLoop();
     const r = run.current;
-    const total = Math.round(r.score);
+    const total = Math.round(r.carried + r.score);
     setSections([...r.sections]);
-    setHud((h) => ({ ...h, score: total, grabbed: false }));
+    setHud((h) => ({ ...h, score: Math.round(r.score), grabbed: false }));
     setPhase('over');
     if (total > loadBest()) {
       try { localStorage.setItem(BEST_KEY, String(total)); } catch { /* ignore */ }
@@ -299,7 +312,18 @@ export default function SpeedMaster({ onBack }: Props) {
 
     timerRef.current = window.setTimeout(() => {
       r.idx += 1;
-      if (r.idx >= r.sections.length) { finish(); return; }
+      if (r.idx >= r.sections.length) {
+        /* 한 단계가 끝났다. 900점을 넘겼고 아직 위 단계가 남았으면 갈 수 있다.
+           못 넘겼으면 여기서 판이 끝난다 — 총점은 지나온 단계까지 합친 값이다. */
+        if (Math.round(r.score) > STAGE_PASS && r.stage < MAX_STAGE) {
+          setRevealed(null);
+          setPhase('stageclear');
+          play('record');
+        } else {
+          finish();
+        }
+        return;
+      }
       // 다음 구간은 정지 상태에서 다시 시작한다 — 앞 구간 속도가 힌트가 되면 안 된다
       r.v = 0; r.t = 0; r.notch = 0; r.warned = false;
       r.overInJudge = false; r.judgeSum = 0; r.judgeN = 0;
@@ -332,7 +356,7 @@ export default function SpeedMaster({ onBack }: Props) {
     }
 
     r.t += dt;
-    const judging = r.t >= SECTION_SEC * (1 - JUDGE_RATIO);
+    const judging = r.t >= r.secSec * (1 - JUDGE_RATIO);
 
     /* ── 초과 판정 ──
        넘기면 그 구간은 오답이고 경고가 울린다. 다만 강제로 세우지는 않는다 —
@@ -350,30 +374,36 @@ export default function SpeedMaster({ onBack }: Props) {
     /* ── 판정 구간에서만 채점용 속도를 모은다 ── */
     if (judging) { r.judgeSum += r.v; r.judgeN += 1; }
 
-    if (r.t >= SECTION_SEC) { closeSection(); return; }
+    if (r.t >= r.secSec) { closeSection(); return; }
 
     setHud({
       v: r.v, idx: r.idx, t: r.t, score: Math.round(r.score),
       warn: r.v > limit,
       notch: r.notch, grabbed: grab.current !== null, judging,
+      stage: r.stage, carried: r.carried,
     });
     rafRef.current = requestAnimationFrame(tick);
   }, [closeSection, finish, play]);
 
   useEffect(() => { tickRef.current = tick; }, [tick]);
 
-  const start = useCallback(() => {
+  /** 한 단계 시작 — stage=1 이면 새 판, 그 위면 앞 단계 점수를 안고 이어간다 */
+  const startStage = useCallback((stage: number, carried: number) => {
     const secs = buildSections();
     run.current = {
       v: 0, t: 0, idx: 0, score: 0,
       notch: 0, warned: false, overInJudge: false,
       judgeSum: 0, judgeN: 0,
       sections: secs,
+      stage, carried, secSec: stageSec(stage),
     };
     grab.current = null;
     setSections(secs);
     setRevealed(null);
-    setHud({ v: 0, idx: 0, t: 0, score: 0, warn: false, notch: 0, grabbed: false, judging: false });
+    setHud({
+      v: 0, idx: 0, t: 0, score: 0, warn: false, notch: 0, grabbed: false, judging: false,
+      stage, carried,
+    });
     setPhase('ready');
     play('button');
     timerRef.current = window.setTimeout(() => {
@@ -383,6 +413,13 @@ export default function SpeedMaster({ onBack }: Props) {
       rafRef.current = requestAnimationFrame(tick);
     }, READY_MS);
   }, [play, tick]);
+
+  const start = useCallback(() => startStage(1, 0), [startStage]);
+  /** 다음 단계로 — 지금까지의 점수를 안고 간다 */
+  const nextStage = useCallback(() => {
+    const r = run.current;
+    startStage(r.stage + 1, Math.round(r.carried + r.score));
+  }, [startStage]);
 
   /* ── T바 ── 잡은 지점에서 얼마나 밀었/당겼는지로 단을 센다. 손을 떼도 단은 머문다. */
   const onGrab = useCallback((e: React.PointerEvent) => {
@@ -402,7 +439,9 @@ export default function SpeedMaster({ onBack }: Props) {
     const next = Math.max(-MAX_B, Math.min(MAX_P, notchAt(y)));
     if (next !== run.current.notch) {
       run.current.notch = next;
-      play('tick');
+      /* 역행과 제동은 소리가 다르다 — 화면을 안 보고 손만 움직여도 어느 쪽인지 알게.
+         중립은 둘 사이를 지나는 자리라 가벼운 딸깍으로 둔다. */
+      play(next > 0 ? 'power' : next < 0 ? 'brake' : 'tick');
       setHud((h) => ({ ...h, notch: next }));
     }
   }, [play]);
@@ -424,7 +463,7 @@ export default function SpeedMaster({ onBack }: Props) {
   }, []);
 
   const cur = run.current.sections[hud.idx];
-  const progress = Math.min(hud.t / SECTION_SEC, 1) * 100;
+  const progress = Math.min(hud.t / stageSec(hud.stage), 1) * 100;
   const overState = hud.warn ? 'warn' : 'ok';
   const correctCount = sections.filter((s) => s.verdict === 'correct').length;
 
@@ -442,8 +481,9 @@ export default function SpeedMaster({ onBack }: Props) {
           <BookOpen size={15} strokeWidth={2.2} />
           속도공부
         </button>
+        {/* 배지는 단계만 — 구간 진행은 아래 줄에 둔다(둘 다 넣으면 제목이 두 줄로 밀린다) */}
         {(phase === 'running' || phase === 'reveal') && (
-          <span className={styles.roundBadge}>{Math.min(hud.idx + 1, SECTION_COUNT)} / {SECTION_COUNT}</span>
+          <span className={styles.roundBadge}>{hud.stage}단계</span>
         )}
         <button
           type="button"
@@ -475,6 +515,11 @@ export default function SpeedMaster({ onBack }: Props) {
             <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
             <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>입니다.</li>
             <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
+            <li>
+              한 단계는 {SECTION_COUNT}구간입니다. <b>{STAGE_PASS}점을 넘기면 다음 단계</b>로 가고,
+              단계마다 한 구간이 <b>2초씩 짧아집니다</b> (16 · 14 · 12 · 10초, {MAX_STAGE}단계까지).
+            </li>
+            <li>점수는 <b>단계마다 쌓입니다.</b> 기록은 그 총점입니다.</li>
           </ul>
           {best > 0 && <p className={styles.best}>내 최고 점수 <b>{best.toLocaleString()}</b></p>}
           <button type="button" className={styles.primaryBtn} onClick={start}>출발</button>
@@ -558,8 +603,10 @@ export default function SpeedMaster({ onBack }: Props) {
           </div>
 
           <div className={styles.foot}>
-            <span className={styles.footItem}>점수 <b>{hud.score.toLocaleString()}</b></span>
+            {/* 이 단계 점수와, 앞 단계까지 합친 총점을 함께 — 총점이 곧 기록이다 */}
             <span className={styles.footItem}>구간 <b>{Math.min(hud.idx + 1, SECTION_COUNT)}</b> / {SECTION_COUNT}</span>
+            <span className={styles.footItem}>이 단계 <b>{hud.score.toLocaleString()}</b></span>
+            <span className={styles.footItem}>총점 <b>{(hud.carried + hud.score).toLocaleString()}</b></span>
           </div>
 
           <p className={styles.hint}>화면을 잡고 아래로 내리면 역행 · 위로 올리면 제동</p>
@@ -580,22 +627,50 @@ export default function SpeedMaster({ onBack }: Props) {
             <span className={styles.answerU}>km/h 이하</span>
           </div>
 
-          <p className={styles.answerMine}>내 속도 <b>{revealed.avg.toFixed(1)}</b> km/h</p>
+          <p className={styles.answerMine}>내 속도 <b>{revealed.avg.toFixed(0)}</b> km/h</p>
           <p className={styles.answerSource}>{revealed.rule.source}</p>
           {revealed.score > 0 && <p className={styles.answerScore}>+{revealed.score}점</p>}
+        </div>
+      )}
+
+      {/* ── 단계 통과 ── 900점을 넘겨야 여기로 온다 */}
+      {phase === 'stageclear' && (
+        <div className={styles.panel}>
+          <h2 className={styles.resultTitle}>{hud.stage}단계 통과</h2>
+          <div className={styles.resultScore}>
+            <span className={styles.resultScoreV}>{(hud.carried + hud.score).toLocaleString()}</span>
+            <span className={styles.resultScoreU}>점</span>
+          </div>
+          <p className={styles.best}>이 단계 <b>{hud.score.toLocaleString()}점</b> · 맞춘 구간 <b>{correctCount} / {sections.length}</b></p>
+          <p className={styles.lead}>
+            다음은 <b>{hud.stage + 1}단계</b>입니다. 한 구간이 <b>{stageSec(hud.stage + 1)}초</b>로 줄어듭니다.
+          </p>
+          <button type="button" className={styles.primaryBtn} onClick={nextStage}>
+            {hud.stage + 1}단계 출발
+          </button>
+          <button type="button" className={styles.ghostBtn} onClick={finish}>여기서 끝내기</button>
         </div>
       )}
 
       {/* ── 결과 ── */}
       {phase === 'over' && (
         <div className={styles.panel}>
-          <h2 className={styles.resultTitle}>완주</h2>
+          <h2 className={styles.resultTitle}>
+            {hud.stage >= MAX_STAGE && hud.score > STAGE_PASS ? '전 단계 완주' : `${hud.stage}단계에서 종료`}
+          </h2>
           <div className={styles.resultScore}>
-            <span className={styles.resultScoreV}>{hud.score.toLocaleString()}</span>
+            <span className={styles.resultScoreV}>{(hud.carried + hud.score).toLocaleString()}</span>
             <span className={styles.resultScoreU}>점</span>
           </div>
-          <p className={styles.best}>맞춘 구간 <b>{correctCount} / {sections.length}</b></p>
-          {hud.score >= best && hud.score > 0 && <p className={styles.record}>신기록입니다</p>}
+          <p className={styles.best}>
+            {hud.stage}단계까지 · 마지막 단계 맞춘 구간 <b>{correctCount} / {sections.length}</b>
+          </p>
+          {hud.stage < MAX_STAGE && (
+            <p className={styles.hint}>한 단계를 {STAGE_PASS}점 넘게 마치면 다음 단계로 갑니다</p>
+          )}
+          {hud.carried + hud.score >= best && hud.carried + hud.score > 0 && (
+            <p className={styles.record}>신기록입니다</p>
+          )}
 
           {sections.some((s) => s.verdict && s.verdict !== 'correct') && (
             <div className={styles.review}>
@@ -605,7 +680,7 @@ export default function SpeedMaster({ onBack }: Props) {
                   <li key={s.rule.id}>
                     <b>{s.rule.label}</b>
                     <span className={styles.reviewLimit}>
-                      {s.rule.limit} km/h 이하 <em>(내 속도 {s.avg.toFixed(1)})</em>
+                      {s.rule.limit} km/h 이하 <em>(내 속도 {s.avg.toFixed(0)})</em>
                     </span>
                     <small>{s.rule.source}</small>
                   </li>

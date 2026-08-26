@@ -127,6 +127,23 @@
 }
 .primaryBtn:active { transform: scale(0.98); }
 
+/* 단계 통과 화면의 '여기서 끝내기' — 다음 단계로 가는 것이 주인공이라 한 단계 눌러 둔다 */
+.ghostBtn {
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--dia-space-2);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: transparent;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.ghostBtn:active { transform: scale(0.98); }
+
 /* ── 주행 화면 ── */
 .stage {
   flex: 1;

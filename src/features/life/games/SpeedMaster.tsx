@@ -30,17 +30,20 @@ interface Props {
 }
 
 /* ── 규칙 ── */
-/* 한 단계 7구간. */
-const SECTION_COUNT = 7;
+/* 한 단계 5구간. */
+const SECTION_COUNT = 5;
 const JUDGE_RATIO = 0.25;        // 마지막 1/4 이 판정 구간
 const REVEAL_MS = 2600;          // 정답 보여주는 시간
 
 /* ── 단계 ──
    단계가 오를수록 한 구간의 시간이 2초씩 짧아진다. 같은 문제라도 생각할 틈이 줄어드니,
    "알고는 있다"에서 "몸이 먼저 안다"로 넘어가야 통과된다.
-   한 단계를 900점 넘게 마쳐야 다음 단계로 갈 수 있다(만점 1,050점 = 7구간 × 150점). */
+   한 단계를 600점 넘게 마쳐야 다음 단계로 갈 수 있다(만점 750점 = 5구간 × 150점).
+   구간이 7 → 5 로 줄면서 만점도 1,050 → 750 으로 줄었다. 통과선을 900 그대로 두면
+   아무도 못 넘으므로 같이 낮춘다. 600 은 다섯 구간을 모두 맞히고 평균 120점
+   (제한속도에 어지간히 붙였을 때) 이면 넘는 선이다. */
 const MAX_STAGE = 4;
-const STAGE_PASS = 900;
+const STAGE_PASS = 600;
 const stageSec = (stage: number) => 16 - (stage - 1) * 2;   // 16 · 14 · 12 · 10
 
 /** 계기판 최대 눈금 (km/h) */
@@ -332,7 +335,7 @@ export default function SpeedMaster({ onBack }: Props) {
     timerRef.current = window.setTimeout(() => {
       r.idx += 1;
       if (r.idx >= r.sections.length) {
-        /* 한 단계가 끝났다. 900점을 넘겼고 아직 위 단계가 남았으면 갈 수 있다.
+        /* 한 단계가 끝났다. 통과선(STAGE_PASS)을 넘겼고 아직 위 단계가 남았으면 갈 수 있다.
            못 넘겼으면 여기서 판이 끝난다 — 총점은 지나온 단계까지 합친 값이다. */
         if (Math.round(r.score) > STAGE_PASS && r.stage < MAX_STAGE) {
           setRevealed(null);
@@ -709,7 +712,7 @@ export default function SpeedMaster({ onBack }: Props) {
         </div>
       )}
 
-      {/* ── 단계 통과 ── 900점을 넘겨야 여기로 온다 */}
+      {/* ── 단계 통과 ── 통과선(STAGE_PASS)을 넘겨야 여기로 온다 */}
       {phase === 'stageclear' && (
         <div className={styles.panel}>
           <h2 className={styles.resultTitle}>{hud.stage}단계 통과</h2>

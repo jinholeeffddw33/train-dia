@@ -572,6 +572,8 @@
 .verdict_correct { background: var(--dia-green-dim); color: var(--dia-green-text); }
 .verdict_over    { background: var(--dia-red-dim);   color: var(--dia-red); }
 .verdict_slow    { background: var(--dia-amber-dim); color: var(--dia-amber-text); }
+/* 넘겼지만 1.2배 안 — 정답은 아니고 0점도 아니다. 붉은색보다 약하게 */
+.verdict_overtol { background: var(--dia-amber-dim); color: var(--dia-amber-text); }
 
 .answer {
   display: flex;

@@ -63,8 +63,8 @@ const DIAL_LABELS = Array.from(
 const POWER_ACC = [0, 3, 6, 8.5, 11];
 /** 제동 1~7단 감속도 (km/h per sec) — 가속을 낮춘 만큼 함께 낮춰 균형을 맞춘다 */
 const BRAKE_DEC = [0, 2, 3.5, 5, 7, 9.5, 12, 15];
-/* 제한속도는 '이하'다. 조금이라도 넘으면 그 구간은 오답이고 경고가 울린다.
-   (실제 ATC 는 1km/h 초과에서 경고음이지만, 이 게임은 외우게 하는 것이 목적이라 더 엄격하다) */
+/* 제한속도는 '이하'다. 넘기면 곧바로 경고가 울린다(실제 ATC 와 같은 1km/h 초과 기준).
+   경고는 넘긴 즉시, 0점은 1.2배부터 — OVER_ALLOW 참고 */
 const READY_MS = 2200;
 
 const MAX_P = 4;
@@ -105,6 +105,15 @@ function notchAt(y: number): number {
 
 /** 정답으로 인정하는 폭 — 제한속도 바로 아래. 너무 느려도 속도를 모르는 것이다. */
 const tolerance = (limit: number) => Math.max(2, limit * 0.12);
+
+/* ── 초과 허용 (진호 요청) ──
+   전에는 제한속도를 1km/h만 넘겨도 그 구간이 0점이었다. 배우는 중에는 손이 미끄러지는
+   일이 잦아 그 한 번으로 판이 끝나 버렸다. 그래서 제한속도의 1.2배까지는 점수를 남긴다.
+   다만 '넘겨도 된다'가 되면 안 되므로, 초과 구간의 최고점(80)이 제한속도 아래에서 받는
+   최저점(100)보다 낮다 — 넘겨서 이득을 보는 경우는 없다. */
+const OVER_ALLOW = 1.2;          // 제한속도 × 1.2 까지 허용
+const OVER_MAX_SCORE = 80;       // 막 넘겼을 때
+const OVER_MIN_SCORE = 10;       // 1.2배에 닿았을 때
 
 function notchLabel(n: number): string {
   if (n > 0) return `P${n}`;
@@ -202,7 +211,8 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
 }
 
 type Phase = 'idle' | 'ready' | 'running' | 'reveal' | 'stageclear' | 'over';
-type Verdict = 'correct' | 'slow' | 'over';
+/** overtol = 제한속도를 넘었지만 1.2배 안 — 감점하고 점수는 남긴다 */
+type Verdict = 'correct' | 'overtol' | 'slow' | 'over';
 
 interface Section {
   rule: SpeedRule;
@@ -257,7 +267,7 @@ export default function SpeedMaster({ onBack }: Props) {
 
   const run = useRef({
     v: 0, t: 0, idx: 0, score: 0,
-    notch: 0, warned: false, overInJudge: false,
+    notch: 0, warned: false, hardOver: false,
     judgeSum: 0, judgeN: 0,
     sections: [] as Section[],
     stage: 1,
@@ -309,8 +319,11 @@ export default function SpeedMaster({ onBack }: Props) {
     const avg = r.judgeN > 0 ? r.judgeSum / r.judgeN : 0;
     const tol = tolerance(limit);
 
+    const cap = limit * OVER_ALLOW;
+
     let verdict: Verdict;
-    if (r.overInJudge || avg > limit) verdict = 'over';
+    if (r.hardOver || avg > cap) verdict = 'over';        // 1.2배까지 넘겼다 — 0점
+    else if (avg > limit) verdict = 'overtol';            // 넘겼지만 허용 범위 — 감점
     else if (avg >= limit - tol) verdict = 'correct';
     else verdict = 'slow';
 
@@ -322,6 +335,12 @@ export default function SpeedMaster({ onBack }: Props) {
       sec.score = 100 + Math.round(50 * closeness);
       r.score += sec.score;
       play('success');
+    } else if (verdict === 'overtol') {
+      // 넘긴 만큼 비례해서 깎는다 — 막 넘기면 80, 1.2배에 닿으면 10
+      const excess = Math.min((avg - limit) / (cap - limit), 1);
+      sec.score = Math.round(OVER_MAX_SCORE - (OVER_MAX_SCORE - OVER_MIN_SCORE) * excess);
+      r.score += sec.score;
+      play('tick');
     } else {
       sec.score = 0;
       play('fail');
@@ -348,7 +367,7 @@ export default function SpeedMaster({ onBack }: Props) {
       }
       // 다음 구간은 정지 상태에서 다시 시작한다 — 앞 구간 속도가 힌트가 되면 안 된다
       r.v = 0; r.t = 0; r.notch = 0; r.warned = false;
-      r.overInJudge = false; r.judgeSum = 0; r.judgeN = 0;
+      r.hardOver = false; r.judgeSum = 0; r.judgeN = 0;
       grab.current = null;
       setRevealed(null);
       setHud((h) => ({ ...h, v: 0, t: 0, idx: r.idx, notch: 0, warn: false, judging: false, grabbed: false }));
@@ -381,14 +400,15 @@ export default function SpeedMaster({ onBack }: Props) {
     const judging = r.t >= r.secSec * (1 - JUDGE_RATIO);
 
     /* ── 초과 판정 ──
-       넘기면 그 구간은 오답이고 경고가 울린다. 다만 강제로 세우지는 않는다 —
-       전에는 4km/h 넘기면 비상제동이 걸려 속도가 0이 됐는데, 한 번 넘기면 그 구간을
-       되돌릴 방법이 없어 배우기 전에 게임이 끝나 버렸다(진호 요청으로 없앰).
-       구간 어디서 넘겼든 오답인 것은 그대로다. 판정 구간에서만 따지면 앞에서 슬쩍 올려
-       경고가 뜨는 지점을 찾아 답을 알아낸 뒤 내려오는 게 가능해진다 — 그러면 외울 이유가 없다. */
+       넘기면 경고가 울린다. 다만 강제로 세우지는 않는다 — 전에는 4km/h 넘기면 비상제동이
+       걸려 속도가 0이 됐는데, 한 번 넘기면 그 구간을 되돌릴 방법이 없어 배우기 전에
+       게임이 끝나 버렸다(진호 요청으로 없앰).
+       1.2배까지 넘긴 순간부터는 구간 어디였든 0점이다. 판정 구간에서만 따지면 앞에서 슬쩍
+       올려 경고가 뜨는 지점을 찾아 답을 알아낸 뒤 내려오는 게 가능해진다 — 그러면 외울
+       이유가 없다. */
     if (r.v > limit) {
       if (!r.warned) { r.warned = true; play('fail'); }
-      r.overInJudge = true;
+      if (r.v > limit * OVER_ALLOW) r.hardOver = true;
     } else {
       r.warned = false;
     }
@@ -414,7 +434,7 @@ export default function SpeedMaster({ onBack }: Props) {
     const secs = buildSections();
     run.current = {
       v: 0, t: 0, idx: 0, score: 0,
-      notch: 0, warned: false, overInJudge: false,
+      notch: 0, warned: false, hardOver: false,
       judgeSum: 0, judgeN: 0,
       sections: secs,
       stage, carried, secSec: stageSec(stage),
@@ -594,8 +614,9 @@ export default function SpeedMaster({ onBack }: Props) {
               <li>제한속도는 <b>알려주지 않습니다.</b> 구간이 끝나야 정답이 나옵니다.</li>
               <li>화면을 잡고 <b>아래로 내리면 역행</b>(4단), <b>위로 올리면 제동</b>(7단), 가운데는 <b>중립</b>(타행)입니다.</li>
               <li>구간의 <b>마지막 1/4</b>이 판정 구간입니다. 그 동안 유지한 속도로 채점합니다.</li>
-              <li>제한속도는 <b>이하</b>입니다. <b>조금이라도 넘기면 그 구간은 오답</b>입니다.</li>
-              <li>너무 느려도 오답입니다. <b>제한속도 바로 아래</b>가 정답입니다.</li>
+              <li>제한속도는 <b>이하</b>입니다. 넘겨도 <b>1.2배까지는 점수가 남지만</b> 넘긴 만큼 깎입니다.</li>
+              <li><b>1.2배를 넘기면 그 구간은 0점</b>입니다. 너무 느려도 0점입니다.</li>
+              <li><b>제한속도 바로 아래</b>가 만점입니다 — 넘겨서 점수가 오르는 경우는 없습니다.</li>
               <li>
                 한 단계는 {SECTION_COUNT}구간입니다. <b>{STAGE_PASS}점을 넘기면 다음 단계</b>로 가고,
                 단계마다 한 구간이 <b>2초씩 짧아집니다</b> (16 · 14 · 12 · 10초, {MAX_STAGE}단계까지).
@@ -698,7 +719,10 @@ export default function SpeedMaster({ onBack }: Props) {
           <span className={styles.situationLabel}>{revealed.rule.label}</span>
 
           <div className={`${styles.verdict} ${styles[`verdict_${revealed.verdict}`]}`}>
-            {revealed.verdict === 'correct' ? '정답' : revealed.verdict === 'over' ? '초과' : '너무 느림'}
+            {revealed.verdict === 'correct' ? '정답'
+              : revealed.verdict === 'overtol' ? '초과 · 감점'
+              : revealed.verdict === 'over' ? '초과'
+              : '너무 느림'}
           </div>
 
           <div className={styles.answer}>
@@ -753,7 +777,8 @@ export default function SpeedMaster({ onBack }: Props) {
 
           {sections.some((s) => s.verdict && s.verdict !== 'correct') && (
             <div className={styles.review}>
-              <h3 className={styles.reviewTitle}>틀린 구간 다시 보기</h3>
+              {/* 초과·감점 구간도 여기 들어온다 — 만점을 못 받았으면 다시 볼 이유가 있다 */}
+              <h3 className={styles.reviewTitle}>놓친 구간 다시 보기</h3>
               <ul className={styles.reviewList}>
                 {sections.filter((s) => s.verdict && s.verdict !== 'correct').map((s) => (
                   <li key={s.rule.id}>

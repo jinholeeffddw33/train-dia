@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, HelpCircle, X, Eye, EyeOff } from 'lucide-react';
-import { BREAKERS, SWITCHES, BREAKER_QUIZ, labelOf, type BreakerQuiz } from '@/data/breakers';
+import { ArrowLeft, Volume2, VolumeX, Vibrate, VibrateOff, HelpCircle, X, Eye, EyeOff, Image as ImageIcon, List } from 'lucide-react';
+import {
+  BREAKERS, SWITCHES, BREAKER_QUIZ, STRIPS, SPOTS, itemsOfStrip, labelOf,
+  type BreakerQuiz, type StripId,
+} from '@/data/breakers';
 import GameRanking from './GameRanking';
 import { useGameFeedback } from './useGameFeedback';
 import styles from './BreakerMaster.module.css';
@@ -66,6 +69,10 @@ export default function BreakerMaster({ onBack }: Props) {
   const [best, setBest] = useState(0);
   const [labelsOn, setLabelsOn] = useState(true);
   const [help, setHelp] = useState(false);
+  /* 실제 사진으로 볼 것인가 — 진호 요청. 사진이면 실물과 같은 자리라 위치도 함께 익는다.
+     목록은 글씨가 커서 찾기 쉬우니 남겨 둔다. */
+  const [photo, setPhoto] = useState(true);
+  const [strip, setStrip] = useState<StripId>('row1');
   /** 다시 풀기 중인가 — 점수에 넣지 않는다 */
   const [review, setReview] = useState(false);
 
@@ -167,6 +174,25 @@ export default function BreakerMaster({ onBack }: Props) {
     setPhase('ask');
   }, [idx, quizzes.length, attempts, best, review, play]);
 
+  /* 정답이 나오면 그 차단기가 있는 줄로 옮기고, 그 자리가 보이게 밀어 준다 —
+     어디였는지 눈으로 봐야 남는다. 화면 밖에 있으면 알려 줘도 못 본다. */
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (phase !== 'reveal' || !quiz) return;
+    const s = SPOTS[quiz.answer[0]]?.strip;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 정답 공개에 맞춰 보이는 줄을 옮긴다
+    if (s) setStrip(s);
+  }, [phase, quiz]);
+
+  useEffect(() => {
+    if (phase !== 'reveal' || !quiz || !photo) return;
+    const el = scrollRef.current;
+    const spot = SPOTS[quiz.answer[0]];
+    if (!el || !spot || spot.strip !== strip) return;
+    const target = spot.x * STRIPS[strip].w - el.clientWidth / 2;
+    el.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+  }, [phase, quiz, photo, strip]);
+
   const wrongOnes = useMemo(
     () => attempts.filter((a) => a.gotOn === 0).map((a) => a.quiz),
     [attempts],
@@ -174,7 +200,87 @@ export default function BreakerMaster({ onBack }: Props) {
   const firstTry = attempts.filter((a) => a.gotOn === 1).length;
   const secondTry = attempts.filter((a) => a.gotOn === 2).length;
 
-  /** 배전반 한 줄 */
+  /** 지금 이 차단기가 어떤 꼴로 보여야 하나 */
+  const stateOf = (id: string) => ({
+    isAnswer: answered && !!quiz?.answer.includes(id),
+    isWrong: wrongFlash === id,
+    isHit: hit.includes(id),
+    wasPicked: picked.includes(id),
+  });
+
+  /** ── 사진 배전반 ──
+      실물 사진을 줄별로 잘라 놓고 그 위에 투명한 버튼을 얹는다. 자리가 실물과 같으니
+      문제를 푸는 동안 "그 차단기가 어디쯤 있었다"가 손에 남는다. */
+  const renderPhoto = () => {
+    const s = STRIPS[strip];
+    const ids = itemsOfStrip(strip);
+    const spotW = strip === 'sw' ? 86 : 48;
+    const spotH = strip === 'sw' ? 86 : 120;
+    return (
+      <div className={styles.photoBoard}>
+        <div className={styles.tabs}>
+          {(Object.keys(STRIPS) as StripId[]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              className={`${styles.tab} ${strip === k ? styles.tabOn : ''}`}
+              onClick={() => setStrip(k)}
+              aria-pressed={strip === k}
+            >
+              {STRIPS[k].title}
+            </button>
+          ))}
+        </div>
+        {/* 가로로 미는 판 — swipe-guard 가 없으면 미는 동작이 교번/더보기 이동으로 새어 나간다 */}
+        <div className={styles.photoScroll} data-swipe-guard ref={scrollRef}>
+          {/* STYLE-EXCEPTION: 사진 조각마다 크기가 달라 CSS 로 못 적는다 */}
+          <div className={styles.photoInner} style={{ width: s.w, height: s.h }}>
+            <img
+              src={s.src}
+              alt={`운전실 배전반 ${s.title}`}
+              width={s.w}
+              height={s.h}
+              className={styles.photoImg}
+              draggable={false}
+            />
+            {ids.map((id) => {
+              const p = SPOTS[id];
+              const st = stateOf(id);
+              const spare = id.startsWith('SPARE');
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={[
+                    styles.spot,
+                    st.isHit ? styles.spotHit : '',
+                    st.isWrong ? styles.spotWrong : '',
+                    st.wasPicked && !st.isWrong ? styles.spotUsed : '',
+                    st.isAnswer ? styles.spotAnswer : '',
+                  ].filter(Boolean).join(' ')}
+                  /* STYLE-EXCEPTION: 사진 위 실제 좌표 — 차단기마다 다르다 */
+                  style={{
+                    left: p.x * s.w - spotW / 2,
+                    top: p.y * s.h - spotH / 2,
+                    width: spotW,
+                    height: spotH,
+                  }}
+                  onClick={() => pick(id)}
+                  disabled={phase !== 'ask' || spare}
+                  aria-label={`${id} ${labelOf(id)}`}
+                >
+                  {(st.isAnswer || st.isHit) && <span className={styles.spotTag}>{id}</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <p className={styles.photoHint}>옆으로 밀어서 찾으세요 · 줄은 위 단추로 바꿉니다</p>
+      </div>
+    );
+  };
+
+  /** 배전반 한 줄 (목록 보기) */
   const renderRow = (row: 1 | 2 | 3) => (
     <div className={styles.rowBlock} key={row}>
       <span className={styles.rowTitle}>{ROW_TITLE[row]}</span>
@@ -222,13 +328,24 @@ export default function BreakerMaster({ onBack }: Props) {
         {review && <span className={styles.roundBadge}>다시 풀기</span>}
         <button
           type="button"
-          className={`${styles.toggleBtn} ${!labelsOn ? styles.toggleBtnOff : ''}`}
-          onClick={() => setLabelsOn((v) => !v)}
-          aria-label={labelsOn ? '우리말 라벨 감추기' : '우리말 라벨 보기'}
-          aria-pressed={labelsOn}
+          className={styles.toggleBtn}
+          onClick={() => setPhoto((v) => !v)}
+          aria-label={photo ? '목록으로 보기' : '실제 사진으로 보기'}
+          aria-pressed={photo}
         >
-          {labelsOn ? <Eye size={18} strokeWidth={2} /> : <EyeOff size={18} strokeWidth={2} />}
+          {photo ? <List size={18} strokeWidth={2} /> : <ImageIcon size={18} strokeWidth={2} />}
         </button>
+        {!photo && (
+          <button
+            type="button"
+            className={`${styles.toggleBtn} ${!labelsOn ? styles.toggleBtnOff : ''}`}
+            onClick={() => setLabelsOn((v) => !v)}
+            aria-label={labelsOn ? '우리말 라벨 감추기' : '우리말 라벨 보기'}
+            aria-pressed={labelsOn}
+          >
+            {labelsOn ? <Eye size={18} strokeWidth={2} /> : <EyeOff size={18} strokeWidth={2} />}
+          </button>
+        )}
         <button
           type="button"
           className={`${styles.toggleBtn} ${!soundOn ? styles.toggleBtnOff : ''}`}
@@ -346,7 +463,10 @@ export default function BreakerMaster({ onBack }: Props) {
             </div>
           )}
 
+          {photo && renderPhoto()}
+
           {/* 배전반 — 실물 3단 구성 그대로 묶었다 */}
+          {!photo && (
           <div className={styles.board}>
             {([1, 2, 3] as const).map(renderRow)}
 
@@ -380,6 +500,7 @@ export default function BreakerMaster({ onBack }: Props) {
               </div>
             </div>
           </div>
+          )}
 
           <div className={styles.foot}>
             <span className={styles.footItem}>문제 <b>{idx + 1}</b> / {quizzes.length}</span>

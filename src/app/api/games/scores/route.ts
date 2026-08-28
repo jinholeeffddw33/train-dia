@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { getSessionUser } from '@/lib/authServer';
 
-const VALID_GAMES = ['snake', 'reaction', 'mental', 'simon', 'halli', 'apex', 'speed'] as const;
+const VALID_GAMES = ['snake', 'reaction', 'mental', 'simon', 'halli', 'apex', 'speed', 'breaker'] as const;
 
 // 게임별 점수 상한 — 클라이언트 점수 위조 방어(안티치트). APEX 는 3D 실시간이라 위조가 쉬워 상한 필수.
 //   APEX 이론 최대 ≈ 거리 10만m × 150/m = 1500만이지만, 현실 상위 플레이는 수십만 → 500만으로 넉넉히 차단.

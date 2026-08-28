@@ -23,7 +23,8 @@ type FeedbackKind =
   | 'ready'         // ready 전환 (반응속도 초록 전환)
   | 'button'        // 버튼 눌림
   | 'power'         // 역행 단 올림 (스피드 마스터) — 밝고 짧게
-  | 'brake';        // 제동 단 취급 (스피드 마스터) — 낮고 바람 빠지듯
+  | 'brake'         // 제동 단 취급 (스피드 마스터) — 낮고 바람 빠지듯
+  | 'buzzer';       // 오답 부저 (차단기 마스터) — 실제 부저처럼 두 번 짧게
 
 interface ToneSpec {
   freq: number;
@@ -63,6 +64,11 @@ const TONES: Record<FeedbackKind, ToneSpec[]> = {
     { freq: 790, duration: 0.05, type: 'triangle', gain: 0.16 },
   ],
   brake:    [{ freq: 240, duration: 0.09, type: 'sawtooth', gain: 0.14 }],
+  /* 오답 부저 — fail 보다 낮고 두 번 끊어 울린다. 틀렸다는 것이 소리만으로 분명해야 한다. */
+  buzzer:   [
+    { freq: 150, duration: 0.13, type: 'square', gain: 0.2 },
+    { freq: 120, duration: 0.2, type: 'square', gain: 0.2 },
+  ],
 };
 
 const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
@@ -75,6 +81,7 @@ const VIBRATE_PATTERNS: Record<FeedbackKind, number | number[]> = {
   button: [20, 40, 30],
   power: 12,
   brake: 22,
+  buzzer: [90, 60, 120],
 };
 
 function loadPref(key: string, defaultValue: boolean): boolean {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed, Gauge } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed, Gauge, ToggleLeft } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
@@ -12,6 +12,7 @@ const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
 const SpeedMaster = lazy(() => import('./games/SpeedMaster'));
+const BreakerMaster = lazy(() => import('./games/BreakerMaster'));
 const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
 const HallOfFame = lazy(() => import('./games/HallOfFame'));
 const ApexRush = lazy(() => import('./games/ApexRush'));
@@ -49,7 +50,7 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
   }
 }
 
-type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex' | 'speed';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex' | 'speed' | 'breaker';
 type View = 'home' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp' | 'menu';
 
 // 홈에 직접 노출하는 게임 타일 — 1탭에 바로 실행. 중간 목록 화면 없음.
@@ -58,6 +59,7 @@ type View = 'home' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof
 type HomeGameKey = GameId | 'hof';
 const HOME_GAMES: { key: HomeGameKey; label: string; icon: typeof Zap; bg: string; variant?: 'hof' }[] = [
   { key: 'speed',    label: '스피드 마스터', icon: Gauge, bg: 'iconBgBlue' },
+  { key: 'breaker',  label: '차단기 마스터', icon: ToggleLeft, bg: 'iconBgBlue' },
   { key: 'apex',     label: 'APEX',       icon: Bike,    bg: 'iconBgAmber' },
   { key: 'reaction', label: '반응속도',    icon: Zap,     bg: 'iconBgAmber' },
   { key: 'snake',    label: '사과 먹기',   icon: Bug,     bg: 'iconBgGreen' },
@@ -196,6 +198,7 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
           {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
           {view.gameId === 'speed' && <SpeedMaster onBack={goBack} />}
+          {view.gameId === 'breaker' && <BreakerMaster onBack={goBack} />}
           {view.gameId === 'apex' && <ApexRush onBack={goBack} />}
           {view.gameId === 'multi' && <MultiLobby onBack={goBack} />}
         </Suspense>

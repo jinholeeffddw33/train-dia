@@ -1,0 +1,513 @@
+/* 차단기 마스터 — 배전반에서 차단기를 찾아 내리는 게임.
+   차단기가 예순 개가 넘어 판이 길다. 그래서 문제 카드를 위에 붙박아 두었다 —
+   아래로 훑으며 찾는 동안에도 "무슨 증상이었지"를 다시 읽을 수 있어야 한다. */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+}
+@supports not (min-height: 100dvh) {
+  .wrap { min-height: 100vh; }
+}
+
+/* ── 헤더 ── (다른 게임과 같은 구성) */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: calc(var(--dia-space-3) + var(--sat)) var(--dia-space-4) var(--dia-space-3);
+}
+.backBtn,
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease;
+}
+.backBtn:active,
+.toggleBtn:active { transform: scale(0.95); }
+.toggleBtnOff { color: var(--dia-text-tertiary); }
+.headerTitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.roundBadge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 시작·결과 패널 ── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-8) + var(--sab));
+}
+
+/* ── 시작 화면 ──
+   배전반을 닮은 그림을 얹는다. 실물처럼 몇 개는 내려가 있게 두었다 —
+   전부 올라가 있으면 그냥 줄무늬로 보이고, 하나쯤 내려가 있어야 차단기로 읽힌다. */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-5) var(--dia-space-4) var(--dia-space-4);
+  background: radial-gradient(120% 70% at 50% 8%, var(--dia-blue-dim) 0%, transparent 70%);
+  border-radius: var(--dia-radius-xl);
+}
+.heroPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+}
+.heroRow { display: flex; gap: 5px; }
+.heroSw {
+  width: 9px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--dia-text-secondary) 0 42%, var(--dia-surface-hover) 42% 100%);
+}
+.heroSwOff {
+  background: linear-gradient(180deg, var(--dia-surface-hover) 0 58%, var(--dia-red) 58% 100%);
+}
+.heroLead {
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  text-align: center;
+}
+.heroLead b { color: var(--dia-blue); }
+.heroSub {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+
+.startStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dia-space-2);
+}
+.startStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--dia-space-3) var(--dia-space-2);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+}
+.startStatLabel {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: 600;
+}
+.startStatValue {
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.primaryBtn {
+  height: 54px;
+  border: none;
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.primaryBtn:active { transform: scale(0.98); }
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 46px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease;
+}
+.ghostBtn:active { transform: scale(0.98); }
+
+/* ── 규칙 ── */
+.rulesCard {
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  padding: var(--dia-space-4);
+}
+.rulesHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dia-space-3);
+}
+.rulesTitle { margin: 0; font-size: var(--dia-text-base); font-weight: 800; }
+.rulesClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface-hover);
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.rules {
+  margin: 0;
+  padding-left: 1.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+  line-height: 1.6;
+}
+.rules b { color: var(--dia-text-primary); font-weight: 700; }
+
+/* ── 진행 화면 ── */
+.play {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding: 0 var(--dia-space-4) calc(var(--dia-space-8) + var(--sab));
+}
+
+/* 문제 카드는 위에 붙박는다 — 판이 길어 아래로 훑는 동안 증상을 잊는다 */
+.askCard {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-4);
+  margin: 0 calc(var(--dia-space-4) * -1);
+  border-bottom: 1px solid var(--dia-border);
+  background: var(--dia-bg);
+}
+.symptom {
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+}
+.askMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+.multiTag {
+  padding: 3px 9px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+}
+.tries { display: inline-flex; gap: 6px; margin-left: auto; }
+.tryDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--dia-blue);
+}
+.tryDotUsed { background: var(--dia-surface-hover); }
+
+/* ── 정답 공개 ── */
+.answerCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-4);
+  border: 1px solid var(--dia-green);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-green-dim);
+}
+.answerCardBad {
+  border-color: var(--dia-red);
+  background: var(--dia-red-dim);
+}
+.answerTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+.answerCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.answerKo {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.answerWhy {
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  line-height: 1.6;
+  color: var(--dia-text-primary);
+}
+/* 함정은 정답을 맞혀도 보여준다 — 이름만 알아서는 틀리는 것들이라 */
+.answerTrap {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  border-left: 3px solid var(--dia-amber);
+  font-size: var(--dia-text-sm);
+  line-height: 1.6;
+  color: var(--dia-text-secondary);
+}
+.answerSrc {
+  margin: 0;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-weight: 600;
+}
+
+/* ── 배전반 ── */
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-4);
+}
+.rowBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.rowTitle {
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+  letter-spacing: 0.02em;
+}
+.chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+/* 차단기 한 개. 실물처럼 위쪽에 노란 이름표, 아래에 손잡이가 있는 모양 */
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 52px;
+  padding: 7px 8px 8px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-surface);
+  color: var(--dia-text-primary);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease,
+              border-color var(--dia-dur-base) ease;
+}
+.chip:active { transform: scale(0.96); }
+.chip:disabled { cursor: default; }
+@media (hover: hover) {
+  .chip:not(:disabled):hover { border-color: var(--dia-text-tertiary); }
+}
+.chipCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+}
+.chipKo {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--dia-text-tertiary);
+  overflow-wrap: anywhere;
+}
+/* 배전반에 붉은 글씨로 적힌 것 — 실물의 강조를 그대로 옮긴다 */
+.chipRed .chipCode { color: var(--dia-red); }
+.chipSpare { opacity: 0.45; }
+.chipSwitch {
+  border-style: dashed;
+  border-color: var(--dia-amber);
+}
+.chipSwitch .chipCode { color: var(--dia-amber-text); }
+
+/* 맞게 고른 것 — 정답이 둘일 때 하나만 고른 상태에서도 보인다 */
+.chipHit {
+  border-color: var(--dia-green);
+  background: var(--dia-green-dim);
+}
+/* 잘못 내린 것 — 잠깐 붉게 튀고 원위치 */
+.chipWrong {
+  border-color: var(--dia-red);
+  background: var(--dia-red-dim);
+  animation: shake 0.32s ease;
+}
+/* 이번 문제에서 이미 틀렸던 것 — 다시 눌러도 기회는 안 깎이지만 흐리게 남긴다 */
+.chipUsed { opacity: 0.5; }
+.chipAnswer {
+  border-color: var(--dia-green);
+  background: var(--dia-green-dim);
+  box-shadow: 0 0 0 2px var(--dia-green-dim);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ── 하단 ── */
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-3);
+  padding-top: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+.footItem b {
+  color: var(--dia-text-primary);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 결과 ── */
+.resultTitle {
+  margin: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: 800;
+  text-align: center;
+}
+.resultScore {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+}
+.resultScoreV {
+  font-size: clamp(44px, 14vw, 64px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  color: var(--dia-blue);
+  font-variant-numeric: tabular-nums;
+}
+.resultScoreU {
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+}
+.resultLine {
+  margin: 0;
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+.resultLine b { color: var(--dia-text-primary); font-weight: 800; }
+.record {
+  margin: 0;
+  text-align: center;
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-amber-text);
+}
+
+.review {
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface);
+  padding: var(--dia-space-4);
+}
+.reviewTitle {
+  margin: 0 0 var(--dia-space-3);
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+}
+.reviewList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+}
+.reviewList li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 10px;
+  border-left: 3px solid var(--dia-green);
+}
+.reviewBad { border-left-color: var(--dia-red); }
+.reviewList b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+}
+.reviewKo {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-secondary);
+  font-weight: 600;
+}
+.reviewList small {
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backBtn, .toggleBtn, .primaryBtn, .ghostBtn, .chip { transition: none; }
+  .chipWrong { animation: none; }
+}

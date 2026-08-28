@@ -356,20 +356,20 @@
   transition: transform var(--dia-dur-fast) ease, background var(--dia-dur-base) ease,
               border-color var(--dia-dur-base) ease;
 }
-.chip:active { transform: scale(0.96); }
+.chip:active { transform: scale(0.95); }
 .chip:disabled { cursor: default; }
 @media (hover: hover) {
   .chip:not(:disabled):hover { border-color: var(--dia-text-tertiary); }
 }
 .chipCode {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 13px;
+  font-size: var(--dia-text-xs);
   font-weight: 700;
   letter-spacing: -0.2px;
   line-height: 1.25;
 }
 .chipKo {
-  font-size: 13px;
+  font-size: var(--dia-text-xs);
   line-height: 1.3;
   color: var(--dia-text-tertiary);
   overflow-wrap: anywhere;

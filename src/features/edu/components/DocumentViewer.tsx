@@ -349,7 +349,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
 
   if (!doc) {
     return (
-      <div className={styles.screen}>
+      <div className={`${styles.screen} ${styles.screenWide}`}>
         <div className={styles.topBar}>
           <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
             <ArrowLeft size={20} strokeWidth={2} />
@@ -373,7 +373,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
     const showMeta = hasSummary || hasCaution || hasKeywords;
 
     return (
-      <div className={styles.screen}>
+      <div className={`${styles.screen} ${styles.screenWide}`}>
         <div className={styles.topBar}>
           <button
             type="button"
@@ -484,7 +484,7 @@ export default function DocumentViewer({ onBack, initSection, initChapter, initC
   }
 
   return (
-    <div className={styles.screen}>
+    <div className={`${styles.screen} ${styles.screenWide}`}>
       <div className={styles.topBar}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
           <ArrowLeft size={20} strokeWidth={2} />

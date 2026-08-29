@@ -169,6 +169,10 @@
 }
 
 /* ── Detail ── */
+/* 자료 상세(운전정보·사례교육·열차정보·위험개소)는 화면 전체를 쓴다 —
+   문서 사진을 펴 놓고 읽는 화면이라 폰 폭에 묶으면 태블릿에서 글씨가 안 보인다.
+   목록은 그대로 묶여 있다. 가운데 기둥을 빠져나오는 방법은 edu.module.css 의
+   .screenWide 와 같다(body 에 overflow-x: hidden 이 있어 가로 넘침 없음). */
 .detailWrap {
   display: flex;
   flex-direction: column;
@@ -177,6 +181,8 @@
   background: var(--dia-bg);
   padding-left: var(--sal);
   padding-right: var(--sar);
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
 }
 
 .detailHeader {

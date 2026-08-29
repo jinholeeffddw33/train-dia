@@ -49,7 +49,7 @@ export default function VideoEducation({ onBack }: VideoEducationProps) {
   };
 
   return (
-    <div className={styles.screen}>
+    <div className={`${styles.screen} ${styles.screenWide}`}>
       {/* 헤더 */}
       <div className={styles.topBar}>
         <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">

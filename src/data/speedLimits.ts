@@ -58,7 +58,7 @@ export const SPEED_RULES: SpeedRule[] = [
   /* 차량입환은 제104조에 25 로 적혀 있지만, 기지구내에서 하는 입환은 기지구내 속도(20)를 따른다.
      답십리 기관사가 실제로 하는 입환은 기지구내라 20 이 맞다. */
   { id: 'iphwan', limit: 20, label: '차량입환 (기지구내)', source: '기지구내 입환 20km/h 이하 · 제104조 차량입환은 25 이지만 기지구내는 20', group: 'depot' },
-  { id: 'gongjang', limit: 5, label: '검수고·공장 내 운전', source: '제100조 · 5km/h 이하', group: 'depot' },
+  { id: 'gongjang', limit: 5, label: '검수고 운전', source: '제100조 · 5km/h 이하', group: 'depot' },
   { id: 'jeonsak', limit: 5, label: '전삭고선·하부검사선 진입', source: '5km/h 이하 · 우선멈춤표지 5m 전방 일단정차 후 협의', group: 'depot' },
   { id: 'sechuk', limit: 5, label: '자동세척기로 세척', source: '5km/h 이하 · 세척고 전방 일단정차 후', group: 'depot' },
   { id: 'sechukno', limit: 15, label: '세척하지 않고 세척고 통과', source: '15km/h 이하', group: 'depot' },

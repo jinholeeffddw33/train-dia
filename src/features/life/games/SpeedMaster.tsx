@@ -76,7 +76,9 @@ const MAX_B = 7;
    제동은 일곱 단이라 좁게 잡아야 한 화면에 들어온다. */
 const POWER_PX = 32;   // 역행 한 단
 const NEUTRAL_PX = 28; // 중립
-const BRAKE_PX = 20;   // 제동 한 단
+/* 제동 칸을 20 → 16 으로 줄였다(진호 요청). 일곱 단이라 여기서 28px 이 빠지고,
+   그만큼 계기판이 커질 자리가 난다. 역행은 네 단뿐이라 그대로 넓게 둔다. */
+const BRAKE_PX = 16;   // 제동 한 단
 const NOTCHES = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4] as const;
 
 const notchPx = (n: number) => (n > 0 ? POWER_PX : n < 0 ? BRAKE_PX : NEUTRAL_PX);
@@ -518,11 +520,14 @@ export default function SpeedMaster({ onBack }: Props) {
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h1 className={styles.headerTitle}>스피드 마스터</h1>
-        {/* 공부하기 — 답이 기억나지 않을 때 바로 펴 볼 수 있어야 한다 */}
-        <button type="button" className={styles.studyBtn} onClick={() => setStudy(true)}>
-          <BookOpen size={15} strokeWidth={2.2} />
-          속도공부
-        </button>
+        {/* 공부하기 — 판이 돌아가는 중에는 감춘다. 달리는 중에 펴 볼 수 없을뿐더러,
+            좁은 폰에서 이 단추가 제목을 밀어 세로로 쪼개 놓았다(진호 지적). */}
+        {phase === 'idle' && (
+          <button type="button" className={styles.studyBtn} onClick={() => setStudy(true)}>
+            <BookOpen size={15} strokeWidth={2.2} />
+            속도공부
+          </button>
+        )}
         {/* 배지는 단계만 — 구간 진행은 아래 줄에 둔다(둘 다 넣으면 제목이 두 줄로 밀린다) */}
         {(phase === 'running' || phase === 'reveal') && (
           <span className={styles.roundBadge}>{hud.stage}단계</span>

@@ -39,6 +39,8 @@
 .backBtn:active,
 .toggleBtn:active { transform: scale(0.95); }
 .toggleBtnOff { color: var(--dia-text-tertiary); }
+/* 제목은 반드시 한 줄로. min-width:0 만 있고 nowrap 이 없으면, 단추가 많은 좁은 폰에서
+   flex 가 제목을 글자 폭까지 짜부라뜨려 「스/피/드/…」 처럼 세로로 쪼개진다. */
 .headerTitle {
   flex: 1;
   min-width: 0;
@@ -46,6 +48,9 @@
   font-size: var(--dia-text-lg);
   font-weight: 800;
   letter-spacing: -0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* 속도공부 — 제목 옆. 글자를 남겨 둔다(아이콘만 두면 무슨 버튼인지 모른다) */
 .studyBtn {
@@ -278,8 +283,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dia-space-3);
-  padding: var(--dia-space-4) var(--dia-space-4) calc(var(--dia-space-6) + var(--sab));
+  /* 계기판을 키우려면 위아래 여백부터 걷어야 한다 — 줄마다 12px 씩 여덟 줄이면
+     계기판 하나가 더 들어갈 높이가 된다. */
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-4) + var(--sab));
   border: none;
   background: var(--dia-surface);
   color: inherit;
@@ -293,39 +300,50 @@
 }
 .stage_warn { background: var(--dia-amber-dim); }
 
+/* 문제는 이 화면에서 제일 먼저 읽혀야 하는 글이다. 띠를 깔아 계기판·마스콘과 갈라
+   놓는다 — 아무 바탕에 얹어 두면 눈금·숫자와 같은 무게로 보여 그냥 지나친다. */
 .situation {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-height: 62px;
-  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-surface-hover);
 }
 .situationLabel {
-  font-size: var(--dia-text-lg);
+  font-size: var(--dia-text-xl);
   font-weight: 800;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  text-wrap: balance;
 }
 /* 제한속도는 절대 여기 쓰지 않는다 — 답을 보여주면 암기가 되지 않는다 */
 .situationAsk {
-  font-size: var(--dia-text-sm);
+  font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
   font-weight: 600;
 }
 
-/* 속도계와 주간제어기를 나란히 — 속도를 보면서 손은 핸들에 있어야 한다 */
+/* 계기판을 위, 마스콘을 그 아래 가운데로 세운다(진호 요청).
+   나란히 두면 계기판이 화면 절반만 쓰게 되어 작다. 위아래로 세우면 계기판을
+   화면 폭만큼 키울 수 있고, 실물처럼 '눈은 위 · 손은 아래'가 된다. */
 .readout {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 5vw, 32px);
+  gap: var(--dia-space-2);
   width: 100%;
-  margin: var(--dia-space-2) 0;
 }
 
 /* ── 반원 속도계 ── 눈금과 바늘은 SVG, 숫자는 그 안에 겹쳐 둔다 */
+/* 세로로 세우면서 폭을 키웠다. 다만 화면 높이도 같이 본다 — 짧은 폰에서 계기판만
+   크면 마스콘이 화면 밖으로 밀려 손이 닿을 자리가 없어진다. */
 .dial {
   position: relative;
-  width: clamp(180px, 52vw, 260px);
+  width: clamp(200px, min(92vw, 42vh), 380px);
   flex-shrink: 0;
 }
 .dialSvg {
@@ -631,6 +649,23 @@
   margin: 0;
   font-size: var(--dia-text-xs);
   color: var(--dia-text-tertiary);
+}
+
+/* ── 낮은 화면(아이폰 SE 같은 667px 대) ──
+   주행 화면은 .stage 에 touch-action: none 이 걸려 있어 스크롤이 막혀 있다.
+   내용이 넘치면 진행 바와 점수가 잘린 채 아예 볼 수 없게 되므로, 화면이 낮으면
+   덜 중요한 것부터 줄여 한 화면에 넣는다. 큰 폰은 그대로 시원하게 둔다. */
+@media (max-height: 740px) {
+  .stage {
+    gap: var(--dia-space-1);
+    padding-top: var(--dia-space-2);
+  }
+  .situation { padding: var(--dia-space-2) var(--dia-space-3); }
+  .situationLabel { font-size: var(--dia-text-lg); }
+  .dial { width: clamp(180px, min(92vw, 32vh), 300px); }
+  .statusLine { min-height: 18px; }
+  /* 조작법 한 줄은 아래 상태줄(타행/역행/제동)이 이미 말해 준다 */
+  .hint { display: none; }
 }
 
 /* ── 결과 ── */

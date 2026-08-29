@@ -681,6 +681,17 @@
   border-radius: var(--dia-radius-md);
   margin-bottom: var(--dia-space-2);
 }
+/* 고르는 칸이 네 개라 좁은 폰에서는 이름과 나란히 둘 자리가 없다.
+   이름을 위로 올리고 아래 한 줄을 통째로 내준다 — 옆에 붙여 두면 칸이 짜부라져
+   글자가 세로로 쪼개진다. */
+.ctrlRowStack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+}
+.ctrlRowStack :global(.z-segment) { width: 100%; }
+
 .ctrlLabel {
   display: flex;
   align-items: center;

@@ -443,6 +443,10 @@ html[data-vt='fade']::view-transition-new(root) { animation: axis-in-fade 260ms 
   justify-content: center;
   gap: 6px;
   min-height: 44px;
+  /* 세그먼트 글자는 짧은 낱말이라 절대 줄바꿈하지 않는다. flex:1 로 좁아지면
+     「크/게」처럼 글자마다 줄이 갈려 단추가 세로로 늘어난다(설정 글자 크기에서 발생).
+     넘칠 것 같으면 줄을 접지 말고 부모가 자리를 내주게 만드는 편이 맞다. */
+  white-space: nowrap;
   border: none;
   background: transparent;
   border-radius: var(--z-radius-full);

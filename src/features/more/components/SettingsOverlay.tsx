@@ -124,7 +124,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
       {/* 화면 — 다크 모드는 홈 헤더의 1탭 토글이 담당(중복 제거), 여기선 글자 크기만 */}
       <p className={styles.setGroupTitle}>화면</p>
-      <div className={styles.ctrlRow}>
+      <div className={`${styles.ctrlRow} ${styles.ctrlRowStack}`}>
         <span className={styles.ctrlLabel}>
           <span className={styles.ctrlIcon}>🔤</span>글자 크기
         </span>

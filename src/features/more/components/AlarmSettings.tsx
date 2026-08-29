@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Bell, BellOff, AlertCircle } from 'lucide-react';
+import { Bell, BellOff, AlertCircle, ChevronDown } from 'lucide-react';
 import {
   useAlarmStore,
   NORMAL_OPTIONS,
@@ -40,6 +40,10 @@ export default function AlarmSettings() {
   const { selected, fixedTimes, toggle, toggleFixed, clearAll } = useAlarmStore();
   const { supported, permission, requestPermission } = useNotification();
   const [scheduledCount, setScheduledCount] = useState<number | null>(null);
+  /* 기본은 접어 둔다(진호 요청). 웹에서는 앱 화면이 켜져 있을 때만 울려서
+     실제로 쓰는 사람이 드문데, 펼쳐 두면 설정 화면에서 가장 큰 자리를 차지한다.
+     켜 둔 사람이 못 찾는 일이 없도록 접힌 줄에 켜진 개수를 적어 둔다. */
+  const [open, setOpen] = useState(false);
 
   const anyOn = selected.length > 0 || fixedTimes.length > 0;
   const native = isNativeApp();
@@ -88,15 +92,38 @@ export default function AlarmSettings() {
 
   return (
     <div className={styles.alarmRow}>
-      <div className={styles.alarmHeader}>
+      {/* 줄 전체가 여닫는 단추다 — 접힌 상태에서 켜진 개수를 함께 보여 준다 */}
+      <button
+        type="button"
+        className={styles.alarmToggle}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
         <span className={styles.ctrlIcon}>{anyOn ? <Bell size={18} /> : <BellOff size={18} />}</span>
         <span className={styles.ctrlLabel}>근무 알람</span>
-        {anyOn && (
+        <span className={styles.alarmState}>
+          {anyOn ? `${selected.length + fixedTimes.length}개 켜짐` : '꺼짐'}
+        </span>
+        <ChevronDown
+          size={18}
+          className={`${styles.alarmChevron} ${open ? styles.alarmChevronOpen : ''}`}
+          aria-hidden
+        />
+      </button>
+
+      {!open && !native && (
+        <p className={styles.alarmDesc}>앱 화면이 켜져 있을 때만 울려요</p>
+      )}
+
+      {open && (
+      <>
+      {anyOn && (
+        <div className={styles.alarmHeader}>
           <button type="button" className={styles.notifBtn} onClick={clearAll}>
             전체 끄기
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <p className={styles.alarmDesc}>
         {native
@@ -162,6 +189,8 @@ export default function AlarmSettings() {
             ? `예약됨 ${scheduledCount}개`
             : '예약된 알람 없음 — 오늘 남은 근무가 없거나 알림 권한을 확인해주세요'}
         </p>
+      )}
+      </>
       )}
     </div>
   );

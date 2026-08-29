@@ -337,6 +337,38 @@
   display: flex;
   align-items: center;
   gap: var(--dia-space-3);
+  margin-left: 32px;
+}
+
+/* 여닫는 줄. 기본은 접혀 있고 눌러야 펴진다 — 설정에서 가장 큰 자리를 차지하던 것을
+   쓰는 사람만 펴 보게 한다. 접힌 채로도 켜짐/꺼짐은 오른쪽에 적혀 있다. */
+.alarmToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.alarmState {
+  margin-left: auto;
+  font-size: var(--dia-text-xs);
+  font-weight: 700;
+  color: var(--dia-text-tertiary);
+}
+.alarmChevron {
+  flex-shrink: 0;
+  color: var(--dia-text-tertiary);
+  transition: transform var(--dia-dur-base) ease;
+}
+.alarmChevronOpen { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .alarmChevron { transition: none; }
 }
 
 .alarmDesc {

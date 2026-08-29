@@ -14,6 +14,7 @@ import AnnounceModal from '@/components/common/AnnounceModal';
 import WhatsNewModal from '@/components/common/WhatsNewModal';
 import WorldLoading from '@/components/common/WorldLoading';
 import AppShell from '@/components/layout/AppShell';
+import pageStyles from './page.module.css';
 import WorldHub, { type WorldId } from '@/components/layout/WorldHub';
 import ComingSoon from '@/components/layout/ComingSoon';
 import type { TabId } from '@/components/layout/TabBar';
@@ -146,25 +147,28 @@ export default function HomePage() {
         <AnnounceModal />
         <WhatsNewModal />
         <SettingsOverlay open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        {world === null ? (
-          home === 'office'
-            ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => navHome('hub')} onOpenSettings={() => setSettingsOpen(true)} />
-            : <WorldHub onEnter={handleEnter} onOpenSchedule={() => navHome('office')} onOpenSettings={() => setSettingsOpen(true)} />
-        ) : world === 'duty' ? (
-          <AppShell onBack={handleBack} initialTab={initialTab}>
-            {(activeTab) => <TabContent tab={activeTab} />}
-          </AppShell>
-        ) : world === 'edu' ? (
-          <EduTab onBack={handleBack} />
-        ) : world === 'safety' ? (
-          <SafetyWorld onBack={handleBack} />
-        ) : world === 'life' ? (
-          <LifeWorld onBack={handleBack} />
-        ) : world === 'standby' ? (
-          <StandbyCoverageView onBack={handleBack} />
-        ) : (
-          <ComingSoon worldId={world} onBack={handleBack} />
-        )}
+        {/* 월드가 무엇이든 본문 폭은 하나로 묶는다 — page.module.css 설명 참고 */}
+        <div className={pageStyles.appWidth}>
+          {world === null ? (
+            home === 'office'
+              ? <OfficeDashboard onEnter={handleEnter} onOpenHub={() => navHome('hub')} onOpenSettings={() => setSettingsOpen(true)} />
+              : <WorldHub onEnter={handleEnter} onOpenSchedule={() => navHome('office')} onOpenSettings={() => setSettingsOpen(true)} />
+          ) : world === 'duty' ? (
+            <AppShell onBack={handleBack} initialTab={initialTab}>
+              {(activeTab) => <TabContent tab={activeTab} />}
+            </AppShell>
+          ) : world === 'edu' ? (
+            <EduTab onBack={handleBack} />
+          ) : world === 'safety' ? (
+            <SafetyWorld onBack={handleBack} />
+          ) : world === 'life' ? (
+            <LifeWorld onBack={handleBack} />
+          ) : world === 'standby' ? (
+            <StandbyCoverageView onBack={handleBack} />
+          ) : (
+            <ComingSoon worldId={world} onBack={handleBack} />
+          )}
+        </div>
       </AuthGate>
     </>
   );

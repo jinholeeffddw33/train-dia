@@ -1,0 +1,10 @@
+/* 월드 공통 폭 제한.
+   근무만 AppShell 안에서 480px 로 묶여 있고 교육·안전·라이프는 통짜라, 태블릿에서
+   눌러 들어갈 때마다 폭이 출렁였다. 월드를 고르는 자리 한 곳에서 함께 묶는다.
+
+   전체화면 오버레이(position: fixed)는 이 폭에 걸리지 않는다 — 뷰포트 기준이라
+   조상의 max-width 를 따르지 않기 때문이다. 덮어야 할 것은 그대로 덮는다. */
+.appWidth {
+  max-width: var(--dia-app-max);
+  margin-inline: auto;
+}

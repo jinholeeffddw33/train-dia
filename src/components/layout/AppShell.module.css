@@ -7,7 +7,7 @@
 }
 
 .content {
-  max-width: 480px;
+  max-width: var(--dia-app-max);
   margin: 0 auto;
   padding-bottom: calc(var(--dia-tab-height-safe) + var(--dia-space-4));
   padding-left: var(--sal);

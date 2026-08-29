@@ -9,6 +9,11 @@
   bottom: 0;
   left: 0;
   right: 0;
+  /* 본문과 같은 폭으로 묶고 가운데로. fixed 라 조상의 max-width 를 안 따르는데,
+     그냥 두면 태블릿에서 본문은 480px 인데 탭바만 화면 끝까지 뻗는다.
+     transform 은 쓰지 않는다 — fixed 자식의 기준 상자가 바뀌어 오버레이가 어긋난다. */
+  max-width: var(--dia-app-max);
+  margin-inline: auto;
   display: flex;
   align-items: stretch;
   padding: 8px 8px calc(8px + var(--sab));

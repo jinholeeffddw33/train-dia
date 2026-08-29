@@ -45,7 +45,7 @@
 .hub > * {
   align-self: center;
   width: 100%;
-  max-width: 420px;
+  max-width: var(--dia-app-max);
 }
 
 /* ── Animated ambient orbs ── */

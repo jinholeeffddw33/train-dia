@@ -196,7 +196,7 @@ function SpeedDial({ value, sweep = false }: { value: number; sweep?: boolean })
         {!sweep && (
           <>
             <text x={DIAL_CX} y={80} textAnchor="middle" className={styles.dialValue}>
-              {Math.floor(v)}
+              {Math.round(v)}
             </text>
             <text x={DIAL_CX} y={93} textAnchor="middle" className={styles.dialUnit}>
               km/h
@@ -323,23 +323,29 @@ export default function SpeedMaster({ onBack }: Props) {
 
     const cap = limit * OVER_ALLOW;
 
+    /* ── 보이는 숫자로 판정한다 (진호 지적) ──
+       전에는 계기판이 소수점을 '버리고'(5.6 → 5) 결과는 '반올림'해서(5.6 → 6) 보여 줬다.
+       내내 5 를 보며 유지했는데 결과에 6 이 뜨니, 무엇을 어떻게 고쳐야 할지 알 수가 없다.
+       이제 판정도 화면과 같은 정수로 한다 — 보인 대로 채점된다. */
+    const shown = Math.round(avg);
+
     let verdict: Verdict;
-    if (r.hardOver || avg > cap) verdict = 'over';        // 1.2배까지 넘겼다 — 0점
-    else if (avg > limit) verdict = 'overtol';            // 넘겼지만 허용 범위 — 감점
-    else if (avg >= limit - tol) verdict = 'correct';
+    if (r.hardOver || shown > cap) verdict = 'over';      // 1.2배까지 넘겼다 — 0점
+    else if (shown > limit) verdict = 'overtol';          // 넘겼지만 허용 범위 — 감점
+    else if (shown >= limit - tol) verdict = 'correct';
     else verdict = 'slow';
 
-    sec.avg = avg;
+    sec.avg = shown;
     sec.verdict = verdict;
     if (verdict === 'correct') {
       // 제한속도에 가까울수록 보너스 — 딱 붙이면 만점
-      const closeness = 1 - Math.min((limit - avg) / tol, 1);
+      const closeness = 1 - Math.min(Math.max((limit - shown) / tol, 0), 1);
       sec.score = 100 + Math.round(50 * closeness);
       r.score += sec.score;
       play('success');
     } else if (verdict === 'overtol') {
       // 넘긴 만큼 비례해서 깎는다 — 막 넘기면 80, 1.2배에 닿으면 10
-      const excess = Math.min((avg - limit) / (cap - limit), 1);
+      const excess = Math.min(Math.max((shown - limit) / (cap - limit), 0), 1);
       sec.score = Math.round(OVER_MAX_SCORE - (OVER_MAX_SCORE - OVER_MIN_SCORE) * excess);
       r.score += sec.score;
       play('tick');
@@ -408,9 +414,12 @@ export default function SpeedMaster({ onBack }: Props) {
        1.2배까지 넘긴 순간부터는 구간 어디였든 0점이다. 판정 구간에서만 따지면 앞에서 슬쩍
        올려 경고가 뜨는 지점을 찾아 답을 알아낸 뒤 내려오는 게 가능해진다 — 그러면 외울
        이유가 없다. */
-    if (r.v > limit) {
+    /* 경고도 화면에 뜬 숫자로 판단한다 — 계기판은 5 인데 경고가 울리면
+       무엇 때문에 울리는지 알 수 없다. */
+    const shownV = Math.round(r.v);
+    if (shownV > limit) {
       if (!r.warned) { r.warned = true; play('fail'); }
-      if (r.v > limit * OVER_ALLOW) r.hardOver = true;
+      if (shownV > limit * OVER_ALLOW) r.hardOver = true;
     } else {
       r.warned = false;
     }
@@ -422,7 +431,7 @@ export default function SpeedMaster({ onBack }: Props) {
 
     setHud({
       v: r.v, idx: r.idx, t: r.t, score: Math.round(r.score),
-      warn: r.v > limit,
+      warn: shownV > limit,
       notch: r.notch, grabbed: grab.current !== null, judging,
       stage: r.stage, carried: r.carried,
     });

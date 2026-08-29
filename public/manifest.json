@@ -7,7 +7,7 @@
   "display": "standalone",
   "display_override": ["standalone"],
   "orientation": "portrait",
-  "background_color": "#0F172A",
+  "background_color": "#272625",
   "theme_color": "#0F172A",
   "icons": [
     {

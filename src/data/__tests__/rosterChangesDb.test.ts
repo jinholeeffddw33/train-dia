@@ -296,6 +296,24 @@ describe('관리자 모드 인사 변경 — 직급', () => {
     expect(activeRanks(day('2027-03-01')).get('21711694')).toBe(null);
   });
 
+  it('직급이 있는 사람이 업무를 맡아도 직급이 남는다 — 이름 옆에 둘 다 보여야 한다', () => {
+    // 김봉철은 부장. 업무만 지도부장으로 정해 준다(직급은 안 건드림)
+    expect(rankOf('21707406', day('2027-02-28'))).toBe('manager');
+    setDbRosterChanges([c({
+      from: '2027-03-01', n: '김봉철', s: '21707406', work: 'office', duty: 'jido_bujang',
+    })]);
+    expect(rankOf('21707406', day('2027-03-01'))).toBe('manager');   // 부장 그대로
+    expect(dutyOf('21707406', day('2027-03-01'))).toBe('jido_bujang');
+  });
+
+  it('업무가 있는 사람의 직급만 바꿔도 업무가 남는다', () => {
+    // 박종길은 지원기관사. 직급만 차장으로 준다
+    expect(dutyOf('21711719', day('2027-02-28'))).toBe('jiwon_gisa');
+    setDbRosterChanges([c({ from: '2027-03-01', n: '박종길', s: '21711719', work: 'office', rank: 'deputy' })]);
+    expect(rankOf('21711719', day('2027-03-01'))).toBe('deputy');
+    expect(dutyOf('21711719', day('2027-03-01'))).toBe('jiwon_gisa');   // 업무 그대로
+  });
+
   it('직급만 바꾸는 변경은 교번 자리를 건드리지 않는다', () => {
     const base = getRoster(day('2027-03-01'));
     setDbRosterChanges([c({ from: '2027-03-01', n: '신은미', s: '21717671', work: 'office', rank: 'manager' })]);

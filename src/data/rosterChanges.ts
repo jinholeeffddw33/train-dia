@@ -235,21 +235,33 @@ export function activeWorkTypes(at: Date = new Date()): Map<string, WorkType> {
   return m;
 }
 
-/** 시행된 업무 변경 — 사번 → 업무. 내근이 아니게 되면 업무도 사라진다 */
+/**
+ * 시행된 업무 변경 — 사번 → 업무.
+ *
+ * 내근이 아니게 되면 업무는 사라진다(기관사에게 «서무» 가 남으면 안 된다).
+ * 내근인데 업무를 안 적었으면 «건드리지 않는다» — 원래 업무를 지우지 않는다.
+ */
 export function activeDuties(at: Date = new Date()): Map<string, Duty | null> {
   const m = new Map<string, Duty | null>();
   for (const c of activeChanges(at)) {
-    m.set(c.s, c.work === 'office' ? (c.duty ?? null) : null);
+    if (c.work !== 'office') m.set(c.s, null);
+    else if (c.duty) m.set(c.s, c.duty);
   }
   return m;
 }
 
-/** 시행된 직급 변경 — 사번 → 직급. 뒤에 오는 것이 이긴다 */
+/**
+ * 시행된 직급 변경 — 사번 → 직급. 뒤에 오는 것이 이긴다.
+ *
+ * 기관사·인턴이 되면 직급이 사라진다 — 남겨 두면 «기관사 부장님» 이 된다.
+ * 그밖에는 직급을 «적었을 때만» 바꾼다. 업무만 정해 주는 경우가 흔한데,
+ * 그때 직급까지 지워 버리면 부장이 업무를 맡는 순간 부장이 아니게 된다.
+ */
 export function activeRanks(at: Date = new Date()): Map<string, StaffRank | null> {
   const m = new Map<string, StaffRank | null>();
   for (const c of activeChanges(at)) {
-    // 기관사·인턴이 되면 직급이 사라진다 — 남겨 두면 «기관사 부장님» 이 된다
-    m.set(c.s, c.work === 'driver' || c.work === 'intern' ? null : (c.rank ?? null));
+    if (c.work === 'driver' || c.work === 'intern') m.set(c.s, null);
+    else if (c.rank) m.set(c.s, c.rank);
   }
   return m;
 }

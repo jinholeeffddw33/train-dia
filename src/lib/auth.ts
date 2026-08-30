@@ -1,5 +1,5 @@
 import { P, getRoster } from '@/data/cycle';
-import { departedSabuns } from '@/data/rosterChanges';
+import { departedSabuns, joinedUsers, activeRanks, RANK_LABEL, type StaffRank } from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 
 /**
@@ -99,13 +99,26 @@ export const GONGRO_YEONSU_USERS: { n: string; s: string }[] = [];
  * 인턴/내근 목록에서는 빠진다 — 그래서 한 사람이 두 번 잡히지 않는다.
  */
 function allUsers(at: Date = new Date()): Person[] {
-  const goneIntern = departedSabuns('intern', at);
-  const goneExtra = departedSabuns('extra', at);
-  return [
-    ...getRoster(at),
-    ...EXTRA_USERS.filter((u) => !u.s || !goneExtra.has(u.s)),
-    ...INTERN_USERS.filter((u) => !u.s || !goneIntern.has(u.s)),
-  ];
+  return [...getRoster(at), ...officeUsers(at), ...internUsers(at)];
+}
+
+/**
+ * 그 시점의 내근 명단 — 나간 사람은 빠지고, 기관사에서 내려온 사람은 들어온다.
+ * (관리자 모드에서 «기관사 → 내근/휴직/병가/공로연수» 를 넣으면 여기로 온다)
+ */
+export function officeUsers(at: Date = new Date()): Person[] {
+  const gone = departedSabuns('extra', at);
+  const base = EXTRA_USERS.filter((u) => !u.s || !gone.has(u.s));
+  const known = new Set(base.map((u) => u.s));
+  return [...base, ...joinedUsers('extra', at).filter((u) => !known.has(u.s))];
+}
+
+/** 그 시점의 인턴 명단 — 정식 임용된 사람은 빠지고, 새로 등록된 인턴은 들어온다 */
+export function internUsers(at: Date = new Date()): Person[] {
+  const gone = departedSabuns('intern', at);
+  const base = INTERN_USERS.filter((u) => !u.s || !gone.has(u.s));
+  const known = new Set(base.map((u) => u.s));
+  return [...base, ...joinedUsers('intern', at).filter((u) => !known.has(u.s))];
 }
 
 /**
@@ -160,34 +173,49 @@ export function isAdmin(sabun: string): boolean {
   return ADMIN_SABUNS.has(sabun);
 }
 
-/** 내근직 여부 확인 (기관사 외 모든 직원 — EXTRA_USERS + 교번 미배정 INTERN_USERS) */
+/** 내근직 여부 확인 (기관사 외 모든 직원 — 내근 + 교번 미배정 인턴) */
 export function isOffice(sabun: string): boolean {
-  // 발령일이 지났으면 더 이상 내근직이 아니다(기관사 명부로 옮겨간다)
-  if (departedSabuns('intern').has(sabun) || departedSabuns('extra').has(sabun)) return false;
-  return EXTRA_USERS.some((u) => u.s === sabun) || INTERN_USERS.some((u) => u.s === sabun);
+  return officeUsers().some((u) => u.s === sabun) || internUsers().some((u) => u.s === sabun);
 }
 
-/** 사번으로 EXTRA_USERS/INTERN_USERS의 canonical name 조회 (dutySchedule과 매칭) */
+/** 사번으로 내근/인턴 명단의 canonical name 조회 (dutySchedule과 매칭) */
 export function getOfficeName(sabun: string): string | null {
-  return EXTRA_USERS.find((u) => u.s === sabun)?.n
-    ?? INTERN_USERS.find((u) => u.s === sabun)?.n
+  return officeUsers().find((u) => u.s === sabun)?.n
+    ?? internUsers().find((u) => u.s === sabun)?.n
     ?? null;
 }
 
 /** 인턴사원 여부 확인 (2026년 신규임용 — 통상근무 중) */
 export function isIntern(sabun: string): boolean {
-  if (departedSabuns('intern').has(sabun)) return false;   // 정식 임용됨
-  return INTERN_USERS.some((u) => u.s === sabun);
+  return internUsers().some((u) => u.s === sabun);
+}
+
+/**
+ * 그 사람의 직급 — 관리자 모드에서 바꾼 것이 있으면 그것이 이긴다.
+ *
+ * 아래 사번 목록들은 «처음 값»이다. [관리자 모드 → 명부 관리]에서 직급을 바꾸면
+ * 배포 없이 이 함수의 답이 바뀌고, 호칭·임무카드가 따라온다.
+ * 기관사·인턴이 되면 직급이 사라진다(activeRanks 가 null 을 넣는다).
+ */
+export function rankOf(sabun: string, at: Date = new Date()): StaffRank | null {
+  const changed = activeRanks(at);
+  if (changed.has(sabun)) return changed.get(sabun) ?? null;
+  if (sabun === '21704630') return 'chief';
+  if (sabun === '21711216') return 'vice';
+  if (MANAGER_SABUNS.has(sabun)) return 'manager';
+  if (GWAJANG_SABUNS.has(sabun)) return 'gwajang';
+  if (DAERI_SABUNS.has(sabun)) return 'daeri';
+  return null;
 }
 
 /** 사업소장 여부 확인 (안성숙 소장) */
 export function isChief(sabun: string): boolean {
-  return sabun === '21704630';
+  return rankOf(sabun) === 'chief';
 }
 
 /** 부소장 여부 (이태원) */
 export function isViceChief(sabun: string): boolean {
-  return sabun === '21711216';
+  return rankOf(sabun) === 'vice';
 }
 
 /** 부장 여부 (11명) */
@@ -205,13 +233,18 @@ const MANAGER_SABUNS: ReadonlySet<string> = new Set([
   '21706793', // 유승용 (2026-07 신규)
 ]);
 export function isManager(sabun: string): boolean {
-  return MANAGER_SABUNS.has(sabun);
+  return rankOf(sabun) === 'manager';
+}
+
+/** 차장 여부 — 처음 값은 없다. 관리자 모드에서만 붙는다 */
+export function isChajang(sabun: string): boolean {
+  return rankOf(sabun) === 'deputy';
 }
 
 /** 과장 여부 — 현재 해당자 없음 (유희종 2026-08-01 기관사 발령으로 해제) */
 const GWAJANG_SABUNS: ReadonlySet<string> = new Set([]);
 export function isGwajang(sabun: string): boolean {
-  return GWAJANG_SABUNS.has(sabun);
+  return rankOf(sabun) === 'gwajang';
 }
 
 /** 대리 여부 */
@@ -219,7 +252,7 @@ const DAERI_SABUNS: ReadonlySet<string> = new Set([
   '21717671', // 신은미 (2026-07 신규)
 ]);
 export function isDaeri(sabun: string): boolean {
-  return DAERI_SABUNS.has(sabun);
+  return rankOf(sabun) === 'daeri';
 }
 
 /** 주간 통상근무자 — 평일 출근·주말/공휴일 휴무 (직원 10명 + 인턴 9명) */
@@ -251,14 +284,11 @@ export function isRegularDayOffice(sabun: string | undefined | null): boolean {
   return REGULAR_DAY_OFFICE_SABUNS.has(sabun);
 }
 
-/** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 과장 > 대리 > 인턴 > 기관사 */
+/** 사용자 호칭 — 우선순위: 소장 > 부소장 > 부장 > 차장 > 과장 > 대리 > 인턴 > 기관사 */
 export function getUserRole(sabun: string | undefined | null): string {
   if (!sabun) return '기관사님';
-  if (isChief(sabun)) return '소장님';
-  if (isViceChief(sabun)) return '부소장님';
-  if (isManager(sabun)) return '부장님';
-  if (isGwajang(sabun)) return '과장님';
-  if (isDaeri(sabun)) return '대리님';
+  const rank = rankOf(sabun);
+  if (rank) return `${RANK_LABEL[rank]}님`;
   if (isIntern(sabun)) return '인턴님';
   return '기관사님';
 }

@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Users, Clock, UserX, Activity, ArrowLeftRight } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import styles from '../styles/More.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-const ADMIN_PIN = '9110';
 
 interface VisitUser { userId: string; name: string; lastAt: string; action: string }
 
@@ -34,30 +32,17 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onClose }: AdminDashboardProps) {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [pin, setPin] = useState('');
-  const [pinError, setPinError] = useState('');
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   /** 접속자 목록에 보여 줄 날 — 요약 카드를 눌러 오늘↔어제 전환 */
   const [day, setDay] = useState<'today' | 'yesterday'>('today');
 
-  const handlePinSubmit = useCallback(() => {
-    if (pin === ADMIN_PIN) {
-      setAuthenticated(true);
-      setPinError('');
-    } else {
-      setPinError('비밀번호가 올바르지 않아요');
-      setPin('');
-    }
-  }, [pin]);
-
   // ESC 로 닫기
   useEscapeClose(true, onClose);
 
+  // 비밀번호는 입구(AdminHub)에서 이미 확인했다
   useEffect(() => {
-    if (!authenticated) return;
     setLoading(true);
     fetch('/api/admin/dashboard')
       .then(r => {
@@ -67,7 +52,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       .then(setData)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [authenticated]);
+  }, []);
 
   const formatTime = (iso: string) => {
     const d = new Date(iso);
@@ -79,46 +64,6 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     return `${parseInt(m)}/${parseInt(d)}`;
   };
 
-  // PIN 게이트
-  if (!authenticated) {
-    return (
-      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="관리자 현황판">
-        <div className={styles.overlayHeader}>
-          <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="닫기">
-            <ArrowLeft size={20} />
-          </button>
-          <h2 className={styles.overlayTitle}>관리자 현황판</h2>
-        </div>
-        <div className={styles.adminPinGate}>
-          <div className={styles.adminPinIcon}>
-            <Activity size={40} />
-          </div>
-          <p className={styles.adminPinLabel}>관리자 비밀번호를 입력하세요</p>
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            className={styles.adminPinInput}
-            value={pin}
-            onChange={e => { setPin(e.target.value.replace(/\D/g, '')); setPinError(''); }}
-            onKeyDown={e => { if (e.key === 'Enter') handlePinSubmit(); }}
-            placeholder="****"
-            autoFocus
-          />
-          {pinError && <p className={styles.adminPinError}>{pinError}</p>}
-          <button
-            type="button"
-            className={`z-cta ${styles.adminPinSubmit}`}
-            data-press
-            onClick={handlePinSubmit}
-            disabled={pin.length < 4}
-          >
-            확인
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   // 로딩/에러
   if (loading) {

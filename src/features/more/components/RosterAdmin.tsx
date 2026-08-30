@@ -5,95 +5,114 @@
  *
  * 인원이 바뀔 때 배포 없이 여기서 넣는다. 시행일을 정해 두면 그 날 자동으로 반영된다.
  *
- * 화면 흐름
- *   ① 명부에서 바뀔 «자리»를 고른다 (순번·교번·현재 사람)
- *   ② 들어올 사람과 시행일을 넣는다
- *   ③ 예약 목록에서 확인 — 시행 전이면 언제든 취소할 수 있다
+ * 화면 흐름 — 사람을 누르고, 묻는 것에 차례로 답한다
+ *   ① 전 직원을 가나다순으로 (기관사 / 내근 / 인턴 세 묶음)
+ *   ② 사람을 누르면 → 근무형태를 고른다
+ *   ③ 내근 계열이면 → 직급을 고른다 (기관사·인턴은 직급을 쓰지 않으므로 건너뛴다)
+ *   ④ 기관사가 되면 → 비어 있는 결원 자리를 고른다
+ *      기관사에서 빠지면 → 그 자리가 몇 번 결원이 될지 고른다
+ *   ⑤ 시행일을 정하고 넣는다
  *
  * 안전장치 (잘못 넣으면 175명의 근무표가 틀어진다)
- *   · 자리를 «고르게만» 한다 — 순번을 손으로 치지 않으므로 없는 자리를 짚을 수 없다
- *   · 넣기 전에 «누구 자리에 누가»를 문장으로 다시 보여준다
- *   · 사번이 이미 다른 자리에 있으면 서버가 막는다
- *   · 인턴·내근 명단에 있는 사번이면 시행일에 그 명단에서 자동으로 뺀다
+ *   · 자리·결원번호를 «고르게만» 한다 — 손으로 치지 않으므로 없는 값을 짚을 수 없다
+ *   · 넣기 전에 «누가 무엇이 되는지»를 문장으로 다시 보여준다
+ *   · 이미 쓰이는 사번·결원번호는 서버가 막는다
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ArrowLeft, Users, Search, CalendarClock, Trash2, AlertTriangle, Check } from 'lucide-react';
+import { ArrowLeft, Search, CalendarClock, Trash2, AlertTriangle, ChevronRight, Check } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { getRoster, P } from '@/data/cycle';
 import { syncRosterChanges } from '@/lib/rosterSync';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
+import { officeUsers, internUsers, rankOf } from '@/lib/auth';
+import {
+  WORK_TYPE_LABEL, RANK_LABEL, RANK_ORDER,
+  type RosterChange, type StaffRank, type WorkType,
+} from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 import styles from '../styles/More.module.css';
 
-const ADMIN_PIN = '9110';
+/** 지금 어느 묶음 사람인가 */
+type Group = 'driver' | 'office' | 'intern';
 
-interface PendingChange {
-  id: number;
-  from: string;
-  I: string;
+interface Member {
   n: string;
   s: string;
-  replaces: string;
-  leaves?: 'intern' | 'extra';
-  note?: string;
-  by?: string;
+  group: Group;
+  /** 기관사면 그 자리(P.I) */
+  I?: string;
+  rank: StaffRank | null;
 }
 
-/** KST 오늘 — 시행 전/후 판단용 */
+const GROUP_LABEL: Record<Group, string> = { driver: '기관사', office: '내근', intern: '인턴' };
+
+/** 기관사가 아닌 상태들 — 기관사인 사람에게 보여줄 선택지 */
+const LEAVING: WorkType[] = ['office', 'leave', 'sick', 'service', 'resign'];
+/** 기관사가 아닌 사람에게 보여줄 선택지 */
+const JOINING: WorkType[] = ['driver', 'office', 'intern', 'leave', 'sick', 'service', 'resign'];
+
 function todayKST(): string {
   return new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
 }
 
-/** 올해면 «8월 30일», 해가 다르면 «2027년 12월 31일» — 연도를 빼면 내년 것과 구별이 안 된다 */
+/** 올해면 «8월 30일», 해가 다르면 «2027년 12월 31일» */
 function fmtDate(d: string): string {
   const [y, m, day] = d.split('-');
-  const thisYear = todayKST().slice(0, 4);
-  const head = y === thisYear ? '' : `${y}년 `;
+  const head = y === todayKST().slice(0, 4) ? '' : `${y}년 `;
   return `${head}${parseInt(m)}월 ${parseInt(day)}일`;
 }
 
-/**
- * 이름 뒤에 붙는 «로/으로» 를 고른다.
- * 받침이 없거나 받침이 ㄹ 이면 «로» — "조건희로", "김철로". 그밖엔 «으로» — "김경률으로"가 아니라
- * 받침 ㄹ 도 «로» 이므로 "김경률로". 한글이 아니면 «로» 로 둔다.
- */
+/** 마지막 글자의 받침 — 0 이면 없음, 8 이면 ㄹ. 한글이 아니면 null */
+function jongOf(word: string): number | null {
+  const code = word.trim().slice(-1).charCodeAt(0) - 0xac00;
+  return code < 0 || code > 11171 ? null : code % 28;
+}
+
+/** 이름 뒤 «로/으로» — 받침이 없거나 ㄹ 이면 «로» */
 function ro(word: string): string {
-  const last = word.trim().slice(-1);
-  const code = last.charCodeAt(0) - 0xac00;
-  if (code < 0 || code > 11171) return '로';
-  const jong = code % 28;
-  return jong === 0 || jong === 8 ? '로' : '으로';
+  const j = jongOf(word);
+  return j === null || j === 0 || j === 8 ? '로' : '으로';
+}
+
+/** 이름 뒤 «은/는» */
+function eun(word: string): string {
+  const j = jongOf(word);
+  return j === null || j === 0 ? '는' : '은';
+}
+
+/** 이름 뒤 «을/를» */
+function eul(word: string): string {
+  const j = jongOf(word);
+  return j === null || j === 0 ? '를' : '을';
+}
+
+/** 결원 이름에서 번호 뽑기 — '결원06' → 6 */
+function vacancyNoOf(name: string): number | null {
+  const m = /^결원(\d+)$/.exec(name);
+  return m ? parseInt(m[1], 10) : null;
 }
 
 export default function RosterAdmin({ onClose }: { onClose: () => void }) {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [pin, setPin] = useState('');
-  const [pinError, setPinError] = useState('');
-
-  const [changes, setChanges] = useState<PendingChange[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [changes, setChanges] = useState<RosterChange[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  /** 고른 자리 — null 이면 목록 화면 */
-  const [slot, setSlot] = useState<Person | null>(null);
   const [query, setQuery] = useState('');
 
-  // 넣을 값
-  const [name, setName] = useState('');
-  const [sabun, setSabun] = useState('');
+  /** 고른 사람 — null 이면 목록 화면 */
+  const [who, setWho] = useState<Member | null>(null);
+  const [work, setWork] = useState<WorkType | null>(null);
+  const [rank, setRank] = useState<StaffRank | null>(null);
+  const [slotI, setSlotI] = useState<string | null>(null);
+  const [vacancyNo, setVacancyNo] = useState<number | null>(null);
   const [from, setFrom] = useState(todayKST());
-  const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
-  /** 지우기 확인을 기다리는 예약 — window.confirm 금지(CLAUDE.md §1.5) */
-  const [pendingRemove, setPendingRemove] = useState<PendingChange | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<RosterChange | null>(null);
 
-  // ESC 는 안쪽부터 닫는다 — 확인창 → 인원 바꾸기 → 명부 관리
   useEscapeClose(true, () => {
     if (pendingRemove) setPendingRemove(null);
-    else if (slot) setSlot(null);
+    else if (who) setWho(null);
     else onClose();
   });
 
@@ -106,65 +125,91 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { if (authenticated) load(); }, [authenticated, load]);
+  useEffect(() => { load(); }, [load]);
 
-  const handlePinSubmit = useCallback(() => {
-    if (pin === ADMIN_PIN) { setAuthenticated(true); setPinError(''); }
-    else { setPinError('비밀번호가 올바르지 않아요'); setPin(''); }
-  }, [pin]);
-
-  /** 지금 시점의 명부 — 이미 시행된 변경이 반영된 상태 */
-  const roster = useMemo(() => getRoster(), [changes]);
+  // ── 전 직원 = 기관사 + 내근 + 인턴, 각 묶음 안에서 가나다순 ──
+  const members = useMemo<Member[]>(() => {
+    const ko = (a: Member, b: Member) => a.n.localeCompare(b.n, 'ko');
+    // 결원은 사람이 아니라 «빈 자리»다 — 명단에 섞이면 누를 것이 없는 줄이 생긴다.
+    // 빈 자리는 «기관사가 될 자리» 고르는 곳에서만 보여준다.
+    const drivers = getRoster()
+      .filter((p) => !/^결원/.test(p.n))
+      .map<Member>((p) => ({ n: p.n, s: p.s ?? '', group: 'driver', I: p.I, rank: null }));
+    const office = officeUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'office', rank: rankOf(u.s ?? '') }));
+    const interns = internUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'intern', rank: null }));
+    return [...drivers.sort(ko), ...office.sort(ko), ...interns.sort(ko)];
+    // changes 가 바뀌면 명부도 다시 계산해야 한다
+  }, [changes]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return roster;
-    return roster.filter((p) => p.n.toLowerCase().includes(q) || p.I.includes(q) || p.d.includes(q) || (p.s ?? '').includes(q));
-  }, [roster, query]);
+    if (!q) return members;
+    return members.filter((m) => m.n.toLowerCase().includes(q));
+  }, [members, query]);
 
-  /** 자리별 예약 — 목록에 «예약됨» 표시 */
-  const pendingBySlot = useMemo(() => {
+  /** 사람별 예약 — 목록에 «예약됨» 표시 */
+  const pendingBy = useMemo(() => {
     const today = todayKST();
-    const m = new Map<string, PendingChange>();
-    for (const c of changes) if (c.from > today) m.set(c.I, c);
+    const m = new Map<string, RosterChange>();
+    for (const c of changes) if (c.from > today) m.set(c.s, c);
     return m;
   }, [changes]);
 
-  /** 사번을 넣으면 인턴·내근 명단에서 이름을 찾아 준다 — 손으로 치는 실수를 줄인다 */
-  const known = useMemo(() => {
-    if (sabun.length < 6) return null;
-    const intern = INTERN_USERS.find((u) => u.s === sabun);
-    if (intern) return { n: intern.n, where: '인턴' as const };
-    const extra = EXTRA_USERS.find((u) => u.s === sabun);
-    if (extra) return { n: extra.n, where: '내근·지도' as const };
-    return null;
-  }, [sabun]);
+  /** 지금 비어 있는 결원 자리 — 기관사가 될 사람이 고를 수 있는 자리 */
+  const vacantSlots = useMemo(
+    () => getRoster().filter((p) => /^결원/.test(p.n)),
+    [changes],
+  );
 
-  /** 그 사번이 이미 명부에 있으면 미리 막는다 (서버도 막지만 손이 덜 간다) */
-  const dupPerson = useMemo(() => {
-    if (sabun.length < 6 || !slot) return null;
-    return P.find((p) => p.s === sabun && p.I !== slot.I) ?? null;
-  }, [sabun, slot]);
+  /** 아직 안 쓰는 결원 번호 — 자리를 비울 때 붙일 번호 */
+  const freeVacancyNos = useMemo(() => {
+    const used = new Set<number>();
+    for (const p of getRoster()) { const no = vacancyNoOf(p.n); if (no !== null) used.add(no); }
+    for (const c of changes) { const no = c.vacancyName ? vacancyNoOf(c.vacancyName) : null; if (no !== null) used.add(no); }
+    return Array.from({ length: 60 }, (_, i) => i + 1).filter((n) => !used.has(n));
+  }, [changes]);
+
+  const pick = (m: Member) => {
+    setWho(m);
+    setWork(null);
+    setRank(m.rank);
+    setSlotI(null);
+    setVacancyNo(null);
+    setFrom(todayKST());
+  };
+
+  const isLeavingDriver = who?.group === 'driver' && work !== null && work !== 'driver';
+  // 직급은 내근만 쓴다 — 기관사·인턴은 직급을 표시하지 않고, 휴직·병가·공로연수·퇴사도 물을 일이 없다
+  const needsRank = work === 'office';
+  const needsSlot = work === 'driver' && who?.group !== 'driver';
 
   const canSave =
-    !!slot && name.trim().length > 0 && /^\d{6,10}$/.test(sabun) && /^\d{4}-\d{2}-\d{2}$/.test(from) && !dupPerson;
+    !!who && !!work &&
+    /^\d{4}-\d{2}-\d{2}$/.test(from) &&
+    (!needsSlot || !!slotI) &&
+    (!isLeavingDriver || vacancyNo !== null);
 
   const save = async () => {
-    if (!slot || !canSave || saving) return;
+    if (!who || !work || !canSave || saving) return;
     setSaving(true);
     try {
       const res = await fetch('/api/roster/changes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ from, I: slot.I, n: name.trim(), s: sabun, note: note.trim() || undefined }),
+        body: JSON.stringify({
+          from, n: who.n, s: who.s, work,
+          ...(needsRank && rank ? { rank } : {}),
+          ...(needsSlot && slotI ? { I: slotI } : {}),
+          ...(isLeavingDriver ? { I: who.I, vacancyNo } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) { showToast(data?.message ?? '저장하지 못했어요'); return; }
-      showToast(`${fmtDate(from)}부터 ${slot.I}번은 ${name.trim()}`);
-      setSlot(null); setName(''); setSabun(''); setNote(''); setFrom(todayKST());
+      showToast(`${fmtDate(from)}부터 ${who.n} → ${WORK_TYPE_LABEL[work]}`);
+      setWho(null);
       load();
-      syncRosterChanges();   // 지금 이 기기의 명부에도 바로 반영
+      syncRosterChanges();
     } catch {
       showToast('저장하지 못했어요. 연결을 확인해주세요');
     } finally {
@@ -188,21 +233,6 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     }
   };
 
-  /** 예약을 지우기 전 한 번 더 묻는다 — 시행된 것을 지우면 명부가 바로 되돌아간다 */
-  const confirmDialog = (
-    <ConfirmDialog
-      open={pendingRemove !== null}
-      title="예약 취소"
-      message={pendingRemove
-        ? <>{fmtDate(pendingRemove.from)}부터 {pendingRemove.I}번 자리를 <strong>{pendingRemove.n}</strong>{ro(pendingRemove.n)} 바꾸기로 한 예약을 취소할까요?</>
-        : ''}
-      confirmLabel="예약 취소하기"
-      variant="danger"
-      onConfirm={remove}
-      onClose={() => setPendingRemove(null)}
-    />
-  );
-
   const header = (title: string, back?: () => void) => (
     <div className={styles.overlayHeader}>
       <button type="button" className={styles.overlayClose} onClick={back ?? onClose} aria-label="뒤로">
@@ -212,113 +242,135 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     </div>
   );
 
-  // ── 비밀번호 ──
-  if (!authenticated) {
-    return (
-      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="명부 관리">
-        {header('명부 관리')}
-        <div className={styles.adminPinGate}>
-          <div className={styles.adminPinIcon}><Users size={40} /></div>
-          <p className={styles.adminPinLabel}>관리자 비밀번호를 입력하세요</p>
-          <input
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            className={styles.adminPinInput}
-            value={pin}
-            onChange={(e) => { setPin(e.target.value.replace(/\D/g, '')); setPinError(''); }}
-            onKeyDown={(e) => { if (e.key === 'Enter') handlePinSubmit(); }}
-            placeholder="****"
-            autoFocus
-          />
-          {pinError && <p className={styles.adminPinError}>{pinError}</p>}
-          <button type="button" className={`z-cta ${styles.adminPinSubmit}`} data-press onClick={handlePinSubmit} disabled={pin.length < 4}>
-            확인
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const confirmDialog = (
+    <ConfirmDialog
+      open={pendingRemove !== null}
+      title="예약 취소"
+      message={pendingRemove
+        ? <>{fmtDate(pendingRemove.from)}부터 <strong>{pendingRemove.n}</strong>{eul(pendingRemove.n)} {WORK_TYPE_LABEL[pendingRemove.work]}{ro(WORK_TYPE_LABEL[pendingRemove.work])} 바꾸기로 한 예약을 취소할까요?</>
+        : ''}
+      confirmLabel="예약 취소하기"
+      variant="danger"
+      onConfirm={remove}
+      onClose={() => setPendingRemove(null)}
+    />
+  );
 
-  // ── ② 자리를 고른 뒤: 새 사람 넣기 ──
-  if (slot) {
+  // ── ② 사람을 고른 뒤: 차례로 답한다 ──
+  if (who) {
+    const options = who.group === 'driver' ? LEAVING : JOINING;
     return (
-      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="인원 바꾸기">
-        {header('인원 바꾸기', () => setSlot(null))}
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="인사 변경">
+        {header(who.n, () => setWho(null))}
         <div className={styles.adminContent}>
           <div className={styles.rosterTarget}>
-            <span className={styles.rosterTargetNo}>{slot.I}번</span>
-            <span className={styles.rosterTargetDia}>교번 {slot.d}</span>
-            <span className={styles.rosterTargetName}>{slot.n}</span>
+            <span className={styles.rosterTargetName}>{who.n}</span>
+            <span className={styles.rosterTargetNow}>
+              지금 {GROUP_LABEL[who.group]}
+              {who.rank ? ` · ${RANK_LABEL[who.rank]}` : ''}
+              {who.I ? ` · ${who.I}번` : ''}
+            </span>
           </div>
 
-          <label className={styles.rosterField}>
-            <span className={styles.rosterFieldLabel}>들어올 사람 사번</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              className={styles.rosterInput}
-              value={sabun}
-              maxLength={10}
-              placeholder="예) 22600439"
-              onChange={(e) => {
-                const v = e.target.value.replace(/\D/g, '');
-                setSabun(v);
-                // 인턴·내근 명단에 있으면 이름을 자동으로 채운다
-                const hit = INTERN_USERS.find((u) => u.s === v) ?? EXTRA_USERS.find((u) => u.s === v);
-                if (hit) setName(hit.n);
-              }}
-            />
-          </label>
-          {known && (
-            <p className={styles.rosterHintOk}>
-              <Check size={14} /> {known.where} 명단의 {known.n} — 시행일에 그 명단에서 자동으로 빠져요
-            </p>
+          {/* 첫째 — 근무형태 */}
+          <section className={styles.rosterStep}>
+            <h3 className={styles.rosterStepTitle}>어떻게 바뀌나요?</h3>
+            <div className={styles.rosterChips}>
+              {options.map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  className={`${styles.rosterChip} ${work === w ? styles.rosterChipOn : ''}`}
+                  data-press
+                  onClick={() => { setWork(w); setSlotI(null); setVacancyNo(null); if (w === 'driver' || w === 'intern') setRank(null); }}
+                >
+                  {WORK_TYPE_LABEL[w]}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* 둘째 — 직급 (기관사·인턴은 직급을 쓰지 않는다) */}
+          {needsRank && (
+            <section className={styles.rosterStep}>
+              <h3 className={styles.rosterStepTitle}>직급</h3>
+              <div className={styles.rosterChips}>
+                {RANK_ORDER.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    className={`${styles.rosterChip} ${rank === r ? styles.rosterChipOn : ''}`}
+                    data-press
+                    onClick={() => setRank(rank === r ? null : r)}
+                  >
+                    {RANK_LABEL[r]}
+                  </button>
+                ))}
+              </div>
+              <p className={styles.rosterStepHint}>없으면 안 골라도 됩니다</p>
+            </section>
           )}
-          {dupPerson && (
-            <p className={styles.rosterHintBad}>
-              <AlertTriangle size={14} /> 이 사번은 이미 {dupPerson.I}번 {dupPerson.n}입니다
-            </p>
+
+          {/* 셋째 — 들어갈 자리 */}
+          {needsSlot && (
+            <section className={styles.rosterStep}>
+              <h3 className={styles.rosterStepTitle}>어느 자리로 가나요? (비어 있는 결원)</h3>
+              {vacantSlots.length === 0 ? (
+                <p className={styles.rosterHintBad}><AlertTriangle size={14} /> 지금 비어 있는 자리가 없어요</p>
+              ) : (
+                <div className={styles.rosterChips}>
+                  {vacantSlots.map((p) => (
+                    <button
+                      key={p.I}
+                      type="button"
+                      className={`${styles.rosterChip} ${slotI === p.I ? styles.rosterChipOn : ''}`}
+                      data-press
+                      onClick={() => setSlotI(p.I)}
+                    >
+                      {p.I}번 · {p.n}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
           )}
 
-          <label className={styles.rosterField}>
-            <span className={styles.rosterFieldLabel}>이름</span>
-            <input
-              type="text"
-              className={styles.rosterInput}
-              value={name}
-              maxLength={20}
-              placeholder="예) 김경률"
-              onChange={(e) => setName(e.target.value)}
-            />
-          </label>
+          {/* 셋째(반대) — 비는 자리가 될 결원 번호 */}
+          {isLeavingDriver && (
+            <section className={styles.rosterStep}>
+              <h3 className={styles.rosterStepTitle}>{who.I}번 자리는 몇 번 결원이 되나요?</h3>
+              <div className={styles.rosterChips}>
+                {freeVacancyNos.slice(0, 30).map((no) => (
+                  <button
+                    key={no}
+                    type="button"
+                    className={`${styles.rosterChip} ${vacancyNo === no ? styles.rosterChipOn : ''}`}
+                    data-press
+                    onClick={() => setVacancyNo(no)}
+                  >
+                    결원{String(no).padStart(2, '0')}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
-          <label className={styles.rosterField}>
-            <span className={styles.rosterFieldLabel}>시행일 — 이 날부터 바뀝니다</span>
-            <input
-              type="date"
-              className={styles.rosterInput}
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-            />
-          </label>
+          {/* 넷째 — 시행일 */}
+          {work && (
+            <label className={styles.rosterField}>
+              <span className={styles.rosterFieldLabel}>시행일 — 이 날부터 바뀝니다</span>
+              <input type="date" className={styles.rosterInput} value={from} onChange={(e) => setFrom(e.target.value)} />
+            </label>
+          )}
 
-          <label className={styles.rosterField}>
-            <span className={styles.rosterFieldLabel}>메모 (안 써도 됩니다)</span>
-            <input
-              type="text"
-              className={styles.rosterInput}
-              value={note}
-              maxLength={200}
-              placeholder="예) 인턴 정식 임용"
-              onChange={(e) => setNote(e.target.value)}
-            />
-          </label>
-
-          {canSave && (
+          {canSave && work && (
             <p className={styles.rosterConfirm}>
-              <strong>{fmtDate(from)}</strong>부터 <strong>{slot.I}번</strong> 자리(교번 {slot.d})가<br />
-              {slot.n} → <strong>{name.trim()}</strong>{ro(name)} 바뀝니다
+              <strong>{fmtDate(from)}</strong>부터 <strong>{who.n}</strong>{eun(who.n)}<br />
+              <strong>{WORK_TYPE_LABEL[work]}</strong>
+              {needsRank && rank ? ` · ${RANK_LABEL[rank]}` : ''}
+              {ro(needsRank && rank ? RANK_LABEL[rank] : WORK_TYPE_LABEL[work])} 바뀝니다
+              {needsSlot && slotI ? ` (${slotI}번 자리로)` : ''}
+              {isLeavingDriver && vacancyNo !== null ? ` (${who.I}번 자리는 결원${String(vacancyNo).padStart(2, '0')})` : ''}
             </p>
           )}
 
@@ -326,14 +378,17 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
             {saving ? '넣는 중…' : '예약 넣기'}
           </button>
         </div>
+        {confirmDialog}
       </div>
     );
   }
 
-  // ── ① 명부 목록 + 예약 목록 ──
+  // ── ① 전 직원 목록 ──
   const today = todayKST();
   const upcoming = changes.filter((c) => c.from > today);
   const applied = changes.filter((c) => c.from <= today);
+
+  let lastGroup: Group | null = null;
 
   return (
     <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="명부 관리">
@@ -352,7 +407,9 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                   <div className={styles.rosterPendingMain}>
                     <span className={styles.rosterPendingDate}>{fmtDate(c.from)}</span>
                     <span className={styles.rosterPendingBody}>
-                      {c.I}번 {c.replaces} → <strong>{c.n}</strong>
+                      {c.n} → <strong>{WORK_TYPE_LABEL[c.work]}</strong>
+                      {c.rank ? ` · ${RANK_LABEL[c.rank]}` : ''}
+                      {c.I ? ` · ${c.I}번` : ''}
                     </span>
                   </div>
                   <button type="button" className={styles.rosterPendingDel} data-press onClick={() => setPendingRemove(c)} aria-label="예약 취소">
@@ -365,16 +422,14 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
         )}
 
         <section className={styles.adminSection}>
-          <h3 className={styles.adminSectionTitle}>
-            <Users size={15} /> 명부 {roster.length}명 — 바꿀 자리를 누르세요
-          </h3>
+          <h3 className={styles.adminSectionTitle}>전 직원 {members.length}명 — 바꿀 사람을 누르세요</h3>
           <div className={styles.rosterSearch}>
             <Search size={16} />
             <input
               type="text"
               className={styles.rosterSearchInput}
               value={query}
-              placeholder="이름·순번·교번·사번"
+              placeholder="이름으로 찾기"
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
@@ -382,22 +437,28 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
             <div className={styles.adminEmpty}>불러오는 중…</div>
           ) : (
             <ul className={styles.rosterList}>
-              {filtered.map((p) => {
-                const pending = pendingBySlot.get(p.I);
+              {filtered.map((m) => {
+                const head = m.group !== lastGroup ? m.group : null;
+                lastGroup = m.group;
+                const pending = pendingBy.get(m.s);
                 return (
-                  <li key={p.I}>
+                  <li key={`${m.group}-${m.s}-${m.n}`}>
+                    {head && (
+                      <p className={styles.rosterGroupHead}>
+                        {GROUP_LABEL[head]} {filtered.filter((x) => x.group === head).length}명
+                      </p>
+                    )}
                     <button
                       type="button"
-                      className={styles.rosterRowBtn}
+                      className={`${styles.rosterRowBtn} ${styles[`rosterRow_${m.group}`]}`}
                       data-press
-                      onClick={() => { setSlot(p); setName(''); setSabun(''); setNote(''); setFrom(todayKST()); }}
+                      onClick={() => pick(m)}
                     >
-                      <span className={styles.rosterRowNo}>{p.I}</span>
-                      <span className={styles.rosterRowDia}>{p.d}</span>
-                      <span className={styles.rosterRowName}>{p.n}</span>
+                      <span className={styles.rosterRowName}>{m.n}</span>
+                      {m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
                       {pending
-                        ? <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {pending.n}</span>
-                        : <span className={styles.rosterRowSabun}>{p.s}</span>}
+                        ? <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {WORK_TYPE_LABEL[pending.work]}</span>
+                        : <ChevronRight size={16} className={styles.rosterRowArrow} aria-hidden />}
                     </button>
                   </li>
                 );
@@ -408,14 +469,16 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
 
         {applied.length > 0 && (
           <section className={styles.adminSection}>
-            <h3 className={styles.adminSectionTitle}>이미 시행된 변경 {applied.length}건</h3>
+            <h3 className={styles.adminSectionTitle}><Check size={15} /> 이미 시행된 변경 {applied.length}건</h3>
             <ul className={styles.rosterPendingList}>
               {applied.map((c) => (
                 <li key={c.id} className={styles.rosterPendingItem}>
                   <div className={styles.rosterPendingMain}>
                     <span className={styles.rosterPendingDate}>{fmtDate(c.from)}</span>
                     <span className={styles.rosterPendingBody}>
-                      {c.I}번 {c.replaces} → <strong>{c.n}</strong>
+                      {c.n} → <strong>{WORK_TYPE_LABEL[c.work]}</strong>
+                      {c.rank ? ` · ${RANK_LABEL[c.rank]}` : ''}
+                      {c.I ? ` · ${c.I}번` : ''}
                     </span>
                   </div>
                   <button type="button" className={styles.rosterPendingDel} data-press onClick={() => setPendingRemove(c)} aria-label="되돌리기">

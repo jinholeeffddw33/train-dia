@@ -1,9 +1,9 @@
 /**
- * 명부 변경 예약 API — 관리자 모드
+ * 인사 변경 API — 관리자 모드
  *
- * GET    누구나(로그인) — 앱이 시작할 때 읽어서 명부에 덮어씌운다
- * POST   관리자만 — 예약 추가
- * DELETE 관리자만 — 예약 취소 (?id=)
+ * GET    누구나(로그인) — 앱이 시작할 때 읽어서 명부·명단·직급에 덮어씌운다
+ * POST   관리자만 — 변경 넣기
+ * DELETE 관리자만 — 변경 취소 (?id=)
  *
  * 왜 GET 은 전원 공개인가
  *   이 값이 곧 "오늘 누가 그 교번인가"다. 모든 기관사 화면이 이걸 써야 하므로
@@ -15,40 +15,45 @@ import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { errorResponse, okJson, internalError, parseBody, ERROR_CODES } from '@/lib/api/response';
 import { P } from '@/data/cycle';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
-import type { RosterChange } from '@/data/rosterChanges';
+import type { RosterChange, StaffRank, WorkType } from '@/data/rosterChanges';
 
 interface DbRow {
   id: number;
   effective_from: string;
-  person_index: string;
-  name: string;
-  sabun: string;
-  replaces: string;
-  leaves: string | null;
+  subject_sabun: string;
+  subject_name: string;
+  work_type: string;
+  rank: string | null;
+  slot_index: string | null;
+  slot_before: string | null;
+  vacancy_name: string | null;
+  vacancy_sabun: string | null;
   note: string | null;
   created_by_name: string | null;
-  created_at: string;
 }
 
+const SELECT =
+  'id, effective_from, subject_sabun, subject_name, work_type, rank, slot_index, slot_before, vacancy_name, vacancy_sabun, note, created_by_name';
+
 /** DB 한 줄 → 앱이 쓰는 모양 */
-function toChange(row: DbRow): RosterChange & { id: number; by?: string } {
+function toChange(row: DbRow): RosterChange {
   return {
     id: row.id,
     from: row.effective_from.slice(0, 10),
-    I: row.person_index,
-    n: row.name,
-    s: row.sabun,
-    replaces: row.replaces,
-    ...(row.leaves ? { leaves: row.leaves as 'intern' | 'extra' } : {}),
+    n: row.subject_name,
+    s: row.subject_sabun,
+    work: row.work_type as WorkType,
+    ...(row.rank ? { rank: row.rank as StaffRank } : {}),
+    ...(row.slot_index ? { I: row.slot_index } : {}),
+    ...(row.slot_before ? { replaces: row.slot_before } : {}),
+    ...(row.vacancy_name ? { vacancyName: row.vacancy_name } : {}),
+    ...(row.vacancy_sabun ? { vacancySabun: row.vacancy_sabun } : {}),
     ...(row.note ? { note: row.note } : {}),
     ...(row.created_by_name ? { by: row.created_by_name } : {}),
   };
 }
 
-const SELECT = 'id, effective_from, person_index, name, sabun, replaces, leaves, note, created_by_name, created_at';
-
-// ── GET: 예약 목록 ──
+// ── GET: 변경 목록 ──
 export async function GET(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
@@ -71,16 +76,30 @@ export async function GET(req: NextRequest) {
   }
 }
 
+const WORK_TYPES = ['driver', 'office', 'intern', 'leave', 'sick', 'service', 'resign'] as const;
+const RANKS = ['chief', 'vice', 'manager', 'deputy', 'gwajang', 'daeri'] as const;
+
 const PostSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '시행일'),
-  I: z.string().min(1).max(4),
+  /** 바뀌는 사람 */
   n: z.string().trim().min(1).max(20),
-  s: z.string().trim().regex(/^\d{6,10}$/, '사번'),
-  leaves: z.enum(['intern', 'extra']).optional(),
+  s: z.string().trim().regex(/^[0-9A-Za-z]{6,10}$/, '사번'),
+  work: z.enum(WORK_TYPES),
+  rank: z.enum(RANKS).optional(),
+  /** 기관사가 될 때 = 들어갈 자리 / 기관사에서 빠질 때 = 비울 자리 */
+  I: z.string().min(1).max(4).optional(),
+  /** 자리를 비울 때 그 자리가 될 결원 번호 (1~99) */
+  vacancyNo: z.number().int().min(1).max(99).optional(),
   note: z.string().trim().max(200).optional(),
 });
 
-// ── POST: 예약 추가 (관리자만) ──
+/** 결원 번호 → 이름·사번. cycle.ts 의 기존 규칙(결원06 = 9G010906)을 그대로 따른다 */
+function vacancyOf(no: number) {
+  const nn = String(no).padStart(2, '0');
+  return { name: `결원${nn}`, sabun: `9G0109${nn}` };
+}
+
+// ── POST: 변경 넣기 (관리자만) ──
 export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
@@ -95,50 +114,77 @@ export async function POST(req: NextRequest) {
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
 
-  // ① 그 자리가 실제로 있는가 — 없는 순번을 넣으면 아무 일도 안 일어나고 조용히 묻힌다
-  const slot = P.find((p) => p.I === body.I);
-  if (!slot) {
-    return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번 자리는 명부에 없어요`);
+  // 기관사·인턴은 직급을 쓰지 않는다 — 남겨 두면 «기관사 부장님» 이 된다
+  const rank = body.work === 'driver' || body.work === 'intern' ? null : (body.rank ?? null);
+
+  const leavingDriver = body.work !== 'driver' && !!body.I;
+
+  if (body.work === 'driver' && !body.I) {
+    return errorResponse(ERROR_CODES.BAD_REQUEST, '기관사가 될 자리를 골라주세요');
+  }
+  if (leavingDriver && body.vacancyNo === undefined) {
+    return errorResponse(ERROR_CODES.BAD_REQUEST, '비는 자리가 어느 결원이 될지 골라주세요');
   }
 
-  // ② 그 사번이 이미 다른 자리에 있는가 — 한 사람이 두 교번을 갖게 되면 근무표가 깨진다
-  const dupInBase = P.find((p) => p.s === body.s && p.I !== body.I);
-  if (dupInBase) {
-    return errorResponse(
-      ERROR_CODES.CONFLICT,
-      `${body.s}는 이미 ${dupInBase.I}번 ${dupInBase.n}입니다`,
-    );
+  // ① 그 자리가 실제로 있는가 — 없는 순번을 넣으면 아무 일도 안 일어나고 조용히 묻힌다
+  let slot: (typeof P)[number] | undefined;
+  if (body.I) {
+    slot = P.find((p) => p.I === body.I);
+    if (!slot) return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번 자리는 명부에 없어요`);
+  }
+
+  // ② 기관사가 되는데 그 사번이 이미 다른 자리에 있는가 — 한 사람이 두 교번을 가지면 근무표가 깨진다
+  if (body.work === 'driver') {
+    const dup = P.find((p) => p.s === body.s && p.I !== body.I);
+    if (dup) {
+      return errorResponse(ERROR_CODES.CONFLICT, `${body.s}는 이미 ${dup.I}번 ${dup.n}입니다`);
+    }
+  }
+
+  const vacancy = body.vacancyNo !== undefined ? vacancyOf(body.vacancyNo) : null;
+
+  // ③ 결원 번호가 이미 쓰이고 있는가 — 결원06 이 둘이면 어느 자리인지 알 수 없다
+  if (leavingDriver && vacancy && P.some((p) => p.n === vacancy.name && p.I !== body.I)) {
+    return errorResponse(ERROR_CODES.CONFLICT, `${vacancy.name}은 이미 쓰이고 있어요`);
   }
 
   try {
-    // ③ 다른 예약과 사번이 겹치는가 (같은 자리로 옮기는 것은 허용 — 날짜만 바꾸는 경우)
     const { data: existing } = await serverSupabase
       .from('roster_changes')
-      .select('id, person_index, name, sabun, effective_from')
+      .select('id, subject_sabun, subject_name, slot_index, effective_from, vacancy_name')
       .eq('status', 'active');
+    const rows = (existing as Pick<DbRow, 'id' | 'subject_sabun' | 'subject_name' | 'slot_index' | 'effective_from' | 'vacancy_name'>[] | null) ?? [];
 
-    const rows = (existing as { id: number; person_index: string; name: string; sabun: string; effective_from: string }[] | null) ?? [];
-    const dupInPending = rows.find((r) => r.sabun === body.s && r.person_index !== body.I);
-    if (dupInPending) {
-      return errorResponse(
-        ERROR_CODES.CONFLICT,
-        `${body.s}는 이미 ${dupInPending.person_index}번 자리로 예약돼 있어요`,
-      );
+    if (rows.some((r) => r.subject_sabun === body.s && r.effective_from.slice(0, 10) === body.from)) {
+      return errorResponse(ERROR_CODES.CONFLICT, '이 사람은 그 날짜에 이미 예약이 있어요');
     }
-    if (rows.some((r) => r.person_index === body.I && r.effective_from.slice(0, 10) === body.from)) {
+    if (body.I && rows.some((r) => r.slot_index === body.I && r.effective_from.slice(0, 10) === body.from)) {
       return errorResponse(ERROR_CODES.CONFLICT, '같은 자리에 같은 시행일 예약이 이미 있어요');
     }
+    // 다른 예약이 이미 그 사람을 기관사로 앉혀 두었는데 또 다른 자리에 앉히려는 경우
+    if (body.work === 'driver') {
+      const dup = rows.find((r) => r.subject_sabun === body.s && r.slot_index && r.slot_index !== body.I);
+      if (dup) {
+        return errorResponse(ERROR_CODES.CONFLICT, `${body.n}은(는) 이미 ${dup.slot_index}번 자리로 예약돼 있어요`);
+      }
+    }
+    if (leavingDriver && vacancy && rows.some((r) => r.vacancy_name === vacancy.name)) {
+      return errorResponse(ERROR_CODES.CONFLICT, `${vacancy.name}은 다른 예약이 이미 쓰고 있어요`);
+    }
 
-    // replaces 는 서버가 채운다 — 화면이 보내온 값을 믿으면 자리를 잘못 짚어도 통과한다
+    // slot_before 는 서버가 채운다 — 화면이 보내온 값을 믿으면 자리를 잘못 짚어도 통과한다
     const { data, error } = await serverSupabase
       .from('roster_changes')
       .insert({
         effective_from: body.from,
-        person_index: body.I,
-        name: body.n,
-        sabun: body.s,
-        replaces: slot.n,
-        leaves: body.leaves ?? guessLeaves(body.s),
+        subject_sabun: body.s,
+        subject_name: body.n,
+        work_type: body.work,
+        rank,
+        slot_index: body.I ?? null,
+        slot_before: slot?.n ?? null,
+        vacancy_name: leavingDriver && vacancy ? vacancy.name : null,
+        vacancy_sabun: leavingDriver && vacancy ? vacancy.sabun : null,
         note: body.note ?? null,
         created_by: auth.sabun,
         created_by_name: auth.name,
@@ -153,7 +199,7 @@ export async function POST(req: NextRequest) {
     await auditLog(auth.sub, auth.name, 'roster_change_add', {
       targetType: 'roster_changes',
       targetId: String((data as DbRow).id),
-      metadata: { I: body.I, name: body.n, sabun: body.s, from: body.from, replaces: slot.n },
+      metadata: { name: body.n, sabun: body.s, work: body.work, rank, I: body.I, from: body.from },
       ip: getClientIP(req),
     });
 
@@ -163,14 +209,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/** 인턴·내근 명단에 있는 사번이면 시행일에 그 명단에서 빼야 한다 — 손으로 고르지 않게 자동 판별 */
-function guessLeaves(sabun: string): 'intern' | 'extra' | null {
-  if (INTERN_USERS.some((u) => u.s === sabun)) return 'intern';
-  if (EXTRA_USERS.some((u) => u.s === sabun)) return 'extra';
-  return null;
-}
-
-// ── DELETE: 예약 취소 (관리자만) ──
+// ── DELETE: 변경 취소 (관리자만) ──
 export async function DELETE(req: NextRequest) {
   const auth = await requireAuth(req);
   if (auth instanceof NextResponse) return auth;
@@ -204,7 +243,7 @@ export async function DELETE(req: NextRequest) {
     await auditLog(auth.sub, auth.name, 'roster_change_delete', {
       targetType: 'roster_changes',
       targetId: String(id),
-      metadata: { I: row.person_index, name: row.name, sabun: row.sabun, from: row.effective_from },
+      metadata: { name: row.subject_name, sabun: row.subject_sabun, work: row.work_type, from: row.effective_from },
       ip: getClientIP(req),
     });
 

@@ -33,12 +33,13 @@ describe('명부 발령 예약 (rosterChanges)', () => {
     }
   });
 
-  it('시행일이 지나면 인턴/내근 목록에서 빠진다 (한 사람이 두 번 잡히지 않음)', () => {
-    for (const c of ROSTER_CHANGES.filter((x) => x.leaves)) {
+  it('기관사가 되면 인턴/내근 목록에서 빠진다 (한 사람이 두 번 잡히지 않음)', () => {
+    for (const c of ROSTER_CHANGES.filter((x) => x.work === 'driver')) {
       const day = new Date(`${c.from}T12:00:00+09:00`);
-      const src = c.leaves === 'intern' ? INTERN_USERS : EXTRA_USERS;
-      expect(src.some((u) => u.s === c.s)).toBe(true);            // 원본에는 아직 있고
-      expect(departedSabuns(c.leaves!, day).has(c.s)).toBe(true); // 시행일엔 제외 대상
+      const list = INTERN_USERS.some((u) => u.s === c.s) ? 'intern' as const : 'extra' as const;
+      const src = list === 'intern' ? INTERN_USERS : EXTRA_USERS;
+      expect(src.some((u) => u.s === c.s)).toBe(true);        // 원본에는 아직 있고
+      expect(departedSabuns(list, day).has(c.s)).toBe(true);  // 시행일엔 제외 대상
     }
   });
 

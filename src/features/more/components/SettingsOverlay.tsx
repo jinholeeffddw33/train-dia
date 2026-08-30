@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, BarChart3, Users } from 'lucide-react';
+import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -16,8 +16,7 @@ import { isNativeApp } from '@/lib/native/platform';
 import AlarmSettings from './AlarmSettings';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
-import AdminDashboard from './AdminDashboard';
-import RosterAdmin from './RosterAdmin';
+import AdminHub from './AdminHub';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { showToast } from '@/components/common/Toast';
@@ -48,8 +47,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const [pinChangeOpen, setPinChangeOpen] = useState(false);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
   const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
-  const [adminDashOpen, setAdminDashOpen] = useState(false);
-  const [rosterAdminOpen, setRosterAdminOpen] = useState(false);
+  const [adminHubOpen, setAdminHubOpen] = useState(false);
   const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [curPin, setCurPin] = useState('');
@@ -60,16 +58,15 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
   // 하위 오버레이가 열려 있으면 뒤로가기/ESC 는 그것부터 닫는다 (설정은 마지막)
   const anySub = shortcutsOpen || pinChangeOpen || installGuideOpen
-    || adminFeedbackOpen || adminDashOpen || rosterAdminOpen || levelRecordsOpen;
+    || adminFeedbackOpen || adminHubOpen || levelRecordsOpen;
   const closeSub = useCallback(() => {
     if (shortcutsOpen) setShortcutsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
     else if (adminFeedbackOpen) setAdminFeedbackOpen(false);
-    else if (adminDashOpen) setAdminDashOpen(false);
-    else if (rosterAdminOpen) setRosterAdminOpen(false);
+    else if (adminHubOpen) setAdminHubOpen(false);
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
-  }, [shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminDashOpen, rosterAdminOpen, levelRecordsOpen]);
+  }, [shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminHubOpen, levelRecordsOpen]);
 
   useHistoryBack('settings', onClose, open && !anySub);
   useHistoryBack('settings-sub', closeSub, anySub);
@@ -230,17 +227,14 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
         </button>
         {authUser?.role === 'admin' && (
           <>
-            <button type="button" className={styles.tile} data-press onClick={() => setAdminDashOpen(true)}>
-              <span className={`${styles.tileIcon} ${styles.toolIconBlue}`}><BarChart3 size={18} /></span>
-              <span className={styles.tileLabel}>접속 현황판</span>
+            {/* 관리자 전용 화면은 여기 하나로 모은다 — 안에서 비밀번호를 한 번만 묻는다 */}
+            <button type="button" className={styles.tile} data-press onClick={() => setAdminHubOpen(true)}>
+              <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><ShieldCheck size={18} /></span>
+              <span className={styles.tileLabel}>관리자 모드</span>
             </button>
             <button type="button" className={styles.tile} data-press onClick={() => setAdminFeedbackOpen(true)}>
               <span className={`${styles.tileIcon} ${styles.toolIconPurple}`}><ClipboardList size={18} /></span>
               <span className={styles.tileLabel}>제보 목록</span>
-            </button>
-            <button type="button" className={styles.tile} data-press onClick={() => setRosterAdminOpen(true)}>
-              <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><Users size={18} /></span>
-              <span className={styles.tileLabel}>명부 관리</span>
             </button>
           </>
         )}
@@ -494,13 +488,9 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
         onClose={() => setShortcutsOpen(false)}
       />
 
-      {/* 관리자 현황판 */}
-      {adminDashOpen && (
-        <AdminDashboard onClose={() => setAdminDashOpen(false)} />
-      )}
-
-      {rosterAdminOpen && (
-        <RosterAdmin onClose={() => setRosterAdminOpen(false)} />
+      {/* 관리자 모드 — 접속 현황판 · 명부 관리 */}
+      {adminHubOpen && (
+        <AdminHub onClose={() => setAdminHubOpen(false)} />
       )}
 
       {/* 관리자 제보 목록 오버레이 */}

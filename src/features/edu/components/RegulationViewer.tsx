@@ -860,6 +860,18 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       const children: ReactNode[] = [];
       let bcur = 0;
       let subKey = 0;
+      /**
+       * «제N조» 를 조문 제목으로 볼지, 문장 속 참조로 볼지.
+       *
+       * 제목은 언제나 블록 맨 앞에 온다 — computeBlocks 가 줄 첫머리의 «제N조» 를
+       * 구조적 시작으로 보고 반드시 새 블록을 열기 때문이다.
+       * 그래서 블록 맨 앞이 아니면 «…제4조, 제5조에서 정한 사고» 같은 참조다.
+       *
+       * 예전에는 전부 제목으로 그려서, 문장이 조문 참조마다 끊기고 파란 제목이
+       * 중간에 튀어나왔다(실측 293곳, 인사규정 95곳). data-article 도 참조에 붙어
+       * 조문 이동이 엉뚱한 곳으로 가기도 했다.
+       */
+      const leadWs = blockText.length - blockText.trimStart().length;
       for (const m of blockText.matchAll(ARTICLE_RE)) {
         const mStart = m.index!;
         const mEnd = mStart + m[0].length;
@@ -871,14 +883,22 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
           if (countRe) localMatchOffset += (pre.match(countRe) || []).length;
         }
         const artNumMatch = /제\s*(\d+)\s*조/.exec(m[0]);
+        const isHeading = mStart === leadWs;
         children.push(
-          <span
-            key={`a-${subKey++}`}
-            className={styles.articleMark}
-            data-article={artNumMatch ? artNumMatch[1] : undefined}
-          >
-            {renderHighlighted(m[0], pageStartIdx + localMatchOffset)}
-          </span>,
+          isHeading ? (
+            <span
+              key={`a-${subKey++}`}
+              className={styles.articleMark}
+              data-article={artNumMatch ? artNumMatch[1] : undefined}
+            >
+              {renderHighlighted(m[0], pageStartIdx + localMatchOffset)}
+            </span>
+          ) : (
+            // 참조는 본문 흐름 그대로 — 옅게만 구분한다
+            <span key={`a-${subKey++}`} className={styles.articleRef}>
+              {renderHighlighted(m[0], pageStartIdx + localMatchOffset)}
+            </span>
+          ),
         );
         if (countRe) localMatchOffset += (m[0].match(countRe) || []).length;
         bcur = mEnd;

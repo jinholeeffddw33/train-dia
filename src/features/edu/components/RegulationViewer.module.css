@@ -523,6 +523,17 @@
   margin-top: 0;
 }
 
+/* 문장 속 조문 참조(«제4조에서 정한…») — 제목이 아니므로 줄을 끊지 않는다.
+   본문과 같은 크기·굵기로 두고 색으로만 «다른 조문을 가리킨다» 는 것을 알린다. */
+.articleRef {
+  color: #3B82F6;
+  font-weight: 600;
+}
+
+:global(.light) .articleRef {
+  color: #1D4ED8;
+}
+
 :global(.light) .articleMark {
   color: #1D4ED8;
 }

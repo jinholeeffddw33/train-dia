@@ -55,11 +55,22 @@ function forSpeech(text: string): string {
     .replace(/[<〈]\s*삭제[^>〉]*[>〉]/g, '삭제.')             // 삭제된 항 — 삭제 사실은 남기고 날짜만 뺀다
     .replace(/[<〈][^>〉]{0,40}[>〉]/g, '')                    // 개정·신설 이력 — "꺾쇠 2017 점 12" 로 읽힌다
     .replace(/\[(?:제목개정|전문개정|본조신설)[^\]]*\]/g, '') // 조문 끝의 개정 이력 — 내용이 아니다
-    .replace(/[“”"']/g, '')                                  // 따옴표를 "따옴표"라고 읽는 엔진이 있다
+    .replace(/[“”‘’"']/g, '')                                // 따옴표를 "따옴표"라고 읽는 엔진이 있다
     .replace(/(\d+)\s*[.]\s*(\d+)\s*[.]\s*(\d+)\s*\./g, '$1년 $2월 $3일')
     .replace(/㎞\/h|km\/h/gi, '킬로미터')
     .replace(/㎞/g, '킬로미터').replace(/㎧/g, '초당 미터')
+    /* 단위 기호를 안 바꾸면 엔진이 통째로 삼키거나 글자 그대로 읽는다.
+       실측: ㎜ 28곳(완장·표지 치수), ㎏ 2곳, ㎠ 2곳, ℃ 1곳. */
+    .replace(/㎜/g, '밀리미터').replace(/㎝/g, '센티미터').replace(/㎡/g, '제곱미터')
+    .replace(/㎠/g, '제곱센티미터').replace(/㎏/g, '킬로그램').replace(/℃/g, '도')
     .replace(/‰/g, '퍼밀').replace(/%/g, '퍼센트')
+    /* 화살표는 «이렇게 바뀐다»·«메뉴를 타고 들어간다» 는 뜻으로 쓰인다.
+       (예: "주차제동 걸림"⇒"주차제동 풀림", 메트로피스→운전관리→열차운행관리)
+       뜻을 지어내지 않고 쉼표로 끊어 준다 — 그대로 두면 엔진이 무음이거나 "화살표". */
+    .replace(/[→⇒↔⇔←⇐↑↓▲▼◀▶]/g, ', ')
+    /* 도면의 치수선·괘선(―――, ─, │…). 소리로는 아무 뜻이 없다.
+       대부분 【표】 안이라 이미 건너뛰지만 제164조(전령자 완장)처럼 표 밖에 남은 것이 있다. */
+    .replace(/[―─━│┃┌┐└┘├┤┬┴┼]+/g, ' ')
     .replace(/·/g, ', ')                                     // 가운뎃점 — 쉼표로 읽어야 끊긴다
     .replace(/[~∼]/g, '에서 ')
     .replace(/제(\d+)조\s*의\s*(\d+)/g, '제$1조의 $2')
@@ -71,6 +82,12 @@ function forSpeech(text: string): string {
        두 자리까지만 잡아서 연도(2023.)에는 걸리지 않는다. */
     .replace(/(^|[\s.])(\d{1,2})\.\s/g, '$1제$2호. ')
     .replace(/：/g, ', ')                                     // 전각 콜론 — 그대로면 무음이거나 "콜론"
+    /* 기호를 걷어내고 나면 쉼표만 겹쳐 남는 자리가 생긴다(", , 380밀리미터 ,").
+       엔진이 그때마다 쉼을 넣어 말이 뚝뚝 끊긴다 — 하나로 합치고 군더더기를 뗀다. */
+    .replace(/\s+,/g, ',')                                    // "한다 ," → "한다,"
+    .replace(/,(?:\s*,)+/g, ',')                              // 겹친 쉼표
+    .replace(/([.?!])\s*,/g, '$1')                            // "한다. ," → "한다."
+    .replace(/^[\s,]+|[\s,]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -120,7 +137,11 @@ function splitSentences(text: string): string[] {
       parts[i + 1] = `${p} ${parts[i + 1]}`;
     } else merged.push(p);
   }
-  return merged;
+  /* 한글이 한 글자도 없는 조각은 읽지 않는다.
+     기호를 걷어내고 나면 도면 부스러기("380", ", ,")만 남는 경우가 생기는데,
+     엔진이 이것만 따로 읽으면 앞뒤 문장과 이어지지 않아 잡음으로 들린다.
+     뜻이 있는 숫자는 위 병합 단계에서 이미 앞뒤 문장에 붙는다. */
+  return merged.filter((s) => /[가-힣]/.test(s));
 }
 
 /**
@@ -148,9 +169,22 @@ export function koreanVoices(all: SpeechSynthesisVoice[]): SpeechSynthesisVoice[
     .sort((a, b) => rankVoice(b) - rankVoice(a));
 }
 
+/**
+ * 조문 제목 — 없는 것을 «null» 이라고 읽지 않게.
+ *
+ * 원본 PDF 에 «제15조(null)» 처럼 인쇄된 조문이 19곳 있다(전동차승무원업무예규 18곳,
+ * 운전취급세부요령 1곳). 전부 삭제된 조문이고, 원본을 만든 쪽의 표기 사고다.
+ * 본문은 원본 그대로 보여 주되(화면), 소리로는 «널» 이라고 읽지 않는다.
+ */
+export function articleTitle(raw: string | null | undefined): string {
+  const t = (raw ?? '').trim();
+  return /^(null|undefined|-)?$/i.test(t) ? '' : t;
+}
+
 /** 조문 하나 → 낭독 조각들. 표는 빼고 있다는 사실만 알린다. */
 export function articleToChunks(a: ReaderArticle): Chunk[] {
-  const head: Chunk = { text: forSpeech(`제${a.n}조. ${a.title}.`), kind: 'head' };
+  const title = articleTitle(a.title);
+  const head: Chunk = { text: forSpeech(title ? `제${a.n}조. ${title}.` : `제${a.n}조.`), kind: 'head' };
   if (a.hasTable && (a.tableShare ?? 0) >= TABLE_SKIP_SHARE) {
     return [head, { text: '이 조문은 표로 되어 있습니다. 화면에서 확인하세요.', kind: 'notice' }];
   }
@@ -165,6 +199,22 @@ export function articleToChunks(a: ReaderArticle): Chunk[] {
     last = m.index + m[0].length;
   }
   push(body.slice(last));
+
+  /*
+   * 표 비중(tableShare)만으로는 못 거르는 조문이 있다.
+   * 표 사이에 낀 «본문» 이 실은 표 칸 부스러기라, 읽으면
+   *   "출입문선택스위치 수/수 지적 … 9 (TCMS 출고전 검사) TCMS 지적 및 해당스위치 취급가."
+   * 처럼 뜻이 안 통한다. 실측하면 이런 조문은 조각이 «문장으로 끝나지 않는다».
+   * 그래서 표가 있는 조문에 한해, 조각 대부분이 문장이 아니면 읽지 않고 알리기만 한다.
+   * (기준 미달 실측: 운전관계직원업무내규 제34조, 운전취급규정 제293조 두 곳)
+   */
+  const bodies = out.filter((c) => c.kind === 'body');
+  if (a.hasTable && bodies.length >= 2) {
+    const sentences = bodies.filter((c) => /[.?!]\s*$/.test(c.text)).length;
+    if (sentences / bodies.length < 0.3) {
+      return [head, { text: '이 조문은 표로 되어 있습니다. 화면에서 확인하세요.', kind: 'notice' }];
+    }
+  }
   return out;
 }
 
@@ -407,6 +457,19 @@ export function useRegulationReader(regulationId: string) {
     setStatus('playing');
   }, [articles, acquireWake, unlock]);
 
+  /**
+   * 재생하지 않고 그 조문으로 옮겨만 둔다.
+   *
+   * 읽기판은 열자마자 «재생을 누르면 이 조문부터 읽어드려요» 라고 안내한다.
+   * 그런데 실제 이동은 play() 안에서만 일어나서, 누르기 전에는 늘 제1조가 떠 있었다 —
+   * 40조를 보다가 열면 «제1조 1/122» 가 보이니 안내가 거짓말이 된다.
+   */
+  const seek = useCallback((articleNo: number) => {
+    if (!articles) return;
+    const i = articles.findIndex((a) => a.n === articleNo);
+    if (i >= 0) { artIdxRef.current = i; setArtIdx(i); setChunkIdx(0); }
+  }, [articles]);
+
   const pause = useCallback(() => {
     /* speechSynthesis.pause() 는 안드로이드 크롬에서 재개가 안 되는 사례가 있다.
        멈추고 현재 조각 번호를 붙잡아 뒀다가 거기서 다시 읽는 편이 확실하다. */
@@ -478,7 +541,7 @@ export function useRegulationReader(regulationId: string) {
     articles, loadError, status, rate, setRate,
     voices, voiceURI, setVoiceURI, usingRecorded,
     current, chunks: chunksRef.current, chunkIdx,
-    play, pause, resume, stop, jump,
+    play, pause, resume, stop, jump, seek,
     total: articles?.length ?? 0, index: artIdx,
   };
 }

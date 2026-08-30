@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, X } from 'lucide-react';
-import { useRegulationReader } from '../hooks/useRegulationReader';
+import { useRegulationReader, articleTitle } from '../hooks/useRegulationReader';
 import styles from './RegulationReader.module.css';
 
 interface Props {
@@ -18,7 +18,16 @@ const SPEEDS = [0.8, 1, 1.2, 1.5];
 
 export default function RegulationReader({ regulationId, startArticle, onClose, onArticleChange }: Props) {
   const r = useRegulationReader(regulationId);
-  const { current, status, chunks, chunkIdx } = r;
+  const { current, status, chunks, chunkIdx, articles, seek } = r;
+
+  /* 열자마자 «보던 조문» 을 띄운다. 이걸 안 하면 재생을 누르기 전까지 늘 제1조가 보여
+     "재생을 누르면 이 조문부터" 라는 안내와 어긋난다. 조문 목록이 오면 한 번만 맞춘다. */
+  const seeded = useRef(false);
+  useEffect(() => {
+    if (seeded.current || !articles || startArticle == null) return;
+    seeded.current = true;
+    seek(startArticle);
+  }, [articles, startArticle, seek]);
 
   // 재생 중일 때만 본문을 따라 스크롤한다. 열자마자(idle) 통지하면 보던 자리를 잃고
   // 무조건 제1조로 튀어 버린다 — 읽기 시작한 조문부터 따라가야 한다.
@@ -51,7 +60,7 @@ export default function RegulationReader({ regulationId, startArticle, onClose, 
     <div className={styles.panel} role="region" aria-label="규정 음성 읽기">
       <div className={styles.nowRow}>
         <span className={styles.nowArt}>
-          {current ? `제${current.n}조 ${current.title}` : '읽을 조문이 없어요'}
+          {current ? `제${current.n}조 ${articleTitle(current.title)}`.trim() : '읽을 조문이 없어요'}
         </span>
         <span className={styles.nowCount}>{r.index + 1}/{r.total}</span>
         <button type="button" className={styles.closeBtn} onClick={() => { r.stop(); onClose(); }} aria-label="음성 읽기 닫기">

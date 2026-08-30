@@ -302,10 +302,17 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       });
       const data = await res.json();
       if (!res.ok) { showToast(data?.message ?? '저장하지 못했어요'); return; }
-      showToast(`${fmtDate(from)}부터 ${who.n} → ${needsDuty && duty ? DUTY_LABEL[duty] : WORK_TYPE_LABEL[work]}`);
+      const what = needsDuty && duty ? DUTY_LABEL[duty] : WORK_TYPE_LABEL[work];
+      showToast(
+        data?.replacedCount > 0
+          ? `${fmtDate(from)}부터 ${who.n} → ${what} (이전 예약을 고쳤어요)`
+          : `${fmtDate(from)}부터 ${who.n} → ${what}`,
+      );
       setWho(null);
+      // 순서가 중요하다 — 먼저 명부(모듈 값)를 새로 받고, 그 다음 목록을 다시 그린다.
+      // 반대로 하면 목록이 예전 명부로 계산돼 방금 넣은 것이 바로 안 보인다.
+      await syncRosterChanges();
       load();
-      syncRosterChanges();
     } catch {
       showToast('저장하지 못했어요. 연결을 확인해주세요');
     } finally {
@@ -322,8 +329,8 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       const data = await res.json();
       if (!res.ok) { showToast(data?.message ?? '취소하지 못했어요'); return; }
       showToast('예약을 취소했어요');
+      await syncRosterChanges();   // 명부를 먼저 되돌리고 목록을 다시 그린다
       load();
-      syncRosterChanges();
     } catch {
       showToast('취소하지 못했어요. 연결을 확인해주세요');
     }

@@ -212,21 +212,38 @@ export async function POST(req: NextRequest) {
       .eq('status', 'active');
     const rows = (existing as Pick<DbRow, 'id' | 'subject_sabun' | 'subject_name' | 'slot_index' | 'effective_from' | 'vacancy_name'>[] | null) ?? [];
 
-    if (rows.some((r) => r.subject_sabun === body.s && r.effective_from.slice(0, 10) === body.from)) {
-      return errorResponse(ERROR_CODES.CONFLICT, '이 사람은 그 날짜에 이미 예약이 있어요');
-    }
-    if (body.I && rows.some((r) => r.slot_index === body.I && r.effective_from.slice(0, 10) === body.from)) {
-      return errorResponse(ERROR_CODES.CONFLICT, '같은 자리에 같은 시행일 예약이 이미 있어요');
-    }
-    // 다른 예약이 이미 그 사람을 기관사로 앉혀 두었는데 또 다른 자리에 앉히려는 경우
+    /**
+     * 같은 사람·같은 날짜(또는 같은 자리·같은 날짜)에 이미 예약이 있으면 **새것이 대신한다**.
+     *
+     * 전에는 «이미 예약이 있어요» 로 막았다. 그런데 고쳐 넣는 일이 잦다 —
+     * 업무만 넣었다가 직급을 더하거나, 자리를 잘못 골라 다시 넣거나.
+     * 막아 두면 관리자가 먼저 지우고 다시 넣어야 했다(진호 2026-08-30 지시).
+     * 한 날짜에 두 줄이 남으면 어느 쪽이 이길지 알 수 없으므로, 옛것은 치운다.
+     */
+    const sameDay = (r: { effective_from: string }) => r.effective_from.slice(0, 10) === body.from;
+    const superseded = rows.filter(
+      (r) => sameDay(r) && (r.subject_sabun === body.s || (!!body.I && r.slot_index === body.I)),
+    );
+    const supersededIds = new Set(superseded.map((r) => r.id));
+    const others = rows.filter((r) => !supersededIds.has(r.id));
+
+    // 아래 검사들은 «대신할 것» 을 뺀 나머지와만 비교한다 — 자기 자신과 부딪힐 수는 없다
     if (body.work === 'driver') {
-      const dup = rows.find((r) => r.subject_sabun === body.s && r.slot_index && r.slot_index !== body.I);
+      const dup = others.find((r) => r.subject_sabun === body.s && r.slot_index && r.slot_index !== body.I);
       if (dup) {
         return errorResponse(ERROR_CODES.CONFLICT, `${body.n}은(는) 이미 ${dup.slot_index}번 자리로 예약돼 있어요`);
       }
     }
-    if (leavingDriver && vacancy && rows.some((r) => r.vacancy_name === vacancy.name)) {
+    if (leavingDriver && vacancy && others.some((r) => r.vacancy_name === vacancy.name)) {
       return errorResponse(ERROR_CODES.CONFLICT, `${vacancy.name}은 다른 예약이 이미 쓰고 있어요`);
+    }
+
+    // 옛 예약을 먼저 치운다 — 남겨 두면 유일 인덱스에 걸려 새것이 못 들어간다
+    if (supersededIds.size > 0) {
+      await serverSupabase
+        .from('roster_changes')
+        .update({ status: 'deleted', updated_at: new Date().toISOString() })
+        .in('id', [...supersededIds]);
     }
 
     // slot_before 는 서버가 채운다 — 화면이 보내온 값을 믿으면 자리를 잘못 짚어도 통과한다
@@ -257,11 +274,16 @@ export async function POST(req: NextRequest) {
     await auditLog(auth.sub, auth.name, 'roster_change_add', {
       targetType: 'roster_changes',
       targetId: String((data as DbRow).id),
-      metadata: { name: body.n, sabun: body.s, work: body.work, rank, duty, I: body.I, from: body.from },
+      metadata: {
+        name: body.n, sabun: body.s, work: body.work, rank, duty, I: body.I, from: body.from,
+        // 무엇을 대신했는지 남긴다 — 조용히 덮어쓴 것으로 보이지 않게
+        replaced: superseded.map((r) => ({ id: r.id, name: r.subject_name, I: r.slot_index })),
+      },
       ip: getClientIP(req),
     });
 
-    return okJson({ change: toChange(data as DbRow) });
+    // replacedCount 로 화면이 «고쳐 넣었다» 고 말해 줄 수 있다
+    return okJson({ change: toChange(data as DbRow), replacedCount: superseded.length });
   } catch (e) {
     return internalError(e, 'roster/changes POST');
   }

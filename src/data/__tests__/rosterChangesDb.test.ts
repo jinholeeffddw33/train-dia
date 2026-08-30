@@ -142,6 +142,37 @@ describe('관리자 모드 인사 변경 — 기관사에서 빠진다', () => {
   });
 });
 
+describe('같은 날 다시 넣으면 새것이 이긴다', () => {
+  /**
+   * 서버는 같은 사람·같은 날짜의 옛 예약을 지우고 새것을 넣는다(고쳐 넣기).
+   * 만에 하나 둘이 남더라도 «나중에 온 것» 이 이겨야 화면과 명부가 어긋나지 않는다.
+   */
+  it('업무만 넣었다가 직급을 더해도 둘 다 남는다', () => {
+    setDbRosterChanges([
+      c({ from: '2027-03-01', n: '김민정', s: '21715676', work: 'office', duty: 'seomu' }),
+      c({ from: '2027-03-01', n: '김민정', s: '21715676', work: 'office', duty: 'seomu', rank: 'daeri' }),
+    ]);
+    expect(dutyOf('21715676', day('2027-03-01'))).toBe('seomu');
+    expect(rankOf('21715676', day('2027-03-01'))).toBe('daeri');
+  });
+
+  it('같은 날 업무를 바꿔 넣으면 나중 것이 이긴다', () => {
+    setDbRosterChanges([
+      c({ from: '2027-03-01', n: '강병우', s: '21714898', work: 'office', duty: 'jido_gisa' }),
+      c({ from: '2027-03-01', n: '강병우', s: '21714898', work: 'office', duty: 'jido_bujang' }),
+    ]);
+    expect(dutyOf('21714898', day('2027-03-01'))).toBe('jido_bujang');
+  });
+
+  it('같은 자리를 다시 채워 넣으면 나중 사람이 앉는다', () => {
+    setDbRosterChanges([
+      c({ from: '2027-03-01', I: '55', n: '먼저', s: '99911111', work: 'driver' }),
+      c({ from: '2027-03-01', I: '55', n: '나중', s: '99922222', work: 'driver' }),
+    ]);
+    expect(getRoster(day('2027-03-01')).find((p) => p.I === '55')?.n).toBe('나중');
+  });
+});
+
 describe('명부에 올릴 자격 — 교번표에 근거가 있는 것만', () => {
   /** 명부 관리 화면의 «기관사» 칸이 쓰는 조건과 같다 */
   const driverColumn = (at: Date) =>

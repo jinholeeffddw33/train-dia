@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, BarChart3 } from 'lucide-react';
+import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, BarChart3, Users } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -17,6 +17,7 @@ import AlarmSettings from './AlarmSettings';
 import ShortcutsOverlay from './ShortcutsOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminDashboard from './AdminDashboard';
+import RosterAdmin from './RosterAdmin';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { showToast } from '@/components/common/Toast';
@@ -48,6 +49,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
   const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
   const [adminDashOpen, setAdminDashOpen] = useState(false);
+  const [rosterAdminOpen, setRosterAdminOpen] = useState(false);
   const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [curPin, setCurPin] = useState('');
@@ -58,15 +60,16 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
   // 하위 오버레이가 열려 있으면 뒤로가기/ESC 는 그것부터 닫는다 (설정은 마지막)
   const anySub = shortcutsOpen || pinChangeOpen || installGuideOpen
-    || adminFeedbackOpen || adminDashOpen || levelRecordsOpen;
+    || adminFeedbackOpen || adminDashOpen || rosterAdminOpen || levelRecordsOpen;
   const closeSub = useCallback(() => {
     if (shortcutsOpen) setShortcutsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
     else if (adminFeedbackOpen) setAdminFeedbackOpen(false);
     else if (adminDashOpen) setAdminDashOpen(false);
+    else if (rosterAdminOpen) setRosterAdminOpen(false);
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
-  }, [shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminDashOpen, levelRecordsOpen]);
+  }, [shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminDashOpen, rosterAdminOpen, levelRecordsOpen]);
 
   useHistoryBack('settings', onClose, open && !anySub);
   useHistoryBack('settings-sub', closeSub, anySub);
@@ -234,6 +237,10 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
             <button type="button" className={styles.tile} data-press onClick={() => setAdminFeedbackOpen(true)}>
               <span className={`${styles.tileIcon} ${styles.toolIconPurple}`}><ClipboardList size={18} /></span>
               <span className={styles.tileLabel}>제보 목록</span>
+            </button>
+            <button type="button" className={styles.tile} data-press onClick={() => setRosterAdminOpen(true)}>
+              <span className={`${styles.tileIcon} ${styles.toolIconGreen}`}><Users size={18} /></span>
+              <span className={styles.tileLabel}>명부 관리</span>
             </button>
           </>
         )}
@@ -490,6 +497,10 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
       {/* 관리자 현황판 */}
       {adminDashOpen && (
         <AdminDashboard onClose={() => setAdminDashOpen(false)} />
+      )}
+
+      {rosterAdminOpen && (
+        <RosterAdmin onClose={() => setRosterAdminOpen(false)} />
       )}
 
       {/* 관리자 제보 목록 오버레이 */}

@@ -1971,3 +1971,239 @@
 }
 .privacyLink:active { transform: scale(0.95); }
 .privacyLink:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+
+/* ─────────────────────────────────────────────
+   명부 관리 (관리자 모드) — RosterAdmin
+   ───────────────────────────────────────────── */
+
+/* 고른 자리를 위에 크게 — 누구를 바꾸는지 놓치면 근무표가 통째로 틀어진다 */
+.rosterTarget {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface-hover);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+}
+
+.rosterTargetNo {
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  color: var(--dia-blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.rosterTargetDia {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.rosterTargetName {
+  margin-left: auto;
+  font-size: var(--dia-text-lg);
+  font-weight: 700;
+  color: var(--dia-text-primary);
+}
+
+.rosterField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+
+.rosterFieldLabel {
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-text-secondary);
+}
+
+.rosterInput {
+  width: 100%;
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-surface);
+  border: 2px solid var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  outline: none;
+}
+
+.rosterInput:focus {
+  border-color: var(--dia-blue);
+  box-shadow: 0 0 0 3px var(--dia-blue-dim);
+}
+
+.rosterHintOk,
+.rosterHintBad {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  margin: 0;
+}
+
+.rosterHintOk { color: var(--dia-green); }
+.rosterHintBad { color: var(--dia-red); }
+
+/* 넣기 직전 «누구 자리에 누가» 를 문장으로 다시 보여준다 */
+.rosterConfirm {
+  padding: var(--dia-space-3) var(--dia-space-4);
+  background: var(--dia-blue-dim);
+  border-radius: var(--dia-radius-md);
+  font-size: var(--dia-text-sm);
+  line-height: 1.6;
+  color: var(--dia-text-primary);
+  margin: 0;
+}
+
+.rosterSave {
+  padding: var(--dia-space-4);
+  font-size: var(--dia-text-base);
+  cursor: pointer;
+}
+
+/* 못 넣는 상태를 눈으로 알 수 있어야 한다 — 안 그러면 눌러 놓고 왜 안 되나 헤맨다 */
+.rosterSave:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 찾기 */
+.rosterSearch {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-text-tertiary);
+}
+
+.rosterSearchInput {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+}
+
+/* 명부 목록 */
+.rosterList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+  max-height: 420px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rosterRowBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+  cursor: pointer;
+  text-align: left;
+}
+
+.rosterRowNo {
+  min-width: 32px;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.rosterRowDia {
+  min-width: 44px;
+  font-size: var(--dia-text-xs);
+  font-weight: 600;
+  color: var(--dia-blue);
+}
+
+.rosterRowName {
+  font-size: var(--dia-text-sm);
+  font-weight: 500;
+  color: var(--dia-text-primary);
+}
+
+.rosterRowSabun {
+  margin-left: auto;
+  font-size: var(--dia-text-xs);
+  color: var(--dia-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 이 자리에 예약이 걸려 있음 — 목록에서 바로 보이게 */
+.rosterRowBadge {
+  margin-left: auto;
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-sm);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  font-size: var(--dia-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* 예약 목록 */
+.rosterPendingList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rosterPendingItem {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-sm);
+}
+
+.rosterPendingMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rosterPendingDate {
+  font-size: var(--dia-text-xs);
+  font-weight: 600;
+  color: var(--dia-blue);
+}
+
+.rosterPendingBody {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+}
+
+.rosterPendingDel {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  border-radius: var(--dia-radius-sm);
+  color: var(--dia-text-tertiary);
+  cursor: pointer;
+}

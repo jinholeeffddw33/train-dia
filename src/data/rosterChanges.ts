@@ -9,7 +9,10 @@
 //   그렇다고 시행일마다 사람이 배포를 하러 오는 것도 현실적이지 않다.
 //
 // 쓰는 법
-//   1) 아래 배열에 한 줄 추가 (from = 시행일, I = 들어갈 자리, n/s = 들어갈 사람)
+//   ★ 이제 보통은 여기를 고칠 필요가 없다 — 앱의 [설정 → 관리자 → 명부 관리]에서 넣으면
+//     DB(roster_changes)에 저장되고 배포 없이 시행일에 반영된다.
+//   아래 배열은 그 이전에 손으로 적어 둔 것 + DB 가 없을 때의 기본값으로 남는다.
+//   1) 배열에 한 줄 추가 (from = 시행일, I = 들어갈 자리, n/s = 들어갈 사람)
 //   2) 그 사람이 INTERN_USERS / EXTRA_USERS 에 있으면 leaves 를 적는다 → 시행일에 자동 제외
 //   시행일이 지나 완전히 굳으면 cycle.ts 를 직접 고치고 여기서 지워도 된다(선택).
 
@@ -45,15 +48,49 @@ export const ROSTER_CHANGES: RosterChange[] = [
   { from: '2026-08-27', I: '168', n: '한지승', s: '22601004', replaces: '결원09', leaves: 'intern' },
 ];
 
+// ───────────────────────────────────────────────────────────
+// 관리자 모드에서 넣은 예약 (DB) — 앱 시작 때 한 번 채워진다
+//
+// 왜 모듈 변수인가
+//   명부는 getRoster() 로 **동기 호출**되는 자리가 8곳이다(교번 목록·교대자·비교 등).
+//   여기를 전부 비동기로 바꾸면 화면이 잠깐 빈 채로 뜨는 위험이 커진다.
+//   그래서 로그인 관문(AuthGate)에서 화면을 그리기 전에 이 값을 채워 넣고,
+//   그 뒤로는 지금까지처럼 동기로 읽는다.
+// ───────────────────────────────────────────────────────────
+let DB_CHANGES: RosterChange[] = [];
+
+/** 앱 시작 때 서버에서 받은 예약을 심는다 (src/lib/rosterSync.ts 가 호출) */
+export function setDbRosterChanges(list: RosterChange[]): void {
+  DB_CHANGES = list;
+}
+
+/** 지금 앱이 알고 있는 DB 예약 — 관리자 화면 표시용 */
+export function getDbRosterChanges(): RosterChange[] {
+  return DB_CHANGES;
+}
+
+/** 정적 + DB 를 합친 전체 예약. 같은 자리·같은 시행일이면 DB 가 이긴다. */
+export function allChanges(): RosterChange[] {
+  const seen = new Set(DB_CHANGES.map((c) => `${c.I}@${c.from}`));
+  return [...ROSTER_CHANGES.filter((c) => !seen.has(`${c.I}@${c.from}`)), ...DB_CHANGES];
+}
+
 /** KST 기준 오늘 날짜 문자열 — 시행일 비교용 */
 function todayKST(at: Date = new Date()): string {
   return new Date(at.getTime() + 9 * 3600_000).toISOString().slice(0, 10);
 }
 
-/** 해당 시점에 이미 시행된 변경만 */
+/**
+ * 해당 시점에 이미 시행된 변경만 — 시행일 오름차순.
+ *
+ * 정렬이 중요한 이유: 한 자리가 여러 번 바뀌었으면(A→B→C) 마지막 것이 이겨야 한다.
+ * applyRosterChanges 가 Map 에 덮어쓰는 방식이라 **뒤에 오는 것이 이긴다**.
+ */
 export function activeChanges(at: Date = new Date()): RosterChange[] {
   const today = todayKST(at);
-  return ROSTER_CHANGES.filter((c) => c.from <= today);
+  return allChanges()
+    .filter((c) => c.from <= today)
+    .sort((a, b) => a.from.localeCompare(b.from));
 }
 
 /** P 에 시행된 변경을 반영한 명부. 원본 배열은 건드리지 않는다. */

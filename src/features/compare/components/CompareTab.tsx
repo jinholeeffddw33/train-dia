@@ -12,7 +12,8 @@ import { showToast } from '@/components/common/Toast';
 import type { Person } from '@/lib/types';
 import styles from '../styles/Compare.module.css';
 
-const P_SORTED = getRoster().sort((a, b) => a.n.localeCompare(b.n, 'ko'));
+// 파일이 읽히는 순간 굳혀 두면 관리자가 넣은 명부 변경이 반영되지 않는다 → 부를 때 계산
+const sortedRoster = () => getRoster().sort((a, b) => a.n.localeCompare(b.n, 'ko'));
 
 const MIN_COUNT = 2;
 const MAX_COUNT = 20;
@@ -117,9 +118,10 @@ export default function CompareTab() {
   }, [persons, year, month, isCurrentMonth, today]);
 
   const filteredPersons = useMemo(() => {
-    if (!searchQuery.trim()) return P_SORTED;
+    const all = sortedRoster();
+    if (!searchQuery.trim()) return all;
     const q = searchQuery.trim().toLowerCase();
-    return P_SORTED.filter((p) => p.n.toLowerCase().includes(q) || p.I.includes(q));
+    return all.filter((p) => p.n.toLowerCase().includes(q) || p.I.includes(q));
   }, [searchQuery]);
 
   const openSelector = () => {

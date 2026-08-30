@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore, type SabunStatus } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { getDuplicateNameGroup } from '@/lib/auth';
+import { syncRosterChanges } from '@/lib/rosterSync';
 import { KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import styles from './AuthGate.module.css';
 
@@ -28,6 +29,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   const [screen, setScreen] = useState<Screen>('loading');
   const [sessionChecked, setSessionChecked] = useState(false);
+  /** 명부 변경 예약(관리자 모드)까지 받아왔는가 — 이게 끝나야 맞는 이름으로 화면을 그린다 */
+  const [rosterReady, setRosterReady] = useState(false);
 
   // 사번 입력
   const [sabun, setSabun] = useState('');
@@ -48,13 +51,24 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // ── 앱 시작 시 세션 확인 + 온라인 복귀 시 재검증(오프라인 그레이스 해제) ──
   useEffect(() => {
     checkSession().then(() => setSessionChecked(true));
-    const handleOnline = () => { checkSession(); };
+    const handleOnline = () => { checkSession(); syncRosterChanges(); };
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
   }, [checkSession]);
 
-  // ── 로그인 성공 시 driver store 연동 ──
+  // ── 로그인되면 명부 변경 예약을 받아 심는다 (화면을 그리기 전에) ──
+  //    실패해도 rosterReady 는 true 로 둔다 — 명부를 못 받았다고 앱을 못 쓰면 더 나쁘다
   useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    syncRosterChanges().finally(() => { if (alive) setRosterReady(true); });
+    return () => { alive = false; };
+  }, [user]);
+
+  // ── 로그인 성공 시 driver store 연동 ──
+  //    명부를 받은 뒤에 해야 한다 — 먼저 하면 발령 전 이름으로 «내 교번»이 잡힌다
+  useEffect(() => {
+    if (!rosterReady) return;
     if (user?.sabun) {
       const { myDriver, setMyDriverById, setMyDriverBySabun, setMyDriver } = useDriverStore.getState();
       if (!myDriver || myDriver.s !== user.sabun || myDriver.n !== user.name) {
@@ -71,7 +85,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         }
       }
     }
-  }, [user]);
+  }, [user, rosterReady]);
 
   // ── 세션 확인 후 화면 결정 ──
   useEffect(() => {
@@ -87,13 +101,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     }
   }, [sessionChecked, user, lastSabun]);
 
-  // ── 인증 완료 → 앱 렌더 ──
-  if (user && screen !== 'pin-setup') {
+  // ── 인증 완료 → 앱 렌더 (명부까지 받은 뒤) ──
+  if (user && screen !== 'pin-setup' && rosterReady) {
     return <>{children}</>;
   }
 
   // ── 로딩 ──
-  if (screen === 'loading' || !sessionChecked) {
+  if (screen === 'loading' || !sessionChecked || (user && !rosterReady)) {
     return (
       <div className={styles.gate}>
         <div className={styles.card}>

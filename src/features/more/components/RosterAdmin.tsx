@@ -118,6 +118,21 @@ function vacancyNoOf(name: string): number | null {
   return m ? parseInt(m[1], 10) : null;
 }
 
+/** 실제 교번을 가진 사람인가 — 이태원(W5)처럼 d='내근' 인 자리는 기관사가 아니다 */
+function hasRealDia(p: Person): boolean {
+  return !!p.d && p.d !== '내근';
+}
+
+/**
+ * 교번표에 실제로 있는 결원 번호 전부.
+ *
+ * 지어낸 번호(결원39 같은 것)를 쓰면 교번표에 없는 결원이 앱에만 생긴다.
+ * 그래서 새 결원도 «원래 교번표에 있던 번호» 중에서만 고르게 한다.
+ */
+const REAL_VACANCY_NOS: number[] = [
+  ...new Set(P.map((p) => vacancyNoOf(p.n)).filter((n): n is number => n !== null)),
+].sort((a, b) => a - b);
+
 export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   const [changes, setChanges] = useState<RosterChange[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,10 +170,12 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   // ── 전 직원 = 기관사 + 내근 + 인턴, 각 묶음 안에서 가나다순 ──
   const members = useMemo<Member[]>(() => {
     const ko = (a: Member, b: Member) => a.n.localeCompare(b.n, 'ko');
-    // 결원은 사람이 아니라 «빈 자리»다 — 명단에 섞이면 누를 것이 없는 줄이 생긴다.
-    // 빈 자리는 «기관사가 될 자리» 고르는 곳에서만 보여준다.
+    // 기관사 칸에는 «실제 교번이 있는 사람» 만 올린다.
+    //   · 결원은 사람이 아니라 빈 자리다 — 빈 자리는 «갈 자리» 고르는 곳에서만 보여준다
+    //   · 이태원(W5)은 교번이 d='내근' 이라 기관사가 아니다. 내근 칸에 이미 있어
+    //     걸러내지 않으면 한 사람이 양쪽에 두 번 나온다
     const drivers = getRoster()
-      .filter((p) => !/^결원/.test(p.n))
+      .filter((p) => !/^결원/.test(p.n) && hasRealDia(p))
       .map<Member>((p) => ({ n: p.n, s: p.s ?? '', group: 'driver', I: p.I, rank: null, duty: null }));
     const office = officeUsers().map<Member>((u) => ({
       n: u.n, s: u.s ?? '', group: 'office', rank: rankOf(u.s ?? ''), duty: dutyOf(u.s ?? ''),
@@ -188,12 +205,15 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     [changes],
   );
 
-  /** 아직 안 쓰는 결원 번호 — 자리를 비울 때 붙일 번호 */
+  /**
+   * 지금 붙일 수 있는 결원 번호 — 교번표에 원래 있던 번호 중 아무도 안 쓰는 것.
+   * 사람이 들어와 이름이 놀고 있는 번호(예: 결원04)를 다시 쓰는 것이다.
+   */
   const freeVacancyNos = useMemo(() => {
     const used = new Set<number>();
     for (const p of getRoster()) { const no = vacancyNoOf(p.n); if (no !== null) used.add(no); }
     for (const c of changes) { const no = c.vacancyName ? vacancyNoOf(c.vacancyName) : null; if (no !== null) used.add(no); }
-    return Array.from({ length: 60 }, (_, i) => i + 1).filter((n) => !used.has(n));
+    return REAL_VACANCY_NOS.filter((n) => !used.has(n));
   }, [changes]);
 
   const pick = (m: Member) => {
@@ -393,19 +413,25 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
           {isLeavingDriver && (
             <section className={styles.rosterStep}>
               <h3 className={styles.rosterStepTitle}>{who.I}번 자리는 몇 번 결원이 되나요?</h3>
-              <div className={styles.rosterChips}>
-                {freeVacancyNos.slice(0, 30).map((no) => (
-                  <button
-                    key={no}
-                    type="button"
-                    className={`${styles.rosterChip} ${vacancyNo === no ? styles.rosterChipOn : ''}`}
-                    data-press
-                    onClick={() => setVacancyNo(no)}
-                  >
-                    결원{String(no).padStart(2, '0')}
-                  </button>
-                ))}
-              </div>
+              {freeVacancyNos.length === 0 ? (
+                <p className={styles.rosterHintBad}>
+                  <AlertTriangle size={14} /> 교번표의 결원 번호를 모두 쓰고 있어요. 다른 예약을 먼저 정리해주세요
+                </p>
+              ) : (
+                <div className={styles.rosterChips}>
+                  {freeVacancyNos.map((no) => (
+                    <button
+                      key={no}
+                      type="button"
+                      className={`${styles.rosterChip} ${vacancyNo === no ? styles.rosterChipOn : ''}`}
+                      data-press
+                      onClick={() => setVacancyNo(no)}
+                    >
+                      결원{String(no).padStart(2, '0')}
+                    </button>
+                  ))}
+                </div>
+              )}
             </section>
           )}
 

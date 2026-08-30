@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { errorResponse, okJson, internalError, parseBody, ERROR_CODES } from '@/lib/api/response';
-import { P } from '@/data/cycle';
+import { P, getRoster } from '@/data/cycle';
 import type { Duty, RosterChange, StaffRank, WorkType } from '@/data/rosterChanges';
 
 interface DbRow {
@@ -104,6 +104,15 @@ function vacancyOf(no: number) {
   return { name: `결원${nn}`, sabun: `9G0109${nn}` };
 }
 
+/**
+ * 교번표에 실제로 있는 결원 번호.
+ * 화면에서도 이 안에서만 고르게 하지만, 서버가 다시 막는다 —
+ * 지어낸 번호가 들어오면 교번표에 없는 결원이 앱에만 생긴다.
+ */
+const REAL_VACANCY_NOS: ReadonlySet<number> = new Set(
+  P.map((p) => /^결원(\d+)$/.exec(p.n)).filter(Boolean).map((m) => parseInt(m![1], 10)),
+);
+
 // ── POST: 변경 넣기 (관리자만) ──
 export async function POST(req: NextRequest) {
   const auth = await requireAuth(req);
@@ -118,6 +127,10 @@ export async function POST(req: NextRequest) {
   const parsed = await parseBody(req, PostSchema);
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
+
+  // 검사는 «지금 명부» 로 한다 — 정적 P 는 발령이 반영되기 전이라, 이미 사람이 들어와
+  // 이름이 놀고 있는 결원(예: 결원04)을 아직 쓰이는 것으로 잘못 판정한다
+  const roster = getRoster();
 
   // 기관사·인턴은 직급을 쓰지 않는다 — 남겨 두면 «기관사 부장님» 이 된다
   const rank = body.work === 'driver' || body.work === 'intern' ? null : (body.rank ?? null);
@@ -140,22 +153,35 @@ export async function POST(req: NextRequest) {
   // ① 그 자리가 실제로 있는가 — 없는 순번을 넣으면 아무 일도 안 일어나고 조용히 묻힌다
   let slot: (typeof P)[number] | undefined;
   if (body.I) {
-    slot = P.find((p) => p.I === body.I);
+    slot = roster.find((p) => p.I === body.I);
     if (!slot) return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번 자리는 명부에 없어요`);
   }
 
-  // ② 기관사가 되는데 그 사번이 이미 다른 자리에 있는가 — 한 사람이 두 교번을 가지면 근무표가 깨진다
+  // ② 기관사는 «실제 교번이 있는 자리» 에만 앉는다 — 이태원(W5)처럼 d='내근' 인 자리는 교번이 아니다
+  if (body.work === 'driver' && slot && (!slot.d || slot.d === '내근')) {
+    return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번은 교번이 있는 자리가 아니에요`);
+  }
+
+  // 기관사가 되는데 그 사번이 이미 다른 자리에 있는가 — 한 사람이 두 교번을 가지면 근무표가 깨진다
   if (body.work === 'driver') {
-    const dup = P.find((p) => p.s === body.s && p.I !== body.I);
+    const dup = roster.find((p) => p.s === body.s && p.I !== body.I);
     if (dup) {
       return errorResponse(ERROR_CODES.CONFLICT, `${body.s}는 이미 ${dup.I}번 ${dup.n}입니다`);
     }
   }
 
+  // ③ 교번표에 없는 결원 번호는 받지 않는다 — 앱에만 있는 결원이 생긴다
+  if (body.vacancyNo !== undefined && !REAL_VACANCY_NOS.has(body.vacancyNo)) {
+    return errorResponse(
+      ERROR_CODES.BAD_REQUEST,
+      `결원${String(body.vacancyNo).padStart(2, '0')}은 교번표에 없는 번호예요`,
+    );
+  }
+
   const vacancy = body.vacancyNo !== undefined ? vacancyOf(body.vacancyNo) : null;
 
-  // ③ 결원 번호가 이미 쓰이고 있는가 — 결원06 이 둘이면 어느 자리인지 알 수 없다
-  if (leavingDriver && vacancy && P.some((p) => p.n === vacancy.name && p.I !== body.I)) {
+  // ④ 결원 번호가 이미 쓰이고 있는가 — 결원06 이 둘이면 어느 자리인지 알 수 없다
+  if (leavingDriver && vacancy && roster.some((p) => p.n === vacancy.name && p.I !== body.I)) {
     return errorResponse(ERROR_CODES.CONFLICT, `${vacancy.name}은 이미 쓰이고 있어요`);
   }
 

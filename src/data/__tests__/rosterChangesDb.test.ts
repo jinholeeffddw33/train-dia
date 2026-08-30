@@ -140,6 +140,45 @@ describe('관리자 모드 인사 변경 — 기관사에서 빠진다', () => {
   });
 });
 
+describe('명부에 올릴 자격 — 교번표에 근거가 있는 것만', () => {
+  /** 명부 관리 화면의 «기관사» 칸이 쓰는 조건과 같다 */
+  const driverColumn = (at: Date) =>
+    getRoster(at).filter((p) => !/^결원/.test(p.n) && !!p.d && p.d !== '내근');
+
+  it('교번이 없는 사람은 기관사가 아니다 — 이태원(W5)은 d=내근', () => {
+    const w5 = P.find((p) => p.I === 'W5');
+    expect(w5?.d).toBe('내근');                                     // 전제가 깨지면 알려야 한다
+    expect(driverColumn(day('2026-09-01')).some((p) => p.I === 'W5')).toBe(false);
+  });
+
+  it('기관사 칸과 내근 명단에 같은 사람이 두 번 나오지 않는다', () => {
+    const at = day('2026-09-01');
+    const office = new Set(officeUsers(at).map((u) => u.s));
+    const both = driverColumn(at).filter((p) => p.s && office.has(p.s));
+    expect(both.map((p) => `${p.I} ${p.n}`)).toEqual([]);
+  });
+
+  it('통상근무 기관사(W1~W4)는 교번이 있으므로 남는다', () => {
+    const col = driverColumn(day('2026-09-01'));
+    for (const I of ['W1', 'W2', 'W3', 'W4']) {
+      expect(col.some((p) => p.I === I)).toBe(true);
+    }
+  });
+
+  it('결원 번호는 교번표에 있는 것뿐이다 — 지어낸 번호가 없다', () => {
+    const real = new Set(
+      P.map((p) => /^결원(\d+)$/.exec(p.n)).filter(Boolean).map((m) => parseInt(m![1], 10)),
+    );
+    expect([...real].sort((a, b) => a - b)).toEqual([1, 3, 4, 5, 6, 7, 8, 9, 10, 21, 22, 23, 26, 27, 28]);
+
+    // 지금 비어 있는 결원은 전부 그 안에 있어야 한다
+    for (const p of getRoster(day('2026-09-01'))) {
+      const m = /^결원(\d+)$/.exec(p.n);
+      if (m) expect(real.has(parseInt(m[1], 10))).toBe(true);
+    }
+  });
+});
+
 describe('관리자 모드 인사 변경 — 업무', () => {
   it('기관사가 업무를 맡으면 내근 명단으로 오고 업무가 붙는다', () => {
     setDbRosterChanges([c({

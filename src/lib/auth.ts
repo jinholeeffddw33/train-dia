@@ -1,5 +1,8 @@
 import { P, getRoster } from '@/data/cycle';
-import { departedSabuns, joinedUsers, activeRanks, RANK_LABEL, type StaffRank } from '@/data/rosterChanges';
+import {
+  departedSabuns, joinedUsers, activeRanks, activeDuties, RANK_LABEL,
+  type StaffRank, type Duty,
+} from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 
 /**
@@ -345,9 +348,23 @@ const JIWON_GIGWANSA_SABUNS: ReadonlySet<string> = new Set([
   '21713547', // 한태환
 ]);
 
-/** 지원기관사 여부 (8명) — 대기충당현황 등 지원업무 자료를 관리한다 */
+/**
+ * 그 사람의 업무 — 관리자 모드에서 바꾼 것이 있으면 그것이 이긴다.
+ *
+ * 아래 사번 목록들은 «처음 값»이다. [관리자 모드 → 명부 관리]에서 업무를 바꾸면
+ * 배포 없이 이 함수의 답이 바뀌고, 지원기관사 권한 등이 따라온다.
+ */
+export function dutyOf(sabun: string | undefined | null, at: Date = new Date()): Duty | null {
+  if (!sabun) return null;
+  const changed = activeDuties(at);
+  if (changed.has(sabun)) return changed.get(sabun) ?? null;
+  if (JIWON_GIGWANSA_SABUNS.has(sabun)) return 'jiwon_gisa';
+  return null;
+}
+
+/** 지원기관사 여부 — 대기충당현황 등 지원업무 자료를 관리한다 */
 export function isJiwonGigwansa(sabun: string | undefined | null): boolean {
-  return !!sabun && JIWON_GIGWANSA_SABUNS.has(sabun);
+  return dutyOf(sabun) === 'jiwon_gisa';
 }
 
 /**

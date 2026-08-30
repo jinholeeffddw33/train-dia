@@ -26,10 +26,10 @@ import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { getRoster, P } from '@/data/cycle';
 import { syncRosterChanges } from '@/lib/rosterSync';
-import { officeUsers, internUsers, rankOf } from '@/lib/auth';
+import { officeUsers, internUsers, rankOf, dutyOf } from '@/lib/auth';
 import {
-  WORK_TYPE_LABEL, RANK_LABEL, RANK_ORDER,
-  type RosterChange, type StaffRank, type WorkType,
+  WORK_TYPE_LABEL, RANK_LABEL, RANK_ORDER, DUTY_LABEL, DUTY_ORDER,
+  type Duty, type RosterChange, type StaffRank, type WorkType,
 } from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 import styles from '../styles/More.module.css';
@@ -44,14 +44,38 @@ interface Member {
   /** 기관사면 그 자리(P.I) */
   I?: string;
   rank: StaffRank | null;
+  duty: Duty | null;
 }
 
 const GROUP_LABEL: Record<Group, string> = { driver: '기관사', office: '내근', intern: '인턴' };
 
-/** 기관사가 아닌 상태들 — 기관사인 사람에게 보여줄 선택지 */
+/** 두 단 배치 — 왼쪽은 기관사, 오른쪽은 내근(인턴은 그 아래) */
+const COLUMNS: [string, Group[]][] = [
+  ['left', ['driver']],
+  ['right', ['office', 'intern']],
+];
+
+/**
+ * 고를 수 있는 근무형태.
+ *
+ * «내근» 이 없는 이유 — 뭉뚱그린 내근 대신 «업무» 를 고르게 한다(업무를 고르면 곧 내근이다).
+ * «인턴» 이 없는 이유 — 이미 직원인 사람이 인턴으로 되돌아갈 수는 없다.
+ */
+const OFFICE_CHIP = 'office' as const;
+/** 기관사인 사람에게 보여줄 선택지 */
 const LEAVING: WorkType[] = ['office', 'leave', 'sick', 'service', 'resign'];
-/** 기관사가 아닌 사람에게 보여줄 선택지 */
-const JOINING: WorkType[] = ['driver', 'office', 'intern', 'leave', 'sick', 'service', 'resign'];
+/** 기관사가 아닌 사람에게 보여줄 선택지 — 기관사로 갈 수 있다 */
+const JOINING: WorkType[] = ['driver', 'office', 'leave', 'sick', 'service', 'resign'];
+
+/** 칩에 쓸 이름 — 내근은 «업무» 라고 보여준다 */
+function chipLabel(w: WorkType): string {
+  return w === OFFICE_CHIP ? '업무' : WORK_TYPE_LABEL[w];
+}
+
+/** 예약 한 줄을 사람 말로 — 내근이면 «내근» 이 아니라 실제 업무 이름을 쓴다 */
+function changeLabel(c: RosterChange): string {
+  return c.work === 'office' && c.duty ? DUTY_LABEL[c.duty] : WORK_TYPE_LABEL[c.work];
+}
 
 function todayKST(): string {
   return new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
@@ -104,6 +128,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   const [who, setWho] = useState<Member | null>(null);
   const [work, setWork] = useState<WorkType | null>(null);
   const [rank, setRank] = useState<StaffRank | null>(null);
+  const [duty, setDuty] = useState<Duty | null>(null);
   const [slotI, setSlotI] = useState<string | null>(null);
   const [vacancyNo, setVacancyNo] = useState<number | null>(null);
   const [from, setFrom] = useState(todayKST());
@@ -134,9 +159,11 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     // 빈 자리는 «기관사가 될 자리» 고르는 곳에서만 보여준다.
     const drivers = getRoster()
       .filter((p) => !/^결원/.test(p.n))
-      .map<Member>((p) => ({ n: p.n, s: p.s ?? '', group: 'driver', I: p.I, rank: null }));
-    const office = officeUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'office', rank: rankOf(u.s ?? '') }));
-    const interns = internUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'intern', rank: null }));
+      .map<Member>((p) => ({ n: p.n, s: p.s ?? '', group: 'driver', I: p.I, rank: null, duty: null }));
+    const office = officeUsers().map<Member>((u) => ({
+      n: u.n, s: u.s ?? '', group: 'office', rank: rankOf(u.s ?? ''), duty: dutyOf(u.s ?? ''),
+    }));
+    const interns = internUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'intern', rank: null, duty: null }));
     return [...drivers.sort(ko), ...office.sort(ko), ...interns.sort(ko)];
     // changes 가 바뀌면 명부도 다시 계산해야 한다
   }, [changes]);
@@ -173,19 +200,22 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     setWho(m);
     setWork(null);
     setRank(m.rank);
+    setDuty(m.duty);
     setSlotI(null);
     setVacancyNo(null);
     setFrom(todayKST());
   };
 
   const isLeavingDriver = who?.group === 'driver' && work !== null && work !== 'driver';
-  // 직급은 내근만 쓴다 — 기관사·인턴은 직급을 표시하지 않고, 휴직·병가·공로연수·퇴사도 물을 일이 없다
+  // 업무·직급은 내근만 쓴다 — 기관사·인턴은 표시하지 않고, 휴직·병가·공로연수·퇴사도 물을 일이 없다
+  const needsDuty = work === 'office';
   const needsRank = work === 'office';
   const needsSlot = work === 'driver' && who?.group !== 'driver';
 
   const canSave =
     !!who && !!work &&
     /^\d{4}-\d{2}-\d{2}$/.test(from) &&
+    (!needsDuty || !!duty) &&
     (!needsSlot || !!slotI) &&
     (!isLeavingDriver || vacancyNo !== null);
 
@@ -199,6 +229,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
         credentials: 'same-origin',
         body: JSON.stringify({
           from, n: who.n, s: who.s, work,
+          ...(needsDuty && duty ? { duty } : {}),
           ...(needsRank && rank ? { rank } : {}),
           ...(needsSlot && slotI ? { I: slotI } : {}),
           ...(isLeavingDriver ? { I: who.I, vacancyNo } : {}),
@@ -206,7 +237,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       });
       const data = await res.json();
       if (!res.ok) { showToast(data?.message ?? '저장하지 못했어요'); return; }
-      showToast(`${fmtDate(from)}부터 ${who.n} → ${WORK_TYPE_LABEL[work]}`);
+      showToast(`${fmtDate(from)}부터 ${who.n} → ${needsDuty && duty ? DUTY_LABEL[duty] : WORK_TYPE_LABEL[work]}`);
       setWho(null);
       load();
       syncRosterChanges();
@@ -247,7 +278,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       open={pendingRemove !== null}
       title="예약 취소"
       message={pendingRemove
-        ? <>{fmtDate(pendingRemove.from)}부터 <strong>{pendingRemove.n}</strong>{eul(pendingRemove.n)} {WORK_TYPE_LABEL[pendingRemove.work]}{ro(WORK_TYPE_LABEL[pendingRemove.work])} 바꾸기로 한 예약을 취소할까요?</>
+        ? <>{fmtDate(pendingRemove.from)}부터 <strong>{pendingRemove.n}</strong>{eul(pendingRemove.n)} {changeLabel(pendingRemove)}{ro(changeLabel(pendingRemove))} 바꾸기로 한 예약을 취소할까요?</>
         : ''}
       confirmLabel="예약 취소하기"
       variant="danger"
@@ -282,15 +313,38 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                   type="button"
                   className={`${styles.rosterChip} ${work === w ? styles.rosterChipOn : ''}`}
                   data-press
-                  onClick={() => { setWork(w); setSlotI(null); setVacancyNo(null); if (w === 'driver' || w === 'intern') setRank(null); }}
+                  onClick={() => {
+                    setWork(w); setSlotI(null); setVacancyNo(null);
+                    if (w !== 'office') { setRank(null); setDuty(null); }
+                  }}
                 >
-                  {WORK_TYPE_LABEL[w]}
+                  {chipLabel(w)}
                 </button>
               ))}
             </div>
           </section>
 
-          {/* 둘째 — 직급 (기관사·인턴은 직급을 쓰지 않는다) */}
+          {/* 둘째 — 업무 («업무» 를 골랐으면 무슨 일인지까지 정해야 한다) */}
+          {needsDuty && (
+            <section className={styles.rosterStep}>
+              <h3 className={styles.rosterStepTitle}>무슨 업무인가요?</h3>
+              <div className={styles.rosterChips}>
+                {DUTY_ORDER.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    className={`${styles.rosterChip} ${duty === d ? styles.rosterChipOn : ''}`}
+                    data-press
+                    onClick={() => setDuty(d)}
+                  >
+                    {DUTY_LABEL[d]}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 셋째 — 직급 (기관사·인턴은 직급을 쓰지 않는다) */}
           {needsRank && (
             <section className={styles.rosterStep}>
               <h3 className={styles.rosterStepTitle}>직급</h3>
@@ -363,16 +417,21 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
             </label>
           )}
 
-          {canSave && work && (
-            <p className={styles.rosterConfirm}>
-              <strong>{fmtDate(from)}</strong>부터 <strong>{who.n}</strong>{eun(who.n)}<br />
-              <strong>{WORK_TYPE_LABEL[work]}</strong>
-              {needsRank && rank ? ` · ${RANK_LABEL[rank]}` : ''}
-              {ro(needsRank && rank ? RANK_LABEL[rank] : WORK_TYPE_LABEL[work])} 바뀝니다
-              {needsSlot && slotI ? ` (${slotI}번 자리로)` : ''}
-              {isLeavingDriver && vacancyNo !== null ? ` (${who.I}번 자리는 결원${String(vacancyNo).padStart(2, '0')})` : ''}
-            </p>
-          )}
+          {canSave && work && (() => {
+            // 내근이면 «내근» 대신 실제 업무 이름으로 말한다 — «내근으로 바뀝니다» 는 아무것도 안 알려준다
+            const head = needsDuty && duty ? DUTY_LABEL[duty] : WORK_TYPE_LABEL[work];
+            const tail = needsRank && rank ? RANK_LABEL[rank] : head;
+            return (
+              <p className={styles.rosterConfirm}>
+                <strong>{fmtDate(from)}</strong>부터 <strong>{who.n}</strong>{eun(who.n)}<br />
+                <strong>{head}</strong>
+                {needsRank && rank ? ` · ${RANK_LABEL[rank]}` : ''}
+                {ro(tail)} 바뀝니다
+                {needsSlot && slotI ? ` (${slotI}번 자리로)` : ''}
+                {isLeavingDriver && vacancyNo !== null ? ` (${who.I}번 자리는 결원${String(vacancyNo).padStart(2, '0')})` : ''}
+              </p>
+            );
+          })()}
 
           <button type="button" className={`z-cta ${styles.rosterSave}`} data-press onClick={save} disabled={!canSave || saving}>
             {saving ? '넣는 중…' : '예약 넣기'}
@@ -388,7 +447,6 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   const upcoming = changes.filter((c) => c.from > today);
   const applied = changes.filter((c) => c.from <= today);
 
-  let lastGroup: Group | null = null;
 
   return (
     <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="명부 관리">
@@ -407,7 +465,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                   <div className={styles.rosterPendingMain}>
                     <span className={styles.rosterPendingDate}>{fmtDate(c.from)}</span>
                     <span className={styles.rosterPendingBody}>
-                      {c.n} → <strong>{WORK_TYPE_LABEL[c.work]}</strong>
+                      {c.n} → <strong>{changeLabel(c)}</strong>
                       {c.rank ? ` · ${RANK_LABEL[c.rank]}` : ''}
                       {c.I ? ` · ${c.I}번` : ''}
                     </span>
@@ -436,34 +494,45 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
           {loading ? (
             <div className={styles.adminEmpty}>불러오는 중…</div>
           ) : (
-            <ul className={styles.rosterList}>
-              {filtered.map((m) => {
-                const head = m.group !== lastGroup ? m.group : null;
-                lastGroup = m.group;
-                const pending = pendingBy.get(m.s);
-                return (
-                  <li key={`${m.group}-${m.s}-${m.n}`}>
-                    {head && (
-                      <p className={styles.rosterGroupHead}>
-                        {GROUP_LABEL[head]} {filtered.filter((x) => x.group === head).length}명
-                      </p>
-                    )}
-                    <button
-                      type="button"
-                      className={`${styles.rosterRowBtn} ${styles[`rosterRow_${m.group}`]}`}
-                      data-press
-                      onClick={() => pick(m)}
-                    >
-                      <span className={styles.rosterRowName}>{m.n}</span>
-                      {m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
-                      {pending
-                        ? <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {WORK_TYPE_LABEL[pending.work]}</span>
-                        : <ChevronRight size={16} className={styles.rosterRowArrow} aria-hidden />}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+            /* 왼쪽 기관사 · 오른쪽 내근(+인턴) — 기관사가 167명이라 한 줄로 세우면 한없이 길어진다 */
+            <div className={styles.rosterCols}>
+              {COLUMNS.map(([colKey, groups]) => (
+                <div key={colKey} className={styles.rosterCol}>
+                  {groups.map((g) => {
+                    const rows = filtered.filter((m) => m.group === g);
+                    if (rows.length === 0) return null;
+                    return (
+                      <section key={g} className={styles.rosterColGroup}>
+                        <p className={styles.rosterGroupHead}>{GROUP_LABEL[g]} {rows.length}명</p>
+                        <ul className={styles.rosterList}>
+                          {rows.map((m) => {
+                            const pending = pendingBy.get(m.s);
+                            return (
+                              <li key={`${m.group}-${m.s}-${m.n}`}>
+                                <button
+                                  type="button"
+                                  className={`${styles.rosterRowBtn} ${styles[`rosterRow_${m.group}`]}`}
+                                  data-press
+                                  onClick={() => pick(m)}
+                                >
+                                  <span className={styles.rosterRowName}>{m.n}</span>
+                                  {m.duty
+                                    ? <span className={styles.rosterRowRank}>{DUTY_LABEL[m.duty]}</span>
+                                    : m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
+                                  {pending && (
+                                    <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {changeLabel(pending)}</span>
+                                  )}
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </section>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           )}
         </section>
 
@@ -476,7 +545,7 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                   <div className={styles.rosterPendingMain}>
                     <span className={styles.rosterPendingDate}>{fmtDate(c.from)}</span>
                     <span className={styles.rosterPendingBody}>
-                      {c.n} → <strong>{WORK_TYPE_LABEL[c.work]}</strong>
+                      {c.n} → <strong>{changeLabel(c)}</strong>
                       {c.rank ? ` · ${RANK_LABEL[c.rank]}` : ''}
                       {c.I ? ` · ${c.I}번` : ''}
                     </span>

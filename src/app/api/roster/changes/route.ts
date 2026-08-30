@@ -15,7 +15,7 @@ import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { errorResponse, okJson, internalError, parseBody, ERROR_CODES } from '@/lib/api/response';
 import { P } from '@/data/cycle';
-import type { RosterChange, StaffRank, WorkType } from '@/data/rosterChanges';
+import type { Duty, RosterChange, StaffRank, WorkType } from '@/data/rosterChanges';
 
 interface DbRow {
   id: number;
@@ -24,6 +24,7 @@ interface DbRow {
   subject_name: string;
   work_type: string;
   rank: string | null;
+  duty: string | null;
   slot_index: string | null;
   slot_before: string | null;
   vacancy_name: string | null;
@@ -33,7 +34,7 @@ interface DbRow {
 }
 
 const SELECT =
-  'id, effective_from, subject_sabun, subject_name, work_type, rank, slot_index, slot_before, vacancy_name, vacancy_sabun, note, created_by_name';
+  'id, effective_from, subject_sabun, subject_name, work_type, rank, duty, slot_index, slot_before, vacancy_name, vacancy_sabun, note, created_by_name';
 
 /** DB 한 줄 → 앱이 쓰는 모양 */
 function toChange(row: DbRow): RosterChange {
@@ -44,6 +45,7 @@ function toChange(row: DbRow): RosterChange {
     s: row.subject_sabun,
     work: row.work_type as WorkType,
     ...(row.rank ? { rank: row.rank as StaffRank } : {}),
+    ...(row.duty ? { duty: row.duty as Duty } : {}),
     ...(row.slot_index ? { I: row.slot_index } : {}),
     ...(row.slot_before ? { replaces: row.slot_before } : {}),
     ...(row.vacancy_name ? { vacancyName: row.vacancy_name } : {}),
@@ -78,6 +80,7 @@ export async function GET(req: NextRequest) {
 
 const WORK_TYPES = ['driver', 'office', 'intern', 'leave', 'sick', 'service', 'resign'] as const;
 const RANKS = ['chief', 'vice', 'manager', 'deputy', 'gwajang', 'daeri'] as const;
+const DUTIES = ['jido_bujang', 'jiwon_gisa', 'unyong_bujang', 'giji_gwanje', 'safety_manager', 'seomu', 'jido_gisa', 'yeongyangsa'] as const;
 
 const PostSchema = z.object({
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '시행일'),
@@ -86,6 +89,8 @@ const PostSchema = z.object({
   s: z.string().trim().regex(/^[0-9A-Za-z]{6,10}$/, '사번'),
   work: z.enum(WORK_TYPES),
   rank: z.enum(RANKS).optional(),
+  /** 내근 업무 — work: 'office' 일 때만 */
+  duty: z.enum(DUTIES).optional(),
   /** 기관사가 될 때 = 들어갈 자리 / 기관사에서 빠질 때 = 비울 자리 */
   I: z.string().min(1).max(4).optional(),
   /** 자리를 비울 때 그 자리가 될 결원 번호 (1~99) */
@@ -116,6 +121,12 @@ export async function POST(req: NextRequest) {
 
   // 기관사·인턴은 직급을 쓰지 않는다 — 남겨 두면 «기관사 부장님» 이 된다
   const rank = body.work === 'driver' || body.work === 'intern' ? null : (body.rank ?? null);
+  // 업무는 내근일 때만 의미가 있다 — 기관사·퇴사에 업무가 붙으면 화면이 헷갈린다
+  const duty = body.work === 'office' ? (body.duty ?? null) : null;
+
+  if (body.work === 'office' && !duty) {
+    return errorResponse(ERROR_CODES.BAD_REQUEST, '어떤 업무인지 골라주세요');
+  }
 
   const leavingDriver = body.work !== 'driver' && !!body.I;
 
@@ -181,6 +192,7 @@ export async function POST(req: NextRequest) {
         subject_name: body.n,
         work_type: body.work,
         rank,
+        duty,
         slot_index: body.I ?? null,
         slot_before: slot?.n ?? null,
         vacancy_name: leavingDriver && vacancy ? vacancy.name : null,
@@ -199,7 +211,7 @@ export async function POST(req: NextRequest) {
     await auditLog(auth.sub, auth.name, 'roster_change_add', {
       targetType: 'roster_changes',
       targetId: String((data as DbRow).id),
-      metadata: { name: body.n, sabun: body.s, work: body.work, rank, I: body.I, from: body.from },
+      metadata: { name: body.n, sabun: body.s, work: body.work, rank, duty, I: body.I, from: body.from },
       ip: getClientIP(req),
     });
 

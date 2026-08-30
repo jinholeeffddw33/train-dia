@@ -22,6 +22,31 @@ export type WorkType = 'driver' | 'office' | 'intern' | 'leave' | 'sick' | 'serv
 /** 내근 직급 — 기관사·인턴은 직급을 쓰지 않는다 */
 export type StaffRank = 'chief' | 'vice' | 'manager' | 'deputy' | 'gwajang' | 'daeri';
 
+/**
+ * 내근 업무 — 그 사람이 실제로 하는 일.
+ * 예전에는 «내근» 하나로 뭉뚱그렸는데, 그러면 앱이 무슨 일을 하는지 모른다.
+ */
+export type Duty =
+  | 'jido_bujang' | 'jiwon_gisa' | 'unyong_bujang' | 'giji_gwanje'
+  | 'safety_manager' | 'seomu' | 'jido_gisa' | 'yeongyangsa';
+
+export const DUTY_LABEL: Record<Duty, string> = {
+  jido_bujang: '지도부장',
+  jiwon_gisa: '지원기관사',
+  unyong_bujang: '운용계획부장',
+  giji_gwanje: '기지관제',
+  safety_manager: '안전관리자',
+  seomu: '서무',
+  jido_gisa: '지도기관사',
+  yeongyangsa: '영양사',
+};
+
+/** 고르는 차례 — 화면에 이 순서로 나온다 */
+export const DUTY_ORDER: Duty[] = [
+  'jido_bujang', 'jido_gisa', 'jiwon_gisa', 'unyong_bujang',
+  'giji_gwanje', 'safety_manager', 'seomu', 'yeongyangsa',
+];
+
 export const WORK_TYPE_LABEL: Record<WorkType, string> = {
   driver: '기관사',
   office: '내근',
@@ -70,6 +95,8 @@ export interface RosterChange {
   work: WorkType;
   /** 내근 직급 (내근 계열만) */
   rank?: StaffRank;
+  /** 내근 업무 (work === 'office' 일 때만) */
+  duty?: Duty;
   /** 관련 교번 자리 = cycle.ts P 의 I. 직급만 바꾸면 없다 */
   I?: string;
   /** 시행 전 그 자리에 있던 이름 — 자리를 잘못 짚었는지 검증용 */
@@ -194,6 +221,15 @@ export function joinedUsers(list: 'intern' | 'extra', at: Date = new Date()): Pe
     else byS.delete(c.s);                  // 나중에 다른 데로 갔으면 취소
   }
   return [...byS.values()];
+}
+
+/** 시행된 업무 변경 — 사번 → 업무. 내근이 아니게 되면 업무도 사라진다 */
+export function activeDuties(at: Date = new Date()): Map<string, Duty | null> {
+  const m = new Map<string, Duty | null>();
+  for (const c of activeChanges(at)) {
+    m.set(c.s, c.work === 'office' ? (c.duty ?? null) : null);
+  }
+  return m;
 }
 
 /** 시행된 직급 변경 — 사번 → 직급. 뒤에 오는 것이 이긴다 */

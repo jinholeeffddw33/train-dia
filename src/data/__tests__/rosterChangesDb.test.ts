@@ -10,7 +10,7 @@ import {
   joinedUsers,
   type RosterChange,
 } from '@/data/rosterChanges';
-import { officeUsers, internUsers, rankOf, getUserRole } from '@/lib/auth';
+import { officeUsers, internUsers, rankOf, dutyOf, isJiwonGigwansa, getUserRole } from '@/lib/auth';
 
 /**
  * 관리자 모드(설정 → 관리자 모드 → 명부 관리)에서 넣은 인사 변경이 정확히 얹히는지.
@@ -137,6 +137,39 @@ describe('관리자 모드 인사 변경 — 기관사에서 빠진다', () => {
   it('결원 이름을 안 정하면 자리를 건드리지 않는다 (조용히 사라지지 않게)', () => {
     setDbRosterChanges([c({ from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work: 'resign' })]);
     expect(getRoster(day('2027-03-01')).find((p) => p.I === '1')?.n).toBe('조임현');
+  });
+});
+
+describe('관리자 모드 인사 변경 — 업무', () => {
+  it('기관사가 업무를 맡으면 내근 명단으로 오고 업무가 붙는다', () => {
+    setDbRosterChanges([c({
+      from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work: 'office', duty: 'jido_gisa',
+      vacancyName: '결원50', vacancySabun: '9G010950',
+    })]);
+    expect(dutyOf('21714375', day('2027-02-28'))).toBe(null);
+    expect(dutyOf('21714375', day('2027-03-01'))).toBe('jido_gisa');
+    expect(officeUsers(day('2027-03-01')).some((u) => u.s === '21714375')).toBe(true);
+  });
+
+  it('업무를 지원기관사로 바꾸면 그 권한이 따라온다', () => {
+    // 박종길(21711719)은 처음부터 지원기관사, 김다솜(22000103)은 아니다
+    expect(isJiwonGigwansa('22000103')).toBe(false);
+    setDbRosterChanges([c({ from: '2027-03-01', n: '김다솜', s: '22000103', work: 'office', duty: 'jiwon_gisa' })]);
+    expect(dutyOf('22000103', day('2027-03-01'))).toBe('jiwon_gisa');
+  });
+
+  it('지원기관사가 기관사로 가면 그 권한이 사라진다', () => {
+    expect(dutyOf('21711719', day('2027-02-28'))).toBe('jiwon_gisa');
+    setDbRosterChanges([c({ from: '2027-03-01', I: '55', n: '박종길', s: '21711719', work: 'driver' })]);
+    expect(dutyOf('21711719', day('2027-03-01'))).toBe(null);
+  });
+
+  it('내근이 아니면 업무가 남지 않는다 — «퇴사한 서무» 가 생기지 않게', () => {
+    setDbRosterChanges([c({
+      from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work: 'resign', duty: 'seomu',
+      vacancyName: '결원50', vacancySabun: '9G010950',
+    })]);
+    expect(dutyOf('21714375', day('2027-03-01'))).toBe(null);
   });
 });
 

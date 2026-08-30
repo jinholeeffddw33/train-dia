@@ -200,7 +200,8 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
       const s = u.s ?? '';
       const w = nowWork.get(s);
       const m: Member = { n: u.n, s, group: 'office', rank: rankOf(s), duty: dutyOf(s) };
-      if (w && isAway(w)) away.push({ ...m, group: 'away', away: w, rank: null, duty: null });
+      // 쉬는 중이면 «무엇으로 쉬는지» 를 붙인다. 직급은 그대로 두고 업무만 뗀다 — 쉬는 동안 맡은 일은 없다
+      if (w && isAway(w)) away.push({ ...m, group: 'away', away: w, duty: null });
       else office.push(m);
     }
     const interns = internUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'intern', rank: null, duty: null }));
@@ -417,8 +418,9 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
           <div className={styles.rosterTarget}>
             <span className={styles.rosterTargetName}>{who.n}</span>
             <span className={styles.rosterTargetNow}>
-              지금 {GROUP_LABEL[who.group]}
-              {who.rank ? ` · ${RANK_LABEL[who.rank]}` : ''}
+              지금 {who.away ? WORK_TYPE_LABEL[who.away] : GROUP_LABEL[who.group]}
+              {who.rank ? ` · 직급 ${RANK_LABEL[who.rank]}` : ''}
+              {who.duty ? ` · 업무 ${DUTY_LABEL[who.duty]}` : ''}
               {who.I ? ` · ${who.I}번` : ''}
             </span>
           </div>
@@ -685,11 +687,10 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                                   onClick={() => pick(m)}
                                 >
                                   <span className={styles.rosterRowName}>{m.n}</span>
-                                  {m.away
-                                    ? <span className={styles.rosterRowRank}>{WORK_TYPE_LABEL[m.away]}</span>
-                                    : m.duty
-                                      ? <span className={styles.rosterRowRank}>{DUTY_LABEL[m.duty]}</span>
-                                      : m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
+                                  {/* 직급과 업무는 다른 것이다 — 한 칸에 몰아 넣으면 무엇이 무엇인지 알 수 없다 */}
+                                  {m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
+                                  {m.duty && <span className={styles.rosterRowDuty}>{DUTY_LABEL[m.duty]}</span>}
+                                  {m.away && <span className={styles.rosterRowAway}>{WORK_TYPE_LABEL[m.away]}</span>}
                                   {pending && (
                                     <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {changeLabel(pending)}</span>
                                   )}

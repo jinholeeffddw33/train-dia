@@ -13,15 +13,24 @@ import { setDbRosterChanges, type RosterChange } from '@/data/rosterChanges';
 
 const CACHE_KEY = 'dia5:roster-changes:v1';
 
-/** 서버가 보내온 값이 진짜 명부 예약인지 확인 — 깨진 캐시가 명부를 망가뜨리지 않게 */
+const WORK_TYPES = ['driver', 'office', 'intern', 'leave', 'sick', 'service', 'resign'];
+
+/**
+ * 서버가 보내온 값이 진짜 인사 변경인지 확인 — 깨진 캐시가 명부를 망가뜨리지 않게.
+ *
+ * ★ 자리(I)는 «있을 수도 없을 수도» 있다. 직급·업무만 바꾸는 변경에는 자리가 없다.
+ *   예전에 I 를 필수로 검사하다가, 관리자가 넣은 직급·업무 변경을 앱이 받자마자
+ *   전부 버리는 사고가 있었다(2026-08-30). 필수는 사람(n·s)·시행일·근무형태뿐이다.
+ */
 function isValid(c: unknown): c is RosterChange {
   if (!c || typeof c !== 'object') return false;
   const o = c as Record<string, unknown>;
   return (
     typeof o.from === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.from) &&
-    typeof o.I === 'string' && o.I.length > 0 &&
     typeof o.n === 'string' && o.n.length > 0 &&
-    typeof o.s === 'string' && o.s.length > 0
+    typeof o.s === 'string' && o.s.length > 0 &&
+    typeof o.work === 'string' && WORK_TYPES.includes(o.work) &&
+    (o.I === undefined || (typeof o.I === 'string' && o.I.length > 0))
   );
 }
 

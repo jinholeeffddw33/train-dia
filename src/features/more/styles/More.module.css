@@ -2383,3 +2383,25 @@
   background: var(--dia-surface-hover);
   opacity: 0.85;
 }
+
+/* 이름 옆 꼬리표 — 직급과 업무는 다른 것이므로 색으로 구분한다
+   직급(회색) = 그 사람의 급 · 업무(파랑) = 하는 일 · 쉬는 중(옅은 글씨) */
+.rosterRowDuty {
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-sm);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+  font-size: var(--dia-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rosterRowAway {
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-sm);
+  border: 1px solid var(--dia-border-strong);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}

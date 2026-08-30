@@ -6,6 +6,8 @@ import {
   allChanges,
   activeChanges,
   activeRanks,
+  activeWorkTypes,
+  isAway,
   departedSabuns,
   joinedUsers,
   type RosterChange,
@@ -176,6 +178,71 @@ describe('명부에 올릴 자격 — 교번표에 근거가 있는 것만', () 
       const m = /^결원(\d+)$/.exec(p.n);
       if (m) expect(real.has(parseInt(m[1], 10))).toBe(true);
     }
+  });
+});
+
+describe('휴직·병가·공로연수 — 내근 명단 맨 아래로', () => {
+  /** 명부 관리 화면이 오른쪽 단을 나누는 기준과 같다 */
+  const split = (at: Date) => {
+    const now = activeWorkTypes(at);
+    const office: string[] = [];
+    const away: string[] = [];
+    for (const u of officeUsers(at)) {
+      const w = now.get(u.s ?? '');
+      (w && isAway(w) ? away : office).push(u.n);
+    }
+    return { office, away };
+  };
+
+  it('휴직·병가·공로연수는 «쉬는 사람» 으로 따로 잡힌다', () => {
+    for (const work of ['leave', 'sick', 'service'] as const) {
+      setDbRosterChanges([c({
+        from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work,
+        vacancyName: '결원50', vacancySabun: '9G010950',
+      })]);
+      const { office, away } = split(day('2027-03-01'));
+      expect(away).toContain('조임현');
+      expect(office).not.toContain('조임현');
+    }
+  });
+
+  it('업무를 맡은 사람은 «쉬는 사람» 이 아니다', () => {
+    setDbRosterChanges([c({
+      from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work: 'office', duty: 'seomu',
+      vacancyName: '결원50', vacancySabun: '9G010950',
+    })]);
+    const { office, away } = split(day('2027-03-01'));
+    expect(office).toContain('조임현');
+    expect(away).not.toContain('조임현');
+  });
+
+  it('시행 전에는 아직 기관사다', () => {
+    setDbRosterChanges([c({
+      from: '2027-03-01', I: '1', n: '조임현', s: '21714375', work: 'sick',
+      vacancyName: '결원50', vacancySabun: '9G010950',
+    })]);
+    expect(split(day('2027-02-28')).away).not.toContain('조임현');
+    expect(getRoster(day('2027-02-28')).find((p) => p.I === '1')?.n).toBe('조임현');
+  });
+});
+
+describe('새로 입사한 직원', () => {
+  it('인턴으로 넣으면 인턴 명단에 나타난다', () => {
+    setDbRosterChanges([c({ from: '2027-03-01', n: '신입사원', s: '22699001', work: 'intern' })]);
+    expect(internUsers(day('2027-02-28')).some((u) => u.s === '22699001')).toBe(false);
+    expect(internUsers(day('2027-03-01')).some((u) => u.s === '22699001')).toBe(true);
+  });
+
+  it('업무를 맡겨 넣으면 내근 명단에 나타난다', () => {
+    setDbRosterChanges([c({ from: '2027-03-01', n: '신입사원', s: '22699001', work: 'office', duty: 'yeongyangsa' })]);
+    expect(officeUsers(day('2027-03-01')).some((u) => u.s === '22699001')).toBe(true);
+    expect(dutyOf('22699001', day('2027-03-01'))).toBe('yeongyangsa');
+  });
+
+  it('기관사로 넣으면 그 결원 자리에 앉는다', () => {
+    setDbRosterChanges([c({ from: '2027-03-01', I: '55', n: '신입사원', s: '22699001', work: 'driver' })]);
+    expect(getRoster(day('2027-03-01')).find((p) => p.I === '55')?.n).toBe('신입사원');
+    expect(getRoster(day('2027-03-01')).length).toBe(P.length);   // 자리 수는 그대로
   });
 });
 

@@ -15,6 +15,7 @@ import { requireAuth, auditLog, getClientIP } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { errorResponse, okJson, internalError, parseBody, ERROR_CODES } from '@/lib/api/response';
 import { P, getRoster } from '@/data/cycle';
+import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
 import type { Duty, RosterChange, StaffRank, WorkType } from '@/data/rosterChanges';
 
 interface DbRow {
@@ -95,6 +96,13 @@ const PostSchema = z.object({
   I: z.string().min(1).max(4).optional(),
   /** 자리를 비울 때 그 자리가 될 결원 번호 (1~99) */
   vacancyNo: z.number().int().min(1).max(99).optional(),
+  /**
+   * 교번표에 없던 결원 번호를 «새로 만드는» 것임을 분명히 밝힌 경우에만 true.
+   * 이게 없으면 교번표에 있는 번호만 받는다 — 실수로 없는 번호가 들어오는 것을 막는다.
+   */
+  newVacancy: z.boolean().optional(),
+  /** 새로 입사한 사람 — 기존 명부에 없는 사번임을 밝힌 경우에만 true */
+  newHire: z.boolean().optional(),
   note: z.string().trim().max(200).optional(),
 });
 
@@ -157,6 +165,17 @@ export async function POST(req: NextRequest) {
     if (!slot) return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번 자리는 명부에 없어요`);
   }
 
+  // 새로 입사한 사람이라면 그 사번이 정말 처음이어야 한다 — 남의 사번을 넣으면 두 사람이 겹친다
+  if (body.newHire) {
+    const known =
+      roster.find((p) => p.s === body.s)
+      ?? EXTRA_USERS.find((u) => u.s === body.s)
+      ?? INTERN_USERS.find((u) => u.s === body.s);
+    if (known) {
+      return errorResponse(ERROR_CODES.CONFLICT, `${body.s}는 이미 ${known.n}의 사번이에요`);
+    }
+  }
+
   // ② 기관사는 «실제 교번이 있는 자리» 에만 앉는다 — 이태원(W5)처럼 d='내근' 인 자리는 교번이 아니다
   if (body.work === 'driver' && slot && (!slot.d || slot.d === '내근')) {
     return errorResponse(ERROR_CODES.BAD_REQUEST, `${body.I}번은 교번이 있는 자리가 아니에요`);
@@ -170,11 +189,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ③ 교번표에 없는 결원 번호는 받지 않는다 — 앱에만 있는 결원이 생긴다
-  if (body.vacancyNo !== undefined && !REAL_VACANCY_NOS.has(body.vacancyNo)) {
+  // ③ 교번표에 없는 결원 번호는 «새로 만든다» 고 밝혔을 때만 받는다.
+  //    그냥 받으면 오타 하나로 교번표에 없는 결원이 앱에만 생긴다.
+  if (body.vacancyNo !== undefined && !REAL_VACANCY_NOS.has(body.vacancyNo) && !body.newVacancy) {
     return errorResponse(
       ERROR_CODES.BAD_REQUEST,
-      `결원${String(body.vacancyNo).padStart(2, '0')}은 교번표에 없는 번호예요`,
+      `결원${String(body.vacancyNo).padStart(2, '0')}은 교번표에 없는 번호예요. 새로 만들려면 «새 번호 만들기» 로 넣어주세요`,
     );
   }
 

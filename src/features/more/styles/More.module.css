@@ -2346,3 +2346,40 @@
   margin-left: 0;
   white-space: normal;
 }
+
+/* 잘 넣고 있다는 초록 안내 */
+.rosterHintOk {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  font-size: var(--dia-text-sm);
+  color: var(--dia-green);
+  margin: 0;
+}
+
+/* 새로 입사한 직원 넣기 */
+.rosterHireBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  width: 100%;
+  padding: var(--dia-space-3);
+  background: var(--dia-surface);
+  border: 1px dashed var(--dia-border-strong);
+  border-radius: var(--dia-radius-md);
+  color: var(--dia-blue);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--dia-dur-fast) var(--dia-ease-press);
+}
+.rosterHireBtn:active { transform: scale(0.98); }
+.rosterHireBtn:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+
+/* 쉬는 중(휴직·병가·공로연수) — 일하는 내근과 눈으로 구분되게 */
+.rosterRow_away {
+  border-left-color: var(--dia-text-tertiary);
+  background: var(--dia-surface-hover);
+  opacity: 0.85;
+}

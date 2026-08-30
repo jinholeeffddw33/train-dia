@@ -20,7 +20,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ArrowLeft, Search, CalendarClock, Trash2, AlertTriangle, ChevronRight, Check } from 'lucide-react';
+import { ArrowLeft, Search, CalendarClock, Trash2, AlertTriangle, Check, Plus, UserPlus } from 'lucide-react';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -28,14 +28,14 @@ import { getRoster, P } from '@/data/cycle';
 import { syncRosterChanges } from '@/lib/rosterSync';
 import { officeUsers, internUsers, rankOf, dutyOf } from '@/lib/auth';
 import {
-  WORK_TYPE_LABEL, RANK_LABEL, RANK_ORDER, DUTY_LABEL, DUTY_ORDER,
+  WORK_TYPE_LABEL, RANK_LABEL, RANK_ORDER, DUTY_LABEL, DUTY_ORDER, activeWorkTypes, isAway,
   type Duty, type RosterChange, type StaffRank, type WorkType,
 } from '@/data/rosterChanges';
 import type { Person } from '@/lib/types';
 import styles from '../styles/More.module.css';
 
-/** 지금 어느 묶음 사람인가 */
-type Group = 'driver' | 'office' | 'intern';
+/** 지금 어느 묶음 사람인가 — away = 휴직·병가·공로연수 */
+type Group = 'driver' | 'office' | 'intern' | 'away';
 
 interface Member {
   n: string;
@@ -45,14 +45,20 @@ interface Member {
   I?: string;
   rank: StaffRank | null;
   duty: Duty | null;
+  /** away 묶음에서 무엇으로 쉬는 중인지 */
+  away?: WorkType;
+  /** 새로 넣는 사람 — 아직 어느 명단에도 없다 */
+  isNew?: boolean;
 }
 
-const GROUP_LABEL: Record<Group, string> = { driver: '기관사', office: '내근', intern: '인턴' };
+const GROUP_LABEL: Record<Group, string> = {
+  driver: '기관사', office: '내근', intern: '인턴', away: '휴직 · 병가 · 공로연수',
+};
 
-/** 두 단 배치 — 왼쪽은 기관사, 오른쪽은 내근(인턴은 그 아래) */
+/** 두 단 배치 — 왼쪽 기관사, 오른쪽 내근 → 인턴 → 쉬는 사람(맨 아래) */
 const COLUMNS: [string, Group[]][] = [
   ['left', ['driver']],
-  ['right', ['office', 'intern']],
+  ['right', ['office', 'intern', 'away']],
 ];
 
 /**
@@ -66,6 +72,8 @@ const OFFICE_CHIP = 'office' as const;
 const LEAVING: WorkType[] = ['office', 'leave', 'sick', 'service', 'resign'];
 /** 기관사가 아닌 사람에게 보여줄 선택지 — 기관사로 갈 수 있다 */
 const JOINING: WorkType[] = ['driver', 'office', 'leave', 'sick', 'service', 'resign'];
+/** 새로 입사한 사람 — 인턴으로 시작하는 경우가 대부분이다 */
+const NEW_HIRE: WorkType[] = ['intern', 'driver', 'office'];
 
 /** 칩에 쓸 이름 — 내근은 «업무» 라고 보여준다 */
 function chipLabel(w: WorkType): string {
@@ -149,6 +157,13 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   const [from, setFrom] = useState(todayKST());
   const [saving, setSaving] = useState(false);
   const [pendingRemove, setPendingRemove] = useState<RosterChange | null>(null);
+  /** 새 직원 입력 화면 */
+  const [hireOpen, setHireOpen] = useState(false);
+  const [hireName, setHireName] = useState('');
+  const [hireSabun, setHireSabun] = useState('');
+  /** 교번표에 없는 결원 번호를 새로 만드는 중 */
+  const [newVacancy, setNewVacancy] = useState(false);
+  const [newVacancyNo, setNewVacancyNo] = useState('');
 
   useEscapeClose(true, () => {
     if (pendingRemove) setPendingRemove(null);
@@ -177,11 +192,19 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     const drivers = getRoster()
       .filter((p) => !/^결원/.test(p.n) && hasRealDia(p))
       .map<Member>((p) => ({ n: p.n, s: p.s ?? '', group: 'driver', I: p.I, rank: null, duty: null }));
-    const office = officeUsers().map<Member>((u) => ({
-      n: u.n, s: u.s ?? '', group: 'office', rank: rankOf(u.s ?? ''), duty: dutyOf(u.s ?? ''),
-    }));
+    // 휴직·병가·공로연수는 내근 명단에 들어 있지만 «일하는 내근» 과 섞이면 헷갈린다 → 맨 아래 따로
+    const nowWork = activeWorkTypes();
+    const office: Member[] = [];
+    const away: Member[] = [];
+    for (const u of officeUsers()) {
+      const s = u.s ?? '';
+      const w = nowWork.get(s);
+      const m: Member = { n: u.n, s, group: 'office', rank: rankOf(s), duty: dutyOf(s) };
+      if (w && isAway(w)) away.push({ ...m, group: 'away', away: w, rank: null, duty: null });
+      else office.push(m);
+    }
     const interns = internUsers().map<Member>((u) => ({ n: u.n, s: u.s ?? '', group: 'intern', rank: null, duty: null }));
-    return [...drivers.sort(ko), ...office.sort(ko), ...interns.sort(ko)];
+    return [...drivers.sort(ko), ...office.sort(ko), ...interns.sort(ko), ...away.sort(ko)];
     // changes 가 바뀌면 명부도 다시 계산해야 한다
   }, [changes]);
 
@@ -223,8 +246,17 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     setDuty(m.duty);
     setSlotI(null);
     setVacancyNo(null);
+    setNewVacancy(false);
+    setNewVacancyNo('');
     setFrom(todayKST());
   };
+
+  /** 이미 명부에 있는 사번인가 — 새 직원을 넣기 전에 화면에서 먼저 걸러 준다 */
+  const hireDup = useMemo(
+    () => (hireSabun.length >= 6 ? members.find((m) => m.s === hireSabun) ?? null : null),
+    [hireSabun, members],
+  );
+  const canHire = hireName.trim().length > 0 && /^\d{6,10}$/.test(hireSabun) && !hireDup;
 
   const isLeavingDriver = who?.group === 'driver' && work !== null && work !== 'driver';
   // 업무·직급은 내근만 쓴다 — 기관사·인턴은 표시하지 않고, 휴직·병가·공로연수·퇴사도 물을 일이 없다
@@ -232,12 +264,23 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
   const needsRank = work === 'office';
   const needsSlot = work === 'driver' && who?.group !== 'driver';
 
+  /** 새로 만드는 결원 번호 — 이미 쓰는 번호면 안 된다 */
+  const newVacancyValid = useMemo(() => {
+    const no = parseInt(newVacancyNo, 10);
+    if (!Number.isInteger(no) || no < 1 || no > 99) return null;
+    const used = new Set<number>();
+    for (const p of getRoster()) { const v = vacancyNoOf(p.n); if (v !== null) used.add(v); }
+    for (const c of changes) { const v = c.vacancyName ? vacancyNoOf(c.vacancyName) : null; if (v !== null) used.add(v); }
+    return used.has(no) ? null : no;
+  }, [newVacancyNo, changes]);
+
   const canSave =
     !!who && !!work &&
     /^\d{4}-\d{2}-\d{2}$/.test(from) &&
     (!needsDuty || !!duty) &&
     (!needsSlot || !!slotI) &&
-    (!isLeavingDriver || vacancyNo !== null);
+    (!isLeavingDriver || vacancyNo !== null) &&
+    (!newVacancy || newVacancyValid !== null);
 
   const save = async () => {
     if (!who || !work || !canSave || saving) return;
@@ -249,10 +292,11 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
         credentials: 'same-origin',
         body: JSON.stringify({
           from, n: who.n, s: who.s, work,
+          ...(who.isNew ? { newHire: true } : {}),
           ...(needsDuty && duty ? { duty } : {}),
           ...(needsRank && rank ? { rank } : {}),
           ...(needsSlot && slotI ? { I: slotI } : {}),
-          ...(isLeavingDriver ? { I: who.I, vacancyNo } : {}),
+          ...(isLeavingDriver ? { I: who.I, vacancyNo, ...(newVacancy ? { newVacancy: true } : {}) } : {}),
         }),
       });
       const data = await res.json();
@@ -307,9 +351,65 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
     />
   );
 
+  // ── ①-b 새로 입사한 사람 넣기 ──
+  if (hireOpen) {
+    return (
+      <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="새 직원 넣기">
+        {header('새 직원 넣기', () => setHireOpen(false))}
+        <div className={styles.adminContent}>
+          <label className={styles.rosterField}>
+            <span className={styles.rosterFieldLabel}>이름</span>
+            <input
+              type="text"
+              className={styles.rosterInput}
+              value={hireName}
+              maxLength={20}
+              placeholder="예) 홍길동"
+              onChange={(e) => setHireName(e.target.value)}
+            />
+          </label>
+          <label className={styles.rosterField}>
+            <span className={styles.rosterFieldLabel}>사번</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              className={styles.rosterInput}
+              value={hireSabun}
+              maxLength={10}
+              placeholder="예) 22601500"
+              onChange={(e) => setHireSabun(e.target.value.replace(/\D/g, ''))}
+            />
+          </label>
+          {hireDup && (
+            <p className={styles.rosterHintBad}>
+              <AlertTriangle size={14} /> 이 사번은 이미 {hireDup.n}입니다
+            </p>
+          )}
+          <p className={styles.rosterStepHint}>넣고 나면 무엇으로 시작할지(인턴·기관사·업무) 고릅니다</p>
+          <button
+            type="button"
+            className={`z-cta ${styles.rosterSave}`}
+            data-press
+            disabled={!canHire}
+            onClick={() => {
+              pick({ n: hireName.trim(), s: hireSabun, group: 'intern', rank: null, duty: null, isNew: true });
+              setHireOpen(false);
+              setHireName('');
+              setHireSabun('');
+            }}
+          >
+            다음
+          </button>
+        </div>
+        {confirmDialog}
+      </div>
+    );
+  }
+
   // ── ② 사람을 고른 뒤: 차례로 답한다 ──
   if (who) {
-    const options = who.group === 'driver' ? LEAVING : JOINING;
+    // 새 직원은 인턴으로 시작할 수 있다(기존 직원은 인턴으로 되돌아갈 수 없다)
+    const options = who.isNew ? NEW_HIRE : who.group === 'driver' ? LEAVING : JOINING;
     return (
       <div className={styles.fullOverlay} role="dialog" aria-modal="true" aria-label="인사 변경">
         {header(who.n, () => setWho(null))}
@@ -413,24 +513,59 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
           {isLeavingDriver && (
             <section className={styles.rosterStep}>
               <h3 className={styles.rosterStepTitle}>{who.I}번 자리는 몇 번 결원이 되나요?</h3>
-              {freeVacancyNos.length === 0 ? (
-                <p className={styles.rosterHintBad}>
-                  <AlertTriangle size={14} /> 교번표의 결원 번호를 모두 쓰고 있어요. 다른 예약을 먼저 정리해주세요
-                </p>
-              ) : (
-                <div className={styles.rosterChips}>
-                  {freeVacancyNos.map((no) => (
-                    <button
-                      key={no}
-                      type="button"
-                      className={`${styles.rosterChip} ${vacancyNo === no ? styles.rosterChipOn : ''}`}
-                      data-press
-                      onClick={() => setVacancyNo(no)}
-                    >
-                      결원{String(no).padStart(2, '0')}
-                    </button>
-                  ))}
-                </div>
+              <div className={styles.rosterChips}>
+                {freeVacancyNos.map((no) => (
+                  <button
+                    key={no}
+                    type="button"
+                    className={`${styles.rosterChip} ${!newVacancy && vacancyNo === no ? styles.rosterChipOn : ''}`}
+                    data-press
+                    onClick={() => { setNewVacancy(false); setVacancyNo(no); }}
+                  >
+                    결원{String(no).padStart(2, '0')}
+                  </button>
+                ))}
+                {/* 교번표에 없는 번호를 새로 붙여야 할 때 — 실수로 눌리지 않게 따로 둔다 */}
+                <button
+                  type="button"
+                  className={`${styles.rosterChip} ${newVacancy ? styles.rosterChipOn : ''}`}
+                  data-press
+                  onClick={() => {
+                    setNewVacancy(!newVacancy);
+                    setVacancyNo(null);
+                    setNewVacancyNo('');
+                  }}
+                >
+                  <Plus size={14} /> 새 번호 만들기
+                </button>
+              </div>
+              {newVacancy && (
+                <>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={2}
+                    className={styles.rosterInput}
+                    value={newVacancyNo}
+                    placeholder="예) 29"
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, '');
+                      setNewVacancyNo(v);
+                      const no = parseInt(v, 10);
+                      setVacancyNo(Number.isInteger(no) ? no : null);
+                    }}
+                  />
+                  {newVacancyNo && newVacancyValid === null && (
+                    <p className={styles.rosterHintBad}>
+                      <AlertTriangle size={14} /> 1~99 사이의, 아직 안 쓰는 번호여야 해요
+                    </p>
+                  )}
+                  {newVacancyValid !== null && (
+                    <p className={styles.rosterHintOk}>
+                      <Check size={14} /> 결원{String(newVacancyValid).padStart(2, '0')} 을(를) 새로 만듭니다
+                    </p>
+                  )}
+                </>
               )}
             </section>
           )}
@@ -517,6 +652,14 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
+          <button
+            type="button"
+            className={styles.rosterHireBtn}
+            data-press
+            onClick={() => { setHireName(''); setHireSabun(''); setHireOpen(true); }}
+          >
+            <UserPlus size={16} /> 새로 입사한 직원 넣기
+          </button>
           {loading ? (
             <div className={styles.adminEmpty}>불러오는 중…</div>
           ) : (
@@ -542,9 +685,11 @@ export default function RosterAdmin({ onClose }: { onClose: () => void }) {
                                   onClick={() => pick(m)}
                                 >
                                   <span className={styles.rosterRowName}>{m.n}</span>
-                                  {m.duty
-                                    ? <span className={styles.rosterRowRank}>{DUTY_LABEL[m.duty]}</span>
-                                    : m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
+                                  {m.away
+                                    ? <span className={styles.rosterRowRank}>{WORK_TYPE_LABEL[m.away]}</span>
+                                    : m.duty
+                                      ? <span className={styles.rosterRowRank}>{DUTY_LABEL[m.duty]}</span>
+                                      : m.rank && <span className={styles.rosterRowRank}>{RANK_LABEL[m.rank]}</span>}
                                   {pending && (
                                     <span className={styles.rosterRowBadge}>{fmtDate(pending.from)} → {changeLabel(pending)}</span>
                                   )}

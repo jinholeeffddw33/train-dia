@@ -223,6 +223,18 @@ export function joinedUsers(list: 'intern' | 'extra', at: Date = new Date()): Pe
   return [...byS.values()];
 }
 
+/** 자리를 비운 채 쉬는 중 — 내근 명단에는 있지만 «일하는 내근» 과는 구분해서 보여준다 */
+export function isAway(w: WorkType): boolean {
+  return w === 'leave' || w === 'sick' || w === 'service';
+}
+
+/** 시행된 근무형태 — 사번 → 지금 무엇인가. 뒤에 오는 것이 이긴다 */
+export function activeWorkTypes(at: Date = new Date()): Map<string, WorkType> {
+  const m = new Map<string, WorkType>();
+  for (const c of activeChanges(at)) m.set(c.s, c.work);
+  return m;
+}
+
 /** 시행된 업무 변경 — 사번 → 업무. 내근이 아니게 되면 업무도 사라진다 */
 export function activeDuties(at: Date = new Date()): Map<string, Duty | null> {
   const m = new Map<string, Duty | null>();

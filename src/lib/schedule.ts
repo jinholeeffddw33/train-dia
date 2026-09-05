@@ -417,10 +417,42 @@ export interface ExchangePartner {
 }
 
 /**
+ * 구간이 실제로 벌어지는 날 — 스케줄 시작일 기준 며칠째인가.
+ * 야간 교번은 하루치 스케줄이 이틀에 걸친다: 밤 구간은 0, 자정 넘긴 새벽 구간은 1.
+ * (출발시각이 앞 구간보다 이르면 자정을 넘긴 것으로 본다)
+ */
+function segDayOffsets(segs: Segment[]): number[] {
+  const out: number[] = [];
+  let off = 0;
+  let prev = -1;
+  for (const seg of segs) {
+    const d = timeToMins(seg.d);
+    if (prev >= 0 && d >= 0 && d < prev) off = 1;
+    if (d >= 0) prev = d;
+    out.push(off);
+  }
+  return out;
+}
+
+/** 매칭 풀의 한 줄 — 「누가·어느 날·무슨 열차로 시작해서 무슨 열차로 끝나는가」 */
+interface PoolSeg {
+  name: string;
+  first: number;
+  last: number;
+  /** 오늘을 0 으로 둔 실제 달력 날짜 */
+  day: number;
+}
+
+/**
  * 교대 상대 찾기 (v1 findExchangePartners 포팅)
  * - 내 구간 첫 열차 = 상대 구간 마지막 열차 → left (내가 받음)
  * - 내 구간 마지막 열차 = 상대 구간 첫 열차 → right (내가 줌)
  * - 1xxx/2xxx 번대 열차는 기지 입출고 — 교대 없음
+ *
+ * ★ 같은 날끼리만 맞춘다. 야간 교번의 새벽 구간은 「교번표에 적힌 날」이 아니라
+ *   그 다음 날 아침에 벌어진다 — 아침에 열차를 넘겨주는 사람은 어제 야간조다.
+ *   예전에는 오늘치 스케줄만 뒤져서, 금요일 아침처럼 어제(목 야간)와 오늘(금 야간)의
+ *   새벽 열차번호가 갈리는 날이면 상대를 못 찾고 「타소」로 떨어졌다(2026-09-04 확인).
  */
 export function findExchangePartners(
   mySchedule: Schedule,
@@ -443,70 +475,54 @@ export function findExchangePartners(
   const endMins = mySchedule.e ? timeToMins(mySchedule.e) : -1;
   const isNight = startMins >= 0 && endMins >= 0 && startMins > endMins;
 
-  // 전체 인원 스케줄을 한번에 빌드 (같은 날)
-  const allSchedules: { person: Person; schedule: Schedule }[] = [];
-  for (const p of P) {
-    if (p.I === myPerson.I) continue; // 자기 자신 제외
-    const dia = getDia(p, date);
-    const tp = getType(dia);
-    if (tp === 'rest') continue;
-    const sc = getSchedule(dia, date);
-    if (sc && sc.g && sc.g.length > 0) {
-      allSchedules.push({ person: p, schedule: sc });
-    }
-  }
-
-  // 야간이면 다음 날 스케줄도 풀에 추가 (2근무 아침 교대 매칭용)
-  if (isNight) {
-    const nextDay = new Date(date);
-    nextDay.setDate(nextDay.getDate() + 1);
+  // 어제·오늘·내일 세 날의 스케줄을 구간 단위로 펼쳐 담는다.
+  // 어제치가 필요한 이유는 야간조의 새벽 구간이 오늘 아침에 벌어지기 때문이고,
+  // 내일치가 필요한 이유는 내가 야간일 때 내 새벽 구간의 상대가 내일 주간조이기 때문이다.
+  const pool: PoolSeg[] = [];
+  const addDay = (base: number) => {
+    const when = new Date(date);
+    when.setDate(when.getDate() + base);
     for (const p of P) {
-      if (p.I === myPerson.I) continue;
-      const dia = getDia(p, nextDay);
-      const tp = getType(dia);
-      if (tp === 'rest') continue;
-      const sc = getSchedule(dia, nextDay);
-      if (sc && sc.g && sc.g.length > 0) {
-        allSchedules.push({ person: p, schedule: sc });
-      }
+      if (p.I === myPerson.I) continue; // 자기 자신 제외
+      const dia = getDia(p, when);
+      if (getType(dia) === 'rest') continue;
+      const sc = getSchedule(dia, when);
+      if (!sc || !sc.g || sc.g.length === 0) continue;
+      const offs = segDayOffsets(sc.g);
+      sc.g.forEach((seg, k) => {
+        if (!seg.n || seg.n.length === 0) return;
+        pool.push({
+          name: p.n,
+          first: seg.n[0],
+          last: seg.n[seg.n.length - 1],
+          day: base + offs[k],
+        });
+      });
     }
-  }
+  };
+  addDay(-1);
+  addDay(0);
+  if (isNight) addDay(1);
+
+  const myOffs = segDayOffsets(segs);
 
   for (let i = 0; i < segs.length; i++) {
     const seg = segs[i];
     if (!seg.n || seg.n.length === 0) continue;
     const firstTrain = seg.n[0];
     const lastTrain = seg.n[seg.n.length - 1];
+    const myDay = myOffs[i];
+    const sameDay = pool.filter((o) => o.day === myDay);
     const p: ExchangePartner = {};
 
     // 왼쪽: 내 첫 열차 = 상대 마지막 열차 (내가 받음)
     if (!isDepotTrain(firstTrain)) {
-      for (const other of allSchedules) {
-        for (const otherSeg of other.schedule.g!) {
-          if (!otherSeg.n || otherSeg.n.length === 0) continue;
-          const otherLast = otherSeg.n[otherSeg.n.length - 1];
-          if (otherLast === firstTrain) {
-            p.left = other.person.n;
-            break;
-          }
-        }
-        if (p.left) break;
-      }
+      p.left = sameDay.find((o) => o.last === firstTrain)?.name;
     }
 
     // 오른쪽: 내 마지막 열차 = 상대 첫 열차 (내가 줌)
     if (!isDepotTrain(lastTrain)) {
-      for (const other of allSchedules) {
-        for (const otherSeg of other.schedule.g!) {
-          if (!otherSeg.n || otherSeg.n.length === 0) continue;
-          const otherFirst = otherSeg.n[0];
-          if (otherFirst === lastTrain) {
-            p.right = other.person.n;
-            break;
-          }
-        }
-        if (p.right) break;
-      }
+      p.right = sameDay.find((o) => o.first === lastTrain)?.name;
     }
 
     if (p.left || p.right) partners[i] = p;

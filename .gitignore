@@ -21,3 +21,6 @@ npm-debug.log*
 
 # 조사 증거(직원 실명·사번 포함) — 커밋 금지
 _evidence_stationdia/
+
+# 운전정보 업로드 스크립트의 임시 렌더 결과
+.tmp_driving/

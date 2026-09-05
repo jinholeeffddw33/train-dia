@@ -15,7 +15,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { P } from '@/data/cycle';
-import { getDia, getType, getSchedule, findExchangePartners } from '@/lib/schedule';
+import { getDia, getType, getSchedule, findExchangePartners, JUBAK_SELF } from '@/lib/schedule';
 
 /** 그날 그 교번을 맡은 사람 */
 function holderOf(dia: string, date: Date) {
@@ -67,5 +67,64 @@ describe('findExchangePartners — 야간조 새벽 구간의 날짜 경계', ()
       }
     }
     expect(missing).toEqual([]);
+  });
+});
+
+/**
+ * 주박 — 야간 근무자는 누구나 자정을 넘겨 길게 쉰다. 그래서 「자정 넘김 + 2시간 이상」
+ * 만으로 주박을 판정하면 사업소 숙박(답→답, 8~9시간)까지 전부 주박으로 잡혀,
+ * 새벽에 실제로 열차를 넘겨준 사람이 「본인」으로 덮어씌워졌다.
+ * 진짜 주박은 사업소가 아닌 곳에서 밤을 보내고 아침에 그곳에서 다시 나온다.
+ */
+describe('findExchangePartners — 주박과 사업소 숙박 구분', () => {
+  const date = new Date(2026, 5, 2); // 2026-06-02 (화)
+
+  it('사업소(답십리)에서 자고 새벽에 열차를 받으면 상대 이름이 나온다', () => {
+    // 홍운기 dia70: 답하방답 / 답하답 — 22:16 에 5711 을 넘기고 06:46 에 5011 을 받는다.
+    // 5011 을 06:46 에 답십리로 몰고 온 사람은 박선기(dia67, 기지에서 05:40 출고).
+    const me = holderOf('70', date);
+    const sc = getSchedule('70', date);
+    expect(sc?.g?.[1]?.n?.[0]).toBe(5011);
+
+    const partners = findExchangePartners(sc!, me!, date);
+    expect(partners[1]?.left).toBe('박선기');
+    expect(partners[1]?.left).not.toBe(JUBAK_SELF);
+  });
+
+  it('원격지(하남검단산)에서 주박하면 본인이 이어받는다', () => {
+    // dia91: 답방하 / 하답 — 하남검단산에서 자고 그곳에서 새벽에 다시 나온다.
+    const me = holderOf('91', date);
+    const sc = getSchedule('91', date);
+    expect(sc?.m?.split(',')[0].trim().slice(-1)).toBe('하');
+
+    const partners = findExchangePartners(sc!, me!, date);
+    expect(partners[1]?.left).toBe(JUBAK_SELF);
+  });
+
+  it('교대 관계가 서로 맞는다 — 내가 넘긴 사람은 나에게서 받는다', () => {
+    const broken: string[] = [];
+    const sched = new Map<string, ReturnType<typeof getSchedule>>();
+    const parts = new Map<string, ReturnType<typeof findExchangePartners>>();
+    for (const p of P) {
+      const dia = getDia(p, date);
+      if (getType(dia) === 'rest') continue;
+      const sc = getSchedule(dia, date);
+      if (!sc?.g?.length) continue;
+      sched.set(p.n, sc);
+      parts.set(p.n, findExchangePartners(sc, p, date));
+    }
+    for (const [name, mine] of parts) {
+      sched.get(name)!.g!.forEach((seg, i) => {
+        const to = mine[i]?.right;
+        if (!to || to === JUBAK_SELF || !seg.n?.length) return;
+        const train = seg.n[seg.n.length - 1];
+        const osc = sched.get(to), other = parts.get(to);
+        if (!osc || !other) return; // 상대가 어제 야간조 — 오늘 표에 없다
+        const j = osc.g!.findIndex((s) => s.n?.[0] === train);
+        if (j < 0) return;
+        if (other[j]?.left !== name) broken.push(`${name} 넘김→${to}(열차${train}) 인데 ${to} 받음=${other[j]?.left ?? '없음'}`);
+      });
+    }
+    expect(broken).toEqual([]);
   });
 });

@@ -439,8 +439,34 @@ interface PoolSeg {
   name: string;
   first: number;
   last: number;
+  /** 구간 출발 시각(분) */
+  dep: number;
+  /** 구간 도착 시각(분) */
+  arr: number;
   /** 오늘을 0 으로 둔 실제 달력 날짜 */
   day: number;
+}
+
+/**
+ * 후보가 여럿이면 시각으로 고른다.
+ * 한 열차를 여러 기관사가 이어 모는 날이 있어(60일에 9건) 열차번호만으로는 갈리지 않는다.
+ * 교대는 「상대가 내린 시각 = 내가 탄 시각」이므로 그 한 명이 곧 상대다.
+ * 시각이 딱 떨어지지 않는 표도 1.3% 있어, 후보가 하나뿐이면 시각은 보지 않는다.
+ */
+function pickByTime(cands: PoolSeg[], myTime: number, side: 'left' | 'right'): string | undefined {
+  if (cands.length <= 1) return cands[0]?.name;
+  const exact = cands.filter((o) => (side === 'left' ? o.arr : o.dep) === myTime);
+  return (exact.length === 1 ? exact[0] : cands[0]).name;
+}
+
+/** 우리 승무사업소 — 행로 약호에서 이 글자로 끝나고 시작하면 사업소 숙박(주박 아님) */
+const HOME_DEPOT_ABBR = '답'; // 답십리
+
+/** 행로 약호를 근무 단위로 쪼갠다 — "답방답,답하답" → ["답방답","답하답"] */
+function routeParts(m: string | undefined, segCount: number): string[] | null {
+  if (!m || m.includes('충당여부') || m.includes('대휴')) return null;
+  const parts = m.split(',').map((s) => s.replace(/\s*\([^)]*\)/g, '').trim()).filter(Boolean);
+  return parts.length === segCount ? parts : null;
 }
 
 /**
@@ -495,6 +521,8 @@ export function findExchangePartners(
           name: p.n,
           first: seg.n[0],
           last: seg.n[seg.n.length - 1],
+          dep: timeToMins(seg.d) % 1440,
+          arr: timeToMins(seg.a) % 1440,
           day: base + offs[k],
         });
       });
@@ -517,41 +545,46 @@ export function findExchangePartners(
 
     // 왼쪽: 내 첫 열차 = 상대 마지막 열차 (내가 받음)
     if (!isDepotTrain(firstTrain)) {
-      p.left = sameDay.find((o) => o.last === firstTrain)?.name;
+      p.left = pickByTime(sameDay.filter((o) => o.last === firstTrain), timeToMins(seg.d) % 1440, 'left');
     }
 
     // 오른쪽: 내 마지막 열차 = 상대 첫 열차 (내가 줌)
     if (!isDepotTrain(lastTrain)) {
-      p.right = sameDay.find((o) => o.first === lastTrain)?.name;
+      p.right = pickByTime(sameDay.filter((o) => o.first === lastTrain), timeToMins(seg.a) % 1440, 'right');
     }
 
     if (p.left || p.right) partners[i] = p;
   }
 
-  // 주박 자가교대 — 야간 근무 중 원격지(여/애/왕/군/화 등)에서 주박:
-  // 밤에 상대에게 넘기는 게 아니라 본인이 숙소에서 자고 아침에 그 열차를 다시 이어받음.
+  // 주박 자가교대 — 야간 근무 중 원격지(여/애/왕/군/하/화 등)에서 주박:
+  // 밤에 상대에게 넘기는 게 아니라 본인이 숙소에서 자고 아침에 그 편성을 다시 몰고 나옴.
   // → 밤 도착 구간의 '넘김', 새벽 재출발 구간의 '받음'은 모두 본인.
-  // (기지 1xxx/2xxx 입·출고 유치 경계는 실제 주박 아님 → 제외, 이미 교대 없음 처리됨)
-  if (isNight) {
+  //
+  // ★ 판정은 시각이 아니라 «행로 약호» 로 한다. 야간 근무자는 어차피 모두 자정을 넘겨
+  //   길게 쉬므로 「자정 넘김 + 2시간 이상」 만으로는 사업소 숙박(답→답, 8~9시간)까지
+  //   전부 주박으로 잡혀, 새벽에 실제로 열차를 넘겨준 사람이 「본인」으로 덮어씌워졌다.
+  //   진짜 주박은 앞 근무가 사업소가 아닌 곳에서 끝나고 다음 근무가 바로 그곳에서 시작한다.
+  //   (기지 1xxx/2xxx 입·출고 유치 경계는 실제 주박 아님 → 제외, 이미 교대 없음 처리됨)
+  const parts = isNight ? routeParts(mySchedule.m, segs.length) : null;
+  if (parts) {
     for (let i = 0; i < segs.length - 1; i++) {
       const cur = segs[i];
       const nxt = segs[i + 1];
       if (!cur.n || cur.n.length === 0 || !nxt.n || nxt.n.length === 0) continue;
-      const curLast = cur.n[cur.n.length - 1];
-      const nxtFirst = nxt.n[0];
-      if (isDepotTrain(curLast) || isDepotTrain(nxtFirst)) continue;
+      if (isDepotTrain(cur.n[cur.n.length - 1]) || isDepotTrain(nxt.n[0])) continue;
+      const stay = parts[i].slice(-1);            // 앞 근무를 마친 곳
+      if (!stay || stay !== parts[i + 1][0]) continue;  // 다음 근무를 그곳에서 이어가야 주박
+      if (stay === HOME_DEPOT_ABBR) continue;     // 사업소 숙박은 주박이 아니다
+      // 자정을 넘겨 새벽에 다시 나오는가
       const aPrev = timeToMins(cur.a);
       const dPrev = timeToMins(cur.d);
       const dNext = timeToMins(nxt.d);
-      if (aPrev < 0 || dPrev < 0 || dNext < 0) continue;
-      // 자정 넘겨 새벽 재출발(시각 되감김) + 충분한 휴식 간격(≥120분) = 주박
-      const gap = dNext + 1440 - aPrev;
-      if (dNext < dPrev && gap >= 120) {
-        if (!partners[i]) partners[i] = {};
-        partners[i].right = JUBAK_SELF;      // 밤: 넘김 = 본인
-        if (!partners[i + 1]) partners[i + 1] = {};
-        partners[i + 1].left = JUBAK_SELF;   // 새벽: 받음 = 본인
-      }
+      if (aPrev < 0 || dPrev < 0 || dNext < 0 || dNext >= dPrev) continue;
+      // 이미 찾은 상대는 덮어쓰지 않는다 — 실제 교대자가 있으면 그쪽이 맞다
+      if (!partners[i]) partners[i] = {};
+      if (!partners[i].right) partners[i].right = JUBAK_SELF;      // 밤: 넘김 = 본인
+      if (!partners[i + 1]) partners[i + 1] = {};
+      if (!partners[i + 1].left) partners[i + 1].left = JUBAK_SELF; // 새벽: 받음 = 본인
     }
   }
 

@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones, Eraser, BookmarkPlus, Share, Copy, NotebookPen } from 'lucide-react';
 import RegulationReader from './RegulationReader';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
-import { useAnnotations, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
+import { useAnnotations, HIGHLIGHT_COLORS, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
 import { useFontSizeStore } from '@/stores/fontSize';
+import { showToast } from '@/components/common/Toast';
 import styles from './RegulationViewer.module.css';
 
 /** url에서 regulationId 추출 (예: /data/edu/regulations/operation-rules-search.json → operation-rules) */
@@ -205,8 +206,14 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   // ── 형광·메모 (localStorage) ──
   const regulationId = deriveRegulationId(url);
   const { annotations, add: addAnnotation, update: updateAnnotation, remove: removeAnnotation } = useAnnotations(regulationId);
-  const [selPopover, setSelPopover] = useState<{
-    text: string; before: string; after: string; page: number; x: number; y: number;
+  /**
+   * 지금 잡힌 본문 조각. 잡히면 화면 아래에서 «작업 막대»가 올라온다.
+   * 잡는 방법은 셋인데 모두 같은 자리에 들어온다 —
+   *   ① 항을 탭 (기본)  ② 형광펜 모드에서 문장 탭  ③ 끌어서 구간 지정
+   * blockKey 는 «어느 항을 탭했는가» — 그 항을 회색으로 반전시키는 데만 쓴다.
+   */
+  const [selection, setSelection] = useState<{
+    text: string; before: string; after: string; page: number; blockKey?: string;
   } | null>(null);
   const [memoEditor, setMemoEditor] = useState<{ id: string; text: string; memo: string } | null>(null);
   const [memoDraft, setMemoDraft] = useState('');
@@ -219,7 +226,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
 
   useHistoryBack('regulation-pdf', () => setPdfOpen(false), pdfOpen);
   useHistoryBack('regulation-reader', () => setReaderOpen(false), readerOpen);
-  useHistoryBack('regulation-popover', () => setSelPopover(null), !!selPopover);
+  useHistoryBack('regulation-popover', () => setSelection(null), !!selection);
   useHistoryBack('regulation-memo', () => setMemoEditor(null), !!memoEditor);
   useHistoryBack('regulation-notes', () => setNotesOpen(false), notesOpen);
 
@@ -229,13 +236,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       if (e.key !== 'Escape') return;
       if (notesOpen) setNotesOpen(false);
       else if (memoEditor) setMemoEditor(null);
-      else if (selPopover) setSelPopover(null);
+      else if (selection) setSelection(null);
       else if (pdfOpen) setPdfOpen(false);
       else onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [notesOpen, memoEditor, selPopover, pdfOpen, onClose]);
+  }, [notesOpen, memoEditor, selection, pdfOpen, onClose]);
 
   useEffect(() => {
     let active = true;
@@ -373,14 +380,11 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     const text = src.slice(s, e).trim();
     if (text.length < 2) return;
 
-    const rect = (el as HTMLElement).getBoundingClientRect();
-    setSelPopover({
+    setSelection({
       text: text.slice(0, 300),
       before: src.slice(Math.max(0, s - 30), s),
       after: src.slice(e, e + 30),
       page,
-      x: Math.min(Math.max(rect.left + rect.width / 2, 90), window.innerWidth - 90),
-      y: clientY - 12,
     });
   }, [pages]);
 
@@ -414,13 +418,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       if (pos < 0) return;
       const before = pageData.text.slice(Math.max(0, pos - 30), pos);
       const after = pageData.text.slice(pos + text.length, pos + text.length + 30);
-      // 팝오버 위치
-      const rect = range.getBoundingClientRect();
-      setSelPopover({
-        text, before, after, page,
-        x: rect.left + rect.width / 2,
-        y: rect.top,
-      });
+      setSelection({ text, before, after, page });
     };
     document.addEventListener('mouseup', handleSelectionEnd);
     document.addEventListener('touchend', handleSelectionEnd);
@@ -500,7 +498,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       startXY = { x: e.clientX, y: e.clientY };
       dragged = false;
       paint(null);
-      setSelPopover(null);
+      setSelection(null);
     };
 
     const onMove = (e: PointerEvent) => {
@@ -553,14 +551,11 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       const s = map[at];
       const e2 = map[Math.min(at + target.length - 1, map.length - 1)] + 1;
 
-      const rect = range.getBoundingClientRect();
-      setSelPopover({
+      setSelection({
         text: src.slice(s, e2),
         before: src.slice(Math.max(0, s - 30), s),
         after: src.slice(e2, e2 + 30),
         page,
-        x: Math.min(Math.max(rect.left + rect.width / 2, 90), window.innerWidth - 90),
-        y: rect.top,
       });
     };
 
@@ -578,16 +573,18 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
 
   // 팝오버가 닫히면 미리보기도 지운다
   useEffect(() => {
-    if (selPopover) return;
+    if (selection) return;
     if (typeof CSS === 'undefined' || !('highlights' in CSS)) return;
     (CSS as unknown as { highlights: Map<string, unknown> }).highlights.delete('regsel');
-  }, [selPopover]);
+  }, [selection]);
 
   // ── annotations → DOM 적용 (텍스트 노드 walk + wrap) ──
   useEffect(() => {
     const root = bodyRef.current;
     if (!root) return;
     // 1) 기존 annotation 마크 제거 (텍스트 노드로 복원)
+    // 메모 뱃지부터 걷어낸다 — 형광 밖으로 흘러나온 뱃지가 남으면 본문에 📝만 둥둥 뜬다
+    root.querySelectorAll('[data-anno-badge]').forEach((el) => el.remove());
     root.querySelectorAll(`[data-anno]`).forEach((el) => {
       const parent = el.parentNode;
       if (!parent) return;
@@ -660,90 +657,236 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
           }
           return null;
         };
-        const startLoc = findNodeFor(idx);
-        const endLoc = findNodeFor(endIdx);
-        if (!startLoc || !endLoc) continue;
+        /* 걸치는 «텍스트 마디»마다 따로 칠한다.
+           예전엔 시작~끝을 한 Range 로 잡아 extractContents 로 통째 들어냈는데, 항 하나처럼
+           여러 줄·여러 span 에 걸친 형광에서는 그 덩어리가 문단 상자(.textBlock) 밖으로
+           끌려 나와 본문이 어긋났다(실측: 형광이 본문 아래에 따로 떨어져 그려짐).
+           마디별로 감싸면 문단 구조는 한 글자도 건드리지 않는다. */
+        const parts: { node: Text; from: number; to: number }[] = [];
+        for (const o of offsets) {
+          const nodeStart = o.start;
+          const nodeEnd = o.start + o.node.data.length;
+          if (nodeEnd <= idx || nodeStart >= endIdx) continue;
+          parts.push({
+            node: o.node,
+            from: Math.max(idx, nodeStart) - nodeStart,
+            to: Math.min(endIdx, nodeEnd) - nodeStart,
+          });
+        }
+        if (parts.length === 0) continue;
 
-        // Range 생성 후 surroundContents 시도. 노드 경계 걸치면 splitText로 정리.
-        try {
-          const range = document.createRange();
-          range.setStart(startLoc.node, startLoc.offset);
-          range.setEnd(endLoc.node, endLoc.offset);
-          const span = document.createElement('span');
-          span.setAttribute('data-anno', anno.id);
-          span.setAttribute('data-color', anno.color);
-          span.className = styles.annotation + ' ' + styles[`annotationColor_${anno.color}`];
-          if (anno.memo) span.setAttribute('title', anno.memo);
-          // 단일 텍스트 노드 안이면 surroundContents 가능
-          if (startLoc.node === endLoc.node) {
+        let lastSpan: HTMLElement | null = null;
+        for (const part of parts) {
+          if (part.to <= part.from) continue;
+          // 공백만 걸린 마디는 건너뛴다 — 빈 형광 상자가 생기는 것을 막는다
+          if (!part.node.data.slice(part.from, part.to).trim()) continue;
+          try {
+            const range = document.createRange();
+            range.setStart(part.node, part.from);
+            range.setEnd(part.node, part.to);
+            const span = document.createElement('span');
+            span.setAttribute('data-anno', anno.id);
+            span.setAttribute('data-color', anno.color);
+            span.className = styles.annotation + ' ' + styles[`annotationColor_${anno.color}`];
+            if (anno.memo) span.setAttribute('title', anno.memo);
             range.surroundContents(span);
-          } else {
-            // 여러 노드 걸치면 extractContents → append → insert
-            const frag = range.extractContents();
-            span.appendChild(frag);
-            range.insertNode(span);
-          }
-          // 메모 있으면 작은 인디케이터 추가
-          if (anno.memo) {
-            const badge = document.createElement('span');
-            badge.className = styles.annotationMemoBadge;
-            badge.setAttribute('data-anno-badge', anno.id);
-            badge.textContent = '📝';
-            badge.setAttribute('aria-label', '메모 보기');
-            span.appendChild(badge);
-          }
-        } catch { /* 일부 케이스에서 wrap 실패 — 무시하고 다음 annotation 처리 */ }
+            lastSpan = span;
+          } catch { /* 이 마디만 건너뛴다 */ }
+        }
+
+        // 메모·북마크 표시는 맨 끝에 한 번만
+        if (lastSpan && (anno.memo || anno.bookmark)) {
+          const badge = document.createElement('span');
+          badge.className = styles.annotationMemoBadge;
+          badge.setAttribute('data-anno-badge', anno.id);
+          badge.textContent = anno.bookmark ? (anno.memo ? '🔖📝' : '🔖') : '📝';
+          badge.setAttribute('aria-label', anno.bookmark ? '북마크' : '메모 보기');
+          lastSpan.appendChild(badge);
+        }
       }
     });
   }, [annotations, pages, query, activeMatchIdx, fontSize]);
 
-  // ── 본문 클릭 → annotation 클릭 처리 (메모 보기·편집) ──
+  /**
+   * 본문 탭 → 그 «항»을 잡는다. (갓피플 성경에서 절을 누르는 것과 같다)
+   *
+   * 이미 형광이 칠해진 자리를 누르면 그 형광 조각을 그대로 잡는다 — 색을 바꾸거나
+   * 메모를 고칠 때 엉뚱하게 항 전체가 잡히지 않도록.
+   *
+   * 글자를 끌어서 고르고 있는 중이면(선택이 살아 있으면) 건드리지 않는다. 끌기는
+   * 원래대로 «구간 지정» 이고, 그 처리는 아래 selection 핸들러가 맡는다.
+   */
   useEffect(() => {
     const root = bodyRef.current;
     if (!root) return;
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
+      // 목차 카드·버튼 등 본문이 아닌 것은 그대로 둔다
+      if (target.closest('button, a, input, textarea')) return;
+      const sel = window.getSelection();
+      if (sel && !sel.isCollapsed && sel.toString().trim().length > 1) return;
+
+      const pageEl = target.closest('[data-page]') as HTMLElement | null;
+      if (!pageEl) return;
+      const page = parseInt(pageEl.dataset.page || '0', 10);
+      const pageData = pages.find((pg) => pg.page === page);
+      if (!page || !pageData) return;
+
+      // ① 형광 조각을 눌렀으면 그 조각
       const annoEl = target.closest('[data-anno]') as HTMLElement | null;
-      if (!annoEl) return;
-      const id = annoEl.dataset.anno;
-      if (!id) return;
-      const anno = annotations.find((a) => a.id === id);
-      if (!anno) return;
-      e.stopPropagation();
-      setMemoEditor({ id, text: anno.text, memo: anno.memo ?? '' });
-      setMemoDraft(anno.memo ?? '');
+      const anno = annoEl ? annotations.find((a) => a.id === annoEl.dataset.anno) : undefined;
+      if (anno) {
+        setSelection({ text: anno.text, before: anno.before, after: anno.after, page: anno.page });
+        return;
+      }
+
+      // ② 아니면 그 항 전체
+      const blockEl = target.closest('[data-bstart]') as HTMLElement | null;
+      if (!blockEl) return;
+      const start = parseInt(blockEl.dataset.bstart || '', 10);
+      const len = parseInt(blockEl.dataset.blen || '', 10);
+      if (!Number.isFinite(start) || !Number.isFinite(len) || len < 2) return;
+      const src = pageData.text;
+      const text = src.slice(start, start + len).trim();
+      if (text.length < 2) return;
+      setSelection({
+        text,
+        before: src.slice(Math.max(0, start - 30), start),
+        after: src.slice(start + len, start + len + 30),
+        page,
+        blockKey: `${page}:${start}`,
+      });
     };
     root.addEventListener('click', onClick);
     return () => root.removeEventListener('click', onClick);
-  }, [annotations]);
+  }, [annotations, pages]);
 
+  /* 잡힌 항을 회색으로 반전. 본문은 블록이 수백 개라 다시 그리면 무거워서,
+     클래스만 직접 붙였다 뗀다. */
+  useEffect(() => {
+    const root = bodyRef.current;
+    if (!root) return;
+    const key = selection?.blockKey;
+    if (!key) return;
+    const [pageStr, startStr] = key.split(':');
+    const el = root.querySelector<HTMLElement>(`[data-page="${pageStr}"] [data-bstart="${startStr}"]`);
+    if (!el) return;
+    el.classList.add(styles.blockPicked);
+    return () => el.classList.remove(styles.blockPicked);
+  }, [selection]);
+
+  const clearSelection = useCallback(() => {
+    setSelection(null);
+    window.getSelection()?.removeAllRanges();
+  }, []);
+
+  /** 지금 잡힌 자리에 이미 저장된 형광·메모·북마크가 있는가 (같은 페이지 + 글이 겹치면 같은 자리로 본다) */
+  const pickedAnnotation = useMemo(() => {
+    if (!selection) return undefined;
+    const mine = selection.text.replace(/\s+/g, '');
+    return annotations.find((a) => {
+      if (a.page !== selection.page) return false;
+      const his = a.text.replace(/\s+/g, '');
+      return his === mine || his.includes(mine) || mine.includes(his);
+    });
+  }, [selection, annotations]);
+
+  /** 형광색 — 이미 있으면 색만 갈아입히고, 없으면 새로 만든다 */
   const handleAddHighlight = useCallback((color: HighlightColor) => {
-    if (!selPopover) return;
-    addAnnotation({
-      page: selPopover.page,
-      text: selPopover.text,
-      before: selPopover.before,
-      after: selPopover.after,
-      color,
-    });
-    setSelPopover(null);
-    window.getSelection()?.removeAllRanges();
-  }, [selPopover, addAnnotation]);
+    if (!selection) return;
+    if (pickedAnnotation) updateAnnotation(pickedAnnotation.id, { color });
+    else {
+      addAnnotation({
+        page: selection.page,
+        text: selection.text,
+        before: selection.before,
+        after: selection.after,
+        color,
+      });
+    }
+    clearSelection();
+  }, [selection, pickedAnnotation, addAnnotation, updateAnnotation, clearSelection]);
 
+  /** 지우개 — 색을 지운다. 메모나 북마크가 남아 있으면 그것까지 지우지는 않는다. */
+  const handleEraseHighlight = useCallback(() => {
+    if (!pickedAnnotation) { clearSelection(); return; }
+    const keep = pickedAnnotation.memo?.trim() || pickedAnnotation.bookmark;
+    if (keep) updateAnnotation(pickedAnnotation.id, { color: 'none' });
+    else removeAnnotation(pickedAnnotation.id);
+    showToast(keep ? '형광만 지웠어요' : '표시를 지웠어요', 'info');
+    clearSelection();
+  }, [pickedAnnotation, updateAnnotation, removeAnnotation, clearSelection]);
+
+  const handleToggleBookmark = useCallback(() => {
+    if (!selection) return;
+    if (pickedAnnotation) {
+      const next = !pickedAnnotation.bookmark;
+      updateAnnotation(pickedAnnotation.id, { bookmark: next });
+      showToast(next ? '북마크에 담았어요' : '북마크에서 뺐어요', next ? 'success' : 'info');
+    } else {
+      addAnnotation({
+        page: selection.page,
+        text: selection.text,
+        before: selection.before,
+        after: selection.after,
+        color: 'none',
+        bookmark: true,
+      });
+      showToast('북마크에 담았어요', 'success');
+    }
+    clearSelection();
+  }, [selection, pickedAnnotation, addAnnotation, updateAnnotation, clearSelection]);
+
+  /** 공유·복사에 붙일 출처 — 어느 규정 몇 쪽인지 알아야 남에게 보내도 쓸모가 있다 */
+  const selectionForShare = useCallback(() => {
+    if (!selection) return '';
+    return `${selection.text}
+
+— ${title} p.${selection.page}`;
+  }, [selection, title]);
+
+  const handleCopy = useCallback(async () => {
+    const body = selectionForShare();
+    if (!body) return;
+    try {
+      await navigator.clipboard.writeText(body);
+      showToast('복사했어요', 'success');
+    } catch {
+      showToast('복사할 수 없어요', 'error');
+    }
+    clearSelection();
+  }, [selectionForShare, clearSelection]);
+
+  const handleShare = useCallback(async () => {
+    const body = selectionForShare();
+    if (!body) return;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text: body });
+      } else {
+        await navigator.clipboard.writeText(body);
+        showToast('공유가 안 되는 기기예요 — 복사했어요', 'info');
+      }
+    } catch {
+      /* 사용자가 공유창을 닫은 것도 여기로 온다 — 알릴 것 없다 */
+    }
+    clearSelection();
+  }, [selectionForShare, title, clearSelection]);
+
+  /** 노트작성 — 이미 있으면 그 메모를 고치고, 없으면 형광 없이 메모만 남긴다 */
   const handleAddWithMemo = useCallback(() => {
-    if (!selPopover) return;
-    const item = addAnnotation({
-      page: selPopover.page,
-      text: selPopover.text,
-      before: selPopover.before,
-      after: selPopover.after,
-      color: 'yellow',
+    if (!selection) return;
+    const item = pickedAnnotation ?? addAnnotation({
+      page: selection.page,
+      text: selection.text,
+      before: selection.before,
+      after: selection.after,
+      color: 'none',
     });
-    setMemoEditor({ id: item.id, text: item.text, memo: '' });
-    setMemoDraft('');
-    setSelPopover(null);
-    window.getSelection()?.removeAllRanges();
-  }, [selPopover, addAnnotation]);
+    setMemoEditor({ id: item.id, text: item.text, memo: item.memo ?? '' });
+    setMemoDraft(item.memo ?? '');
+    clearSelection();
+  }, [selection, pickedAnnotation, addAnnotation, clearSelection]);
 
   const handleMemoSave = useCallback(() => {
     if (!memoEditor) return;
@@ -856,7 +999,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     // 조문 머리(예: "제39조(열차의운전방향)") 강조용 정규식
     const ARTICLE_RE = /제\s*\d+\s*조(?:\s*\([^)]+\))?/g;
 
-    const renderBlock = (blockText: string, blockKey: string): ReactNode => {
+    const renderBlock = (blockText: string, blockKey: string, blockStart: number): ReactNode => {
       const children: ReactNode[] = [];
       let bcur = 0;
       let subKey = 0;
@@ -910,10 +1053,17 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         );
         if (countRe) localMatchOffset += (tail.match(countRe) || []).length;
       }
-      return <div key={blockKey} className={styles.textBlock}>{children}</div>;
+      /* data-bstart/blen — 이 덩어리가 페이지 «원문»의 어디부터 어디까지인가.
+         항을 탭했을 때 원문을 그대로 오려내기 위한 좌표다. 화면에 그려진 글자에서
+         거꾸로 찾으면 공백·줄바꿈이 달라 어긋나는데, 이 좌표는 어긋날 일이 없다. */
+      return (
+        <div key={blockKey} className={styles.textBlock} data-bstart={blockStart} data-blen={blockText.length}>
+          {children}
+        </div>
+      );
     };
 
-    const pushText = (slice: string, key: string) => {
+    const pushText = (slice: string, key: string, base: number) => {
       if (slice.length === 0) return;
       // 원본 텍스트는 그대로 두고, 구조적 시작점 기준으로 블록 div를 만들어 white-space:normal로 렌더
       const blocks = computeBlocks(slice);
@@ -925,13 +1075,13 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       }
       blocks.forEach(([s, e], bi) => {
         const blockText = slice.slice(s, e);
-        segments.push(renderBlock(blockText, `${key}-b${bi}`));
+        segments.push(renderBlock(blockText, `${key}-b${bi}`, base + s));
       });
     };
 
     for (const toc of pageToc) {
       if (cursor < toc.startInPage) {
-        pushText(p.text.slice(cursor, toc.startInPage), `t-${cursor}`);
+        pushText(p.text.slice(cursor, toc.startInPage), `t-${cursor}`, cursor);
       }
       const markerText = p.text.slice(toc.startInPage, toc.startInPage + toc.matchLength);
       // 머리말 부분 추출: "제N장" + 공백/줄바꿈 후의 제목까지
@@ -957,7 +1107,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     }
 
     if (cursor < p.text.length) {
-      pushText(p.text.slice(cursor), `t-${cursor}-end`);
+      pushText(p.text.slice(cursor), `t-${cursor}-end`, cursor);
     }
 
     return segments;
@@ -1081,7 +1231,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         <button
           type="button"
           className={`${styles.pdfBtn} ${markMode ? styles.markModeOn : ''}`}
-          onClick={() => { setMarkMode((v) => !v); setSelPopover(null); window.getSelection()?.removeAllRanges(); }}
+          onClick={() => { setMarkMode((v) => !v); setSelection(null); window.getSelection()?.removeAllRanges(); }}
           aria-pressed={markMode}
           aria-label={markMode ? '형광펜 모드 끄기' : '형광펜 모드 켜기 — 문장을 눌러 표시'}
         >
@@ -1204,7 +1354,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
 
       {/* 목차로 빠르게 이동하는 FAB — TOC 카드가 화면 밖으로 나갔을 때 노출.
           낭독 패널이 열리면 하단 속도 버튼(1.5배)을 덮어 못 누르게 되므로 숨긴다. */}
-      {showTocFab && tocEntries.length > 0 && !readerOpen && (
+      {showTocFab && tocEntries.length > 0 && !readerOpen && !selection && (
         <button
           type="button"
           className={styles.tocFab}
@@ -1253,49 +1403,52 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         </div>
       )}
 
-      {/* 형광색 선택 팝오버 (텍스트 선택 직후) */}
-      {selPopover && (
-        <div
-          className={styles.annoPopover}
-          /* STYLE-EXCEPTION: 동적 좌표 (브라우저 selection 위치) */
-          style={{ left: selPopover.x, top: selPopover.y }}
-          role="dialog"
-          aria-label="형광 선택"
-        >
-          <button
-            type="button"
-            className={`${styles.annoColorBtn} ${styles.annoColorYellow}`}
-            onClick={() => handleAddHighlight('yellow')}
-            aria-label="노랑 형광"
-          />
-          <button
-            type="button"
-            className={`${styles.annoColorBtn} ${styles.annoColorPink}`}
-            onClick={() => handleAddHighlight('pink')}
-            aria-label="분홍 형광"
-          />
-          <button
-            type="button"
-            className={`${styles.annoColorBtn} ${styles.annoColorGreen}`}
-            onClick={() => handleAddHighlight('green')}
-            aria-label="초록 형광"
-          />
-          <button
-            type="button"
-            className={styles.annoMemoBtn}
-            onClick={handleAddWithMemo}
-            aria-label="형광 + 메모"
-          >
-            📝
-          </button>
-          <button
-            type="button"
-            className={styles.annoCloseBtn}
-            onClick={() => setSelPopover(null)}
-            aria-label="취소"
-          >
-            ✕
-          </button>
+      {/* 잡은 자리에 대고 할 일 — 화면 아래에서 올라온다 (갓피플 성경의 절 선택 막대와 같은 얼개) */}
+      {selection && (
+        <div className={styles.actionBar} role="dialog" aria-label="선택한 본문으로 할 일">
+          <p className={styles.actionBarQuote}>{selection.text}</p>
+
+          <div className={styles.penRow}>
+            {HIGHLIGHT_COLORS.map((c) => (
+              <button
+                key={c.key}
+                type="button"
+                className={`${styles.penDot} ${styles[`pen_${c.key}`]} ${pickedAnnotation?.color === c.key ? styles.penDotOn : ''}`}
+                onClick={() => handleAddHighlight(c.key)}
+                aria-label={`${c.label} 형광펜`}
+                aria-pressed={pickedAnnotation?.color === c.key}
+              />
+            ))}
+            <button
+              type="button"
+              className={styles.penEraser}
+              onClick={handleEraseHighlight}
+              aria-label="형광펜 지우개"
+            >
+              <Eraser size={16} strokeWidth={2.2} aria-hidden />
+            </button>
+          </div>
+
+          <div className={styles.actRow}>
+            <button type="button" className={styles.actBtn} onClick={handleToggleBookmark}>
+              <BookmarkPlus size={20} strokeWidth={1.8} aria-hidden className={pickedAnnotation?.bookmark ? styles.actIconOn : undefined} />
+              <span>{pickedAnnotation?.bookmark ? '북마크해제' : '북마크추가'}</span>
+            </button>
+            <button type="button" className={styles.actBtn} onClick={handleShare}>
+              <Share size={20} strokeWidth={1.8} aria-hidden />
+              <span>SNS공유</span>
+            </button>
+            <button type="button" className={styles.actBtn} onClick={handleCopy}>
+              <Copy size={20} strokeWidth={1.8} aria-hidden />
+              <span>복사하기</span>
+            </button>
+            <button type="button" className={styles.actBtn} onClick={handleAddWithMemo}>
+              <NotebookPen size={20} strokeWidth={1.8} aria-hidden />
+              <span>{pickedAnnotation?.memo ? '노트수정' : '노트작성'}</span>
+            </button>
+          </div>
+
+          <button type="button" className={styles.actCancel} onClick={clearSelection}>선택 취소</button>
         </div>
       )}
 
@@ -1330,12 +1483,12 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         <div className={styles.notesOverlay} role="dialog" aria-modal="true" aria-label="내 메모 목록" onClick={(e) => { if (e.target === e.currentTarget) setNotesOpen(false); }}>
           <div className={styles.notesSheet}>
             <div className={styles.notesHeader}>
-              <h3 className={styles.notesTitle}>내 메모 · 형광 <span className={styles.notesCount}>{annotations.length}건</span></h3>
+              <h3 className={styles.notesTitle}>내 표시 <span className={styles.notesCount}>{annotations.length}건</span></h3>
               <button type="button" className={styles.memoClose} onClick={() => setNotesOpen(false)} aria-label="닫기">✕</button>
             </div>
             <div className={styles.notesList}>
               {annotations.length === 0 && (
-                <p className={styles.notesEmpty}>본문에서 글자를 선택하면 형광을 칠하거나 메모를 남길 수 있어요</p>
+                <p className={styles.notesEmpty}>본문에서 항(①②③)을 누르면 형광펜·북마크·노트를 남길 수 있어요</p>
               )}
               {annotations.slice().sort((a, b) => a.page - b.page || a.updatedAt.localeCompare(b.updatedAt)).map((a) => (
                 <button
@@ -1346,6 +1499,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
                 >
                   <div className={styles.notesItemHead}>
                     <span className={styles.notesItemPage}>p. {a.page}</span>
+                    {a.bookmark && <span className={styles.notesItemMemoBadge} aria-label="북마크">🔖</span>}
                     {a.memo && <span className={styles.notesItemMemoBadge}>📝</span>}
                   </div>
                   <p className={styles.notesItemText}>{a.text}</p>

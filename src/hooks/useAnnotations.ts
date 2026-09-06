@@ -7,7 +7,20 @@ import { useCallback, useEffect, useState } from 'react';
  * 한 기기 안에서만 유지되며, 클라이언트 단독 동작.
  */
 
-export type HighlightColor = 'yellow' | 'pink' | 'green';
+/**
+ * 형광색. 'none' 은 «칠하지 않음» — 북마크나 메모만 남기고 색은 안 입힌 자리다.
+ * (yellow·pink·green 은 6색으로 늘리기 전부터 쓰던 값이라 그대로 둔다)
+ */
+export type HighlightColor = 'yellow' | 'pink' | 'green' | 'orange' | 'blue' | 'purple' | 'none';
+
+export const HIGHLIGHT_COLORS: { key: HighlightColor; label: string }[] = [
+  { key: 'pink', label: '분홍' },
+  { key: 'orange', label: '주황' },
+  { key: 'yellow', label: '노랑' },
+  { key: 'green', label: '초록' },
+  { key: 'blue', label: '파랑' },
+  { key: 'purple', label: '보라' },
+];
 
 export interface Annotation {
   /** 안정 식별자 (timestamp + random) */
@@ -26,6 +39,8 @@ export interface Annotation {
   color: HighlightColor;
   /** 메모 (선택) */
   memo?: string;
+  /** 북마크 — 나중에 다시 찾아올 자리 표시 */
+  bookmark?: boolean;
   /** ISO 생성/수정 시각 */
   updatedAt: string;
 }
@@ -74,7 +89,7 @@ export function useAnnotations(regulationId: string) {
     return item;
   }, [regulationId]);
 
-  const update = useCallback((id: string, patch: Partial<Pick<Annotation, 'color' | 'memo'>>) => {
+  const update = useCallback((id: string, patch: Partial<Pick<Annotation, 'color' | 'memo' | 'bookmark'>>) => {
     setAll((prev) => {
       const next = prev.map((a) => a.id === id ? { ...a, ...patch, updatedAt: new Date().toISOString() } : a);
       saveAll(next);

@@ -681,10 +681,22 @@
 .annotationColor_yellow { background: rgba(250, 204, 21, 0.55); }
 .annotationColor_pink   { background: rgba(244, 114, 182, 0.45); }
 .annotationColor_green  { background: rgba(74, 222, 128, 0.45); }
+.annotationColor_orange { background: rgba(251, 146, 60, 0.45); }
+.annotationColor_blue   { background: rgba(96, 165, 250, 0.45); }
+.annotationColor_purple { background: rgba(167, 139, 250, 0.45); }
+/* 색은 안 칠하고 북마크·메모만 남긴 자리 — 옅은 밑줄로만 표시한다 */
+.annotationColor_none {
+  background: none;
+  border-bottom: 2px dotted var(--dia-blue);
+}
 
 :global(.light) .annotationColor_yellow { background: rgba(250, 204, 21, 0.7); }
 :global(.light) .annotationColor_pink   { background: rgba(244, 114, 182, 0.55); }
 :global(.light) .annotationColor_green  { background: rgba(74, 222, 128, 0.55); }
+:global(.light) .annotationColor_orange { background: rgba(251, 146, 60, 0.55); }
+:global(.light) .annotationColor_blue   { background: rgba(96, 165, 250, 0.55); }
+:global(.light) .annotationColor_purple { background: rgba(167, 139, 250, 0.55); }
+:global(.light) .annotationColor_none   { background: none; }
 
 .annotationMemoBadge {
   margin-left: 2px;
@@ -973,3 +985,141 @@
   line-height: 1.4;
   white-space: pre-wrap;
 }
+
+
+/* ─────────────────────────────────────────────
+ * 항을 눌러 고르고, 화면 아래 막대에서 처리한다
+ * (갓피플 성경의 «절 선택 → 하단 막대» 와 같은 얼개)
+ * ───────────────────────────────────────────── */
+
+/* 지금 고른 항 — 무슨 글을 잡았는지 눈으로 바로 알아야 한다.
+   토큰(--dia-surface-hover)은 본문 바탕과 너무 비슷해 고른 티가 안 났다.
+   밝은 화면·어두운 화면 양쪽에서 같은 정도로 도드라지는 회색을 직접 쓴다. */
+.blockPicked {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: var(--dia-radius-sm);
+  box-shadow: 0 0 0 5px rgba(148, 163, 184, 0.3);
+}
+
+.actionBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--dia-layer-modal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4) calc(var(--dia-space-3) + var(--sab));
+  background: var(--dia-sheet-fill);
+  border-top: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-2xl) var(--dia-radius-2xl) 0 0;
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
+  animation: actionBarUp 200ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes actionBarUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* 무엇을 잡았는지 한 줄로 되짚어 준다 — 막대가 본문을 가리기 때문 */
+.actionBarQuote {
+  margin: 0;
+  font-size: var(--dia-text-meta);
+  color: var(--dia-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.penRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+
+.penDot {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: var(--dia-radius-full);
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 2px 5px rgba(15, 23, 42, 0.18);
+}
+
+/* 지금 칠해져 있는 색은 테두리로 알려 준다 */
+.penDotOn {
+  border-color: var(--dia-text);
+  transform: scale(1.06);
+}
+
+.pen_pink   { background: linear-gradient(160deg, #f9a8d4, #ec4899); }
+.pen_orange { background: linear-gradient(160deg, #fdba74, #f97316); }
+.pen_yellow { background: linear-gradient(160deg, #fde047, #facc15); }
+.pen_green  { background: linear-gradient(160deg, #86efac, #22c55e); }
+.pen_blue   { background: linear-gradient(160deg, #93c5fd, #3b82f6); }
+.pen_purple { background: linear-gradient(160deg, #c4b5fd, #8b5cf6); }
+
+.penEraser {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+  background: var(--zg-card-fill, var(--dia-bg-elevated));
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.12);
+}
+
+.penDot:active,
+.penEraser:active { transform: scale(0.92); }
+
+.actRow {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+
+.actBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: var(--dia-space-2) var(--dia-space-1);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--zg-card-fill, var(--dia-bg-elevated));
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
+  color: var(--dia-text);
+  font-size: var(--dia-text-meta);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.actBtn:active { background: var(--dia-surface-hover); }
+
+.actIconOn { color: var(--dia-blue); }
+
+.actCancel {
+  align-self: center;
+  min-width: 120px;
+  padding: var(--dia-space-2) var(--dia-space-5);
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+  background: var(--zg-card-fill, var(--dia-bg-elevated));
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  cursor: pointer;
+}
+
+.actCancel:active { background: var(--dia-surface-hover); }

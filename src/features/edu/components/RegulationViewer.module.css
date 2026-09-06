@@ -1072,6 +1072,18 @@
   to { transform: translateY(0); }
 }
 
+/* 몇 곳을 골랐는가 */
+.actionBarCount {
+  display: inline-block;
+  margin-right: var(--dia-space-2);
+  padding: 1px 8px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+}
+
 /* 무엇을 잡았는지 한 줄로 되짚어 준다 — 막대가 본문을 가리기 때문 */
 .actionBarQuote {
   margin: 0;

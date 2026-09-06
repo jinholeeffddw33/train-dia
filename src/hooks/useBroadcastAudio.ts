@@ -21,10 +21,13 @@ function stopAll() {
     try { currentAudio.pause(); currentAudio.src = ''; } catch { /* ignore */ }
     currentAudio = null;
   }
-  if (typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
   if (currentId !== null) {
+    /* 음성 정지는 «우리가 틀어 놓은 것이 있을 때만». speechSynthesis.cancel() 은
+       페이지 전체에 걸리는 명령이라, 아무것도 안 틀어 놓고 부르면 화면이 가려지는
+       순간 규정 읽어주기까지 함께 꺼졌다. */
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     currentId = null;
     notify();
   }

@@ -262,6 +262,12 @@ export function useRegulationReader(regulationId: string) {
   /* cancel() 이 부르는 onend 와 자연 종료 onend 를 구분하는 표식.
      구분하지 않으면 정지·건너뛸 때 다음 조각이 한 번 더 튀어 나간다. */
   const genRef = useRef(0);
+  /** 연속 실패 횟수 — 한 조각이라도 제대로 읽히면 0 으로 돌아간다 */
+  const failRef = useRef(0);
+  /** 이어듣기로 다시 켠 것인가 — 조문을 처음부터 다시 읽지 않기 위한 표시 */
+  const resumingRef = useRef(false);
+  /** 지금 읽고 있는 조각 번호(렌더와 무관하게 읽어야 할 때가 있다) */
+  const chunkIdxRef = useRef(0);
 
   /* 속도는 재생 중에도 즉시 먹혀야 한다. MP3 는 playbackRate 로 음높이를 유지한 채
      빨라지고, 기기 음성은 다음 조각부터 반영된다(utterance 는 도중에 못 바꾼다). */
@@ -327,7 +333,16 @@ export function useRegulationReader(regulationId: string) {
   }, []);
   const acquireWake = useCallback(async () => {
     if (wakeRef.current || !('wakeLock' in navigator)) return;
-    try { wakeRef.current = await navigator.wakeLock.request('screen'); } catch { /* 배터리 절약 모드 등 — 낭독은 계속한다 */ }
+    try {
+      const sentinel = await navigator.wakeLock.request('screen');
+      /* 화면이 가려지면 브라우저가 스스로 놓아준다. 그런데 우리 손에 든 표는 그대로라
+         «이미 잡고 있다» 고 착각해 다시 잡지 않았고, 화면이 계속 꺼져 낭독이 뒤로 밀렸다.
+         놓아준 순간 손을 비워 둔다. */
+      sentinel.addEventListener('release', () => {
+        if (wakeRef.current === sentinel) wakeRef.current = null;
+      });
+      wakeRef.current = sentinel;
+    } catch { /* 배터리 절약 모드 등 — 낭독은 계속한다 */ }
   }, []);
 
   /**
@@ -370,9 +385,16 @@ export function useRegulationReader(regulationId: string) {
     setChunkIdx(0);
   }, [silence, releaseWake]);
 
-  /** 기기 음성으로 읽는다 — MP3 가 없거나 못 받았을 때의 대비책. */
-  const speakWithTts = useCallback((chunk: Chunk, onDone: () => void) => {
-    if (!supported) { onDone(); return; }
+  /**
+   * 기기 음성으로 읽는다 — MP3 가 없거나 못 받았을 때의 대비책.
+   *
+   * ★ 소리를 못 낸 것(onerror)과 다 읽은 것(onend)은 다르다.
+   *   예전엔 둘을 같은 것으로 봐서, 음성 엔진이 막힌 상태(화면이 꺼져 뒤로 밀렸을 때가
+   *   대표적이다)에서 조각마다 즉시 «다 읽었다» 가 되어 규정 전체가 눈 깜짝할 사이에
+   *   끝까지 흘러가고 낭독이 꺼져 있었다. 이제 실패는 실패로 알린다.
+   */
+  const speakWithTts = useCallback((chunk: Chunk, onDone: () => void, onFail?: () => void) => {
+    if (!supported) { (onFail ?? onDone)(); return; }
     const u = new SpeechSynthesisUtterance(chunk.text);
     u.lang = 'ko-KR';
     u.rate = rateRef.current;
@@ -382,7 +404,7 @@ export function useRegulationReader(regulationId: string) {
     else if (chunk.kind === 'notice') { u.pitch = 1.1; }
     if (voiceRef.current) u.voice = voiceRef.current;
     u.onend = onDone;
-    u.onerror = onDone;
+    u.onerror = () => (onFail ?? onDone)();
     window.speechSynthesis.speak(u);
   }, [supported]);
 
@@ -406,38 +428,74 @@ export function useRegulationReader(regulationId: string) {
       return;
     }
     setChunkIdx(i);
-    const next = () => { clearWatchdog(); if (gen === genRef.current) speakFrom(i + 1); };
+    chunkIdxRef.current = i;
+    const next = () => {
+      clearWatchdog();
+      failRef.current = 0;               // 한 조각이라도 제대로 읽혔으면 실패 기록은 지운다
+      if (gen === genRef.current) speakFrom(i + 1);
+    };
+
+    /**
+     * 소리가 안 났다. 다음으로 넘기지 «않고» 같은 조각을 다시 시도한다.
+     *
+     * 넘겨 버리면 — 실제로 그랬다 — 실패가 이어질 때 조각·조문이 순식간에 끝까지
+     * 흘러가 낭독이 저 혼자 꺼진다. 되풀이해 보되 간격을 두어, 화면이 꺼졌다가
+     * 돌아오면 그 자리에서 이어지게 한다.
+     * 세 번까지 해 보고 그래도 안 되면 한 조각만 건너뛴다(그마저도 사이를 둔다).
+     */
+    const retry = () => {
+      if (gen !== genRef.current) return;
+      clearWatchdog();
+      failRef.current += 1;
+      const tooMany = failRef.current % 4 === 0;   // 3번 실패 후 네 번째엔 한 칸 넘어간다
+      const wait = Math.min(400 * failRef.current, 3000);
+      watchdogRef.current = setTimeout(() => {
+        if (gen !== genRef.current) return;
+        speakFrom(tooMany ? i + 1 : i);
+      }, wait);
+    };
+
     /* 진행이 멎으면(onended/onend 유실) 스스로 다음 조각으로 넘어간다.
-       조각 길이로 넉넉한 상한을 잡아, 정상 재생은 건드리지 않고 멈춤만 되살린다. */
+       조각 길이로 넉넉한 상한을 잡아, 정상 재생은 건드리지 않고 멈춤만 되살린다.
+       넘어가기 전에 «앞 소리부터 끈다» — 안 끄면 늦게 도착한 앞 조각과 새 조각이
+       겹쳐 울리고, 사슬이 둘이 되어 조문 하나를 통째로 건너뛴다. */
     const armWatchdog = () => {
       clearWatchdog();
       const ms = (chunks[i].text.length * 140) / rateRef.current + 6000;
-      watchdogRef.current = setTimeout(() => { if (gen === genRef.current) speakFrom(i + 1); }, ms);
+      watchdogRef.current = setTimeout(() => {
+        if (gen !== genRef.current) return;
+        genRef.current += 1;                       // 멎은 사슬을 버린다
+        if (supported) window.speechSynthesis.cancel();
+        audioRef.current?.pause();
+        speakFrom(i + 1);
+      }, ms);
     };
     const url = audioUrlRef.current[i];
-    if (!url) { armWatchdog(); speakWithTts(chunks[i], next); return; }
+    if (!url) { armWatchdog(); speakWithTts(chunks[i], next, retry); return; }
 
     const el = audioRef.current ?? (audioRef.current = new Audio());
     el.src = url;
     el.playbackRate = rateRef.current;   // 브라우저가 음높이를 유지한 채 속도만 바꾼다
     el.onended = next;
-    el.onerror = () => { if (gen === genRef.current) speakWithTts(chunks[i], next); };
+    el.onerror = () => { if (gen === genRef.current) speakWithTts(chunks[i], next, retry); };
     armWatchdog();
-    el.play().catch(() => { if (gen === genRef.current) speakWithTts(chunks[i], next); });
+    el.play().catch(() => { if (gen === genRef.current) speakWithTts(chunks[i], next, retry); });
 
     /* 다음 조각을 미리 받아 둔다. 조각마다 요청이 나가서 그냥 두면 문장 사이가
        한 박자씩 끊긴다. 캐시에만 올려 두면 되므로 응답은 버린다. */
     const ahead = audioUrlRef.current[i + 1];
     if (ahead) fetch(ahead, { cache: 'force-cache' }).catch(() => {});
-  }, [speakWithTts]);
+  }, [speakWithTts, supported]);
 
   /* 조문이 바뀌면 그 조문을 처음부터 읽는다. 재생 중일 때만 — 멈춘 상태에서 조문만
      골라 둔 경우까지 소리가 나면 안 된다. */
   useEffect(() => {
     if (!articles || status !== 'playing') return;
+    if (resumingRef.current) { resumingRef.current = false; return; }  // 이어듣기 — 그 자리에서 잇는다
     const a = articles[artIdx];
     if (!a) { stop(); return; }         // 마지막 조문까지 읽었다
     genRef.current += 1;
+    failRef.current = 0;
     silence();
     chunksRef.current = articleToChunks(a);
     audioUrlRef.current = urlsFor(a, chunksRef.current.length);
@@ -482,8 +540,12 @@ export function useRegulationReader(regulationId: string) {
   const resume = useCallback(() => {
     unlock();                            // 제스처 안에서 <audio> 언락
     acquireWake();
+    /* 아래 «조문이 바뀌면 처음부터» 이펙트는 status 가 playing 으로 바뀌는 것만 봐도
+       돌아서, 이어듣기를 눌러도 조문 첫머리로 되감겼다. 이번은 이어듣기라고 알린다. */
+    resumingRef.current = true;
     setStatus('playing');
     genRef.current += 1;
+    failRef.current = 0;
     speakFrom(chunkIdx);
   }, [acquireWake, speakFrom, chunkIdx, unlock]);
 
@@ -508,6 +570,9 @@ export function useRegulationReader(regulationId: string) {
   useEffect(() => {
     if (!supported || status !== 'playing') return;
     const id = setInterval(() => {
+      /* 화면이 가려진 동안에는 건드리지 않는다. 안드로이드 크롬은 이때 pause 뒤
+         resume 이 돌아오지 않는 일이 있어, 깨우려던 것이 되레 낭독을 끊는다. */
+      if (document.visibilityState !== 'visible') return;
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.pause();
         window.speechSynthesis.resume();
@@ -516,12 +581,25 @@ export function useRegulationReader(regulationId: string) {
     return () => clearInterval(id);
   }, [supported, status]);
 
-  /* 화면이 다시 보이면 Wake Lock 은 자동 해제돼 있다 — 재생 중이면 다시 잡는다 */
+  /* 화면이 다시 보이면 Wake Lock 은 자동 해제돼 있다 — 재생 중이면 다시 잡는다.
+     그리고 가려진 동안 소리가 멎었을 수 있으니, 읽고 있어야 하는데 아무 소리도 안 나면
+     읽던 조각부터 다시 잇는다. 정지를 누르기 전까지는 스스로 꺼지지 않는다. */
   useEffect(() => {
-    const onVis = () => { if (document.visibilityState === 'visible' && status === 'playing') acquireWake(); };
+    const onVis = () => {
+      if (document.visibilityState !== 'visible' || status !== 'playing') return;
+      acquireWake();
+      const el = audioRef.current;
+      const mp3Playing = !!el && !el.paused && !el.ended;
+      const ttsPlaying = supported && window.speechSynthesis.speaking;
+      if (!mp3Playing && !ttsPlaying) {
+        genRef.current += 1;
+        failRef.current = 0;
+        speakFrom(chunkIdxRef.current);
+      }
+    };
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
-  }, [status, acquireWake]);
+  }, [status, acquireWake, supported, speakFrom]);
 
   useEffect(() => () => {
     genRef.current += 1;
@@ -535,6 +613,39 @@ export function useRegulationReader(regulationId: string) {
   /* 이 규정에 미리 합성한 음성이 있는가. 있으면 기기 음성 선택은 예비용이라
      화면에서 감춘다 — 고를 필요가 없는데 보이면 뭘 골라야 하나 헷갈린다. */
   const usingRecorded = !!audioMap && !!current && !!audioMap.chunks[String(current.n)];
+  /* 잠금화면·알림줄에 «지금 읽는 조문» 을 올린다.
+     보기 좋으라고만 하는 게 아니다 — 이걸 걸어 두면 화면을 끄거나 다른 앱으로 넘어가도
+     브라우저가 «소리 내는 중인 페이지» 로 대접해 뒤로 밀어내지 않는다. */
+  useEffect(() => {
+    const ms = typeof navigator !== 'undefined' ? navigator.mediaSession : undefined;
+    if (!ms) return;
+    if (status === 'idle' || !current) { ms.playbackState = 'none'; ms.metadata = null; return; }
+    ms.metadata = new MediaMetadata({
+      title: `제${current.n}조 ${articleTitle(current.title)}`.trim(),
+      artist: '규정 읽어주기',
+      album: current.chapter || '',
+    });
+    ms.playbackState = status === 'playing' ? 'playing' : 'paused';
+    return () => { ms.playbackState = 'none'; };
+  }, [status, current]);
+
+  useEffect(() => {
+    const ms = typeof navigator !== 'undefined' ? navigator.mediaSession : undefined;
+    if (!ms) return;
+    const set = (act: MediaSessionAction, fn: (() => void) | null) => {
+      try { ms.setActionHandler(act, fn); } catch { /* 이 기기가 지원 안 하는 동작 */ }
+    };
+    set('play', () => resume());
+    set('pause', () => pause());
+    set('stop', () => stop());
+    set('nexttrack', () => jump(1));
+    set('previoustrack', () => jump(-1));
+    return () => {
+      set('play', null); set('pause', null); set('stop', null);
+      set('nexttrack', null); set('previoustrack', null);
+    };
+  }, [resume, pause, stop, jump]);
+
   return {
     /* 미리 합성한 MP3 만 있어도 들을 수 있다 — 기기 음성이 없는 브라우저도 재생된다 */
     supported: supported || !!audioMap,

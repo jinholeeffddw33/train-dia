@@ -1,18 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+import Modal from '@/components/common/Modal';
 import { getType, isHoliday } from '@/lib/schedule';
 import styles from './DiaChartModal.module.css';
 
-import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 interface DiaChartModalProps {
   open: boolean;
   dia: string | null;
   date: Date;
   diaLabel?: string;
-  /** 작은 미리보기 — 화면을 꽉 채우지 않고 작게 표시 (예: 5호선 운행 화면 기관사 탭) */
+  /** 작은 미리보기 — 시트를 낮게 띄워 뒤 화면(5호선 운행도)이 더 보이게 한다 */
   compact?: boolean;
   onClose: () => void;
 }
@@ -45,75 +45,52 @@ export function hasDiaChart(dia: string | null | undefined): boolean {
   return !isNaN(parseInt(dia.replace(/\D/g, '')));
 }
 
+/**
+ * 행로표 보기 — 달력의 근무 상세와 같은 바텀시트다.
+ *
+ * 예전엔 이 화면만 가운데 뜨는 별도 오버레이였다. 그래서 같은 앱 안에서 «행로표를 보는
+ * 동작»이 두 가지였고, 안드로이드 뒤로가기로 닫히지도, 아래로 끌어 내리지도 않았다.
+ * 이제 공용 Modal(바텀시트 SSOT) 위에 얹는다 — 위로 올라오고, 아래로 끌면 내려가고,
+ * 뒤로가기·ESC·배경탭이 모두 그대로 따라온다.
+ */
 export default function DiaChartModal({ open, dia, date, diaLabel, compact, onClose }: DiaChartModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
   const [imgError, setImgError] = useState(false);
 
-  const handleClose = useCallback(() => onClose(), [onClose]);
-
-  useEffect(() => {
-    if (!open) return;
-    setImgError(false);
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
-    document.addEventListener('keydown', onKey);
-    acquireScrollLock();
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      releaseScrollLock();
-    };
-  }, [open, handleClose]);
-
-  if (!open) return null;
+  useEffect(() => { if (open) setImgError(false); }, [open, dia]);
 
   const imgPath = dia ? getRouteImagePath(dia, date) : null;
 
-  return (
-    <div
-      ref={overlayRef}
-      className={styles.overlay}
-      role="dialog"
-      aria-modal="true"
-      aria-label="다이아 표"
-      onClick={(e) => { if (e.target === overlayRef.current) handleClose(); }}
+  // 행로표는 근무 카드·5호선 운행도 «안쪽»에서 열린다. 그 자리에 그대로 그리면 감싼 상자가
+  // 시트의 기준이 되어, 화면 아래에 붙지 않고 상자 한가운데 떠 버린다(근무 화면에서 실제로 그랬다).
+  // 화면 최상위(body)로 옮겨 달면 어디서 열든 달력의 근무 상세와 똑같이 아래에서 올라온다.
+  if (!open || typeof document === 'undefined') return null;
+
+  return createPortal(
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={diaLabel ? `${diaLabel} 다이아 표` : '다이아 표'}
     >
-      <div className={`${styles.content} ${compact ? styles.contentCompact : ''}`}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>
-            {diaLabel ? `${diaLabel} 다이아 표` : '다이아 표'}
-          </h2>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={handleClose}
-            aria-label="닫기"
-          >
-            <X size={22} strokeWidth={2.4} />
-          </button>
-        </div>
-        <div className={styles.body}>
-          {imgPath && !imgError ? (
-            <div className={styles.imgWrap}>
-              <Image
-                src={imgPath}
-                alt={`${diaLabel ?? dia} 다이아 운전행로`}
-                width={1200}
-                height={900}
-                className={styles.img}
-                onError={() => setImgError(true)}
-                priority
-                unoptimized
-              />
-            </div>
-          ) : (
-            <div className={styles.empty}>
-              <p>이 다이아의 표 이미지가 준비되지 않았어요.</p>
-              <p className={styles.emptySub}>
-                {dia ? `(${dia})` : ''}
-              </p>
-            </div>
-          )}
-        </div>
+      <div className={`${styles.chart} ${compact ? styles.chartCompact : ''}`}>
+        {imgPath && !imgError ? (
+          <Image
+            src={imgPath}
+            alt={`${diaLabel ?? dia} 다이아 운전행로`}
+            width={1200}
+            height={900}
+            className={styles.img}
+            onError={() => setImgError(true)}
+            priority
+            unoptimized
+          />
+        ) : (
+          <div className={styles.empty}>
+            <p>이 다이아의 표 이미지가 준비되지 않았어요.</p>
+            <p className={styles.emptySub}>{dia ? `(${dia})` : ''}</p>
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>,
+    document.body,
   );
 }

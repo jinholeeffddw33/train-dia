@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones, Eraser, BookmarkPlus, Share, Copy, NotebookPen } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones, MoreVertical, Eraser, BookmarkPlus, Share, Copy, NotebookPen } from 'lucide-react';
 import RegulationReader from './RegulationReader';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, HIGHLIGHT_COLORS, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
@@ -187,13 +187,8 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   const globalFontSize = useFontSizeStore((s) => s.size);
   const [fontSize, setFontSize] = useState<FontSize>(globalFontSize);
   const [pdfOpen, setPdfOpen] = useState(false);
-  /**
-   * 형광펜 모드 — 켜면 본문의 네이티브 텍스트 선택을 끈다.
-   * 끌어서 선택하면 브라우저가 '복사·공유·모두 선택·웹 검색' 막대를 먼저 띄우는데,
-   * 이건 OS가 그리는 것이라 웹에서 막을 방법이 없다. 선택 자체를 없애고
-   * '문장을 탭하면 그 문장이 잡히는' 방식으로 바꾼다.
-   */
-  const [markMode, setMarkMode] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [tocOpen, setTocOpen] = useState(true);
   const [visiblePage, setVisiblePage] = useState<number>(1);
   const matchRefs = useRef<(HTMLElement | null)[]>([]);
@@ -393,8 +388,6 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     if (loading || pages.length === 0) return;
     const root = bodyRef.current;
     if (!root) return;
-    // 형광펜 모드에선 네이티브 선택을 안 쓴다 (아래 탭 핸들러가 담당)
-    if (markMode) return;
     const handleSelectionEnd = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
@@ -426,150 +419,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       document.removeEventListener('mouseup', handleSelectionEnd);
       document.removeEventListener('touchend', handleSelectionEnd);
     };
-  }, [loading, pages, markMode]);
-
-  /**
-   * 형광펜 모드의 범위 지정.
-   *
-   * 끌면 그 구간이 그대로 잡힌다. 브라우저 선택(window.getSelection)을 쓰지 않고
-   * **CSS Custom Highlight API** 로 직접 칠하기 때문에 OS 의 '복사·공유' 막대가 뜨지 않는다.
-   * 끌지 않고 그냥 누르면 그 문장 하나를 잡는다(빠른 길).
-   *
-   * Highlight API 미지원 브라우저에서는 미리보기만 안 보이고 지정은 그대로 된다.
-   */
-  useEffect(() => {
-    if (!markMode || loading || pages.length === 0) return;
-    const root = bodyRef.current;
-    if (!root) return;
-
-    type WithCaret = Document & {
-      caretRangeFromPoint?: (x: number, y: number) => Range | null;
-      caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
-    };
-    const doc = document as WithCaret;
-    const caretAt = (x: number, y: number): { node: Node; offset: number } | null => {
-      if (doc.caretRangeFromPoint) {
-        const r = doc.caretRangeFromPoint(x, y);
-        return r ? { node: r.startContainer, offset: r.startOffset } : null;
-      }
-      if (doc.caretPositionFromPoint) {
-        const p = doc.caretPositionFromPoint(x, y);
-        return p ? { node: p.offsetNode, offset: p.offset } : null;
-      }
-      return null;
-    };
-
-    // CSS.highlights 로 미리보기 — 선택 시스템을 건드리지 않는다
-    const HL = 'regsel';
-    const hlSupported = typeof CSS !== 'undefined' && 'highlights' in CSS;
-    const paint = (range: Range | null) => {
-      if (!hlSupported) return;
-      const reg = (CSS as unknown as { highlights: Map<string, unknown> }).highlights;
-      if (!range) { reg.delete(HL); return; }
-      reg.set(HL, new (window as unknown as { Highlight: new (r: Range) => unknown }).Highlight(range));
-    };
-
-    let start: { node: Node; offset: number } | null = null;
-    let startXY: { x: number; y: number } | null = null;
-    let dragged = false;
-
-    const buildRange = (endX: number, endY: number): Range | null => {
-      if (!start) return null;
-      const end = caretAt(endX, endY);
-      if (!end || !root.contains(end.node)) return null;
-      const r = document.createRange();
-      try {
-        r.setStart(start.node, start.offset);
-        r.setEnd(end.node, end.offset);
-        if (r.collapsed) {           // 거꾸로 끈 경우
-          r.setStart(end.node, end.offset);
-          r.setEnd(start.node, start.offset);
-        }
-      } catch { return null; }
-      return r.collapsed ? null : r;
-    };
-
-    const onDown = (e: PointerEvent) => {
-      const t = e.target as HTMLElement;
-      if (t.closest('button')) return;
-      const c = caretAt(e.clientX, e.clientY);
-      if (!c || !root.contains(c.node)) return;
-      start = c;
-      startXY = { x: e.clientX, y: e.clientY };
-      dragged = false;
-      paint(null);
-      setSelection(null);
-    };
-
-    const onMove = (e: PointerEvent) => {
-      if (!start || !startXY) return;
-      // 손떨림은 드래그로 치지 않는다
-      if (Math.hypot(e.clientX - startXY.x, e.clientY - startXY.y) < 8) return;
-      dragged = true;
-      paint(buildRange(e.clientX, e.clientY));
-    };
-
-    const onUp = (e: PointerEvent) => {
-      if (!start) return;
-      const t = e.target as HTMLElement;
-      if (t.closest('button')) { start = null; return; }
-
-      if (!dragged) {                       // 그냥 눌렀다 → 문장 하나
-        paint(null);
-        pickSentenceAt(e.clientX, e.clientY);
-        start = null;
-        return;
-      }
-
-      const range = buildRange(e.clientX, e.clientY);
-      start = null;
-      if (!range) { paint(null); return; }
-
-      const text = range.toString().replace(/\s+/g, ' ').trim();
-      if (text.length < 2) { paint(null); return; }
-
-      // 페이지 식별 + 원문에서 위치 찾기 (기존 저장 형식 그대로)
-      const anchor = range.startContainer.nodeType === Node.TEXT_NODE
-        ? (range.startContainer as Text).parentElement
-        : (range.startContainer as Element);
-      const pageEl = anchor?.closest('[data-page]') as HTMLElement | null;
-      const page = parseInt(pageEl?.dataset.page || '0', 10);
-      const pageData = pages.find((p) => p.page === page);
-      if (!page || !pageData) { paint(null); return; }
-
-      // 렌더 텍스트는 공백이 정규화돼 원문과 다를 수 있다 → 공백 무시로 찾는다
-      const squash = (s: string) => s.replace(/\s+/g, '');
-      const target = squash(text);
-      const src = pageData.text;
-      const map: number[] = [];
-      let flat = '';
-      for (let i = 0; i < src.length; i++) {
-        if (!/\s/.test(src[i])) { flat += src[i]; map.push(i); }
-      }
-      const at = flat.indexOf(target);
-      if (at < 0) { paint(null); return; }
-      const s = map[at];
-      const e2 = map[Math.min(at + target.length - 1, map.length - 1)] + 1;
-
-      setSelection({
-        text: src.slice(s, e2),
-        before: src.slice(Math.max(0, s - 30), s),
-        after: src.slice(e2, e2 + 30),
-        page,
-      });
-    };
-
-    root.addEventListener('pointerdown', onDown);
-    root.addEventListener('pointermove', onMove);
-    root.addEventListener('pointerup', onUp);
-    root.addEventListener('pointercancel', () => { start = null; paint(null); });
-    return () => {
-      root.removeEventListener('pointerdown', onDown);
-      root.removeEventListener('pointermove', onMove);
-      root.removeEventListener('pointerup', onUp);
-      paint(null);
-    };
-  }, [markMode, loading, pages, pickSentenceAt]);
+  }, [loading, pages]);
 
   // 팝오버가 닫히면 미리보기도 지운다
   useEffect(() => {
@@ -821,7 +671,14 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     if (!selection) return;
     if (pickedAnnotation) {
       const next = !pickedAnnotation.bookmark;
-      updateAnnotation(pickedAnnotation.id, { bookmark: next });
+      /* 북마크만 있던 자리에서 북마크를 빼면 남길 것이 없다 — 기록째 지운다.
+         예전엔 bookmark:false 로만 바꿔서, 색도 메모도 없는 빈 기록이 남아
+         본문에 점선 밑줄이 그대로 남아 있었다. */
+      if (!next && pickedAnnotation.color === 'none' && !pickedAnnotation.memo?.trim()) {
+        removeAnnotation(pickedAnnotation.id);
+      } else {
+        updateAnnotation(pickedAnnotation.id, { bookmark: next });
+      }
       showToast(next ? '북마크에 담았어요' : '북마크에서 뺐어요', next ? 'success' : 'info');
     } else {
       addAnnotation({
@@ -835,7 +692,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       showToast('북마크에 담았어요', 'success');
     }
     clearSelection();
-  }, [selection, pickedAnnotation, addAnnotation, updateAnnotation, clearSelection]);
+  }, [selection, pickedAnnotation, addAnnotation, updateAnnotation, removeAnnotation, clearSelection]);
 
   /** 공유·복사에 붙일 출처 — 어느 규정 몇 쪽인지 알아야 남에게 보내도 쓸모가 있다 */
   const selectionForShare = useCallback(() => {
@@ -1139,155 +996,152 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={title}>
+      {/* 제목줄 하나로 끝낸다 — 본문이 화면의 주인이어야 한다.
+          예전엔 검색·글자크기·도구가 각각 한 줄씩 차지해 본문이 화면의 절반도 안 됐다.
+          자주 안 쓰는 것(글자 크기·원본 PDF)은 «더보기» 안으로 넣었다. */}
       <div className={styles.header}>
         <button type="button" className={styles.backBtn} onClick={onClose} aria-label="닫기">
           <ArrowLeft size={20} />
         </button>
         <h2 className={styles.title}>{title}</h2>
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={`${styles.headerBtn} ${searchOpen ? styles.headerBtnOn : ''}`}
+            onClick={() => { if (searchOpen) setQuery(''); setSearchOpen((v) => !v); }}
+            aria-pressed={searchOpen}
+            aria-label="본문 검색"
+          >
+            <Search size={20} />
+          </button>
+          <button
+            type="button"
+            className={`${styles.headerBtn} ${readerOpen ? styles.headerBtnOn : ''}`}
+            onClick={() => {
+              if (readerOpen) { setReaderOpen(false); return; }
+              /* 지금 화면 맨 위에 걸린 조문부터 읽는다 — 보던 자리에서 이어지도록.
+                 observer 를 따로 두지 않고 열 때 한 번만 훑는다(조문 블록이 수백 개다). */
+              const root = bodyRef.current;
+              let start: number | undefined;
+              if (root) {
+                const top = root.getBoundingClientRect().top;
+                for (const el of root.querySelectorAll<HTMLElement>('[data-article]')) {
+                  if (el.getBoundingClientRect().bottom > top) {
+                    start = parseInt(el.dataset.article ?? '', 10) || undefined;
+                    break;
+                  }
+                }
+              }
+              visibleArticleRef.current = start;
+              setReaderStart(start);
+              setReaderOpen(true);
+            }}
+            aria-pressed={readerOpen}
+            aria-label={readerOpen ? '읽어주기 닫기' : '읽어주기 — 보고 있는 조문부터 읽어줍니다'}
+          >
+            <Headphones size={20} />
+          </button>
+          <button
+            type="button"
+            className={styles.headerBtn}
+            onClick={() => setNotesOpen(true)}
+            aria-label={`내 표시 ${annotations.length}건 보기`}
+          >
+            <Highlighter size={20} />
+            {annotations.length > 0 && <span className={styles.headerBadge}>{annotations.length}</span>}
+          </button>
+          <button
+            type="button"
+            className={`${styles.headerBtn} ${menuOpen ? styles.headerBtnOn : ''}`}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-label="더보기"
+          >
+            <MoreVertical size={20} />
+          </button>
+        </div>
       </div>
 
-      <div className={styles.toolbar}>
-        <div className={styles.searchWrap}>
-          <Search size={16} className={styles.searchIcon} />
-          <input
-            type="search"
-            className={styles.searchInput}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleSearchKey}
-            placeholder="단어 검색 (예: 비상, 기관사)"
-            aria-label="규정 본문 검색"
-          />
+      {searchOpen && (
+        <div className={styles.toolbar}>
+          <div className={styles.searchWrap}>
+            <Search size={16} className={styles.searchIcon} />
+            <input
+              type="search"
+              className={styles.searchInput}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleSearchKey}
+              placeholder="단어 검색 (예: 비상, 기관사)"
+              aria-label="규정 본문 검색"
+              autoFocus
+            />
+            {query && (
+              <button type="button" className={styles.searchClear} onClick={() => setQuery('')} aria-label="검색어 지우기">
+                <X size={16} />
+              </button>
+            )}
+          </div>
           {query && (
-            <button type="button" className={styles.searchClear} onClick={() => setQuery('')} aria-label="검색어 지우기">
-              <X size={16} />
+            <>
+              <span className={styles.matchInfo}>
+                {totalMatches > 0 ? `${activeMatchIdx + 1} / ${totalMatches}` : '0 / 0'}
+              </span>
+              <button type="button" className={styles.navBtn} onClick={handlePrev} disabled={totalMatches === 0} aria-label="이전 결과">
+                <ChevronUp size={18} />
+              </button>
+              <button type="button" className={styles.navBtn} onClick={handleNext} disabled={totalMatches === 0} aria-label="다음 결과">
+                <ChevronDown size={18} />
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {menuOpen && (
+        <div className={styles.menuPanel}>
+          <div className={styles.fontControls}>
+            <span className={styles.fontLabel}>글자</span>
+            {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게/특대 */}
+            <div
+              className={`z-segment ${styles.fontSegment}`}
+              data-no-press
+              /* STYLE-EXCEPTION: 세그먼트 활성 인덱스/개수 런타임 주입 */
+              style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
+            >
+              {([
+                { key: 'small' as FontSize, label: '작게' },
+                { key: 'normal' as FontSize, label: '보통' },
+                { key: 'large' as FontSize, label: '크게' },
+                { key: 'xlarge' as FontSize, label: '특대' },
+              ]).map((opt) => (
+                <button
+                  key={opt.key}
+                  type="button"
+                  className={`z-segment-item ${fontSize === opt.key ? 'is-on' : ''}`}
+                  aria-pressed={fontSize === opt.key}
+                  onClick={() => setFontSize(opt.key)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {pdfUrl && (
+            <button type="button" className={styles.menuItem} onClick={() => { setMenuOpen(false); setPdfOpen(true); }}>
+              <FileText size={16} />
+              <span>원본 PDF 보기</span>
             </button>
           )}
         </div>
-        {query && (
-          <>
-            <span className={styles.matchInfo}>
-              {totalMatches > 0 ? `${activeMatchIdx + 1} / ${totalMatches}` : '0 / 0'}
-            </span>
-            <button
-              type="button"
-              className={styles.navBtn}
-              onClick={handlePrev}
-              disabled={totalMatches === 0}
-              aria-label="이전 결과"
-            >
-              <ChevronUp size={18} />
-            </button>
-            <button
-              type="button"
-              className={styles.navBtn}
-              onClick={handleNext}
-              disabled={totalMatches === 0}
-              aria-label="다음 결과"
-            >
-              <ChevronDown size={18} />
-            </button>
-          </>
-        )}
-      </div>
-
-      <div className={styles.fontControls}>
-        <span className={styles.fontLabel}>글자</span>
-        {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게/특대 */}
-        <div
-          className={`z-segment ${styles.fontSegment}`}
-          data-no-press
-          /* STYLE-EXCEPTION: 세그먼트 활성 인덱스/개수 런타임 주입 */
-          style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
-        >
-          {([
-            { key: 'small' as FontSize, label: '작게' },
-            { key: 'normal' as FontSize, label: '보통' },
-            { key: 'large' as FontSize, label: '크게' },
-            { key: 'xlarge' as FontSize, label: '특대' },
-          ]).map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              className={`z-segment-item ${fontSize === opt.key ? 'is-on' : ''}`}
-              aria-pressed={fontSize === opt.key}
-              onClick={() => setFontSize(opt.key)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 도구 줄 — 글자 크기와 한 줄에 두면 360px 에서 폭을 넘겨 마지막 버튼이 잘린다.
-          별도 줄로 빼고 셋을 균등 배분한다(좁으면 잘리지 않고 다음 줄로 내려감). */}
-      <div className={styles.actionRow}>
-        {pdfUrl && (
-          <button type="button" className={styles.pdfBtn} onClick={() => setPdfOpen(true)}>
-            <FileText size={14} />
-            <span>원본 PDF</span>
-          </button>
-        )}
-        <button
-          type="button"
-          className={`${styles.pdfBtn} ${markMode ? styles.markModeOn : ''}`}
-          onClick={() => { setMarkMode((v) => !v); setSelection(null); window.getSelection()?.removeAllRanges(); }}
-          aria-pressed={markMode}
-          aria-label={markMode ? '형광펜 모드 끄기' : '형광펜 모드 켜기 — 문장을 눌러 표시'}
-        >
-          <Highlighter size={14} />
-          <span>형광펜</span>
-        </button>
-        <button
-          type="button"
-          className={`${styles.pdfBtn} ${readerOpen ? styles.markModeOn : ''}`}
-          onClick={() => {
-            if (readerOpen) { setReaderOpen(false); return; }
-            /* 지금 화면 맨 위에 걸린 조문부터 읽는다 — 보던 자리에서 이어지도록.
-               observer 를 따로 두지 않고 열 때 한 번만 훑는다(조문 블록이 수백 개다). */
-            const root = bodyRef.current;
-            let start: number | undefined;
-            if (root) {
-              const top = root.getBoundingClientRect().top;
-              for (const el of root.querySelectorAll<HTMLElement>('[data-article]')) {
-                if (el.getBoundingClientRect().bottom > top) {
-                  start = parseInt(el.dataset.article ?? '', 10) || undefined;
-                  break;
-                }
-              }
-            }
-            visibleArticleRef.current = start;
-            setReaderStart(start);
-            setReaderOpen(true);
-          }}
-          aria-pressed={readerOpen}
-          aria-label={readerOpen ? '음성 읽기 닫기' : '음성 읽기 — 보고 있는 조문부터 읽어줍니다'}
-        >
-          <Headphones size={14} />
-          <span>읽어주기</span>
-        </button>
-        <button
-          type="button"
-          className={styles.pdfBtn}
-          onClick={() => setNotesOpen(true)}
-          aria-label="내 메모·형광 목록"
-        >
-          <span>📝</span>
-          <span>내 메모{annotations.length > 0 && ` ${annotations.length}`}</span>
-        </button>
-      </div>
+      )}
 
       {/* STYLE-EXCEPTION: 사용자 선택 폰트 크기를 CSS 변수로 전달 (런타임 값) */}
       <div
         ref={bodyRef}
-        className={`${styles.body} ${markMode ? styles.bodyMarkMode : ''}`}
+        className={styles.body}
         style={{ ['--reg-font-size' as string]: computedFontSize }}
       >
-        {markMode && (
-          <p className={styles.markModeHint}>
-            형광펜 모드 — <b>끌면 그 구간</b>, <b>누르면 그 문장</b>이 잡혀요. 끄면 평소처럼 복사할 수 있어요.
-          </p>
-        )}
         {loading && <div className={styles.loading}>불러오는 중...</div>}
         {!loading && pages.length === 0 && (
           <div className={styles.emptyState}>본문을 불러올 수 없어요</div>

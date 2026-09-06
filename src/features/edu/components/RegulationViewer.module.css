@@ -38,6 +38,57 @@
   transform: scale(0.9);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* 제목줄 아이콘 — 검색·읽어주기·내 표시·더보기 */
+.headerBtn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  border: none;
+  background: transparent;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) ease;
+}
+
+.headerBtn:active {
+  background: var(--dia-surface-hover);
+  transform: scale(0.9);
+}
+
+/* 켜져 있는 것 — 지금 검색 중이거나, 읽어주는 중이거나, 더보기가 열려 있다 */
+.headerBtnOn {
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue);
+}
+
+/* 표시해 둔 개수 */
+.headerBadge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--dia-weight-bold);
+  line-height: 16px;
+  text-align: center;
+}
+
 .title {
   flex: 1;
   font-size: var(--dia-text-base);
@@ -153,13 +204,42 @@
   cursor: not-allowed;
 }
 
+/* 더보기 — 자주 안 쓰는 것(글자 크기·원본 PDF)만 여기 둔다 */
+.menuPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+  background: var(--dia-bg-elevated);
+  border-bottom: 1px solid var(--dia-border);
+}
+
+.menuItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  min-height: 44px;
+  padding: 0 var(--dia-space-4);
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--zg-card-fill, var(--dia-bg-elevated));
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+}
+
+.menuItem:active {
+  background: var(--dia-surface-hover);
+  transform: scale(0.98);
+}
+
 .fontControls {
   display: flex;
   align-items: center;
   gap: var(--dia-space-1);
-  padding: var(--dia-space-2) var(--dia-space-3);
-  background: var(--dia-bg-elevated);
-  border-bottom: 1px solid var(--dia-border);
 }
 
 .fontLabel {
@@ -214,37 +294,6 @@
 .pdfBtn:active {
   transform: scale(0.95);
   background: var(--dia-surface-hover);
-}
-
-/* 형광펜 모드 ON — 툴바 버튼 강조 */
-.markModeOn {
-  background: var(--dia-amber-dim);
-  color: var(--dia-amber-text);
-}
-
-/**
- * 형광펜 모드의 본문 — 네이티브 텍스트 선택을 끈다.
- * 끌어서 선택하면 브라우저가 '복사·공유·모두 선택·웹 검색' 막대를 먼저 띄우는데,
- * 그건 OS 가 그리는 것이라 웹에서 가릴 수 없다. 선택 자체를 없애고 문장 탭으로 받는다.
- * 모드를 끄면 원래대로 복사가 된다.
- */
-.bodyMarkMode {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  /* 끌어서 범위를 잡는 동안 화면이 따라 스크롤되지 않게 — 세로 스크롤은 살린다 */
-  touch-action: pan-y;
-}
-
-.markModeHint {
-  margin: 0 0 var(--dia-space-3);
-  padding: 9px 12px;
-  border-radius: var(--dia-radius-md);
-  background: var(--dia-amber-dim);
-  color: var(--dia-amber-text);
-  font-size: var(--dia-text-sm);
-  font-weight: 600;
-  line-height: 1.5;
 }
 
 .body {

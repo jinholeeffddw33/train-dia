@@ -1080,7 +1080,7 @@
 }
 
 .penDot:active,
-.penEraser:active { transform: scale(0.92); }
+.penEraser:active { transform: scale(0.9); }
 
 .actRow {
   display: flex;

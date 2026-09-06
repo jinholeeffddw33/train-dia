@@ -249,14 +249,44 @@
   flex-shrink: 0;
 }
 
-/* 법① 세그먼트 레이아웃 — 글자 크기(작게/보통/크게). 룩은 전역 .z-segment 가 책임 */
-.fontSegment {
-  flex: 1;
+/* 글자 크기 — 네 단계(작게/보통/크게/특대)로는 «조금만» 키울 수가 없었다.
+   1px 씩 올리고 내리며 지금 몇인지 숫자로 본다. */
+.stepper {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
 }
-/* 툴바 높이 유지를 위해 항목 높이 축소(전역 44px → 32px) */
-.fontSegment :global(.z-segment-item) {
-  min-height: 32px;
-  font-size: var(--dia-text-meta);
+
+.stepBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+  background: var(--zg-card-fill, var(--dia-bg-elevated));
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.10);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+}
+
+.stepBtn:active { transform: scale(0.9); background: var(--dia-surface-hover); }
+
+.stepBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.stepValue {
+  min-width: 44px;
+  text-align: center;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* 도구 줄 — 원본 PDF · 형광펜 · 내 메모.
@@ -1070,29 +1100,6 @@
 @keyframes actionBarUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
-}
-
-/* 몇 곳을 골랐는가 */
-.actionBarCount {
-  display: inline-block;
-  margin-right: var(--dia-space-2);
-  padding: 1px 8px;
-  border-radius: var(--dia-radius-full);
-  background: var(--dia-blue);
-  color: #fff;
-  font-size: var(--dia-text-meta);
-  font-weight: var(--dia-weight-bold);
-}
-
-/* 무엇을 잡았는지 한 줄로 되짚어 준다 — 막대가 본문을 가리기 때문 */
-.actionBarQuote {
-  margin: 0;
-  font-size: var(--dia-text-meta);
-  color: var(--dia-text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .penRow {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones, MoreVertical, Eraser, BookmarkPlus, Share, Copy, NotebookPen } from 'lucide-react';
+import { ArrowLeft, Search, X, ChevronUp, ChevronDown, FileText, List, ListTree, Download, Highlighter, Headphones, MoreVertical, Minus, Plus, Eraser, BookmarkPlus, Share, Copy, NotebookPen } from 'lucide-react';
 import RegulationReader from './RegulationReader';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useAnnotations, HIGHLIGHT_COLORS, type Annotation, type HighlightColor } from '@/hooks/useAnnotations';
@@ -31,12 +31,24 @@ interface Props {
 
 type FontSize = 'small' | 'normal' | 'large' | 'xlarge';
 
-const FONT_SIZE_MAP: Record<FontSize, string> = {
-  small: '14px',
-  normal: '16px',
-  large: '20px',
-  xlarge: '24px',
+/** 전역 «글자 크기» 설정을 이 화면의 시작 크기(px)로 옮긴다 */
+const FONT_PX_SEED: Record<FontSize, number> = {
+  small: 14,
+  normal: 16,
+  large: 20,
+  xlarge: 24,
 };
+
+const FONT_PX_MIN = 12;
+const FONT_PX_MAX = 32;
+const FONT_PX_KEY = 'regulation-font-px';
+
+/** 한 번 맞춰 둔 크기는 다음에 열 때도 그대로 — 매번 다시 맞추게 하지 않는다 */
+function loadFontPx(seed: number): number {
+  if (typeof window === 'undefined') return seed;
+  const raw = Number(localStorage.getItem(FONT_PX_KEY));
+  return Number.isFinite(raw) && raw >= FONT_PX_MIN && raw <= FONT_PX_MAX ? raw : seed;
+}
 
 interface TocEntry {
   id: string;
@@ -195,7 +207,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   const [activeMatchIdx, setActiveMatchIdx] = useState(0);
   // 전역 글자 크기 설정을 초기값으로 시드 — "크게" 유저가 열 때마다 재조절하던 문제 해소
   const globalFontSize = useFontSizeStore((s) => s.size);
-  const [fontSize, setFontSize] = useState<FontSize>(globalFontSize);
+  const [fontPx, setFontPx] = useState<number>(() => loadFontPx(FONT_PX_SEED[globalFontSize]));
   const [pdfOpen, setPdfOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -248,6 +260,10 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [notesOpen, memoEditor, hasSelection, pdfOpen, onClose]);
+
+  useEffect(() => {
+    try { localStorage.setItem(FONT_PX_KEY, String(fontPx)); } catch { /* 저장 못 해도 보는 데는 지장 없다 */ }
+  }, [fontPx]);
 
   useEffect(() => {
     let active = true;
@@ -565,7 +581,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
         }
       }
     });
-  }, [annotations, pages, query, activeMatchIdx, fontSize]);
+  }, [annotations, pages, query, activeMatchIdx, fontPx]);
 
   /**
    * 본문 탭 → 그 «항»을 잡는다. (갓피플 성경에서 절을 누르는 것과 같다)
@@ -1024,7 +1040,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
     }
   }, []);
 
-  const computedFontSize = FONT_SIZE_MAP[fontSize];
+  const computedFontSize = `${fontPx}px`;
 
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={title}>
@@ -1133,30 +1149,27 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       {menuOpen && (
         <div className={styles.menuPanel}>
           <div className={styles.fontControls}>
-            <span className={styles.fontLabel}>글자</span>
-            {/* 법① 이어진 세그먼트(상태선택) — 작게/보통/크게/특대 */}
-            <div
-              className={`z-segment ${styles.fontSegment}`}
-              data-no-press
-              /* STYLE-EXCEPTION: 세그먼트 활성 인덱스/개수 런타임 주입 */
-              style={{ '--seg-count': 4, '--seg-idx': (['small', 'normal', 'large', 'xlarge'] as FontSize[]).indexOf(fontSize) } as React.CSSProperties}
-            >
-              {([
-                { key: 'small' as FontSize, label: '작게' },
-                { key: 'normal' as FontSize, label: '보통' },
-                { key: 'large' as FontSize, label: '크게' },
-                { key: 'xlarge' as FontSize, label: '특대' },
-              ]).map((opt) => (
-                <button
-                  key={opt.key}
-                  type="button"
-                  className={`z-segment-item ${fontSize === opt.key ? 'is-on' : ''}`}
-                  aria-pressed={fontSize === opt.key}
-                  onClick={() => setFontSize(opt.key)}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            <span className={styles.fontLabel}>글자 크기</span>
+            <div className={styles.stepper}>
+              <button
+                type="button"
+                className={styles.stepBtn}
+                onClick={() => setFontPx((v) => Math.max(FONT_PX_MIN, v - 1))}
+                disabled={fontPx <= FONT_PX_MIN}
+                aria-label="글자 작게"
+              >
+                <Minus size={18} strokeWidth={2.4} />
+              </button>
+              <span className={styles.stepValue} aria-live="polite">{fontPx}</span>
+              <button
+                type="button"
+                className={styles.stepBtn}
+                onClick={() => setFontPx((v) => Math.min(FONT_PX_MAX, v + 1))}
+                disabled={fontPx >= FONT_PX_MAX}
+                aria-label="글자 크게"
+              >
+                <Plus size={18} strokeWidth={2.4} />
+              </button>
             </div>
           </div>
           {pdfUrl && (
@@ -1292,11 +1305,6 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       {/* 잡은 자리에 대고 할 일 — 화면 아래에서 올라온다 (갓피플 성경의 절 선택 막대와 같은 얼개) */}
       {hasSelection && (
         <div className={styles.actionBar} role="dialog" aria-label="선택한 본문으로 할 일">
-          <p className={styles.actionBarQuote}>
-            {selections.length > 1 && <b className={styles.actionBarCount}>{selections.length}곳</b>}
-            {selections.map((sel) => sel.text).join(' / ')}
-          </p>
-
           <div className={styles.penRow}>
             {HIGHLIGHT_COLORS.map((c) => (
               <button
@@ -1337,7 +1345,9 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
             </button>
           </div>
 
-          <button type="button" className={styles.actCancel} onClick={clearSelection}>선택 취소</button>
+          <button type="button" className={styles.actCancel} onClick={clearSelection}>
+            선택 취소{selections.length > 1 && ` (${selections.length}곳)`}
+          </button>
         </div>
       )}
 

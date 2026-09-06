@@ -355,6 +355,28 @@
   min-width: 40px;
 }
 
+/* 누르면 행로표가 열리는 근무 번호.
+   글자 크기·색은 .tableDia 와 같게 두고, 밑줄로만 «누를 수 있음» 을 보인다
+   (휴무·비번·대기는 볼 행로가 없어 밑줄이 없다 — 눈으로 구분된다). */
+.tableDiaBtn {
+  background: none;
+  border: none;
+  padding: var(--dia-space-1) 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--dia-radius-sm);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.tableDiaBtn:active {
+  background: var(--dia-surface-hover);
+  text-decoration-style: solid;
+}
+
 .cmpType_day { color: var(--dia-blue); }
 .cmpType_night { color: var(--dia-purple); }
 .cmpType_standby { color: var(--dia-amber-text); }

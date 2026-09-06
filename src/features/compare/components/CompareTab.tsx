@@ -7,6 +7,7 @@ import { getRoster } from '@/data/cycle';
 import { getDia, getType, getDiaDisplay, isHoliday } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import Modal from '@/components/common/Modal';
+import DiaChartModal, { hasDiaChart } from '@/components/layout/DiaChartModal';
 import EmptyState from '@/components/common/EmptyState';
 import { showToast } from '@/components/common/Toast';
 import type { Person } from '@/lib/types';
@@ -63,6 +64,8 @@ export default function CompareTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [editingMemo, setEditingMemo] = useState<number | null>(null);
+  // 근무 번호를 누르면 그 날 그 사람의 행로표를 띄운다
+  const [chart, setChart] = useState<{ dia: string; date: Date; name: string; label: string } | null>(null);
   // 닫은 직후 '고스트 클릭'이 기관사 선택을 다시 눌러 모달이 재열림 되는 것 차단(안드로이드).
   const lastCloseRef = useRef(0);
 
@@ -92,7 +95,7 @@ export default function CompareTab() {
 
         // 월이 바뀌는 날에 월 표시
         const label = (i === 0 || d === 1) ? `${m}/${d}` : `${d}`;
-        result.push({ d, label, dow, isSun, isSat, isHol, disps, types, allRest, isToday: i === 0 });
+        result.push({ d, label, dow, isSun, isSat, isHol, dias, disps, types, allRest, isToday: i === 0, date });
       }
     } else {
       // 미래/과거 월: 1일~말일
@@ -111,7 +114,7 @@ export default function CompareTab() {
         const filledCount = types.filter((t) => t !== null).length;
         const allRest = filledCount >= 2 && types.every((t) => t === null || t === 'rest');
 
-        result.push({ d, label: `${d}`, dow, isSun, isSat, isHol, disps, types, allRest, isToday: false });
+        result.push({ d, label: `${d}`, dow, isSun, isSat, isHol, dias, disps, types, allRest, isToday: false, date });
       }
     }
     return result;
@@ -290,11 +293,23 @@ export default function CompareTab() {
                 <span className={`${styles.tableDate} ${row.isSun || row.isHol ? styles.tableDateSun : ''} ${row.isSat ? styles.tableDateSat : ''} ${row.isToday ? styles.tableDateToday : ''}`}>
                   {row.label} ({row.dow})
                 </span>
-                {row.disps.map((disp, idx) => (
-                  <span key={idx} className={`${styles.tableDia} ${row.types[idx] ? styles[`cmpType_${row.types[idx]}`] : ''}`}>
-                    {disp}
-                  </span>
-                ))}
+                {row.disps.map((disp, idx) => {
+                  const cls = `${styles.tableDia} ${row.types[idx] ? styles[`cmpType_${row.types[idx]}`] : ''}`;
+                  const dia = row.dias[idx];
+                  // 행로표가 있는 근무만 누를 수 있다 — 휴무·비번·대기는 볼 행로가 없다
+                  if (!hasDiaChart(dia)) return <span key={idx} className={cls}>{disp}</span>;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`${cls} ${styles.tableDiaBtn}`}
+                      onClick={() => setChart({ dia: dia!, date: row.date, name: persons[idx]?.n ?? '', label: `${row.label}(${row.dow})` })}
+                      aria-label={`${persons[idx]?.n ?? ''} ${row.label} ${disp}다이아 행로표 보기`}
+                    >
+                      {disp}
+                    </button>
+                  );
+                })}
               </div>
             ))}
           </div>
@@ -363,6 +378,15 @@ export default function CompareTab() {
           )}
         </div>
       </Modal>
+
+      {/* 근무 번호 탭 → 그 날 그 기관사의 행로표 */}
+      <DiaChartModal
+        open={chart !== null}
+        dia={chart?.dia ?? null}
+        date={chart?.date ?? today}
+        diaLabel={chart ? `${chart.name} ${chart.label}` : undefined}
+        onClose={() => setChart(null)}
+      />
     </div>
   );
 }

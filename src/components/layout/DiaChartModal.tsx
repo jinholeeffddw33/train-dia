@@ -35,6 +35,16 @@ function getRouteImagePath(dia: string, date: Date): string | null {
   return `/images/route/${prefix}_${diaNum}.png`;
 }
 
+/**
+ * 이 교번에 볼 행로표가 있는가 — 휴무·비번·대기는 운전행로가 없다.
+ * 누를 수 있는 것만 누르게 하려고 부르는 쪽에서 미리 쓴다(눌렀더니 빈 창이 뜨지 않도록).
+ */
+export function hasDiaChart(dia: string | null | undefined): boolean {
+  if (!dia) return false;
+  if (dia.startsWith('휴') || dia.startsWith('대') || dia.endsWith('~')) return false;
+  return !isNaN(parseInt(dia.replace(/\D/g, '')));
+}
+
 export default function DiaChartModal({ open, dia, date, diaLabel, compact, onClose }: DiaChartModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [imgError, setImgError] = useState(false);

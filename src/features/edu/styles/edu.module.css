@@ -3958,6 +3958,28 @@
 .railBotSource:active { transform: scale(0.98); }
 .railBotSource:disabled { color: var(--dia-text-tertiary); cursor: default; }
 
+/* 이 근거가 걸린 말 — 배지 오른쪽 끝에 작게 붙는다 */
+.railBotWhy {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-2xs);   /* 값(자료 이름) 옆에 붙는 짧은 라벨 */
+  font-style: normal;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 답을 고른 까닭 — 본문에서 걸린 말에 색을 칠한다 */
+.railBotHit {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-weight: 700;
+}
+
 .railBotLoading {
   display: flex;
   align-items: center;

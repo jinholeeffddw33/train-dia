@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Send, BookOpen, AlertTriangle, Loader2, Bot } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Send, BookOpen, AlertTriangle, Loader2, Bot, PlayCircle, Volume2 } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import RegulationViewer from './RegulationViewer';
@@ -12,21 +12,78 @@ interface Props { onBack: () => void }
 
 interface SourceRef {
   label: string;
-  kind: 'reg' | 'book' | 'case';
+  kind: 'reg' | 'book' | 'case' | 'video' | 'broadcast';
   regId: string | null;
   article: number | null;
   chapterId: string | null;
   sectionId: string | null;
+  url: string | null;
+  audioId: string | null;
+  /** 이 근거가 걸린 말 */
+  terms?: string[];
 }
 
 interface Msg {
   role: 'me' | 'bot';
   text: string;
   sources?: SourceRef[];
+  /** 답을 고른 까닭 — 본문에서 색칠할 말 */
+  terms?: string[];
   /** 차종 되묻기 */
   ask?: { id: string; label: string }[];
   urgent?: boolean;
   error?: boolean;
+}
+
+/**
+ * 답변 본문에서 «걸린 말» 을 색칠한다.
+ *
+ * 원문은 띄어쓰기가 제멋대로라(PDF 추출) 검색은 공백을 지우고 맞춘다.
+ * 그래서 색칠도 공백을 건너뛰며 맞춰야 한다 — 「판타그라프상승」 으로 찾은 것이
+ * 본문에는 「판타그라프 상승」 으로 적혀 있다.
+ */
+function paint(text: string, terms: string[]): React.ReactNode[] {
+  if (terms.length === 0) return [text];
+  // 공백을 뺀 글자만 모아 두고, 그 자리를 원문 위치로 되돌릴 지도를 만든다
+  const bare: string[] = [];
+  const at: number[] = [];
+  for (let i = 0; i < text.length; i++) {
+    if (!/\s/.test(text[i])) { bare.push(text[i].toLowerCase()); at.push(i); }
+  }
+  const flat = bare.join('');
+  const mark = new Array<boolean>(text.length).fill(false);
+  for (const t of terms) {
+    if (t.length < 2) continue;
+    let from = 0;
+    for (;;) {
+      const k = flat.indexOf(t, from);
+      if (k < 0) break;
+      for (let j = k; j < k + t.length; j++) mark[at[j]] = true;
+      from = k + 1;
+    }
+  }
+  // 칠한 글자 사이에 낀 공백도 이어서 칠한다 — 「판타그라프 상승」 이 두 토막으로 갈리지 않게
+  for (let i = 1; i < text.length - 1; i++) {
+    if (mark[i] || !/^[ \t]+$/.test(text[i])) continue;
+    let l = i - 1; while (l >= 0 && /[ \t]/.test(text[l])) l--;
+    let r = i + 1; while (r < text.length && /[ \t]/.test(text[r])) r++;
+    if (l >= 0 && r < text.length && mark[l] && mark[r]) mark[i] = true;
+  }
+
+  const out: React.ReactNode[] = [];
+  let buf = '';
+  let on = mark[0];
+  const flush = () => {
+    if (!buf) return;
+    out.push(on ? <mark key={out.length} className={styles.railBotHit}>{buf}</mark> : buf);
+    buf = '';
+  };
+  for (let i = 0; i < text.length; i++) {
+    if (mark[i] !== on) { flush(); on = mark[i]; }
+    buf += text[i];
+  }
+  flush();
+  return out;
 }
 
 interface DocEntry { title: string; url: string; pdfUrl?: string }
@@ -91,7 +148,7 @@ export default function RailBot({ onBack }: Props) {
       } else if (d.mode === 'no-evidence') {
         setMsgs((m) => [...m, { role: 'bot', text: d.message }]);
       } else {
-        setMsgs((m) => [...m, { role: 'bot', text: d.answer, sources: d.sources, urgent: d.urgent }]);
+        setMsgs((m) => [...m, { role: 'bot', text: d.answer, sources: d.sources, terms: d.terms, urgent: d.urgent }]);
       }
     } catch {
       setMsgs((m) => [...m, { role: 'bot', text: '연결이 끊겼어요. 잠시 후 다시 시도해주세요.', error: true }]);
@@ -120,9 +177,11 @@ export default function RailBot({ onBack }: Props) {
       const d = docs[s.regId];
       if (!d) return;
       setOpenDoc({ ...d, article: s.article ?? undefined });
-    } else if (s.kind === 'book' && s.sectionId) {
-      // 교재 — handbook.json 의 장/절 원문 섹션으로 점프
+    } else if ((s.kind === 'book' || s.kind === 'broadcast') && s.sectionId) {
+      // 교재·안내방송 — handbook.json 의 장/절 원문 섹션으로 점프(거기서 음성도 듣는다)
       setOpenBook({ chapterId: s.chapterId, sectionId: s.sectionId, title: s.label });
+    } else if (s.kind === 'video' && s.url) {
+      window.open(s.url, '_blank', 'noopener,noreferrer');
     }
     // case(사고사례)는 답변 본문에 전체가 이미 표시되어 별도 이동 없음
   };
@@ -130,7 +189,15 @@ export default function RailBot({ onBack }: Props) {
   /** 근거 배지를 누를 수 있는가 (열 곳이 있는가) */
   const canOpen = (s: SourceRef) =>
     (s.kind === 'reg' && !!s.regId && !!docs[s.regId]) ||
-    (s.kind === 'book' && !!s.sectionId);
+    ((s.kind === 'book' || s.kind === 'broadcast') && !!s.sectionId) ||
+    (s.kind === 'video' && !!s.url);
+
+  /** 근거 종류를 한눈에 — 규정·교재는 책, 영상은 재생, 방송은 스피커 */
+  const sourceIcon = (kind: SourceRef['kind']) => {
+    if (kind === 'video') return <PlayCircle size={12} aria-hidden />;
+    if (kind === 'broadcast') return <Volume2 size={12} aria-hidden />;
+    return <BookOpen size={12} aria-hidden />;
+  };
 
   return (
     <div className={styles.railBotScreen}>
@@ -147,8 +214,9 @@ export default function RailBot({ onBack }: Props) {
             <span className={styles.railBotIntroIcon}><Bot size={30} /></span>
             <p className={styles.railBotIntroTitle}>규정·교재에서 찾아 답합니다</p>
             <p className={styles.railBotIntroDesc}>
-              규정 9종(조문 892개)과 교재를 근거로만 답해요.<br />
-              근거를 못 찾으면 지어내지 않고 못 찾았다고 알려드려요.
+              규정 9종(조문 892개)과 교재·고장조치·사고사례,<br />
+              영상 가이드와 안내방송 문안까지 근거로 삼아요.<br />
+              답에서 <mark className={styles.railBotHit}>색칠한 말</mark>이 그 답을 고른 까닭이에요.
             </p>
             <div className={styles.railBotExamples}>
               {EXAMPLES.map((e) => (
@@ -169,7 +237,9 @@ export default function RailBot({ onBack }: Props) {
                   진행 중인 상황이면 <b>관제보고가 먼저</b>입니다
                 </span>
               )}
-              <p className={styles.railBotText}>{m.text}</p>
+              <p className={styles.railBotText}>
+                {m.terms && m.terms.length > 0 ? paint(m.text, m.terms) : m.text}
+              </p>
 
               {m.ask && (
                 <span className={styles.railBotChips}>
@@ -193,8 +263,11 @@ export default function RailBot({ onBack }: Props) {
                       onClick={() => openSource(s)}
                       disabled={!canOpen(s)}
                     >
-                      <BookOpen size={12} aria-hidden />
+                      {sourceIcon(s.kind)}
                       {s.label}
+                      {s.terms && s.terms.length > 0 && (
+                        <em className={styles.railBotWhy}>{s.terms[0]}</em>
+                      )}
                     </button>
                   ))}
                 </span>

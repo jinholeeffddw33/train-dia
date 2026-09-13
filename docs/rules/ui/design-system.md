@@ -36,9 +36,13 @@
 ## UI-TEXT-SIZE-001 — 텍스트 하한 + 글자 설정 우회 방지
 
 50-60대 사용자 가독 하한 가드 (2026-07-02 대개편 감사에서 신설 — 달력 출근시각 10px 사고 재발 방지):
-- **[FAIL]** `font-size` 13px 미만 raw px — 어떤 경우에도 불허 (CLAUDE.md §1.1)
-- **[WARN]** `font-size` 13px 이상 raw px — raw px 는 글자 크기 설정(`font-small/large/xlarge`)을 우회하므로 `var(--dia-text-*)` 토큰 사용
+- **[FAIL]** `font-size` 12px 미만 raw px — 어떤 경우에도 불허 (CLAUDE.md §1.1)
+- **[WARN]** `font-size` 12px 이상 raw px — raw px 는 글자 크기 설정(`font-small/large/xlarge`)을 우회하므로 `var(--dia-text-*)` 토큰 사용
 - **[WARN]** 버튼성 셀렉터(btn/button/chip/tab/fab)의 `min-height|height` 40px 미만 — 터치 타겟 44px 권장
+
+하한을 14px → 12px 로 내린 것은 2026-09-10 진호 지시. 다만 **자리를 가려서** 쓴다:
+`var(--dia-text-2xs)`(12px)는 값과 짝을 이루는 짧은 라벨 한정(옆의 값이 14px 이상이라 뜻이 흐려지지 않는 자리),
+`var(--dia-text-meta)`(13px)는 타임스탬프·배지·메타. 본문·라벨·버튼·CTA 는 그대로 14px 이상.
 
 - 예외: 직전 줄 `/* TEXT-EXCEPTION: 사유 */`(장식·dev 전용만), `components/dev/` 자동 제외.
 - 가드: `scripts/check-text-size.mjs` (`check:text-size`) · FAIL은 severity **fail** (변경 라인만).

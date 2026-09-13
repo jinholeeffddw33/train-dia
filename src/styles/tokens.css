@@ -213,7 +213,10 @@
      ======================================== */
   --dia-font: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   /* Fluid type: 360px → min, 430px+ → max (최대 +4px)
-     P0: 모든 본문/라벨/버튼은 14px 이상. --dia-text-meta(13px)는 타임스탬프·배지·메타데이터·측정값 한정 예외. */
+     P0: 본문·버튼·CTA 는 14px 이상. 아래 두 토큰만 예외 자리에서 더 작게 쓴다.
+     --dia-text-meta(13px) 타임스탬프·배지·메타데이터·측정값,
+     --dia-text-2xs(12px) 값과 짝을 이루는 짧은 라벨(옆 값이 14px 이상인 자리). */
+  --dia-text-2xs: 12px;  /* 예외 한정: 값 옆에 붙는 짧은 라벨 */
   --dia-text-meta: 13px; /* 예외 한정: 타임스탬프, 배지, 메타데이터, 측정값(%·점수 단위) */
   --dia-text-xs:  clamp(14px, 13px + 0.28vw, 15px);
   --dia-text-sm:  clamp(14px, 13px + 0.28vw, 16px);
@@ -468,6 +471,7 @@
    --dia-text-meta(13px)는 예외 한정 (타임스탬프·배지·메타).
    ========================================== */
 :root.font-small {
+  --dia-text-2xs: 12px;  /* 하한선 고정 */
   --dia-text-meta: 13px;
   --dia-text-xs:  14px; /* 하한선 고정 */
   --dia-text-sm:  clamp(14px, 13px + 0.28vw, 15px);
@@ -483,6 +487,7 @@
    FONT SIZE — Large (확대)
    ========================================== */
 :root.font-large {
+  --dia-text-2xs: 13px;
   --dia-text-meta: 14px;
   --dia-text-xs:  clamp(14px, 13px + 0.28vw, 16px);
   --dia-text-sm:  clamp(16px, 15px + 0.28vw, 18px);
@@ -499,6 +504,7 @@
    large 대비 한 단계 더(+2px 수준) — 노안 최상위 옵션.
    ========================================== */
 :root.font-xlarge {
+  --dia-text-2xs: 14px;
   --dia-text-meta: 15px;
   --dia-text-xs:  clamp(16px, 15px + 0.28vw, 18px);
   --dia-text-sm:  clamp(18px, 17px + 0.28vw, 20px);

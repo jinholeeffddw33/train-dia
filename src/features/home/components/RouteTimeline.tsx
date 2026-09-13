@@ -52,13 +52,19 @@ export default function RouteTimeline({ schedule, person, date }: RouteTimelineP
                 {multi && <span className={styles.rtNum}>{i + 1}근무</span>}
                 {routeParts[i] && <span className={styles.rtRoute}>{routeParts[i]}</span>}
               </span>
+              {/* 교대받음은 언제나 왼쪽, 교대넘김은 언제나 오른쪽.
+                  한쪽이 없어도 자리를 비워 두어 줄마다 같은 위치에서 읽힌다. */}
               <span className={styles.rtLinePartners}>
-                {!isFirstDepot && (
-                  <span className={styles.rtPartner}>교대받음 <strong>{partner?.left ?? '타소'}</strong></span>
-                )}
-                {!isLastDepot && (
-                  <span className={styles.rtPartner}>교대넘김 <strong>{partner?.right ?? '타소'}</strong></span>
-                )}
+                <span className={`${styles.rtPartner} ${styles.rtPartnerLeft}`}>
+                  {isFirstDepot
+                    ? <span className={styles.rtPartnerOther}>출고</span>
+                    : <>교대받음 <strong>{partner?.left ?? '타소'}</strong></>}
+                </span>
+                <span className={`${styles.rtPartner} ${styles.rtPartnerRight}`}>
+                  {isLastDepot
+                    ? <span className={styles.rtPartnerOther}>입고</span>
+                    : <>교대넘김 <strong>{partner?.right ?? '타소'}</strong></>}
+                </span>
               </span>
             </div>
           );

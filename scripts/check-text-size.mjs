@@ -4,8 +4,9 @@
  * (2026-07-02 대개편 감사에서 신설 — 달력 출근시각 10px 같은 사고 재발 방지)
  *
  * 잡는 패턴 (변경 라인만 --staged/--changed · 전체는 all 리포트):
- *   [FAIL] font-size 에 13px 미만 raw 값 — 어떤 경우에도 불허 (CLAUDE.md §1.1)
- *   [WARN] font-size 에 13px 이상 raw px — var(--dia-text-*) 토큰 권장
+ *   [FAIL] font-size 에 12px 미만 raw 값 — 어떤 경우에도 불허 (CLAUDE.md §1.1)
+ *   [WARN] font-size 에 12px 이상 raw px — var(--dia-text-*) 토큰 권장
+ *          (12px = --dia-text-2xs, 13px = --dia-text-meta 는 예외 자리 한정)
  *          (raw px 는 font-small/large/xlarge 글자 크기 설정을 우회한다)
  *   [WARN] 버튼성 셀렉터(btn/button/chip/tab/fab)의 min-height|height < 40px raw
  *          — 터치 타겟 44px 권장(최소 40px)
@@ -110,8 +111,8 @@ function checkFile(file, mode) {
       if (px === null) continue
       const declOffset = m.index + m[0].indexOf(g[0])
       const lineNo = src.slice(0, declOffset).split('\n').length
-      if (px < 13) {
-        pushIfChanged(fails, lineNo, `font-size: ${px}px — 13px 미만 절대 금지`)
+      if (px < 12) {
+        pushIfChanged(fails, lineNo, `font-size: ${px}px — 12px 미만 절대 금지`)
       } else {
         pushIfChanged(warns, lineNo, `font-size: ${px}px — raw px 는 글자 크기 설정을 우회, var(--dia-text-*) 사용`)
       }
@@ -155,7 +156,7 @@ function main() {
     for (const w of warns) console.log(`  ${w.file}:${w.line}  ${w.msg}`)
   }
   if (fails.length > 0) {
-    console.log(`\n❌ [F / UI-TEXT-SIZE-001] 13px 미만 텍스트 ${fails.length}건 — read: docs/rules/ui/design-system.md`)
+    console.log(`\n❌ [F / UI-TEXT-SIZE-001] 12px 미만 텍스트 ${fails.length}건 — read: docs/rules/ui/design-system.md`)
     for (const f of fails) console.log(`  ${f.file}:${f.line}  ${f.msg}`)
     console.log('  예외가 필요하면 직전 줄에 /* TEXT-EXCEPTION: 사유 */ (장식/dev 전용만).')
     process.exit(1)

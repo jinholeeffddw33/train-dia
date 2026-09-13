@@ -1407,22 +1407,48 @@
 }
 .rtLineHead .rtNum { font-size: var(--dia-text-sm); }
 .rtLineHead .rtRoute { font-size: var(--dia-text-sm); font-weight: 800; }
+/* 교대받음 | 교대넘김 — 같은 너비의 두 칸으로 잡아 늘 같은 자리에서 읽힌다.
+   받음은 언제나 왼쪽, 넘김은 언제나 오른쪽. 한쪽이 없는 줄에서도
+   남은 쪽이 자리를 옮기지 않는다. 라벨은 --dia-text-2xs(12px), 이름은
+   그대로 14px 이상 — 그렇게 벌어진 자리로 가장 긴 행로 약호까지 한 줄에 앉는다. */
 .rtLinePartners {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px var(--dia-space-3);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: baseline;
+  gap: 4px var(--dia-space-2);
   margin-left: auto;
+  flex: 0 0 54%;
+  min-width: 0;
 }
 .rtLinePartners .rtPartner {
-  font-size: var(--dia-text-sm);
+  font-size: var(--dia-text-2xs);
   color: var(--dia-text-secondary);
   opacity: 1;
+  min-width: 0;
+  white-space: nowrap;   /* 이름이 「홍운/기」처럼 쪼개지지 않게 */
 }
-.rtLinePartners .rtPartner strong { color: var(--dia-text-primary); }
+.rtLinePartners .rtPartner strong {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-primary);
+}
 
-.rtPartnerLeft {}
-.rtPartnerRight { margin-left: auto; }
+.rtPartnerLeft { text-align: left; }
+.rtPartnerRight { text-align: right; }
+
+/* 아주 좁은 기기에서 큰 글씨를 쓰면 한 줄에 다 들어가지 않는다.
+   그때만 교대 두 칸을 아랫줄로 통째로 내린다 — 좌우 자리는 그대로. */
+@media (max-width: 400px) {
+  :global(:root.font-large) .rtLinePartners,
+  :global(:root.font-xlarge) .rtLinePartners {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}
+/* 특대 글씨는 넓은 기기에서도 한 줄에 안 들어간다 */
+:global(:root.font-xlarge) .rtLinePartners {
+  flex-basis: 100%;
+  margin-left: 0;
+}
 
 .rtPartnerOther {
   opacity: 0.45;

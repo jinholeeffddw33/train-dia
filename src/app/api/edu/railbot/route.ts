@@ -186,7 +186,8 @@ const SYNONYMS: string[][] = [
   ['냉방', '에어컨', '공조', '송풍'],
   ['무전', '무전기', '열차무선', '무선'],
   ['비상', '비상시', '긴급', '비상제동'],
-  ['입환', '입고', '출고', '기지'],
+  // 출고와 입고는 «반대» 다 — 한 묶음으로 두었더니 출고를 물으면 입고 조문이 따라왔다
+  ['입환', '기지', '차량기지'],
   ['역행', '역행불능', '무동력', '출력'],
   ['전차선', '가선', '급전', '단전'],
   ['확인운전', '확인 운전', '주의운전'],
@@ -209,6 +210,17 @@ const SYNONYMS: string[][] = [
  * 그 조각은 규정 어디에나 있어 엉뚱한 조문이 1등이 됐다(제40조 도중점검).
  */
 const TAIL_RE = /(합니다|하나요|되나요|인가요|입니까|하는지|해야|해요|하고|하는|한다|하나|되는|된다|까요|나요|이나|에서|으로|처럼|보다|부터|까지|이라|라고|은|는|이|가|을|를|에|로|와|과|의|도|만|한|할|해|된|나|요)$/;
+
+/**
+ * 낱말 끝의 이음말 — 「점검시」·「주박할때」·「운행중」 의 끝 글자.
+ * 구를 이어 붙일 때만 뗀다. 두 글자 미만이 남으면 떼지 않는다(운전 → 운 을 막는다).
+ */
+const CONNECT_RE = /(시|때|중|간|내|외)$/;
+
+function trimConnective(word: string): string {
+  const m = CONNECT_RE.exec(word);
+  return m && word.length - m[0].length >= 2 ? word.slice(0, m.index) : word;
+}
 
 function stripTail(token: string): string {
   let t = token;
@@ -237,6 +249,8 @@ interface Concept {
   terms: string[];
   /** 이어 붙인 구인가 — 구가 걸리면 훨씬 값지다 */
   phrase: boolean;
+  /** 몇 번째 낱말에서 시작하는가 — 한국어는 앞에 오는 말이 주제다 */
+  at: number;
 }
 
 function conceptsOf(question: string): Concept[] {
@@ -248,9 +262,13 @@ function conceptsOf(question: string): Concept[] {
     const terms = new Set<string>([w]);
     // 앞토막 — 띄어쓰기를 안 한 말에서 뒤에 붙은 군더더기를 떼어 준다
     for (let len = w.length - 1; len >= 2; len--) terms.add(w.slice(0, len));
-    // 안쪽 조각 — 원문이 「출입문차측표시등」 처럼 붙어 있어도 걸리게
-    for (let len = w.length - 1; len >= 3; len--) {
-      for (let i = 1; i + len <= w.length; i++) terms.add(w.slice(i, i + len));
+    // 안쪽 조각 — 원문이 「출입문차측표시등」 처럼 붙어 있어도 걸리게.
+    // 다섯 글자부터만 쪼갠다. 네 글자를 쪼개면 「주의사항」 에서 「의사항」 같은
+    // 반토막이 나와 엉뚱한 조문에 걸린다.
+    if (w.length >= 5) {
+      for (let len = w.length - 1; len >= 3; len--) {
+        for (let i = 1; i + len <= w.length; i++) terms.add(w.slice(i, i + len));
+      }
     }
     // 동의어·말끝 변화 — «낱말이 그 말을 품고 있을 때» 만 퍼뜨린다.
     // 반대로 하면 「확인」 이 「확인운전」 을 끌어와 주박 질문에 확인운전 조문이 나온다.
@@ -260,14 +278,26 @@ function conceptsOf(question: string): Concept[] {
         group.forEach((t) => terms.add(squash(t)));
       }
     }
-    out.push({ word: w, terms: [...terms].filter((t) => t.length >= 2), phrase: false });
+    out.push({ word: w, terms: [...terms].filter((t) => t.length >= 2), phrase: false, at: out.length });
   }
 
-  // 이어 붙인 구 — 두 낱말부터 네 낱말까지. 띄어쓰기를 어떻게 하든 같은 구가 나온다
+  // 이어 붙인 구 — 두 낱말부터 네 낱말까지. 띄어쓰기를 어떻게 하든 같은 구가 나온다.
+  //
+  // 낱말 끝의 «시·때·중» 같은 이음말은 떼고도 한 벌 더 만든다.
+  // 「출고 점검시 주의 사항」 은 그냥 이으면 «출고점검시» 가 되어, 원문의 «출고점검» 과
+  // 걸리지 않는다. 그래서 「출고점검 주의사항」 과 답이 달라졌다.
+  // 잘못 뗀 구(자동운전 → 자동운)는 어디에도 없어 점수가 0이라 해롭지 않다.
+  const cores = words.map(trimConnective);
   for (let i = 0; i < words.length; i++) {
     for (let j = i + 1; j < Math.min(i + 4, words.length); j++) {
-      const span = words.slice(i, j + 1).join('');
-      out.push({ word: words.slice(i, j + 1).join(' '), terms: [span], phrase: true });
+      const label = words.slice(i, j + 1).join(' ');
+      const spans = new Set([
+        words.slice(i, j + 1).join(''),
+        cores.slice(i, j + 1).join(''),
+        // 마지막 낱말만 그대로 둔 벌 — 「출고점검 주의사항」 처럼 뒤가 온전한 경우
+        [...cores.slice(i, j), words[j]].join(''),
+      ]);
+      out.push({ word: label, terms: [...spans], phrase: true, at: i });
     }
   }
   return out;
@@ -314,6 +344,9 @@ const PHRASE_BOOST = 3;
  * 낮출수록 «여러 낱말을 두루 덮은 자료» 가 «한 낱말만 걸린 자료» 를 크게 앞선다.
  */
 const COVER_FLOOR = 0.25;
+
+/** 앞에 오는 낱말을 얼마나 더 쳐줄 것인가 — 첫 낱말이 마지막보다 1.5배 */
+const POS_BOOST = 0.5;
 
 /**
  * 이만큼도 안 걸리면 답하지 않는다.
@@ -368,15 +401,16 @@ function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, li
     return n !== undefined && n <= N * COMMON_RATIO;
   };
 
+  // 낱말(구가 아닌 것) 개수 — 자리 가중과 «얼마나 덮었나» 에 쓴다
+  const plainCount = concepts.filter((c) => !c.phrase).length;
+
   const scored: Hit[] = [];
   for (let i = 0; i < N; i++) {
     // 이 자료가 «질문의 어느 뜻을» 덮었는가 — 낱말 하나 걸린 것과 다 걸린 것은 다르다
     let covered = 0;
-    let plain = 0;
     let score = 0;
     const shown: string[] = [];
     for (const con of concepts) {
-      if (!con.phrase) plain++;
       // 한 덩어리 안에서는 «가장 값진 말 하나» 만 센다 — 같은 뜻을 여러 번 세지 않는다
       let best = 0;
       let bestTerm = '';
@@ -393,14 +427,17 @@ function search(chunks: Chunk[], question: string, vehicle: VehicleId | null, li
       }
       if (best === 0) continue;
       if (!con.phrase) covered++;
+      // 앞에 오는 말일수록 크게 — 「출고점검 주의사항」 에서 주제는 출고점검이다.
+      // (이것이 없으면 아무 조문에나 있는 「주의사항」 이 주제어를 이긴다)
+      const pos = 1 + POS_BOOST * (1 - con.at / Math.max(1, plainCount - 1));
       // 이어 붙인 구가 통째로 걸리면 «정확히 그것을 물은 것» — 크게 쳐준다
-      score += con.phrase ? best * PHRASE_BOOST : best;
+      score += (con.phrase ? best * PHRASE_BOOST : best) * pos;
       shown.push(bestTerm);
     }
     if (score === 0) continue;
 
     // 질문을 얼마나 덮었나 — 하나만 걸린 자료는 눌러 둔다
-    if (plain > 0) score *= COVER_FLOOR + (1 - COVER_FLOOR) * (covered / plain);
+    if (plainCount > 0) score *= COVER_FLOOR + (1 - COVER_FLOOR) * (covered / plainCount);
 
     const c = chunks[i];
     if (artNum && c.article === Number(artNum)) score += 5000;

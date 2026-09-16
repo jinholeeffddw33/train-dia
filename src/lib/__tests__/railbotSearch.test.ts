@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { __searchForTest as search, type __ChunkForTest as Chunk } from '../route';
+import { search, type Chunk } from '../railbotSearch';
 
 const INDEX = path.join(process.cwd(), 'public/data/edu/railbot-index.json');
 const chunks = JSON.parse(fs.readFileSync(INDEX, 'utf8')) as Chunk[];

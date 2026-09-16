@@ -1068,7 +1068,6 @@
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
 }
-.tdsGuide,
 .tdsMuted,
 .tdsFootnote {
   margin: 0;
@@ -1098,6 +1097,8 @@
   flex-wrap: wrap;
   gap: var(--dia-space-2);
   padding: var(--dia-space-3);
+  /* 지금 달리는 중 — 초록 테두리로 «살아 있는 정보» 임을 알린다 */
+  border-color: rgba(52, 211, 153, 0.4);
 }
 .tdsNowDot {
   width: 10px;
@@ -1106,10 +1107,40 @@
   background: var(--dia-green);
   box-shadow: 0 0 0 4px var(--dia-green-dim);
 }
+/* 지금 역 · 방향 — 오른쪽에 크게 */
 .tdsNowWhere {
   margin-left: auto;
-  color: var(--dia-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+.tdsNowStation {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+}
+/* 방향 배지 — 실시간 목록과 같은 색: 상행 초록 · 하행 빨강 */
+.tdsDirBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+}
+.tdsDirUp {
+  background: rgba(13, 148, 82, 0.18);
+  border-color: rgba(13, 148, 82, 0.45);
+  color: var(--dia-track-up);
+}
+.tdsDirDown {
+  background: rgba(211, 47, 47, 0.16);
+  border-color: rgba(211, 47, 47, 0.42);
+  color: var(--dia-track-down);
 }
 
 .tdsList {

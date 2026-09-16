@@ -187,12 +187,7 @@ export default function TrainDriverSearch({ open, onClose }: Props) {
           </div>
           {badInput && <p className={styles.tdsHintBad}>열차번호 네 자리를 넣어 주세요</p>}
 
-          {query === null ? (
-            <p className={styles.tdsGuide}>
-              열차번호를 넣으면 그날 이 열번을 모는 기관사를 구간별로 보여 드려요.
-              답십리 기관사가 맡지 않는 구간은 영등포 기관사로 표시해요.
-            </p>
-          ) : (
+          {query !== null && (
             <>
               {/* 지금 운행 중 — 오늘일 때만 */}
               {live && (
@@ -212,7 +207,18 @@ export default function TrainDriverSearch({ open, onClose }: Props) {
                       ) : (
                         <span className={live.ours ? styles.tdsName : styles.tdsNameOther}>{live.name}</span>
                       )}
-                      <span className={styles.tdsNowWhere}>{live.station} · {live.dir}</span>
+                      {/* 지금 어느 역에서 어느 쪽으로 — 실시간 목록과 같은 색(상행 초록·하행 빨강) */}
+                      <span className={styles.tdsNowWhere}>
+                        <span className={styles.tdsNowStation}>{live.station}</span>
+                        <span
+                          className={`${styles.tdsDirBadge} ${
+                            live.dir === '상행' ? styles.tdsDirUp : live.dir === '하행' ? styles.tdsDirDown : ''
+                          }`}
+                        >
+                          {live.dir === '상행' ? '▲ ' : live.dir === '하행' ? '▼ ' : ''}
+                          {live.dir}
+                        </span>
+                      </span>
                     </div>
                   ) : (
                     <p className={styles.tdsMuted}>지금은 선로에 없는 열번이에요</p>

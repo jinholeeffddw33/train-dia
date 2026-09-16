@@ -896,8 +896,7 @@ function trainSideFor(routePart: string, index: number, count: number): TrainSid
  * 날짜는 «그 열차가 실제로 달리는 달력 날짜» 로 본다. 전날 밤에 시작한 야간근무자가
  * 자정 넘어 새벽에 모는 열번(주박 후 첫차 등)도 그날의 열번이다.
  *
- * 답십리 기관사 누구도 맡지 않은 쪽은 영등포 기관사로 채운다. 한 열번을 통째로 맡은
- * 사람이 있으면 영등포는 없다.
+ * 답십리 기관사만 돌려준다. 영등포·없는 열번 판정은 공식 시간표를 함께 보는 lookupTrain 이 한다.
  */
 export function findTrainDrivers(trainNo: number, date: Date): TrainDriverRow[] {
   const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -936,24 +935,102 @@ export function findTrainDrivers(trainNo: number, date: Date): TrainDriverRow[] 
     }
   }
 
-  // 답십리 기관사가 맡지 않은 쪽 = 영등포 기관사
-  const hasFull = rows.some((r) => r.side === 'full');
-  if (!hasFull) {
-    const yeongdeungpo = (side: TrainSide): TrainDriverRow & { sortKey: number } => ({
-      name: '영등포 기관사', ours: false, side, dia: null, diaDate: null, from: null, to: null,
-      sortKey: 10000,
-    });
-    if (rows.length === 0) {
-      rows.push(yeongdeungpo('full'));
-    } else {
-      if (!rows.some((r) => r.side === 'west')) rows.push(yeongdeungpo('west'));
-      if (!rows.some((r) => r.side === 'east')) rows.push(yeongdeungpo('east'));
-    }
-  }
-
   return rows
     .sort((a, b) => a.sortKey - b.sortKey)
     .map(({ sortKey: _sortKey, ...r }) => r);
+}
+
+// ── 공식 시간표로 «없는 열번 / 영등포 열번» 을 가른다 ──
+
+/** 5호선 시간표 한 열번 — scripts/build-line5-timetable.mjs 가 만든 public/data/line5-trains.json */
+export interface Line5TrainInfo {
+  /** 시발역 */
+  o: string;
+  /** 종착역 */
+  d: string;
+  /** 답십리 출발 시각 — 답십리를 안 지나면 null */
+  dap: string | null;
+}
+
+export interface Line5Timetable {
+  weekday: Record<string, Line5TrainInfo>;
+  saturday: Record<string, Line5TrainInfo>;
+  holiday: Record<string, Line5TrainInfo>;
+}
+
+/**
+ * 그날 쓰는 공식 시간표 — 일요일·공휴일은 휴일, 토요일은 토요일, 나머지는 평일.
+ *
+ * ★ isHoliday 를 그대로 쓰면 안 된다. 근무표 기준이라 토요일도 «휴일» 로 치기 때문에,
+ *   공식 시간표의 토요일(평일·휴일과 열번이 다르다)이 통째로 휴일 시간표로 잘못 간다.
+ *   그래서 공휴일 명단(HOL)을 따로 본다.
+ */
+export function timetableDayKey(date: Date): keyof Line5Timetable {
+  const y = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const publicHoliday = (HOL[String(y)] ?? '').includes(`${y}/${mm}/${dd}`);
+  if (date.getDay() === 0 || publicHoliday) return 'holiday';
+  if (date.getDay() === 6) return 'saturday';
+  return 'weekday';
+}
+
+export const TIMETABLE_DAY_LABEL: Record<keyof Line5Timetable, string> = {
+  weekday: '평일',
+  saturday: '토요일',
+  holiday: '휴일',
+};
+
+export type TrainLookup =
+  /** 그날 공식 시간표에도, 답십리 행로표에도 없는 번호 */
+  | { status: 'none' }
+  /** 시간표에는 있는데 답십리 기관사가 한 구간도 안 맡는다 — 확실한 영등포 열번 */
+  | { status: 'yeongdeungpo'; info: Line5TrainInfo }
+  /** 답십리 기관사가 모는 열번 — 맡지 않은 쪽은 영등포 기관사 줄로 채운다 */
+  | { status: 'ours'; rows: TrainDriverRow[]; info: Line5TrainInfo | null }
+  /** 시간표를 못 불러와 영등포인지 없는 번호인지 가를 수 없다 */
+  | { status: 'unknown' };
+
+/** 시발·종착역을 보고 이 열번이 답십리 서쪽·동쪽 중 어디를 달리는가 */
+function routeSides(info: Line5TrainInfo): { west: boolean; east: boolean } {
+  const a = stationPosIndex(info.o);
+  const b = stationPosIndex(info.d);
+  if (a === null || b === null) return { west: true, east: true };
+  return { west: Math.min(a, b) < DAP_IDX, east: Math.max(a, b) > DAP_IDX };
+}
+
+function yeongdeungpoRow(side: TrainSide): TrainDriverRow {
+  return { name: '영등포 기관사', ours: false, side, dia: null, diaDate: null, from: null, to: null };
+}
+
+/**
+ * 열번 조회의 최종 판정.
+ *
+ * 예전엔 답십리 행로표에 없으면 무조건 «영등포 기관사» 라고 했다. 그래서 아무 번호나 넣어도
+ * 영등포라고 답했다. 이제는 공식 시간표로 가른다.
+ *   · 답십리 기관사가 모는 열번 → 그 사람들. 기지 입출고 회송(1xxx·2xxx)은 승객 시간표에 없지만
+ *     행로표에 기관사가 있으니 있는 열번이다
+ *   · 우리 기관사는 없는데 시간표에 있다 → 확실한 영등포 열번
+ *   · 둘 다 없다 → 없는 열번
+ *
+ * 한쪽만 우리 기관사가 맡으면, 시간표로 «그 열번이 실제로 반대쪽까지 가는지» 를 보고 갈 때만
+ * 영등포 기관사 줄을 붙인다(답십리에서 돌아 나오는 짧은 운행엔 붙이지 않는다).
+ */
+export function lookupTrain(trainNo: number, date: Date, timetable: Line5Timetable | null): TrainLookup {
+  const ours = findTrainDrivers(trainNo, date);
+  const info = timetable?.[timetableDayKey(date)]?.[String(trainNo)] ?? null;
+
+  if (ours.length === 0) {
+    if (!timetable) return { status: 'unknown' };
+    return info ? { status: 'yeongdeungpo', info } : { status: 'none' };
+  }
+  if (ours.some((r) => r.side === 'full')) return { status: 'ours', rows: ours, info };
+
+  const sides = info ? routeSides(info) : { west: true, east: true };
+  const rows = [...ours];
+  if (sides.west && !ours.some((r) => r.side === 'west')) rows.push(yeongdeungpoRow('west'));
+  if (sides.east && !ours.some((r) => r.side === 'east')) rows.push(yeongdeungpoRow('east'));
+  return { status: 'ours', rows, info };
 }
 
 // ===== 교대 방향 =====

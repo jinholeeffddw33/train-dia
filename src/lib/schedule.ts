@@ -2,7 +2,7 @@
 
 import type { Person, DiaType, Schedule, Segment, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
 import { LABELS, DIR, dirFull, dirSub } from './constants';
-import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS } from '@/data/cycle';
+import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS, getRoster } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 import { TRANSITION_MAY_2026 } from '@/data/transition';
@@ -701,7 +701,9 @@ export function buildTrainDriverMap(now: Date, livePos?: Map<string, LiveTrainPo
   for (const date of dates) {
     const isYesterday = date.getTime() < todayDate.getTime();
 
-    for (const person of P) {
+    // 그날의 명부 — 발령 예약(결원21 → 이민우 같은)이 시행일에 맞춰 반영된다.
+    // 예전엔 cycle.ts 의 P 를 그대로 써서, 발령이 시행돼도 운행도에는 옛 이름이 떴다.
+    for (const person of getRoster(date)) {
       // 결원은 스킵하지 않고 "결원" 라벨로 표시 — 안 하면 답십리 담당인데도
       // 이름이 비어 다른 소속(영등포 등) 기관사로 오인됨.
       const isVacant = person.n.startsWith('결원');
@@ -837,6 +839,121 @@ export function buildTrainDiaMap(now: Date, livePos?: Map<string, LiveTrainPos>)
     buildTrainDriverMap(now, livePos);
   }
   return cachedDiaMap ?? new Map();
+}
+
+// ===== 열차번호로 기관사 찾기 =====
+
+/**
+ * 한 열번 안에서 맡은 쪽.
+ *   full — 처음부터 끝까지
+ *   west — 답십리 서쪽(방화 방면)만
+ *   east — 답십리 동쪽(하남검단산·마천 방면)만
+ */
+export type TrainSide = 'full' | 'west' | 'east';
+
+export interface TrainDriverRow {
+  /** 기관사 이름 — 답십리 기관사가 맡지 않은 쪽은 '영등포 기관사' */
+  name: string;
+  /** 답십리 소속인가 */
+  ours: boolean;
+  side: TrainSide;
+  /** 행로표 열기용 — 영등포면 null */
+  dia: string | null;
+  /** 그 다이아가 시작된 날. 자정 넘어 새벽에 모는 야간근무는 «전날» 이다 */
+  diaDate: Date | null;
+  /** 이 열번이 든 운행 구간의 출발·도착 시각 (열번 하나의 정확한 시각은 자료에 없다) */
+  from: string | null;
+  to: string | null;
+}
+
+/** 행로 약호 한 글자 → 답십리의 어느 쪽인가 */
+function sideOfChar(c: string): TrainSide {
+  if (UP_CHARS.has(c)) return 'west';
+  if (DOWN_CHARS.has(c)) return 'east';
+  return 'full';
+}
+
+/**
+ * 이 기관사가 이 열번의 어느 쪽을 맡는가.
+ *
+ * 기관사는 답십리에서 바뀐다. 그래서 행로가 답십리에서 시작하는 «첫 열번»(답X…)은
+ * 답십리부터 X 쪽만, 답십리에서 끝나는 «마지막 열번»(…X답)은 X 쪽에서 답십리까지만 맡는다.
+ * 같은 열번의 반대쪽은 다른 사람이 몬다. 그 사이의 열번은 처음부터 끝까지 이 사람이다.
+ * (buildTrainDriverMap 의 위치 게이팅과 같은 규칙)
+ */
+function trainSideFor(routePart: string, index: number, count: number): TrainSide {
+  const part = routePart.trim();
+  if (index === 0 && part.length >= 2 && part[0] === '답') return sideOfChar(part[1]);
+  if (index === count - 1 && part.length >= 2 && part[part.length - 1] === '답') {
+    return sideOfChar(part[part.length - 2]);
+  }
+  return 'full';
+}
+
+/**
+ * 그날 이 열차번호를 누가 모는가 — 5호선 실시간의 «열번 조회».
+ *
+ * 날짜는 «그 열차가 실제로 달리는 달력 날짜» 로 본다. 전날 밤에 시작한 야간근무자가
+ * 자정 넘어 새벽에 모는 열번(주박 후 첫차 등)도 그날의 열번이다.
+ *
+ * 답십리 기관사 누구도 맡지 않은 쪽은 영등포 기관사로 채운다. 한 열번을 통째로 맡은
+ * 사람이 있으면 영등포는 없다.
+ */
+export function findTrainDrivers(trainNo: number, date: Date): TrainDriverRow[] {
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const prevDay = new Date(day);
+  prevDay.setDate(prevDay.getDate() - 1);
+
+  const rows: (TrainDriverRow & { sortKey: number })[] = [];
+
+  // [다이아가 시작된 날, 그 다이아에서 «오늘 달력» 에 해당하는 구간의 날짜 차이]
+  const sources: [Date, number][] = [[day, 0], [prevDay, 1]];
+  for (const [base, offset] of sources) {
+    for (const person of getRoster(base)) {
+      const dia = getDia(person, base);
+      if (getType(dia) === 'rest') continue;
+      const sc = getSchedule(dia, base);
+      if (!sc?.g?.length) continue;
+
+      const offsets = segDayOffsets(sc.g);
+      const parts = (sc.m ?? '').split(',');
+      sc.g.forEach((seg, si) => {
+        if (offsets[si] !== offset || !seg.n?.length) return;
+        const k = seg.n.indexOf(trainNo);
+        if (k < 0) return;
+        const dep = timeToMins(seg.d);
+        rows.push({
+          name: person.n,
+          ours: true,
+          side: trainSideFor(parts[si] ?? '', k, seg.n.length),
+          dia,
+          diaDate: base,
+          from: seg.d || null,
+          to: seg.a || null,
+          sortKey: dep < 0 ? 9999 : dep,
+        });
+      });
+    }
+  }
+
+  // 답십리 기관사가 맡지 않은 쪽 = 영등포 기관사
+  const hasFull = rows.some((r) => r.side === 'full');
+  if (!hasFull) {
+    const yeongdeungpo = (side: TrainSide): TrainDriverRow & { sortKey: number } => ({
+      name: '영등포 기관사', ours: false, side, dia: null, diaDate: null, from: null, to: null,
+      sortKey: 10000,
+    });
+    if (rows.length === 0) {
+      rows.push(yeongdeungpo('full'));
+    } else {
+      if (!rows.some((r) => r.side === 'west')) rows.push(yeongdeungpo('west'));
+      if (!rows.some((r) => r.side === 'east')) rows.push(yeongdeungpo('east'));
+    }
+  }
+
+  return rows
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map(({ sortKey: _sortKey, ...r }) => r);
 }
 
 // ===== 교대 방향 =====

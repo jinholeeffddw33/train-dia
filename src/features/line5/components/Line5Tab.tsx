@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { useTrainStore } from '@/stores/train';
 import { useTrainPolling } from '../hooks/useTrainPolling';
 import TrainList from './TrainList';
 import RouteMap from './RouteMap';
+import TrainDriverSearch from './TrainDriverSearch';
 import styles from '../styles/Line5.module.css';
 
 const BRANCHES = [
@@ -53,6 +54,7 @@ function UpdatedAgoLabel({ lastFetch, loading }: { lastFetch: number | null; loa
 export default function Line5Tab() {
   const { branch, viewMode, loading, error, lastFetch, setBranch, setViewMode, triggerScroll } = useTrainStore();
   const { refresh } = useTrainPolling();
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const handleRefresh = () => {
     refresh();
@@ -64,6 +66,16 @@ export default function Line5Tab() {
       {/* 헤더 */}
       <div className={`${styles.header} z-app-header`}>
         <h2 className={styles.title}>5호선 실시간</h2>
+        {/* 열번 조회 — 열차번호로 그날 누가 모는지, 지금은 누가 몰고 있는지 */}
+        <button
+          type="button"
+          className={`z-glass-pill ${styles.searchTrigger}`}
+          onClick={() => setSearchOpen(true)}
+          data-press
+        >
+          <Search size={16} aria-hidden />
+          열번 조회
+        </button>
       </div>
 
       {/* 지선 탭 — 법① 세그먼트 */}
@@ -143,6 +155,8 @@ export default function Line5Tab() {
         </button>
         <UpdatedAgoLabel lastFetch={lastFetch} loading={loading} />
       </div>
+
+      <TrainDriverSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

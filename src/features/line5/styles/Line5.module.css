@@ -938,3 +938,258 @@
   padding: var(--dia-space-2) var(--dia-space-4);
   min-height: 44px;
 }
+
+/* ── 열번 조회 ───────────────────────────────────────────────
+   열차번호를 넣으면 그날 그 열번을 누가 모는지, 지금은 누가 몰고 있는지.
+   한 열번은 답십리에서 기관사가 바뀌어 «구간별 사람» 으로 보여준다. */
+
+/* 헤더 오른쪽 «열번 조회» 알약 */
+.searchTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--dia-space-4);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tdsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding-bottom: var(--dia-space-4);
+}
+
+.tdsDateRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+}
+
+.tdsStep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 날짜 글자 위에 투명한 달력 입력을 덮어, 글자를 누르면 달력이 열린다 */
+.tdsDateBox {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-2);
+  min-height: 44px;
+  border-radius: var(--dia-radius-md);
+  cursor: pointer;
+}
+.tdsDateText {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+.tdsTodayMark {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--dia-green-dim);
+  color: var(--dia-green);
+  font-size: var(--dia-text-2xs);
+  font-weight: var(--dia-weight-bold);
+}
+.tdsDateInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.tdsBackToday {
+  align-self: center;
+  min-height: 40px;
+  padding: 0 var(--dia-space-4);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+}
+
+.tdsInputRow {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+.tdsInput {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--dia-space-3);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  letter-spacing: 3px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.tdsInput::placeholder {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  letter-spacing: 0;
+}
+.tdsGo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 var(--dia-space-4);
+  font-size: var(--dia-text-sm);
+  cursor: pointer;
+}
+
+.tdsHintBad {
+  margin: 0;
+  color: var(--dia-red);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+}
+.tdsGuide,
+.tdsMuted,
+.tdsFootnote {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  line-height: 1.5;
+}
+.tdsFootnote {
+  color: var(--dia-text-tertiary);
+}
+
+.tdsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.tdsSectionTitle {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+
+.tdsNow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+}
+.tdsNowDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dia-green);
+  box-shadow: 0 0 0 4px var(--dia-green-dim);
+}
+.tdsNowWhere {
+  margin-left: auto;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+}
+
+.tdsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* 한 줄 — 시각 | 이름 | 맡은 구간 */
+.tdsRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'time who'
+    'time side';
+  align-items: center;
+  column-gap: var(--dia-space-3);
+  row-gap: 2px;
+  padding: var(--dia-space-3);
+}
+.tdsTime {
+  grid-area: time;
+  /* 시각이 없는 영등포 줄(「—」)도 칸 너비를 같게 — 이름이 줄마다 같은 자리에서 시작한다 */
+  min-width: 6.2em;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tdsWho {
+  grid-area: who;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  min-width: 0;
+}
+.tdsSide {
+  grid-area: side;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+}
+
+.tdsName {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+}
+.tdsNameOther {
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+}
+/* 이름 = 행로표 열기. 밑줄로 «누를 수 있음» 을 알린다(TrainList 이름 버튼과 같은 결) */
+.tdsNameLink {
+  min-height: 32px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: var(--dia-blue-text);
+  font-family: inherit;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tdsNameLink:active {
+  transform: scale(0.95);
+}
+
+.tdsNowBadge {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--dia-green-dim);
+  color: var(--dia-green);
+  font-size: var(--dia-text-2xs);
+  font-weight: var(--dia-weight-bold);
+}

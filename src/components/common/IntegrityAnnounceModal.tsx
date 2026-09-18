@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { X, Scale, CalendarDays, ListChecks, Lock } from 'lucide-react';
+import { X, Scale, CalendarDays, ListChecks, Lock, Gift } from 'lucide-react';
 import { requestEntryModal } from '@/lib/entryModalGate';
 import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 import { useIntegrityStore } from '@/stores/integrity';
@@ -124,10 +124,10 @@ export default function IntegrityAnnounceModal() {
               응시는 한 번만 할 수 있어요
             </p>
             <p className={styles.noticeAlert}>
-              <Scale size={20} strokeWidth={2.4} aria-hidden />
-              <span>많이 응시해 주세요</span>
+              <Gift size={22} strokeWidth={2.4} aria-hidden />
+              <span>고득점 5명에게 푸짐한 상품이 있습니다!</span>
             </p>
-            <p className={styles.noticeUntil}>이 안내는 9월 27일(일)까지 보입니다.</p>
+            <p className={styles.noticeText}>많이 응시해 주세요 🙌</p>
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Scale, CalendarDays, ListChecks, Lock, CheckCircle2, Send, AlertTriangle, BarChart3 } from 'lucide-react';
+import { Scale, CalendarDays, ListChecks, Lock, Gift, CheckCircle2, Send, AlertTriangle, BarChart3 } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import LoadingDots from '@/components/common/LoadingDots';
 import { useIntegrityStore } from '@/stores/integrity';
@@ -205,10 +205,26 @@ export default function IntegrityQuizSheet() {
                     <Lock size={20} strokeWidth={2.2} aria-hidden className={styles.iqFactIcon} />
                     <span className={styles.iqFactText}>
                       <strong>응시는 한 번만</strong>
-                      <span>정답은 공개하지 않고, {INTEGRITY_AWARD_LABEL} 점수로 포상해요</span>
+                      <span>정답은 공개하지 않아요</span>
                     </span>
                   </li>
                 </ul>
+
+                {/* 상품 — 응시할 마음이 드는 자리. 다른 안내와 같은 무게로 두면 묻힌다.
+                    대회가 끝난 뒤(closed)에는 걸지 않는다 — 이제 와서 권할 일이 아니다. */}
+                {stage !== 'closed' && (
+                  <>
+                    <p className={styles.iqPrize}>
+                      <Gift size={24} strokeWidth={2.4} aria-hidden />
+                      <span>
+                        고득점 <strong>5명</strong>에게
+                        <br />
+                        푸짐한 상품이 있습니다!
+                      </span>
+                    </p>
+                    <p className={styles.iqPrizeWhen}>{INTEGRITY_AWARD_LABEL} 점수로 시상해요</p>
+                  </>
+                )}
 
                 {stage === 'intro' && (
                   <>

@@ -82,6 +82,34 @@
   line-height: 1.45;
 }
 
+/* 상품 — 이 화면에서 제일 센 한 마디. 앰버로 띄워 안내 카드들과 무게를 다르게 둔다. */
+.iqPrize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  margin: var(--dia-space-2) 0 0;
+  padding: var(--dia-space-4);
+  border: 2px solid var(--dia-amber-text);
+  border-radius: var(--dia-radius-lg);
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  line-height: 1.45;
+  text-align: left;
+}
+.iqPrize strong {
+  font-size: var(--dia-text-xl);
+  font-weight: 800;
+}
+.iqPrizeWhen {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+}
+
 .iqCall {
   margin: var(--dia-space-2) 0 0;
   color: var(--dia-green-text);

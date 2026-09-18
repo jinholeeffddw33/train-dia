@@ -12,6 +12,7 @@ import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
 import AnnounceModal from '@/components/common/AnnounceModal';
 import WhatsNewModal from '@/components/common/WhatsNewModal';
+import IntegrityAnnounceModal from '@/components/common/IntegrityAnnounceModal';
 import WorldLoading from '@/components/common/WorldLoading';
 import AppShell from '@/components/layout/AppShell';
 import pageStyles from './page.module.css';
@@ -35,6 +36,8 @@ const LifeWorld = dynamic(() => import('@/features/life/LifeWorld'), { ssr: fals
 const StandbyCoverageView = dynamic(() => import('@/features/standby/StandbyCoverageView'), { ssr: false, loading });
 const OfficeDashboard = dynamic(() => import('@/features/office/OfficeDashboard'), { ssr: false, loading });
 const SettingsOverlay = dynamic(() => import('@/features/more/components/SettingsOverlay'), { ssr: false });
+// 청렴 경진대회 시트 — 기간 한정이라 첫 화면 번들에 싣지 않는다
+const IntegrityQuizSheet = dynamic(() => import('@/features/integrity/IntegrityQuizSheet'), { ssr: false });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -146,6 +149,9 @@ export default function HomePage() {
         <KimMinkyungAwardModal />
         <AnnounceModal />
         <WhatsNewModal />
+        <IntegrityAnnounceModal />
+        {/* 청렴 경진대회 시트 — 홈 아이콘과 팝업의 «바로 응시하기» 가 같은 시트를 연다 */}
+        <IntegrityQuizSheet />
         <SettingsOverlay open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         {/* 월드가 무엇이든 본문 폭은 하나로 묶는다 — page.module.css 설명 참고 */}
         <div className={pageStyles.appWidth}>

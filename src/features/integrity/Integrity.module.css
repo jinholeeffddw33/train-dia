@@ -1,0 +1,442 @@
+/* ── 청렴 문제풀기 경진대회 ───────────────────────────────────────
+   문제를 푸는 화면이라 «지금 어디를 고르는가» 가 한눈에 보여야 한다.
+   고른 보기는 초록으로 채우고(테두리만으로는 50-60대 화면에서 약하다),
+   보기 하나하나를 48px 이상으로 둬서 흔들리는 전동차 안에서도 눌린다. */
+
+/* 공용 시트 본문은 좌우 여백이 없다 — 시트 제목과 같은 20px 을 준다 */
+.iqWrap {
+  padding: var(--dia-space-1) var(--dia-space-5) var(--dia-space-6);
+}
+
+/* ── 안내(시작 전) ── */
+.iqIntro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding-top: var(--dia-space-2);
+  text-align: center;
+}
+.iqBadgeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-green-dim);
+  color: var(--dia-green-text);
+}
+.iqBadgeDone {
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+}
+.iqSubtitle {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+}
+.iqTitle {
+  margin: 0;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-xl);
+  font-weight: var(--dia-weight-bold);
+  line-height: 1.35;
+}
+
+.iqFacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  width: 100%;
+  margin: var(--dia-space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.iqFact {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+  text-align: left;
+}
+.iqFactIcon {
+  flex: 0 0 auto;
+  color: var(--dia-green-text);
+}
+.iqFactText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.iqFactText strong {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+}
+.iqFactText span {
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  line-height: 1.45;
+}
+
+.iqCall {
+  margin: var(--dia-space-2) 0 0;
+  color: var(--dia-green-text);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+}
+.iqNotice {
+  margin: var(--dia-space-2) 0 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-base);
+}
+.iqStart {
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--dia-space-2);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+
+/* ── 문제 목록 ── */
+.iqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding-top: var(--dia-space-2);
+}
+.iqCard {
+  padding: var(--dia-space-4);
+}
+.iqQHead {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-2);
+}
+.iqQNo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-green-dim);
+  color: var(--dia-green-text);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+.iqQKind {
+  padding: 2px 8px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+}
+.iqQText {
+  margin: 0 0 var(--dia-space-3);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  line-height: 1.55;
+}
+
+.iqOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+}
+.iqOption {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.iqOption:active {
+  transform: scale(0.95);
+}
+.iqOptionNo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border-strong);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+.iqOptionText {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  line-height: 1.45;
+}
+
+/* OX — 두 칸을 크게 나눠 손가락이 빗나가지 않게 */
+.iqOxRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+}
+.iqOx {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.iqOx:active {
+  transform: scale(0.95);
+}
+.iqOxMark {
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+}
+
+/* 고른 보기 — 초록으로 채운다 */
+.iqChosen {
+  border-color: var(--dia-green);
+  background: var(--dia-green-dim);
+}
+.iqChosen .iqOptionNo {
+  border-color: var(--dia-green);
+  background: var(--dia-green);
+  color: var(--dia-bg);
+}
+.iqChosen .iqOptionText,
+.iqChosen .iqOxMark {
+  font-weight: var(--dia-weight-bold);
+}
+
+.iqError {
+  margin: 0;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-red-dim);
+  color: var(--dia-red);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  text-align: center;
+}
+
+/* ── 하단바 ── */
+.iqFooter {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+.iqProgress {
+  flex: 1;
+  min-width: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+}
+.iqProgress strong {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+}
+.iqProgressHint {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  white-space: nowrap;
+}
+.iqSubmit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  min-height: 48px;
+  padding: 0 var(--dia-space-5);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ── 로딩·완료 등 가운데 정렬 상태 ── */
+.iqCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-8) var(--dia-space-2);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+.iqCenterText {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-base);
+  line-height: 1.6;
+}
+.iqRetry {
+  min-height: 44px;
+  padding: 0 var(--dia-space-5);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+
+/* ── 관리자 결과 ── */
+.iqAdminBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 var(--dia-space-3);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+.iqResults {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding-top: var(--dia-space-2);
+}
+.iqStatRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dia-space-3);
+}
+.iqStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--dia-space-3);
+}
+.iqStatIcon {
+  color: var(--dia-green-text);
+}
+.iqStatValue {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-2xl);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.iqStatLabel {
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-meta);
+  text-align: center;
+}
+.iqResultTitle {
+  margin: var(--dia-space-2) 0 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+.iqRankList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.iqRank {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-3);
+}
+.iqRankNo {
+  flex: 0 0 24px;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  text-align: center;
+}
+.iqRankName {
+  flex: 1;
+  min-width: 0;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+}
+.iqRankDay {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  font-variant-numeric: tabular-nums;
+}
+.iqRankScore {
+  color: var(--dia-green-text);
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+.iqRankOf {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.iqQRateList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.iqQRate {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+}
+.iqQRateNo {
+  flex: 0 0 40px;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.iqQRateBar {
+  flex: 1;
+  min-width: 0;
+  height: 10px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface-active);
+  overflow: hidden;
+}
+.iqQRateFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-green);
+}
+.iqQRateValue {
+  flex: 0 0 44px;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

@@ -12,6 +12,8 @@ const SESSION_KEY = 'dia-entry-modal-shown';
 
 /** 우선순위 — 높을수록 먼저 (CycleChange > RefreshGuide > WhatsNew > InternWelcome > KimMinkyungAward) */
 const PRIORITY: Record<string, number> = {
+  // 마감이 있는 안내가 먼저다 — 기간(9/18~27)을 놓치면 응시 자체가 끝난다
+  'integrity-quiz-2026-09': 6,
   'cycle-change': 5,
   'refresh-guide': 4,
   'announce-2026-07-14': 4, // 3일 전직원 공지 (whats-new 위)

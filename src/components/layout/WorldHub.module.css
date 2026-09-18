@@ -237,11 +237,49 @@
   gap: var(--dia-space-2);
 }
 
+/* 제목 줄 — 왼쪽 제목, 오른쪽에 기간 한정 바로가기(청렴 경진대회) */
+.servicesHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+
 .servicesTitle {
   font-size: var(--dia-text-base);
   font-weight: 700;
   color: var(--dia-text-primary);
   margin: 0;
+}
+
+/* 청렴 — 9월 18~27일에만 보이는 임시 아이콘. 대회가 끝나면 이 줄만 걷어내면 된다. */
+.integrityBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  background: var(--hub-tile-bg);
+  border: 1px solid var(--dia-green);
+  box-shadow: var(--hub-tile-shadow);
+  color: var(--dia-green-text);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.integrityBtn:active {
+  transform: scale(0.95);
+}
+/* 아직 안 낸 사람에게만 붙는 점 — «할 일이 남았다» 를 말 없이 알린다 */
+.integrityDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dia-red);
 }
 
 .servicesGrid {

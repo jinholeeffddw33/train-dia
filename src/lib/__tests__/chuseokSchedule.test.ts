@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getSchedule, getRouteImagePath, isSpecialRest, getSpecialDayLabel } from '../schedule';
+import { getSchedule, getRouteImagePath, isSpecialRest, getSpecialDayLabel, getLabel } from '../schedule';
 import { S } from '@/data/schedules';
 import { SPECIAL_DAYS } from '@/data/specialDays';
 import type { Schedule } from '../types';
@@ -64,6 +64,19 @@ describe('추석 다이아', () => {
     expect(getSchedule('64', D(9, 27))?.s).toBeTruthy();
     // 연장 변경이 없는 번호는 그날의 추석표 그대로
     expect(getSchedule('69', D(9, 26))).toBe(getSchedule('69', D(9, 25)));
+  });
+
+  it('임시 다이아는 «임시 다이아» 로 보이고, 교번 변경으로 넣으면 그날 시간·그림이 나온다', () => {
+    expect(getLabel('임시61')).toBe('임시 다이아');
+    const sc = getSchedule('임시61', D(9, 26))!;
+    expect(sc.s).toBe('18:47');
+    expect(sc.e).toBe('06:31');
+    expect(getRouteImagePath('임시61', D(9, 26))).toBe('/images/route/chuseok2026/late0926_t61.jpg');
+    expect(getSchedule('임시62', D(9, 26))?.g?.length).toBeGreaterThan(0);
+    expect(getSchedule('임시61', D(9, 27))?.g?.length).toBeGreaterThan(0);
+    // 임시 다이아가 없는 날에는 근무가 없다
+    expect(getSchedule('임시61', D(9, 25))).toBeNull();
+    expect(getSchedule('임시62', D(9, 27))).toBeNull();
   });
 
   it('쉬는 번호에는 행로표 그림이 없다', () => {

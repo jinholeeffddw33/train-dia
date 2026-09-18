@@ -85,6 +85,9 @@ export function getType(dia: string): DiaType {
   if (dia.startsWith('휴')) return 'rest';
   if (dia.endsWith('~')) return 'rest';
   if (dia.startsWith('대')) return 'standby';
+  // 임시 다이아(예: 추석 심야 연장 «임시61») — 교번에 걸린 사람은 없고, 그날 휴무자가 교번 변경으로 들어간다.
+  // 저녁에 시작하는 근무라 야간 표에서 찾는다.
+  if (dia.startsWith('임시')) return 'night';
   const n = parseInt(dia);
   if (n >= 62 && n <= 91) return 'night';
   if ((n >= 1 && n <= 43) || (n >= 51 && n <= 54)) return 'day';
@@ -200,6 +203,7 @@ export function getLabel(dia: string): string {
   if (dia.startsWith('휴')) return '휴무';
   if (dia.endsWith('~')) return '비번';
   if (dia.startsWith('대')) return '대기';
+  if (dia.startsWith('임시')) return '임시 다이아';
   const n = parseInt(dia);
   if (n >= 62) return '야간';
   return '주간';

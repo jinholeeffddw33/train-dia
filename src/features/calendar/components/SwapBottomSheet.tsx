@@ -73,8 +73,8 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
     }
   }, [existingSwap]);
 
-  // 입력된 교번의 프리뷰
-  const previewDia = inputDia.trim();
+  // 입력된 교번의 프리뷰 — «임시 61» 처럼 띄어 써도 «임시61» 로 맞춘다
+  const previewDia = inputDia.replace(/\s+/g, '');
   const previewType = previewDia ? getType(previewDia) : null;
   const previewLabel = previewDia ? getLabel(previewDia) : '';
   const previewSchedule = previewDia ? getSchedule(previewDia, date) : null;

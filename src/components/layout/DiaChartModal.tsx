@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Modal from '@/components/common/Modal';
-import { getType, isHoliday } from '@/lib/schedule';
+import { getRouteImagePath } from '@/lib/schedule';
 import styles from './DiaChartModal.module.css';
 
 interface DiaChartModalProps {
@@ -15,24 +15,6 @@ interface DiaChartModalProps {
   /** 작은 미리보기 — 시트를 낮게 띄워 뒤 화면(5호선 운행도)이 더 보이게 한다 */
   compact?: boolean;
   onClose: () => void;
-}
-
-function getRouteImagePath(dia: string, date: Date): string | null {
-  if (dia.startsWith('휴') || dia.startsWith('대')) return null;
-  const diaNum = parseInt(dia.replace(/\D/g, ''));
-  if (isNaN(diaNum)) return null;
-  const h = isHoliday(date);
-  const tm = new Date(date);
-  tm.setDate(tm.getDate() + 1);
-  const th = isHoliday(tm);
-  const isNight = getType(dia) === 'night';
-  let prefix: string;
-  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
-  else if (h && th) prefix = 'p_hh';
-  else if (h && !th) prefix = 'p_hp';
-  else if (!h && th) prefix = 'p_ph';
-  else prefix = 'p_pp';
-  return `/images/route/${prefix}_${diaNum}.png`;
 }
 
 /**

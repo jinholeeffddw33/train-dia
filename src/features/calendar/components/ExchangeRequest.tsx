@@ -6,7 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import { useExchangeStore, type ExchangePost } from '@/stores/exchange';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { showToast } from '@/components/common/Toast';
-import { getDia, getType, getDiaDisplay, isHoliday as checkHoliday } from '@/lib/schedule';
+import { getDia, getType, getDiaDisplay, isHoliday as checkHoliday, getRouteImagePath } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import { getRoster } from '@/data/cycle';
 import type { Person } from '@/lib/types';
@@ -50,25 +50,6 @@ function matchesWish(dia: string, wish: WishType): boolean {
     case '비번': return dia.endsWith('~');
     case '휴무': return dia.startsWith('휴');
   }
-}
-
-/** 교번+날짜 → 행로 이미지 경로 */
-function getRouteImagePath(dia: string, date: Date): string | null {
-  if (dia.startsWith('휴') || dia.startsWith('대') || dia.endsWith('~')) return null;
-  const diaNum = parseInt(dia.replace(/\D/g, ''));
-  if (isNaN(diaNum)) return null;
-  const h = checkHoliday(date);
-  const tm = new Date(date);
-  tm.setDate(tm.getDate() + 1);
-  const th = checkHoliday(tm);
-  const isNight = getType(dia) === 'night';
-  let prefix: string;
-  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
-  else if (h && th) prefix = 'p_hh';
-  else if (h && !th) prefix = 'p_hp';
-  else if (!h && th) prefix = 'p_ph';
-  else prefix = 'p_pp';
-  return `/images/route/${prefix}_${diaNum}.png`;
 }
 
 /** 오늘 기준 14일 미리보기 배열 */

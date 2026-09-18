@@ -6,6 +6,7 @@ import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS, getRoster } from '@/da
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 import { TRANSITION_MAY_2026 } from '@/data/transition';
+import { SPECIAL_DAYS, type SpecialShift } from '@/data/specialDays';
 import { LINE5_MAIN, LINE5_MACHEON, LINE5_HANAM } from '@/data/line5';
 import { WATERMARK, CANARY } from './provenance';
 
@@ -90,6 +91,36 @@ export function getType(dia: string): DiaType {
   return 'rest';
 }
 
+// ===== 특별 다이아 (명절 등 며칠만 바뀌는 행로표) =====
+
+function ymdLocal(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * 그날 그 근무(주간/야간)에 걸린 특별 다이아. 없으면 null.
+ * date 는 근무 시작일이다 — 야간은 저녁에 시작한 날로 찾는다.
+ */
+export function getSpecialShift(date: Date, night: boolean): SpecialShift | null {
+  const sd = SPECIAL_DAYS[ymdLocal(date)];
+  if (!sd) return null;
+  return (night ? sd.night : sd.day) ?? null;
+}
+
+/** 그날이 특별 다이아 날이면 그 이름(예: «추석 연휴»), 아니면 null */
+export function getSpecialDayLabel(date: Date): string | null {
+  return SPECIAL_DAYS[ymdLocal(date)]?.label ?? null;
+}
+
+/** 특별 다이아 날에 쉬는 번호 — 평소 휴일표의 운휴와 같은 모양으로 돌려준다 */
+function suspendedSchedule(key: string): Schedule {
+  return { s: `운휴${key}`, e: '', m: '운휴 충당여부 및 출근시각 확인' };
+}
+
+function isNightDia(dia: string): boolean {
+  return getType(dia) === 'night' || (dia.startsWith('대') && parseInt(dia.replace('대', '')) >= 61);
+}
+
 /** 교번 + 날짜 → 스케줄 조회 */
 export function getSchedule(dia: string, date: Date): Schedule | null {
   if (dia.startsWith('휴')) return null;
@@ -100,8 +131,16 @@ export function getSchedule(dia: string, date: Date): Schedule | null {
   const tm = new Date(date);
   tm.setDate(tm.getDate() + 1);
   const th = isHoliday(tm);
-  const isNight = getType(dia) === 'night' ||
-    (dia.startsWith('대') && parseInt(dia.replace('대', '')) >= 61);
+  const isNight = isNightDia(dia);
+
+  // 특별 다이아 날이면 평소 표보다 먼저 본다 — 모든 화면이 이 함수를 거치므로 여기 한 곳이면 된다
+  const special = getSpecialShift(date, isNight);
+  if (special) {
+    if (special.suspended?.includes(key)) return suspendedSchedule(key);
+    const sp = special.table?.[key];
+    if (sp) return sp;
+  }
+
   let t: Record<string, Schedule>;
   if (!isNight) {
     t = h ? S.p_hol : S.p_ord;
@@ -120,6 +159,38 @@ export function getSchedule(dia: string, date: Date): Schedule | null {
     return { ...sched, s: `${String(nh).padStart(2, '0')}:${String(nm).padStart(2, '0')}` };
   }
   return sched;
+}
+
+/**
+ * 교번 + 날짜 → 행로표 그림 경로. 운전 행로가 없으면 null.
+ *
+ * 예전에는 이 계산이 화면마다 복사돼 있었다(근무 탭·달력·교환 요청·행로표 시트·오늘 카드).
+ * 특별 다이아 날에 한 곳만 고치면 나머지가 평소 그림을 보여 주는 사고가 나므로 여기로 모았다.
+ */
+export function getRouteImagePath(dia: string, date: Date): string | null {
+  if (dia.startsWith('휴') || dia.startsWith('대') || dia.endsWith('~')) return null;
+  const diaNum = parseInt(dia.replace(/\D/g, ''));
+  if (isNaN(diaNum)) return null;
+  const isNight = getType(dia) === 'night';
+
+  const special = getSpecialShift(date, isNight);
+  if (special) {
+    if (special.suspended?.includes(dia)) return null;
+    const img = special.images?.[dia];
+    if (img) return img;
+  }
+
+  const h = isHoliday(date);
+  const tm = new Date(date);
+  tm.setDate(tm.getDate() + 1);
+  const th = isHoliday(tm);
+  let prefix: string;
+  if (!isNight) prefix = h ? 'p_hol' : 'p_ord';
+  else if (h && th) prefix = 'p_hh';
+  else if (h && !th) prefix = 'p_hp';
+  else if (!h && th) prefix = 'p_ph';
+  else prefix = 'p_pp';
+  return `/images/route/${prefix}_${diaNum}.png`;
 }
 
 // ===== 라벨 유틸 =====

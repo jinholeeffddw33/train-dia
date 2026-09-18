@@ -6,7 +6,7 @@ import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { isOffice, isIntern, isRegularDayOffice, getUserRole } from '@/lib/auth';
 import {
-  getDia, getType, getSchedule, getDiaDisplay,
+  getDia, getType, getSchedule, getDiaDisplay, getRouteImagePath,
   getWorkTime, getNextShift, getBannerState, formatTimeUntil,
   getRouteDirection, getSegmentDirection, getCurrentSegmentInfo,
   isSpecialRest, getSpecialRestLabel, isDepotStart, timeToMins,
@@ -34,20 +34,7 @@ function routeImagePath(dia: string, date: Date): string | null {
   // 동번호 근무 다이아(8)의 행로표가 잘못 나옴 → 실제 운행 구간(g)이 있는 근무만 허용.
   const sch = getSchedule(dia, date);
   if (!sch?.g || sch.g.length === 0) return null;
-  const diaNum = parseInt(dia.replace(/\D/g, ''));
-  if (isNaN(diaNum)) return null;
-  const h = isHoliday(date);
-  const tm = new Date(date);
-  tm.setDate(tm.getDate() + 1);
-  const th = isHoliday(tm);
-  const night = getType(dia) === 'night';
-  let prefix: string;
-  if (!night) prefix = h ? 'p_hol' : 'p_ord';
-  else if (h && th) prefix = 'p_hh';
-  else if (h && !th) prefix = 'p_hp';
-  else if (!h && th) prefix = 'p_ph';
-  else prefix = 'p_pp';
-  return `/images/route/${prefix}_${diaNum}.png`;
+  return getRouteImagePath(dia, date);
 }
 
 /** 대기(충당) 근무면 안내 문구 — 행로가 없는 이유와 할 일을 알려준다. 아니면 null */

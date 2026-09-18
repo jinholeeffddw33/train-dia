@@ -3,29 +3,10 @@
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, X, Megaphone } from 'lucide-react';
 import { getRoster } from '@/data/cycle';
-import { getDia, getType, getSchedule, isHoliday as checkHoliday } from '@/lib/schedule';
+import { getDia, getType, getSchedule, isHoliday as checkHoliday, getRouteImagePath } from '@/lib/schedule';
 import { DOW } from '@/lib/constants';
 import type { Person, Schedule } from '@/lib/types';
 import styles from '../styles/Duty.module.css';
-
-/** 교번+날짜 → 행로 이미지 경로 */
-function getRouteImagePath(dia: string, date: Date): string | null {
-  if (dia.startsWith('휴') || dia.startsWith('대')) return null;
-  const diaNum = parseInt(dia.replace(/\D/g, ''));
-  if (isNaN(diaNum)) return null;
-  const h = checkHoliday(date);
-  const tm = new Date(date);
-  tm.setDate(tm.getDate() + 1);
-  const th = checkHoliday(tm);
-  const isNight = getType(dia) === 'night';
-  let prefix: string;
-  if (!isNight) { prefix = h ? 'p_hol' : 'p_ord'; }
-  else if (h && th) prefix = 'p_hh';
-  else if (h && !th) prefix = 'p_hp';
-  else if (!h && th) prefix = 'p_ph';
-  else prefix = 'p_pp';
-  return `/images/route/${prefix}_${diaNum}.png`;
-}
 
 /** 주간 다이아 1~44 */
 const DAY_DIAS = Array.from({ length: 44 }, (_, i) => String(i + 1));

@@ -5,8 +5,9 @@
  * 명부 전체로 세면 «안 읽은 사람» 이 늘 절반을 넘어 숫자가 뜻을 잃는다.
  * 운휴(추석 연휴처럼 그날 그 번호가 안 도는 경우)도 출근하지 않으므로 뺀다.
  *
- * 줄 순서: 주간 근무 → 주간 대기 → 야간 근무 → 야간 대기, 각 묶음 안에서는 출근 시각 순.
- * 대기를 시각 순으로 섞으면 주간 근무 한복판에 대기가 끼어들어 읽기 어렵다(진호 2026-09-21).
+ * 줄 순서: 주간 근무 → 주간 대기 → 야간 근무 → 야간 대기.
+ * 근무는 출근 시각 순, **대기는 출근 시각과 무관하게 번호 순으로 한 덩어리**다(진호 2026-09-21).
+ * 대기는 충당이 정해지기 전이라 출근 시각으로 줄을 세워 봐야 뜻이 없고, 묶어 두는 편이 읽기 쉽다.
  */
 import { getRoster } from '@/data/cycle';
 import { getDia, getSchedule, getType, isSpecialRest } from '@/lib/schedule';
@@ -40,6 +41,17 @@ export interface RollCallWorker {
   group: RollCallGroup;
 }
 
+/** 대기 묶음인가 — 대기는 시간으로 줄 세우지 않는다 */
+export function isStandby(group: RollCallGroup): boolean {
+  return group === 'dayStandby' || group === 'nightStandby';
+}
+
+/** 대기 번호 — «대4» → 4 */
+function diaNumber(dia: string): number {
+  const n = parseInt(dia.replace(/\D/g, ''), 10);
+  return Number.isNaN(n) ? 999 : n;
+}
+
 /** 'HH:MM' → 분. 없으면 아주 큰 값(맨 뒤로). */
 export function startMinutes(start: string | null): number {
   const m = /^(\d{1,2}):(\d{2})$/.exec(start ?? '');
@@ -60,10 +72,10 @@ export function workersOn(date: Date): RollCallWorker[] {
     const start = sc?.s && /^\d{1,2}:\d{2}$/.test(sc.s) ? sc.s : null;
     out.push({ sabun, name: person.n, dia, start, group: groupOf(dia) });
   }
-  return out.sort(
-    (a, b) =>
-      GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group) ||
-      startMinutes(a.start) - startMinutes(b.start) ||
-      a.dia.localeCompare(b.dia),
-  );
+  return out.sort((a, b) => {
+    const byGroup = GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group);
+    if (byGroup !== 0) return byGroup;
+    if (isStandby(a.group)) return diaNumber(a.dia) - diaNumber(b.dia); // 대기는 번호 순
+    return startMinutes(a.start) - startMinutes(b.start) || a.dia.localeCompare(b.dia);
+  });
 }

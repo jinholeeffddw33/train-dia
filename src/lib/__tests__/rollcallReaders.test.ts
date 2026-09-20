@@ -43,10 +43,18 @@ describe('줄 순서와 출근 시각', () => {
     expect(list.filter((w) => w.start).length).toBe(list.length); // 근무자는 모두 출근 시각이 있다
   });
 
-  it('묶음 안에서는 출근 시각 순', () => {
-    for (const g of ['dayWork', 'dayStandby', 'nightWork', 'nightStandby'] as const) {
+  it('근무 묶음 안에서는 출근 시각 순', () => {
+    for (const g of ['dayWork', 'nightWork'] as const) {
       const mins = workersOn(DAY).filter((w) => w.group === g).map((w) => startMinutes(w.start));
       expect([...mins].sort((a, b) => a - b), g).toEqual(mins);
+    }
+  });
+
+  it('대기 묶음은 출근 시각과 무관하게 번호 순으로 한 덩어리', () => {
+    for (const g of ['dayStandby', 'nightStandby'] as const) {
+      const nums = workersOn(DAY).filter((w) => w.group === g).map((w) => Number(w.dia.replace(/\D/g, '')));
+      expect(nums.length, g).toBeGreaterThan(0);
+      expect([...nums].sort((a, b) => a - b), g).toEqual(nums);
     }
   });
 

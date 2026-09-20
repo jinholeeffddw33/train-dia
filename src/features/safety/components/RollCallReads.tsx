@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, AlertTriangle, Check } from 'lucide-react';
 import LoadingDots from '@/components/common/LoadingDots';
-import { ROLLCALL_GROUP_LABEL, type RollCallGroup } from '@/lib/rollcallReaders';
+import { ROLLCALL_GROUP_LABEL, isStandby, type RollCallGroup } from '@/lib/rollcallReaders';
 import styles from '../styles/RollCall.module.css';
 
 interface ReadRow {
@@ -92,14 +92,17 @@ export default function RollCallReads({ onBack }: { onBack: () => void }) {
     return order
       .map((key) => ({ key, rows: data.rows.filter((r) => r.group === key) }))
       .filter((g) => g.rows.length > 0)
-      .map((g) => ({
-        ...g,
-        // 기준선은 지금 시각이 «걸치는» 묶음에만 — 통째로 미래인 묶음 맨 위에 선을 그으면 줄만 늘어난다
+      .map(({ key, rows }) => ({
+        key,
+        rows,
+        // 기준선은 지금 시각이 «걸치는» 근무 묶음에만. 통째로 미래인 묶음 맨 위에 선을 그으면 줄만 늘고,
+        // 대기는 시간으로 줄 세우지 않으므로 선을 긋지 않는다(한 덩어리로 둔다).
         lineAt: (() => {
-          const i = g.rows.findIndex((r) => toMinutes(r.start) > nowMin);
+          if (isStandby(key)) return -1;
+          const i = rows.findIndex((r) => toMinutes(r.start) > nowMin);
           return i > 0 ? i : -1;
         })(),
-        readCount: g.rows.filter((r) => r.readAt).length,
+        readCount: rows.filter((r) => r.readAt).length,
       }));
   }, [data, nowMin]);
 

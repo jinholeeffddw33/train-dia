@@ -165,11 +165,6 @@ export default function IntegrityAnnounceModal() {
                   <CalendarDays size={18} strokeWidth={2.2} />
                   {HOLIDAY_PERIOD_LABEL}
                 </p>
-                <p className={styles.noticeText}>
-                  연휴 동안 <b>다이아가 줄어</b> 쉬는 번호(운휴)가 생겼어요.
-                  <br />
-                  달력에서 날짜를 누르면 그날 <b>출퇴근 시각과 행로표</b>를 볼 수 있어요.
-                </p>
               </>
             )}
           </div>

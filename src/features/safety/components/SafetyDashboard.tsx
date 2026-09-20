@@ -5,6 +5,7 @@ import {
   ArrowLeft, AlertTriangle, TrainFront, Gauge, GraduationCap,
   Megaphone, ChevronRight, Bell, Check, X, Lightbulb, TrendingUp,
 } from 'lucide-react';
+import { useRollCallStore } from '@/stores/rollcall';
 import styles from './SafetyDashboard.module.css';
 import { acquireScrollLock, releaseScrollLock } from '@/lib/overlay/scrollLockManager';
 import { LINE5_PROFILE_ID } from '../constants';
@@ -308,13 +309,18 @@ export default function SafetyDashboard({
     return { trainReports: train, drivingReports: drive, noticeReports: notice };
   }, [inspectReports]);
 
+  /* === 공지(점호)사항 — 안전 게시판이 아니라 점호 게시판(줄 하나)을 읽는다 === */
+  const rollCallItems = useRollCallStore((st) => st.items);
+  const loadRollCall = useRollCallStore((st) => st.load);
+  useEffect(() => { loadRollCall(); }, [loadRollCall]);
+
   /* === 좌측 섹션 결정 — 액션(사고사례)과 운전정보 중 더 최근 === */
   const parsedActions = useMemo(() => actionReports.map(r => ({ item: r, ...parseDescription(r.description) })), [actionReports]);
   const latestActionAt = parsedActions[0]?.item.createdAt ?? '';
   const latestDrivingAt = drivingReports[0]?.item.createdAt ?? '';
   const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
   const hasRealTrain = trainReports.length > 0;
-  const hasRealNotice = noticeReports.length > 0;
+  const hasRealNotice = rollCallItems.length > 0;
   const hasRealHazard = parsedHazards.length > 0;
   // 캐시 적용으로 재진입 시 dataLoaded=true 로 시작 → 실데이터 즉시 표시.
   // 첫 진입(캐시 없음)은 빈 상태로 fetch 대기 (샘플 깜빡임 없음).
@@ -384,12 +390,12 @@ export default function SafetyDashboard({
       )}
 
       <main className={styles.content}>
-        {/* 공지사항 */}
+        {/* 공지(점호)사항 */}
         <section className={styles.noticeSection}>
           <div className={styles.noticeHead}>
             <div className={styles.noticeHeadLeft}>
               <Megaphone size={14} className={styles.noticeHeadIcon} />
-              <span className={styles.noticeHeadLabel}>공지사항</span>
+              <span className={styles.noticeHeadLabel}>공지(점호)사항</span>
             </div>
             <div className={styles.sectionHeadActions}>
               <button type="button" className={styles.sectionMore} onClick={onOpenNotice}>
@@ -397,30 +403,26 @@ export default function SafetyDashboard({
               </button>
             </div>
           </div>
-          {noticeReports.length > 0 ? (
+          {rollCallItems.length > 0 ? (
             <ul className={styles.itemList}>
-              {noticeReports.slice(0, 3).map((p) => {
-                const id = `notice-${p.item.id}`;
-                const isRead = readIds.has(id);
-                return (
-                  <li key={p.item.id}>
-                    <button
-                      type="button"
-                      className={`${styles.noticeListItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                      onClick={() => onOpenNotice?.()}
-                    >
-                      <div className={styles.noticeListHead}>
-                        <span className={styles.noticeListTitle}>{p.title || '(제목 없음)'}</span>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
+              {rollCallItems.slice(0, 3).map((it, i) => (
+                <li key={it.id}>
+                  <button
+                    type="button"
+                    className={`${styles.noticeListItem} ${styles.itemBtn} ${styles.itemUnread}`}
+                    onClick={() => onOpenNotice?.()}
+                  >
+                    <div className={styles.noticeListHead}>
+                      <span className={styles.noticeListTitle}>{i + 1}. {it.text}</span>
+                    </div>
+                  </button>
+                </li>
+              ))}
             </ul>
           ) : (
             <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
-              <p className={styles.noticeEmptyText}>등록된 공지사항이 없어요</p>
-              <p className={styles.noticeEmptyHint}>관리자가 등록한 공지가 여기에 표시돼요</p>
+              <p className={styles.noticeEmptyText}>오늘 전달할 점호 사항이 없어요</p>
+              <p className={styles.noticeEmptyHint}>관리자가 적은 점호 사항이 여기에 표시돼요</p>
             </button>
           )}
         </section>

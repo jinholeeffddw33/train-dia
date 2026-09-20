@@ -252,6 +252,38 @@
   margin: 0;
 }
 
+/* 제목 오른쪽 단추 묶음 — 좁은 화면에서는 줄이 바뀌어도 넘치지 않게 */
+.servicesHeadActions {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* 공지(점호)사항 — 안전 화면 안에 있어 찾기 어려웠다. 홈에서 바로 연다. */
+.rollCallBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  background: var(--hub-tile-bg);
+  border: 1px solid var(--dia-blue);
+  box-shadow: var(--hub-tile-shadow);
+  color: var(--dia-blue-text);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.rollCallBtn:active {
+  transform: scale(0.95);
+}
+
 /* 청렴 — 9월 18~27일에만 보이는 임시 아이콘. 대회가 끝나면 이 줄만 걷어내면 된다. */
 .integrityBtn {
   display: inline-flex;

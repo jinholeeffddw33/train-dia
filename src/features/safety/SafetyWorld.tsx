@@ -19,6 +19,7 @@ import SafetyDashboard from './components/SafetyDashboard';
 import SafetyTipsView from './components/SafetyTipsView';
 import Line5GradientProfile from './components/Line5GradientProfile';
 import { isAdmin, getUserRole } from '@/lib/auth';
+import { useRollCallStore } from '@/stores/rollcall';
 import { useSafetyUnread } from './hooks/useSafetyUnread';
 import styles from './SafetyWorld.module.css';
 
@@ -78,7 +79,7 @@ const CARD_DISPLAY: Record<CardKey, { label: string; emptyIcon: string; emptyTex
   driving:  { label: '운전 정보', emptyIcon: '🚆', emptyText: '등록된 운전 정보가 없어요', emptyHint: '서행 구간·운전 변경 사항을 공유해주세요' },
   train:    { label: '열차 정보', emptyIcon: '🚇', emptyText: '등록된 열차 정보가 없어요', emptyHint: '차량 업데이트·변경 사항을 공유해주세요' },
   hazard:   { label: '위험개소', emptyIcon: '📷', emptyText: '등록된 위험개소가 없어요', emptyHint: '발견한 위험개소를 사진으로 공유해주세요' },
-  notice:   { label: '공지사항', emptyIcon: '📋', emptyText: '등록된 공지가 없어요', emptyHint: '관리자가 등록한 공지가 여기에 표시됩니다' },
+  notice:   { label: '공지(점호)사항', emptyIcon: '📋', emptyText: '등록된 공지가 없어요', emptyHint: '관리자가 등록한 공지가 여기에 표시됩니다' },
 };
 
 /** 카테고리별 리스트 화면 (위험/조치/점검 공통) */
@@ -195,6 +196,8 @@ function CategoryListView({
 }
 
 export default function SafetyWorld({ onBack }: SafetyWorldProps) {
+  // 공지(점호)사항은 안전 게시판이 아니라 점호 게시판 시트로 연다
+  const openRollCall = useRollCallStore((st) => st.openBoard);
   const [view, setView] = useState<SafetyView>('home');
   const [showAlertForm, setShowAlertForm] = useState(false);
   const [showHazardForm, setShowHazardForm] = useState(false);
@@ -396,7 +399,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
     <SafetyDashboard
       onBack={onBack}
       onOpenCategory={handleDashboardCategory}
-      onOpenNotice={() => setView({ type: 'list', category: 'inspect', cardKey: 'notice' })}
+      onOpenNotice={openRollCall}
       onOpenReport={handleOpenReport}
       onBellClick={handleBellClick}
       unreadCount={totalUnread}

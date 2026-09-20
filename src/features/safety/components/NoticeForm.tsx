@@ -91,14 +91,14 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
         category: 'inspect',
       });
 
-      // 공지사항 등록 시 전체 푸시 자동 발송
+      // 공지(점호)사항 등록 시 전체 푸시 자동 발송
       fetch('/api/push/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
           sabun,
-          title: '📋 공지사항',
+          title: '📋 공지(점호)사항',
           message: titleText.trim(),
         }),
       }).catch(() => {});
@@ -114,7 +114,7 @@ export default function NoticeForm({ onClose }: NoticeFormProps) {
 
   return (
     <div className={styles.formWrap}>
-      <h2 className={styles.formTitle}>공지사항 등록</h2>
+      <h2 className={styles.formTitle}>공지(점호)사항 등록</h2>
 
       {/* 사진 (선택) */}
       <div className={styles.fieldGroup}>

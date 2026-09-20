@@ -38,6 +38,8 @@ const OfficeDashboard = dynamic(() => import('@/features/office/OfficeDashboard'
 const SettingsOverlay = dynamic(() => import('@/features/more/components/SettingsOverlay'), { ssr: false });
 // 청렴 경진대회 시트 — 기간 한정이라 첫 화면 번들에 싣지 않는다
 const IntegrityQuizSheet = dynamic(() => import('@/features/integrity/IntegrityQuizSheet'), { ssr: false });
+// 공지(점호)사항 시트 — 홈 아이콘과 안전 화면이 같은 시트를 연다
+const RollCallSheet = dynamic(() => import('@/features/safety/components/RollCallSheet'), { ssr: false });
 
 function TabContent({ tab }: { tab: TabId }) {
   switch (tab) {
@@ -152,6 +154,7 @@ export default function HomePage() {
         <IntegrityAnnounceModal />
         {/* 청렴 경진대회 시트 — 홈 아이콘과 팝업의 «바로 응시하기» 가 같은 시트를 연다 */}
         <IntegrityQuizSheet />
+        <RollCallSheet />
         <SettingsOverlay open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         {/* 월드가 무엇이든 본문 폭은 하나로 묶는다 — page.module.css 설명 참고 */}
         <div className={pageStyles.appWidth}>

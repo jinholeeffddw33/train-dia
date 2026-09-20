@@ -1,0 +1,317 @@
+/* ── 공지(점호)사항 ────────────────────────────────────────────
+   출근 점호에서 전달할 사항을 번호로 쌓는 게시판.
+   읽는 사람이 훑어 내려가는 화면이라 번호는 왼쪽에 고정하고, 본문은 왼쪽 끝을 맞춘다. */
+
+/* 공용 시트 본문은 좌우 여백이 없다 — 시트 제목과 같은 20px */
+.rcWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-2) var(--dia-space-5) var(--dia-space-6);
+}
+
+/* ── 보기 ── */
+.rcList,
+.rcEditList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rcItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-3) var(--dia-space-4);
+}
+
+/* 번호 — 항목이 몇 개인지, 어디까지 읽었는지 눈으로 세게 한다 */
+.rcNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.rcItemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.rcItemText {
+  margin: 0;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.rcItemDetail {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 첨부 — 자주 쓰지 않는다. 눈에 띄지 않게 아래 작게. */
+.rcAttachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 10px;
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-meta);
+  text-decoration: none;
+}
+
+.rcMeta {
+  margin: 0;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  text-align: right;
+}
+
+.rcEditBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  margin-top: var(--dia-space-1);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+
+/* ── 고치기 ── */
+.rcEditItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-3);
+}
+.rcEditHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+.rcEditTools {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+}
+.rcToolBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: var(--dia-text-secondary);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.rcToolBtn:active {
+  transform: scale(0.9);
+}
+.rcToolBtn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+.rcToolDanger {
+  color: var(--dia-red);
+}
+
+.rcTitleInput,
+.rcDetailInput {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-bg);
+  color: var(--dia-text-primary);
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  overflow: hidden;
+}
+.rcTitleInput {
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+}
+.rcDetailInput {
+  font-size: var(--dia-text-sm);
+  color: var(--dia-text-secondary);
+}
+
+.rcDetailAdd {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  min-height: 36px;
+  padding: 0 var(--dia-space-2);
+  border: none;
+  background: none;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-sm);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rcAddBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 48px;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+
+.rcFileRow {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  flex-wrap: wrap;
+}
+.rcFileLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px dashed var(--dia-border-strong);
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-meta);
+  cursor: pointer;
+  overflow: hidden;
+}
+.rcFileLabel span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rcFileInput {
+  display: none;
+}
+.rcFileDrop {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 var(--dia-space-2);
+  border: none;
+  background: none;
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  cursor: pointer;
+}
+
+.rcError {
+  margin: 0;
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  background: var(--dia-red-dim);
+  color: var(--dia-red);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  text-align: center;
+}
+
+.rcActions {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+.rcCancelBtn {
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 0 var(--dia-space-5);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+.rcSaveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  min-height: 52px;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}
+
+/* 전부 지우기 — 되돌릴 수 없는 일이라 눈에 덜 띄는 자리에 둔다 */
+.rcClearBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  align-self: center;
+  min-height: 44px;
+  padding: 0 var(--dia-space-4);
+  border: none;
+  background: none;
+  color: var(--dia-red);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── 로딩·빈 상태 ── */
+.rcCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-8) var(--dia-space-2);
+  color: var(--dia-text-secondary);
+  text-align: center;
+}
+.rcCenterText {
+  margin: 0;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-base);
+  line-height: 1.6;
+}
+.rcRetry {
+  min-height: 44px;
+  padding: 0 var(--dia-space-5);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  cursor: pointer;
+}

@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Scale } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Scale, ClipboardList } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useAuthStore } from '@/stores/auth';
 import { useIntegrityStore } from '@/stores/integrity';
+import { useRollCallStore, hasUnseenRollCall } from '@/stores/rollcall';
 import { INTEGRITY_OPEN_FROM, INTEGRITY_OPEN_UNTIL } from '@/data/integrityQuiz';
 import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { getUserRole } from '@/lib/auth';
@@ -94,6 +95,14 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
   const ensureIntegrityStatus = useIntegrityStore((s) => s.ensureStatus);
   const integritySubmitted = useIntegrityStore((s) => s.submitted);
   const isDevAdmin = useAuthStore((s) => s.user?.role) === 'admin';
+
+  // ── 공지(점호)사항 — 안전 화면 안에 있어 찾기 어려웠다. 홈에서 한 번에 연다. ──
+  const openRollCall = useRollCallStore((s) => s.openBoard);
+  const loadRollCall = useRollCallStore((s) => s.load);
+  const rollCallItems = useRollCallStore((s) => s.items);
+  const rollCallUpdatedAt = useRollCallStore((s) => s.updatedAt);
+  const rollCallUnseen = hasUnseenRollCall(rollCallItems, rollCallUpdatedAt);
+  useEffect(() => { loadRollCall(); }, [loadRollCall]);
   const today = todayStr();
   const showIntegrity = isDevAdmin || (today >= INTEGRITY_OPEN_FROM && today <= INTEGRITY_OPEN_UNTIL);
 
@@ -176,6 +185,18 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
       <section className={styles.servicesWrap} aria-labelledby="services-title">
         <div className={styles.servicesHead}>
           <h2 id="services-title" className={styles.servicesTitle}>주요 서비스</h2>
+          <div className={styles.servicesHeadActions}>
+          <button
+            type="button"
+            className={styles.rollCallBtn}
+            onClick={openRollCall}
+            aria-label="공지(점호)사항 보기"
+            data-press
+          >
+            <ClipboardList size={16} strokeWidth={2.4} aria-hidden />
+            공지(점호)
+            {rollCallUnseen && <span className={styles.integrityDot} aria-hidden />}
+          </button>
           {/* 청렴 경진대회 — 기간에만 뜨는 임시 바로가기. 관리자는 결과를 보려고 기간 뒤에도 본다. */}
           {showIntegrity && (
             <button
@@ -190,6 +211,7 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
               {integritySubmitted === false && <span className={styles.integrityDot} aria-hidden />}
             </button>
           )}
+          </div>
         </div>
         <div className={styles.servicesGrid}>
           {SERVICES.map((s) => {

@@ -6,13 +6,9 @@
  * 열어 주는 어긋남이 생긴다. 그래서 날짜는 언제나 KST 로 만든다.
  */
 import { INTEGRITY_OPEN_FROM, INTEGRITY_OPEN_UNTIL } from '@/data/integrityQuiz';
+import { kstToday } from '@/lib/kstDate';
 
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
-
-/** 오늘(한국) — 'YYYY-MM-DD' */
-export function kstToday(now: Date = new Date()): string {
-  return new Date(now.getTime() + KST_OFFSET_MS).toISOString().slice(0, 10);
-}
+export { kstToday };
 
 export type IntegrityPhase = 'before' | 'open' | 'closed';
 

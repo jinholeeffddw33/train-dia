@@ -35,22 +35,13 @@ function hhmm(iso: string): string {
     : `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-/** 출근까지 남은 시간 — 「2시간 10분 뒤」 */
-function untilLabel(mins: number): string {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  if (h === 0) return `${m}분 뒤`;
-  if (m === 0) return `${h}시간 뒤`;
-  return `${h}시간 ${m}분 뒤`;
-}
-
 /**
  * 점호 읽음 확인 — 관리자만.
  *
  * 주간 근무 → 주간 대기 → 야간 근무 → 야간 대기 순으로 묶고, 묶음 안은 출근 시각 순.
  * 지금 시각이 걸치는 묶음에는 기준선을 긋는다.
  * 선 위는 이미 출근한 사람 — 여기 빨간 줄이 있으면 점호 사항을 못 보고 나간 사람이다.
- * 선 아래는 아직 출근 전 — 몇 시간 뒤에 나오는지 옆에 적는다.
+ * 선 아래는 아직 출근 전이라 상태 칸을 비워 둔다.
  */
 export default function RollCallReads({ onBack }: { onBack: () => void }) {
   const [data, setData] = useState<ReadStatus | null>(null);
@@ -185,12 +176,9 @@ export default function RollCallReads({ onBack }: { onBack: () => void }) {
                         <span className={styles.rcReadName}>{r.name}</span>
                         <span className={styles.rcReadDia}>{r.dia}</span>
                         <span className={styles.rcReadStart}>{r.start ?? '—'}</span>
+                        {/* 아직 출근 전이면 비워 둔다 — 출근 시각만 보면 되지, 몇 시간 남았는지는 셀 필요가 없다 */}
                         <span className={styles.rcReadState}>
-                          {read
-                            ? `읽음 ${hhmm(r.readAt!)}`
-                            : before
-                              ? untilLabel(startMin - nowMin)
-                              : '안 읽음'}
+                          {read ? `읽음 ${hhmm(r.readAt!)}` : late ? '안 읽음' : ''}
                         </span>
                       </div>
                     </li>

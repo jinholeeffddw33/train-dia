@@ -67,11 +67,13 @@ export async function GET(req: NextRequest) {
   }
 
   const readAt = new Map((data ?? []).map((r) => [r.sabun as string, r.read_at as string]));
-  const workers = workersOn(date);
-  const read = workers
-    .filter((w) => readAt.has(w.sabun))
-    .map((w) => ({ name: w.name, dia: w.dia, at: readAt.get(w.sabun)! }));
-  const unread = workers.filter((w) => !readAt.has(w.sabun)).map((w) => ({ name: w.name, dia: w.dia }));
+  const workers = workersOn(date); // 출근 시각 순 — 화면의 «지금» 기준선이 여기에 놓인다
+  const rows = workers.map((w) => ({
+    name: w.name,
+    dia: w.dia,
+    start: w.start,
+    readAt: readAt.get(w.sabun) ?? null,
+  }));
 
   // 근무자가 아닌데 본 사람 — 휴무자가 미리 봤을 수도 있어 숫자만 알려 준다
   const workerSabuns = new Set(workers.map((w) => w.sabun));
@@ -79,10 +81,9 @@ export async function GET(req: NextRequest) {
 
   return okJson({
     date: dateStr,
-    workerCount: workers.length,
-    readCount: read.length,
-    read: read.sort((a, b) => a.at.localeCompare(b.at)),
-    unread: unread.sort((a, b) => a.name.localeCompare(b.name, 'ko')),
+    workerCount: rows.length,
+    readCount: rows.filter((r) => r.readAt).length,
+    rows,
     others,
   });
 }

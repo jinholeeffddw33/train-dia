@@ -11,16 +11,8 @@ import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { isAdmin } from '@/lib/auth';
 import { useRollCallStore, type RollCallItem } from '@/stores/rollcall';
+import RollCallReads from './RollCallReads';
 import styles from '../styles/RollCall.module.css';
-
-interface ReadStatus {
-  date: string;
-  workerCount: number;
-  readCount: number;
-  read: { name: string; dia: string; at: string }[];
-  unread: { name: string; dia: string }[];
-  others: number;
-}
 
 /** 새 항목 만들기 — id 는 화면에서 줄을 구분하려고만 쓴다(번호는 순서가 정한다) */
 function newItem(): RollCallItem {
@@ -89,9 +81,7 @@ export default function RollCallBoard() {
   const [dropAttachment, setDropAttachment] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [reads, setReads] = useState<ReadStatus | null>(null);
   const [showReads, setShowReads] = useState(false);
-  const [readsLoading, setReadsLoading] = useState(false);
 
   useEffect(() => { load(); }, [load]);
 
@@ -102,20 +92,6 @@ export default function RollCallBoard() {
     marked.current = true;
     fetch('/api/rollcall/reads', { method: 'POST' }).catch(() => {});
   }, [items.length]);
-
-  const readPercent = reads?.workerCount ? Math.round((reads.readCount / reads.workerCount) * 100) : 0;
-
-  const loadReads = useCallback(async () => {
-    setReadsLoading(true);
-    try {
-      const r = await fetch('/api/rollcall/reads', { cache: 'no-store' });
-      setReads(r.ok ? await r.json() : null);
-    } catch {
-      setReads(null);
-    } finally {
-      setReadsLoading(false);
-    }
-  }, []);
 
   const startEdit = useCallback(() => {
     setDraft(items.length ? items.map((it) => ({ ...it })) : [newItem()]);
@@ -326,9 +302,25 @@ export default function RollCallBoard() {
     );
   }
 
+  // ── 읽음 확인 (관리자 전용 화면) ──
+  if (showReads) {
+    return <RollCallReads onBack={() => setShowReads(false)} />;
+  }
+
   // ── 보기 ──
   return (
     <div className={styles.rcWrap}>
+      {canEdit && items.length > 0 && (
+        <button
+          type="button"
+          className={`z-glass-pill ${styles.rcReadsEntry}`}
+          onClick={() => setShowReads(true)}
+          data-press
+        >
+          <CheckCheck size={17} strokeWidth={2.4} aria-hidden />
+          읽음 확인
+        </button>
+      )}
       {items.length === 0 ? (
         <div className={styles.rcCenter}>
           <p className={styles.rcCenterText}>
@@ -358,56 +350,6 @@ export default function RollCallBoard() {
       )}
 
       {meta && <p className={styles.rcMeta}>{meta}</p>}
-
-      {canEdit && items.length > 0 && (
-        <section className={styles.rcReads}>
-          <button
-            type="button"
-            className={`z-glass-pill ${styles.rcReadsToggle}`}
-            onClick={() => { setShowReads((v) => !v); if (!reads) loadReads(); }}
-            data-press
-          >
-            <CheckCheck size={16} />
-            {showReads ? '읽음 확인 닫기' : '누가 읽었는지 보기'}
-          </button>
-
-          {showReads && (
-            readsLoading && !reads ? (
-              <p className={styles.rcReadsHint}>불러오는 중…</p>
-            ) : !reads ? (
-              <p className={styles.rcReadsHint}>읽음 현황을 불러오지 못했어요</p>
-            ) : (
-              <>
-                <p className={styles.rcReadsCount}>
-                  오늘 근무자 <strong>{reads.workerCount}</strong>명 중{' '}
-                  <strong className={styles.rcReadsDone}>{reads.readCount}</strong>명 읽음
-                  {reads.others > 0 && <span className={styles.rcReadsOthers}> · 그 외 {reads.others}명</span>}
-                </p>
-                <div className={styles.rcBar} aria-hidden>
-                  {/* STYLE-EXCEPTION: 읽은 비율은 런타임 값이라 CSS 로 정할 수 없다 */}
-                  <span className={styles.rcBarFill} style={{ width: `${readPercent}%` }} />
-                </div>
-                {reads.unread.length > 0 && (
-                  <>
-                    <h4 className={styles.rcReadsHead}>아직 안 읽은 근무자 {reads.unread.length}명</h4>
-                    <p className={styles.rcNameList}>
-                      {reads.unread.map((u) => `${u.name}(${u.dia})`).join(', ')}
-                    </p>
-                  </>
-                )}
-                {reads.read.length > 0 && (
-                  <>
-                    <h4 className={styles.rcReadsHead}>읽은 근무자 {reads.read.length}명</h4>
-                    <p className={`${styles.rcNameList} ${styles.rcNameListDone}`}>
-                      {reads.read.map((u) => `${u.name}(${u.dia})`).join(', ')}
-                    </p>
-                  </>
-                )}
-              </>
-            )
-          )}
-        </section>
-      )}
 
       {canEdit && (
         <button type="button" className={`z-cta ${styles.rcEditBtn}`} onClick={startEdit} data-press>

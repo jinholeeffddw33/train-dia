@@ -445,30 +445,37 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* 다이아·출근·상태 칸은 폭을 못 박는다 — «2» 와 «대63» 의 폭이 달라지면 줄이 어긋나 읽기 힘들다.
+   가운데 정렬이라 글자 수가 달라도 세로줄이 그대로 선다. */
 .rcReadDia {
-  flex: 0 0 auto;
-  min-width: 34px;
+  flex: 0 0 42px;
+  width: 42px;
   color: var(--dia-text-secondary);
   font-size: var(--dia-text-meta);
   font-weight: var(--dia-weight-bold);
-  text-align: right;
+  text-align: center;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rcReadStart {
-  flex: 0 0 auto;
-  min-width: 44px;
+  flex: 0 0 46px;
+  width: 46px;
   color: var(--dia-text-primary);
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-bold);
-  text-align: right;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 .rcReadState {
-  flex: 0 0 auto;
-  min-width: 72px;
+  flex: 0 0 78px;
+  width: 78px;
   font-size: var(--dia-text-meta);
   text-align: right;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 읽음 — 초록 */

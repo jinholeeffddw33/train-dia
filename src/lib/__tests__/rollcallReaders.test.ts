@@ -3,7 +3,7 @@
  * 전 직원으로 세면 «안 읽은 사람» 이 늘 절반을 넘어 숫자가 뜻을 잃는다.
  */
 import { describe, it, expect } from 'vitest';
-import { workersOn, startMinutes } from '../rollcallReaders';
+import { workersOn, startMinutes, groupOf } from '../rollcallReaders';
 import { getRoster } from '@/data/cycle';
 import { getDia, getType } from '../schedule';
 
@@ -34,11 +34,27 @@ describe('그날 근무자', () => {
 });
 
 describe('줄 순서와 출근 시각', () => {
-  it('출근 시각 순으로 나온다 — 다이아 번호 순과 같은 결과', () => {
+  it('주간 근무 → 주간 대기 → 야간 근무 → 야간 대기 순으로 묶인다', () => {
     const list = workersOn(DAY);
-    const mins = list.map((w) => startMinutes(w.start));
-    expect([...mins].sort((a, b) => a - b)).toEqual(mins);
+    const order = ['dayWork', 'dayStandby', 'nightWork', 'nightStandby'];
+    const seen = list.map((w) => order.indexOf(w.group));
+    expect([...seen].sort((a, b) => a - b)).toEqual(seen);
+    expect(new Set(list.map((w) => w.group)).size).toBe(4); // 평일이면 네 묶음이 다 있다
     expect(list.filter((w) => w.start).length).toBe(list.length); // 근무자는 모두 출근 시각이 있다
+  });
+
+  it('묶음 안에서는 출근 시각 순', () => {
+    for (const g of ['dayWork', 'dayStandby', 'nightWork', 'nightStandby'] as const) {
+      const mins = workersOn(DAY).filter((w) => w.group === g).map((w) => startMinutes(w.start));
+      expect([...mins].sort((a, b) => a - b), g).toEqual(mins);
+    }
+  });
+
+  it('대기는 61번부터 야간 — 대10 은 주간, 대61 은 야간', () => {
+    expect(groupOf('대10')).toBe('dayStandby');
+    expect(groupOf('대61')).toBe('nightStandby');
+    expect(groupOf('34')).toBe('dayWork');
+    expect(groupOf('62')).toBe('nightWork');
   });
 
   it('추석 연휴 운휴 번호는 근무자에서 빠진다', () => {

@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, AlertTriangle, Check } from 'lucide-react';
 import LoadingDots from '@/components/common/LoadingDots';
+import { ROLLCALL_GROUP_LABEL, type RollCallGroup } from '@/lib/rollcallReaders';
 import styles from '../styles/RollCall.module.css';
 
 interface ReadRow {
   name: string;
   dia: string;
+  group: RollCallGroup;
   /** 출근 시각 'HH:MM' */
   start: string | null;
   /** 읽은 시각(ISO) — 아직 안 읽었으면 null */
@@ -45,7 +47,8 @@ function untilLabel(mins: number): string {
 /**
  * 점호 읽음 확인 — 관리자만.
  *
- * 그날 근무자를 **출근 시각 순**(= 다이아 순)으로 세우고, 지금 시각에 기준선을 긋는다.
+ * 주간 근무 → 주간 대기 → 야간 근무 → 야간 대기 순으로 묶고, 묶음 안은 출근 시각 순.
+ * 지금 시각이 걸치는 묶음에는 기준선을 긋는다.
  * 선 위는 이미 출근한 사람 — 여기 빨간 줄이 있으면 점호 사항을 못 보고 나간 사람이다.
  * 선 아래는 아직 출근 전 — 몇 시간 뒤에 나오는지 옆에 적는다.
  */
@@ -82,11 +85,22 @@ export default function RollCallReads({ onBack }: { onBack: () => void }) {
 
   const nowLabel = `${String(Math.floor(nowMin / 60)).padStart(2, '0')}:${String(nowMin % 60).padStart(2, '0')}`;
 
-  /** 기준선이 들어갈 자리 — 출근 시각이 지금을 넘어서는 첫 줄 */
-  const lineAt = useMemo(() => {
-    if (!data) return -1;
-    const i = data.rows.findIndex((r) => toMinutes(r.start) > nowMin);
-    return i;
+  /** 묶음별로 자른 목록 — 묶음 안에서 지금을 넘어서는 첫 줄에 기준선을 둔다 */
+  const groups = useMemo(() => {
+    if (!data) return [];
+    const order: RollCallGroup[] = ['dayWork', 'dayStandby', 'nightWork', 'nightStandby'];
+    return order
+      .map((key) => ({ key, rows: data.rows.filter((r) => r.group === key) }))
+      .filter((g) => g.rows.length > 0)
+      .map((g) => ({
+        ...g,
+        // 기준선은 지금 시각이 «걸치는» 묶음에만 — 통째로 미래인 묶음 맨 위에 선을 그으면 줄만 늘어난다
+        lineAt: (() => {
+          const i = g.rows.findIndex((r) => toMinutes(r.start) > nowMin);
+          return i > 0 ? i : -1;
+        })(),
+        readCount: g.rows.filter((r) => r.readAt).length,
+      }));
   }, [data, nowMin]);
 
   const lateUnread = useMemo(
@@ -140,47 +154,48 @@ export default function RollCallReads({ onBack }: { onBack: () => void }) {
             </p>
           )}
 
-          <ul className={styles.rcReadList}>
-            {data.rows.map((r, i) => {
-              const startMin = toMinutes(r.start);
-              const before = startMin > nowMin;
-              const read = !!r.readAt;
-              const late = !read && !before;
-              return (
-                <li key={`${r.name}-${r.dia}`}>
-                  {i === lineAt && (
-                    <div className={styles.rcNowLine} aria-hidden>
-                      <span className={styles.rcNowLineLabel}>지금 {nowLabel}</span>
-                    </div>
-                  )}
-                  <div
-                    className={`${styles.rcReadRow} ${read ? styles.rcRowRead : late ? styles.rcRowLate : styles.rcRowWaiting}`}
-                  >
-                    <span className={styles.rcReadMark} aria-hidden>
-                      {read ? <Check size={15} strokeWidth={3} /> : '·'}
-                    </span>
-                    <span className={styles.rcReadName}>{r.name}</span>
-                    <span className={styles.rcReadDia}>{r.dia}</span>
-                    <span className={styles.rcReadStart}>{r.start ?? '—'}</span>
-                    <span className={styles.rcReadState}>
-                      {read
-                        ? `읽음 ${hhmm(r.readAt!)}`
-                        : before
-                          ? untilLabel(startMin - nowMin)
-                          : '안 읽음'}
-                    </span>
-                  </div>
-                </li>
-              );
-            })}
-            {lineAt === -1 && data.rows.length > 0 && (
-              <li>
-                <div className={styles.rcNowLine} aria-hidden>
-                  <span className={styles.rcNowLineLabel}>지금 {nowLabel}</span>
-                </div>
-              </li>
-            )}
-          </ul>
+          {groups.map((g) => (
+            <section key={g.key} className={styles.rcGroup}>
+              <h4 className={styles.rcGroupHead}>
+                {ROLLCALL_GROUP_LABEL[g.key]}
+                <span className={styles.rcGroupCount}>{g.readCount}/{g.rows.length}</span>
+              </h4>
+              <ul className={styles.rcReadList}>
+                {g.rows.map((r, i) => {
+                  const startMin = toMinutes(r.start);
+                  const before = startMin > nowMin;
+                  const read = !!r.readAt;
+                  const late = !read && !before;
+                  return (
+                    <li key={`${r.name}-${r.dia}`}>
+                      {i === g.lineAt && (
+                        <div className={styles.rcNowLine} aria-hidden>
+                          <span className={styles.rcNowLineLabel}>지금 {nowLabel}</span>
+                        </div>
+                      )}
+                      <div
+                        className={`${styles.rcReadRow} ${read ? styles.rcRowRead : late ? styles.rcRowLate : styles.rcRowWaiting}`}
+                      >
+                        <span className={styles.rcReadMark} aria-hidden>
+                          {read ? <Check size={15} strokeWidth={3} /> : '·'}
+                        </span>
+                        <span className={styles.rcReadName}>{r.name}</span>
+                        <span className={styles.rcReadDia}>{r.dia}</span>
+                        <span className={styles.rcReadStart}>{r.start ?? '—'}</span>
+                        <span className={styles.rcReadState}>
+                          {read
+                            ? `읽음 ${hhmm(r.readAt!)}`
+                            : before
+                              ? untilLabel(startMin - nowMin)
+                              : '안 읽음'}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
         </>
       )}
     </div>

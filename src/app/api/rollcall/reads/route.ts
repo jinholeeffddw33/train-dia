@@ -72,6 +72,7 @@ export async function GET(req: NextRequest) {
     name: w.name,
     dia: w.dia,
     start: w.start,
+    group: w.group,
     readAt: readAt.get(w.sabun) ?? null,
   }));
 

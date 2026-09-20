@@ -536,3 +536,24 @@
   font-weight: var(--dia-weight-bold);
   font-variant-numeric: tabular-nums;
 }
+
+/* 묶음 — 주간 근무 / 주간 대기 / 야간 근무 / 야간 대기 */
+.rcGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rcGroupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--dia-space-2) 0 2px;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+}
+.rcGroupCount {
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  font-variant-numeric: tabular-nums;
+}

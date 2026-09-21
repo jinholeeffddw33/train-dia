@@ -5,12 +5,13 @@ import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
-  Settings, History, CalendarDays, Newspaper,
+  Settings, History, CalendarDays, Newspaper, ClipboardList,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
 import { useThemeStore } from '@/stores/theme';
 import { useOfficeStore, isOverdue } from '@/stores/office';
+import { useRollCallStore, hasUnseenRollCall } from '@/stores/rollcall';
 import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { APP_VERSION } from '@/lib/constants';
 import { COPYRIGHT_NOTICE } from '@/lib/provenance';
@@ -154,6 +155,14 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
     onSwipe: (dir) => { if (dir === 'next') onOpenHub?.(); },
   });
 
+  // 공지(점호)사항 — 같은 게시판을 홈 허브·안전 화면과 함께 본다(시트는 page.tsx 에 한 번만 달려 있다)
+  const openRollCall = useRollCallStore((st) => st.openBoard);
+  const loadRollCall = useRollCallStore((st) => st.load);
+  const rollCallItems = useRollCallStore((st) => st.items);
+  const rollCallUpdatedAt = useRollCallStore((st) => st.updatedAt);
+  const rollCallUnseen = hasUnseenRollCall(rollCallItems, rollCallUpdatedAt);
+  useEffect(() => { loadRollCall(); }, [loadRollCall]);
+
   const quickIcons = [
     { key: 'cal',   label: '일정관리',    tone: 'blue',   Icon: CalendarRange, onClick: () => { setSchedStartView('day'); setSchedStartMonth(true); setScheduleOpen(true); } },
     { key: 'todo',  label: '오늘의 할일', tone: 'blue',   Icon: ListChecks,    onClick: () => setTaskBoardOpen(true) },
@@ -169,7 +178,17 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
           <p className={styles.greeting}>안녕하세요,</p>
           <h1 className={styles.hubTitle}>{name ? `${name} ${role}` : '답십리 승무사업소'} 👋</h1>
           {name && <p className={styles.office}>답십리 승무사업소</p>}
-          <p className={styles.hubSubtitle}>{getSubtitle()}</p>
+          {/* 인사 끝 줄 오른쪽 — 공지(점호)사항 바로가기. 부장님들(관리자 22명이 모두 내근직)은 이 화면이
+              첫 화면이라, 안전 → 공지(점호)사항으로 두 번 들어가던 길을 한 번으로 줄인다. */}
+          <div className={styles.subRow}>
+            <p className={styles.hubSubtitle}>{getSubtitle()}</p>
+            <button type="button" className={styles.rollCallShortcut} onClick={openRollCall}
+              aria-label="공지(점호)사항 보기" data-press>
+              <ClipboardList size={15} strokeWidth={2.4} aria-hidden />
+              점호
+              {rollCallUnseen && <span className={styles.rollCallDot} aria-hidden />}
+            </button>
+          </div>
         </div>
         <div className={styles.headerRight}>
           <div className={styles.topBar}>

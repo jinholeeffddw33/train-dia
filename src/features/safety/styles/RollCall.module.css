@@ -557,3 +557,88 @@
   font-size: var(--dia-text-meta);
   font-variant-numeric: tabular-nums;
 }
+
+/* ── 중요도 (기본 · 중요 · 긴급) ──
+   글자만 다르면 점호 때 훑어보다 놓친다. 긴급은 빨강, 중요는 주황으로 줄 전체의 테두리와 번호까지 물들인다. */
+.rcLevelRow {
+  display: flex;
+  gap: var(--dia-space-2);
+}
+.rcLevelBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-bg);
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.rcLevelBtn:active {
+  transform: scale(0.95);
+}
+.rcLevelDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dia-text-tertiary);
+}
+.rcLevel_important .rcLevelDot { background: var(--dia-amber); }
+.rcLevel_urgent .rcLevelDot { background: var(--dia-red); }
+/* 고른 것 — 제 색으로 채운다 */
+.rcLevelOn {
+  border-color: var(--dia-text-secondary);
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-bold);
+}
+.rcLevel_important.rcLevelOn {
+  border-color: var(--dia-amber);
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+}
+.rcLevel_urgent.rcLevelOn {
+  border-color: var(--dia-red);
+  background: var(--dia-red-dim);
+  color: var(--dia-red);
+}
+
+/* 보기 — 중요도 있는 줄 */
+.rcItem_important {
+  border-color: var(--dia-amber);
+  border-left: 6px solid var(--dia-amber);
+}
+.rcItem_important .rcNum {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+}
+.rcItem_urgent {
+  border-color: var(--dia-red);
+  border-left: 6px solid var(--dia-red);
+  background: var(--dia-red-dim);
+}
+.rcItem_urgent .rcNum {
+  background: var(--dia-red);
+  color: var(--dia-bg);
+}
+.rcLevelTag {
+  align-self: flex-start;
+  padding: 1px 8px;
+  border-radius: var(--dia-radius-full);
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+}
+.rcLevelTag_important {
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+}
+.rcLevelTag_urgent {
+  background: var(--dia-red);
+  color: var(--dia-bg);
+}

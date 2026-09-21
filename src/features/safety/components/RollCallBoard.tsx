@@ -10,9 +10,11 @@ import { showToast } from '@/components/common/Toast';
 import { useAuthStore } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { isAdmin } from '@/lib/auth';
-import { useRollCallStore, type RollCallItem } from '@/stores/rollcall';
+import { useRollCallStore, ROLLCALL_LEVEL_LABEL, type RollCallItem, type RollCallLevel } from '@/stores/rollcall';
 import RollCallReads from './RollCallReads';
 import styles from '../styles/RollCall.module.css';
+
+const LEVELS: RollCallLevel[] = ['normal', 'important', 'urgent'];
 
 /** 새 항목 만들기 — id 는 화면에서 줄을 구분하려고만 쓴다(번호는 순서가 정한다) */
 function newItem(): RollCallItem {
@@ -222,6 +224,25 @@ export default function RollCallBoard() {
                 onChange={(v) => patch(i, { text: v })}
                 placeholder="전달할 내용"
               />
+              {/* 중요도 — 색으로 드러낸다. 대부분은 기본, 꼭 짚을 것만 중요·긴급 */}
+              <div className={styles.rcLevelRow} role="radiogroup" aria-label={`${i + 1}번 항목 중요도`}>
+                {LEVELS.map((lv) => {
+                  const on = (it.level ?? 'normal') === lv;
+                  return (
+                    <button
+                      key={lv}
+                      type="button"
+                      role="radio"
+                      aria-checked={on}
+                      className={`${styles.rcLevelBtn} ${styles[`rcLevel_${lv}`]} ${on ? styles.rcLevelOn : ''}`}
+                      onClick={() => patch(i, { level: lv === 'normal' ? undefined : lv })}
+                    >
+                      <span className={styles.rcLevelDot} aria-hidden />
+                      {ROLLCALL_LEVEL_LABEL[lv]}
+                    </button>
+                  );
+                })}
+              </div>
               {it.detail === undefined ? (
                 <button
                   type="button"
@@ -331,9 +352,17 @@ export default function RollCallBoard() {
       ) : (
         <ol className={styles.rcList}>
           {items.map((it, i) => (
-            <li key={it.id} className={`z-glass-surface ${styles.rcItem}`}>
+            <li
+              key={it.id}
+              className={`z-glass-surface ${styles.rcItem} ${it.level && it.level !== 'normal' ? styles[`rcItem_${it.level}`] : ''}`}
+            >
               <span className={styles.rcNum}>{i + 1}</span>
               <div className={styles.rcItemBody}>
+                {it.level && it.level !== 'normal' && (
+                  <span className={`${styles.rcLevelTag} ${styles[`rcLevelTag_${it.level}`]}`}>
+                    {ROLLCALL_LEVEL_LABEL[it.level]}
+                  </span>
+                )}
                 <p className={styles.rcItemText}>{it.text}</p>
                 {it.detail && <p className={styles.rcItemDetail}>{it.detail}</p>}
               </div>

@@ -8,10 +8,20 @@
  */
 import { create } from 'zustand';
 
+/** 중요도 — 색으로만 알린다. 없으면 기본 */
+export type RollCallLevel = 'normal' | 'important' | 'urgent';
+
+export const ROLLCALL_LEVEL_LABEL: Record<RollCallLevel, string> = {
+  normal: '기본',
+  important: '중요',
+  urgent: '긴급',
+};
+
 export interface RollCallItem {
   id: string;
   text: string;
   detail?: string;
+  level?: RollCallLevel;
 }
 
 interface RollCallState {

@@ -147,6 +147,49 @@
   color: var(--dia-text-tertiary);
   margin: 3px 0 0;
 }
+/* 인사 끝 줄 — 왼쪽 인사말, 오른쪽 끝에 «점호» 바로가기 */
+.subRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dia-space-2);
+}
+.subRow .hubSubtitle {
+  min-width: 0;
+}
+/* 공지(점호)사항 바로가기 — 작게. 머리의 다른 단추와 같은 둥근 알약 */
+.rollCallShortcut {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-blue);
+  background: var(--dia-surface);
+  color: var(--dia-blue-text);
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.rollCallShortcut:active {
+  transform: scale(0.95);
+}
+.rollCallDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dia-red);
+  border: 2px solid var(--dia-surface);
+}
 .headerActions { display: flex; gap: 8px; flex-shrink: 0; }
 .iconBtn {
   width: 44px; height: 44px;

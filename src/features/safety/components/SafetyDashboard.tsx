@@ -413,7 +413,9 @@ export default function SafetyDashboard({
                     onClick={() => onOpenNotice?.()}
                   >
                     <div className={styles.noticeListHead}>
-                      <span className={styles.noticeListTitle}>{i + 1}. {it.text}</span>
+                      <span className={styles.noticeListTitle}>
+                        {i + 1}. {it.level === 'urgent' ? '[긴급] ' : it.level === 'important' ? '[중요] ' : ''}{it.text}
+                      </span>
                     </div>
                   </button>
                 </li>

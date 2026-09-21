@@ -24,3 +24,6 @@ _evidence_stationdia/
 
 # 운전정보 업로드 스크립트의 임시 렌더 결과
 .tmp_driving/
+
+# 추석 행로표 대조 도구가 뽑아 두는 새 그림 — 옮겨 적을 때만 쓰는 임시 자료
+scripts/chuseok2026/new/

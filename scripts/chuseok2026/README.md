@@ -15,3 +15,21 @@
 전날 야간조의 새벽 열차를 다음 날 누군가 받는지(9/23→9/24 28/28, 9/24→9/25 21/21).
 옮겨 적는 규칙은 `TRANSCRIBE.md`, 시각·약호 규칙은 `build.py` 머리말.
 원본 한글·엑셀·캡처 파일은 저장소에 넣지 않았다(사업소 배포 자료).
+
+## 수정본이 나왔을 때 (2026-09-21~)
+
+사업소가 추석 행로표 수정본을 냈다. 받은 파일은 문서보안(MarkAny) 파일이라 이 PC 에서 열리지 않는다
+(파일 머리가 `<DOCUMENTSAFER` 로 시작, 엑셀도 «파일 형식이 잘못됐다»). 행로표 시스템에서
+**보안 없는 엑셀**을 다시 받아 아래로 대조한다 — 바뀐 다이아만 골라 준다.
+
+```
+py -3 scripts/chuseok2026/diff_tables.py <엑셀> ph       # 9/23 평휴 연결
+py -3 scripts/chuseok2026/diff_tables.py <엑셀> hol      # 주간 9/24~27
+py -3 scripts/chuseok2026/diff_tables.py <엑셀> hh       # 휴휴 9/24~25
+py -3 scripts/chuseok2026/diff_tables.py <엑셀> hh0926   # 휴휴 9/26 심야연장 반영
+py -3 scripts/chuseok2026/diff_tables.py <엑셀> hp0927   # 휴평 9/27 심야연장 반영
+```
+
+바뀐 다이아의 새 그림은 `scripts/chuseok2026/new/<표>/` 에 떨어진다. 그 다이아만 `TRANSCRIBE.md` 대로
+옮겨 적어 해당 JSON 을 고치고 `gen_ts.py` 로 `src/data/chuseok2026.ts` 를 다시 만든다.
+9/26·9/27 은 지난번엔 «기본표 + 심야연장 변경 캡처» 로 만들었으니, 반영본이 오면 그 표를 통째로 기준으로 삼는다.

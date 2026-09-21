@@ -136,6 +136,10 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
   // 알림마당 수정용: description을 번호별 items로 파싱
   const [editItems, setEditItems] = useState<string[]>([]);
   const [removeFile, setRemoveFile] = useState(false);
+  // 첨부 파일(PDF·한글 등) 바꾸기·빼기 — 저장할 때 반영
+  const [newAttachment, setNewAttachment] = useState<File | null>(null);
+  const [dropAttachment, setDropAttachment] = useState(false);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   // 열차 정보 수정용: 편성번호 별도 상태
   const [editTrainTag, setEditTrainTag] = useState<string>('전');
   // 운전 정보 수정용: 분류 별도 상태
@@ -235,6 +239,8 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     if (!report) return;
     setEditLocation(report.location);
     setRemoveFile(false);
+    setNewAttachment(null);
+    setDropAttachment(false);
     if (isPureNotice) {
       setEditDesc(report.description);
       setEditItems(parseDescToItems(report.description));
@@ -283,9 +289,14 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
     const finalLocation = isIncidentEdit ? editCaseEduNo.trim() : editLocation.trim();
     setError('');
     try {
-      await updateReport(reportId, desc, finalLocation, name, sabun, removeFile || undefined);
+      await updateReport(reportId, desc, finalLocation, name, sabun, removeFile || undefined, {
+        file: newAttachment,
+        remove: dropAttachment,
+      });
       setEditMode(false);
       setRemoveFile(false);
+      setNewAttachment(null);
+      setDropAttachment(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : '수정하지 못했어요');
     }
@@ -363,6 +374,53 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
       </div>
     );
   }
+
+  /* 수정 화면의 첨부 파일 칸 — 지금 붙은 파일을 보여 주고 «바꾸기»·«빼기». 사진은 따로 다룬다 */
+  const attachmentEditor = (
+    <div className={styles.editField}>
+      <label className={styles.editLabel}>첨부 파일</label>
+      <div className={styles.fileDeleteWrap}>
+        <Paperclip size={14} />
+        <span className={styles.fileDeleteName}>
+          {newAttachment
+            ? `${newAttachment.name} (새 파일)`
+            : report.attachmentUrl && !dropAttachment
+              ? report.attachmentName || '첨부 파일'
+              : dropAttachment
+                ? '뺄 예정 (저장 시 적용)'
+                : '없음'}
+        </span>
+        <button type="button" className={styles.fileReplaceBtn} onClick={() => attachmentInputRef.current?.click()}>
+          {report.attachmentUrl || newAttachment ? '바꾸기' : '붙이기'}
+        </button>
+        {(newAttachment || (report.attachmentUrl && !dropAttachment)) && (
+          <button
+            type="button"
+            className={styles.fileDeleteBtn}
+            onClick={() => {
+              if (newAttachment) setNewAttachment(null);
+              else setDropAttachment(true);
+              if (attachmentInputRef.current) attachmentInputRef.current.value = '';
+            }}
+          >
+            <Trash2 size={14} /> 빼기
+          </button>
+        )}
+      </div>
+      <input
+        ref={attachmentInputRef}
+        type="file"
+        hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null;
+          if (!f) return;
+          if (f.size > 20 * 1024 * 1024) { setError('첨부 파일은 20MB 까지 올릴 수 있어요'); return; }
+          setNewAttachment(f);
+          setDropAttachment(false);
+        }}
+      />
+    </div>
+  );
 
   return (
     <div className={styles.detailWrap}>
@@ -501,6 +559,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                     )}
                   </div>
                 )}
+                {attachmentEditor}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
                     <X size={16} /> 취소
@@ -530,6 +589,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <label className={styles.editLabel}>설명</label>
                   <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
                 </div>
+                {attachmentEditor}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
                     <X size={16} /> 취소
@@ -565,6 +625,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <label className={styles.editLabel}>설명</label>
                   <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
                 </div>
+                {attachmentEditor}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
                     <X size={16} /> 취소
@@ -607,6 +668,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <label className={styles.editLabel}>설명</label>
                   <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
                 </div>
+                {attachmentEditor}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
                     <X size={16} /> 취소
@@ -627,6 +689,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   <label className={styles.editLabel}>설명</label>
                   <textarea className={styles.textArea} value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={4} maxLength={1000} />
                 </div>
+                {attachmentEditor}
                 <div className={styles.editActions}>
                   <button type="button" className={styles.editCancelBtn} onClick={() => setEditMode(false)}>
                     <X size={16} /> 취소
@@ -706,6 +769,19 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
                   >
                     <Paperclip size={14} /> 첨부파일 보기
                   </button>
+                )}
+
+                {/* 첨부 파일(PDF·한글 등) — 원본 그대로 열기·내려받기 */}
+                {report.attachmentUrl && (
+                  <a
+                    className={styles.noticeFileLink}
+                    href={report.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download={report.attachmentName || undefined}
+                  >
+                    <Paperclip size={14} /> {report.attachmentName || '첨부 파일'}
+                  </a>
                 )}
 
                 {/* 좋아요 + 확인 상태 */}

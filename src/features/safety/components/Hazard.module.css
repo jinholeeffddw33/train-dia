@@ -1472,6 +1472,23 @@
 
 .fileDeleteBtn:active { opacity: 0.7; }
 
+/* 첨부 파일 바꾸기·붙이기 */
+.fileReplaceBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--dia-radius-sm);
+  font-size: var(--dia-text-sm);
+  font-weight: 600;
+  color: var(--dia-blue-text);
+  background: var(--dia-blue-dim);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.fileReplaceBtn:active { transform: scale(0.95); }
+
 .fileDeletedLabel {
   font-size: var(--dia-text-sm);
   color: var(--dia-red, #ef4444);

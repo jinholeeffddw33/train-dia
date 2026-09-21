@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { verifyUser, isAdmin } from '@/lib/auth';
 
-// ── PATCH: 위험요소 수정 (description, location) ──
+const MAX_ATTACHMENT = 20 * 1024 * 1024;
+
+/** 공개 URL → 통 안 경로. 우리 통 파일이 아니면 null */
+function storagePathOf(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const p = url.split('/hazard-photos/')[1];
+  return p ? decodeURIComponent(p) : null;
+}
+
+// ── PATCH: 위험요소 수정 (description, location, 첨부 파일 바꾸기·빼기) ──
+// 새 첨부 파일이 있으면 multipart, 아니면 JSON 으로 온다.
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -17,8 +27,22 @@ export async function PATCH(
   const { id: reportId } = await params;
 
   let body: Record<string, unknown>;
+  let newAttachment: File | null = null;
   try {
-    body = await req.json();
+    if ((req.headers.get('content-type') ?? '').includes('multipart/form-data')) {
+      const fd = await req.formData();
+      body = {
+        description: fd.get('description'),
+        location: fd.get('location'),
+        name: fd.get('name'),
+        sabun: fd.get('sabun'),
+        removeFile: fd.get('removeFile') === 'true',
+      };
+      const f = fd.get('attachment');
+      if (f instanceof File && f.size > 0) newAttachment = f;
+    } else {
+      body = await req.json();
+    }
   } catch {
     return NextResponse.json(
       { code: 'INVALID_JSON', message: '잘못된 요청입니다' },
@@ -31,6 +55,14 @@ export async function PATCH(
   const name = (body.name as string | undefined)?.trim();
   const sabun = (body.sabun as string | undefined)?.trim();
   const removeFile = body.removeFile === true;
+  const removeAttachment = body.removeAttachment === true;
+
+  if (newAttachment && newAttachment.size > MAX_ATTACHMENT) {
+    return NextResponse.json(
+      { code: 'ATTACHMENT_TOO_LARGE', message: '첨부 파일은 20MB 까지 올릴 수 있습니다' },
+      { status: 400 },
+    );
+  }
 
   if (!description || !name || !sabun) {
     return NextResponse.json(
@@ -50,7 +82,7 @@ export async function PATCH(
   // 본인 글인지 확인
   const { data: report, error: fetchErr } = await serverSupabase
     .from('hazard_reports')
-    .select('created_by')
+    .select('created_by, category, attachment_url')
     .eq('id', reportId)
     .single();
 
@@ -68,7 +100,35 @@ export async function PATCH(
     );
   }
 
-  const updateData: Record<string, string> = { description, location };
+  const updateData: Record<string, string | null> = { description, location };
+
+  // 첨부 파일 바꾸기 — 새 파일을 먼저 올리고, 글을 고친 뒤에 옛 파일을 지운다(실패해도 옛 첨부가 살아 있게)
+  const oldAttachmentPath = storagePathOf(report.attachment_url as string | null);
+  let attachmentChanged = false;
+  if (newAttachment) {
+    const safeExt = (newAttachment.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) || 'bin';
+    const category = String(report.category || 'etc').replace(/[^a-z]/g, '') || 'etc';
+    const filePath = `attachments/${category}/${Date.now()}_${Math.random().toString(36).slice(2)}.${safeExt}`;
+    const { error: upErr } = await serverSupabase.storage
+      .from('hazard-photos')
+      .upload(filePath, Buffer.from(await newAttachment.arrayBuffer()), {
+        contentType: newAttachment.type || 'application/octet-stream',
+        upsert: false,
+      });
+    if (upErr) {
+      return NextResponse.json(
+        { code: 'ATTACHMENT_UPLOAD_FAILED', message: '파일 업로드에 실패했습니다', detail: upErr.message },
+        { status: 500 },
+      );
+    }
+    updateData.attachment_url = serverSupabase.storage.from('hazard-photos').getPublicUrl(filePath).data.publicUrl;
+    updateData.attachment_name = newAttachment.name.slice(0, 200);
+    attachmentChanged = true;
+  } else if (removeAttachment) {
+    updateData.attachment_url = null;
+    updateData.attachment_name = null;
+    attachmentChanged = true;
+  }
 
   // 첨부파일 삭제 요청
   if (removeFile) {
@@ -99,7 +159,16 @@ export async function PATCH(
     );
   }
 
-  return NextResponse.json({ success: true });
+  if (attachmentChanged && oldAttachmentPath) {
+    await serverSupabase.storage.from('hazard-photos').remove([oldAttachmentPath]);
+  }
+
+  return NextResponse.json({
+    success: true,
+    ...(attachmentChanged
+      ? { attachmentUrl: updateData.attachment_url ?? '', attachmentName: updateData.attachment_name ?? '' }
+      : {}),
+  });
 }
 
 // ── DELETE: 위험요소 삭제 (글 + 댓글 + 좋아요 + Storage 사진) ──

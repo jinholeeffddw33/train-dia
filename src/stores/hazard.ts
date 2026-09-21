@@ -62,7 +62,11 @@ interface HazardState {
   }) => Promise<void>;
   fetchComments: (reportId: string) => Promise<void>;
   addComment: (reportId: string, comment: string, name: string, sabun: string) => Promise<void>;
-  updateReport: (reportId: string, description: string, location: string, name: string, sabun: string, removeFile?: boolean) => Promise<void>;
+  /** attachment — file 이 있으면 첨부를 그 파일로 바꾸고, remove 면 첨부를 뺀다. 없으면 그대로 둔다 */
+  updateReport: (
+    reportId: string, description: string, location: string, name: string, sabun: string,
+    removeFile?: boolean, attachment?: { file?: File | null; remove?: boolean },
+  ) => Promise<void>;
   deleteReport: (reportId: string, name: string, sabun: string) => Promise<void>;
   toggleResolved: (reportId: string, resolved: boolean, name: string, sabun: string) => Promise<void>;
   updateComment: (reportId: string, commentId: string, comment: string, name: string, sabun: string) => Promise<void>;
@@ -165,21 +169,44 @@ export const useHazardStore = create<HazardState>()((set, get) => ({
     }));
   },
 
-  updateReport: async (reportId, description, location, name, sabun, removeFile) => {
-    const res = await fetch(`/api/safety/hazards/${reportId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ description, location, name, sabun, removeFile }),
-    });
+  updateReport: async (reportId, description, location, name, sabun, removeFile, attachment) => {
+    // 새 첨부 파일이 있을 때만 multipart — 나머지는 예전처럼 JSON
+    let init: RequestInit;
+    if (attachment?.file) {
+      const fd = new FormData();
+      fd.append('description', description);
+      fd.append('location', location);
+      fd.append('name', name);
+      fd.append('sabun', sabun);
+      if (removeFile) fd.append('removeFile', 'true');
+      fd.append('attachment', attachment.file, attachment.file.name);
+      init = { method: 'PATCH', body: fd };
+    } else {
+      init = {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description, location, name, sabun, removeFile, removeAttachment: attachment?.remove === true }),
+      };
+    }
+    const res = await fetch(`/api/safety/hazards/${reportId}`, init);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error((err as { message?: string }).message || '수정에 실패했습니다');
     }
+    const result = (await res.json().catch(() => ({}))) as { attachmentUrl?: string; attachmentName?: string };
 
     set((state) => ({
       reports: state.reports.map((r) =>
         r.id === reportId
-          ? { ...r, description, location, ...(removeFile ? { photoUrl: '' } : {}) }
+          ? {
+              ...r,
+              description,
+              location,
+              ...(removeFile ? { photoUrl: '' } : {}),
+              ...(result.attachmentUrl !== undefined
+                ? { attachmentUrl: result.attachmentUrl, attachmentName: result.attachmentName ?? '' }
+                : {}),
+            }
           : r,
       ),
     }));

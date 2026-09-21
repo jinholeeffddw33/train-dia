@@ -148,14 +148,17 @@
   margin: 3px 0 0;
 }
 /* 인사 끝 줄 — 왼쪽 인사말, 오른쪽 끝에 «공지» 바로가기 */
+/* 글자와 단추의 가운데를 맞춘다 — 아래끝(flex-end)에 맞추면 단추가 글자보다 처져 보였다(2026-09-21) */
 .subRow {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: var(--dia-space-2);
+  margin-top: 3px;
 }
 .subRow .hubSubtitle {
   min-width: 0;
+  margin: 0;
 }
 /* 공지(점호)사항 바로가기 — 작게. 머리의 다른 단추와 같은 둥근 알약 */
 .rollCallShortcut {

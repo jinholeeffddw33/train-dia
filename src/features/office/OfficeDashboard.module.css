@@ -147,7 +147,7 @@
   color: var(--dia-text-tertiary);
   margin: 3px 0 0;
 }
-/* 인사 끝 줄 — 왼쪽 인사말, 오른쪽 끝에 «점호» 바로가기 */
+/* 인사 끝 줄 — 왼쪽 인사말, 오른쪽 끝에 «공지» 바로가기 */
 .subRow {
   display: flex;
   align-items: flex-end;

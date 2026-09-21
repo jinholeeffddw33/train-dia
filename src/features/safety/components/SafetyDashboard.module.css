@@ -1126,3 +1126,7 @@
 .hazardProfileTitle { font-size: var(--dia-text-base); font-weight: var(--dia-weight-bold); color: var(--dia-text-primary); }
 .hazardProfileDesc { font-size: var(--dia-text-meta); color: var(--dia-text-tertiary); font-weight: 600; }
 .hazardProfileChevron { color: var(--dia-text-tertiary); flex-shrink: 0; }
+
+/* 공지(점호)사항 미리보기 — 게시판에서 고른 제목 글자색 그대로 */
+.noticeTitleRed { color: var(--dia-red-text); }
+.noticeTitleBlue { color: var(--dia-blue-text); }

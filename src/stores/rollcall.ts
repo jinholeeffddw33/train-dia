@@ -8,20 +8,23 @@
  */
 import { create } from 'zustand';
 
-/** 중요도 — 색으로만 알린다. 없으면 기본 */
-export type RollCallLevel = 'normal' | 'important' | 'urgent';
+/**
+ * 제목 글자색 — 규정·공문처럼 검정(기본)·빨강·파랑 세 가지.
+ * 중요·긴급 같은 이름표는 붙이지 않고 글자색만 바꾼다(2026-09-21). 없으면 검정.
+ */
+export type RollCallColor = 'black' | 'red' | 'blue';
 
-export const ROLLCALL_LEVEL_LABEL: Record<RollCallLevel, string> = {
-  normal: '기본',
-  important: '중요',
-  urgent: '긴급',
+export const ROLLCALL_COLOR_LABEL: Record<RollCallColor, string> = {
+  black: '검정',
+  red: '빨강',
+  blue: '파랑',
 };
 
 export interface RollCallItem {
   id: string;
   text: string;
   detail?: string;
-  level?: RollCallLevel;
+  color?: Exclude<RollCallColor, 'black'>;
 }
 
 interface RollCallState {

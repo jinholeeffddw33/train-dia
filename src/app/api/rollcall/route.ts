@@ -22,8 +22,8 @@ const ItemSchema = z.object({
   id: z.string().min(1).max(64),
   text: z.string().min(1).max(4000),
   detail: z.string().max(8000).optional(),
-  // 중요도 — 없으면 기본. 예전에 저장한 항목에는 이 칸이 없다.
-  level: z.enum(['normal', 'important', 'urgent']).optional(),
+  // 제목 글자색 — 없으면 검정. 예전에 저장한 항목에는 이 칸이 없다.
+  color: z.enum(['red', 'blue']).optional(),
 });
 const ItemsSchema = z.array(ItemSchema).max(50);
 
@@ -31,7 +31,7 @@ export interface RollCallItem {
   id: string;
   text: string;
   detail?: string;
-  level?: 'normal' | 'important' | 'urgent';
+  color?: 'red' | 'blue';
 }
 
 export async function GET() {

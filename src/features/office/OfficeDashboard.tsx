@@ -178,14 +178,14 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
           <p className={styles.greeting}>안녕하세요,</p>
           <h1 className={styles.hubTitle}>{name ? `${name} ${role}` : '답십리 승무사업소'} 👋</h1>
           {name && <p className={styles.office}>답십리 승무사업소</p>}
-          {/* 인사 끝 줄 오른쪽 — 공지(점호)사항 바로가기. 부장님들(관리자 22명이 모두 내근직)은 이 화면이
+          {/* 인사 끝 줄 오른쪽 — 공지(점호)사항 바로가기(글자는 «공지», 진호 2026-09-21). 부장님들(관리자 22명이 모두 내근직)은 이 화면이
               첫 화면이라, 안전 → 공지(점호)사항으로 두 번 들어가던 길을 한 번으로 줄인다. */}
           <div className={styles.subRow}>
             <p className={styles.hubSubtitle}>{getSubtitle()}</p>
             <button type="button" className={styles.rollCallShortcut} onClick={openRollCall}
               aria-label="공지(점호)사항 보기" data-press>
               <ClipboardList size={15} strokeWidth={2.4} aria-hidden />
-              점호
+              공지
               {rollCallUnseen && <span className={styles.rollCallDot} aria-hidden />}
             </button>
           </div>

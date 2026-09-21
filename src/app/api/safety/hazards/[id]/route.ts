@@ -31,9 +31,14 @@ export async function PATCH(
   try {
     if ((req.headers.get('content-type') ?? '').includes('multipart/form-data')) {
       const fd = await req.formData();
+      // multipart 는 줄바꿈을 \r\n 으로 바꿔 보낸다 — JSON 으로 저장한 글과 같게 \n 으로 되돌린다
+      const text = (k: string) => {
+        const v = fd.get(k);
+        return typeof v === 'string' ? v.replace(/\r\n/g, '\n') : v;
+      };
       body = {
-        description: fd.get('description'),
-        location: fd.get('location'),
+        description: text('description'),
+        location: text('location'),
         name: fd.get('name'),
         sabun: fd.get('sabun'),
         removeFile: fd.get('removeFile') === 'true',

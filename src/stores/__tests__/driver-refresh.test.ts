@@ -30,7 +30,7 @@ describe('발령 뒤 «나» 다시 찾기', () => {
     expect(useDriverStore.getState().myDriver?.I).toBe('0');
 
     // 2) 발령 예약(이미 시행됨)을 받는다
-    const change: RosterChange = { from: '2000-01-01', I: slot.I, n: office.n, s: office.s, work: 'driver' };
+    const change: RosterChange = { from: '2000-01-01', I: slot.I, n: office.n, s: office.s ?? '', work: 'driver' };
     setDbRosterChanges([change]);
     useDriverStore.getState().refreshFromRoster();
 

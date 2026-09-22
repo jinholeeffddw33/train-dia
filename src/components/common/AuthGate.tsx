@@ -70,6 +70,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!rosterReady) return;
     if (user?.sabun) {
+      // 저장돼 있던 «나»는 명부를 받기 전에 복원된 것이다 — 사번이 같아도 자리(I)가 바뀌었을 수 있다
+      useDriverStore.getState().refreshFromRoster();
       const { myDriver, setMyDriverById, setMyDriverBySabun, setMyDriver } = useDriverStore.getState();
       if (!myDriver || myDriver.s !== user.sabun || myDriver.n !== user.name) {
         if (user.personId && user.personId !== '0') {

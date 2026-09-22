@@ -48,6 +48,12 @@ interface DriverState {
   setMyDriverById: (id: string) => void;
   /** 사번으로 내 기관사 설정 */
   setMyDriverBySabun: (sabun: string) => void;
+  /**
+   * 명부를 받은 뒤 «나»와 «조회 중인 사람»을 다시 찾는다(사번 기준).
+   * 앱이 켜질 때 복원은 발령 예약(DB)을 받기 전이라, 내근 → 기관사 발령자가
+   * 옛 내근 모습(I='0')으로 잡혀 내근 화면이 뜬다.
+   */
+  refreshFromRoster: () => void;
   /** 내 보기로 돌아가기 */
   backToMe: () => void;
   /** 로그아웃 — 인증 초기화 */
@@ -102,6 +108,17 @@ export const useDriverStore = create<DriverState>()(
         if (person) {
           set({ myDriver: person, current: person, isViewMode: false });
         }
+      },
+
+      refreshFromRoster: () => {
+        const { myDriver, current } = get();
+        const me = myDriver ? resolvePerson(myDriver) : null;
+        const cur = current ? resolvePerson(current) : me;
+        set({
+          myDriver: me,
+          current: cur,
+          isViewMode: !!(me && cur && personKey(cur) !== personKey(me)),
+        });
       },
 
       backToMe: () => {

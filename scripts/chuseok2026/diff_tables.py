@@ -37,18 +37,24 @@ def is_dia(k: str) -> bool:
     return bool(re.fullmatch(r'(?:임시|변)?\d+', k))
 
 
+def dia_name(v) -> str:
+    """칸의 다이아 번호 — «임시\\n61» 처럼 줄이 바뀐 것도 «임시61» 로"""
+    return str(int(v)) if isinstance(v, (int, float)) else re.sub(r'\s+', '', str(v))
+
+
 def read_workbook(path):
     wb = openpyxl.load_workbook(path)
     wbv = openpyxl.load_workbook(path, data_only=True)
     summ, imgs = {}, {}
     for ws, wsv in zip(wb.worksheets, wbv.worksheets):
         g = {(c.row, c.column): c.value for row in wsv.iter_rows() for c in row if c.value not in (None, '')}
+        labels = []   # (행, 열, 다이아) — 다이아 번호 칸의 자리
         for (r, c), v in g.items():
             if isinstance(v, str) and v.replace(' ', '') == '승무구간':
                 dv = g.get((r, c - 2))
                 if dv is None:
                     continue
-                dia = str(int(dv)) if isinstance(dv, (int, float)) else str(dv).strip()
+                dia = dia_name(dv)
                 info = {}
                 for (r2, c2), v2 in g.items():
                     if r < r2 <= r + 30 and c2 == c + 30 and v2 in LABELS:
@@ -57,12 +63,15 @@ def read_workbook(path):
                         info['km'] = g.get((r2, c2 + 4))
                 if is_dia(dia):
                     summ[dia] = info
+                    labels.append((r, c - 2, dia))
         for im in ws._images:
             a = im.anchor._from
-            v = ws.cell(row=a.row + 1 - 2, column=a.col + 1 - 3).value
-            dia = str(int(v)) if isinstance(v, (int, float)) else str(v).strip()
-            if is_dia(dia):
-                imgs[dia] = im._data()
+            row, col = a.row + 1, a.col + 1
+            # 그림은 보통 번호 칸에서 2행 아래·2열 오른쪽에 붙는데, 손으로 갈아 끼운 그림은 자리가 조금씩
+            # 어긋난다(9/27 심야연장 반영본에서 row 2·col 40 등). 그림의 왼쪽 위에서 가장 가까운 번호 칸을 쓴다.
+            near = [(r, c, d) for r, c, d in labels if r <= row + 2 and c <= col + 2]
+            if near:
+                imgs[max(near)[2]] = im._data()
     return summ, imgs
 
 

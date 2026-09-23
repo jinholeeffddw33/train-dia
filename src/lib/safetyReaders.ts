@@ -5,6 +5,7 @@
  * - 인턴(INTERN_SABUNS)은 더 이상 자동 제외하지 않음 (2026-06-08 정책 변경)
  *   → 인턴도 읽음현황에 포함되어 본인 확인 시 정상 집계
  */
+import { GUEST_SABUN } from './guestAccount';
 
 /** 인턴 사번 — 참조용 (현재 읽음 추적 제외에서는 빠짐) */
 export const INTERN_SABUNS: ReadonlySet<string> = new Set([
@@ -23,6 +24,7 @@ export const READ_TRACKING_EXCLUDED_SABUNS: ReadonlySet<string> = new Set([
   '22200209', // 김현진
   '030827',   // jinho (테스트/개발 계정)
   '22000103', // 김다솜
+  GUEST_SABUN, // 체험 계정(답십리) — 여러 사람이 함께 쓰는 둘러보기 계정
 ]);
 
 /** 집계 대상에서 제외해야 하는 사번 여부 — 인턴은 더 이상 제외하지 않음 */

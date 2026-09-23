@@ -5,6 +5,8 @@ import { useAuthStore, type SabunStatus } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { getDuplicateNameGroup } from '@/lib/auth';
 import { syncRosterChanges } from '@/lib/rosterSync';
+import { isGuest } from '@/lib/guestAccount';
+import { guestPerson } from '@/lib/guestView';
 import { KeyRound, Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import styles from './AuthGate.module.css';
 
@@ -69,6 +71,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   //    명부를 받은 뒤에 해야 한다 — 먼저 하면 발령 전 이름으로 «내 교번»이 잡힌다
   useEffect(() => {
     if (!rosterReady) return;
+    if (user?.sabun && isGuest(user.sabun)) {
+      // 체험 계정 — 그날 5다이아 기관사의 자리로 보여준다. setMyDriver 는 사번·순번으로
+      // 실제 기관사를 다시 찾아 체험 계정 사번을 지우므로 스토어에 바로 넣는다.
+      const me = guestPerson(user.sabun, user.name);
+      useDriverStore.setState({ myDriver: me, current: me, isViewMode: false });
+      return;
+    }
     if (user?.sabun) {
       // 저장돼 있던 «나»는 명부를 받기 전에 복원된 것이다 — 사번이 같아도 자리(I)가 바뀌었을 수 있다
       useDriverStore.getState().refreshFromRoster();

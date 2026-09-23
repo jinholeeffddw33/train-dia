@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/authServer';
 import { ERROR_CODES, errorResponse, internalError, okJson } from '@/lib/api/response';
 import { INTEGRITY_QUESTIONS } from '@/data/integrityQuiz';
 import { INTEGRITY_ANSWER_BY_NO } from '@/lib/integrityAnswerKey';
+import { GUEST_SABUN } from '@/lib/guestAccount';
 
 /**
  * GET — 참여율·점수 전체 보기. **관리자만**.
@@ -35,11 +36,12 @@ export async function GET(req: NextRequest) {
 
   const rows = data ?? [];
 
-  // 참여율의 분모 — 로그인할 수 있는 현재 인원
+  // 참여율의 분모 — 로그인할 수 있는 현재 인원 (체험 계정은 사람이 아니다)
   const { count: headcount } = await serverSupabase
     .from('driver_profiles')
     .select('id', { count: 'exact', head: true })
-    .eq('is_active', true);
+    .eq('is_active', true)
+    .neq('sabun', GUEST_SABUN);
 
   const perQuestion = INTEGRITY_QUESTIONS.map((q, i) => {
     const correct = rows.filter((r) => {

@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/authServer';
 import { serverSupabase } from '@/lib/serverSupabase';
 import type { TokenPayload } from '@/lib/jwt';
 import { dayKST, getKstDayStart, kstDay, todayKST, VISIT_ACTIONS } from '@/lib/visitStats';
+import { isGuest } from '@/lib/guestAccount';
 
 export async function GET(req: NextRequest) {
   const userOrRes = await requireAuth(req);
@@ -95,14 +96,14 @@ export async function GET(req: NextRequest) {
   const allUserIds = new Set((allProfiles ?? []).map(p => p.id));
   const recentUserIds = new Set((recentLogs ?? []).map(l => l.user_id));
   const neverOrOldUsers = (allProfiles ?? [])
-    .filter(p => !recentUserIds.has(p.id) && p.person_id !== 'ADMIN')
+    .filter(p => !recentUserIds.has(p.id) && p.person_id !== 'ADMIN' && !isGuest(p.sabun))
     .map(p => ({ name: p.name, sabun: p.sabun }));
 
   return NextResponse.json({
     today: {
       date: today,
       uniqueCount: todayUsers.length,
-      totalMembers: (allProfiles ?? []).filter(p => p.person_id !== 'ADMIN').length,
+      totalMembers: (allProfiles ?? []).filter(p => p.person_id !== 'ADMIN' && !isGuest(p.sabun)).length,
       users: todayUsers,
     },
     yesterday: {

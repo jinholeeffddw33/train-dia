@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, Component, lazy, Suspense, type ReactNode } from 'react';
-import { ArrowLeft, ChevronRight, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed, Gauge, ToggleLeft } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Sprout, Music2, Zap, Bug, Brain, Palette, Bell, Users, Trophy, Sparkles, Stamp, Bike, UtensilsCrossed } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import LoadingDots from '@/components/common/LoadingDots';
 import styles from './styles/Life.module.css';
@@ -11,8 +11,8 @@ const SnakeGame = lazy(() => import('./games/SnakeGame'));
 const MentalMath = lazy(() => import('./games/MentalMath'));
 const SimonSays = lazy(() => import('./games/SimonSays'));
 const HalliGalli = lazy(() => import('./games/HalliGalli'));
-const SpeedMaster = lazy(() => import('./games/SpeedMaster'));
-const BreakerMaster = lazy(() => import('./games/BreakerMaster'));
+// 스피드 마스터·차단기 마스터는 교육 > 고장조치 에서 연다(EduTab) — 오락 게임과 구분.
+// 파일은 게임 공용 부품(랭킹·효과음)을 함께 쓰므로 여기(life/games)에 그대로 둔다.
 const MultiLobby = lazy(() => import('./games/multi/MultiLobby'));
 const HallOfFame = lazy(() => import('./games/HallOfFame'));
 const ApexRush = lazy(() => import('./games/ApexRush'));
@@ -50,16 +50,14 @@ class LifeErrorBoundary extends Component<{ children: ReactNode; onBack: () => v
   }
 }
 
-type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex' | 'speed' | 'breaker';
+type GameId = 'reaction' | 'snake' | 'mental' | 'simon' | 'halli' | 'multi' | 'apex';
 type View = 'home' | { type: 'game'; gameId: GameId } | 'bonsai' | 'asmr' | 'hof' | 'fortune' | 'stamp' | 'menu';
 
 // 홈에 직접 노출하는 게임 타일 — 1탭에 바로 실행. 중간 목록 화면 없음.
-// 게임 7개 먼저 → 온라인대전(8) → 명예의전당(9, 게임 아님 → 골드로 차별화).
-// 스피드 마스터는 규정 학습을 겸하는 게임이라 맨 앞에 둔다.
+// 게임 6개 먼저 → 온라인대전 → 명예의전당(게임 아님 → 골드로 차별화).
+// 학습용(스피드 마스터·차단기 마스터)은 교육 > 고장조치 로 옮겼다.
 type HomeGameKey = GameId | 'hof';
 const HOME_GAMES: { key: HomeGameKey; label: string; icon: typeof Zap; bg: string; variant?: 'hof' }[] = [
-  { key: 'speed',    label: '스피드 마스터', icon: Gauge, bg: 'iconBgBlue' },
-  { key: 'breaker',  label: '차단기 마스터', icon: ToggleLeft, bg: 'iconBgBlue' },
   { key: 'apex',     label: 'APEX',       icon: Bike,    bg: 'iconBgAmber' },
   { key: 'reaction', label: '반응속도',    icon: Zap,     bg: 'iconBgAmber' },
   { key: 'snake',    label: '사과 먹기',   icon: Bug,     bg: 'iconBgGreen' },
@@ -197,8 +195,6 @@ export default function LifeWorld({ onBack }: { onBack: () => void }) {
           {view.gameId === 'mental' && <MentalMath onBack={goBack} />}
           {view.gameId === 'simon' && <SimonSays onBack={goBack} />}
           {view.gameId === 'halli' && <HalliGalli onBack={goBack} />}
-          {view.gameId === 'speed' && <SpeedMaster onBack={goBack} />}
-          {view.gameId === 'breaker' && <BreakerMaster onBack={goBack} />}
           {view.gameId === 'apex' && <ApexRush onBack={goBack} />}
           {view.gameId === 'multi' && <MultiLobby onBack={goBack} />}
         </Suspense>

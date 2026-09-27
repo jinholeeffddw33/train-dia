@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
+import LoadingDots from '@/components/common/LoadingDots';
 import EduHome from './EduHome';
 import DocumentViewer from './DocumentViewer';
 import QuizSystem from './QuizSystem';
@@ -16,6 +17,12 @@ import NewcomerHome from './NewcomerHome';
 import VideoGuideList from './VideoGuideList';
 import RailBot from './RailBot';
 
+// 고장조치 > 스피드 마스터·차단기 마스터 — 게임 공용 부품과 함께 life/games 에 있다.
+// 교육을 열 때마다 받지 않게 누를 때만 불러온다.
+const SpeedMaster = lazy(() => import('@/features/life/games/SpeedMaster'));
+const BreakerMaster = lazy(() => import('@/features/life/games/BreakerMaster'));
+const gameLoading = <LoadingDots label="불러오고 있어요" />;
+
 type EduView =
   | { type: 'home' }
   | { type: 'study'; initSection?: string; initChapter?: string; initChapters?: string[]; initTitle?: string; flatMode?: boolean }
@@ -29,6 +36,8 @@ type EduView =
   | { type: 'rescue-procedure' }
   | { type: 'rescue-simulation' }
   | { type: 'mr-burst' }
+  | { type: 'speed-master' }
+  | { type: 'breaker-master' }
   | { type: 'newcomer' }
   | { type: 'newcomer-video' }
   | { type: 'newcomer-handbook' };
@@ -100,6 +109,10 @@ export default function EduTab({ onBack }: EduTabProps) {
       return <RescueSimulation onBack={goBack} />;
     case 'mr-burst':
       return <MrBurstSimulation onBack={goBack} />;
+    case 'speed-master':
+      return <Suspense fallback={gameLoading}><SpeedMaster onBack={goBack} /></Suspense>;
+    case 'breaker-master':
+      return <Suspense fallback={gameLoading}><BreakerMaster onBack={goBack} /></Suspense>;
     case 'newcomer':
       return (
         <NewcomerHome
@@ -137,6 +150,8 @@ export default function EduTab({ onBack }: EduTabProps) {
           onRescueProcedure={() => push({ type: 'rescue-procedure' })}
           onRescueSimulation={() => push({ type: 'rescue-simulation' })}
           onMrBurst={() => push({ type: 'mr-burst' })}
+          onSpeedMaster={() => push({ type: 'speed-master' })}
+          onBreakerMaster={() => push({ type: 'breaker-master' })}
           onNewcomerVideo={() => push({ type: 'newcomer-video' })}
           onNewcomerHandbook={() => push({ type: 'newcomer-handbook' })}
         />

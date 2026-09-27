@@ -436,9 +436,11 @@
   padding: var(--dia-space-1);
 }
 
+/* 3열 — 9개(차종 3 · 비교 · 구원 2 · 주공기관 · 스피드 · 차단기)가 3×3 으로 빈칸 없이 선다.
+   4열이던 때는 320px 에서 «시뮬레이/션»처럼 낱말이 쪼개지고 마지막 줄에 하나만 남았다. */
 .subMenuGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--dia-space-3);
 }
 

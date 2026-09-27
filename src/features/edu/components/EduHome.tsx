@@ -7,7 +7,7 @@ import {
   ArrowLeft, ChevronRight, X, Home, GraduationCap,
   Mic, DoorOpen, Wrench,
   Award, User, ClipboardList,
-  RotateCcw, GitCompareArrows, Link, Zap, Wind,
+  RotateCcw, GitCompareArrows, Link, Zap, Wind, Gauge, ToggleLeft,
   Clapperboard, BookOpen, Bot,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
@@ -32,6 +32,8 @@ interface EduHomeProps {
   onRescueProcedure: () => void;
   onRescueSimulation: () => void;
   onMrBurst: () => void;
+  onSpeedMaster: () => void;
+  onBreakerMaster: () => void;
   onNewcomerVideo: () => void;
   onNewcomerHandbook: () => void;
   onRailBot: () => void;
@@ -74,7 +76,7 @@ const SUBMENU_COLOR_MAP = {
   red:    styles.iconBgRed,
 } as const;
 
-export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onSpeedMaster, onBreakerMaster, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
   const { wrongCount, unresolvedWrongCount } = useEduStore();
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
@@ -111,6 +113,9 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
     { id: 'rescue',  label: '구원연결\n조치순서', color: 'red' as const,    targets: [],            coming: false },
     { id: 'rescue-sim', label: '구원연결\n시뮬레이션', color: 'amber' as const, targets: [],            coming: false },
     { id: 'mr-burst',   label: '주공기관\n파열 훈련', color: 'red'   as const, targets: [],            coming: false },
+    // 익히는 훈련 게임 — 라이프(오락 게임)에서 옮겨 왔다. 점수·랭킹은 그대로 이어진다.
+    { id: 'speed-master',   label: '스피드\n마스터',   color: 'blue'   as const, targets: [],     coming: false },
+    { id: 'breaker-master', label: '차단기\n마스터',   color: 'purple' as const, targets: [],     coming: false },
   ];
 
   const handleMenuClick = (item: typeof MENU_ITEMS[number]) => {
@@ -276,6 +281,8 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
                   rescue: Link,
                   'rescue-sim': Zap,
                   'mr-burst': Wind,
+                  'speed-master': Gauge,
+                  'breaker-master': ToggleLeft,
                 };
                 const SubIcon = iconMap[sub.id] ?? Wrench;
                 return (
@@ -297,6 +304,14 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
                       }
                       if (sub.id === 'mr-burst') {
                         onMrBurst();
+                        return;
+                      }
+                      if (sub.id === 'speed-master') {
+                        onSpeedMaster();
+                        return;
+                      }
+                      if (sub.id === 'breaker-master') {
+                        onBreakerMaster();
                         return;
                       }
                       onChapters([...sub.targets], sub.label);

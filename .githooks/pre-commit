@@ -73,4 +73,14 @@ npm run --silent check:ai-rules:staged || {
   exit 1
 }
 
+# 검사를 모두 통과한 커밋만 버전을 올린다 — 막힌 커밋이 번호를 먹지 않게 맨 끝에 둔다.
+# 앱 파일(src/·public/)을 바꾼 커밋(수정·새 기능)이면 APP_VERSION 끝자리 +1 (끄기: SKIP_VERSION_BUMP=1)
+echo "[pre-commit] version bump"
+node scripts/bump-version.mjs || {
+  echo ""
+  echo "❌ pre-commit blocked: 버전 자동 올림 실패 (scripts/bump-version.mjs)."
+  echo "   급하면 SKIP_VERSION_BUMP=1 git commit ... 으로 이번만 건너뛰고 원인을 알려주세요."
+  exit 1
+}
+
 echo "✅ pre-commit passed."

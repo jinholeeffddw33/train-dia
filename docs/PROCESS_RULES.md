@@ -175,6 +175,12 @@ npm run build
 - 수정 → build → test → commit → main push
 - 문제 시 `git revert` 또는 Vercel Instant Rollback
 
+### 17.4 앱 버전은 자동으로 올라간다
+- 앱 파일(`src/`·`public/`)을 바꾼 커밋(수정·새 기능)마다 pre-commit 이 `APP_VERSION` 끝자리를 +1 한다 (`scripts/bump-version.mjs`)
+- 올릴 번호 = max(내 버전, origin/main 버전) + 0.0.1 — 다른 곳에서 먼저 올린 번호와 겹치지 않는다
+- 문서·스크립트만 바꾼 커밋은 올리지 않는다. 손으로 올리지 말 것 (큰 개편 때 앞자리만 손으로)
+- 폰의 새 버전 감지는 버전 번호가 아니라 배포마다 바뀌는 `BUILD_ID` 로 한다 — 번호와 무관하게 배포는 바로 닿는다
+
 ---
 
 ## 18) 버그 수정 프로토콜

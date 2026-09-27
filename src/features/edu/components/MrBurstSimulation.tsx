@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { ArrowLeft, RotateCcw, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import styles from '../styles/edu.module.css';
 
@@ -173,6 +173,9 @@ const VALVE_LABELS = ['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩
 
 const TOTAL_ROUNDS = 8;
 
+/** 정답 안내를 보여주는 시간 — 읽을 틈은 주되 흐름은 끊기지 않게 */
+const CORRECT_HOLD_MS = 1500;
+
 function pickRandom(scenarios: Scenario[], count: number): Scenario[] {
   const shuffled = [...scenarios].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
@@ -194,20 +197,25 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
   const [wrongAttempt, setWrongAttempt] = useState(false); // 오답 표시
   const [showAnswer, setShowAnswer] = useState(false); // 3회 실패 시 정답 공개
   const [retryCount, setRetryCount] = useState<number[]>([]); // 각 문제 재시도 횟수
+  // 정답 안내 — 맞히면 «정답입니다!»와 해설을 잠깐 보여준 뒤 다음 문제로 넘어간다.
+  // 예전엔 곧바로 넘어가서 맞혔는지 알 수 없었다(오답만 알려 줌).
+  const [justCorrect, setJustCorrect] = useState(false);
+  const correctTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (correctTimer.current) window.clearTimeout(correctTimer.current); }, []);
 
   const scenario = rounds[current];
   const currentRetries = retryCount[current] ?? 0;
 
   const toggleValve = useCallback((valve: number) => {
-    if (wrongAttempt || showAnswer) return;
+    if (wrongAttempt || showAnswer || justCorrect) return;
     setSelected(prev =>
       prev.includes(valve) ? prev.filter(v => v !== valve) : [...prev, valve]
     );
-  }, [wrongAttempt, showAnswer]);
+  }, [wrongAttempt, showAnswer, justCorrect]);
 
   const handleConfirm = useCallback(() => {
     if (selected.length === 0) return;
-    if (wrongAttempt || showAnswer) return;
+    if (wrongAttempt || showAnswer || justCorrect) return;
 
     const isCorrect = setsEqual(selected, scenario.correctCuts);
 
@@ -228,9 +236,15 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
       return;
     }
 
-    // 정답 → 다음 문제로
-    goNext(selected);
-  }, [selected, answers, scenario, wrongAttempt, showAnswer, current, retryCount]);
+    // 정답 → «정답입니다!» 를 잠깐 보여주고 다음 문제로
+    setJustCorrect(true);
+    const sel = selected;
+    correctTimer.current = window.setTimeout(() => {
+      correctTimer.current = null;
+      setJustCorrect(false);
+      goNext(sel);
+    }, CORRECT_HOLD_MS);
+  }, [selected, answers, scenario, wrongAttempt, showAnswer, justCorrect, current, retryCount]);
 
   const goNext = useCallback((sel: number[]) => {
     const nextAnswers = [...answers, sel];
@@ -391,6 +405,17 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
             ) : null}
           </div>
 
+          {/* 정답 피드백 — 잠깐 보여준 뒤 다음 문제로 */}
+          {justCorrect && (
+            <div className={styles.mrCorrectFeedback} role="status">
+              <CheckCircle2 size={20} />
+              <div className={styles.mrWrongText}>
+                <strong>정답입니다!</strong>
+                <span>{scenario.explanation}</span>
+              </div>
+            </div>
+          )}
+
           {/* 오답 피드백 (1~2회) */}
           {wrongAttempt && !showAnswer && (
             <div className={styles.mrWrongFeedback}>
@@ -420,7 +445,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
           )}
 
           {/* 경고 */}
-          {!wrongAttempt && !showAnswer && (
+          {!wrongAttempt && !showAnswer && !justCorrect && (
             <div className={styles.rescueWarning}>
               <AlertTriangle size={16} />
               <span>파열된 차량의 공기관을 격리할 CUT 번호를 정확히 선택하세요</span>
@@ -451,7 +476,7 @@ export default function MrBurstSimulation({ onBack }: MrBurstSimulationProps) {
                 type="button"
                 className={styles.mrConfirmBtn}
                 onClick={handleConfirm}
-                disabled={selected.length === 0}
+                disabled={selected.length === 0 || justCorrect}
               >
                 확인 ({current + 1}/{TOTAL_ROUNDS})
               </button>

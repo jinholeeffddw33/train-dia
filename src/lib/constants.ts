@@ -3,6 +3,12 @@
 /** 앱 버전 — 표지·설정 등 모든 표시 위치에서 이 상수를 참조 */
 export const APP_VERSION = 'v4.0.2';
 
+/**
+ * 배포 표식 — 배포할 때마다 저절로 바뀐다(next.config.js 의 NEXT_PUBLIC_BUILD_ID).
+ * 새 버전 감지는 이 값으로 한다. APP_VERSION 은 화면 표시용이라 올리지 않은 배포가 많다.
+ */
+export const BUILD_ID = process.env.NEXT_PUBLIC_BUILD_ID || 'dev';
+
 
 export const LABELS = {
   START: '출근',

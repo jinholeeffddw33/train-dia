@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { APP_VERSION } from '@/lib/constants';
+import { APP_VERSION, BUILD_ID } from '@/lib/constants';
 
 const UPDATE_CHECK_INTERVAL = 30 * 60 * 1000;
 const VERSION_CHECK_INTERVAL = 5 * 60 * 1000;
@@ -34,6 +34,7 @@ export function forceAppUpdate() {
 export function useServiceWorker() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
+  const [latestBuild, setLatestBuild] = useState<string | null>(null);
   const regRef = useRef<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
@@ -93,11 +94,12 @@ export function useServiceWorker() {
       });
     };
 
-    // ★ 등록 URL 에 배포 버전을 실어 보낸다 — sw.js 파일 내용은 배포해도 안 바뀌므로
+    // ★ 등록 URL 에 배포 표식을 실어 보낸다 — sw.js 파일 내용은 배포해도 안 바뀌므로
     //   `/sw.js` 그대로면 브라우저가 **SW 업데이트를 감지조차 못 한다**(바이트 동일).
     //   v 가 바뀌면 새 스크립트로 취급돼 install→activate 가 돌고,
     //   sw.js 가 그 v 로 캐시 이름을 만들어 옛 버전 캐시를 activate 에서 폐기한다.
-    navigator.serviceWorker.register(`/sw.js?v=${APP_VERSION}`).then((reg) => {
+    //   APP_VERSION 만 쓰면 번호를 안 올린 배포는 폰에 닿지 않아서 BUILD_ID 를 함께 싣는다.
+    navigator.serviceWorker.register(`/sw.js?v=${APP_VERSION}-${BUILD_ID}`).then((reg) => {
       regRef.current = reg;
       reg.addEventListener('updatefound', () => watchInstalling(reg));
       reg.update().catch(() => {});
@@ -134,7 +136,9 @@ export function useServiceWorker() {
       fetch('/api/version', { cache: 'no-store' })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => {
-          if (!cancelled && d && typeof d.version === 'string') setLatestVersion(d.version);
+          if (cancelled || !d) return;
+          if (typeof d.version === 'string') setLatestVersion(d.version);
+          if (typeof d.build === 'string') setLatestBuild(d.build);
         })
         .catch(() => { /* 오프라인 등 — 무시 */ });
     };
@@ -151,7 +155,10 @@ export function useServiceWorker() {
     };
   }, []);
 
-  const outdated = latestVersion != null && latestVersion !== APP_VERSION;
+  // 배포 표식이 다르면 옛 앱이다. 개발 서버(dev)는 비교하지 않는다.
+  const outdated =
+    (latestVersion != null && latestVersion !== APP_VERSION) ||
+    (latestBuild != null && BUILD_ID !== 'dev' && latestBuild !== BUILD_ID);
 
   // ── 콜드 스타트 자동 적용 ──
   // "앱을 밀었다 켜면 새 버전이 적용돼 있어야 한다"(진호 2026-08-09).

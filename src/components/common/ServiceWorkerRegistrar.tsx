@@ -42,7 +42,8 @@ export default function ServiceWorkerRegistrar() {
         <div className={styles.updateBanner}>
           <div className={styles.updateInfo}>
             <span>새 버전이 나왔어요</span>
-            {outdated && latestVersion && (
+            {/* 번호를 안 올린 배포(빌드 표식만 다름)는 «v4 → v4» 가 되니 번호가 다를 때만 */}
+            {outdated && latestVersion && latestVersion !== currentVersion && (
               <span className={styles.updateVer}>현재 {currentVersion} → 최신 {latestVersion}</span>
             )}
           </div>

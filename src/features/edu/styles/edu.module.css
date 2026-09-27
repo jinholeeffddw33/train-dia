@@ -3140,9 +3140,11 @@
   --dia-border-light: rgba(255, 255, 255, 0.04);
 }
 
-/* 본문은 Lottie 위에 떠야 함 */
+/* 본문은 Lottie 위에 떠야 함.
+   고장조치 서브메뉴 오버레이는 뺀다 — 여기 걸리면 position:fixed 가 relative 로 덮여
+   화면이 아니라 페이지 맨 아래에 붙는다(폰에서 시트가 화면 밖에 생겨 안 올라오는 것처럼 보였다) */
 .screenHome > header,
-.screenHome > div:not(.lottieBgLayer):not(.lottieBgOverlay) {
+.screenHome > div:not(.lottieBgLayer):not(.lottieBgOverlay):not(.subMenuOverlay) {
   position: relative;
   z-index: 1;
 }

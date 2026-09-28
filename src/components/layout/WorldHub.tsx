@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, Scale, ClipboardList } from 'lucide-react';
+import { Bell, TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, Coffee, Moon, Sun, CalendarRange, ChevronRight, Settings, ClipboardList } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
-import { useAuthStore } from '@/stores/auth';
-import { useIntegrityStore } from '@/stores/integrity';
 import { useRollCallStore, hasUnseenRollCall } from '@/stores/rollcall';
-import { INTEGRITY_OPEN_FROM, INTEGRITY_OPEN_UNTIL } from '@/data/integrityQuiz';
 import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { getUserRole } from '@/lib/auth';
 import { APP_VERSION } from '@/lib/constants';
@@ -49,12 +46,6 @@ const SERVICES: ServiceDef[] = [
 
 const DOW = ['일', '월', '화', '수', '목', '금', '토'];
 
-/** 오늘 — 'YYYY-MM-DD'. 기간 한정 기능을 켜고 끄는 데 쓴다. */
-function todayStr(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 function todayLabel(): string {
   const d = new Date();
   return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${DOW[d.getDay()]})`;
@@ -90,12 +81,6 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
   const hasNotice = safetyTotal > 0;
   const { theme, toggle: toggleTheme } = useThemeStore();
 
-  // ── 청렴 경진대회(2026-09-18 ~ 09-27) — 기간이 지나면 이 블록만 지우면 자취가 없다 ──
-  const openIntegrity = useIntegrityStore((s) => s.openQuiz);
-  const ensureIntegrityStatus = useIntegrityStore((s) => s.ensureStatus);
-  const integritySubmitted = useIntegrityStore((s) => s.submitted);
-  const isDevAdmin = useAuthStore((s) => s.user?.role) === 'admin';
-
   // ── 공지(점호)사항 — 안전 화면 안에 있어 찾기 어려웠다. 홈에서 한 번에 연다. ──
   const openRollCall = useRollCallStore((s) => s.openBoard);
   const loadRollCall = useRollCallStore((s) => s.load);
@@ -103,12 +88,6 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
   const rollCallUpdatedAt = useRollCallStore((s) => s.updatedAt);
   const rollCallUnseen = hasUnseenRollCall(rollCallItems, rollCallUpdatedAt);
   useEffect(() => { loadRollCall(); }, [loadRollCall]);
-  const today = todayStr();
-  const showIntegrity = isDevAdmin || (today >= INTEGRITY_OPEN_FROM && today <= INTEGRITY_OPEN_UNTIL);
-
-  useEffect(() => {
-    if (showIntegrity) ensureIntegrityStatus();
-  }, [showIntegrity, ensureIntegrityStatus]);
 
   const handleClick = useCallback((worldId: WorldId) => {
     window.setTimeout(() => onEnter(worldId), 60);
@@ -195,22 +174,8 @@ export default function WorldHub({ onEnter, onOpenSchedule, onOpenSettings }: Wo
           >
             <ClipboardList size={16} strokeWidth={2.4} aria-hidden />
             공지(점호)
-            {rollCallUnseen && <span className={styles.integrityDot} aria-hidden />}
+            {rollCallUnseen && <span className={styles.rollCallDot} aria-hidden />}
           </button>
-          {/* 청렴 경진대회 — 기간에만 뜨는 임시 바로가기. 관리자는 결과를 보려고 기간 뒤에도 본다. */}
-          {showIntegrity && (
-            <button
-              type="button"
-              className={styles.integrityBtn}
-              onClick={openIntegrity}
-              aria-label="청렴 문제풀기 경진대회 응시하기"
-              data-press
-            >
-              <Scale size={16} strokeWidth={2.4} aria-hidden />
-              청렴
-              {integritySubmitted === false && <span className={styles.integrityDot} aria-hidden />}
-            </button>
-          )}
           </div>
         </div>
         <div className={styles.servicesGrid}>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getRoster } from '@/data/cycle';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
+import { officeUsers, internUsers } from '@/lib/auth';
 import type { Person } from '@/lib/types';
 
 // ── 서버 전용 Supabase 클라이언트 ──
@@ -15,7 +15,7 @@ const serverSupabase =
     ? createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey)
     : null;
 
-const allUsers = () => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
+const allUsers = () => [...getRoster(), ...officeUsers(), ...internUsers()];
 
 /**
  * 이름 + 사번 매칭 검증.

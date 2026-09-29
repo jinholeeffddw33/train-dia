@@ -2,13 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
 import { getRoster } from '@/data/cycle';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
+import { officeUsers, internUsers } from '@/lib/auth';
 
-// 내근직(EXTRA_USERS)·인턴(INTERN_USERS)은 교번 미배정이라 I('순번')가 전원 '0'으로 동일하다.
+// 내근직·인턴은 교번 미배정이라 I('순번')가 전원 '0'으로 동일하다.
 // 따라서 I는 고유 식별자가 아니며, 고유값인 사번(s)을 우선 키로 써야 한다.
 // 발령 시행일이 지나면 그 사람은 getRoster() 쪽으로 옮겨 간다 → 호출 시점에 계산한다
 //   (모듈 로드 때 얼려두면 앱을 켜 둔 채 자정을 넘겼을 때 옛 명부가 남는다)
-const allPeople = (): Person[] => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
+// 내근·인턴도 시행일이 반영된 명단을 쓴다 — 원본 목록을 쓰면 임용된 인턴이 두 번 잡히고,
+// 기관사에서 휴직으로 빠진 사람은 어디에도 없어 옛 교번이 그대로 남는다.
+const allPeople = (): Person[] => [...getRoster(), ...officeUsers(), ...internUsers()];
 
 /** 순번(I)으로 조회 — '0'은 내근직/인턴 공용 placeholder라 식별 불가 → 무시 */
 function findById(id: string | null | undefined): Person | null {

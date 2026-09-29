@@ -40,6 +40,28 @@ describe('발령 뒤 «나» 다시 찾기', () => {
     expect(useDriverStore.getState().isViewMode).toBe(false);
   });
 
+  it('기관사에서 휴직으로 빠진 사람은 옛 교번이 아니라 내근 명단으로 다시 찾는다', () => {
+    // 정적 발령이 쓰지 않는, 사람이 앉아 있는 자리
+    const taken = new Set(ROSTER_CHANGES.map((c) => c.I));
+    const driver = P.find((p) => !p.n.startsWith('결원') && p.d && p.d !== '내근' && !taken.has(p.I))!;
+
+    setDbRosterChanges([]);
+    useDriverStore.getState().setMyDriver(driver);
+    expect(useDriverStore.getState().myDriver?.I).toBe(driver.I);
+
+    // 휴직 — 그 자리는 결원이 된다. 원본 내근 목록에는 없는 사람이라,
+    // 시행일이 반영된 명단을 보지 않으면 자리 번호로 찾아 결원을 «나» 로 잡는다
+    setDbRosterChanges([{
+      from: '2000-01-01', I: driver.I, n: driver.n, s: driver.s ?? '', work: 'leave',
+      vacancyName: '결원99', vacancySabun: '9G010999',
+    }]);
+    useDriverStore.getState().refreshFromRoster();
+
+    const me = useDriverStore.getState().myDriver;
+    expect(me?.s).toBe(driver.s);
+    expect(me?.I).toBe('0');
+  });
+
   it('다른 사람을 조회 중이면 조회 모드는 그대로 둔다', () => {
     const office = EXTRA_USERS[EXTRA_USERS.length - 1];
     const other = P.find((p) => !p.n.startsWith('결원'))!;

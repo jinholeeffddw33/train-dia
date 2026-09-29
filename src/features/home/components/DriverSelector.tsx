@@ -4,16 +4,24 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Modal from '@/components/common/Modal';
 import { getRoster } from '@/data/cycle';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
+import { officeUsers, internUsers } from '@/lib/auth';
 import { useDriverStore } from '@/stores/driver';
 import styles from '../styles/Home.module.css';
 
-/** 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원 + 인턴) */
-const sortedPeople = () =>
-  [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS].sort((a, b) => a.n.localeCompare(b.n, 'ko'));
-/** I가 '0'인 직원/인턴 구분용 Set */
-const EXTRA_SET = new Set(EXTRA_USERS.map((u) => u.s));
-const INTERN_SET = new Set(INTERN_USERS.map((u) => u.s));
+/**
+ * 가나다순 정렬된 기관사 목록 (기관사 + 관리자/기타 직원 + 인턴) — 시행일이 반영된 명단.
+ * 원본 인턴 목록을 쓰면 임용된 사람이 «교번» 과 «인턴» 두 줄로 나온다.
+ */
+function peopleNow() {
+  const office = officeUsers();
+  const interns = internUsers();
+  return {
+    list: [...getRoster(), ...office, ...interns].sort((a, b) => a.n.localeCompare(b.n, 'ko')),
+    /** I가 '0'인 직원/인턴 구분용 */
+    extraSet: new Set(office.map((u) => u.s)),
+    internSet: new Set(interns.map((u) => u.s)),
+  };
+}
 
 interface DriverSelectorProps {
   open: boolean;
@@ -31,14 +39,16 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
   const setCurrent = useDriverStore((s) => s.setCurrent);
   const myDriver = useDriverStore((s) => s.myDriver);
 
+  // 열 때마다 다시 계산 — 켜 둔 채 시행일(자정)을 넘겨도 새 명단으로 보인다
+  const { list: people, extraSet, internSet } = useMemo(() => peopleNow(), [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const filtered = useMemo(() => {
-    const people = sortedPeople();
     if (!query.trim()) return people;
     const q = query.trim();
     return people.filter(
       (p) => p.n.includes(q) || (p.I !== '0' && p.I.includes(q)) || p.d.includes(q) || (p.s && p.s.includes(q)),
     );
-  }, [query]);
+  }, [query, people]);
 
   useEffect(() => {
     if (open) {
@@ -116,8 +126,8 @@ export default function DriverSelector({ open, onClose, onSelectOverride }: Driv
           </button>
         )}
         {filtered.map((p) => {
-          const isIntern = INTERN_SET.has(p.s);
-          const isExtra = EXTRA_SET.has(p.s);
+          const isIntern = internSet.has(p.s);
+          const isExtra = extraSet.has(p.s);
           const isMe = myDriver && p.n === myDriver.n && p.s === myDriver.s;
           if (isMe) return null; // 위에 고정 표시했으므로 중복 제거
           const isActive = current?.n === p.n && current?.s === p.s;

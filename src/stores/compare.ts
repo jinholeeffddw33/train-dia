@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Person } from '@/lib/types';
 import { getRoster } from '@/data/cycle';
-import { EXTRA_USERS, INTERN_USERS } from '@/lib/auth';
+import { officeUsers, internUsers } from '@/lib/auth';
 
 // 내근직·인턴은 I('순번')가 전원 '0' → 고유값인 사번(s)을 우선 키로 사용
-// 발령 시행일 반영 — 호출 시점에 계산한다
-const allPeople = () => [...getRoster(), ...EXTRA_USERS, ...INTERN_USERS];
+// 발령 시행일 반영 — 호출 시점에 계산한다 (내근·인턴 명단도 시행일이 반영된 것)
+const allPeople = () => [...getRoster(), ...officeUsers(), ...internUsers()];
 function findById(id: string | null | undefined): Person | null {
   if (!id || id === '0') return null;
   return allPeople().find((p) => p.I === id) ?? null;

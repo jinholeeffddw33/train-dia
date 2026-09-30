@@ -1485,7 +1485,7 @@
   background: var(--dia-blue-dim);
   border: none;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
 }
 .fileReplaceBtn:active { transform: scale(0.95); }
 
@@ -2082,4 +2082,44 @@
   font-weight: var(--dia-weight-bold);
   letter-spacing: 0.3px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×32)는 그대로 (CLAUDE.md §3.3) */
+.attachmentRemove {
+  position: relative;
+}
+.attachmentRemove::after {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.kindBtn {
+  position: relative;
+}
+.kindBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.reactionBtn {
+  position: relative;
+}
+.reactionBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.commentMenuBtn {
+  position: relative;
+}
+.commentMenuBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
 }

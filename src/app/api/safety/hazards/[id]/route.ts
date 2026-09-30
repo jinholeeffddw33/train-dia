@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { verifyUser, isAdmin } from '@/lib/auth';
+import { okJson } from '@/lib/api/response';
 
 const MAX_ATTACHMENT = 20 * 1024 * 1024;
 
@@ -168,7 +169,7 @@ export async function PATCH(
     await serverSupabase.storage.from('hazard-photos').remove([oldAttachmentPath]);
   }
 
-  return NextResponse.json({
+  return okJson({
     success: true,
     ...(attachmentChanged
       ? { attachmentUrl: updateData.attachment_url ?? '', attachmentName: updateData.attachment_name ?? '' }
@@ -268,5 +269,5 @@ export async function DELETE(
     );
   }
 
-  return NextResponse.json({ success: true });
+  return okJson({ success: true });
 }

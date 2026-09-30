@@ -511,3 +511,13 @@
   .backBtn, .toggleBtn, .primaryBtn, .ghostBtn, .chip { transition: none; }
   .chipWrong { animation: none; }
 }
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.rulesClose {
+  position: relative;
+}
+.rulesClose::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}

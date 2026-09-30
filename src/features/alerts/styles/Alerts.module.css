@@ -588,3 +588,13 @@
   color: var(--dia-text-tertiary);
   margin-bottom: var(--dia-space-2);
 }
+
+/* 누르는 자리 44 — 보이는 크기(auto×34)는 그대로 (CLAUDE.md §3.3) */
+.directionOption {
+  position: relative;
+}
+.directionOption::after {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
+}

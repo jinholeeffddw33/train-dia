@@ -116,7 +116,14 @@ export default function LevelRecordsOverlay({ open, onClose }: LevelRecordsOverl
         )}
 
         {error && (
-          <p className={styles.levelEmpty}>데이터를 불러올 수 없어요</p>
+          <div className={styles.levelError} role="alert">
+            <p className={styles.levelEmpty}>도전 기록을 불러오지 못했어요</p>
+            {/* 오류에는 다시 시도하는 길이 있어야 한다(CLAUDE.md §5) — 위 새로고침 아이콘은 눈에 잘 안 띈다 */}
+            <button type="button" className={styles.levelRetry} onClick={fetchRecords}>
+              <RefreshCw size={16} aria-hidden />
+              다시 시도
+            </button>
+          </div>
         )}
 
         {!loading && !error && records.length === 0 && (

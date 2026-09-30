@@ -163,6 +163,23 @@
   min-width: 0;
 }
 
+/* 폰 폭(≤430)에서는 사용자 칩을 첫 글자 원만 — 360 에서 제목이 «5호선 …» 으로 잘렸다.
+   이름은 화면에서만 숨기고 낭독기는 그대로 읽는다 */
+@media (max-width: 430px) {
+  .userChip {
+    padding: 4px;
+  }
+  .userText {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
 .prototypeNotice {
   display: flex;
   justify-content: center;
@@ -1130,3 +1147,31 @@
 /* 공지(점호)사항 미리보기 — 게시판에서 고른 제목 글자색 그대로 */
 .noticeTitleRed { color: var(--dia-red-text); }
 .noticeTitleBlue { color: var(--dia-blue-text); }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn::after,
+.bellBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×28)는 그대로 (CLAUDE.md §3.3) */
+.addBtn {
+  position: relative;
+}
+.addBtn::after {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(30×30)는 그대로 (CLAUDE.md §3.3) */
+.sampleModalClose {
+  position: relative;
+}
+.sampleModalClose::after {
+  content: '';
+  position: absolute;
+  inset: -7px -7px;
+}

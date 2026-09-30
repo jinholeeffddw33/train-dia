@@ -107,3 +107,23 @@
 /* 내용 지우기 */
 .clearBtn { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 7px 11px; border-radius: 999px; border: 1px solid var(--dia-border); background: var(--dia-surface); color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); font-weight: 700; }
 .clearBtn:active { transform: scale(0.95); background: var(--dia-surface-hover); }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.starBtn {
+  position: relative;
+}
+.starBtn::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}

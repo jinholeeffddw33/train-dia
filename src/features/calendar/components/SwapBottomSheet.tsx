@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { X } from 'lucide-react';
 import { useDriverStore } from '@/stores/driver';
 import { useSwapStore } from '@/stores/swap';
 import { useSheetDragDismiss } from '@/hooks/useSheetDragDismiss';
@@ -138,6 +139,10 @@ export default function SwapBottomSheet({ dateStr, onClose }: SwapBottomSheetPro
         <div className={styles.swapHeader}>
           <span className={styles.swapTitle}>교번 변경</span>
           <span className={styles.swapDate}>{month}월 {day}일 ({dow})</span>
+          {/* 닫기 — ESC·바깥 누르기·손잡이 끌기에 더해 눈에 보이는 닫는 길(CLAUDE.md §6.3) */}
+          <button type="button" className={styles.swapClose} onClick={requestClose} aria-label="닫기">
+            <X size={20} strokeWidth={2.2} aria-hidden />
+          </button>
         </div>
 
         {/* 현재 교번 */}

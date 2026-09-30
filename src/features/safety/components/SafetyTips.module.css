@@ -384,3 +384,50 @@
 .formBtnSecondary:active, .formBtnPrimary:active {
   transform: scale(0.98); filter: brightness(0.95);
 }
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×36)는 그대로 (CLAUDE.md §3.3) */
+.addBtn {
+  position: relative;
+}
+.addBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.detailClose {
+  position: relative;
+}
+.detailClose::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.formClose {
+  position: relative;
+}
+.formClose::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.previewRemove::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}

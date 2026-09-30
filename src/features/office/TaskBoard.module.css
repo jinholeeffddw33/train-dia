@@ -327,3 +327,33 @@
 .allDayOn { border-color: var(--dia-blue); background: var(--dia-blue-dim); color: var(--dia-blue-text); }
 .schedOn { border-color: var(--dia-green, #22c55e); background: color-mix(in srgb, var(--dia-green, #22c55e) 16%, transparent); color: var(--dia-text-primary); }
 .fieldHint { font-weight: 600; color: var(--dia-text-tertiary); font-size: var(--dia-text-meta); }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.delBtn {
+  position: relative;
+}
+.delBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.modalClose {
+  position: relative;
+}
+.modalClose::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}

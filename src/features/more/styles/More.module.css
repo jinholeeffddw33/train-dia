@@ -1376,6 +1376,35 @@
   padding: var(--dia-space-10) var(--dia-space-4);
 }
 
+/* 오류 — 문구 + 다시 시도(보조 버튼: 3D 표면, 색 채움 없음) */
+.levelError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: var(--dia-space-10);
+}
+.levelError .levelEmpty {
+  padding-bottom: var(--dia-space-3);
+}
+.levelRetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--dia-space-5);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-surface);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  transition: transform var(--dia-dur-fast) var(--dia-ease-press), box-shadow var(--dia-dur-fast) var(--dia-ease-press);
+}
+.levelRetry:active {
+  transform: scale(0.95);
+  box-shadow: var(--dia-3d-pressed);
+}
+
 .levelSection {
   padding: var(--dia-space-4);
 }
@@ -2404,4 +2433,21 @@
   font-size: var(--dia-text-xs);
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* 누르는 자리 44 — 보이는 크기(52×28)는 그대로 (CLAUDE.md §3.3) */
+.toggle::after {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.rosterChip {
+  position: relative;
+}
+.rosterChip::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }

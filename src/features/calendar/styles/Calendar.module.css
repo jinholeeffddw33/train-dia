@@ -712,6 +712,29 @@
   color: var(--dia-text-secondary);
 }
 
+/* 닫기 — 공통 시트(Modal .closeBtn)와 같은 모양: 44 원 · 흐린 X · hover 면 한 칸 */
+.swapClose {
+  margin-left: auto;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--dia-radius-full);
+  color: var(--dia-text-tertiary);
+  transition: background var(--dia-transition-fast), transform var(--dia-dur-fast) var(--dia-ease-press);
+}
+.swapClose:active {
+  transform: scale(0.9);
+}
+@media (hover: hover) {
+  .swapClose:hover {
+    background: var(--dia-surface-hover);
+  }
+}
+
 /* 현재 교번 표시 */
 .swapCurrentRow {
   display: flex;
@@ -876,4 +899,14 @@
 .swapSaveBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.detailRevertBtn {
+  position: relative;
+}
+.detailRevertBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }

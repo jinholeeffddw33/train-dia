@@ -966,3 +966,25 @@
 .bonsaiNight .bonsaiMilestoneSub {
   color: #d1fae5;
 }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.asmrBackBtn {
+  position: relative;
+}
+.asmrBackBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.bonsaiBackBtn,
+.bonsaiResetBtn {
+  position: relative;
+}
+.bonsaiBackBtn::after,
+.bonsaiResetBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}

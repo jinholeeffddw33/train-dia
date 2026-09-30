@@ -258,3 +258,13 @@
   transform: scale(0.98);
   filter: brightness(0.95);
 }
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.closeBtn {
+  position: relative;
+}
+.closeBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
+}

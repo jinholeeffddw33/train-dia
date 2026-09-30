@@ -301,3 +301,53 @@
 .fTextarea { width: 100%; box-sizing: border-box; padding: 10px 12px; background: var(--dia-bg); border: 1px solid var(--dia-border); border-radius: var(--dia-radius-md); color: var(--dia-text-primary); font-size: var(--dia-text-base); font-family: inherit; line-height: 1.5; resize: vertical; min-width: 0; }
 .fTextarea::placeholder { color: var(--dia-text-tertiary); }
 .ecMemo { margin-top: 3px; font-size: var(--dia-text-meta); color: var(--dia-text-secondary); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(30×30)는 그대로 (CLAUDE.md §3.3) */
+.dateChip {
+  position: relative;
+}
+.dateChip::after {
+  content: '';
+  position: absolute;
+  inset: -7px -7px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.monthNav button {
+  position: relative;
+}
+.monthNav button::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.monthNavBtn {
+  position: relative;
+}
+.monthNavBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(28×28)는 그대로 (CLAUDE.md §3.3) */
+.weekArrow {
+  position: relative;
+}
+.weekArrow::after {
+  content: '';
+  position: absolute;
+  inset: -8px -8px;
+}

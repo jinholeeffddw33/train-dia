@@ -277,7 +277,7 @@
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
   -webkit-tap-highlight-color: transparent;
 }
 .rollCallBtn:active {
@@ -1193,4 +1193,14 @@
 
 :global(:root.light) .ripple {
   background: rgba(0, 0, 0, 0.06);
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×36)는 그대로 (CLAUDE.md §3.3) */
+.rollCallBtn {
+  position: relative;
+}
+.rollCallBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }

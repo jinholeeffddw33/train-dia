@@ -188,3 +188,13 @@
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.retryBtn {
+  position: relative;
+}
+.retryBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}

@@ -1103,3 +1103,30 @@
   flex-shrink: 0;
   color: var(--dia-text-tertiary);
 }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.heroBackBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×36)는 그대로 (CLAUDE.md §3.3) */
+.addBtn {
+  position: relative;
+}
+.addBtn::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}

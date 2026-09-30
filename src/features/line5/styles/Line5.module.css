@@ -1372,3 +1372,13 @@
   font-size: var(--dia-text-2xs);
   font-weight: var(--dia-weight-bold);
 }
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.tdsBackToday {
+  position: relative;
+}
+.tdsBackToday::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}

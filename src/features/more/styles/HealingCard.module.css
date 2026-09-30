@@ -289,3 +289,23 @@
   color: var(--dia-text-tertiary);
   padding: var(--dia-space-3);
 }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.limitEditBtn {
+  position: relative;
+}
+.limitEditBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.historyDelete {
+  position: relative;
+}
+.historyDelete::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}

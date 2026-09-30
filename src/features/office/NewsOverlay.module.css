@@ -177,3 +177,15 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.back,
+.refresh {
+  position: relative;
+}
+.back::after,
+.refresh::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}

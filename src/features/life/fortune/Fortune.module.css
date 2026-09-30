@@ -262,3 +262,13 @@
   text-align: center;
   line-height: 1.6;
 }
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.backBtn {
+  position: relative;
+}
+.backBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}

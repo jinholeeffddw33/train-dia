@@ -131,7 +131,7 @@
   background: none;
   color: var(--dia-text-secondary);
   cursor: pointer;
-  transition: transform 0.1s ease;
+  transition: transform var(--dia-dur-instant) ease;
   -webkit-tap-highlight-color: transparent;
 }
 .rcToolBtn:active {
@@ -578,7 +578,7 @@
   font-size: var(--dia-text-sm);
   font-weight: var(--dia-weight-semibold);
   cursor: pointer;
-  transition: transform 0.12s ease;
+  transition: transform var(--dia-dur-fast) ease;
   -webkit-tap-highlight-color: transparent;
 }
 .rcColorBtn:active {
@@ -610,4 +610,14 @@
 .rcText_blue {
   color: var(--dia-blue-text);
   font-weight: var(--dia-weight-bold);
+}
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.rcColorBtn {
+  position: relative;
+}
+.rcColorBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
 }

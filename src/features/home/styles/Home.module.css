@@ -8,7 +8,9 @@
   padding: calc(16px + var(--sat)) 16px 14px;
   /* 헤더 통일 — 고정하지 않고 본문과 함께 스크롤. relative 는 .refreshBtn(absolute) 기준점. */
   position: relative;
-  overflow: hidden;
+  /* 가로만 자른다(긴 이름이 옆으로 밀어내지 않게). 세로는 열어 둬야 위로 올린 새로고침 버튼이 잘리지 않는다 */
+  overflow-x: clip;
+  overflow-y: visible;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -38,9 +40,24 @@
   background: var(--dia-surface-hover);
 }
 
+/* 누르는 자리 44 — 보이는 크기(40)는 그대로 */
+.refreshBtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+}
+
 /* 뒤로가기 버튼(32px @ left:8px) 공간 확보 */
 :global([data-has-back]) .headerSection {
   padding-left: 44px;
+}
+
+/* 허브로 돌아가는 뒤로 버튼(AppShell · 왼쪽 위 sat+8)이 있으면 그 줄 오른쪽 끝에 짝으로 앉는다.
+   헤더 안(날짜 오른쪽)에 두면 시계의 초 자리를 파고들었다. 헤더 윗변 = 본문 위 36 자리 아래라 -36 */
+:global([data-has-back]) .refreshBtn {
+  top: calc(var(--sat) + 8px - 36px);
+  right: calc(var(--sar) + 10px);
 }
 
 /* ── Header Top (좌우 분할 → 좁으면 자동 세로 스택) ── */
@@ -1410,14 +1427,16 @@
 /* 교대받음 | 교대넘김 — 같은 너비의 두 칸으로 잡아 늘 같은 자리에서 읽힌다.
    받음은 언제나 왼쪽, 넘김은 언제나 오른쪽. 한쪽이 없는 줄에서도
    남은 쪽이 자리를 옮기지 않는다. 라벨은 --dia-text-2xs(12px), 이름은
-   그대로 14px 이상 — 그렇게 벌어진 자리로 가장 긴 행로 약호까지 한 줄에 앉는다. */
+   그대로 14px 이상 — 그렇게 벌어진 자리로 가장 긴 행로 약호까지 한 줄에 앉는다.
+   폭 60%: 54% 일 때 360 폭에서 칸이 80 인데 «교대받음 홍승훈»(86)이 넘쳐 오른쪽 칸과 «홍승훈교대넘김» 으로 붙었다
+   (줄 가운데엔 80 이 비어 있었다). 폭은 고정 비율 그대로라 줄마다 같은 자리는 유지된다. */
 .rtLinePartners {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: baseline;
   gap: 4px var(--dia-space-2);
   margin-left: auto;
-  flex: 0 0 54%;
+  flex: 0 0 60%;
   min-width: 0;
 }
 .rtLinePartners .rtPartner {
@@ -2328,4 +2347,41 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+/* 누르는 자리 44 — 보이는 크기(28×22)는 그대로 (CLAUDE.md §3.3) */
+.nextDiaChip {
+  position: relative;
+}
+.nextDiaChip::after {
+  content: '';
+  position: absolute;
+  inset: -11px -8px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(32×32)는 그대로 (CLAUDE.md §3.3) */
+.routePanelClose {
+  position: relative;
+}
+.routePanelClose::after {
+  content: '';
+  position: absolute;
+  inset: -6px -6px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(40×40)는 그대로 (CLAUDE.md §3.3) */
+.selectorClose {
+  position: relative;
+}
+.selectorClose::after {
+  content: '';
+  position: absolute;
+  inset: -2px -2px;
+}
+
+/* 누르는 자리 44 — 보이는 크기(36×36)는 그대로 (CLAUDE.md §3.3) */
+.installCardClose::after {
+  content: '';
+  position: absolute;
+  inset: -4px -4px;
 }

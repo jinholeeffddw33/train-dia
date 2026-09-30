@@ -97,3 +97,13 @@
 .bk { font-size: var(--dia-text-meta); color: var(--dia-text-secondary); font-weight: 600; margin-top: 1px; }
 .dp { font-size: var(--dia-text-meta); font-weight: 700; color: var(--dia-text-secondary); }
 .spacer { height: 2px; }
+
+/* 누르는 자리 44 — 보이는 크기(auto×40)는 그대로 (CLAUDE.md §3.3) */
+.tbtn {
+  position: relative;
+}
+.tbtn::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}

@@ -36,9 +36,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (newPin.length < 4) {
+  // 숫자 4~10자리 — 로그인·설정 화면의 안내와 같은 규칙(화면에서도 숫자만 받는다)
+  if (!/^\d{4,10}$/.test(newPin)) {
     return NextResponse.json(
-      { code: 'PIN_TOO_SHORT', message: 'PIN은 4자리 이상이어야 합니다' },
+      { code: 'PIN_INVALID', message: 'PIN은 숫자 4~10자리로 정해주세요' },
       { status: 400 },
     );
   }

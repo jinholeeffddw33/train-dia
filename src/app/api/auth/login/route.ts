@@ -16,9 +16,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const sabun = body.sabun?.trim();
+  // 사번의 공백·하이픈, 이름 가운데 띄어쓰기는 무시한다(«217-12345», «홍 길동») — 화면에서도 지우지만 서버가 마지막 방어선
+  const sabun = body.sabun?.replace(/[\s-]/g, '');
   const pin = body.pin?.trim();
-  const nameInput = body.name?.trim();
+  const nameInput = body.name?.replace(/\s+/g, '');
 
   if (!sabun) {
     return NextResponse.json(
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   const profile = await getProfileBySabun(sabun);
   if (!profile) {
     return NextResponse.json(
-      { code: 'AUTH_FAILED', message: '등록되지 않은 사번입니다' },
+      { code: 'AUTH_FAILED', message: '등록되지 않은 사번이에요. 숫자 8자리를 다시 확인해주세요' },
       { status: 401 },
     );
   }
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
           ip: getClientIP(req),
         });
         return NextResponse.json(
-          { code: 'AUTH_FAILED', message: 'PIN이 일치하지 않습니다' },
+          { code: 'AUTH_FAILED', message: 'PIN이 맞지 않아요. 잊었다면 이현구 부장님께 초기화를 부탁하세요' },
           { status: 401 },
         );
       }
@@ -67,13 +68,13 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    if (nameInput !== profile.name) {
+    if (nameInput !== profile.name.replace(/\s+/g, '')) {
       await auditLog(profile.id, profile.name, 'login_failed', {
         metadata: { reason: 'invalid_name' },
         ip: getClientIP(req),
       });
       return NextResponse.json(
-        { code: 'AUTH_FAILED', message: '이름이 일치하지 않습니다' },
+        { code: 'AUTH_FAILED', message: '사번과 이름이 맞지 않아요. 사번과 이름을 다시 확인해주세요' },
         { status: 401 },
       );
     }

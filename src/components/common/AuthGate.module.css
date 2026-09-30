@@ -1,20 +1,41 @@
 /* AuthGate — 인증 오버레이 (생체인증 + PIN) */
 
+/* 키보드가 올라오면 화면 높이가 줄어든다 — 전에는 가운데 고정·스크롤 없음이라
+   입력칸 아래 «다음/로그인» 버튼이 키보드 뒤로 숨었다(2026-09-30 진호).
+   → 스크롤되게 두고, 카드는 margin:auto 로 가운데(넘치면 위에서부터 보인다 · align-items:center 는 위를 잘라먹는다) */
 .gate {
   position: fixed;
   inset: 0;
   z-index: var(--dia-layer-critical);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--dia-bg);
-  padding: var(--dia-space-4);
+  padding: max(var(--dia-space-4), var(--sat)) var(--dia-space-4) max(var(--dia-space-4), var(--sab));
 }
 
 .card {
   width: 100%;
   max-width: 360px;
+  margin: auto 0;
   text-align: center;
+}
+
+/* 키보드가 올라와 높이가 낮을 때 — 장식(큰 아이콘·여백)을 줄여 입력칸과 버튼이 한 화면에 */
+@media (max-height: 560px) {
+  .icon,
+  .iconWrap {
+    display: none;
+  }
+  .subtitle {
+    margin-bottom: var(--dia-space-4);
+  }
+  .steps {
+    gap: var(--dia-space-2);
+  }
 }
 
 .icon {
@@ -59,9 +80,9 @@
   margin-bottom: var(--dia-space-2);
 }
 
-/* ── 입력란 도움말 (label 옆) ── */
+/* ── 입력란 도움말 — 버튼 아래에 둔다(입력칸과 버튼 사이에 있으면 버튼이 키보드 뒤로 밀렸다) ── */
 .hint {
-  margin-top: var(--dia-space-2);
+  margin-top: var(--dia-space-3);
   padding: var(--dia-space-3);
   background: var(--dia-surface);
   border: 1px solid var(--dia-border);
@@ -156,6 +177,10 @@
   font-size: var(--dia-text-sm);
   color: var(--dia-text-secondary);
   line-height: 1.4;
+}
+.stepText b {
+  color: var(--dia-text-primary);
+  font-weight: var(--dia-weight-bold);
 }
 
 /* ── 초기 PIN 강조 박스 ── */

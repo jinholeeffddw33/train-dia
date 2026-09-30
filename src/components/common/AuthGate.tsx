@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuthStore, type SabunStatus } from '@/stores/auth';
 import { useDriverStore } from '@/stores/driver';
 import { getDuplicateNameGroup } from '@/lib/auth';
@@ -13,10 +13,24 @@ import styles from './AuthGate.module.css';
 type Screen =
   | 'loading'
   | 'sabun'
-  | 'notice'         // 관리자 첫 방문: PIN 0000 안내
+  | 'notice'         // 관리자 첫 방문(또는 PIN 초기화 뒤): 새 PIN 설정 안내
   | 'name-pick'      // 동명이인(김성준A/B): 사번 확인 후 본인 이름 선택
   | 'login'          // 일반: 이름 입력 / 관리자: PIN 입력
-  | 'pin-setup';     // 관리자 PIN 최초 설정
+  | 'pin-setup'      // 관리자 PIN 최초 설정
+  | 'done';          // PIN 설정을 마쳤다 — 바로 앱으로 들어간다
+
+/** 사번은 8자리 숫자 — 다 치면 «다음» 을 따로 누르지 않아도 넘어간다 */
+const SABUN_LEN = 8;
+/** 관리자 PIN — 숫자 4~10자리 */
+const PIN_MIN = 4;
+const PIN_MAX = 10;
+
+/** 사번에 섞여 들어온 공백·하이픈은 지운다(«217-12345», 붙여넣기 공백) */
+const cleanSabun = (v: string) => v.replace(/[\s-]/g, '');
+/** 이름 가운데 띄어쓰기는 무시한다(«홍 길동» → «홍길동») */
+const cleanName = (v: string) => v.replace(/\s+/g, '');
+/** PIN 은 숫자만 */
+const digitsOnly = (v: string) => v.replace(/\D/g, '');
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
@@ -49,6 +63,20 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const [newPin, setNewPin] = useState('');
   const [newPinConfirm, setNewPinConfirm] = useState('');
   const [pinChangeError, setPinChangeError] = useState('');
+  const [pinSaving, setPinSaving] = useState(false);
+  const confirmRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * 화면의 주 버튼 — 입력칸을 누르면 키보드가 올라온 뒤 이 버튼이 보이도록 끌어올린다.
+   * (키보드가 버튼을 가려 «다음/완료» 를 찾기 어려웠다 — 2026-09-30 진호)
+   */
+  const actionRef = useRef<HTMLButtonElement>(null);
+  const revealAction = () => {
+    // 키보드가 다 올라온 뒤(약 0.3초) — 그 전에 굴리면 키보드가 다시 덮는다
+    window.setTimeout(() => {
+      actionRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 320);
+  };
 
   // ── 앱 시작 시 세션 확인 + 온라인 복귀 시 재검증(오프라인 그레이스 해제) ──
   useEffect(() => {
@@ -113,12 +141,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   }, [sessionChecked, user, lastSabun]);
 
   // ── 인증 완료 → 앱 렌더 (명부까지 받은 뒤) ──
-  if (user && screen !== 'pin-setup' && rosterReady) {
+  if (user && !user.mustChangePin && screen !== 'pin-setup' && rosterReady) {
     return <>{children}</>;
   }
 
   // ── 로딩 ──
-  if (screen === 'loading' || !sessionChecked || (user && !rosterReady)) {
+  if (screen === 'loading' || screen === 'done' || !sessionChecked || (user && !rosterReady)) {
     return (
       <div className={styles.gate}>
         <div className={styles.card}>
@@ -132,15 +160,16 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
   // ── 1단계: 사번 입력 ──
   if (screen === 'sabun') {
-    const handleNext = async () => {
-      if (loading) return; // Enter 연타 중복 요청 가드
-      if (!sabun.trim()) return;
-      const status = await checkSabun(sabun.trim());
+    const handleNext = async (value: string = sabun) => {
+      if (loading) return; // Enter 연타·자동 넘김 중복 요청 가드
+      const s = cleanSabun(value).trim();
+      if (!s) return;
+      const status = await checkSabun(s);
       if (!status) return;
       setSabunStatus(status);
       if (status.isAdmin && status.mustChangePin) {
         setScreen('notice');
-      } else if (!status.isAdmin && getDuplicateNameGroup(sabun.trim())) {
+      } else if (!status.isAdmin && getDuplicateNameGroup(s)) {
         // 동명이인 — 이름을 직접 받으면 A/B 중 뭘 쓸지 몰라 로그인 실패 → 선택지로 확인
         setScreen('name-pick');
       } else {
@@ -156,47 +185,58 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <p className={styles.subtitle}>답십리 승무사업소 · 5호선</p>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="auth-sabun" className={styles.label}>사번</label>
+            <label htmlFor="auth-sabun" className={styles.label}>사번 (숫자 8자리)</label>
             <input
               id="auth-sabun"
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              maxLength={8}
+              enterKeyHint="next"
+              maxLength={SABUN_LEN + 2}
               className={styles.input}
               placeholder="21700000"
               value={sabun}
-              onChange={(e) => { setSabun(e.target.value); clearError(); }}
+              onChange={(e) => {
+                const v = cleanSabun(e.target.value);
+                setSabun(v);
+                clearError();
+                // 8자리를 다 쳤으면 바로 넘어간다 — 키보드에 가린 «다음» 을 찾지 않아도 된다
+                if (v.length === SABUN_LEN && /^\d+$/.test(v)) handleNext(v);
+              }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleNext(); }}
+              onFocus={revealAction}
               autoComplete="off"
               autoFocus
             />
-            <div className={styles.hint}>
-              본인 <span className={styles.hintStrong}>사번 8자리</span>를 그대로 입력하세요.
-              <span className={styles.hintLine}>예) 21712345 — 숫자만, 공백·하이픈 없이</span>
-            </div>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button
+            ref={actionRef}
             type="button"
             className={`z-cta ${styles.btn}`}
             data-press
-            onClick={handleNext}
+            onClick={() => handleNext()}
             disabled={loading || !sabun.trim()}
           >
             {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
             <span>{loading ? '확인 중...' : '다음'}</span>
           </button>
+
+          <div className={styles.hint}>
+            본인 <span className={styles.hintStrong}>사번 8자리</span>를 숫자만 입력하세요.
+            <span className={styles.hintLine}>예) 21712345 — 8자리를 다 치면 저절로 다음으로 넘어가요</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  // ── 관리자 첫 방문 안내 (PIN 0000) ──
+  // ── 관리자 첫 방문 안내 (PIN 초기화 뒤에도 여기로 온다) ──
   if (screen === 'notice') {
     const handleStart = async () => {
+      if (loading) return;
       const ok = await loginWithPin(sabun, '');
       if (ok) setScreen('pin-setup');
     };
@@ -207,30 +247,31 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <div className={styles.iconWrap}>
             <ShieldCheck size={40} className={styles.iconBlue} />
           </div>
-          <h1 className={styles.title}>관리자 보안 설정</h1>
+          <h1 className={styles.title}>관리자 PIN 만들기</h1>
           <p className={styles.subtitle}>
-            관리자 계정은 PIN으로 보호됩니다.<br />
-            처음 접속 시 새 PIN을 설정해주세요.
+            관리자 계정은 PIN으로 보호합니다.<br />
+            지금은 PIN 없이 들어가 새 PIN을 정하면 돼요.
           </p>
 
           <div className={styles.steps}>
             <div className={styles.step}>
               <span className={styles.stepNum}>1</span>
-              <span className={styles.stepText}>아래 버튼을 눌러 시작</span>
+              <span className={styles.stepText}>아래 버튼을 누르세요</span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>2</span>
-              <span className={styles.stepText}>본인만의 새 PIN 설정</span>
+              <span className={styles.stepText}>본인만 아는 <b>숫자 {PIN_MIN}~{PIN_MAX}자리</b> PIN을 두 번 입력</span>
             </div>
             <div className={styles.step}>
               <span className={styles.stepNum}>3</span>
-              <span className={styles.stepText}>다음부터는 PIN으로 로그인</span>
+              <span className={styles.stepText}>다음부터는 사번 + 그 PIN으로 로그인</span>
             </div>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button
+            ref={actionRef}
             type="button"
             className={`z-cta ${styles.btn}`}
             data-press
@@ -238,7 +279,15 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             disabled={loading}
           >
             {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
-            <span>{loading ? '잠시만요...' : 'PIN 설정 시작 →'}</span>
+            <span>{loading ? '잠시만요...' : 'PIN 만들기 시작 →'}</span>
+          </button>
+
+          <button
+            type="button"
+            className={styles.btnSecondary}
+            onClick={() => { clearError(); setSabunStatus(null); setScreen('sabun'); }}
+          >
+            ← 사번 다시 입력
           </button>
         </div>
       </div>
@@ -291,7 +340,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button
             type="button"
@@ -313,8 +362,9 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     if (!isAdminUser) {
       const handleNameLogin = async () => {
         if (loading) return; // Enter 연타 중복 로그인 가드
-        if (!name.trim()) return;
-        await loginWithName(sabun, name.trim());
+        const n = cleanName(name);
+        if (!n) return;
+        await loginWithName(sabun, n);
       };
 
       return (
@@ -329,33 +379,37 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
               <input
                 id="auth-name"
                 type="text"
+                enterKeyHint="done"
                 className={styles.input}
                 placeholder="홍길동"
                 value={name}
                 onChange={(e) => { setName(e.target.value); clearError(); }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleNameLogin(); }}
+                onFocus={revealAction}
                 autoComplete="off"
                 autoFocus
               />
-              <div className={styles.hint}>
-                <span className={styles.hintStrong}>본인 이름 3글자</span>를 그대로 입력하세요. (PIN 아님)
-                <span className={styles.hintLine}>예) 박종길 · 장진수 — 공백 없이, 한자·영문 불가</span>
-                <span className={styles.hintLine}>※ 일반 기관사는 PIN을 사용하지 않습니다.</span>
-              </div>
             </div>
 
-            {error && <p className={styles.error}>{error}</p>}
+            {error && <p className={styles.error} role="alert">{error}</p>}
 
             <button
+              ref={actionRef}
               type="button"
               className={`z-cta ${styles.btn}`}
-            data-press
+              data-press
               onClick={handleNameLogin}
-              disabled={loading || !name.trim()}
+              disabled={loading || !cleanName(name)}
             >
               {loading ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
               <span>{loading ? '로그인 중...' : '로그인'}</span>
             </button>
+
+            <div className={styles.hint}>
+              <span className={styles.hintStrong}>본인 이름</span>을 한글로 그대로 입력하세요. (PIN 아님)
+              <span className={styles.hintLine}>예) 박종길 · 장진수 — 키보드의 «완료» 를 눌러도 로그인돼요</span>
+              <span className={styles.hintLine}>※ 일반 기관사는 PIN을 쓰지 않습니다.</span>
+            </div>
 
             <button
               type="button"
@@ -384,18 +438,20 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <p className={styles.subtitle}>사번 {sabun} (관리자)</p>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="auth-pin" className={styles.label}>PIN</label>
+            <label htmlFor="auth-pin" className={styles.label}>PIN (숫자 {PIN_MIN}~{PIN_MAX}자리)</label>
             <div className={styles.pinWrap}>
               <input
                 id="auth-pin"
                 type={showPin ? 'text' : 'password'}
                 inputMode="numeric"
+                enterKeyHint="done"
                 className={styles.input}
                 placeholder="● ● ● ●"
                 value={pin}
                 onChange={(e) => { setPin(e.target.value); clearError(); }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handlePinLogin(); }}
-                maxLength={10}
+                onFocus={revealAction}
+                maxLength={PIN_MAX}
                 autoComplete="off"
                 autoFocus
               />
@@ -408,15 +464,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
                 {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            <div className={styles.hint}>
-              본인이 설정한 <span className={styles.hintStrong}>PIN(4자리 이상 숫자)</span>를 입력하세요.
-              <span className={styles.hintLine}>초기 PIN을 잊었다면 이현구(관리자)에게 초기화 요청 → 사번 뒤 6자리로 리셋됩니다.</span>
-            </div>
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p className={styles.error} role="alert">{error}</p>}
 
           <button
+            ref={actionRef}
             type="button"
             className={`z-cta ${styles.btn}`}
             data-press
@@ -426,6 +479,13 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
             <KeyRound size={18} />
             <span>{loading ? '로그인 중...' : 'PIN으로 로그인'}</span>
           </button>
+
+          <div className={styles.hint}>
+            처음 PIN을 만들 때 정한 <span className={styles.hintStrong}>숫자 PIN</span>을 입력하세요.
+            <span className={styles.hintLine}>
+              PIN을 잊었다면 이현구 부장님께 초기화를 부탁하세요. 초기화 뒤에는 PIN 없이 들어가 새로 정하면 돼요.
+            </span>
+          </div>
 
           <button
             type="button"
@@ -442,27 +502,42 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // ── 관리자 PIN 최초 설정 ──
   if (screen === 'pin-setup') {
     const handleSetPin = async () => {
+      if (pinSaving) return; // 연타로 두 번 저장되면 두 번째가 «현재 PIN» 을 요구하며 실패했다
       setPinChangeError('');
-      if (newPin.length < 4) {
-        setPinChangeError('PIN은 4자리 이상이어야 합니다');
+      if (newPin.length < PIN_MIN) {
+        setPinChangeError(`PIN은 숫자 ${PIN_MIN}자리 이상으로 정해주세요`);
         return;
       }
       if (newPin !== newPinConfirm) {
-        setPinChangeError('PIN이 일치하지 않습니다');
+        setPinChangeError('두 번 입력한 PIN이 서로 달라요. 아래 칸에 다시 입력해주세요');
+        setNewPinConfirm('');
+        confirmRef.current?.focus();
         return;
       }
-      const res = await fetch('/api/auth/pin/change', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newPin, firstSetup: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setPinChangeError(data.message || 'PIN 설정에 실패했습니다');
-        return;
-      }
-      if (user) {
-        useAuthStore.setState({ user: { ...user, mustChangePin: false } });
+      setPinSaving(true);
+      try {
+        const res = await fetch('/api/auth/pin/change', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newPin, firstSetup: true }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setPinChangeError(data.message || 'PIN을 저장하지 못했어요. 잠시 후 다시 시도해주세요');
+          setPinSaving(false);
+          return;
+        }
+        // ★ 저장 성공 → 바로 앱으로. 전에는 화면이 PIN 설정에 그대로 남아 다시 누르면
+        //   «현재 PIN» 을 요구하는 오류가 났다(이미 설정이 끝났으므로) — 나갔다 들어와야 들어가졌다.
+        const current = useAuthStore.getState().user;
+        if (current) useAuthStore.setState({ user: { ...current, mustChangePin: false } });
+        setNewPin('');
+        setNewPinConfirm('');
+        setPinSaving(false);
+        setScreen('done');
+      } catch {
+        setPinChangeError('인터넷 연결이 불안정해요. 연결을 확인하고 다시 눌러주세요');
+        setPinSaving(false);
       }
     };
 
@@ -472,53 +547,66 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           <div className={styles.iconWrap}>
             <ShieldCheck size={40} className={styles.iconBlue} />
           </div>
-          <h1 className={styles.title}>새 PIN 설정</h1>
+          <h1 className={styles.title}>새 PIN 만들기</h1>
           <p className={styles.subtitle}>
-            앞으로 사용할 개인 PIN을 설정해주세요.<br />
-            <span className={styles.subtitleHint}>생년월일 앞 4자리 등 기억하기 쉬운 숫자를 추천합니다.</span>
+            다음부터 로그인할 때 쓸 <b>숫자 {PIN_MIN}~{PIN_MAX}자리</b>를 정해주세요.<br />
+            <span className={styles.subtitleHint}>본인만 아는, 기억하기 쉬운 숫자를 추천합니다.</span>
           </p>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="new-pin" className={styles.label}>새 PIN (4자리 이상)</label>
+            <label htmlFor="new-pin" className={styles.label}>새 PIN (숫자 {PIN_MIN}~{PIN_MAX}자리)</label>
             <input
               id="new-pin"
               type="password"
               inputMode="numeric"
+              pattern="[0-9]*"
+              enterKeyHint="next"
               className={styles.input}
               placeholder="● ● ● ●"
               value={newPin}
-              onChange={(e) => { setNewPin(e.target.value); setPinChangeError(''); }}
-              maxLength={10}
+              onChange={(e) => { setNewPin(digitsOnly(e.target.value)); setPinChangeError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); confirmRef.current?.focus(); } }}
+              onFocus={revealAction}
+              maxLength={PIN_MAX}
+              autoComplete="new-password"
               autoFocus
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label htmlFor="new-pin-confirm" className={styles.label}>PIN 확인</label>
+            <label htmlFor="new-pin-confirm" className={styles.label}>한 번 더 입력</label>
             <input
+              ref={confirmRef}
               id="new-pin-confirm"
               type="password"
               inputMode="numeric"
+              pattern="[0-9]*"
+              enterKeyHint="done"
               className={styles.input}
               placeholder="● ● ● ●"
               value={newPinConfirm}
-              onChange={(e) => { setNewPinConfirm(e.target.value); setPinChangeError(''); }}
-              maxLength={10}
+              onChange={(e) => { setNewPinConfirm(digitsOnly(e.target.value)); setPinChangeError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSetPin(); }}
+              onFocus={revealAction}
+              maxLength={PIN_MAX}
+              autoComplete="new-password"
             />
           </div>
 
           {(pinChangeError || error) && (
-            <p className={styles.error}>{pinChangeError || error}</p>
+            <p className={styles.error} role="alert">{pinChangeError || error}</p>
           )}
 
           <button
+            ref={actionRef}
             type="button"
             className={`z-cta ${styles.btn}`}
             data-press
             onClick={handleSetPin}
-            disabled={loading}
+            disabled={pinSaving || !newPin || !newPinConfirm}
           >
-            {loading ? '설정 중...' : 'PIN 설정 완료'}
+            {pinSaving ? <Loader2 size={18} className={styles.spinnerInline} /> : null}
+            <span>{pinSaving ? '저장 중...' : 'PIN 저장하고 시작하기'}</span>
           </button>
         </div>
       </div>

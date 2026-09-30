@@ -303,15 +303,17 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                 />
               </div>
               <div className={styles.pinField}>
-                <label className={styles.pinLabel}>새 PIN (4자리 이상)</label>
+                <label className={styles.pinLabel}>새 PIN (숫자 4~10자리)</label>
                 <input
                   type="password"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   className={styles.pinInput}
                   placeholder="새 PIN"
                   value={newPin}
-                  onChange={(e) => { setNewPin(e.target.value); setPinError(''); }}
+                  onChange={(e) => { setNewPin(e.target.value.replace(/\D/g, '')); setPinError(''); }}
                   maxLength={10}
+                  autoComplete="new-password"
                 />
               </div>
               <div className={styles.pinField}>
@@ -320,10 +322,12 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                   type="password"
                   inputMode="numeric"
                   className={styles.pinInput}
+                  pattern="[0-9]*"
                   placeholder="새 PIN 확인"
                   value={newPinConfirm}
-                  onChange={(e) => { setNewPinConfirm(e.target.value); setPinError(''); }}
+                  onChange={(e) => { setNewPinConfirm(e.target.value.replace(/\D/g, '')); setPinError(''); }}
                   maxLength={10}
+                  autoComplete="new-password"
                 />
               </div>
               {pinError && <p className={styles.pinError}>{pinError}</p>}
@@ -333,15 +337,24 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
                 disabled={pinLoading}
                 onClick={async () => {
                   if (!curPin) { setPinError('현재 PIN을 입력해주세요'); return; }
-                  if (newPin.length < 4) { setPinError('새 PIN은 4자리 이상이어야 해요'); return; }
+                  if (newPin.length < 4) { setPinError('새 PIN은 숫자 4자리 이상으로 정해주세요'); return; }
                   if (newPin !== newPinConfirm) { setPinError('새 PIN이 서로 달라요. 다시 확인해주세요'); return; }
                   setPinLoading(true);
-                  const res = await fetch('/api/auth/pin/change', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ currentPin: curPin, newPin }),
-                  });
-                  const data = await res.json();
+                  let res: Response;
+                  let data: { message?: string } = {};
+                  try {
+                    res = await fetch('/api/auth/pin/change', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ currentPin: curPin, newPin }),
+                    });
+                    data = await res.json().catch(() => ({}));
+                  } catch {
+                    // 인터넷이 끊기면 전에는 «변경 중...» 에서 멈춰 버렸다
+                    setPinLoading(false);
+                    setPinError('인터넷 연결이 불안정해요. 연결을 확인하고 다시 눌러주세요');
+                    return;
+                  }
                   setPinLoading(false);
                   if (!res.ok) { setPinError(data.message || 'PIN을 변경하지 못했어요'); return; }
                   setPinChangeOpen(false);

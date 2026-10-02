@@ -6,7 +6,7 @@
     "doc": {
       "url": "/data/edu/regulations/operation-rules-search.json",
       "pdfUrl": "/data/edu/regulations/operation-rules.pdf",
-      "version": "24.5.8"
+      "version": "24.12.3"
     },
     "quiz": {
       "url": "/data/edu/regulations/operation-rules-quiz.json"
@@ -19,7 +19,7 @@
     "doc": {
       "url": "/data/edu/regulations/crew-management-rules-search.json",
       "pdfUrl": "/data/edu/regulations/crew-management-rules.pdf",
-      "version": "24.5.8"
+      "version": "26.5.13"
     },
     "quiz": {
       "url": "/data/edu/regulations/crew-management-rules-quiz.json"
@@ -32,7 +32,7 @@
     "doc": {
       "url": "/data/edu/regulations/operating-staff-rules-search.json",
       "pdfUrl": "/data/edu/regulations/operating-staff-rules.pdf",
-      "version": "21.11.5"
+      "version": "24.12.3"
     },
     "quiz": {
       "url": "/data/edu/regulations/operating-staff-rules-quiz.json"
@@ -58,7 +58,7 @@
     "doc": {
       "url": "/data/edu/regulations/depot-operation-rules-search.json",
       "pdfUrl": "/data/edu/regulations/depot-operation-rules.pdf",
-      "version": "24.5.8"
+      "version": "26.8.27"
     },
     "quiz": {
       "url": "/data/edu/regulations/depot-operation-rules-quiz.json"
@@ -71,7 +71,7 @@
     "doc": {
       "url": "/data/edu/regulations/crew-business-rules-search.json",
       "pdfUrl": "/data/edu/regulations/crew-business-rules.pdf",
-      "version": "25.7.1"
+      "version": "26.5.15"
     },
     "quiz": {
       "url": "/data/edu/regulations/crew-business-rules-quiz.json"
@@ -98,7 +98,7 @@
     "doc": {
       "url": "/data/edu/regulations/hr-rules-search.json",
       "pdfUrl": "/data/edu/regulations/hr-rules.pdf",
-      "version": "24.7.11"
+      "version": "26.6.29"
     },
     "quiz": {
       "url": "/data/edu/regulations/hr-rules-quiz.json"

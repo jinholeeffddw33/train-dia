@@ -51,12 +51,19 @@ const REG_TITLES = {
 const ARTICLE_RE = /제\s*(\d+)\s*조\s*\(([^)]{1,60})\)/g;
 /* 장·절 제목은 PDF 추출 과정에 줄바꿈이 끼어 있다("제2장 운\n전"). 줄바꿈을 허용하되
    다음 조/절 표시 직전까지만 집는다 — RegulationViewer 의 목차 파서와 같은 방식. */
-const CHAPTER_RE = /제\s*(\d+)\s*장\s*([\s\S]{1,24}?)(?=\s*제\s*\d+\s*[조절])/g;
+/* 바로 뒤가 괄호·조사가 아닐 때만 — 본문 인용 «운전취급세부요령 제2장(열차화재 발생 시 조치)»,
+   «운전취급규정 제3장에 의거» 를 장 제목으로 잡지 않는다.
+   (뷰어 목차는 원문 쪽을 읽어 «줄 맨 앞» 조건도 쓰지만, 여기선 줄을 이어 붙인 뒤라 그 조건을 쓰면 진짜 장 제목을 놓친다) */
+const CHAPTER_RE = /제\s*(\d+)\s*장\s*(?![(（에의을를])([\s\S]{1,24}?)(?=\s*제\s*\d+\s*[조절])/g;
 const SECTION_RE = /제\s*(\d+)\s*절\s*([\s\S]{1,24}?)(?=\s*제\s*\d+\s*조)/g;
 
 /* 조문 본문이 아니라 문서 꼬리(부칙·별표·별지서식)가 시작되는 지점.
    줄 맨 앞에 올 때만 구조 표시로 본다 — 마지막 조문이 문서 끝까지 삼키는 것을 막는다. */
-const TAIL_RE = /\n\s*(?:부\s*칙|[[〔<]\s*별[표지]|별표\s*\d|별지제\d)/;
+/* «별표 4의 실천사항을…», «별표7과 같다» 처럼 본문이 줄 맨 앞에서 별표를 인용하는 경우가 있다.
+   예전엔 그걸 꼬리 시작으로 보고 조문을 거기서 잘라 문장이 반쯤 사라졌다
+   (운전취급규정 제362조, 운전관계직원업무내규 제79·83조, 전동차승무원업무예규 제102·103조).
+   번호 뒤에 제목 괄호나 줄 끝이 와야 별표·별지 머리로 본다. */
+const TAIL_RE = /\n\s*(?:부\s*칙|[[〔<]\s*별[표지]|별[표지]\s*(?:제\s*)?\d+\s*(?:호\s*)?(?:서식\s*)?(?:\(|\n|$))/;
 
 /** 표 구간의 시작·끝 표시. 지우지 않고 감싸기만 한다 — 쓰는 쪽마다 처리가 달라서다.
  *  낭독: 통째로 건너뛰고 "표가 있습니다" 한 마디로 대체 (셀이 순서 없이 흩어져 귀로는 못 따라간다)
@@ -208,11 +215,23 @@ function buildOne(file, vocab) {
   }
   // 제목이 붙은 채로 인용되는 경우도 드물게 있다(부칙·별표). 번호별 첫 등장만 조문 시작으로.
   const seen = new Set();
-  const starts = marks.filter((m) => {
+  const firsts = marks.filter((m) => {
     if (seen.has(m.n)) return false;
     seen.add(m.n);
     return true;
   });
+  /* 본문 인용이 진짜 조문보다 먼저 나오는 경우 — 운전관계직원업무내규 제63조의
+     "…관제업무내규 제72조(관제업무 및 관제지원 업무 자료의 보존)에 의한다" 가 제72조 자리를 차지해
+     진짜 제72조(인계인수)가 사라졌었다(2026-10 개정 반영 때 확인).
+     조문은 번호 순으로 나오므로, 앞 번호 조문보다 앞에 잡힌 것은 그 뒤의 같은 번호로 바꾼다. */
+  const byNum = [...firsts].sort((a, b) => a.n - b.n);
+  for (let i = 1; i < byNum.length; i++) {
+    const prevIdx = byNum[i - 1].idx;
+    if (byNum[i].idx >= prevIdx) continue;
+    const later = marks.find((m) => m.n === byNum[i].n && m.idx > prevIdx);
+    if (later) byNum[i] = later;
+  }
+  const starts = byNum.sort((a, b) => a.idx - b.idx);
 
   const articles = starts.map((s, i) => {
     const end = i + 1 < starts.length ? starts[i + 1].idx : text.length;

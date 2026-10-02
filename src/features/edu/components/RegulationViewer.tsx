@@ -60,8 +60,13 @@ interface TocEntry {
   matchLength: number;
 }
 
-const CHAPTER_RE = /제\s*(\d+)\s*장\s*([\s\S]{1,30}?)(?=\s*제\s*\d+\s*[조절])/g;
-const SECTION_RE = /제\s*(\d+)\s*절\s*([\s\S]{1,30}?)(?=\s*제\s*\d+\s*조)/g;
+/* 줄 맨 앞 + 바로 뒤가 괄호·조사가 아닐 때만 장 제목 — 본문 인용 «운전취급세부요령 제2장(열차화재 발생 시 조치)»,
+   «운전취급규정 제3장에 의거» 가 목차에 끼지 않게 (scripts/build-regulation-articles.mjs 와 같은 규칙) */
+const CHAPTER_RE = /(?<=(?:^|\n)[ \t]*)제\s*(\d+)\s*장\s*(?![(（에의을를])([\s\S]{1,30}?)(?=\s*제\s*\d+\s*[조절])/g;
+/* 절 제목 끝에 개정 꼬리표가 붙는 경우 «제7절 장암역 및 신내역 운전취급 <개정 2019.12.30.>» —
+   꼬리표까지 30자에 넣으면 넘쳐서 목차에서 빠졌다. 꼬리표는 따로 받고 제목에서는 지운다. */
+const SECTION_RE = /제\s*(\d+)\s*절\s*((?:[^<\n]|\n(?!\s*제\s*\d+\s*조)){1,30}?(?:\s*<[^>]{1,40}>)?)(?=\s*제\s*\d+\s*조)/g;
+const TOC_TAG_RE = /<[^>]*>/g;
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -173,7 +178,7 @@ function parseToc(pages: RegulationPage[]): TocEntry[] {
     }
     for (const m of p.text.matchAll(SECTION_RE)) {
       const num = parseInt(m[1], 10);
-      const title = m[2].replace(/\s+/g, '').trim();
+      const title = m[2].replace(TOC_TAG_RE, '').replace(/\s+/g, '').trim();
       if (!title) continue;
       entries.push({
         id: `sec-${p.page}-${m.index}`,
@@ -278,6 +283,23 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
       .catch(() => active && setLoading(false));
     return () => { active = false; };
   }, [url]);
+
+  /* 본문 쪽 → 원문 PDF 쪽. 개정판 PDF 는 표·별표가 빠져 쪽 수가 달라(운전취급규정 134→102쪽)
+     같은 번호로 열면 엉뚱한 쪽이 나온다. 대응표(scripts/build-regulation-pdfmap.py)가 있으면
+     같은 조문이 있는 쪽으로 연다. 없으면(404) 예전처럼 같은 쪽 번호. */
+  const [pdfPageMap, setPdfPageMap] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    let active = true;
+    setPdfPageMap(null);
+    if (!pdfUrl) return;
+    fetch(`/data/edu/regulations/${regulationId}-pdfmap.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { pages?: Record<string, number> } | null) => {
+        if (active && data?.pages) setPdfPageMap(data.pages);
+      })
+      .catch(() => { /* 대응표가 없으면 같은 쪽 번호로 연다 */ });
+    return () => { active = false; };
+  }, [regulationId, pdfUrl]);
 
   // 진입 위치 스크롤 — 조문(제N조)이 지정되면 그 조문으로, 없으면 페이지 최상단으로
   useEffect(() => {
@@ -820,11 +842,12 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
   }, []);
 
   // PDF.js 자체 뷰어로 표시 (iOS Safari 등 모든 브라우저에서 #page=N 정확 동작)
+  const pdfPage = pdfPageMap?.[String(visiblePage)] ?? visiblePage;
   const pdfSrcWithPage = useMemo(() => {
     if (!pdfUrl) return '';
     const encoded = encodeURIComponent(pdfUrl);
-    return `/pdfjs/web/viewer.html?file=${encoded}#page=${visiblePage}`;
-  }, [pdfUrl, visiblePage]);
+    return `/pdfjs/web/viewer.html?file=${encoded}#page=${pdfPage}`;
+  }, [pdfUrl, pdfPage]);
 
   // 목차 (장·절) 파싱
   const tocEntries = useMemo(() => parseToc(pages), [pages]);
@@ -1280,7 +1303,7 @@ export default function RegulationViewer({ title, url, pdfUrl, initialPage, init
             <button type="button" className={styles.backBtn} onClick={() => setPdfOpen(false)} aria-label="닫기">
               <ArrowLeft size={20} />
             </button>
-            <h2 className={styles.title}>{title} (원본 p.{visiblePage})</h2>
+            <h2 className={styles.title}>{title} (원본 p.{pdfPage})</h2>
             {/*
               PDF.js 툴바에도 저장 버튼이 있지만 아이콘만 있고 라벨이 영어(Save)라 찾기 어렵다.
               같은 출처(/data/edu/regulations/*.pdf)라 download 속성이 그대로 먹는다 —

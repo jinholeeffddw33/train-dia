@@ -27,3 +27,5 @@ _evidence_stationdia/
 
 # 추석 행로표 대조 도구가 뽑아 두는 새 그림 — 옮겨 적을 때만 쓰는 임시 자료
 scripts/chuseok2026/new/
+# 규정 낭독 MP3 합성 작업 폴더 (scripts/gen-regulation-audio-manifest.ts · gen_regulation_mp3.py)
+.tmp_regulation_audio/

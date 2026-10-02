@@ -18,6 +18,17 @@ describe('앱 버전 자동 올림', () => {
     expect(formatVersion(nextVersion([4, 1, 0], [4, 0, 9]))).toBe('v4.1.1');
   });
 
+  it('끝자리는 9 까지 — 그다음은 앞자리가 오른다', () => {
+    expect(formatVersion(nextVersion([4, 0, 9], null))).toBe('v4.1.0');
+    expect(formatVersion(nextVersion([4, 1, 1], null))).toBe('v4.1.2');
+    expect(formatVersion(nextVersion([4, 9, 9], null))).toBe('v5.0.0');
+  });
+
+  it('예전 규칙으로 두 자리가 된 번호도 맞춰서 올린다 (v4.0.12 = v4.1.2)', () => {
+    expect(formatVersion(nextVersion([4, 0, 12], null))).toBe('v4.1.3');
+    expect(formatVersion(nextVersion([4, 1, 2], [4, 0, 12]))).toBe('v4.1.3');
+  });
+
   it('버전 번호만 바꾸고 줄바꿈과 다른 줄은 그대로 둔다', () => {
     const out = writeVersion(SRC, [4, 0, 3]);
     expect(out).toBe(SRC.replace("'v4.0.2'", "'v4.0.3'"));

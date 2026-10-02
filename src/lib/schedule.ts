@@ -2,7 +2,7 @@
 
 import type { Person, DiaType, Schedule, Segment, BannerState, BannerStateType, NextShiftInfo, MonthSummary, DaysUntilRest, Direction, DirectionInfo } from './types';
 import { LABELS, DIR, dirFull, dirSub } from './constants';
-import { CYCLE, DB_STD, CL, P, WEEKDAY_REF, WEEKDAY_DIAS, getRoster } from '@/data/cycle';
+import { CYCLE, DB_STD, CL, WEEKDAY_REF, WEEKDAY_DIAS, getRoster } from '@/data/cycle';
 import { HOL } from '@/data/holidays';
 import { S } from '@/data/schedules';
 import { TRANSITION_MAY_2026 } from '@/data/transition';
@@ -583,7 +583,8 @@ export function findExchangePartners(
   const addDay = (base: number) => {
     const when = new Date(date);
     when.setDate(when.getDate() + base);
-    for (const p of P) {
+    // 그날의 명부 — 원래 명부(P)를 쓰면 발령·휴직이 반영되지 않아 교대자가 «결원»으로 나왔다
+    for (const p of getRoster(when)) {
       if (p.I === myPerson.I) continue; // 자기 자신 제외
       const dia = getDia(p, when);
       if (getType(dia) === 'rest') continue;

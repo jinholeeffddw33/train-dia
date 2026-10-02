@@ -8,16 +8,31 @@
  *   - 기지관제 2명 → 항상 기지
  *
  * 기준일: 2026-03-01 (A조 position 0)
+ *
+ * ── 2026-10 사업소 근무계획(2~12월)과 맞춘 규칙 ──
+ * 예전엔 «짝수 달마다 본소↔기지를 통째로 뒤집는다»고 보고, 부장과 지원기관사 짝도 달리 묶었다.
+ * 실제 계획표는 월이 바뀌어도 뒤집지 않고 8일 주기가 그대로 이어진다(본소 2일 → 쉼 2일 → 기지 2일 → 쉼 2일).
+ * 그래서 부장은 짝수 달, 지원기관사는 홀수 달에 본소/기지가 반대로 나왔다.
+ * 같은 곳에서 함께 근무하는 짝도 계획표 기준으로 바로잡았다(예: A조 장진수+석영훈, 김진완+박종길).
+ * 계획표의 «지원» 근무(그달 1회 지원근무)는 앱에서 다루지 않는다 — 휴무로 보인다.
+ *
+ * ── 계획표가 있는 달은 계획표 그대로 ──
+ * 부장은 일정한 8일 사이클로 움직이지만, 지원기관사는 달이 바뀌면 같은 조의 다른 부장과
+ * 짝이 될 수 있다(2026-10 B조). 미리 계산할 수 없으므로 사업소 월별 계획표(src/data/officeDutyPlan.ts)가
+ * 있는 달은 그 표를 그대로 쓰고, 표가 없는 달만 아래 규칙으로 계산한다.
  */
+import { OFFICE_DUTY_PLAN } from '@/data/officeDutyPlan';
+
+interface Pair { manager: string; crew: string }
 
 interface GroupData {
   name: string;
   /** 2026-03-01 기준 8일 주기 내 position */
   offset: number;
   /** 첫 번째 4일에 기지 배치되는 쌍 (두 번째 4일엔 본소) */
-  gijiFirst: { manager: string; crew: string };
+  gijiFirst: Pair;
   /** 첫 번째 4일에 본소 배치되는 쌍 (두 번째 4일엔 기지) */
-  bonsoFirst: { manager: string; crew: string };
+  bonsoFirst: Pair;
   /** 기지관제 (항상 기지) */
   gwanje: [string, string];
 }
@@ -26,8 +41,8 @@ const GROUPS: GroupData[] = [
   {
     name: 'A조',
     offset: 0,
-    gijiFirst: { manager: '장진수', crew: '박종길' },
-    bonsoFirst: { manager: '김진완', crew: '석영훈' },
+    gijiFirst: { manager: '장진수', crew: '석영훈' },
+    bonsoFirst: { manager: '김진완', crew: '박종길' },
     gwanje: ['현덕일', '박용덕'],
   },
   {
@@ -40,15 +55,15 @@ const GROUPS: GroupData[] = [
   {
     name: 'C조',
     offset: 6,
-    gijiFirst: { manager: '김봉철', crew: '김준홍' },
-    bonsoFirst: { manager: '이병홍', crew: '정광구' },
+    gijiFirst: { manager: '김봉철', crew: '정광구' },
+    bonsoFirst: { manager: '이병홍', crew: '김준홍' },
     gwanje: ['정성한', '이동복'],
   },
   {
     name: 'D조',
     offset: 5,
-    gijiFirst: { manager: '김재범', crew: '정용식' },
-    bonsoFirst: { manager: '조재홍', crew: '한태환' },
+    gijiFirst: { manager: '김재범', crew: '한태환' },
+    bonsoFirst: { manager: '조재홍', crew: '정용식' },
     gwanje: ['신제윤', '이승훈'],
   },
 ];
@@ -83,6 +98,54 @@ function getDaysSinceRef(date: Date): number {
   return Math.round((target.getTime() - ref.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+/** 그 달의 사업소 계획표 (없으면 null → 규칙으로 계산) */
+function planOf(date: Date): Record<string, string> | null {
+  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  return OFFICE_DUTY_PLAN[key] ?? null;
+}
+
+/** 계획표 한 글자: A 본소 주간 · B 본소 야간 · a 기지 주간 · b 기지 야간 · ~ 비번 · . 휴무 */
+function planCode(plan: Record<string, string>, name: string, date: Date): string | undefined {
+  return plan[name]?.[date.getDate() - 1];
+}
+
+const shiftOfCode = (c: string): '주간' | '야간' => (c === 'A' || c === 'a' ? '주간' : '야간');
+const locOfCode = (c: string): '본소' | '기지' => (c === 'A' || c === 'B' ? '본소' : '기지');
+const isWorkCode = (c: string | undefined): c is string => !!c && 'ABab'.includes(c);
+
+/** 계획표가 있는 날 — 표에 적힌 그대로 짝을 짓는다(같은 곳·같은 근무의 부장과 지원기관사) */
+function dutyInfoFromPlan(plan: Record<string, string>, date: Date): DutyInfo {
+  const assignments: ShiftAssignment[] = [];
+  const gwanje: GwanjeAssignment[] = [];
+  for (const group of GROUPS) {
+    const managers = [group.gijiFirst.manager, group.bonsoFirst.manager];
+    const crews = [group.gijiFirst.crew, group.bonsoFirst.crew];
+    const usedCrew = new Set<string>();
+    const mine: ShiftAssignment[] = [];
+    for (const m of managers) {
+      const c = planCode(plan, m, date);
+      if (!isWorkCode(c)) continue;
+      const crew = crews.find((x) => !usedCrew.has(x) && planCode(plan, x, date) === c) ?? '';
+      if (crew) usedCrew.add(crew);
+      mine.push({ location: locOfCode(c), shift: shiftOfCode(c), manager: m, crew, group: group.name });
+    }
+    // 부장 없이 지원기관사만 근무하는 경우(표에 드물게) — 빠뜨리지 않는다
+    for (const x of crews) {
+      const c = planCode(plan, x, date);
+      if (usedCrew.has(x) || !isWorkCode(c)) continue;
+      mine.push({ location: locOfCode(c), shift: shiftOfCode(c), manager: '', crew: x, group: group.name });
+    }
+    // 규칙으로 만들 때와 같은 차례 — 조마다 본소 먼저
+    mine.sort((a, b) => (a.location === b.location ? 0 : a.location === '본소' ? -1 : 1));
+    assignments.push(...mine);
+    const g0 = planCode(plan, group.gwanje[0], date);
+    const g1 = planCode(plan, group.gwanje[1], date);
+    const gc = isWorkCode(g0) ? g0 : isWorkCode(g1) ? g1 : undefined;
+    if (gc) gwanje.push({ shift: shiftOfCode(gc), names: group.gwanje, group: group.name });
+  }
+  return { assignments, gwanje };
+}
+
 /**
  * 주어진 날짜의 근무 배치 정보를 반환
  *
@@ -92,14 +155,12 @@ function getDaysSinceRef(date: Date): number {
  *   pos 4-7: second-half (기지first→본소, 본소first→기지)
  */
 export function getDutyInfo(date: Date): DutyInfo {
+  const plan = planOf(date);
+  if (plan) return dutyInfoFromPlan(plan, date);
+
   const daysSince = getDaysSinceRef(date);
   const assignments: ShiftAssignment[] = [];
   const gwanje: GwanjeAssignment[] = [];
-
-  // 월별 본소↔기지 교대: 홀수월(3,5,7...)=기본, 짝수월(4,6,8...)=뒤집힘
-  // 기준: 2026-03 (홀수월) = gijiFirst→기지, bonsoFirst→본소
-  const month = date.getMonth() + 1; // 1-indexed
-  const isSwappedMonth = month % 2 === 0;
 
   for (const group of GROUPS) {
     const pos = ((daysSince + group.offset) % 8 + 8) % 8;
@@ -111,43 +172,14 @@ export function getDutyInfo(date: Date): DutyInfo {
     const isFirstHalf = pos < 4;
     const shift = isDay ? '주간' as const : '야간' as const;
 
-    // 짝수월이면 gijiFirst↔bonsoFirst 역할 교대
-    const giji = isSwappedMonth ? group.bonsoFirst : group.gijiFirst;
-    const bonso = isSwappedMonth ? group.gijiFirst : group.bonsoFirst;
+    const giji = group.gijiFirst;
+    const bonso = group.bonsoFirst;
+    // 앞 4일: giji 쌍이 기지 / 뒤 4일: 서로 바꾼다
+    const atBonso = isFirstHalf ? bonso : giji;
+    const atGiji = isFirstHalf ? giji : bonso;
 
-    if (isFirstHalf) {
-      // giji → 기지, bonso → 본소
-      assignments.push({
-        location: '본소',
-        shift,
-        manager: bonso.manager,
-        crew: bonso.crew,
-        group: group.name,
-      });
-      assignments.push({
-        location: '기지',
-        shift,
-        manager: giji.manager,
-        crew: giji.crew,
-        group: group.name,
-      });
-    } else {
-      // second-half: giji → 본소, bonso → 기지
-      assignments.push({
-        location: '본소',
-        shift,
-        manager: giji.manager,
-        crew: giji.crew,
-        group: group.name,
-      });
-      assignments.push({
-        location: '기지',
-        shift,
-        manager: bonso.manager,
-        crew: bonso.crew,
-        group: group.name,
-      });
-    }
+    assignments.push({ location: '본소', shift, manager: atBonso.manager, crew: atBonso.crew, group: group.name });
+    assignments.push({ location: '기지', shift, manager: atGiji.manager, crew: atGiji.crew, group: group.name });
 
     gwanje.push({
       shift,
@@ -166,6 +198,16 @@ export type MyDuty =
 
 /** 내근직 개인 근무 조회 — 이름으로 그 날짜의 배치 찾기 */
 export function findDutyByName(name: string, date: Date): MyDuty {
+  // 계획표가 있는 달 — 그 사람 칸을 그대로 읽는다
+  const plan = planOf(date);
+  const code = plan ? planCode(plan, name, date) : undefined;
+  if (code !== undefined) {
+    if (code === '~') return 'standby';
+    if (!isWorkCode(code)) return 'rest';
+    const isGwanje = GROUPS.some((g) => g.gwanje.includes(name));
+    return { location: isGwanje ? '기지관제' : locOfCode(code), shift: shiftOfCode(code) };
+  }
+
   const info = getDutyInfo(date);
   for (const a of info.assignments) {
     if (a.manager === name || a.crew === name) {

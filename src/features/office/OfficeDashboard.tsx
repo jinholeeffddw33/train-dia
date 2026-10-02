@@ -5,8 +5,10 @@ import {
   Bell, Moon, Sun, ChevronRight, Plus, X, Check,
   ListChecks, CalendarClock, StickyNote, CalendarRange,
   TrainFront, GraduationCap, Shield, Heart, ClipboardCheck, UtensilsCrossed, Coffee,
-  Settings, History, CalendarDays, Newspaper, ClipboardList,
+  Settings, History, CalendarDays, Newspaper, ClipboardList, UserCheck,
 } from 'lucide-react';
+import { canViewJido } from '@/features/jido/lib/jidoAccess';
+import JidoOverlay from '@/features/jido/components/JidoOverlay';
 import { useAuthStore } from '@/stores/auth';
 import { getUserRole } from '@/lib/auth';
 import { useThemeStore } from '@/stores/theme';
@@ -74,6 +76,8 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
   const [taskBoardOpen, setTaskBoardOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
+  const [jidoOpen, setJidoOpen] = useState(false);
+  const jidoAllowed = canViewJido(authUser?.sabun, authUser?.role);
   // 인라인 추가 폼 토글 (2열 카드라 기본 접힘)
   const [todoAddOpen, setTodoAddOpen] = useState(false);
   const [schedAddOpen, setSchedAddOpen] = useState(false);
@@ -141,7 +145,7 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
    * 스크롤러가 둘이면 안드로이드 크롬이 드래그 일부를 주소창 숨김/표시에 써 버려서,
    * 내용이 잠깐 멈췄다 다시 움직이는 끊김으로 보인다. 앱의 다른 모달들과 같은 방식.
    */
-  const anyOverlay = scheduleOpen || noteMgrOpen || taskBoardOpen || menuOpen || newsOpen;
+  const anyOverlay = scheduleOpen || noteMgrOpen || taskBoardOpen || menuOpen || newsOpen || jidoOpen;
   useEffect(() => {
     if (!anyOverlay) return;
     acquireScrollLock();
@@ -178,17 +182,27 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
           <p className={styles.greeting}>안녕하세요,</p>
           <h1 className={styles.hubTitle}>{name ? `${name} ${role}` : '답십리 승무사업소'} 👋</h1>
           {name && <p className={styles.office}>답십리 승무사업소</p>}
-          {/* 인사 끝 줄 오른쪽 — 공지(점호)사항 바로가기(글자는 «공지», 진호 2026-09-21). 부장님들(관리자 22명이 모두 내근직)은 이 화면이
-              첫 화면이라, 안전 → 공지(점호)사항으로 두 번 들어가던 길을 한 번으로 줄인다. */}
           <div className={styles.subRow}>
             <p className={styles.hubSubtitle}>{getSubtitle()}</p>
-            <button type="button" className={styles.rollCallShortcut} onClick={openRollCall}
-              aria-label="공지(점호)사항 보기" data-press>
-              <ClipboardList size={15} strokeWidth={2.4} aria-hidden />
-              공지
-              {rollCallUnseen && <span className={styles.rollCallDot} aria-hidden />}
-            </button>
           </div>
+        </div>
+        {/* 인사말과 날짜 카드 사이 빈자리 — 위: 공지(점호)사항, 아래: 지도승무(진호 2026-10-02).
+            부장님들은 이 화면이 첫 화면이라 안전 → 공지로 두 번 들어가던 길을 한 번으로 줄였다(09-21).
+            지도승무는 소장·부소장·부장만 보인다. */}
+        <div className={styles.shortcutCol}>
+          <button type="button" className={styles.rollCallShortcut} onClick={openRollCall}
+            aria-label="공지(점호)사항 보기" data-press>
+            <ClipboardList size={15} strokeWidth={2.4} aria-hidden />
+            공지
+            {rollCallUnseen && <span className={styles.rollCallDot} aria-hidden />}
+          </button>
+          {jidoAllowed && (
+            <button type="button" className={`${styles.rollCallShortcut} ${styles.jidoShortcut}`} onClick={() => setJidoOpen(true)}
+              aria-label="지도승무 현황 보기" data-press>
+              <UserCheck size={15} strokeWidth={2.4} aria-hidden />
+              지도승무
+            </button>
+          )}
         </div>
         <div className={styles.headerRight}>
           <div className={styles.topBar}>
@@ -447,6 +461,11 @@ export default function OfficeDashboard({ onEnter, onOpenHub, onOpenSettings }: 
       {newsOpen && (
         <div className={styles.schedOverlay}>
           <NewsOverlay onBack={() => setNewsOpen(false)} />
+        </div>
+      )}
+      {jidoOpen && jidoAllowed && (
+        <div className={styles.schedOverlay}>
+          <JidoOverlay onBack={() => setJidoOpen(false)} />
         </div>
       )}
     </div>

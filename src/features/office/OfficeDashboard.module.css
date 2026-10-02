@@ -134,6 +134,8 @@
   letter-spacing: -0.03em;
   line-height: 1.12;
   margin: 2px 0 0;
+  /* 좁아서 줄이 바뀌면 낱말 단위로 — «이현구 부장 / 님» 처럼 호칭이 쪼개지지 않게 */
+  word-break: keep-all;
 }
 /* 이름 아래 사업소명 (부제) */
 .office {
@@ -192,6 +194,60 @@
   border-radius: 50%;
   background: var(--dia-red);
   border: 2px solid var(--dia-surface);
+}
+/* 인사말과 날짜 카드 사이 빈자리 — 위: 공지, 아래: 지도승무 (진호 2026-10-02)
+   이름 줄 높이에서 시작한다(«안녕하세요,» 한 줄 아래). */
+.shortcutCol {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--dia-space-2);
+  padding-top: var(--dia-space-1);
+}
+/* 자리가 좁다 — 아이콘 위·글자 아래로 세워 폭을 줄인다(인사말이 덜 밀리게) */
+.shortcutCol .rollCallShortcut {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  width: 64px;
+  min-height: 52px;
+  padding: var(--dia-space-1) 0;
+  border-radius: var(--dia-radius-lg);
+  font-size: var(--dia-text-meta);
+  line-height: 1.1;
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+}
+/* 누르는 자리 44 — 보이는 크기는 그대로 */
+.shortcutCol .rollCallShortcut::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+}
+.shortcutCol .rollCallShortcut:focus-visible {
+  outline: 2px solid var(--dia-blue);
+  outline-offset: 2px;
+}
+.jidoShortcut {
+  border-color: var(--dia-green);
+  color: var(--dia-green-text);
+}
+/* 좁은 폰(≤374px)은 사이에 자리가 없다 — 인사말 아래 한 줄로 */
+@media (max-width: 340px) {
+  .headerRow { flex-wrap: wrap; }
+  .shortcutCol {
+    order: 3;
+    flex-direction: row;
+    width: 100%;
+    padding-top: 0;
+  }
+  .shortcutCol .rollCallShortcut {
+    flex-direction: row;
+    width: auto;
+    min-height: 40px;
+    padding: 0 var(--dia-space-3);
+    border-radius: var(--dia-radius-full);
+  }
 }
 .headerActions { display: flex; gap: 8px; flex-shrink: 0; }
 .iconBtn {

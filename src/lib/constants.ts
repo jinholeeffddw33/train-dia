@@ -5,7 +5,7 @@
  * ★ 손으로 올리지 않는다 — 앱 파일(src/·public/)을 바꾼 커밋마다 pre-commit 이
  *   끝자리를 +1 한다(scripts/bump-version.mjs). 큰 개편 때만 앞자리를 손으로 바꾼다.
  */
-export const APP_VERSION = 'v4.0.11';
+export const APP_VERSION = 'v4.0.12';
 
 /**
  * 배포 표식 — 배포할 때마다 저절로 바뀐다(next.config.js 의 NEXT_PUBLIC_BUILD_ID).

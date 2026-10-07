@@ -24,7 +24,8 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: '기관사DIA',
+    // 홈 화면 아이콘 아래 이름 (manifest short_name 과 같게 — 진호 2026-10-07)
+    title: 'SMART5',
   },
   // 저작권·원작 지문 — 서빙되는 HTML <head> 에 각인(무단복제 판별). @/lib/provenance
   authors: [{ name: COPYRIGHT_OWNER }],

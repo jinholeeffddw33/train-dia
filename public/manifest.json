@@ -1,6 +1,6 @@
 {
-  "name": "답십리 기관사 DIA",
-  "short_name": "기관사DIA",
+  "name": "SMART5",
+  "short_name": "SMART5",
   "description": "서울교통공사 5호선 답십리 승무사업소 기관사 교번·근무표 조회",
   "id": "/",
   "start_url": "/",

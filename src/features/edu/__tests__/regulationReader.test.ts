@@ -110,6 +110,8 @@ describe('규정 읽어주기 — 전수 점검', () => {
         for (const c of articleToChunks(a)) expect(c.text, `${id} 제${a.n}조`).not.toMatch(/\bnull\b/i);
       }
     }
-    expect(nullTitles).toBe(19);   // 줄면 원본이 고쳐진 것 — 그때 이 숫자를 내린다
+    // 2026-10 원본 PDF 로 바꾼 뒤 0 — 웹(HTML)에서 뽑은 옛 자료에만 «null» 제목(삭제 조문)이 있었다.
+    // 다시 늘면 원본이 아닌 자료가 섞인 것이다.
+    expect(nullTitles).toBe(0);
   });
 });

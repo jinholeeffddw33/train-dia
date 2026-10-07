@@ -12,6 +12,9 @@ TARGETS = [
     "safety-record-rules",
     "depot-operation-rules",
     "crew-business-rules",
+    "detail-operation-rules",
+    "hr-rules",
+    "employment-rules",
 ]
 
 

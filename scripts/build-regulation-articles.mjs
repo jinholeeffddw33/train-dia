@@ -164,9 +164,16 @@ function rejoinWrappedWords(text, vocab) {
   return out.join('\n');
 }
 
-function clean(text, vocab) {
+function clean(text, vocab, title = '') {
   let t = text;
   t = t.replace(/^\s*-\s*\d+\s*-\s*$/gm, '');            // 페이지 번호 줄
+  // 쪽 머리말(규정 이름만 있는 줄) — 운전취급세부요령 원본은 쪽마다 이름이 찍혀 조문 한가운데 끼었다
+  if (title) {
+    const esc = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    t = t.replace(new RegExp(`^\\s*${esc}\\s*$`, 'gm'), '');
+  }
+  // 삭제된 조문 자리표(«제61조 <삭제 ’17.12.21.>») — 앞 조문 끝에 붙어 낭독까지 됐다
+  t = t.replace(/^\s*제\s*\d+\s*조\s*(?:\n\s*)?[<〈]\s*삭제[^>〉\n]*[>〉]\s*$/gm, '');
   t = t.replace(/<개정[^>]*>/g, '');                      // 개정 표시
   t = t.replace(/<신설[^>]*>/g, '');
   t = t.replace(/^\s*[()]\s*$/gm, '');                    // 괄호만 있는 줄
@@ -178,11 +185,11 @@ function clean(text, vocab) {
 }
 
 /** 페이지 전체를 이어붙이되 각 글자가 몇 페이지인지 기억해 둔다 (조문 → 페이지 역추적용) */
-function joinPages(pages, vocab) {
+function joinPages(pages, vocab, title = '') {
   let text = '';
   const pageAt = [];   // 글자 인덱스 → 페이지 번호
   for (const p of pages) {
-    const c = clean(p.text, vocab);
+    const c = clean(p.text, vocab, title);
     if (!c) continue;
     const start = text.length;
     text += c + '\n';
@@ -205,13 +212,19 @@ function lastBefore(text, re, idx) {
 function buildOne(file, vocab) {
   const id = path.basename(file, '-search.json');
   const pages = JSON.parse(fs.readFileSync(path.join(DIR, file), 'utf8'));
-  const { text, pageAt } = joinPages(pages, vocab);
+  const { text, pageAt } = joinPages(pages, vocab, REG_TITLES[id] ?? '');
 
   // 조문 시작 위치 수집
   const marks = [];
   ARTICLE_RE.lastIndex = 0;
   for (const m of text.matchAll(ARTICLE_RE)) {
-    marks.push({ n: parseInt(m[1], 10), title: (m[2] || '').replace(/\s+/g, ' ').trim(), idx: m.index ?? 0 });
+    const idx = m.index ?? 0;
+    /* 바로 앞에 규정 이름이 붙은 것은 다른 규정의 인용이다 —
+       운전취급세부요령 표 안의 «규정 제99조(차량을 연결하는 경우의 전호 현시방식)»,
+       «규정 제162조(지도통신식의 개시 및 운전)» 가 조문 시작으로 잡혀 제30조가 잘려 나갔다(2026-10 원본 교체 때).
+       «같은 줄»에서만 본다 — 쪽 머리말(«운전취급세부요령» 다음 줄의 제31조)은 진짜 조문이다. */
+    if (/(규정|내규|예규|요령|규칙|법)[ \t]*$/.test(text.slice(Math.max(0, idx - 8), idx))) continue;
+    marks.push({ n: parseInt(m[1], 10), title: (m[2] || '').replace(/\s+/g, ' ').trim(), idx });
   }
   // 제목이 붙은 채로 인용되는 경우도 드물게 있다(부칙·별표). 번호별 첫 등장만 조문 시작으로.
   const seen = new Set();

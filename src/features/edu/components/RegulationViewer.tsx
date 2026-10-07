@@ -164,7 +164,8 @@ function parseToc(pages: RegulationPage[]): TocEntry[] {
   for (const p of pages) {
     for (const m of p.text.matchAll(CHAPTER_RE)) {
       const num = parseInt(m[1], 10);
-      const title = m[2].replace(/\s+/g, '').trim();
+      // 장 제목에도 개정 꼬리표가 붙는다(«제8장 열차운행 중 금지행위 <개정 ’25.7.1.>») — 목차에는 제목만
+      const title = m[2].replace(TOC_TAG_RE, '').replace(/\s+/g, '').trim();
       if (!title) continue;
       entries.push({
         id: `ch-${p.page}-${m.index}`,

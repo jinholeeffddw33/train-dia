@@ -20,6 +20,7 @@ import { backfillQuizHistory } from '@/features/edu/lib/quizSync';
 import { canViewOthersInfo } from '../lib/myInfoAccess';
 import { STAGE_NAME, BASIS_LABEL, TYPE_TIPS, nextStageGoal, stageRule, type Stage, type StageBasis } from '../lib/complaintStages';
 import type { MyInfoData, ComplaintCase } from '../lib/myInfoTypes';
+import StageRosterView from './StageRosterView';
 import styles from './MyInfo.module.css';
 
 const STAGES: Stage[] = [1, 2, 3, 4, 5, 6, 7];
@@ -49,6 +50,7 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [basis, setBasis] = useState<StageBasis>('door');
+  const [view, setView] = useState<'person' | 'roster'>('person');
   const [casesOpen, setCasesOpen] = useState(false);
   const [openCase, setOpenCase] = useState<number | null>(null);
   // ESC·뒤로가기는 설정 화면이 하위 화면 닫기로 처리한다(중복으로 두 번 닫지 않게) — 여기선 포커스 가두기·스크롤 잠금만
@@ -115,6 +117,31 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
       </div>
 
       <div className={styles.body}>
+        {/* 관리자(소장·부소장·관리자 계정) — 한 사람 보기 ↔ 등급별 명단 */}
+        {canPick && (
+          <div className="z-segment" data-no-press
+            // STYLE-EXCEPTION: 세그먼트 선택 위치는 런타임 값(--seg-idx)으로만 표현된다
+            style={{ '--seg-count': 2, '--seg-idx': view === 'person' ? 0 : 1 } as React.CSSProperties}>
+            <button type="button" className={`z-segment-item ${view === 'person' ? 'is-on' : ''}`}
+              aria-pressed={view === 'person'} onClick={() => setView('person')}>
+              {target ? '선택한 직원' : '내 정보'}
+            </button>
+            <button type="button" className={`z-segment-item ${view === 'roster' ? 'is-on' : ''}`}
+              aria-pressed={view === 'roster'} onClick={() => setView('roster')}>
+              등급별 명단
+            </button>
+          </div>
+        )}
+
+        {canPick && view === 'roster' && (
+          <StageRosterView onPick={(s) => {
+            setTarget(s === authUser?.sabun ? null : s);
+            setView('person');
+            modalRef.current?.scrollTo({ top: 0 });
+          }} />
+        )}
+
+        {view === 'person' && <>
         {/* 관리자(소장·부소장·관리자 계정) — 다른 사람 보기 */}
         {canPick && (
           <div className={styles.picker}>
@@ -432,6 +459,7 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
             )}
           </>
         )}
+        </>}
       </div>
     </div>
   );

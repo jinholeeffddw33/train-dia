@@ -51,6 +51,25 @@ export interface ComplaintSummary {
   doorSame: number;
 }
 
+/** GET /api/my-info/roster — 관리자용 등급별 명단 한 줄 */
+export interface StageRosterEntry {
+  sabun: string;
+  name: string;
+  doorEvents: number;
+  allEvents: number;
+  praise: number;
+  injury: number;
+  doorStage: Stage;
+  allStage: Stage;
+  mgmt: string;
+}
+
+export interface StageRoster {
+  periodFrom: string;
+  periodTo: string;
+  people: StageRosterEntry[];
+}
+
 export interface MyInfoData {
   person: { sabun: string; name: string; role: string };
   /** 열람자가 본인이 아닌 사람을 보는 중인가 */

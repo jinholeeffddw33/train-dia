@@ -29,15 +29,26 @@ const RANGES: Record<StageBasis, Record<Stage, [number, number]>> = {
   all: { 1: [0, 0], 2: [0, 0], 3: [1, 2], 4: [3, 4], 5: [5, 6], 6: [7, 7], 7: [8, Infinity] },
 };
 
+/** 단계별 조치(제안) — 보고서 5-2·5-3쪽 표 그대로 */
+export const STAGE_ACTION: Record<Stage, string> = {
+  1: '칭찬 사례를 교육 자료로 공유',
+  2: '현재 취급 유지',
+  3: '본인 민원 내용 알림',
+  4: '본인에게 집계 알림 · 스스로 점검',
+  5: '부장 면담 · 유형별 주의 사항 전달',
+  6: '면담 + 동승 지도 · 3개월 뒤 재확인',
+  7: '1:1 코칭 + 동승 지도 + 취급 영상 확인 · 매월 확인',
+};
+
 export const BASIS_LABEL: Record<StageBasis, string> = {
   door: '출입문 민원',
   all: '전체 불만 민원',
 };
 
-/** 기준 설명 — «출입문 사건 3~4건» */
+/** 기준 설명(건수 부분만) — «3~4건». 앞에 BASIS_LABEL 을 붙여 쓴다 */
 export function stageRule(basis: StageBasis, stage: Stage): string {
-  if (stage === 1) return `${BASIS_LABEL[basis]} 0건 + 칭찬 1건 이상`;
-  if (stage === 2) return `${BASIS_LABEL[basis]} 0건`;
+  if (stage === 1) return '0건 + 칭찬 1건 이상';
+  if (stage === 2) return '0건';
   const [lo, hi] = RANGES[basis][stage];
   if (hi === Infinity) return `${lo}건 이상`;
   return lo === hi ? `${lo}건` : `${lo}~${hi}건`;

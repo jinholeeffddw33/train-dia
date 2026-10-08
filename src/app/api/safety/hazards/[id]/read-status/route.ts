@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { serverSupabase } from '@/lib/serverSupabase';
 import { isExcludedFromReadTracking } from '@/lib/safetyReaders';
+import { getSessionUser } from '@/lib/authServer';
+import { okJson } from '@/lib/api/response';
+import { readDemoActive, demoReadRatio, fillDemoReads } from '@/features/safety/lib/readDemo';
 
 interface StaffEntry {
   sabun: string;
@@ -13,7 +16,7 @@ interface StaffEntry {
  * 읽은 사람 / 안 읽은 사람을 분리해서 반환
  */
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   if (!serverSupabase) {
@@ -71,6 +74,19 @@ export async function GET(
   }
   // 읽은 사람은 최근 순
   readers.sort((a, b) => b.readAt.localeCompare(a.readAt));
+
+  // 발표용 예시(체험 계정 · 10/21 까지) — DB 는 그대로, 이 응답에서만 채운다 (features/safety/lib/readDemo.ts)
+  const viewer = await getSessionUser(req);
+  if (readDemoActive(viewer?.sabun)) {
+    const { data: report } = await serverSupabase
+      .from('hazard_reports').select('description, location, created_at').eq('id', reportId).maybeSingle();
+    const r = report as { description: string | null; location: string | null; created_at: string } | null;
+    const demo = fillDemoReads(reportId, readers, nonReaders, demoReadRatio(r?.description ?? null, r?.location ?? null), r?.created_at ?? '');
+    return okJson(
+      { readers: demo.readers, nonReaders: demo.nonReaders, totalExpected: targetStaff.length, readCount: demo.readers.length, demo: true },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 
   return NextResponse.json({
     readers,

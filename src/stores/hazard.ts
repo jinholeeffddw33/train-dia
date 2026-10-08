@@ -34,6 +34,8 @@ export interface ReadStatusResponse {
   nonReaders: { sabun: string; name: string }[];
   totalExpected: number;
   readCount: number;
+  /** 발표용 예시(체험 계정 · 2026-10-21 까지) — 실제 기록이 아니다 (features/safety/lib/readDemo.ts) */
+  demo?: boolean;
 }
 
 export interface HazardComment {

@@ -824,6 +824,7 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
           >
             <Users size={16} strokeWidth={2.2} />
             <span className={styles.readStatusHeaderLabel}>읽음 현황</span>
+            {readStatus?.demo && <span className={styles.readDemoBadge}>예시 자료</span>}
             {readStatus ? (
               <span className={styles.readStatusCount}>
                 <strong>{readStatus.readCount}</strong>
@@ -840,6 +841,9 @@ export default function HazardDetail({ reportId, onBack }: HazardDetailProps) {
               안 읽은 사람은 굵게 — 색만으로 구분하지 않아야 색약도 읽을 수 있다. */}
           {readStatusExpanded && readStatus && (
             <div className={styles.readStatusBody}>
+              {readStatus.demo && (
+                <p className={styles.readDemoNote}>체험 계정에서만 보이는 예시 자료예요. 실제 읽음 기록과 달라요.</p>
+              )}
               <div className={styles.readLegend}>
                 <span className={styles.readLegendItem}>
                   <span className={`${styles.readLegendDot} ${styles.readLegendDotUnread}`} aria-hidden />

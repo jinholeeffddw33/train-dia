@@ -387,6 +387,22 @@
   color: var(--dia-text-primary);
 }
 
+/* 발표용 예시(체험 계정 · 10/21 까지) 표시 — 실제 기록과 헷갈리지 않게 */
+.readDemoBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-amber-text);
+  background: var(--dia-amber-dim);
+  border-radius: var(--dia-radius-full);
+}
+.readDemoNote {
+  margin: 0 0 var(--dia-space-2);
+  font-size: var(--dia-text-meta);
+  color: var(--dia-amber-text);
+}
+
 .readStatusCount {
   display: inline-flex;
   align-items: baseline;

@@ -63,8 +63,13 @@ export default function PrivacyPolicyPage() {
               </tr>
               <tr>
                 <td>이용 기록</td>
-                <td>교육 자료 열람 기록, 게임 점수·기록, 대기 근무 등록 내역</td>
+                <td>교육 자료 열람 기록, <strong>교육 시험 점수</strong>, 게임 점수·기록, 대기 근무 등록 내역, 운전정보·점호 확인 기록</td>
                 <td>해당 기능 이용 시</td>
+              </tr>
+              <tr>
+                <td>민원 기록</td>
+                <td>사업소 민원 보고서에 적힌 본인 관련 민원(날짜·역·열차·내용·분류)과 그에 따른 단계</td>
+                <td>사업소가 민원 분석 자료를 등록할 때</td>
               </tr>
               <tr>
                 <td>이용자 작성물</td>
@@ -98,6 +103,7 @@ export default function PrivacyPolicyPage() {
             <li>공지·알림 전달</li>
             <li>부정 이용 방지 및 장애 대응(접속 기록·IP)</li>
             <li>서비스 이용 통계 분석 및 품질 개선</li>
+            <li>«내 정보» 화면 — 본인의 민원 단계·개인 통계 확인(본인과 소장·부소장·관리자만 열람)</li>
           </ul>
         </section>
 
@@ -110,6 +116,7 @@ export default function PrivacyPolicyPage() {
               <tr><td>접속 기록(IP 포함)</td><td>수집일로부터 1년</td></tr>
               <tr><td>위험요인 제보·의견</td><td>처리 완료 후 3년(안전 관리 이력 목적)</td></tr>
               <tr><td>이용 기록·게임 기록</td><td>계정 삭제 시까지</td></tr>
+              <tr><td>민원 기록</td><td>사업소가 새 분석 자료로 바꿀 때까지(분석 기간 밖의 기록은 그때 지워짐)</td></tr>
             </tbody>
           </table>
           <p className={styles.note}>

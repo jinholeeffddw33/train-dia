@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { sendQuizRecord } from '../lib/quizSync';
 
 /* ── 타입 ── */
 
@@ -233,17 +234,20 @@ export function useEduStore() {
 
   /* ── 퀴즈 ── */
   const addQuizRecord = useCallback((record: Omit<QuizRecord, 'date' | 'solvedAt'>) => {
+    const now = new Date().toISOString();
+    const full: QuizRecord = { ...record, date: now, solvedAt: now };
     setProgress(prev => {
-      const now = new Date().toISOString();
       const { streak, lastStudyDate } = updateStreak(prev);
       return {
         ...prev,
-        quizHistory: [...prev.quizHistory, { ...record, date: now, solvedAt: now }],
+        quizHistory: [...prev.quizHistory, full],
         lastActiveAt: now,
         streak,
         lastStudyDate,
       };
     });
+    // 서버에도 남긴다(관리자 열람·폰 교체 대비) — 실패해도 폰 기록이 원본이라 시험에는 영향 없음
+    sendQuizRecord(full);
   }, []);
 
   /* ── 오답노트 ── */

@@ -11,6 +11,7 @@ import {
   Clapperboard, BookOpen, Bot,
 } from 'lucide-react';
 import { useEduStore } from '../hooks/useEduStore';
+import { backfillQuizHistory } from '../lib/quizSync';
 import styles from '../styles/edu.module.css';
 
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
@@ -77,7 +78,11 @@ const SUBMENU_COLOR_MAP = {
 } as const;
 
 export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onSpeedMaster, onBreakerMaster, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
-  const { wrongCount, unresolvedWrongCount } = useEduStore();
+  const { wrongCount, unresolvedWrongCount, progress } = useEduStore();
+
+  // 이 폰에 쌓여 있던 지난 시험 점수를 서버에 한 번 올린다(이미 올린 것은 건너뜀) — 설정 → 내 정보에서 보인다
+  const historyRef = useRef(progress.quizHistory);
+  useEffect(() => { void backfillQuizHistory(historyRef.current); }, []);
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 

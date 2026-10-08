@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList } from 'lucide-react';
+import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, IdCard } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -18,6 +18,7 @@ import ShortcutsOverlay from './ShortcutsOverlay';
 import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminHub from './AdminHub';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
+import MyInfoOverlay from '@/features/myinfo/components/MyInfoOverlay';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { showToast } from '@/components/common/Toast';
 import { APP_VERSION } from '@/lib/constants';
@@ -49,6 +50,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const [adminFeedbackOpen, setAdminFeedbackOpen] = useState(false);
   const [adminHubOpen, setAdminHubOpen] = useState(false);
   const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
+  const [myInfoOpen, setMyInfoOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -58,15 +60,16 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
   // 하위 오버레이가 열려 있으면 뒤로가기/ESC 는 그것부터 닫는다 (설정은 마지막)
   const anySub = shortcutsOpen || pinChangeOpen || installGuideOpen
-    || adminFeedbackOpen || adminHubOpen || levelRecordsOpen;
+    || adminFeedbackOpen || adminHubOpen || levelRecordsOpen || myInfoOpen;
   const closeSub = useCallback(() => {
-    if (shortcutsOpen) setShortcutsOpen(false);
+    if (myInfoOpen) setMyInfoOpen(false);
+    else if (shortcutsOpen) setShortcutsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
     else if (adminFeedbackOpen) setAdminFeedbackOpen(false);
     else if (adminHubOpen) setAdminHubOpen(false);
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
-  }, [shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminHubOpen, levelRecordsOpen]);
+  }, [myInfoOpen, shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminHubOpen, levelRecordsOpen]);
 
   useHistoryBack('settings', onClose, open && !anySub);
   useHistoryBack('settings-sub', closeSub, anySub);
@@ -201,6 +204,13 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
       {/* 기능 · 보안 (타일) */}
       <p className={styles.setGroupTitle}>기능 · 보안</p>
       <div className={styles.tileGrid}>
+        {/* 내 정보 — 민원 등급·개인 통계. 개인정보라 본인 것만 보인다(관리자는 다른 사람도) */}
+        {authUser && (
+          <button type="button" className={styles.tile} data-press onClick={() => setMyInfoOpen(true)}>
+            <span className={`${styles.tileIcon} ${styles.toolIconPurple}`}><IdCard size={18} /></span>
+            <span className={styles.tileLabel}>내 정보</span>
+          </button>
+        )}
         <button type="button" className={styles.tile} data-press onClick={() => setShortcutsOpen(true)}>
           <span className={`${styles.tileIcon} ${styles.toolIconAmber}`}><Bookmark size={18} /></span>
           <span className={styles.tileLabel}>내 바로가기</span>
@@ -510,6 +520,9 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
       {adminFeedbackOpen && (
         <AdminFeedbackOverlay onClose={() => setAdminFeedbackOpen(false)} />
       )}
+
+      {/* 내 정보 */}
+      <MyInfoOverlay open={myInfoOpen} onClose={() => setMyInfoOpen(false)} />
 
       {/* 등급도전 현황 오버레이 */}
       <LevelRecordsOverlay open={levelRecordsOpen} onClose={() => setLevelRecordsOpen(false)} />

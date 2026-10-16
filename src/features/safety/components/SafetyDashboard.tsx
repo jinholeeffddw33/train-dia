@@ -225,7 +225,8 @@ export default function SafetyDashboard({
      캐시 전략: 직전 fetch 결과를 localStorage 에 저장해두고, 재진입 시
      초기 state 를 캐시에서 즉시 채워 깜빡임 제거. 그 후 백그라운드 refetch. */
   const CACHE_KEY = 'safety-dashboard-cache-v1';
-  type Cache = { action: ReportItem[]; inspect: ReportItem[]; hazard: ReportItem[]; cachedAt: number };
+  type TipItem = { id: string; title: string; createdAt: string };
+  type Cache = { action: ReportItem[]; inspect: ReportItem[]; hazard: ReportItem[]; tips?: TipItem[]; cachedAt: number };
   const loadCache = (): Cache | null => {
     try {
       const raw = localStorage.getItem(CACHE_KEY);
@@ -238,6 +239,7 @@ export default function SafetyDashboard({
   const [actionReports, setActionReports] = useState<ReportItem[]>(() => loadCache()?.action ?? []);
   const [inspectReports, setInspectReports] = useState<ReportItem[]>(() => loadCache()?.inspect ?? []);
   const [hazardReports, setHazardReports] = useState<ReportItem[]>(() => loadCache()?.hazard ?? []);
+  const [tips, setTips] = useState<TipItem[]>(() => loadCache()?.tips ?? []);
   // 캐시가 있으면 dataLoaded=true 로 시작 → 진입 즉시 실데이터 노출
   const [dataLoaded, setDataLoaded] = useState(() => loadCache() !== null);
   useEffect(() => {
@@ -246,6 +248,7 @@ export default function SafetyDashboard({
     let nextAction: ReportItem[] = [];
     let nextInspect: ReportItem[] = [];
     let nextHazard: ReportItem[] = [];
+    let nextTips: TipItem[] = [];
     const fetchAction = fetch(`/api/safety/hazards${qs}${qs ? '&' : '?'}category=action`)
       .then(r => r.json())
       .then(j => { nextAction = j.data ?? []; if (!cancelled) setActionReports(nextAction); })
@@ -258,12 +261,20 @@ export default function SafetyDashboard({
       .then(r => r.json())
       .then(j => { nextHazard = j.data ?? []; if (!cancelled) setHazardReports(nextHazard); })
       .catch(() => {});
-    Promise.all([fetchAction, fetchInspect, fetchHazard]).then(() => {
+    // 안전상식 — 오른쪽 «최근 업로드된 안전 소식» 에 섞어 보이려고 제목·시각만 쓴다
+    const fetchTips = fetch('/api/safety/tips')
+      .then(r => r.json())
+      .then((j: { data?: TipItem[] }) => {
+        nextTips = (j.data ?? []).map((t) => ({ id: t.id, title: t.title, createdAt: t.createdAt }));
+        if (!cancelled) setTips(nextTips);
+      })
+      .catch(() => {});
+    Promise.all([fetchAction, fetchInspect, fetchHazard, fetchTips]).then(() => {
       if (cancelled) return;
       setDataLoaded(true);
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify({
-          action: nextAction, inspect: nextInspect, hazard: nextHazard, cachedAt: Date.now(),
+          action: nextAction, inspect: nextInspect, hazard: nextHazard, tips: nextTips, cachedAt: Date.now(),
         } satisfies Cache));
       } catch { /* ignore */ }
     });
@@ -336,6 +347,43 @@ export default function SafetyDashboard({
   void latestActionAt; void latestDrivingAt;
   const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사례교육' : '최근 업로드된 운전 정보';
 
+  /* === 오른쪽 — 운전정보를 뺀 최신글(사례교육·위험개소·열차정보·안전상식) 3건 (진호 2026-10-16) ===
+     왼쪽이 사례교육으로 바뀌는 경우(운전정보 0건)에는 사례교육이 양쪽에 겹치지 않게 뺀다. */
+  type LatestOther = { key: string; tone: 'incident' | 'hazard' | 'train' | 'tips'; chip: string; title: string; at: string; open: () => void };
+  const latestOthers = useMemo<LatestOther[]>(() => {
+    const out: LatestOther[] = [];
+    if (leftKindReal !== 'incident') {
+      for (const p of parsedActions) {
+        const ho = (p.item.location || '').trim();
+        out.push({ key: `incident-${p.item.id}`, tone: 'incident', chip: ho ? `사례교육 ${ho}` : '사례교육', title: p.title, at: p.item.createdAt, open: () => onOpenReport?.(p.item.id, 'incident') });
+      }
+    }
+    for (const h of parsedHazards) {
+      out.push({ key: `hazard-${h.item.id}`, tone: 'hazard', chip: `위험개소 ${h.station}`, title: h.title, at: h.item.createdAt, open: () => onOpenReport?.(h.item.id, 'hazard') });
+    }
+    for (const t of trainReports) {
+      out.push({ key: `train-${t.item.id}`, tone: 'train', chip: t.tag ? `열차정보 ${t.tag}` : '열차정보', title: t.title, at: t.item.createdAt, open: () => onOpenReport?.(t.item.id, 'train') });
+    }
+    for (const t of tips) {
+      out.push({ key: `tips-${t.id}`, tone: 'tips', chip: '안전상식', title: t.title, at: t.createdAt, open: () => onOpenCategory('tips') });
+    }
+    // 최신순만 쓰면 위험개소만 3건이 되어 아래 «주요 위험개소» 와 겹친다 →
+    // 분류마다 가장 최근 1건씩 먼저 고르고, 자리가 남으면 다음 최신글로 채운다.
+    const byTime = out.sort((a, b) => b.at.localeCompare(a.at));
+    const picked: LatestOther[] = [];
+    const seen = new Set<LatestOther['tone']>();
+    for (const o of byTime) {
+      if (picked.length >= 3) break;
+      if (!seen.has(o.tone)) { seen.add(o.tone); picked.push(o); }
+    }
+    for (const o of byTime) {
+      if (picked.length >= 3) break;
+      if (!picked.includes(o)) picked.push(o);
+    }
+    return picked.sort((a, b) => b.at.localeCompare(a.at));
+  }, [leftKindReal, parsedActions, parsedHazards, trainReports, tips, onOpenReport, onOpenCategory]);
+  const hasRealOthers = latestOthers.length > 0;
+
   const [selected, setSelected] = useState<SampleDetail | null>(null);
 
   const markRead = useCallback((id: string) => {
@@ -405,25 +453,28 @@ export default function SafetyDashboard({
             </div>
           </div>
           {rollCallItems.length > 0 ? (
-            <ul className={styles.itemList}>
-              {rollCallItems.slice(0, 3).map((it, i) => (
-                <li key={it.id}>
-                  <button
-                    type="button"
-                    className={`${styles.noticeListItem} ${styles.itemBtn} ${styles.itemUnread}`}
-                    onClick={() => onOpenNotice?.()}
-                  >
-                    <div className={styles.noticeListHead}>
-                      <span
-                        className={`${styles.noticeListTitle} ${it.color === 'red' ? styles.noticeTitleRed : it.color === 'blue' ? styles.noticeTitleBlue : ''}`}
-                      >
-                        {i + 1}. {it.text}
-                      </span>
-                    </div>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            /* 점호 사항은 한 묶음 — 줄마다 카드를 따로 두면 서로 다른 글 세 개처럼 보였다(진호 2026-10-16) */
+            <button
+              type="button"
+              className={`${styles.noticeListItem} ${styles.itemBtn} ${styles.noticeCard}`}
+              onClick={() => onOpenNotice?.()}
+            >
+              <span className={styles.noticeRows}>
+                {rollCallItems.slice(0, 3).map((it, i) => (
+                  <span key={it.id} className={styles.noticeRow}>
+                    <span className={styles.noticeNum} aria-hidden="true">{i + 1}</span>
+                    <span
+                      className={`${styles.noticeRowText} ${it.color === 'red' ? styles.noticeTitleRed : it.color === 'blue' ? styles.noticeTitleBlue : ''}`}
+                    >
+                      {it.text}
+                    </span>
+                  </span>
+                ))}
+              </span>
+              {rollCallItems.length > 3 && (
+                <span className={styles.noticeMore}>외 {rollCallItems.length - 3}건 더 보기 ›</span>
+              )}
+            </button>
           ) : (
             <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
               <p className={styles.noticeEmptyText}>오늘 전달할 점호 사항이 없어요</p>
@@ -576,35 +627,27 @@ export default function SafetyDashboard({
             </ul>
           </div>
 
-          {/* 우측 — 열차정보 */}
+          {/* 우측 — 운전정보를 뺀 최신글 */}
           <div className={styles.colWrap}>
             <div className={styles.colHead}>
-              <h2 className={styles.colTitle}>최근 변경된 열차 정보</h2>
+              <h2 className={styles.colTitle}>최근 업로드된 안전 소식</h2>
             </div>
             <ul className={styles.itemList}>
-              {dataLoaded && hasRealTrain ? (
-                trainReports.slice(0, 3).map((p) => {
-                  const id = `train-${p.item.id}`;
-                  const isRead = readIds.has(id);
-                  const bodyBullets = p.body ? p.body.split('\n').filter(Boolean) : [];
+              {dataLoaded && hasRealOthers ? (
+                latestOthers.map((o) => {
+                  const isRead = readIds.has(o.key);
                   return (
-                    <li key={p.item.id}>
+                    <li key={o.key}>
                       <button
                         type="button"
                         className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => {
-                          markRead(id);
-                          onOpenReport?.(p.item.id, 'train');
-                        }}
+                        onClick={() => { markRead(o.key); o.open(); }}
                       >
                         <div className={styles.trainHeadRow}>
-                          <span className={styles.newBadge}>{p.tag || 'NEW'}</span>
-                          <span className={styles.trainTitle}>{p.title}</span>
+                          <span className={`${styles.hoBadgeMini} ${styles[`srcChip_${o.tone}`]}`}>{o.chip}</span>
+                          <span className={styles.trainTitle}>{o.title}</span>
                           <ConfirmBadge read={isRead} />
                         </div>
-                        {bodyBullets.length > 0 && (
-                          <p className={styles.trainPreview}>{bodyBullets[0]}</p>
-                        )}
                       </button>
                     </li>
                   );

@@ -1175,3 +1175,76 @@
   position: absolute;
   inset: -7px -7px;
 }
+
+/* ── 공지(점호)사항 — 한 장의 카드에 번호 줄로 묶음 (진호 2026-10-16) ──
+   줄마다 카드를 따로 두면 서로 다른 글 세 개처럼 보였다. 표면(글래스·라이트 뉴모피즘)은
+   .noticeListItem/.itemBtn 공용 규칙을 그대로 쓰고, 여기서는 안쪽 배치만 정한다.
+   글자색은 카드에 두고 줄은 상속 — 줄에 직접 주면 .noticeTitleRed/Blue 를 덮어쓴다. */
+.noticeCard {
+  padding: 2px 12px;
+  gap: 0;
+  color: var(--dia-text-primary);
+}
+
+.noticeRows {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.noticeRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  min-width: 0;
+}
+
+.noticeRow + .noticeRow {
+  border-top: 1px solid var(--dia-border-light);
+}
+
+/* SURFACE-EXCEPTION: 읽기전용 번호 배지(누르는 자리 아님) */
+.noticeNum {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  border-radius: var(--dia-radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--dia-amber-dim);
+  color: var(--dia-amber-text);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.noticeRowText {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-bold);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.noticeMore {
+  align-self: flex-end;
+  padding: 0 0 8px;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-tertiary);
+}
+
+/* ── 오른쪽 «최근 업로드된 안전 소식» 분류 칩 — 아래 카테고리 버튼 색과 같은 계열 ── */
+.srcChip_incident { background: linear-gradient(145deg, var(--dia-3d-amber-start), var(--dia-3d-amber-end)); }
+.srcChip_hazard   { background: linear-gradient(145deg, var(--dia-3d-red-start), var(--dia-3d-red-end)); }
+.srcChip_train    { background: linear-gradient(145deg, var(--dia-3d-green-start), var(--dia-3d-green-end)); }
+.srcChip_tips     { background: linear-gradient(145deg, var(--dia-3d-purple-start), var(--dia-3d-purple-end)); }

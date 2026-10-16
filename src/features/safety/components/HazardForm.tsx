@@ -87,8 +87,12 @@ const INCIDENT_KINDS: readonly KindOption[] = [
 /** 5호선 편성번호 501 ~ 580 (80개) */
 const TRAIN_NUMBERS: readonly string[] = Array.from({ length: 80 }, (_, i) => String(501 + i));
 
-/** 5호선 전체 역 (방화 → 하남검단산/마천 분기 순) */
+/**
+ * 5호선 전체 역 (방화 → 하남검단산/마천 분기 순) + 차량기지 2곳.
+ * 기지 2곳은 맨 위에 둔다(진호 2026-10-16).
+ */
 const STATIONS: readonly string[] = [
+  '방화기지', '고덕기지',
   '방화', '개화산', '김포공항', '송정', '마곡', '발산', '우장산', '화곡',
   '까치산', '신정', '목동', '오목교', '양평', '영등포구청', '영등포시장',
   '신길', '여의도', '여의나루', '마포', '공덕', '애오개', '충정로',
@@ -99,6 +103,9 @@ const STATIONS: readonly string[] = [
   '하남풍산', '하남시청', '하남검단산',
   '둔촌동', '올림픽공원', '방이', '오금', '개롱', '거여', '마천',
 ];
+
+/** 보이는 이름·저장 태그 — 역은 «○○역», 기지는 이름 그대로(«방화기지역» 방지) */
+const stationLabel = (s: string): string => (s.endsWith('기지') ? s : `${s}역`);
 
 const FORM_VARIANT: Record<HazardFormCardKey, FormVariant> = {
   incident: { title: '사고 사례 등록', kinds: INCIDENT_KINDS, caseEduPicker: true, showLocation: false, dataCategory: 'action'  },
@@ -247,7 +254,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
     setError('');
     try {
       let tag = '';
-      if (variant.stationPicker) tag = station ? `${station}역` : '';
+      if (variant.stationPicker) tag = station ? stationLabel(station) : '';
       else if (variant.trainPicker) tag = trainNo ? `${trainNo}편성` : '';
       else if (variant.kinds && kind) tag = kind;
       // 위험개소: 역 + 심각도 함께 표기 → [강동역·위험] 형식
@@ -457,12 +464,12 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
           </label>
           <select
             id="hazard-station"
-            className={styles.textInput}
+            className={`${styles.textInput} ${styles.selectInput}`}
             value={station}
             onChange={(e) => setStation(e.target.value)}
           >
             {STATIONS.map((s) => (
-              <option key={s} value={s}>{s}역</option>
+              <option key={s} value={s}>{stationLabel(s)}</option>
             ))}
           </select>
         </div>
@@ -474,7 +481,7 @@ export default function HazardForm({ onClose, cardKey }: HazardFormProps) {
           </label>
           <select
             id="hazard-train"
-            className={styles.textInput}
+            className={`${styles.textInput} ${styles.selectInput}`}
             value={trainNo}
             onChange={(e) => setTrainNo(e.target.value)}
           >

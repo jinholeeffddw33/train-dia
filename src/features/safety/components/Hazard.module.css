@@ -1030,6 +1030,21 @@
 
 .textInput::placeholder { color: var(--dia-text-tertiary); }
 
+/* 역·편성 선택칸 — --dia-surface 는 반투명 글래스 그라디언트라 단색이 없어, 다크모드에서
+   펼친 목록이 흰 바탕 + 밝은 글자(상속)가 되어 안 보였다. TimeSelect 와 같은 방식으로
+   단색 배경을 주고 목록 글자색을 명시한다. */
+.selectInput {
+  background: var(--dia-bg);
+  border: 1.5px solid var(--dia-border-strong);
+  font-size: var(--dia-text-base);
+  font-weight: 600;
+}
+
+.selectInput option {
+  background: var(--dia-bg-elevated);
+  color: var(--dia-text-primary);
+}
+
 .textArea {
   padding: var(--dia-space-3);
   background: var(--dia-surface);

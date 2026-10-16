@@ -531,7 +531,7 @@ export default function SafetyDashboard({
             return (
               <button key={c.id} type="button" className={styles.catLite} onClick={() => onOpenCategory(c.id)}>
                 <span className={styles.catLiteIcon}>
-                  <Icon size={22} strokeWidth={2} />
+                  <Icon size={28} strokeWidth={2} />
                 </span>
                 <span className={styles.catLiteLabel}>{c.label}</span>
               </button>

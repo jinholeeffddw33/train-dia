@@ -1832,3 +1832,41 @@
   justify-content: space-between;
 }
 .catLite { flex: 0 0 auto; min-width: 56px; }
+/* 게시물·위험개소 분류 글자 — 회색(tertiary)이라 안 보였다 → 파랑 굵게 (진호 2026-10-17) */
+.feedChip {
+  color: var(--dia-blue-text);
+  font-weight: 800;
+  font-size: var(--dia-text-sm);
+  letter-spacing: -0.01em;
+}
+/* 분류 아이콘 이름·중립 꼬리표도 또렷하게 (진호 2026-10-17 «분류 글자 모두») */
+.catLiteLabel {
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+}
+.tagImportant {
+  color: var(--dia-text-primary);
+  border-color: var(--dia-text-tertiary);
+}
+/* 분류 아이콘 줄 — 크게, 간격은 좁게 (진호 2026-10-17): 다섯 칸 같은 폭 + 8px 간격,
+   상자는 칸 폭을 채우되 최대 72px — 넓은 화면에서 양 끝으로 퍼져 간격이 벌어지던 것 방지 */
+.catLiteRow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--dia-space-2);
+  justify-items: center;
+}
+.catLite {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  gap: var(--dia-space-2);
+}
+.catLiteIcon {
+  width: 100%;
+  max-width: 72px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--dia-radius-lg);
+}

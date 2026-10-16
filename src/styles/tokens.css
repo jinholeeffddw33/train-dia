@@ -74,6 +74,17 @@
   --dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated);
   --dia-overlay-bg: rgba(0, 0, 0, 0.6);
 
+  /* 영역 머리 띠(파랑~남보라 그라데이션) 위 흰 요소 + 주황 강조 — 안전 첫 화면 (진호 2026-10-17)
+     띠는 두 모드 모두 같은 진한 색이라 값도 같다. */
+  --dia-hero-grad-start: #4F46E5;
+  --dia-hero-grad-end: #3B82F6;
+  --dia-on-color-soft: rgba(255, 255, 255, 0.16);
+  --dia-on-color-line: rgba(255, 255, 255, 0.38);
+  --dia-on-color-muted: rgba(255, 255, 255, 0.86);
+  --dia-orange: #F97316;
+  --dia-orange-dim: rgba(249, 115, 22, 0.16);
+  --dia-orange-text: #FB923C;   /* dark bg 위 글자 (7.4:1) */
+
   /* ========================================
      Text (다크 배경용)
      ======================================== */
@@ -578,6 +589,16 @@
   /* 모달/시트 불투명 표면 (라이트) + dim — 다크 동일 사유 */
   --dia-sheet-fill: var(--zg-card-fill), var(--dia-bg-elevated);
   --dia-overlay-bg: rgba(15, 23, 42, 0.42);
+
+  /* 영역 머리 띠 + 주황 강조 (라이트) — 띠 값은 다크와 같다 */
+  --dia-hero-grad-start: #4F46E5;
+  --dia-hero-grad-end: #3B82F6;
+  --dia-on-color-soft: rgba(255, 255, 255, 0.18);
+  --dia-on-color-line: rgba(255, 255, 255, 0.42);
+  --dia-on-color-muted: rgba(255, 255, 255, 0.9);
+  --dia-orange: #F97316;
+  --dia-orange-dim: rgba(249, 115, 22, 0.12);
+  --dia-orange-text: #C2410C;   /* light bg 위 글자 (5.2:1 on white) */
 
   --dia-text-primary: #0F172A;
   --dia-text-secondary: #475569;

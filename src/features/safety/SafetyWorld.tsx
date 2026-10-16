@@ -403,6 +403,7 @@ export default function SafetyWorld({ onBack }: SafetyWorldProps) {
       onOpenReport={handleOpenReport}
       onBellClick={handleBellClick}
       unreadCount={totalUnread}
+      unreadIds={new Set([...getUnreadIds('hazard'), ...getUnreadIds('action'), ...getUnreadIds('inspect')])}
       userName={userName}
       userRole={userRole}
       sabun={sabun}

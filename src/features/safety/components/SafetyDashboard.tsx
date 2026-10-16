@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ArrowLeft, AlertTriangle, TrainFront, Gauge, GraduationCap,
-  Megaphone, ChevronRight, Bell, Check, X, Lightbulb, TrendingUp,
+  Megaphone, ChevronRight, Bell, Check, X, Lightbulb, TrendingUp, ShieldCheck,
 } from 'lucide-react';
 import { useRollCallStore } from '@/stores/rollcall';
 import styles from './SafetyDashboard.module.css';
@@ -50,6 +50,13 @@ function formatDate(iso: string): string {
   return `${y}.${mm}.${dd} ${hh}:${mi}`;
 }
 
+/** «10월 16일» — 목록 보조 줄용 짧은 날짜 */
+function shortDate(iso: string): string {
+  const d = new Date(iso);
+  if (!iso || isNaN(d.getTime())) return '';
+  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
 /** 대시보드 샘플 확인(읽음) 상태 — 카드별 고유 ID로 localStorage 저장 */
 const DASHBOARD_READ_KEY = 'safety-dashboard-read-ids';
 function loadDashboardReadIds(): Set<string> {
@@ -72,6 +79,8 @@ interface Props {
   /** 종 버튼 클릭 — 가장 우선순위 높은 미확인 정보로 즉시 이동 */
   onBellClick?: () => void;
   unreadCount?: number;
+  /** 서버 기준 미확인 게시물 id(위험개소·사례교육·운전/열차정보) — 종 숫자와 같은 출처 */
+  unreadIds?: ReadonlySet<string>;
   userName?: string;
   userRole?: string;
   /** 사용자 사번 — DB fetch에 사용 */
@@ -190,12 +199,6 @@ const CATEGORIES = [
   { id: 'tips'     as const, label: '안전상식',   icon: Lightbulb,     tone: 'purple' as const },
 ];
 
-// 사고사례 vs 운전정보 — 가장 최근 업로드 비교
-const latestIncidentAt = INCIDENT_SAMPLES[0]?.uploadedAt ?? '';
-const latestDrivingAt = DRIVING_SAMPLES[0]?.uploadedAt ?? '';
-const leftIsIncident = latestIncidentAt >= latestDrivingAt;
-const LEFT_TITLE = leftIsIncident ? '최근 업로드된 사례교육' : '최근 업로드된 운전 정보';
-
 type SampleDetail = {
   id: string;
   kind: 'incident' | 'driving' | 'train' | 'hazard';
@@ -214,9 +217,10 @@ type SampleDetail = {
 };
 
 export default function SafetyDashboard({
-  onBack, onOpenCategory, onOpenNotice, onOpenReport, onBellClick, unreadCount = 0, userName = '', userRole = '', sabun = '',
+  onBack, onOpenCategory, onOpenNotice, onOpenReport, onBellClick, unreadCount = 0, unreadIds, userName = '', userRole = '', sabun = '',
 }: Props) {
-  const userLabel = userName ? `${userName} ${userRole.replace(/님$/, '')}` : '';
+  // 머리를 교육 영역 꼴로 바꾸며 사용자 이름 칩은 뺐다(2026-10-17) — 값은 다른 화면 호환용으로만 받는다
+  void userName; void userRole;
 
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
   useEffect(() => { setReadIds(loadDashboardReadIds()); }, []);
@@ -328,8 +332,6 @@ export default function SafetyDashboard({
 
   /* === 좌측 섹션 결정 — 액션(사고사례)과 운전정보 중 더 최근 === */
   const parsedActions = useMemo(() => actionReports.map(r => ({ item: r, ...parseDescription(r.description) })), [actionReports]);
-  const latestActionAt = parsedActions[0]?.item.createdAt ?? '';
-  const latestDrivingAt = drivingReports[0]?.item.createdAt ?? '';
   const hasRealLeft = parsedActions.length > 0 || drivingReports.length > 0;
   const hasRealTrain = trainReports.length > 0;
   const hasRealNotice = rollCallItems.length > 0;
@@ -339,50 +341,7 @@ export default function SafetyDashboard({
   const useRealData = dataLoaded && (hasRealLeft || hasRealTrain || hasRealNotice || hasRealHazard);
   const showSamples = dataLoaded && !useRealData;
   const showProtoBanner = showSamples;
-  // 운전 정보가 1건이라도 있으면 운전 정보 우선 표시 (없을 때만 사고 사례)
-  const leftKindReal: 'incident' | 'driving' = drivingReports.length > 0
-    ? 'driving'
-    : parsedActions.length > 0 ? 'incident' : 'driving';
-  // (참고) 시간순 비교는 유지하지 않음 — 향후 동적 로직 복귀 시 latestActionAt/latestDrivingAt 활용
-  void latestActionAt; void latestDrivingAt;
-  const leftTitleReal = leftKindReal === 'incident' ? '최근 업로드된 사례교육' : '최근 업로드된 운전 정보';
 
-  /* === 오른쪽 — 운전정보를 뺀 최신글(사례교육·위험개소·열차정보·안전상식) 3건 (진호 2026-10-16) ===
-     왼쪽이 사례교육으로 바뀌는 경우(운전정보 0건)에는 사례교육이 양쪽에 겹치지 않게 뺀다. */
-  type LatestOther = { key: string; tone: 'incident' | 'hazard' | 'train' | 'tips'; chip: string; title: string; at: string; open: () => void };
-  const latestOthers = useMemo<LatestOther[]>(() => {
-    const out: LatestOther[] = [];
-    if (leftKindReal !== 'incident') {
-      for (const p of parsedActions) {
-        const ho = (p.item.location || '').trim();
-        out.push({ key: `incident-${p.item.id}`, tone: 'incident', chip: ho ? `사례교육 ${ho}` : '사례교육', title: p.title, at: p.item.createdAt, open: () => onOpenReport?.(p.item.id, 'incident') });
-      }
-    }
-    for (const h of parsedHazards) {
-      out.push({ key: `hazard-${h.item.id}`, tone: 'hazard', chip: `위험개소 ${h.station}`, title: h.title, at: h.item.createdAt, open: () => onOpenReport?.(h.item.id, 'hazard') });
-    }
-    for (const t of trainReports) {
-      out.push({ key: `train-${t.item.id}`, tone: 'train', chip: t.tag ? `열차정보 ${t.tag}` : '열차정보', title: t.title, at: t.item.createdAt, open: () => onOpenReport?.(t.item.id, 'train') });
-    }
-    for (const t of tips) {
-      out.push({ key: `tips-${t.id}`, tone: 'tips', chip: '안전상식', title: t.title, at: t.createdAt, open: () => onOpenCategory('tips') });
-    }
-    // 최신순만 쓰면 위험개소만 3건이 되어 아래 «주요 위험개소» 와 겹친다 →
-    // 분류마다 가장 최근 1건씩 먼저 고르고, 자리가 남으면 다음 최신글로 채운다.
-    const byTime = out.sort((a, b) => b.at.localeCompare(a.at));
-    const picked: LatestOther[] = [];
-    const seen = new Set<LatestOther['tone']>();
-    for (const o of byTime) {
-      if (picked.length >= 3) break;
-      if (!seen.has(o.tone)) { seen.add(o.tone); picked.push(o); }
-    }
-    for (const o of byTime) {
-      if (picked.length >= 3) break;
-      if (!picked.includes(o)) picked.push(o);
-    }
-    return picked.sort((a, b) => b.at.localeCompare(a.at));
-  }, [leftKindReal, parsedActions, parsedHazards, trainReports, tips, onOpenReport, onOpenCategory]);
-  const hasRealOthers = latestOthers.length > 0;
 
   const [selected, setSelected] = useState<SampleDetail | null>(null);
 
@@ -403,33 +362,106 @@ export default function SafetyDashboard({
 
   const closeDetail = () => setSelected(null);
 
+  /* === 최근 게시물 — 한 칸 목록 + 탭(전체/운전정보/안전소식) (진호 2026-10-16 시안) ===
+     두 칸(160px)에 나눠 담으면 제목이 잘려서 한 칸 전체 폭으로 바꿨다.
+     미확인 표시는 서버 기록(unreadIds) — 맨 위 요약·종 숫자와 같은 출처. 안전상식은 읽음 기록이 없다. */
+  type FeedTone = 'driving' | 'incident' | 'hazard' | 'train' | 'tips';
+  type FeedItem = { key: string; reportId?: string; tone: FeedTone; chip: string; title: string; sub: string; at: string; open: () => void };
+  const [feedTab, setFeedTab] = useState<'all' | 'driving' | 'others'>('all');
+  const feedAll = useMemo<FeedItem[]>(() => {
+    const out: FeedItem[] = [];
+    for (const p of drivingReports) {
+      const ho = (p.item.location || '').trim();
+      out.push({ key: `driving-${p.item.id}`, reportId: p.item.id, tone: 'driving', chip: ho ? `운전정보 ${ho}` : '운전정보', title: p.title, sub: shortDate(p.item.createdAt), at: p.item.createdAt, open: () => onOpenReport?.(p.item.id, 'driving') });
+    }
+    for (const p of parsedActions) {
+      const ho = (p.item.location || '').trim();
+      out.push({ key: `incident-${p.item.id}`, reportId: p.item.id, tone: 'incident', chip: ho ? `사례교육 ${ho}` : '사례교육', title: p.title, sub: shortDate(p.item.createdAt), at: p.item.createdAt, open: () => onOpenReport?.(p.item.id, 'incident') });
+    }
+    for (const h of parsedHazards) {
+      out.push({ key: `hazard-${h.item.id}`, reportId: h.item.id, tone: 'hazard', chip: `위험개소 ${h.station}`, title: h.title, sub: `${h.severity} · ${shortDate(h.item.createdAt)}`, at: h.item.createdAt, open: () => onOpenReport?.(h.item.id, 'hazard') });
+    }
+    for (const t of trainReports) {
+      out.push({ key: `train-${t.item.id}`, reportId: t.item.id, tone: 'train', chip: t.tag ? `열차정보 ${t.tag}` : '열차정보', title: t.title, sub: shortDate(t.item.createdAt), at: t.item.createdAt, open: () => onOpenReport?.(t.item.id, 'train') });
+    }
+    for (const t of tips) {
+      out.push({ key: `tips-${t.id}`, tone: 'tips', chip: '안전상식', title: t.title, sub: shortDate(t.createdAt), at: t.createdAt, open: () => onOpenCategory('tips') });
+    }
+    return out.sort((a, b) => b.at.localeCompare(a.at));
+  }, [drivingReports, parsedActions, parsedHazards, trainReports, tips, onOpenReport, onOpenCategory]);
+
+  /* 데이터가 하나도 없을 때(목업) — 샘플을 같은 꼴로 */
+  const feedSamples = useMemo<FeedItem[]>(() => [
+    ...DRIVING_SAMPLES.map((it, i) => ({
+      key: `driving-sample-${i}`, tone: 'driving' as const, chip: '운전정보', title: it.title, sub: it.date, at: it.uploadedAt,
+      open: () => openDetail({ id: `driving-sample-${i}-${it.uploadedAt}`, kind: 'driving', badge: '운전', badgeTone: 'blue', title: it.title, meta: `${it.date} · ${it.location}`, body: it.summary }),
+    })),
+    ...INCIDENT_SAMPLES.map((it, i) => ({
+      key: `incident-sample-${i}`, tone: 'incident' as const, chip: '사례교육', title: it.title, sub: it.date, at: it.uploadedAt,
+      open: () => openDetail({ id: `incident-sample-${i}-${it.uploadedAt}`, kind: 'incident', badge: it.kind, badgeTone: it.kindColor, title: it.title, meta: `${it.date} · ${it.time} · ${it.location}`, body: it.summary }),
+    })),
+    ...TRAIN_UPDATE_SAMPLES.map((it, i) => ({
+      key: `train-sample-${i}`, tone: 'train' as const, chip: '열차정보', title: it.title, sub: it.applied, at: '',
+      open: () => openDetail({ id: `train-sample-${i}-${it.applied}`, kind: 'train', badge: 'NEW', title: it.title, meta: it.applied, bullets: it.items }),
+    })),
+  ].sort((a, b) => b.at.localeCompare(a.at)), [openDetail]);
+
+  const feedSource = useRealData ? feedAll : showSamples ? feedSamples : [];
+  const feedFiltered = feedSource
+    .filter((f) => feedTab === 'all' || (feedTab === 'driving' ? f.tone === 'driving' : f.tone !== 'driving'));
+  // 최신순만 쓰면 위험개소만 줄줄이 나와 아래 «주요 위험개소» 와 겹친다 →
+  // 분류마다 가장 최근 1건씩 먼저 고르고, 자리가 남으면 다음 최신글로 채운다(보여줄 때는 시간순).
+  const feedShown = (() => {
+    const picked: FeedItem[] = [];
+    const seen = new Set<FeedTone>();
+    for (const f of feedFiltered) {
+      if (picked.length >= 5) break;
+      if (!seen.has(f.tone)) { seen.add(f.tone); picked.push(f); }
+    }
+    for (const f of feedFiltered) {
+      if (picked.length >= 5) break;
+      if (!picked.includes(f)) picked.push(f);
+    }
+    return picked.sort((a, b) => b.at.localeCompare(a.at));
+  })();
+  const isUnread = (f: FeedItem) => !!(f.reportId && unreadIds?.has(f.reportId));
+  const feedUnreadCount = feedSource.filter(isUnread).length;
+
+  /* 공지(점호) 꼬리표 — 관리자가 고른 글자색을 뜻으로 보여 준다(빨강=필독, 파랑=중요) */
+  const noticeTag = (color: string | undefined) =>
+    color === 'red' ? { label: '필독', cls: styles.tagMust }
+      : color === 'blue' ? { label: '중요', cls: styles.tagImportant }
+        : null;
+  const mustCount = rollCallItems.filter((it) => it.color === 'red').length;
+
   return (
     <div className={styles.wrap}>
-      <header className={styles.header}>
-        <button type="button" className={styles.backBtn} onClick={onBack} aria-label="뒤로가기">
-          <ArrowLeft size={18} strokeWidth={2} />
-        </button>
-        <span className={styles.lineBadge} aria-hidden="true">5</span>
-        <h1 className={styles.headerTitle}>5호선 안전관리시스템</h1>
-        <button
-          type="button"
-          className={styles.bellBtn}
-          onClick={onBellClick}
-          disabled={!onBellClick || unreadCount === 0}
-          aria-label={unreadCount > 0 ? `미확인 ${unreadCount}건 — 첫 항목으로 이동` : '미확인 정보 없음'}
-          title={unreadCount > 0 ? `미확인 ${unreadCount}건` : '모두 확인 완료'}
-        >
-          <Bell size={18} strokeWidth={2} />
-          {unreadCount > 0 && (
-            <span className={styles.bellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
-          )}
-        </button>
-        {userLabel && (
-          <span className={styles.userChip} aria-label="사용자">
-            <span className={styles.userAvatar}>{userName.slice(0, 1) || '·'}</span>
-            <span className={styles.userText}>{userLabel}</span>
-          </span>
-        )}
+      {/* 머리 — 교육 영역(EduHome heroV3)과 같은 꼴로 맞춘다: 영역끼리 따로 놀지 않게 (진호 2026-10-16) */}
+      <header className={styles.hero}>
+        <div className={styles.heroTop}>
+          <button type="button" className={styles.heroBtn} onClick={onBack} aria-label="뒤로가기">
+            <ArrowLeft size={22} strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            className={styles.heroBtn}
+            onClick={onBellClick}
+            disabled={!onBellClick || unreadCount === 0}
+            aria-label={unreadCount > 0 ? `미확인 ${unreadCount}건 — 첫 항목으로 이동` : '미확인 정보 없음'}
+            title={unreadCount > 0 ? `미확인 ${unreadCount}건` : '모두 확인 완료'}
+          >
+            <Bell size={20} strokeWidth={2} />
+            {unreadCount > 0 && (
+              <span className={styles.heroBellBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
+            )}
+          </button>
+        </div>
+        <span className={styles.heroPill} aria-hidden="true"><span className={styles.heroPillDot} />LINE 5</span>
+        <div className={styles.heroTitleRow}>
+          <span className={styles.heroIconTile} aria-hidden="true"><ShieldCheck size={26} strokeWidth={2.2} /></span>
+          <h1 className={styles.heroTitle}>안전</h1>
+        </div>
+        <p className={styles.heroDesc}>승무 전 꼭 확인할 공지와 안전 정보를 모았어요</p>
       </header>
 
       {showProtoBanner && (
@@ -439,42 +471,51 @@ export default function SafetyDashboard({
       )}
 
       <main className={styles.content}>
-        {/* 공지(점호)사항 */}
-        <section className={styles.noticeSection}>
-          <div className={styles.noticeHead}>
-            <div className={styles.noticeHeadLeft}>
-              <Megaphone size={14} className={styles.noticeHeadIcon} />
-              <span className={styles.noticeHeadLabel}>공지(점호)사항</span>
-            </div>
-            <div className={styles.sectionHeadActions}>
-              <button type="button" className={styles.sectionMore} onClick={onOpenNotice}>
-                전체보기 <ChevronRight size={12} />
-              </button>
-            </div>
+        {/* 공지·점호사항 — 제목줄까지 카드 하나. 첫 건은 안쪽 옅은 바탕 상자로 크게, 나머지는 구분선 줄 (진호 참고안 2026-10-16) */}
+        <section className={styles.noticePanel}>
+          <div className={styles.noticePanelHead}>
+            <h2 className={styles.blockTitle}>
+              <Megaphone size={18} className={styles.blockTitleIcon} aria-hidden />
+              공지·점호사항
+            </h2>
+            {rollCallItems.length > 0 && (
+              <span className={styles.countPill}>{mustCount > 0 ? `필독 ${mustCount}건` : `${rollCallItems.length}건`}</span>
+            )}
           </div>
           {rollCallItems.length > 0 ? (
-            /* 점호 사항은 한 묶음 — 줄마다 카드를 따로 두면 서로 다른 글 세 개처럼 보였다(진호 2026-10-16) */
-            <button
-              type="button"
-              className={`${styles.noticeListItem} ${styles.itemBtn} ${styles.noticeCard}`}
-              onClick={() => onOpenNotice?.()}
-            >
-              <span className={styles.noticeRows}>
-                {rollCallItems.slice(0, 3).map((it, i) => (
-                  <span key={it.id} className={styles.noticeRow}>
-                    <span className={styles.noticeNum} aria-hidden="true">{i + 1}</span>
-                    <span
-                      className={`${styles.noticeRowText} ${it.color === 'red' ? styles.noticeTitleRed : it.color === 'blue' ? styles.noticeTitleBlue : ''}`}
-                    >
-                      {it.text}
-                    </span>
-                  </span>
-                ))}
-              </span>
-              {rollCallItems.length > 3 && (
-                <span className={styles.noticeMore}>외 {rollCallItems.length - 3}건 더 보기 ›</span>
+            <>
+              {(() => {
+                const first = rollCallItems[0];
+                const tag = noticeTag(first.color);
+                const must = first.color === 'red';
+                return (
+                  <button
+                    type="button"
+                    className={`${styles.noticeFeatured} ${must ? styles.noticeFeaturedMust : ''}`}
+                    onClick={() => onOpenNotice?.()}
+                  >
+                    {tag && <span className={`${styles.noticeTag} ${styles.noticeTagOnTint} ${tag.cls}`}>{tag.label}</span>}
+                    <span className={styles.noticeFeaturedText}>{first.text}</span>
+                    <span className={styles.noticeFeaturedCta}>내용 확인하기 <ChevronRight size={16} aria-hidden /></span>
+                  </button>
+                );
+              })()}
+              {rollCallItems.slice(1, 4).map((it) => {
+                const tag = noticeTag(it.color);
+                return (
+                  <button key={it.id} type="button" className={`${styles.listRow} ${styles.noticePanelRow}`} onClick={() => onOpenNotice?.()}>
+                    {tag && <span className={`${styles.noticeTag} ${tag.cls}`}>{tag.label}</span>}
+                    <span className={styles.listRowText}>{it.text}</span>
+                    <ChevronRight size={18} className={styles.listRowChevron} aria-hidden />
+                  </button>
+                );
+              })}
+              {rollCallItems.length > 4 && (
+                <button type="button" className={`${styles.listRow} ${styles.noticePanelRow} ${styles.listRowMore}`} onClick={() => onOpenNotice?.()}>
+                  외 {rollCallItems.length - 4}건 더 보기 <ChevronRight size={16} aria-hidden />
+                </button>
               )}
-            </button>
+            </>
           ) : (
             <button type="button" className={styles.noticeEmpty} onClick={onOpenNotice}>
               <p className={styles.noticeEmptyText}>오늘 전달할 점호 사항이 없어요</p>
@@ -483,300 +524,110 @@ export default function SafetyDashboard({
           )}
         </section>
 
-        {/* 4 카테고리 가로 1줄 (compact) */}
-        <nav className={styles.categoryRow} aria-label="안전 카테고리">
+        {/* 분류 바로가기 — 주인공이 아니라 길잡이: 빛·색 테두리 없이 아이콘과 이름만 */}
+        <nav className={styles.catLiteRow} aria-label="안전 분류">
           {CATEGORIES.map(c => {
             const Icon = c.icon;
             return (
-              <button
-                key={c.id}
-                type="button"
-                className={`${styles.catBtn} ${styles[`catTone_${c.tone}`]}`}
-                onClick={() => onOpenCategory(c.id)}
-              >
-                <span className={styles.catIconWrap}>
-                  <Icon size={22} strokeWidth={2.1} />
+              <button key={c.id} type="button" className={styles.catLite} onClick={() => onOpenCategory(c.id)}>
+                <span className={styles.catLiteIcon}>
+                  <Icon size={22} strokeWidth={2} />
                 </span>
-                <span className={styles.catLabel}>{c.label}</span>
+                <span className={styles.catLiteLabel}>{c.label}</span>
               </button>
             );
           })}
         </nav>
 
-        {/* 좌(사고/운전 동적) + 우(열차정보) 2단 — 실데이터 우선, 없으면 샘플 */}
-        <section className={styles.dualSection}>
-          {/* 좌측 */}
-          <div className={styles.colWrap}>
-            <div className={styles.colHead}>
-              <h2 className={styles.colTitle}>{useRealData ? leftTitleReal : LEFT_TITLE}</h2>
-            </div>
-            <ul className={styles.itemList}>
-              {useRealData ? (
-                leftKindReal === 'incident' ? (
-                  parsedActions.slice(0, 3).map((p) => {
-                    const id = `incident-${p.item.id}`;
-                    const isRead = readIds.has(id);
-                    const hoLabel = (p.item.location || '').trim();
-                    return (
-                      <li key={p.item.id}>
-                        <button
-                          type="button"
-                          className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                          onClick={() => {
-                            markRead(id);
-                            // 클릭 시 요약 모달 대신 상세보기로 바로 진입
-                            onOpenReport?.(p.item.id, 'incident');
-                          }}
-                        >
-                          <div className={styles.incidentHeadRow}>
-                            {hoLabel && <span className={styles.hoBadgeMini}>사례교육 {hoLabel}</span>}
-                            <span className={styles.incidentTitle}>{p.title}</span>
-                            <ConfirmBadge read={isRead} />
-                          </div>
-                          {/* 본문 미리보기 제거 — 제목만 노출, 상세보기에서 전체 확인 */}
-                        </button>
-                      </li>
-                    );
-                  })
-                ) : (
-                  drivingReports.slice(0, 3).map((p) => {
-                    const id = `driving-${p.item.id}`;
-                    const isRead = readIds.has(id);
-                    const hoLabel = (p.item.location || '').trim();
-                    return (
-                      <li key={p.item.id}>
-                        <button
-                          type="button"
-                          className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                          onClick={() => {
-                            markRead(id);
-                            // 클릭 시 요약 모달 대신 상세보기로 바로 진입
-                            onOpenReport?.(p.item.id, 'driving');
-                          }}
-                        >
-                          <div className={styles.incidentHeadRow}>
-                            {hoLabel && <span className={styles.hoBadgeMini}>운전정보 {hoLabel}</span>}
-                            <span className={styles.incidentTitle}>{p.title}</span>
-                            <ConfirmBadge read={isRead} />
-                          </div>
-                          {/* 본문 미리보기 제거 — 제목만 노출, 상세보기에서 전체 확인 */}
-                        </button>
-                      </li>
-                    );
-                  })
-                )
-              ) : showSamples && leftIsIncident ? (
-                INCIDENT_SAMPLES.slice(0, 3).map((it, i) => {
-                  const id = `incident-sample-${i}-${it.uploadedAt}`;
-                  const isRead = readIds.has(id);
-                  return (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => openDetail({
-                          id, kind: 'incident', badge: it.kind, badgeTone: it.kindColor,
-                          title: it.title, meta: `${it.date} · ${it.time} · ${it.location}`, body: it.summary,
-                        })}
-                      >
-                        <div className={styles.incidentHeadRow}>
-                          <span className={`${styles.kindBadge} ${styles[`kind_${it.kindColor}`]}`}>{it.kind}</span>
-                          <span className={styles.incidentTitle}>{it.title}</span>
-                          <ConfirmBadge read={isRead} />
-                        </div>
-                        <div className={styles.incidentMeta}>
-                          <span>{it.date}</span>
-                          <span className={styles.metaDot}>·</span>
-                          <span>{it.location}</span>
-                        </div>
-                        <p className={styles.incidentSummary}>{it.summary}</p>
-                      </button>
-                    </li>
-                  );
-                })
-              ) : showSamples ? (
-                DRIVING_SAMPLES.slice(0, 3).map((it, i) => {
-                  const id = `driving-sample-${i}-${it.uploadedAt}`;
-                  const isRead = readIds.has(id);
-                  return (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className={`${styles.incidentItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => openDetail({
-                          id, kind: 'driving', badge: '운전', badgeTone: 'blue',
-                          title: it.title, meta: `${it.date} · ${it.location}`, body: it.summary,
-                        })}
-                      >
-                        <div className={styles.incidentHeadRow}>
-                          <span className={`${styles.kindBadge} ${styles.kind_blue}`}>운전</span>
-                          <span className={styles.incidentTitle}>{it.title}</span>
-                          <ConfirmBadge read={isRead} />
-                        </div>
-                        <div className={styles.incidentMeta}>
-                          <span>{it.date}</span>
-                          <span className={styles.metaDot}>·</span>
-                          <span>{it.location}</span>
-                        </div>
-                        <p className={styles.incidentSummary}>{it.summary}</p>
-                      </button>
-                    </li>
-                  );
-                })
-              ) : null}
-            </ul>
+        {/* 최근 게시물 — 한 칸 전체 폭 + 탭 */}
+        <section className={styles.homeBlock}>
+          <div className={styles.blockHead}>
+            <h2 className={styles.blockTitle}>최근 게시물</h2>
+            {feedUnreadCount > 0 && <span className={styles.blockHeadMeta}>미확인 <strong>{feedUnreadCount}</strong>건</span>}
           </div>
-
-          {/* 우측 — 운전정보를 뺀 최신글 */}
-          <div className={styles.colWrap}>
-            <div className={styles.colHead}>
-              <h2 className={styles.colTitle}>최근 업로드된 안전 소식</h2>
-            </div>
-            <ul className={styles.itemList}>
-              {dataLoaded && hasRealOthers ? (
-                latestOthers.map((o) => {
-                  const isRead = readIds.has(o.key);
-                  return (
-                    <li key={o.key}>
-                      <button
-                        type="button"
-                        className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => { markRead(o.key); o.open(); }}
-                      >
-                        <div className={styles.trainHeadRow}>
-                          <span className={`${styles.hoBadgeMini} ${styles[`srcChip_${o.tone}`]}`}>{o.chip}</span>
-                          <span className={styles.trainTitle}>{o.title}</span>
-                          <ConfirmBadge read={isRead} />
-                        </div>
-                      </button>
-                    </li>
-                  );
-                })
-              ) : showSamples ? (
-                TRAIN_UPDATE_SAMPLES.map((it, i) => {
-                  const id = `train-sample-${i}-${it.applied}`;
-                  const isRead = readIds.has(id);
-                  return (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className={`${styles.trainItem} ${styles.itemBtn} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                        onClick={() => openDetail({
-                          id, kind: 'train', badge: 'NEW',
-                          title: it.title, meta: it.applied, bullets: it.items,
-                        })}
-                      >
-                        <div className={styles.trainHeadRow}>
-                          <span className={styles.newBadge}>NEW</span>
-                          <span className={styles.trainTitle}>{it.title}</span>
-                          <ConfirmBadge read={isRead} />
-                        </div>
-                        <ul className={styles.trainSubList}>
-                          {it.items.map((sub, j) => (
-                            <li key={j}>{sub}</li>
-                          ))}
-                        </ul>
-                        <span className={styles.trainApplied}>{it.applied}</span>
-                      </button>
-                    </li>
-                  );
-                })
-              ) : null}
-            </ul>
+          <div className={styles.feedTabs} role="tablist" aria-label="게시물 종류">
+            {([['all', '전체'], ['driving', '운전정보'], ['others', '안전소식']] as const).map(([k, label]) => (
+              <button
+                key={k}
+                type="button"
+                role="tab"
+                aria-selected={feedTab === k}
+                tabIndex={feedTab === k ? 0 : -1}
+                className={`${styles.feedTab} ${feedTab === k ? styles.feedTabActive : ''}`}
+                onClick={() => setFeedTab(k)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
+          {feedShown.length > 0 ? (
+            <div className={styles.listCard}>
+              {feedShown.map((f) => {
+                const unread = isUnread(f);
+                return (
+                  <button key={f.key} type="button" className={styles.feedRow} onClick={() => { markRead(f.key); f.open(); }}>
+                    <span className={styles.feedMeta}>
+                      <span className={styles.feedChip}>{f.chip}</span>
+                      {unread && <span className={styles.feedStatus}>미확인</span>}
+                    </span>
+                    <span className={styles.feedTitle}>{f.title}</span>
+                    <span className={styles.feedSub}>
+                      {f.sub}
+                      <ChevronRight size={18} className={styles.listRowChevron} aria-hidden />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : dataLoaded ? (
+            <p className={styles.feedEmpty}>아직 올라온 게시물이 없어요</p>
+          ) : null}
         </section>
 
-        {/* 주요 위험개소 — 4 카드 (방화 기준 좌→우) */}
-        <section className={styles.section}>
-          <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>
-              주요 위험개소 <span className={styles.sectionTitleSub}>(주의 구간)</span>
-            </h2>
-            <div className={styles.sectionHeadActions}>
-              <button
-                type="button"
-                className={styles.sectionMore}
-                onClick={() => onOpenCategory('hazard')}
-              >
-                전체보기 <ChevronRight size={12} />
-              </button>
-            </div>
-          </div>
-          <div className={styles.hazardGrid}>
-            {/* 고정 항목 — 5호선 상구배 단면도 (누르면 상세로 진입) */}
-            <button
-              type="button"
-              className={`${styles.itemBtn} ${styles.hazardProfileCard}`}
-              onClick={() => onOpenReport?.(LINE5_PROFILE_ID, 'hazard')}
-            >
-              <span className={styles.hazardProfileIcon}><TrendingUp size={18} strokeWidth={2.2} /></span>
-              <span className={styles.hazardProfileText}>
-                <span className={styles.hazardProfileTitle}>5호선 상구배 단면도</span>
-                <span className={styles.hazardProfileDesc}>20‰ 초과 오르막 · 가로/세로 보기</span>
-              </span>
-              <ChevronRight size={16} className={styles.hazardProfileChevron} aria-hidden />
+        {/* 주요 위험개소 — 위 목록과 같은 꼴(카드 하나 + 구분선). 색은 «위험» 등급만 빨강 */}
+        <section className={styles.homeBlock}>
+          <div className={styles.blockHead}>
+            <h2 className={styles.blockTitle}>주요 위험개소</h2>
+            <button type="button" className={styles.blockMore} onClick={() => onOpenCategory('hazard')}>
+              전체보기 <ChevronRight size={16} aria-hidden />
             </button>
-            {realHazardTop.length > 0 ? (
-              realHazardTop.map((h) => {
-                const severe = h.severity === '위험';
-                const id = `hazard-${h.item.id}`;
-                const isRead = readIds.has(id);
-                const isResolved = !!h.item.resolved;
-                return (
-                  <button
-                    key={h.item.id}
-                    type="button"
-                    className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isResolved ? styles.hazardCardResolved : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                    onClick={() => {
-                      markRead(id);
-                      onOpenReport?.(h.item.id, 'hazard');
-                    }}
-                  >
-                    <span className={`${styles.severityBadge} ${isResolved ? styles.severityBadgeResolved : severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
-                      {isResolved ? '조치완료' : h.severity}
-                    </span>
-                    <span className={styles.hazardConfirm}>
-                      <ConfirmBadge read={isRead} />
-                    </span>
-                    <span className={styles.hazardStation}>{h.station}</span>
-                    <p className={styles.hazardDesc}>{h.title || h.desc}</p>
-                  </button>
-                );
-              })
-            ) : showSamples ? (
-              HAZARD_ZONES_TOP3.map((h, i) => {
-                const severe = h.severity === '위험';
-                const id = `hazard-${h.station}-${h.uploadedAt}`;
-                const isRead = readIds.has(id);
-                return (
-                  <button
-                    key={i}
-                    type="button"
-                    className={`${styles.hazardCard} ${styles.itemBtn} ${severe ? styles.hazardCardSevere : ''} ${isRead ? styles.itemRead : styles.itemUnread}`}
-                    onClick={() => openDetail({
-                      id, kind: 'hazard',
-                      badge: h.severity,
-                      badgeTone: severe ? 'red' : 'amber',
-                      title: h.station,
-                      meta: `등록 ${h.uploadedAt.slice(0,10)}`,
-                      body: h.detail,
-                      spot: h.spot,
-                      tips: h.tips,
-                      registeredBy: h.registeredBy,
-                    })}
-                  >
-                    <span className={`${styles.severityBadge} ${severe ? styles.severityBadgeSevere : styles.severityBadgeWarn}`}>
-                      {h.severity}
-                    </span>
-                    <span className={styles.hazardConfirm}>
-                      <ConfirmBadge read={isRead} />
-                    </span>
-                    <span className={styles.hazardStation}>{h.station}</span>
-                    <p className={styles.hazardDesc}>{h.desc}</p>
-                  </button>
-                );
-              })
-            ) : null}
+          </div>
+          <div className={styles.listCard}>
+            <button type="button" className={`${styles.listRow} ${styles.profileRow}`} onClick={() => onOpenReport?.(LINE5_PROFILE_ID, 'hazard')}>
+              <span className={styles.profileIcon} aria-hidden="true"><TrendingUp size={20} strokeWidth={2.2} /></span>
+              <span className={styles.profileText}>
+                <span className={styles.profileTitle}>5호선 상구배 단면도</span>
+                <span className={styles.profileDesc}>20‰ 초과 오르막 · 가로/세로 보기</span>
+              </span>
+              <ChevronRight size={18} className={styles.listRowChevron} aria-hidden />
+            </button>
+            {(realHazardTop.length > 0
+              ? realHazardTop.map((h) => ({
+                  key: h.item.id, station: h.station, level: h.item.resolved ? '조치완료' : h.severity, text: h.title || h.desc,
+                  unread: !!unreadIds?.has(h.item.id),
+                  open: () => { markRead(`hazard-${h.item.id}`); onOpenReport?.(h.item.id, 'hazard'); },
+                }))
+              : showSamples
+                ? HAZARD_ZONES_TOP3.map((h, i) => ({
+                    key: `sample-${i}`, station: h.station, level: h.severity, text: h.desc, unread: false,
+                    open: () => openDetail({
+                      id: `hazard-${h.station}-${h.uploadedAt}`, kind: 'hazard', badge: h.severity, badgeTone: h.severity === '위험' ? 'red' : 'amber',
+                      title: h.station, meta: `등록 ${h.uploadedAt.slice(0, 10)}`, body: h.detail, spot: h.spot, tips: h.tips, registeredBy: h.registeredBy,
+                    }),
+                  }))
+                : []
+            ).map((h) => (
+              <button key={h.key} type="button" className={styles.feedRow} onClick={h.open}>
+                <span className={styles.feedMeta}>
+                  <span className={styles.hazardMetaLeft}>
+                    <span className={styles.feedChip}>{h.station}</span>
+                    <span className={`${styles.noticeTag} ${h.level === '위험' ? styles.tagMust : styles.tagImportant}`}>{h.level}</span>
+                  </span>
+                  {h.unread && <span className={styles.feedStatus}>미확인</span>}
+                </span>
+                <span className={styles.feedTitle}>{h.text}</span>
+              </button>
+            ))}
           </div>
         </section>
       </main>
@@ -788,17 +639,6 @@ export default function SafetyDashboard({
   );
 }
 
-/** 확인(✓) 표시 — 읽기 전: 외곽선만, 읽음: 채워진 체크 */
-function ConfirmBadge({ read }: { read: boolean }) {
-  return (
-    <span
-      className={`${styles.confirmBadge} ${read ? styles.confirmBadgeRead : styles.confirmBadgeUnread}`}
-      aria-label={read ? '확인 완료' : '확인 전'}
-    >
-      <Check size={12} strokeWidth={3} />
-    </span>
-  );
-}
 
 /** 샘플 상세 모달 */
 function SampleDetailModal({ detail, onClose }: { detail: SampleDetail; onClose: () => void }) {

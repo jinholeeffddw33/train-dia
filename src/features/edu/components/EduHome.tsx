@@ -33,6 +33,8 @@ interface EduHomeProps {
   onRescueProcedure: () => void;
   onRescueSimulation: () => void;
   onMrBurst: () => void;
+  /** 고장조치 › 전동차 비교 — MASTER BOOK */
+  onMasterBook: () => void;
   onSpeedMaster: () => void;
   onBreakerMaster: () => void;
   onNewcomerVideo: () => void;
@@ -77,7 +79,7 @@ const SUBMENU_COLOR_MAP = {
   red:    styles.iconBgRed,
 } as const;
 
-export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onSpeedMaster, onBreakerMaster, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
+export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: _onSection, onWrongReview, onWrongQuiz: _onWrongQuiz, onChapter: _onChapter, onChapters, onMyInfo, onVideo: _onVideo, onTraining, onRescueProcedure, onRescueSimulation, onMrBurst, onMasterBook, onSpeedMaster, onBreakerMaster, onNewcomerVideo, onNewcomerHandbook, onRailBot }: EduHomeProps) {
   const { wrongCount, unresolvedWrongCount, progress } = useEduStore();
 
   // 이 폰에 쌓여 있던 지난 시험 점수를 서버에 한 번 올린다(이미 올린 것은 건너뜀) — 설정 → 내 정보에서 보인다
@@ -305,6 +307,10 @@ export default function EduHome({ onBack, onStudy: _onStudy, onQuiz, onSection: 
                       }
                       if (sub.id === 'rescue-sim') {
                         onRescueSimulation();
+                        return;
+                      }
+                      if (sub.id === 'compare') {
+                        onMasterBook();
                         return;
                       }
                       if (sub.id === 'mr-burst') {

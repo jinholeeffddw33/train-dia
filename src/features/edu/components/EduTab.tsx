@@ -16,6 +16,8 @@ import MrBurstSimulation from './MrBurstSimulation';
 import NewcomerHome from './NewcomerHome';
 import VideoGuideList from './VideoGuideList';
 import RailBot from './RailBot';
+import MasterBookView from './masterbook/MasterBookView';
+import MasterBookTopic from './masterbook/MasterBookTopic';
 
 // 고장조치 > 스피드 마스터·차단기 마스터 — 게임 공용 부품과 함께 life/games 에 있다.
 // 교육을 열 때마다 받지 않게 누를 때만 불러온다.
@@ -40,7 +42,9 @@ type EduView =
   | { type: 'breaker-master' }
   | { type: 'newcomer' }
   | { type: 'newcomer-video' }
-  | { type: 'newcomer-handbook' };
+  | { type: 'newcomer-handbook' }
+  | { type: 'masterbook' }
+  | { type: 'masterbook-topic'; id: string };
 
 interface EduTabProps {
   onBack: () => void;
@@ -57,6 +61,8 @@ export default function EduTab({ onBack }: EduTabProps) {
 
   const push = useCallback((v: EduView) => setStack((s) => [...s, v]), []);
   const goBack = useCallback(() => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s)), []);
+  /** 같은 깊이에서 화면만 바꿔 끼우기 — MASTER BOOK 앞·뒤 항목 넘김이 뒤로가기 이력을 쌓지 않게 */
+  const replaceTop = useCallback((v: EduView) => setStack((s) => [...s.slice(0, -1), v]), []);
 
   // 깊이를 key 로 — 깊이가 바뀔 때마다 히스토리 항목이 새로 잡혀 한 단계씩 풀린다
   useHistoryBack(`edu-depth-${stack.length}`, goBack, stack.length > 1);
@@ -113,6 +119,23 @@ export default function EduTab({ onBack }: EduTabProps) {
       return <Suspense fallback={gameLoading}><SpeedMaster onBack={goBack} /></Suspense>;
     case 'breaker-master':
       return <Suspense fallback={gameLoading}><BreakerMaster onBack={goBack} /></Suspense>;
+    case 'masterbook':
+      return (
+        <MasterBookView
+          onBack={goBack}
+          onTopic={(id) => push({ type: 'masterbook-topic', id })}
+          onLegacy={() => push({ type: 'study', initChapters: ['ch5'], initTitle: '전동차 비교 (이전 자료)' })}
+        />
+      );
+    case 'masterbook-topic':
+      return (
+        <MasterBookTopic
+          key={view.id}
+          topicId={view.id}
+          onBack={goBack}
+          onNavigate={(id) => replaceTop({ type: 'masterbook-topic', id })}
+        />
+      );
     case 'newcomer':
       return (
         <NewcomerHome
@@ -150,6 +173,7 @@ export default function EduTab({ onBack }: EduTabProps) {
           onRescueProcedure={() => push({ type: 'rescue-procedure' })}
           onRescueSimulation={() => push({ type: 'rescue-simulation' })}
           onMrBurst={() => push({ type: 'mr-burst' })}
+          onMasterBook={() => push({ type: 'masterbook' })}
           onSpeedMaster={() => push({ type: 'speed-master' })}
           onBreakerMaster={() => push({ type: 'breaker-master' })}
           onNewcomerVideo={() => push({ type: 'newcomer-video' })}

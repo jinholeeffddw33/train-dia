@@ -10,6 +10,7 @@ import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
 import InternWelcomeModal from '@/components/common/InternWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
+import SafetyResearchAwardModal from '@/components/common/SafetyResearchAwardModal';
 import AnnounceModal from '@/components/common/AnnounceModal';
 import WhatsNewModal from '@/components/common/WhatsNewModal';
 import WorldLoading from '@/components/common/WorldLoading';
@@ -146,6 +147,7 @@ export default function HomePage() {
         <CycleChangeModal />
         <InternWelcomeModal />
         <KimMinkyungAwardModal />
+        <SafetyResearchAwardModal />
         <AnnounceModal />
         <WhatsNewModal />
         <RollCallSheet />

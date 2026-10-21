@@ -18,6 +18,7 @@ const PRIORITY: Record<string, number> = {
   'whats-new': 3,
   'intern-welcome': 2,
   'kim-minkyung-award': 1,
+  'safety-research-award-2026': 1, // 10/21~27 안전운행 연구발표회 최우수상 축하
 };
 
 let pending: { name: string; grant: () => void }[] = [];

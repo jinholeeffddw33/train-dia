@@ -1696,7 +1696,7 @@
         },
         {
           "id": "wj-04",
-          "title": "SIV·CM·ATC 기동 불능",
+          "title": "SIV·CM·ATC 기동 불능·모니터 불량",
           "content": [
             {
               "type": "images",
@@ -1739,7 +1739,7 @@
         },
         {
           "id": "wj-05",
-          "title": "제동 완해 불량 및 비상역행",
+          "title": "제동 완해 불량·판토 부동·비상역행",
           "content": [
             {
               "type": "images",
@@ -1916,7 +1916,7 @@
         },
         {
           "id": "wj-08",
-          "title": "SIV 고장 및 출입문 조치",
+          "title": "SIV 고장·출입문·냉난방 불능",
           "content": [
             {
               "type": "images",
@@ -2007,7 +2007,7 @@
         },
         {
           "id": "wj-09",
-          "title": "냉난방·객실등·동력운전 불능",
+          "title": "객실등·동력운전 불능·비상제동·ATC 고장",
           "content": [
             {
               "type": "images",
@@ -2066,7 +2066,7 @@
         },
         {
           "id": "wj-10",
-          "title": "역행·제동·ATC 고장 조치",
+          "title": "제동 불량·TCMS·PIS·방송·EO모드",
           "content": [
             {
               "type": "images",
@@ -2141,7 +2141,7 @@
         },
         {
           "id": "wj-11",
-          "title": "TCMS·PIS·방송·EO모드",
+          "title": "MR압력·엔코더·CM 과부하·열차분리",
           "content": [
             {
               "type": "images",
@@ -2161,10 +2161,6 @@
                 {
                   "src": "/images/edu/woojin/wj_059.webp",
                   "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_060.webp",
-                  "caption": ""
                 }
               ]
             },
@@ -2183,10 +2179,6 @@
             {
               "type": "searchText",
               "content": "62\n서울시 5호선 200칸 전동차 응급처치요령\n34. 열차 분리 검지(SOTS1)\n현상\n• TCMS DU 화면 SOTS1 or SOTS2 발생\n조치요령\n1. 열차분리 고장발생 후 비상제동 발생 여부 확인\n[비상제동 미발생 시] \n⇒ SOTS1 발생 시 : TC2 ELN OFF → ON 취급 후 정상 동작 여부 확인\n⇒ SOTS2 발생 시 : TC1 ELN OFF → ON 취급 후 정상 동작 여부 확인\n⇒ 정상 복귀 시, 열차 운행 재개\n[비상제동 발생 시]\n⇒ 관제실에 연락하여 구원운전차량 도착할 때까지 선로 통제\n⇒ 비상 제동 차단 취급 후 구원운전 운행\n관련사진\nELN 차단기 재취급"
-            },
-            {
-              "type": "searchText",
-              "content": "63\n제2장 상황별 조치사할\n35. 출입문 장애물 검지로 인한 열림 및 닫힘 실패\n현상\n• 출입문이 완전히 열림 및 닫히지 않음\n• 출입문이 지정한 시간동안 완전히 열림 및 닫히지 않음\n• 도어 판넬에 기계적 간섭 또는 먼지, 외부 요인이 존재함\n• 출입문 시스템을 부정확하게 설치됨\n조치요령\n1. 이물질이나 먼지를 제거한다.\n2. 출입문을 열림 및 닫힘 중 기계적 간섭을 확인한다.\n3. 필요시 승인도면 또는 작업 절차서에 따라 출입문 설치를 조정한다."
             }
           ]
         },
@@ -2197,6 +2189,10 @@
             {
               "type": "images",
               "items": [
+                {
+                  "src": "/images/edu/woojin/wj_060.webp",
+                  "caption": ""
+                },
                 {
                   "src": "/images/edu/woojin/wj_061.webp",
                   "caption": ""
@@ -2238,6 +2234,10 @@
                   "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "63\n제2장 상황별 조치사할\n35. 출입문 장애물 검지로 인한 열림 및 닫힘 실패\n현상\n• 출입문이 완전히 열림 및 닫히지 않음\n• 출입문이 지정한 시간동안 완전히 열림 및 닫히지 않음\n• 도어 판넬에 기계적 간섭 또는 먼지, 외부 요인이 존재함\n• 출입문 시스템을 부정확하게 설치됨\n조치요령\n1. 이물질이나 먼지를 제거한다.\n2. 출입문을 열림 및 닫힘 중 기계적 간섭을 확인한다.\n3. 필요시 승인도면 또는 작업 절차서에 따라 출입문 설치를 조정한다."
             },
             {
               "type": "searchText",
@@ -2341,10 +2341,6 @@
               "items": [
                 {
                   "src": "/images/edu/woojin/wj_076.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_077.webp",
                   "caption": ""
                 },
                 {
@@ -2515,15 +2511,7 @@
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/woojin/wj_097.webp",
-                  "caption": ""
-                },
-                {
                   "src": "/images/edu/woojin/wj_098.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_099.webp",
                   "caption": ""
                 },
                 {
@@ -2598,15 +2586,7 @@
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/woojin/wj_107.webp",
-                  "caption": ""
-                },
-                {
                   "src": "/images/edu/woojin/wj_108.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_109.webp",
                   "caption": ""
                 },
                 {
@@ -2622,39 +2602,11 @@
                   "caption": ""
                 },
                 {
-                  "src": "/images/edu/woojin/wj_113.webp",
-                  "caption": ""
-                },
-                {
                   "src": "/images/edu/woojin/wj_114.webp",
                   "caption": ""
                 },
                 {
                   "src": "/images/edu/woojin/wj_115.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_116.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_117.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_118.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_119.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_120.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_121.webp",
                   "caption": ""
                 }
               ]
@@ -2682,6 +2634,41 @@
             {
               "type": "searchText",
               "content": "124\n서울시 5호선 200칸 전동차 응급처치요령\n4.2 [M-ATC] 주 ATC 고장(MATCF)\n고장코드\n고장등급\n고장분류\n차량위치\n9008\n중고장\n신호장치\nTC\n차량상태\n1. TCMS 화면 하단부 고장 메시지 현시\n검지조건\n 주 ATC에 대한 통신 시간이 초과됨\n점검조치\n1. 보조 ATC로 자동절체되는지 확인한다. \n   (주 ATC 고장시 TCMS 좌측 상단화면을 통해 보조 ATC 절체되는지 확인)\n2. 보조 ATC로 운행 중 문제시에 ATC의 전원(ATCN1, ATCN2, ADUN)을 껐다 켠다.\n자동 복귀 시\n 일시적인 장애로 정상운행\nATCN1, ATCN2, ADUN\n보조 ATC 절체"
+            }
+          ]
+        },
+        {
+          "id": "wj-17",
+          "title": "SIV 중고장",
+          "content": [
+            {
+              "type": "images",
+              "items": [
+                {
+                  "src": "/images/edu/woojin/wj_116.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_118.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_119.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_120.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_121.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_122.webp",
+                  "caption": ""
+                }
+              ]
             },
             {
               "type": "searchText",
@@ -2702,73 +2689,10 @@
             {
               "type": "searchText",
               "content": "130\n서울시 5호선 200칸 전동차 응급처치요령\n5.4 인버터 출력 과전류(IAOC)\n고장코드\n고장등급\n고장분류\n차량위치\n5020\n중고장\nSIV\nTC, 하부기기, SIV BOX\n차량상태\n1. TCMS 팝업 화면 현시\n2. 해당 SIV 동작 불가\n검지조건\n 인버터 출력 전류가 803Apeak 이상 10s 간 유지\n점검조치\n1. HCTU, HCTW의 저압 및 고압 라인의 연결 상태에 이상이 없는지 확인한다.\n2. 고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다.\n중고장 CUT OUT 시\n 종착역까지 정상 운행\n 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 \n해제됨.\n SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n 계속 고장 시 관제보고 후 협의 조치\n일반 배전반\nSIVCN1, SIVCN2 OFF ➜ ON"
-            }
-          ]
-        },
-        {
-          "id": "wj-17",
-          "title": "SIV 중고장",
-          "content": [
-            {
-              "type": "images",
-              "items": [
-                {
-                  "src": "/images/edu/woojin/wj_122.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_123.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_124.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_125.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_126.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_127.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_128.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_129.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_130.webp",
-                  "caption": ""
-                }
-              ]
             },
             {
               "type": "searchText",
               "content": "131\n제3장 중고장\n5.5 인버터 출력 과부하(OOL)\n고장코드\n고장등급\n고장분류\n차량위치\n5021\n중고장\nSIV\nTC, 하부기기, SIV BOX\n차량상태\n1. TCMS 팝업 화면 현시\n2. 해당 SIV 동작 불가\n검지조건\n 인버터 출력전압 247Vrms 이상, 출력전류 516Arms 이상 60s 간 유지\n점검조치\n1. ACC의 결선이 올바른지 확인하고, 결선 해체 후 커패시턴스 값을 확인한다.\n2. ACPT의 저압 및 고압 라인의 연결 상태에 이상이 없는지 확인한다.\n3. ACCT1~3의 저압 및 고압 라인의 연결 상태에 이상이 없는지 확인한다.\n4. 고압라인 간, 고압과 접지 간 절연상태를 확인 후 이상이 있는 점검부의 관련 부품을 교체한다.\n중고장 CUT OUT 시\n 종착역까지 정상 운행\n 회차선 진입 후 관제에 보고 및 해당 차량의 일반 배전전반에 있는 보조전원제어장치 차단기\n(SIVCN1, SIVCN2) OFF/ON(리셋)\n 보조전원제어장치 차단기(SIVCN1, SIVCN2) 리셋 시 중고장 신호가 리셋되므로 연장급전은 \n해제됨.\n SIV가 재기동 시 고장 상태가 지속 상태이면 중고장 신호를 발생하여 다시 연장급전 모드로 동작\n 계속 고장 시 관제보고 후 협의 조치\n일반 배전반\nSIVCN1, SIVCN2 OFF ➜ ON"
-            },
-            {
-              "type": "searchText",
-              "content": "133\n제3장 중고장\n제6 절\nTCMS 중고장"
-            },
-            {
-              "type": "searchText",
-              "content": "135\n제3장 중고장\n6.1 후진 제한속도 초과에 의한 FSB 출력\n고장코드\n고장등급\n고장분류\n차량위치\n2015\n중고장\nTCMS\nTC, 운전실, 하부\n차량상태\n1. TCMS 팝업 화면 현시\n검지조건\n 후진 시 제한속도 초과(25km/h 초과)\n점검조치\n1. 후진 시 제한속도 준수\n자동 복귀 시\n 일시적인 것으로 정상 운행"
-            },
-            {
-              "type": "searchText",
-              "content": "137\n제3장 중고장\n제7 절\n공조기 중고장"
-            },
-            {
-              "type": "searchText",
-              "content": "139\n제3장 중고장\n7.1 UC1 인버터1 고장(U1INV1F)\n고장코드\n고장등급\n고장분류\n차량위치\n6001\n중고장\nHVAC\nTC, T, M\n차량상태\n1. TCMS 팝업 화면 현시\n검지조건\n 냉방기1 인버터1 동작 불가\n점검조치\n1. 마이컴으로부터 인버터까지 배선상태 확인 후 이상이 있으면 배선 상태 조치\n2. 인버터가 동작 중임에도 피드백 신호를 주지 않는다면 인버터 교체\n3. 위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
             }
           ]
         },
@@ -2779,6 +2703,22 @@
             {
               "type": "images",
               "items": [
+                {
+                  "src": "/images/edu/woojin/wj_124.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_126.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_128.webp",
+                  "caption": ""
+                },
+                {
+                  "src": "/images/edu/woojin/wj_130.webp",
+                  "caption": ""
+                },
                 {
                   "src": "/images/edu/woojin/wj_131.webp",
                   "caption": ""
@@ -2868,6 +2808,22 @@
                   "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "133\n제3장 중고장\n제6 절\nTCMS 중고장"
+            },
+            {
+              "type": "searchText",
+              "content": "135\n제3장 중고장\n6.1 후진 제한속도 초과에 의한 FSB 출력\n고장코드\n고장등급\n고장분류\n차량위치\n2015\n중고장\nTCMS\nTC, 운전실, 하부\n차량상태\n1. TCMS 팝업 화면 현시\n검지조건\n 후진 시 제한속도 초과(25km/h 초과)\n점검조치\n1. 후진 시 제한속도 준수\n자동 복귀 시\n 일시적인 것으로 정상 운행"
+            },
+            {
+              "type": "searchText",
+              "content": "137\n제3장 중고장\n제7 절\n공조기 중고장"
+            },
+            {
+              "type": "searchText",
+              "content": "139\n제3장 중고장\n7.1 UC1 인버터1 고장(U1INV1F)\n고장코드\n고장등급\n고장분류\n차량위치\n6001\n중고장\nHVAC\nTC, T, M\n차량상태\n1. TCMS 팝업 화면 현시\n검지조건\n 냉방기1 인버터1 동작 불가\n점검조치\n1. 마이컴으로부터 인버터까지 배선상태 확인 후 이상이 있으면 배선 상태 조치\n2. 인버터가 동작 중임에도 피드백 신호를 주지 않는다면 인버터 교체\n3. 위와 같은 조치를 취했음에도 계속해서 고장이 발생하면 마이컴을 교체한다."
             },
             {
               "type": "searchText",
@@ -2967,15 +2923,7 @@
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/woojin/wj_153.webp",
-                  "caption": ""
-                },
-                {
                   "src": "/images/edu/woojin/wj_154.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_155.webp",
                   "caption": ""
                 },
                 {
@@ -2996,10 +2944,6 @@
                 },
                 {
                   "src": "/images/edu/woojin/wj_160.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_161.webp",
                   "caption": ""
                 },
                 {
@@ -3032,10 +2976,6 @@
                 },
                 {
                   "src": "/images/edu/woojin/wj_169.webp",
-                  "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_170.webp",
                   "caption": ""
                 }
               ]
@@ -3095,10 +3035,6 @@
             {
               "type": "searchText",
               "content": "178\n서울시 5호선 200칸 전동차 응급처치요령\n9.8 (BMS) 축전지 CAN 통신 이상(CANF)\n고장코드\n고장등급\n고장분류\n차량위치\n12016\n중고장\nBMS\nTC, 하부, BMS BOX\n차량상태\n1. TCMS 팝업 화면 현시\n검지조건\n BMS와 현시 장치 간 CAN 통신 불량 5초 이상 유지됨\n점검조치\n1. TCMS 화면에 메시지 확인 및 차호 확인\n2. 배터리 메인스위치, 전원스위치 OFF\n3. BMS와 현시장치 간 전원 및 통신 케이블 상태 확인\n4. 배터리 메인스위치와 전원스위치 ON\n5. 현시장치에 배터리 상태 현시가 정상인지 확인\n6. 정상 복귀가 되지 않는다면 배터리 메인스위치와 전원스위치를 OFF하고 제작사에 의뢰\n자동 복귀 시\n 일시적인 오류로 정상 운행\n축전지 스위치 OFF/ON\nBCB 스위치 OFF/ON"
-            },
-            {
-              "type": "searchText",
-              "content": "179\n제3장 중고장\n제10 절\nETC 중고장"
             }
           ]
         },
@@ -3110,7 +3046,7 @@
               "type": "images",
               "items": [
                 {
-                  "src": "/images/edu/woojin/wj_171.webp",
+                  "src": "/images/edu/woojin/wj_170.webp",
                   "caption": ""
                 },
                 {
@@ -3164,12 +3100,12 @@
                 {
                   "src": "/images/edu/woojin/wj_184.webp",
                   "caption": ""
-                },
-                {
-                  "src": "/images/edu/woojin/wj_185.webp",
-                  "caption": ""
                 }
               ]
+            },
+            {
+              "type": "searchText",
+              "content": "179\n제3장 중고장\n제10 절\nETC 중고장"
             },
             {
               "type": "searchText",
@@ -3354,7 +3290,7 @@
         },
         {
           "id": "ch5c-05",
-          "title": "전차선 정전·화재 발생",
+          "title": "전차선 정전·화재·독가스(화생방)",
           "summary": [
             "전차선 정전 시 무동력 운행",
             "열차 화재 발생 시 조치"
@@ -3423,7 +3359,7 @@
         },
         {
           "id": "ch5c-07",
-          "title": "제동 불완해·비상제동",
+          "title": "제동·비상제동·주차제동 풀림 불가",
           "summary": [
             "제동 불완해 시 조치",
             "비상제동등 점등 시 조치"
@@ -3458,7 +3394,7 @@
         },
         {
           "id": "ch5c-08",
-          "title": "출입문 고장",
+          "title": "동력운전 불능·출입문 닫힘 불능",
           "summary": [
             "출입문 열림등 점등/소등 시 조치",
             "출입문 위치 확인"
@@ -3488,7 +3424,7 @@
         },
         {
           "id": "ch5c-09",
-          "title": "기타 고장 — 현상파악·ATC·MR관",
+          "title": "전부 TC·LIU 고장·ATC 고장·주공기관 파열",
           "summary": [
             "현상파악 요령",
             "ATC Reset 절차",
@@ -3524,7 +3460,7 @@
         },
         {
           "id": "ch5c-10",
-          "title": "무동력 운전·역행 차단",
+          "title": "전차량 HSCB 차단 (무동력 운전)",
           "summary": [
             "무동력(타력) 운전 절차"
           ],

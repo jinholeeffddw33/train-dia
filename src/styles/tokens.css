@@ -570,14 +570,16 @@
   --dia-pink-dim: rgba(219, 39, 119, 0.13);
   --dia-blue-text: #1D4ED8;     /* light bg 위 텍스트 (6.3:1 on white) */
   --dia-blue-glow: rgba(59, 130, 246, 0.15); /* 라이트 글로우 감쇠 (알파 절반) */
-  /* 민원 7단계 — 라이트는 진한 색 + 흰 글자 (흰 배경 위 글자색으로도 4.5:1 이상) */
-  --dia-stage-1: #047857;
-  --dia-stage-2: #4D7C0F;
-  --dia-stage-3: #A16207;
+  /* 민원 7단계 — 라이트는 진한 색 + 흰 글자 (흰 배경 위 글자색으로도 4.5:1 이상).
+     2026-10-25 올리브·겨자·갈색이 앱의 차분한 남색·회색 톤과 따로 놀아(진호 «너무 안 어울려») 다시 고름:
+     좋은 쪽은 청록·초록, 가장 많은 «양호»는 회색(조용히), 주의부터 호박→주황→빨강→진홍으로만 색을 쓴다. */
+  --dia-stage-1: #0F766E;
+  --dia-stage-2: #15803D;
+  --dia-stage-3: #475569;
   --dia-stage-4: #B45309;
   --dia-stage-5: #C2410C;
   --dia-stage-6: #DC2626;
-  --dia-stage-7: #991B1B;
+  --dia-stage-7: #9F1239;
   --dia-stage-on: #FFFFFF;
   --dia-bg: #F0F4F8;
   --dia-bg-elevated: #F8FAFC;

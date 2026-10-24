@@ -889,3 +889,34 @@
   line-height: 1.5;
   color: var(--dia-text-primary);
 }
+
+/* ── 라이트 모드 — 진한 테두리·진한 바탕 대신 옅은 바탕 + 색 글자. 경고·심각만 진하게 채워 도드라지게 ── */
+:global(:root.light) .stageChip:not(.stage6):not(.stage7),
+:global(:root.light) .cpMgmt:not(.stage6):not(.stage7) {
+  background: color-mix(in srgb, var(--stage) 12%, var(--dia-bg-elevated));
+  color: var(--stage);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--stage) 28%, transparent);
+}
+:global(:root.light) .cpDetail .cpMgmt {
+  background: color-mix(in srgb, var(--stage) 14%, var(--dia-bg-elevated));
+  color: var(--stage);
+}
+:global(:root.light) .cpPill {
+  background: color-mix(in srgb, var(--stage) 9%, var(--dia-bg-elevated));
+  border: 1px solid color-mix(in srgb, var(--stage) 32%, transparent);
+}
+:global(:root.light) .cpPill::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--stage);
+}
+:global(:root.light) .cpPillName { color: var(--stage); }
+:global(:root.light) .cpPillNone { --stage: var(--dia-text-tertiary); }
+:global(:root.light) .driverAlert {
+  background: color-mix(in srgb, var(--stage) 5%, var(--dia-bg-elevated));
+}
+:global(:root.light) .cpDetail {
+  background: color-mix(in srgb, var(--stage) 6%, var(--dia-bg-elevated));
+}

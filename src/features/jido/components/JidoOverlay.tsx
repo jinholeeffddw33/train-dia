@@ -9,6 +9,9 @@
  * 횟수는 «기관사가 받은 횟수» — 담당부장이 아닌 지도요원이 탔어도 그 기관사의 횟수로 센다.
  *
  * 탭: 내 담당 · 전체 현황 · 지도요원 · 기록하기(그날그날 넣기 + 실적 엑셀 올리기)
+ *
+ * 이름 옆 색 표시 = 출입문 민원 7단계(«출입문 민원 분석 보고서» ① 출입문 기준). 심각부터·민원 많은 순으로 놓는다.
+ * 부장은 자기 담당만, 소장·부소장·지도부장 3명은 전체를 본다 — 범위는 서버(/api/jido/complaints)가 자른다.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -25,6 +28,10 @@ import {
   type DriverStatus, type Quarter,
 } from '../lib/jidoStats';
 import type { JidoParseResult } from '../lib/parseJidoExcel';
+import {
+  compareByComplaint, topTypes, type JidoComplaint, type JidoComplaintResponse,
+} from '../lib/jidoComplaint';
+import { STAGE_NAME, STAGE_ACTION, TYPE_TIPS, type Stage } from '@/features/myinfo/lib/complaintStages';
 import styles from './JidoOverlay.module.css';
 
 type Tab = 'mine' | 'all' | 'guides' | 'record';
@@ -43,6 +50,20 @@ function todayISO(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 const md = (iso: string) => `${Number(iso.slice(5, 7))}/${Number(iso.slice(8, 10))}`;
+const ym = (iso: string) => (iso ? `${iso.slice(2, 4)}.${Number(iso.slice(5, 7))}` : '');
+
+type ComplaintMap = Map<string, JidoComplaint>;
+const EMPTY_MAP: ComplaintMap = new Map();
+const TYPE_LABEL = new Map(TYPE_TIPS.map((x) => [x.key, x.label]));
+const STAGES_DESC: Stage[] = [7, 6, 5, 4, 3, 2, 1];
+
+/** 심각부터·민원 많은 순 — 같으면 원래 순서 유지 */
+function sortByComplaint<T extends { sabun: string }>(rows: T[], cm: ComplaintMap): T[] {
+  if (cm.size === 0) return rows;
+  return rows.map((r, i) => ({ r, i }))
+    .sort((a, b) => compareByComplaint(cm.get(a.r.sabun), cm.get(b.r.sabun)) || a.i - b.i)
+    .map((x) => x.r);
+}
 const monthLabel = (ym: string) => `${Number(ym.slice(5, 7))}월`;
 
 export default function JidoOverlay({ onBack }: { onBack: () => void }) {
@@ -81,6 +102,29 @@ export default function JidoOverlay({ onBack }: { onBack: () => void }) {
   }, [quarter]);
   useEffect(() => { load(); }, [load]);
 
+  // 출입문 민원 단계 — 지도승무 기록과 따로 받는다(못 받아도 지도승무 화면은 그대로 쓴다)
+  const [complaints, setComplaints] = useState<{ map: ComplaintMap; scope: 'all' | 'mine'; from: string; to: string } | null>(null);
+  const [cError, setCError] = useState('');
+  const loadComplaints = useCallback(async () => {
+    setCError('');
+    try {
+      const res = await fetch('/api/jido/complaints');
+      const json = (await res.json().catch(() => ({}))) as Partial<JidoComplaintResponse> & { message?: string };
+      if (!res.ok) throw new Error(json.message || '출입문 민원 단계를 불러오지 못했어요');
+      setComplaints({
+        map: new Map((json.people ?? []).map((p) => [p.sabun, p])),
+        scope: json.scope ?? 'mine',
+        from: json.periodFrom ?? '',
+        to: json.periodTo ?? '',
+      });
+    } catch (e) {
+      setCError(e instanceof Error ? e.message : '출입문 민원 단계를 불러오지 못했어요');
+    }
+  }, []);
+  useEffect(() => { loadComplaints(); }, [loadComplaints]);
+  const cm: ComplaintMap = complaints?.map ?? EMPTY_MAP;
+  const reloadAll = () => { load(); loadComplaints(); };
+
   // 지금 명부의 기관사(결원·내근 자리 제외) — 새로 들어온 기관사도 바로 잡힌다
   const drivers = useMemo(
     () => getRoster(new Date()).filter((p) => !/^결원/.test(p.n) && p.d !== '내근' && p.s).map((p) => ({ s: p.s!, n: p.n })),
@@ -115,7 +159,7 @@ export default function JidoOverlay({ onBack }: { onBack: () => void }) {
           <ArrowLeft size={20} strokeWidth={2} />
         </button>
         <h2 className={styles.title}>지도승무</h2>
-        <button type="button" className={styles.iconBtn} onClick={load} aria-label="새로고침" disabled={loading}>
+        <button type="button" className={styles.iconBtn} onClick={reloadAll} aria-label="새로고침" disabled={loading}>
           <RotateCw size={18} strokeWidth={2.2} />
         </button>
       </header>
@@ -174,7 +218,7 @@ export default function JidoOverlay({ onBack }: { onBack: () => void }) {
           </div>
         ) : tab === 'mine' ? (
           myGroup ? (
-            <MineTab group={myGroup} quarter={quarter} />
+            <MineTab group={myGroup} quarter={quarter} cm={cm} period={complaints} cError={cError} onRetry={loadComplaints} />
           ) : (
             <div className={styles.state}>
               <UserCheck size={32} className={styles.stateIcon} aria-hidden />
@@ -183,7 +227,7 @@ export default function JidoOverlay({ onBack }: { onBack: () => void }) {
             </div>
           )
         ) : tab === 'all' ? (
-          <AllTab groups={groups} />
+          <AllTab groups={groups} cm={cm} showAll={complaints?.scope === 'all'} period={complaints} />
         ) : tab === 'guides' ? (
           <GuideTab rides={rides} quarter={quarter} />
         ) : (
@@ -201,51 +245,141 @@ export default function JidoOverlay({ onBack }: { onBack: () => void }) {
 }
 
 /* ── 내 담당 ── */
-function MineTab({ group, quarter }: { group: ReturnType<typeof groupByManager>[number]; quarter: Quarter }) {
+function MineTab({ group, quarter, cm, period, cError, onRetry }: {
+  group: ReturnType<typeof groupByManager>[number];
+  quarter: Quarter;
+  cm: ComplaintMap;
+  period: { from: string; to: string } | null;
+  cError: string;
+  onRetry: () => void;
+}) {
   const [onlyTodo, setOnlyTodo] = useState(false);
-  const rows = onlyTodo ? group.rows.filter((r) => !r.done || (r.focus && focusShort(r.focus.months))) : group.rows;
+  const base = onlyTodo ? group.rows.filter((r) => !r.done || (r.focus && focusShort(r.focus.months))) : group.rows;
+  const rows = sortByComplaint(base, cm);
   return (
     <>
       <div className={styles.groupHead}>
         <span className={styles.groupTitle}>{group.manager} 부장님 담당 {group.total}명</span>
         <Progress done={group.done} total={group.total} />
       </div>
+      <StageSummary rows={group.rows} cm={cm} period={period} cError={cError} onRetry={onRetry} />
       <FilterToggle on={onlyTodo} onChange={setOnlyTodo} />
-      <DriverList rows={rows} quarter={quarter} />
+      <DriverList rows={rows} quarter={quarter} cm={cm} />
     </>
   );
 }
 
+/* ── 출입문 민원 한눈에 — 단계별 인원(심각부터). 색 = 이름 옆 표시와 같은 색 ── */
+function StageSummary({ rows, cm, period, cError, onRetry }: {
+  rows: { sabun: string }[];
+  cm: ComplaintMap;
+  period: { from: string; to: string } | null;
+  cError: string;
+  onRetry: () => void;
+}) {
+  if (cError) {
+    return (
+      <div className={styles.cpBox} role="status">
+        <p className={styles.cpNote}>{cError}</p>
+        <button type="button" className={styles.linkBtn} onClick={onRetry}>다시 불러오기</button>
+      </div>
+    );
+  }
+  if (!period) return null;
+  const counts = new Map<Stage, number>();
+  let none = 0;
+  for (const r of rows) {
+    const c = cm.get(r.sabun);
+    if (c) counts.set(c.doorStage, (counts.get(c.doorStage) ?? 0) + 1);
+    else none += 1;
+  }
+  const care = STAGES_DESC.filter((s) => s >= 5).reduce((n, s) => n + (counts.get(s) ?? 0), 0);
+  return (
+    <section className={styles.cpBox} aria-label="출입문 민원 단계">
+      <p className={styles.cpTitle}>
+        출입문 민원 단계
+        {care > 0 && <span className={styles.cpCare}>경계 이상 {care}명</span>}
+      </p>
+      <ul className={styles.cpPills}>
+        {STAGES_DESC.filter((s) => counts.get(s)).map((s) => (
+          <li key={s} className={`${styles.cpPill} ${styles[`stage${s}`]}`}>
+            <span className={styles.cpPillName}>{STAGE_NAME[s]}</span>
+            <span className={styles.cpPillNum}>{counts.get(s)}명</span>
+          </li>
+        ))}
+        {none > 0 && (
+          <li className={`${styles.cpPill} ${styles.cpPillNone}`}>
+            <span className={styles.cpPillName}>자료 없음</span>
+            <span className={styles.cpPillNum}>{none}명</span>
+          </li>
+        )}
+      </ul>
+      <p className={styles.cpNote}>
+        {period.from && `${ym(period.from)}~${ym(period.to)} · `}출입문 사건 수 기준 7단계 · 심각한 기관사부터 보여요
+      </p>
+    </section>
+  );
+}
+
 /* ── 전체 현황 ── */
-function AllTab({ groups }: { groups: ReturnType<typeof groupByManager> }) {
+function AllTab({ groups, cm, showAll, period }: {
+  groups: ReturnType<typeof groupByManager>;
+  cm: ComplaintMap;
+  /** 소장·부소장·지도부장 3명 — 전체 기관사의 민원 단계를 본다 */
+  showAll: boolean;
+  period: { from: string; to: string } | null;
+}) {
   const [open, setOpen] = useState<string | null>(null);
   const [onlyTodo, setOnlyTodo] = useState(false);
+  const [view, setView] = useState<'manager' | 'stage'>('manager');
+  const keep = (r: DriverStatus) => !onlyTodo || !r.done || !!(r.focus && focusShort(r.focus.months));
+  const everyone = useMemo(
+    () => sortByComplaint(groups.flatMap((g) => g.rows.map((r) => ({ ...r, manager: g.manager }))), cm),
+    [groups, cm],
+  );
   return (
     <>
+      {showAll && (
+        <div className={styles.filterRow} role="group" aria-label="전체 현황 보는 방법">
+          <button type="button" className={`${styles.chip} ${view === 'manager' ? styles.chipOn : ''}`}
+            onClick={() => setView('manager')} aria-pressed={view === 'manager'}>부장별</button>
+          <button type="button" className={`${styles.chip} ${view === 'stage' ? styles.chipOn : ''}`}
+            onClick={() => setView('stage')} aria-pressed={view === 'stage'}>민원 심각 순</button>
+        </div>
+      )}
       <FilterToggle on={onlyTodo} onChange={setOnlyTodo} />
-      <ul className={styles.groupList}>
-        {groups.map((g) => {
-          const isOpen = open === g.manager;
-          const rows = onlyTodo ? g.rows.filter((r) => !r.done || (r.focus && focusShort(r.focus.months))) : g.rows;
-          return (
-            <li key={g.manager} className={styles.groupCard}>
-              <button type="button" className={styles.groupBtn} aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : g.manager)}>
-                <span className={styles.groupName}>{g.manager === '담당 미지정' ? g.manager : `${g.manager} 부장`}</span>
-                <span className={styles.groupMeta}>
-                  {g.done}/{g.total}명
-                  {g.focusMissing > 0 && <span className={styles.badgeBad}>중점 {g.focusMissing}</span>}
-                </span>
-                <ChevronDown size={18} className={isOpen ? styles.chevOpen : styles.chev} aria-hidden />
-                <Progress done={g.done} total={g.total} />
-              </button>
-              {isOpen && (rows.length > 0
-                ? <DriverList rows={rows} />
-                : <p className={styles.emptyLine}>모두 채웠어요 👍</p>)}
-            </li>
-          );
-        })}
-      </ul>
+      {showAll && view === 'stage' ? (
+        <>
+          <StageSummary rows={everyone} cm={cm} period={period} cError="" onRetry={() => {}} />
+          <DriverList rows={everyone.filter(keep)} cm={cm} showManager />
+        </>
+      ) : (
+        <ul className={styles.groupList}>
+          {groups.map((g) => {
+            const isOpen = open === g.manager;
+            const rows = sortByComplaint(g.rows.filter(keep), cm);
+            const care = showAll ? g.rows.filter((r) => (cm.get(r.sabun)?.doorStage ?? 0) >= 5).length : 0;
+            return (
+              <li key={g.manager} className={styles.groupCard}>
+                <button type="button" className={styles.groupBtn} aria-expanded={isOpen}
+                  onClick={() => setOpen(isOpen ? null : g.manager)}>
+                  <span className={styles.groupName}>{g.manager === '담당 미지정' ? g.manager : `${g.manager} 부장`}</span>
+                  <span className={styles.groupMeta}>
+                    {g.done}/{g.total}명
+                    {g.focusMissing > 0 && <span className={styles.badgeBad}>중점 {g.focusMissing}</span>}
+                    {care > 0 && <span className={styles.cpCare}>민원 경계↑ {care}</span>}
+                  </span>
+                  <ChevronDown size={18} className={isOpen ? styles.chevOpen : styles.chev} aria-hidden />
+                  <Progress done={g.done} total={g.total} />
+                </button>
+                {isOpen && (rows.length > 0
+                  ? <DriverList rows={rows} cm={cm} />
+                  : <p className={styles.emptyLine}>모두 채웠어요 👍</p>)}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </>
   );
 }
@@ -534,7 +668,48 @@ function FilterToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) =>
   );
 }
 
-function DriverList({ rows, quarter }: { rows: DriverStatus[]; quarter?: Quarter }) {
+/** 이름 옆 색 표시 — «심각 10건»(출입문 사건 수) */
+function StageChip({ c }: { c: JidoComplaint }) {
+  return (
+    <span className={`${styles.stageChip} ${styles[`stage${c.doorStage}`]}`}
+      aria-label={`출입문 민원 ${c.doorStage}단계 ${STAGE_NAME[c.doorStage]}, 출입문 사건 ${c.doorEvents}건`}>
+      {STAGE_NAME[c.doorStage]}
+      {c.doorEvents > 0 && <span className={styles.stageChipNum}>{c.doorEvents}건</span>}
+    </span>
+  );
+}
+
+/** 펼쳤을 때 — 민원 요약과 조치 제안(보고서 5-2쪽) */
+function ComplaintDetail({ c }: { c: JidoComplaint }) {
+  const types = topTypes(c.types);
+  return (
+    <div className={`${styles.cpDetail} ${styles[`stage${c.doorStage}`]}`}>
+      <p className={styles.cpDetailHead}>
+        출입문 민원 {c.doorStage}단계 · {STAGE_NAME[c.doorStage]}
+        {c.mgmt && <span className={styles.cpMgmt}>{c.mgmt}</span>}
+      </p>
+      <p className={styles.detailLine}>
+        출입문 사건 <strong>{c.doorEvents}건</strong> · 전체 불만 {c.allEvents}건
+        {c.injury > 0 && ` · 부상 호소 ${c.injury}건`}
+        {c.praise > 0 && ` · 칭찬 ${c.praise}건`}
+      </p>
+      {types.length > 0 && (
+        <p className={styles.detailLine}>많은 유형: {types.map((x) => `${TYPE_LABEL.get(x.key) ?? x.key} ${x.count}`).join(' · ')}</p>
+      )}
+      {c.mainStations && <p className={styles.detailLine}>주요 역: {c.mainStations}</p>}
+      {c.mainTimes && <p className={styles.detailLine}>주요 시간대: {c.mainTimes}</p>}
+      {c.otherComplaints && <p className={styles.detailLine}>출입문 외 불만: {c.otherComplaints}</p>}
+      <p className={styles.cpAction}>조치(제안): {STAGE_ACTION[c.doorStage]}</p>
+    </div>
+  );
+}
+
+function DriverList({ rows, quarter, cm = EMPTY_MAP, showManager = false }: {
+  rows: (DriverStatus & { manager?: string | null })[];
+  quarter?: Quarter;
+  cm?: ComplaintMap;
+  showManager?: boolean;
+}) {
   const [open, setOpen] = useState<string | null>(null);
   if (rows.length === 0) return <p className={styles.emptyLine}>모두 채웠어요 👍</p>;
   return (
@@ -542,17 +717,21 @@ function DriverList({ rows, quarter }: { rows: DriverStatus[]; quarter?: Quarter
       {rows.map((r) => {
         const isOpen = open === r.sabun;
         const short = r.focus ? focusShort(r.focus.months) : false;
+        const c = cm.get(r.sabun);
+        const alert = c && c.doorStage >= 5 ? `${styles.driverAlert} ${styles[`stage${c.doorStage}`]}` : '';
         return (
-          <li key={r.sabun} className={styles.driverItem}>
+          <li key={r.sabun} className={`${styles.driverItem} ${alert}`}>
             <button type="button" className={styles.driverBtn} aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : r.sabun)}>
               <span className={styles.driverMain}>
                 <span className={styles.driverName}>{r.name}</span>
+                {c && <StageChip c={c} />}
                 {r.focus && <span className={short ? styles.badgeBad : styles.badgeFocus}>중점</span>}
               </span>
               <span className={r.done ? styles.stateDone : styles.stateTodo}>
                 {r.done ? <><Check size={14} aria-hidden /> {r.count}회</> : '미실시'}
               </span>
               <span className={styles.driverSub}>
+                {showManager && r.manager ? `${r.manager === '담당 미지정' ? r.manager : `${r.manager} 부장`} · ` : ''}
                 {r.lastDate ? `최근 ${md(r.lastDate)} · ${r.lastGuide}` : quarter ? `${quarterLabel(quarter)} 기록 없음` : '기록 없음'}
               </span>
               {r.focus && (
@@ -567,6 +746,7 @@ function DriverList({ rows, quarter }: { rows: DriverStatus[]; quarter?: Quarter
             </button>
             {isOpen && (
               <div className={styles.driverDetail}>
+                {c && <ComplaintDetail c={c} />}
                 {r.focus && <p className={styles.detailLine}>중점관리: {r.focus.reason} ({r.focus.from} ~ {r.focus.to})</p>}
                 {r.rides.length === 0 ? (
                   <p className={styles.detailLine}>이 분기 지도승무 기록이 없어요.</p>

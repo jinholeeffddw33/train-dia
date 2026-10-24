@@ -753,3 +753,139 @@
   .chev,
   .chevOpen { transition: none; }
 }
+
+/* ── 출입문 민원 단계(보고서 7단계 · ① 출입문 기준) — 색은 내 정보와 같은 --dia-stage-1~7 ── */
+.stage1 { --stage: var(--dia-stage-1); }
+.stage2 { --stage: var(--dia-stage-2); }
+.stage3 { --stage: var(--dia-stage-3); }
+.stage4 { --stage: var(--dia-stage-4); }
+.stage5 { --stage: var(--dia-stage-5); }
+.stage6 { --stage: var(--dia-stage-6); }
+.stage7 { --stage: var(--dia-stage-7); }
+
+/* SURFACE-EXCEPTION: 읽기전용 단계 배지 — 이름 옆 색 표시 */
+.stageChip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  background: var(--stage);
+  color: var(--dia-stage-on);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  white-space: nowrap;
+}
+.stageChipNum { font-variant-numeric: tabular-nums; }
+
+/* 경계(5단계) 이상 — 줄 왼쪽에 단계 색 띠 + 옅은 바탕 */
+.driverAlert {
+  border-left: 4px solid var(--stage);
+  background: color-mix(in srgb, var(--stage) 8%, var(--dia-bg-elevated));
+}
+
+.cpBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-2);
+  margin-bottom: var(--dia-space-3);
+  padding: var(--dia-space-3);
+  border-radius: var(--dia-radius-md);
+  border: 1px solid var(--dia-border);
+  background: var(--dia-bg-elevated);
+}
+.cpTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+  margin: 0;
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+/* SURFACE-EXCEPTION: 읽기전용 경고 배지 */
+.cpCare {
+  padding: 1px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-red-dim);
+  color: var(--dia-red-text);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+  white-space: nowrap;
+}
+.cpPills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+}
+/* SURFACE-EXCEPTION: 읽기전용 단계 집계 */
+.cpPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-1);
+  padding: 4px var(--dia-space-3);
+  border-radius: var(--dia-radius-full);
+  background: color-mix(in srgb, var(--stage) 16%, transparent);
+  border: 2px solid var(--stage);
+}
+.cpPillName {
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+.cpPillNum {
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.cpPillNone {
+  --stage: var(--dia-border-strong);
+}
+.cpNote {
+  margin: 0;
+  font-size: var(--dia-text-meta);
+  line-height: 1.5;
+  color: var(--dia-text-secondary);
+}
+
+.cpDetail {
+  margin-top: var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-3);
+  border-radius: var(--dia-radius-sm);
+  border-left: 4px solid var(--stage);
+  background: color-mix(in srgb, var(--stage) 10%, transparent);
+}
+.cpDetail .detailLine { margin-top: var(--dia-space-1); }
+.cpDetail strong { color: var(--dia-text-primary); }
+.cpDetailHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--dia-space-2);
+  margin: 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 800;
+  color: var(--dia-text-primary);
+}
+/* SURFACE-EXCEPTION: 읽기전용 관리 구분 배지 */
+.cpMgmt {
+  padding: 1px var(--dia-space-2);
+  border-radius: var(--dia-radius-full);
+  background: var(--stage);
+  color: var(--dia-stage-on);
+  font-size: var(--dia-text-meta);
+  font-weight: 800;
+}
+.cpAction {
+  margin: var(--dia-space-2) 0 0;
+  font-size: var(--dia-text-sm);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--dia-text-primary);
+}

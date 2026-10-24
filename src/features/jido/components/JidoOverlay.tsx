@@ -300,24 +300,36 @@ function StageSummary({ rows, cm, period, cError, onRetry }: {
         출입문 민원 단계
         {care > 0 && <span className={styles.cpCare}>경계 이상 {care}명</span>}
       </p>
-      <ul className={styles.cpPills}>
-        {STAGES_DESC.filter((s) => counts.get(s)).map((s) => (
-          <li key={s} className={`${styles.cpPill} ${styles[`stage${s}`]}`}>
-            <span className={styles.cpPillName}>{STAGE_NAME[s]}</span>
-            <span className={styles.cpPillNum}>{counts.get(s)}명</span>
-          </li>
-        ))}
-        {none > 0 && (
-          <li className={`${styles.cpPill} ${styles.cpPillNone}`}>
-            <span className={styles.cpPillName}>자료 없음</span>
-            <span className={styles.cpPillNum}>{none}명</span>
-          </li>
-        )}
-      </ul>
+      <StageScale counts={counts} />
       <p className={styles.cpNote}>
         {period.from && `${ym(period.from)}~${ym(period.to)} · `}출입문 사건 수 기준 7단계 · 심각한 기관사부터 보여요
+        {none > 0 && ` · 민원 자료 없음 ${none}명(새로 온 기관사)`}
       </p>
     </section>
+  );
+}
+
+/**
+ * 7단계 눈금 한 줄 — 왼쪽 매우 우수 → 오른쪽 심각(내 정보 사다리와 같은 방향).
+ * counts 를 주면 단계별 인원을, current 를 주면 그 단계만 진하게 칠해 «어디쯤인지» 보여 준다.
+ */
+function StageScale({ counts, current }: { counts?: Map<Stage, number>; current?: Stage }) {
+  const order = [...STAGES_DESC].reverse();
+  return (
+    <ol className={styles.scale} aria-label={current ? `7단계 중 ${current}단계 ${STAGE_NAME[current]}` : '7단계 인원'}>
+      {order.map((s) => {
+        const n = counts?.get(s) ?? 0;
+        const on = current === s;
+        const dim = counts ? n === 0 : current !== undefined && !on;
+        return (
+          <li key={s} className={`${styles.scaleSeg} ${styles[`stage${s}`]} ${on ? styles.scaleOn : ''} ${dim ? styles.scaleDim : ''}`}
+            aria-current={on ? 'true' : undefined}>
+            <span className={styles.scaleName}>{STAGE_NAME[s]}</span>
+            {counts && <span className={styles.scaleNum}>{n > 0 ? `${n}명` : '–'}</span>}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
@@ -688,6 +700,7 @@ function ComplaintDetail({ c }: { c: JidoComplaint }) {
         출입문 민원 {c.doorStage}단계 · {STAGE_NAME[c.doorStage]}
         {c.mgmt && <span className={styles.cpMgmt}>{c.mgmt}</span>}
       </p>
+      <StageScale current={c.doorStage} />
       <p className={styles.detailLine}>
         출입문 사건 <strong>{c.doorEvents}건</strong> · 전체 불만 {c.allEvents}건
         {c.injury > 0 && ` · 부상 호소 ${c.injury}건`}

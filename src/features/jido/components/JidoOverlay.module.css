@@ -815,38 +815,6 @@
   font-weight: 800;
   white-space: nowrap;
 }
-.cpPills {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--dia-space-2);
-}
-/* SURFACE-EXCEPTION: 읽기전용 단계 집계 */
-.cpPill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--dia-space-1);
-  padding: 4px var(--dia-space-3);
-  border-radius: var(--dia-radius-full);
-  background: color-mix(in srgb, var(--stage) 16%, transparent);
-  border: 2px solid var(--stage);
-}
-.cpPillName {
-  font-size: var(--dia-text-sm);
-  font-weight: 800;
-  color: var(--dia-text-primary);
-}
-.cpPillNum {
-  font-size: var(--dia-text-sm);
-  font-weight: 800;
-  color: var(--dia-text-primary);
-  font-variant-numeric: tabular-nums;
-}
-.cpPillNone {
-  --stage: var(--dia-border-strong);
-}
 .cpNote {
   margin: 0;
   font-size: var(--dia-text-meta);
@@ -901,22 +869,55 @@
   background: color-mix(in srgb, var(--stage) 14%, var(--dia-bg-elevated));
   color: var(--stage);
 }
-:global(:root.light) .cpPill {
-  background: color-mix(in srgb, var(--stage) 9%, var(--dia-bg-elevated));
-  border: 1px solid color-mix(in srgb, var(--stage) 32%, transparent);
-}
-:global(:root.light) .cpPill::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--stage);
-}
-:global(:root.light) .cpPillName { color: var(--stage); }
-:global(:root.light) .cpPillNone { --stage: var(--dia-text-tertiary); }
 :global(:root.light) .driverAlert {
   background: color-mix(in srgb, var(--stage) 5%, var(--dia-bg-elevated));
 }
 :global(:root.light) .cpDetail {
   background: color-mix(in srgb, var(--stage) 6%, var(--dia-bg-elevated));
 }
+
+/* ── 7단계 눈금 한 줄 — 왼쪽 매우 우수 → 오른쪽 심각. 위 4px 색 띠 + 옅은 바탕, 지금 단계는 진하게 ── */
+.scale {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1.45fr repeat(6, minmax(0, 1fr));
+  gap: 3px;
+}
+/* SURFACE-EXCEPTION: 읽기전용 눈금 칸 */
+.scaleSeg {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 5px 2px 4px;
+  border-radius: var(--dia-radius-sm);
+  border-top: 4px solid var(--stage);
+  background: color-mix(in srgb, var(--stage) 10%, var(--dia-bg-elevated));
+  text-align: center;
+}
+.scaleName {
+  font-size: var(--dia-text-2xs);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--stage);
+  word-break: keep-all;
+}
+.scaleNum {
+  font-size: var(--dia-text-2xs);
+  font-weight: 700;
+  color: var(--dia-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.scaleDim {
+  background: var(--dia-bg-elevated);
+}
+.scaleDim .scaleName,
+.scaleDim .scaleNum { color: var(--dia-text-tertiary); }
+.scaleOn { background: var(--stage); }
+.scaleOn .scaleName,
+.scaleOn .scaleNum { color: var(--dia-stage-on); }
+.cpDetail .scale { margin-top: var(--dia-space-2); }

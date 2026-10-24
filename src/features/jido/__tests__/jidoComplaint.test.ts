@@ -16,8 +16,8 @@ describe('지도승무 출입문 민원 — 열람 범위', () => {
   it('관리자 계정은 전체를 본다', () => {
     expect(canViewAllComplaints('030827', 'admin')).toBe(true);
   });
-  it('그 밖의 부장은 전체가 아니다(자기 담당만 — 서버가 jido_roster 로 자른다)', () => {
-    expect(canViewAllComplaints('21709589', 'driver')).toBe(false); // 김진완 부장
+  it('지도승무를 하는 다른 부장도 전체를 본다(2026-10-25)', () => {
+    expect(canViewAllComplaints('21709589', 'driver')).toBe(true); // 김진완 부장
     expect(canViewJido('21709589', 'driver')).toBe(true);
   });
   it('기관사는 지도승무도, 전체 민원도 못 본다', () => {

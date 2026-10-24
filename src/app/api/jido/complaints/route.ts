@@ -3,8 +3,8 @@
  *
  * GET → JidoComplaintResponse
  *   - 지도승무를 못 보는 사람(기관사 등)은 403 (jidoAccess.canViewJido)
- *   - 소장·부소장·지도부장 3명·관리자 → 전체 기관사 (jidoComplaint.canViewAllComplaints)
- *   - 그 밖의 부장 → jido_roster 에서 본인이 담당부장인 기관사만
+ *   - 지도승무를 보는 사람(소장·부소장·부장 전원·관리자) → 전체 기관사 (jidoComplaint.canViewAllComplaints)
+ *   - (판정이 다시 좁아지면) 그 밖의 사람 → jido_roster 에서 본인이 담당부장인 기관사만
  * 이름과 민원 단계가 함께 나가는 개인정보라 범위는 반드시 여기(서버)서 자른다.
  */
 import { NextRequest, NextResponse } from 'next/server';

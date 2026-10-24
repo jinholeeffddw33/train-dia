@@ -2,26 +2,19 @@
  * 지도승무 › 담당 기관사 출입문 민원 상태 — «출입문 민원 분석 보고서»의 7단계(① 출입문 기준)를
  * 지도요원이 담당 기관사 이름 옆에서 한눈에 보게 한다.
  *
- * 열람 범위(진호 2026-10-24)
- *   - 소장·부소장·지도부장 3명(이선길·유승용·이현구) + 관리자 계정: 전체 기관사
- *   - 그 밖의 부장: 자기 담당(jido_roster.manager_name = 본인 이름) 기관사만
+ * 열람 범위
+ *   - 지도승무를 여는 사람(소장·부소장·부장 전원 + 관리자 계정) = 전체 기관사
+ *     (진호 2026-10-25 «지도승무를 하는 모든 부장들이 전체를 볼 수 있도록».
+ *      그 전 10-24 판은 소장·부소장·지도부장 3명만 전체, 나머지 부장은 자기 담당만이었다)
  *   - 기관사: 지도승무 자체를 못 연다(jidoAccess.canViewJido) — 서버가 같은 판정으로 막는다
  * 단계 값·건수는 내 정보와 같은 complaint_people 표(scripts/import-complaints.ts 로 갱신)에서 온다.
  */
 import type { Stage } from '@/features/myinfo/lib/complaintStages';
+import { canViewJido } from './jidoAccess';
 
-/** 전체 기관사의 민원 상태를 보는 5명 — 소장·부소장·지도부장(지도·지도1·지도2) */
-export const COMPLAINT_ALL_VIEWERS: ReadonlySet<string> = new Set([
-  '21704630', // 안성숙 — 소장
-  '21711216', // 이태원 — 부소장
-  '21711197', // 이선길 — 지도2
-  '21706793', // 유승용 — 지도
-  '21711694', // 이현구 — 지도1
-]);
-
+/** 전체 기관사의 민원 상태를 보는가 — 지도승무를 볼 수 있으면 전체를 본다 */
 export function canViewAllComplaints(sabun: string | null | undefined, role?: string | null): boolean {
-  if (role === 'admin') return true;
-  return !!sabun && COMPLAINT_ALL_VIEWERS.has(sabun);
+  return canViewJido(sabun, role);
 }
 
 export interface JidoComplaint {

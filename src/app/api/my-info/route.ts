@@ -159,15 +159,19 @@ export async function GET(req: NextRequest) {
     const rideDates = ((rides.data as { ride_date: string }[] | null) ?? []).map((r) => r.ride_date.slice(0, 10));
     const nowQ = quarterOf(dayKST(0));
 
+    // 본인 화면에는 등급(단계·관리 구분·순위·단계별 분포)을 아예 보내지 않는다 — 화면에서만 숨기면 폰에서 들여다볼 수 있다
+    const gradeHidden = target === auth.sabun;
+
     const data: MyInfoData = {
       person: { sabun: target, name, role: getUserRole(target).replace(/님$/, '') },
       viewingOther: target !== auth.sabun,
       complaint: {
         info: me ? {
           doorEvents: me.door_events, doorComplaints: me.door_complaints, allEvents: me.all_events, allComplaints: me.all_complaints,
-          praise: me.praise, injury: me.injury, doorStage: me.door_stage, allStage: me.all_stage, mgmt: me.mgmt,
+          praise: me.praise, injury: me.injury,
+          doorStage: gradeHidden ? null : me.door_stage, allStage: gradeHidden ? null : me.all_stage, mgmt: gradeHidden ? '' : me.mgmt,
           types: me.detail?.types ?? {}, mainStations: me.detail?.mainStations ?? '', mainTimes: me.detail?.mainTimes ?? '',
-          otherComplaints: me.detail?.otherComplaints ?? '', chance: me.detail?.chance ?? '',
+          otherComplaints: me.detail?.otherComplaints ?? '', chance: gradeHidden ? '' : me.detail?.chance ?? '',
           firstDate: me.first_date, lastDate: me.last_date,
           byYear: [...years.entries()].sort().map(([year, v]) => ({ year, ...v })),
           cases: caseList,
@@ -175,10 +179,11 @@ export async function GET(req: NextRequest) {
         summary: everyone.length ? {
           periodFrom: everyone[0].period_from, periodTo: everyone[0].period_to, people: everyone.length,
           avgDoor: avg('door_events'), avgAll: avg('all_events'),
-          doorDist: dist('door_stage'), allDist: dist('all_stage'),
-          doorMore: me ? everyone.filter((p) => p.door_events > me.door_events).length : 0,
-          doorSame: me ? everyone.filter((p) => p.door_events === me.door_events).length : 0,
+          doorDist: gradeHidden ? [] : dist('door_stage'), allDist: gradeHidden ? [] : dist('all_stage'),
+          doorMore: me && !gradeHidden ? everyone.filter((p) => p.door_events > me.door_events).length : 0,
+          doorSame: me && !gradeHidden ? everyone.filter((p) => p.door_events === me.door_events).length : 0,
         } : null,
+        gradeHidden,
       },
       safety: {
         driving: {

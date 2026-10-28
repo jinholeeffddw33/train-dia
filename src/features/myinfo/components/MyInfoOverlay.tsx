@@ -5,8 +5,10 @@
  *
  * 개인정보라 본인 것만 보인다. 소장·부소장·관리자 계정은 위의 칸에서 이름을 찾아 다른 사람을 볼 수 있다
  * (권한 판정은 서버 /api/my-info 가 한다 — 여기서 칸을 숨기는 건 보기 좋으라고일 뿐).
- * 민원 등급이 낮은 사람이 «올리고 싶게» — 내 자리를 색 사다리에 찍고, 한 단계 위까지 몇 건인지,
- * 내 민원 유형에 맞는 요령, 칭찬이 단계를 올린다는 것을 먼저 보여 준다.
+ *
+ * 2026-10-28 — 본인 화면에서는 등급(단계·색 사다리·다음 목표·순위)을 보이지 않는다. 기관사들이 자기 등급을 보고
+ * 불편해해서(진호). 본인은 건수·유형별 요령·원문만 보고, 등급은 관리자 열람(다른 사람 보기)과 지도승무(부장)에서만 본다.
+ * 서버도 본인에게는 단계 값을 보내지 않는다(complaint.gradeHidden).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { X, Lock, Search, ChevronDown, ChevronUp, UserRound, ShieldCheck, BookOpenCheck, Activity, Award, MessageSquareWarning } from 'lucide-react';
@@ -98,7 +100,8 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
 
   const c = data?.complaint.info ?? null;
   const sum = data?.complaint.summary ?? null;
-  const stage = c ? (basis === 'door' ? c.doorStage : c.allStage) : null;
+  const hideGrade = data?.complaint.gradeHidden ?? true;
+  const stage = c && !hideGrade ? (basis === 'door' ? c.doorStage : c.allStage) : null;
   const events = c ? (basis === 'door' ? c.doorEvents : c.allEvents) : 0;
   const avg = sum ? (basis === 'door' ? sum.avgDoor : sum.avgAll) : 0;
   const dist = sum ? (basis === 'door' ? sum.doorDist : sum.allDist) : [];
@@ -207,7 +210,7 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
 
             {/* ── 민원 등급 ── */}
             <section className={styles.section} aria-label="민원 등급">
-              <h3 className={styles.sectionTitle}><MessageSquareWarning size={18} aria-hidden /> 민원 등급</h3>
+              <h3 className={styles.sectionTitle}><MessageSquareWarning size={18} aria-hidden /> {hideGrade ? '내 민원' : '민원 등급'}</h3>
 
               {!c ? (
                 <p className={styles.empty}>
@@ -226,7 +229,20 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
                     ))}
                   </div>
 
-                  {/* 큰 단계 표시 */}
+                  {/* 본인 화면 — 등급 없이 건수만 */}
+                  {hideGrade && (
+                    <div className={styles.countCard}>
+                      <span className={styles.countLabel}>{BASIS_LABEL[basis]}</span>
+                      <span className={styles.countValue}><strong>{events}건</strong> · 사업소 평균 {avg}건</span>
+                      <span className={styles.countSub}>
+                        {sum ? `${sum.periodFrom.slice(2, 7).replace('-', '.')}~${sum.periodTo.slice(2, 7).replace('-', '.')} 집계 · ` : ''}
+                        아래 유형별 요령을 보고 줄여 보세요
+                      </span>
+                    </div>
+                  )}
+
+                  {/* 큰 단계 표시 — 관리자 열람에서만 */}
+                  {stage && <>
                   <div className={`${styles.hero} ${stageCls(stage!)}`}>
                     <span className={styles.heroStage}>{stage}단계</span>
                     <span className={styles.heroName}>{STAGE_NAME[stage!]}</span>
@@ -268,9 +284,11 @@ export default function MyInfoOverlay({ open, onClose }: { open: boolean; onClos
                     )}
                   </div>
 
+                  </>}
+
                   {/* 내 위치 · 추이 */}
                   <div className={styles.factRow}>
-                    {sum && basis === 'door' && (
+                    {sum && basis === 'door' && !hideGrade && (
                       <div className={styles.fact}>
                         <span className={styles.factLabel}>{sum.people}명 중</span>
                         <span className={styles.factValue}>

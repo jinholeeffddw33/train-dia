@@ -21,8 +21,9 @@ export interface ComplaintInfo {
   allComplaints: number;
   praise: number;
   injury: number;
-  doorStage: Stage;
-  allStage: Stage;
+  /** 단계·관리 구분 — 본인 화면에는 보내지 않는다(null·''). 관리자가 다른 사람을 볼 때만 채운다 */
+  doorStage: Stage | null;
+  allStage: Stage | null;
   mgmt: string;
   /** 유형별 건수(엑셀 「기관사별」 열 이름 → 건수) */
   types: Record<string, number>;
@@ -74,7 +75,12 @@ export interface MyInfoData {
   person: { sabun: string; name: string; role: string };
   /** 열람자가 본인이 아닌 사람을 보는 중인가 */
   viewingOther: boolean;
-  complaint: { info: ComplaintInfo | null; summary: ComplaintSummary | null };
+  /**
+   * gradeHidden — 본인이 자기 정보를 볼 때는 민원 «등급»(단계·순위·단계별 분포·관리 구분)을 숨긴다.
+   * 기관사들이 자기 등급을 보고 불편해해서(진호 2026-10-28). 건수·유형·원문은 그대로 보여 준다.
+   * 등급은 지도승무(부장)와 관리자 열람(소장·부소장·관리자)에서만 본다.
+   */
+  complaint: { info: ComplaintInfo | null; summary: ComplaintSummary | null; gradeHidden: boolean };
   safety: {
     driving: { total: number; read: number; unread: number; unreadTitles: { id: string; title: string; date: string }[] };
     train: { total: number; read: number; unread: number };

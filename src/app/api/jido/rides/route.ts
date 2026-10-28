@@ -3,6 +3,8 @@
  *
  * POST   { date, driverSabun, driverName, trainNo?, formation?, fromStation?, toStation? }
  *        지도요원 = 로그인한 사람. 담당이 아닌 기관사도 넣을 수 있다(그 기관사의 횟수로 센다).
+ *        엑셀을 올린 뒤에도 계속 넣을 수 있다. 다만 같은 날·같은 기관사 기록이 이미 있으면(엑셀이든 손이든)
+ *        중복일 가능성이 커서 넣지 않고 «이미 기록됐다»고 알려 준다(2026-10-28 — 엑셀과 손 입력이 겹쳐 횟수가 부풀었다).
  * DELETE ?id=  넣은 사람 본인, 또는 소장·부소장·개발자
  */
 import { NextRequest, NextResponse } from 'next/server';
@@ -44,6 +46,21 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // 같은 날·같은 기관사 — 지도요원 이름·열차번호 표기가 달라도 같은 지도승무일 가능성이 크다
+    const { data: same, error: sErr } = await serverSupabase
+      .from('jido_rides')
+      .select('guide_name, train_no, source')
+      .eq('ride_date', b.date)
+      .eq('driver_sabun', b.driverSabun)
+      .limit(1);
+    if (sErr) return internalError(sErr, 'jido rides POST same-day');
+    const prev = (same as { guide_name: string; train_no: string; source: string }[] | null)?.[0];
+    if (prev) {
+      const md = `${Number(b.date.slice(5, 7))}/${Number(b.date.slice(8, 10))}`;
+      const how = [prev.guide_name, prev.train_no ? `${prev.train_no}열차` : '', prev.source === 'upload' ? '엑셀' : ''].filter(Boolean).join(' · ');
+      return errorResponse(ERROR_CODES.CONFLICT, `${b.driverName} 기관사 ${md} 지도승무는 이미 기록돼 있어요 (${how})`);
+    }
+
     const { data, error } = await serverSupabase
       .from('jido_rides')
       .insert({

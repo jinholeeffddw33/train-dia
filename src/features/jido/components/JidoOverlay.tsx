@@ -537,7 +537,7 @@ function RecordTab({ drivers, rides, meSabun, canDeleteAll, onChanged }: {
           <Check size={18} /> {saving ? '저장하는 중…' : '지도승무 기록하기'}
         </button>
         {msg && <p className={msg.ok ? styles.msgOk : styles.msgBad} role="status">{msg.text}</p>}
-        <p className={styles.hint}>담당이 아닌 기관사를 지도해도 그 기관사의 횟수로 올라가요.</p>
+        <p className={styles.hint}>담당이 아닌 기관사를 지도해도 그 기관사의 횟수로 올라가요. 엑셀을 올린 뒤에도 계속 넣을 수 있고, 같은 날 같은 기관사가 이미 기록돼 있으면 중복이라 알려 드려요.</p>
       </section>
 
       <ExcelUpload onDone={onChanged} />
@@ -614,7 +614,7 @@ function ExcelUpload({ onDone }: { onDone: () => void }) {
       const json = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(json.message || '올리지 못했어요. 다시 시도해주세요');
       const extra = [json.managers ? `담당부장 ${json.managers}명` : '', json.focus ? `중점관리 ${json.focus}명` : ''].filter(Boolean).join(' · ');
-      setMsg({ ok: true, text: `새 기록 ${json.added}건을 더했어요 (이미 있던 ${json.skipped}건은 건너뜀)${extra ? ` · ${extra} 반영` : ''}` });
+      setMsg({ ok: true, text: `새 기록 ${json.added}건을 더했어요 (같은 날 이미 기록된 ${json.skipped}건은 중복이라 건너뜀)${extra ? ` · ${extra} 반영` : ''}` });
       setParsed(null);
       onDone();
     } catch (e) {
@@ -631,7 +631,7 @@ function ExcelUpload({ onDone }: { onDone: () => void }) {
   return (
     <section className={styles.formCard} aria-label="실적 엑셀 올리기">
       <h3 className={styles.formTitle}><FileSpreadsheet size={18} aria-hidden /> 실적 엑셀 올리기</h3>
-      <p className={styles.hint}>사업소 «지도승무 실적» 파일을 그대로 올리면 돼요. 이미 들어 있는 기록은 건너뛰니, 그때까지 모은 파일을 몇 번이고 다시 올려도 겹치지 않아요.</p>
+      <p className={styles.hint}>사업소 «지도승무 실적» 파일을 그대로 올리면 돼요. 같은 날 같은 기관사 기록이 이미 있으면(손으로 넣은 것 포함) 건너뛰니, 몇 번이고 다시 올려도 겹치지 않아요.</p>
       <input ref={fileRef} type="file" accept=".xlsx,.xlsm,.xls" className={styles.fileInput}
         onChange={(e) => pick(e.target.files?.[0])} aria-label="실적 엑셀 파일 고르기" />
       {!parsed && (

@@ -9,6 +9,7 @@ import InAppBrowserGate from '@/components/common/InAppBrowserGate';
 import RefreshGuideModal from '@/components/common/RefreshGuideModal';
 import CycleChangeModal from '@/components/common/CycleChangeModal';
 import InternWelcomeModal from '@/components/common/InternWelcomeModal';
+import NewDriversWelcomeModal from '@/components/common/NewDriversWelcomeModal';
 import KimMinkyungAwardModal from '@/components/common/KimMinkyungAwardModal';
 import SafetyResearchAwardModal from '@/components/common/SafetyResearchAwardModal';
 import AnnounceModal from '@/components/common/AnnounceModal';
@@ -146,6 +147,7 @@ export default function HomePage() {
         <RefreshGuideModal />
         <CycleChangeModal />
         <InternWelcomeModal />
+        <NewDriversWelcomeModal />
         <KimMinkyungAwardModal />
         <SafetyResearchAwardModal />
         <AnnounceModal />

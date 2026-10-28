@@ -54,10 +54,37 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // ① 기록 — 이미 있는 것은 건너뛴다
+    // ① 기록 — 이미 있는 것은 건너뛴다.
+    //    같은 날·같은 기관사 기록이 이미 있으면(손으로 넣은 것 포함) 중복으로 보고 넣지 않는다 — 지도요원 이름·열차번호
+    //    표기가 달라 두 건으로 들어가 횟수가 부풀던 문제(2026-10-28). 파일 안에서 같은 날 두 줄이어도 한 줄만 넣는다.
+    const dates = [...new Set(rides.map((r) => r.date))].sort();
+    const taken = new Set<string>();
+    if (dates.length > 0) {
+      for (let off = 0; ; off += 1000) {
+        const { data, error } = await serverSupabase
+          .from('jido_rides')
+          .select('ride_date, driver_sabun')
+          .gte('ride_date', dates[0])
+          .lte('ride_date', dates[dates.length - 1])
+          .range(off, off + 999);
+        if (error) return internalError(error, 'jido upload existing');
+        for (const r of (data as { ride_date: string; driver_sabun: string }[] | null) ?? []) {
+          taken.add(`${r.ride_date.slice(0, 10)}|${r.driver_sabun}`);
+        }
+        if (!data || data.length < 1000) break;
+      }
+    }
+    const fresh = rides.filter((r) => {
+      const k = `${r.date}|${r.driverSabun}`;
+      if (taken.has(k)) return false;
+      taken.add(k);
+      return true;
+    });
+    const sameDay = rides.length - fresh.length;
+
     let added = 0;
-    for (let i = 0; i < rides.length; i += 500) {
-      const chunk = rides.slice(i, i + 500).map((r) => ({
+    for (let i = 0; i < fresh.length; i += 500) {
+      const chunk = fresh.slice(i, i + 500).map((r) => ({
         ride_date: r.date,
         driver_sabun: r.driverSabun,
         driver_name: r.driverName,
@@ -99,7 +126,7 @@ export async function POST(req: NextRequest) {
 
     await auditLog(auth.sub, auth.name, 'jido_upload', {
       targetType: 'jido_rides',
-      metadata: { rides: rides.length, added, managers: managers.length, focus: focus.length },
+      metadata: { rides: rides.length, added, sameDay, managers: managers.length, focus: focus.length },
       ip: getClientIP(req),
     });
     return okJson({ received: rides.length, added, skipped: rides.length - added, managers: managers.length, focus: focus.length });

@@ -51,6 +51,26 @@ export interface DriverStatus {
   rides: JidoRide[];
 }
 
+/**
+ * 같은 날·같은 기관사 기록은 하루 한 번으로 센다(2026-10-28).
+ * 엑셀로 올린 기록과 손으로 넣은 기록이 지도요원 이름·열차번호 표기가 달라 두 건으로 들어간 일이 있었다 —
+ * 서버도 이제 같은 날 기록을 막지만, 이미 들어 있는 겹친 기록 때문에 횟수가 부풀지 않게 여기서도 한 번 거른다.
+ * 남길 기록: 엑셀(upload) → 열차번호 있는 것 → 먼저 넣은 것.
+ */
+export function onePerDay(rides: JidoRide[]): JidoRide[] {
+  const pick = new Map<string, JidoRide>();
+  const better = (a: JidoRide, b: JidoRide) =>
+    (a.source === 'upload' ? 0 : 1) - (b.source === 'upload' ? 0 : 1)
+    || (a.trainNo ? 0 : 1) - (b.trainNo ? 0 : 1)
+    || a.id - b.id;
+  for (const r of rides) {
+    const k = `${r.date}|${r.driverSabun}`;
+    const cur = pick.get(k);
+    if (!cur || better(r, cur) < 0) pick.set(k, r);
+  }
+  return [...pick.values()];
+}
+
 const monthEnd = (ym: string) => {
   const [y, m] = ym.split('-').map(Number);
   return `${ym}-${String(new Date(y, m, 0).getDate()).padStart(2, '0')}`;
@@ -68,7 +88,7 @@ export function buildStatus(
   today: string,
 ): DriverStatus[] {
   const { from, to, months } = quarterRange(quarter);
-  const inQ = rides.filter((r) => r.date >= from && r.date <= to);
+  const inQ = onePerDay(rides.filter((r) => r.date >= from && r.date <= to));
   const byDriver = new Map<string, JidoRide[]>();
   for (const r of inQ) {
     const list = byDriver.get(r.driverSabun) ?? [];
@@ -149,7 +169,7 @@ export function focusShort(months: MonthCheck[]): boolean {
 export function guideCounts(rides: JidoRide[], quarter: Quarter): { guide: string; count: number }[] {
   const { from, to } = quarterRange(quarter);
   const map = new Map<string, number>();
-  for (const r of rides) {
+  for (const r of onePerDay(rides)) {
     if (r.date < from || r.date > to) continue;
     map.set(r.guideName, (map.get(r.guideName) ?? 0) + 1);
   }

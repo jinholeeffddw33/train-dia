@@ -75,3 +75,18 @@ describe('엑셀 날짜 읽기', () => {
     expect(toISODate(46295)).toBe('2026-09-30');
   });
 });
+
+describe('같은 날·같은 기관사 기록은 하루 한 번', () => {
+  it('엑셀 기록을 남기고 손 입력 중복은 센다에서 뺀다', async () => {
+    const { onePerDay } = await import('../lib/jidoStats');
+    const base = { driverName: '가', guideSabun: null, formation: '', fromStation: '', toStation: '', createdBy: null };
+    const rides = [
+      { ...base, id: 1, date: '2026-10-01', driverSabun: 'A', guideName: '홍길동', trainNo: '', source: 'manual' as const },
+      { ...base, id: 2, date: '2026-10-01', driverSabun: 'A', guideName: '홍 길동', trainNo: '5072', source: 'upload' as const },
+      { ...base, id: 3, date: '2026-10-02', driverSabun: 'A', guideName: '홍길동', trainNo: '', source: 'manual' as const },
+      { ...base, id: 4, date: '2026-10-01', driverSabun: 'B', guideName: '홍길동', trainNo: '', source: 'manual' as const },
+    ];
+    const kept = onePerDay(rides).map((r) => r.id).sort();
+    expect(kept).toEqual([2, 3, 4]);
+  });
+});

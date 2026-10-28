@@ -17,6 +17,7 @@ const PRIORITY: Record<string, number> = {
   'announce-2026-07-14': 4, // 3일 전직원 공지 (whats-new 위)
   'whats-new': 3,
   'intern-welcome': 2,
+  'new-drivers-welcome-2026-10': 2, // 10/28~11/1 신규 직원 5명 환영
   'kim-minkyung-award': 1,
   'safety-research-award-2026': 1, // 10/21~27 안전운행 연구발표회 최우수상 축하
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, IdCard } from 'lucide-react';
+import { X, UserRoundPen, Bookmark, LogOut, KeyRound, ShieldCheck, Smartphone, ClipboardList, IdCard, ScanFace } from 'lucide-react';
 import { useHistoryBack } from '@/hooks/useHistoryBack';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useInstallPrompt } from '@/hooks/useInstallPrompt';
@@ -19,6 +19,7 @@ import AdminFeedbackOverlay from './AdminFeedbackOverlay';
 import AdminHub from './AdminHub';
 import LevelRecordsOverlay from './LevelRecordsOverlay';
 import MyInfoOverlay from '@/features/myinfo/components/MyInfoOverlay';
+import StaffFacesOverlay from './StaffFacesOverlay';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { showToast } from '@/components/common/Toast';
 import { APP_VERSION } from '@/lib/constants';
@@ -51,6 +52,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
   const [adminHubOpen, setAdminHubOpen] = useState(false);
   const [levelRecordsOpen, setLevelRecordsOpen] = useState(false);
   const [myInfoOpen, setMyInfoOpen] = useState(false);
+  const [facesOpen, setFacesOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [curPin, setCurPin] = useState('');
   const [newPin, setNewPin] = useState('');
@@ -60,16 +62,17 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
   // 하위 오버레이가 열려 있으면 뒤로가기/ESC 는 그것부터 닫는다 (설정은 마지막)
   const anySub = shortcutsOpen || pinChangeOpen || installGuideOpen
-    || adminFeedbackOpen || adminHubOpen || levelRecordsOpen || myInfoOpen;
+    || adminFeedbackOpen || adminHubOpen || levelRecordsOpen || myInfoOpen || facesOpen;
   const closeSub = useCallback(() => {
-    if (myInfoOpen) setMyInfoOpen(false);
+    if (facesOpen) setFacesOpen(false);
+    else if (myInfoOpen) setMyInfoOpen(false);
     else if (shortcutsOpen) setShortcutsOpen(false);
     else if (pinChangeOpen) setPinChangeOpen(false);
     else if (installGuideOpen) setInstallGuideOpen(false);
     else if (adminFeedbackOpen) setAdminFeedbackOpen(false);
     else if (adminHubOpen) setAdminHubOpen(false);
     else if (levelRecordsOpen) setLevelRecordsOpen(false);
-  }, [myInfoOpen, shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminHubOpen, levelRecordsOpen]);
+  }, [facesOpen, myInfoOpen, shortcutsOpen, pinChangeOpen, installGuideOpen, adminFeedbackOpen, adminHubOpen, levelRecordsOpen]);
 
   useHistoryBack('settings', onClose, open && !anySub);
   useHistoryBack('settings-sub', closeSub, anySub);
@@ -209,6 +212,13 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
           <button type="button" className={styles.tile} data-press onClick={() => setMyInfoOpen(true)}>
             <span className={`${styles.tileIcon} ${styles.toolIconPurple}`}><IdCard size={18} /></span>
             <span className={styles.tileLabel}>내 정보</span>
+          </button>
+        )}
+        {/* 직원 얼굴 찾기 — 이름을 넣으면 얼굴(기관사 나침반 «선배 찾기»를 옮겨 옴). 로그인한 직원만 */}
+        {authUser && (
+          <button type="button" className={styles.tile} data-press onClick={() => setFacesOpen(true)}>
+            <span className={`${styles.tileIcon} ${styles.toolIconBlue}`}><ScanFace size={18} /></span>
+            <span className={styles.tileLabel}>직원 얼굴</span>
           </button>
         )}
         <button type="button" className={styles.tile} data-press onClick={() => setShortcutsOpen(true)}>
@@ -523,6 +533,7 @@ export default function SettingsOverlay({ open, onClose }: { open: boolean; onCl
 
       {/* 내 정보 */}
       <MyInfoOverlay open={myInfoOpen} onClose={() => setMyInfoOpen(false)} />
+      <StaffFacesOverlay open={facesOpen} onClose={() => setFacesOpen(false)} />
 
       {/* 등급도전 현황 오버레이 */}
       <LevelRecordsOverlay open={levelRecordsOpen} onClose={() => setLevelRecordsOpen(false)} />

@@ -1,0 +1,289 @@
+/* 직원 얼굴 찾기 — 설정 위에 뜨는 전체 화면(내 정보와 같은 틀). 색은 tokens.css(--dia-*)만 쓴다. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--dia-layer-overlay-above);
+  background: var(--dia-bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--sab);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-3);
+  padding: calc(var(--sat) + var(--dia-space-3)) var(--dia-page-pad) var(--dia-space-3);
+  background: var(--dia-bg);
+  border-bottom: 1px solid var(--dia-border);
+}
+.closeBtn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dia-text-secondary);
+  background: var(--z-card-fill);
+  border: 1px solid var(--dia-border);
+  border-radius: var(--dia-radius-lg);
+  box-shadow: var(--z-3d-inset), var(--z-3d-depth);
+  transition: transform var(--dia-dur-instant) ease;
+}
+.closeBtn:active { transform: scale(0.9); box-shadow: var(--z-3d-pressed); }
+.closeBtn:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+.title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--dia-text-lg);
+  font-weight: var(--dia-weight-bold);
+  color: var(--dia-text-primary);
+}
+/* SURFACE-EXCEPTION: 읽기전용 안내 배지 */
+.lockChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-green-text);
+  background: var(--dia-green-dim);
+  border-radius: var(--dia-radius-full);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dia-space-3);
+  padding: var(--dia-space-4) var(--dia-page-pad) var(--dia-space-8);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* 검색 칸 */
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-2) 0 var(--dia-space-4);
+  min-height: 56px;
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  box-shadow: var(--z-card-shadow);
+}
+.searchBox:focus-within { border-color: var(--dia-blue); }
+.searchIcon { flex-shrink: 0; color: var(--dia-text-tertiary); }
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 52px;
+  border: none;
+  background: transparent;
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-base);
+  font-weight: var(--dia-weight-semibold);
+  outline: none;
+}
+.searchInput::placeholder { color: var(--dia-text-tertiary); }
+.clearBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--dia-radius-full);
+  background: transparent;
+  color: var(--dia-text-tertiary);
+  transition: transform var(--dia-dur-instant) ease;
+}
+.clearBtn:active { transform: scale(0.9); }
+.clearBtn:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+
+.countLine {
+  margin: 0;
+  padding: 0 var(--dia-space-1);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+}
+.countLine strong { color: var(--dia-text-primary); }
+
+/* 빈 상태 · 불러오는 중 · 오류 */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: var(--dia-space-8) var(--dia-space-4);
+  text-align: center;
+  color: var(--dia-text-secondary);
+  font-size: var(--dia-text-sm);
+}
+.state p { margin: 0; }
+.stateIcon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--dia-radius-full);
+  background: var(--dia-blue-dim);
+  color: var(--dia-blue-text);
+}
+.stateTitle { font-size: var(--dia-text-base); font-weight: var(--dia-weight-bold); color: var(--dia-text-primary); }
+.stateSub { word-break: keep-all; line-height: 1.5; }
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--dia-border);
+  border-top-color: var(--dia-blue);
+  animation: faceSpin 0.8s linear infinite;
+}
+@keyframes faceSpin { to { transform: rotate(360deg); } }
+
+.allBtn,
+.retryBtn {
+  margin-top: var(--dia-space-2);
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dia-space-2);
+  padding: 0 var(--dia-space-5);
+  border-radius: var(--dia-radius-full);
+  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  box-shadow: var(--dia-3d-inset), var(--dia-3d-depth);
+  color: var(--dia-text-primary);
+  font-size: var(--dia-text-sm);
+  font-weight: var(--dia-weight-bold);
+  transition: transform var(--dia-dur-fast) var(--dia-ease-press);
+}
+.allBtn:active,
+.retryBtn:active { transform: scale(0.95); box-shadow: var(--dia-3d-pressed); }
+.allBtn:focus-visible,
+.retryBtn:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+.allBtn:disabled { opacity: 0.5; }
+
+/* 얼굴 목록 */
+.faceGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--dia-space-3);
+}
+@media (min-width: 640px) {
+  .faceGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.faceGridOne { grid-template-columns: minmax(0, 1fr); }
+.faceGridOne .faceCard { max-width: 420px; margin: 0 auto; }
+.faceWide { grid-column: 1 / -1; }
+.faceWide .faceCard { max-width: 420px; margin: 0 auto; }
+
+.faceCard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--dia-radius-lg);
+  border: 1px solid var(--dia-border);
+  background: var(--z-card-fill);
+  box-shadow: var(--z-card-shadow);
+  color: var(--dia-text-primary);
+  text-align: center;
+  cursor: zoom-in;
+  transition: transform var(--dia-dur-base) var(--dia-ease-press);
+}
+.faceCard:active { transform: scale(0.98); }
+.faceCard:focus-visible { outline: 2px solid var(--dia-blue); outline-offset: 2px; }
+.faceCardLarge { cursor: zoom-out; }
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--dia-bg-elevated);
+}
+.photoPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+}
+.noPhoto {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dia-space-1);
+  background: var(--dia-bg-elevated);
+  color: var(--dia-text-tertiary);
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+}
+
+.faceText {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px var(--dia-space-2);
+  padding: var(--dia-space-2) var(--dia-space-2) var(--dia-space-3);
+}
+.faceName {
+  font-size: var(--dia-text-base);
+  font-weight: 800;
+  word-break: keep-all;
+}
+.faceCardLarge .faceName { font-size: var(--dia-text-xl); }
+.faceRole {
+  font-size: var(--dia-text-meta);
+  font-weight: var(--dia-weight-semibold);
+  color: var(--dia-text-secondary);
+}
+.sameNote {
+  padding: 0 var(--dia-space-2) var(--dia-space-2);
+  font-size: var(--dia-text-meta);
+  color: var(--dia-amber-text);
+  word-break: keep-all;
+}
+
+.footnote {
+  margin: var(--dia-space-4) 0 0;
+  font-size: var(--dia-text-meta);
+  line-height: 1.6;
+  color: var(--dia-text-tertiary);
+  word-break: keep-all;
+}
+
+@media (hover: hover) {
+  .faceCard:hover,
+  .allBtn:hover,
+  .retryBtn:hover { filter: brightness(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; }
+  .faceCard,
+  .allBtn,
+  .retryBtn,
+  .closeBtn,
+  .clearBtn { transition: none; }
+}
